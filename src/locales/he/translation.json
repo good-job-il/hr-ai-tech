@@ -614,6 +614,50 @@
         "total": "משרות שמורות",
         "companies": "חברות שונות"
       }
+    },
+    "interviews": {
+      "title": "ראיונות שלי",
+      "subtitle": "כל הראיונות המתוזמנים שלך",
+      "noJobTitle": "תפקיד לא ידוע",
+      "upcomingBanner": "ראיון קרוב — הכן את עצמך!",
+      "viewJob": "צפה במשרה",
+      "noInterviews": "אין ראיונות מתוכננים",
+      "noInterviewsHint": "ראיונות שיתוזמנו יופיעו כאן",
+      "noResults": "לא נמצאו ראיונות",
+      "noResultsHint": "נסה לשנות את הסינון",
+      "clearFilter": "הצג הכל",
+      "stats": {
+        "total": "סה״כ ראיונות",
+        "upcoming": "ראיונות קרובים",
+        "completed": "הושלמו"
+      },
+      "filters": {
+        "upcoming": "קרובים",
+        "past": "שעברו",
+        "all": "הכל"
+      },
+      "types": {
+        "phone": "ראיון טלפוני",
+        "video": "ראיון וידאו",
+        "in_person": "ראיון פנים מול פנים"
+      },
+      "status": {
+        "scheduled": "מתוזמן",
+        "confirmed": "אושר",
+        "completed": "הושלם",
+        "cancelled": "בוטל",
+        "no_show": "לא הגעתי",
+        "rescheduled": "נדחה"
+      },
+      "detail": {
+        "date": "תאריך",
+        "time": "שעה",
+        "type": "סוג ראיון",
+        "interviewer": "מראיין",
+        "location": "מיקום",
+        "joinLink": "קישור לכניסה",
+        "notes": "הערות"
+      }
     }
   },
   "pipeline": {

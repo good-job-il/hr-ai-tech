@@ -614,6 +614,50 @@
         "total": "Saved Jobs",
         "companies": "Different Companies"
       }
+    },
+    "interviews": {
+      "title": "My Interviews",
+      "subtitle": "All your scheduled interviews",
+      "noJobTitle": "Unknown position",
+      "upcomingBanner": "Upcoming interview — get prepared!",
+      "viewJob": "View Job",
+      "noInterviews": "No interviews scheduled",
+      "noInterviewsHint": "Interviews that get scheduled will appear here",
+      "noResults": "No interviews found",
+      "noResultsHint": "Try changing the filter",
+      "clearFilter": "Show all",
+      "stats": {
+        "total": "Total Interviews",
+        "upcoming": "Upcoming",
+        "completed": "Completed"
+      },
+      "filters": {
+        "upcoming": "Upcoming",
+        "past": "Past",
+        "all": "All"
+      },
+      "types": {
+        "phone": "Phone Interview",
+        "video": "Video Interview",
+        "in_person": "In-Person Interview"
+      },
+      "status": {
+        "scheduled": "Scheduled",
+        "confirmed": "Confirmed",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "no_show": "No Show",
+        "rescheduled": "Rescheduled"
+      },
+      "detail": {
+        "date": "Date",
+        "time": "Time",
+        "type": "Interview Type",
+        "interviewer": "Interviewer",
+        "location": "Location",
+        "joinLink": "Join Link",
+        "notes": "Notes"
+      }
     }
   },
   "pipeline": {
