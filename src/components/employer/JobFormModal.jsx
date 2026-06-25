@@ -67,9 +67,9 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.title) { setError('שם המשרה הוא חובה'); return; }
-    if (!form.company) { setError('שם החברה הוא חובה'); return; }
-    if (!form.category) { setError('קטגוריה היא חובה'); return; }
+    if (!form.title) { setError('Job title is required'); return; }
+    if (!form.company) { setError('Company name is required'); return; }
+    if (!form.category) { setError('Category is required'); return; }
 
     // Build clean payload — convert salary strings to numbers or omit
     const payload = { ...form };
@@ -94,7 +94,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
       onSave();
       onClose();
     } catch (err) {
-      setError(err.message || 'שגיאה בשמירה');
+      setError(err.message || 'Error saving');
     } finally {
       setLoading(false);
     }
@@ -103,10 +103,10 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" dir="rtl">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">{job ? 'עריכת משרה' : 'פרסום משרה חדשה'}</h2>
+          <h2 className="text-xl font-bold">{job ? 'Edit Job' : 'Post New Job'}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X className="w-5 h-5" />
           </button>
@@ -123,7 +123,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
           {job?.job_code && (
             <div className="bg-[#F7FBFF] border border-[#E4ECFF] rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-3">
-                <span className="text-xs font-bold text-[#64748B] w-24 flex-shrink-0">קוד משרה</span>
+                <span className="text-xs font-bold text-[#64748B] w-24 flex-shrink-0">Job Code</span>
                 <span className="font-mono text-sm font-black text-[#7C3AED] bg-[#F3EFFF] px-2.5 py-0.5 rounded-lg">{job.job_code}</span>
               </div>
               {job.apply_email && (
@@ -133,7 +133,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
                   <CopyInline text={job.apply_email} />
                 </div>
               )}
-              <p className="text-xs text-[#94A3B8]">שלח קורות חיים לכתובת זו — המערכת תקלוט אוטומטית</p>
+              <p className="text-xs text-[#94A3B8]">Send resumes to this address — the system will process them automatically</p>
             </div>
           )}
 
@@ -142,20 +142,20 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
           {/* Basic Info */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">שם המשרה (תפקיד) *</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Job Title (Position) *</label>
               <input
                 required
-                placeholder='מהנדס תוכנה, מנהל מכירות...'
+                placeholder='Software Engineer, Sales Manager...'
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">שם החברה *</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Company Name *</label>
               <input
                 required
-                placeholder='Google, Apple, סטארטאפ X...'
+                placeholder='Google, Apple, Startup X...'
                 value={form.company}
                 onChange={(e) => setForm({ ...form, company: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
@@ -165,42 +165,42 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">קטגוריה *</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Category *</label>
               <select
                 required
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
               >
-                <option value="">בחר קטגוריה</option>
-                <option value="תכנות">תכנות</option>
-                <option value="עיצוב">עיצוב</option>
-                <option value="בחסות">בחסות</option>
-                <option value="מכירות">מכירות</option>
-                <option value="ניהול">ניהול</option>
-                <option value="הנדסה">הנדסה</option>
+                <option value="">Select a category</option>
+                <option value="תכנות">Programming</option>
+                <option value="עיצוב">Design</option>
+                <option value="בחסות">Sponsored</option>
+                <option value="מכירות">Sales</option>
+                <option value="ניהול">Management</option>
+                <option value="הנדסה">Engineering</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">סוג משרה *</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Job Type *</label>
               <select
                 required
                 value={form.type}
                 onChange={(e) => setForm({ ...form, type: e.target.value })}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
               >
-                <option value="full">משרה מלאה</option>
-                <option value="part">משרה חלקית</option>
-                <option value="remote">עבודה מרחוק</option>
-                <option value="daily">עבודה יומית</option>
+                <option value="full">Full-time</option>
+                <option value="part">Part-time</option>
+                <option value="remote">Remote</option>
+                <option value="daily">Daily</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">מיקום</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">Location</label>
             <input
-              placeholder="תל אביב"
+              placeholder="Tel Aviv"
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
@@ -209,7 +209,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">שכר מינימום</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Minimum Salary</label>
               <input
                 type="number"
                 placeholder="15000"
@@ -219,7 +219,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">שכר מקסימום</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Maximum Salary</label>
               <input
                 type="number"
                 placeholder="25000"
@@ -231,9 +231,9 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">תיאור המשרה</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">Job Description</label>
             <textarea
-              placeholder="תיאור מפורט של תפקיד, דרישות וועדויות..."
+              placeholder="Detailed description of the role, requirements and benefits..."
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={5}
@@ -246,7 +246,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
           {/* Visibility Settings */}
           <div className="border-t border-gray-100 pt-5">
             <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Eye className="w-4 h-4" /> הגדרות חשיפה
+              <Eye className="w-4 h-4" /> Visibility Settings
             </h3>
             
             <div className="space-y-3">
@@ -258,8 +258,8 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
                   className="w-4 h-4 rounded border-gray-300"
                 />
                 <div>
-                  <div className="text-sm font-medium text-gray-900">משרה אנונימית</div>
-                  <div className="text-xs text-gray-500">הסתר שם חברה ופרטיה</div>
+                  <div className="text-sm font-medium text-gray-900">Anonymous Job</div>
+                  <div className="text-xs text-gray-500">Hide company name and details</div>
                 </div>
               </label>
 
@@ -272,7 +272,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
                       onChange={(e) => setForm({ ...form, show_company_name: e.target.checked })}
                       className="w-4 h-4 rounded border-gray-300"
                     />
-                    <div className="text-sm font-medium text-gray-900">הצג שם חברה</div>
+                    <div className="text-sm font-medium text-gray-900">Show Company Name</div>
                   </label>
 
                   <label className="flex items-center gap-3 cursor-pointer">
@@ -282,7 +282,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
                       onChange={(e) => setForm({ ...form, show_company_info: e.target.checked })}
                       className="w-4 h-4 rounded border-gray-300"
                     />
-                    <div className="text-sm font-medium text-gray-900">הצג מידע על החברה</div>
+                    <div className="text-sm font-medium text-gray-900">Show Company Info</div>
                   </label>
                 </>
               )}
@@ -294,20 +294,20 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
                   onChange={(e) => setForm({ ...form, show_contact_details: e.target.checked })}
                   className="w-4 h-4 rounded border-gray-300"
                 />
-                <div className="text-sm font-medium text-gray-900">הצג פרטי קשר</div>
+                <div className="text-sm font-medium text-gray-900">Show Contact Details</div>
               </label>
 
               {form.show_contact_details && (
                 <div className="space-y-3 mt-3 p-3 bg-gray-50 rounded-lg">
                   <input
                     type="email"
-                    placeholder="אימייל"
+                    placeholder="Email"
                     value={form.contact_email}
                     onChange={(e) => setForm({ ...form, contact_email: e.target.value })}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
                   />
                   <input
-                    placeholder="טלפון"
+                    placeholder="Phone"
                     value={form.contact_phone}
                     onChange={(e) => setForm({ ...form, contact_phone: e.target.value })}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
@@ -322,7 +322,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
             <div className="bg-gradient-to-l from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 space-y-2">
               {/* Warranty period — visible to all roles that can see this modal */}
               <div className="flex items-center justify-between p-2 bg-white rounded-lg">
-                <span className="text-xs font-bold text-blue-700">תקופת אחריות (ימים):</span>
+                <span className="text-xs font-bold text-blue-700">Warranty Period (days):</span>
                 {['admin', 'recruitment_manager', 'team_manager'].includes(user?.role) ? (
                   <input
                     type="number"
@@ -337,7 +337,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
                   />
                 ) : (
                   <span className="text-sm font-black text-blue-800">
-                    {compensationPlan.warranty_period_days ? `${compensationPlan.warranty_period_days} ימים` : '—'}
+                    {compensationPlan.warranty_period_days ? `${compensationPlan.warranty_period_days} days` : '—'}
                   </span>
                 )}
               </div>
@@ -356,7 +356,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
                     {compensationPlan.recruiter_compensation && (canSeeAll || user?.role === 'recruiter' || user?.role === 'team_manager') && (
                       <div className="flex items-center justify-between p-2 bg-white rounded-lg">
                         <span className="text-xs font-bold text-green-700">
-                          {user?.role === 'recruiter' ? 'התגמול שלי' : 'רכז גיוס'}:
+                          {user?.role === 'recruiter' ? 'My Compensation' : 'Recruiter'}:
                         </span>
                         <span className="text-sm font-black text-green-800">
                           {formatComp(compensationPlan.recruiter_compensation, compensationPlan.recruiter_compensation_type, compensationPlan.total_fee)}
@@ -366,7 +366,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
                     {compensationPlan.team_manager_compensation && (canSeeAll || user?.role === 'team_manager') && (
                       <div className="flex items-center justify-between p-2 bg-white rounded-lg">
                         <span className="text-xs font-bold text-green-700">
-                          {user?.role === 'team_manager' ? 'התגמול שלי' : 'מנהל צוות'}:
+                          {user?.role === 'team_manager' ? 'My Compensation' : 'Team Manager'}:
                         </span>
                         <span className="text-sm font-black text-green-800">
                           {formatComp(compensationPlan.team_manager_compensation, compensationPlan.team_manager_compensation_type, compensationPlan.total_fee)}
@@ -376,7 +376,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
                     {compensationPlan.recruitment_manager_compensation && canSeeAll && (
                       <div className="flex items-center justify-between p-2 bg-white rounded-lg">
                         <span className="text-xs font-bold text-green-700">
-                          {user?.role === 'recruitment_manager' ? 'התגמול שלי' : 'מנהל גיוס'}:
+                          {user?.role === 'recruitment_manager' ? 'My Compensation' : 'Recruitment Manager'}:
                         </span>
                         <span className="text-sm font-black text-green-800">
                           {formatComp(compensationPlan.recruitment_manager_compensation, compensationPlan.recruitment_manager_compensation_type, compensationPlan.total_fee)}
@@ -396,14 +396,14 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
               onClick={onClose}
               className="px-4 h-10 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95"
             >
-              ביטול
+              Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
               className="px-6 h-10 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#2563EB] hover:from-[#6D28D9] hover:to-[#1D4ED8] text-white text-sm font-semibold disabled:opacity-50 shadow-md hover:shadow-lg transition-all active:scale-95"
             >
-              {loading ? 'שומר...' : 'שמור'}
+              {loading ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>

@@ -31,13 +31,13 @@ export default function EmployerDashboard() {
     if (!user) return;
     setLoading(true);
     const [jobs, candidates, interviews, applications] = await Promise.all([
-      base44.entities.Job.filter({ employer_id: user.email, is_closed: false }, '', 200).catch(() => []),
+      base44.entities.Job.filter({ employer_id: user.email }, '', 200).catch(() => []),
       base44.entities.Candidate.filter({ employer_id: user.email }, '', 200).catch(() => []),
       base44.entities.Interview.filter({ employer_id: user.email, status: 'scheduled' }, '', 200).catch(() => []),
       base44.entities.Application.filter({ employer_id: user.email }, '', 200).catch(() => []),
     ]);
     setStats({
-      openJobs: jobs.length,
+      openJobs: jobs.filter(j => !j.is_closed).length,
       candidates: candidates.length,
       interviews: interviews.length,
       applications: applications.length,
