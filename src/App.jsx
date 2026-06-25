@@ -72,6 +72,7 @@ import AgencyDashboard from './pages/agency/AgencyDashboard';
 
 // ── Company Pages (Company HR) ────────────────────────────────────────
 import CompanyDashboard from './pages/company/CompanyDashboard';
+import CompanyInterviews from './pages/company/CompanyInterviews';
 
 // ── Candidate Pages ───────────────────────────────────────────────────
 import CandidateDashboard from './pages/candidate/CandidateDashboard';
@@ -240,7 +241,7 @@ const AuthenticatedApp = () => {
           <Route path="/company/jobs/closed" element={<ManageJobsPage />} />
           <Route path="/company/candidates" element={<CandidateListCRMPage candidateRoute="/company/crm/candidate" />} />
           <Route path="/company/crm/candidate" element={<CandidateCRMPage />} />
-          <Route path="/company/interviews" element={<PlaceholderPage title="ראיונות" />} />
+          <Route path="/company/interviews" element={<CompanyInterviews />} />
           <Route path="/company/ai-matching" element={<AIMatchingPage />} />
           <Route path="/company/team" element={<PlaceholderPage title="צוות HR" />} />
           <Route path="/company/team/members" element={<PlaceholderPage title="חברי צוות" />} />

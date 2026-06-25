@@ -5,7 +5,7 @@ import ShareButtons from '@/components/jobs/ShareButtons';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { ArrowRight, MapPin, Briefcase, Eye, Clock, Send, Upload, AlertCircle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, MapPin, Briefcase, Eye, Clock, Send, Upload, AlertCircle, RefreshCw } from 'lucide-react';
 import Navbar from '@/components/home/Navbar';
 import SEOHead from '@/components/SEOHead';
 import SimilarJobsList from '@/components/jobs/SimilarJobsList';
@@ -14,12 +14,12 @@ import { logError, getErrorMessage } from '@/lib/errorHandler';
 // Validation
 const validateForm = (form) => {
   const errors = {};
-  if (!form.candidate_name?.trim()) errors.candidate_name = 'שם מלא הוא שדה חובה';
-  if (!form.candidate_email?.trim()) errors.candidate_email = 'אימייל הוא שדה חובה';
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.candidate_email)) errors.candidate_email = 'כתובת אימייל לא תקינה';
-  if (!form.candidate_phone?.trim()) errors.candidate_phone = 'טלפון הוא שדה חובה';
+  if (!form.candidate_name?.trim()) errors.candidate_name = 'Full name is required';
+  if (!form.candidate_email?.trim()) errors.candidate_email = 'Email is required';
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.candidate_email)) errors.candidate_email = 'Invalid email address';
+  if (!form.candidate_phone?.trim()) errors.candidate_phone = 'Phone is required';
   if (form.desired_salary_min && form.desired_salary_max && Number(form.desired_salary_min) > Number(form.desired_salary_max)) {
-    errors.desired_salary_max = 'שכר מקסימום חייב להיות גבוה ממינימום';
+    errors.desired_salary_max = 'Maximum salary must be higher than minimum';
   }
   return errors;
 };
@@ -37,17 +37,17 @@ const withRetry = async (fn, retries = 2, label = '') => {
   }
 };
 
-const typeLabels = { full: 'משרה מלאה', part: 'חלקית', daily: 'יומי', remote: 'מרחוק' };
+const typeLabels = { full: 'Full-time', part: 'Part-time', daily: 'Daily', remote: 'Remote' };
 
 export default function JobDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [showApply, setShowApply] = useState(false);
-  const [form, setForm] = useState({ 
-    candidate_name: '', 
-    candidate_email: '', 
-    candidate_phone: '', 
+  const [form, setForm] = useState({
+    candidate_name: '',
+    candidate_email: '',
+    candidate_phone: '',
     cover_letter: '',
     desired_salary_min: '',
     desired_salary_max: '',
@@ -86,7 +86,7 @@ export default function JobDetail() {
       const profiles = await base44.entities.CandidateProfile.filter({ user_email: user.email });
       const profile = profiles?.[0];
       if (profile?.resume_url) {
-        setProfileResume({ url: profile.resume_url, filename: 'קורות חיים קיימים' });
+        setProfileResume({ url: profile.resume_url, filename: 'Existing Resume' });
       }
       return profile || null;
     },
@@ -119,7 +119,7 @@ export default function JobDetail() {
       return result.file_url;
     } catch (error) {
       logError(error, 'JobDetail.handleFileUpload');
-      setUploadError('העלאת הקובץ נכשלה. אנא בדוק שהקובץ תקין (PDF/Word עד 10MB) ונסה שוב.');
+      setUploadError('File upload failed. Please check that the file is valid (PDF/Word up to 10MB) and try again.');
       return null;
     } finally {
       setUploading(false);
@@ -130,7 +130,7 @@ export default function JobDetail() {
     if (!file) return;
     const MAX_SIZE = 10 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      setUploadError('הקובץ גדול מדי. גודל מקסימלי הוא 10MB.');
+      setUploadError('File is too large. Maximum size is 10MB.');
       return;
     }
     setUploadError(null);
@@ -197,7 +197,7 @@ export default function JobDetail() {
    onError: (error) => {
      logError(error, 'JobDetail.applyMutation');
      const msg = getErrorMessage(error);
-     setApplyError(msg || 'שליחת המועמדות נכשלה. אנא נסה שוב.');
+     setApplyError(msg || 'Application submission failed. Please try again.');
    },
    onSuccess: async (newApp) => {
      setApplyError(null);
@@ -208,23 +208,23 @@ export default function JobDetail() {
       await base44.functions.invoke('createApplicationTimeline', {
         application_id: newApp.id,
         event_type: 'submitted',
-        description: `המועמד הגיש מועמדות עבור תפקיד ${job.title}`,
+        description: `Candidate applied for ${job.title} position`,
         performed_by_role: 'candidate'
       }).catch(() => {});
 
-      // שלח הודעה למועמד
+      // Send email to candidate
       await base44.integrations.Core.SendEmail({
         to: form.candidate_email,
-        subject: `✓ מועמדותך נקלטה - ${job.title}`,
-        body: `שלום ${form.candidate_name},\n\nתודה על הגשת המועמדות שלך עבור תפקיד ${job.title}.\n\nמועמדותך נקלטה בהצלחה במערכת שלנו.\n\nצוות הגיוס שלנו יבדוק אותה ויצור איתך קשר בקרוב אם תתאים למשרה.\n\nבהצלחה!\n\n---\nHeadHunter - פלטפורמת דרושים`
+        subject: `✓ Application Received - ${job.title}`,
+        body: `Hello ${form.candidate_name},\n\nThank you for submitting your application for the ${job.title} position.\n\nYour application has been successfully received in our system.\n\nOur recruitment team will review it and contact you soon if you're a good fit for the role.\n\nGood luck!\n\n---\nHeadHunter - Job Platform`
       }).catch(() => {});
 
-      // שלח הודעה למעסיק
+      // Send email to employer
       if (job.employer_id) {
         await base44.integrations.Core.SendEmail({
           to: job.employer_id,
-          subject: `📧 מועמדות חדשה - ${job.title}`,
-          body: `הודעה חדשה!\n\nמועמד חדש הגיש מועמדות עבור תפקיד ${job.title}.\n\nפרטי המועמד:\nשם: ${form.candidate_name}\nטלפון: ${form.candidate_phone}\nאימייל: ${form.candidate_email}\nעיר: ${form.location}\nציפיות שכר: ₪${form.desired_salary_min || '-'} - ₪${form.desired_salary_max || '-'}\n\nאנא בדוק את המועמדות במערכת.`
+          subject: `📧 New Application - ${job.title}`,
+          body: `New notification!\n\nA new candidate has applied for the ${job.title} position.\n\nCandidate details:\nName: ${form.candidate_name}\nPhone: ${form.candidate_phone}\nEmail: ${form.candidate_email}\nCity: ${form.location}\nSalary expectations: ₪${form.desired_salary_min || '-'} - ₪${form.desired_salary_max || '-'}\n\nPlease review the application in the system.`
         }).catch(() => {});
       }
 
@@ -246,46 +246,65 @@ export default function JobDetail() {
   };
 
   if (isLoading) return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-[#0f1629] to-background" dir="rtl">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom, #F7FBFF 0%, #EEF5FF 100%)' }}>
       <Navbar />
-      <div className="flex flex-col items-center justify-center py-32 gap-4">
-        <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-        <p className="text-gray-400 text-sm">טוען פרטי משרה...</p>
+      <div className="flex flex-col items-center justify-center py-32 gap-5">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent animate-pulse" />
+          <div className="w-7 h-7 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+        </div>
+        <p className="text-[15px] font-bold text-[#64748B]">Loading job details...</p>
       </div>
     </div>
   );
 
   if (jobLoadError || !job) return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-[#0f1629] to-background" dir="rtl">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom, #F7FBFF 0%, #EEF5FF 100%)' }}>
       <Navbar />
       <div className="flex flex-col items-center justify-center py-32 gap-6 text-center px-4">
-        <AlertCircle className="w-12 h-12 text-red-400" />
-        <div>
-          <h2 className="text-xl font-bold text-white mb-2">{jobLoadError ? 'שגיאה בטעינת המשרה' : 'המשרה לא נמצאה'}</h2>
-          <p className="text-gray-400 text-sm">{jobLoadError ? 'אירעה שגיאה בחיבור לשרת. אנא נסה שוב.' : 'ייתכן שהמשרה הוסרה או שהקישור אינו תקין.'}</p>
+        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FEE2E2] to-[#FECACA] flex items-center justify-center shadow-lg">
+          <AlertCircle className="w-10 h-10 text-[#DC2626]" />
+        </div>
+        <div className="max-w-md">
+          <h2 className="text-[22px] font-black text-[#0F172A] mb-2">
+            {jobLoadError ? 'Error Loading Job' : 'Job Not Found'}
+          </h2>
+          <p className="text-[15px] font-semibold text-[#64748B]">
+            {jobLoadError ? 'A server connection error occurred. Please try again.' : 'This job may have been removed or the link is invalid.'}
+          </p>
         </div>
         <div className="flex gap-3">
           {jobLoadError && (
-            <button onClick={() => refetchJob()} className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-5 h-10 rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all active:scale-95">
-              <RefreshCw className="w-4 h-4" /> נסה שוב
+            <button
+              onClick={() => refetchJob()}
+              className="flex items-center gap-2 h-11 px-6 rounded-xl text-[14px] font-bold text-white shadow-lg hover:shadow-xl transition-all active:scale-95"
+              style={{
+                background: 'linear-gradient(135deg, #8B5CF6 0%, #2F80FF 100%)',
+              }}
+            >
+              <RefreshCw className="w-4 h-4" />
+              Try Again
             </button>
-            )}
-            <Link to="/jobs" className="flex items-center gap-2 border border-white/20 text-gray-300 hover:text-white hover:border-white/40 px-5 h-10 rounded-xl text-sm font-semibold transition-all active:scale-95 inline-flex">
-            חזרה לכל המשרות
-            </Link>
+          )}
+          <Link
+            to="/jobs"
+            className="flex items-center gap-2 border-2 border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] px-6 h-11 rounded-xl text-[14px] font-bold transition-all active:scale-95"
+          >
+            Back to All Jobs
+          </Link>
         </div>
       </div>
     </div>
   );
 
-  const seoTitle = job ? `${job.title} ב-${job.company}${job.location ? ` | ${job.location}` : ''} | HeadHunter` : 'משרה';
-  const seoDesc = job ? `דרושים: ${job.title} בחברת ${job.company}${job.location ? ` ב${job.location}` : ''}. ${job.salary_min && job.salary_max ? `שכר ₪${job.salary_min.toLocaleString()}–₪${job.salary_max.toLocaleString()}.` : ''} ${job.type ? `${typeLabels[job.type]}.` : ''} הגש מועמדות עכשיו ב-HeadHunter.` : '';
+  const seoTitle = job ? `${job.title} at ${job.company}${job.location ? ` | ${job.location}` : ''} | HeadHunter` : 'Job';
+  const seoDesc = job ? `Job Opening: ${job.title} at ${job.company}${job.location ? ` in ${job.location}` : ''}. ${job.salary_min && job.salary_max ? `Salary ₪${job.salary_min.toLocaleString()}–₪${job.salary_max.toLocaleString()}.` : ''} ${job.type ? `${typeLabels[job.type]}.` : ''} Apply now on HeadHunter.` : '';
 
   const jobPostingSchema = job ? {
     "@context": "https://schema.org",
     "@type": "JobPosting",
     "title": job.title,
-    "description": job.description || `${job.title} בחברת ${job.company}`,
+    "description": job.description || `${job.title} at ${job.company}`,
     "datePosted": job.created_date?.split('T')[0],
     "validThrough": new Date(new Date(job.created_date).setMonth(new Date(job.created_date).getMonth() + 3)).toISOString().split('T')[0],
     "employmentType": job.type === 'full' ? 'FULL_TIME' : job.type === 'part' ? 'PART_TIME' : job.type === 'remote' ? 'TELECOMMUTE' : 'CONTRACTOR',
@@ -297,7 +316,7 @@ export default function JobDetail() {
       "@type": "Place",
       "address": {
         "@type": "PostalAddress",
-        "addressLocality": job.location || 'ישראל',
+        "addressLocality": job.location || 'Israel',
         "addressCountry": "IL"
       }
     },
@@ -321,114 +340,182 @@ export default function JobDetail() {
     }
   } : null;
 
+  const glass = {
+    background: 'rgba(255,255,255,0.78)',
+    backdropFilter: 'blur(28px)',
+    WebkitBackdropFilter: 'blur(28px)',
+    border: '1px solid rgba(221,235,255,0.86)',
+    borderRadius: 24,
+    boxShadow: '0 28px 80px rgba(79,124,255,0.11), 0 3px 12px rgba(15,23,42,0.04)',
+  };
+
+  const daysAgo = Math.max(0, Math.floor((Date.now() - new Date(job.created_date || Date.now())) / 86400000));
+  const isNew = daysAgo <= 3;
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-[#0f1629] to-background" dir="rtl">
-      <SEOHead 
+    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom, #F7FBFF 0%, #EEF5FF 100%)' }}>
+      <SEOHead
         title={seoTitle}
         description={seoDesc}
-        keywords={`דרושים ${job?.title}, ${job?.title} ${job?.location || ''}, ${job?.company} דרושים, משרות ${job?.category || ''}`}
+        keywords={`${job?.title} jobs, ${job?.title} ${job?.location || ''}, ${job?.company} careers, ${job?.category || ''} positions`}
         canonical={`https://headhunter.co.il/jobs/${id}`}
         schemaData={jobPostingSchema}
       />
       <Navbar />
 
-
-
       <div className="max-w-[1200px] mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <Link to="/jobs" className="text-cyan-300 hover:text-purple-300 text-sm font-medium flex items-center gap-2 mb-8">
-              <ArrowRight className="w-4 h-4" />
-              חזרה לכל המשרות
+            <Link to="/jobs" className="inline-flex items-center gap-2 mb-6 text-[14px] font-bold text-[#64748B] hover:text-[#7C3AED] transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+              Back to All Jobs
             </Link>
 
-            {/* Combined Hero Section */}
-            <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-3xl border border-white/15 p-8 mb-8 shadow-xl">
-              <div className="flex items-start gap-6 mb-6">
-                <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-bold text-2xl flex-shrink-0 shadow-lg"
-                  style={{ backgroundColor: job.company_color || '#6d28d9' }}>
-                  {job.company_initials || job.company?.slice(0, 2)}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <h1 className="text-4xl font-bold text-white mb-1">{job.title}</h1>
-                      <p className="text-cyan-300 text-lg font-semibold">{job.company}</p>
+            {/* Hero Card */}
+            <div
+              className="relative group overflow-hidden transition-all duration-300 mb-6"
+              style={glass}
+            >
+              <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-l from-[#A855F7] via-[#6C4DFF] to-[#2FB8FF]" />
+              <div className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
+
+              <div className="p-8 relative">
+                <div className="flex items-start gap-6 mb-6">
+                  <div
+                    className="w-[72px] h-[72px] rounded-2xl flex items-center justify-center text-white text-[20px] font-black shadow-[0_20px_45px_rgba(108,77,255,0.25)] flex-shrink-0"
+                    style={{
+                      background: `linear-gradient(135deg, ${job.company_color || '#8B5CF6'}, #2F80FF)`
+                    }}
+                  >
+                    {job.company_initials || job.company?.slice(0, 2) || 'HH'}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-start gap-3 mb-3">
+                      {isNew && (
+                        <span className="px-3 py-1.5 rounded-full text-xs font-black bg-[#EEF6FF] text-[#2F80FF] border border-[#DDEBFF] inline-flex items-center gap-1">
+                          ✨ New
+                        </span>
+                      )}
+                      {job.views > 0 && (
+                        <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0] inline-flex items-center gap-1.5">
+                          <Eye className="w-3.5 h-3.5" />
+                          {job.views} views
+                        </span>
+                      )}
                     </div>
-                    <SaveJobButton job={job} user={user} />
+
+                    <h1 className="text-[32px] leading-[1.25] font-black text-[#0F172A] mb-2">{job.title}</h1>
+                    <p className="text-[18px] font-black text-[#7C3AED] mb-4">{job.company}</p>
+
+                    <div className="flex flex-wrap items-center gap-4 text-[14px] font-bold text-[#64748B]">
+                      {job.location && (
+                        <span className="flex items-center gap-1.5">
+                          <MapPin className="w-4 h-4 text-[#60A5FA]" />
+                          {job.location}
+                        </span>
+                      )}
+                      {job.type && (
+                        <span className="flex items-center gap-1.5">
+                          <Briefcase className="w-4 h-4 text-[#8B5CF6]" />
+                          {typeLabels[job.type]}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="w-4 h-4 text-[#94A3B8]" />
+                        {new Date(job.created_date).toLocaleDateString('en-US')}
+                      </span>
+                    </div>
                   </div>
+
+                  <SaveJobButton job={job} user={user} />
                 </div>
-              </div>
 
-              {/* Key Info */}
-              <div className="flex flex-wrap gap-6 mb-6 pb-6 border-b border-white/10 text-base text-gray-300">
-                {job.location && <span className="flex items-center gap-2"><MapPin className="w-5 h-5 text-cyan-400" />{job.location}</span>}
-                {job.type && <span className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-cyan-400" />{typeLabels[job.type]}</span>}
-                {job.views > 0 && <span className="flex items-center gap-2"><Eye className="w-5 h-5 text-cyan-400" />{job.views} צפיות</span>}
-                <span className="flex items-center gap-2"><Clock className="w-5 h-5 text-cyan-400" />{new Date(job.created_date).toLocaleDateString('he-IL')}</span>
-              </div>
-
-              {/* Salary */}
-              {job.salary_min && job.salary_max && (
-                <div className="mb-6 pb-6 border-b border-white/10">
-                  <p className="text-gray-400 text-sm mb-2">שכר חודשי</p>
-                  <div className="text-2xl font-bold text-cyan-300">
-                    ₪{job.salary_min.toLocaleString()} – ₪{job.salary_max.toLocaleString()}
+                {/* Salary Badge */}
+                {job.salary_min && job.salary_max && (
+                  <div className="mb-6 pb-6 border-b border-[#E4ECFF]">
+                    <p className="text-[13px] font-bold text-[#64748B] mb-2">💰 Monthly Salary</p>
+                    <div className="inline-flex items-baseline gap-2 px-5 py-3 rounded-2xl bg-gradient-to-br from-[#F0F9FF] to-[#E0F2FE] border border-[#BAE6FD]">
+                      <span className="text-[28px] font-black bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] bg-clip-text text-transparent">
+                        ₪{job.salary_min.toLocaleString()}
+                      </span>
+                      <span className="text-[18px] font-bold text-[#64748B]">-</span>
+                      <span className="text-[28px] font-black bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] bg-clip-text text-transparent">
+                        ₪{job.salary_max.toLocaleString()}
+                      </span>
+                    </div>
                   </div>
+                )}
+
+                {/* Job Description */}
+                {job.description && (
+                  <div className="mb-6">
+                    <h2 className="text-[18px] font-black text-[#0F172A] mb-4 flex items-center gap-2">
+                      <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white text-sm">📋</span>
+                      Job Description
+                    </h2>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-[15px] leading-relaxed text-[#475569] whitespace-pre-wrap">{job.description}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Share Section */}
+                <div className="pt-6 border-t border-[#E4ECFF]">
+                  <ShareButtons job={job} user={user} />
                 </div>
-              )}
-
-              {/* Job Description */}
-              {job.description && (
-                <div className="mb-6 pb-6 border-b border-white/10">
-                  <h2 className="text-2xl font-bold text-white mb-4">📋 תיאור המשרה</h2>
-                  <p className="text-gray-300 text-base leading-relaxed whitespace-pre-wrap">{job.description}</p>
-                </div>
-              )}
-
-              {/* Share Buttons */}
-              <ShareButtons job={job} user={user} />
-            </div>
-
-            {/* Internal SEO Links */}
-            <div className="bg-gradient-to-br from-white/5 to-transparent rounded-2xl border border-white/10 p-6 mb-6">
-              <h3 className="text-base font-bold text-white mb-4">משרות קשורות</h3>
-              <div className="flex flex-wrap gap-2">
-                {job.location && (
-                  <Link
-                    to={`/jobs/city/${encodeURIComponent(job.location)}`}
-                    className="px-3 py-1.5 bg-cyan-500/10 border border-cyan-500/20 rounded-lg text-cyan-300 hover:bg-cyan-500/20 transition-all text-sm"
-                  >
-                    📍 משרות ב{job.location}
-                  </Link>
-                )}
-                {job.category && (
-                  <Link
-                    to={`/jobs/category/${encodeURIComponent(job.category)}`}
-                    className="px-3 py-1.5 bg-purple-500/10 border border-purple-500/20 rounded-lg text-purple-300 hover:bg-purple-500/20 transition-all text-sm"
-                  >
-                    💼 דרושים {job.category}
-                  </Link>
-                )}
-                {job.location && job.category && (
-                  <Link
-                    to={`/jobs?search=${encodeURIComponent(job.category)}&location=${encodeURIComponent(job.location)}`}
-                    className="px-3 py-1.5 bg-white/5 border border-white/15 rounded-lg text-gray-300 hover:text-white transition-all text-sm"
-                  >
-                    {job.category} ב{job.location}
-                  </Link>
-                )}
-                <Link
-                  to="/jobs"
-                  className="px-3 py-1.5 bg-white/5 border border-white/15 rounded-lg text-gray-300 hover:text-white transition-all text-sm"
-                >
-                  כל המשרות
-                </Link>
               </div>
             </div>
 
-            {/* Similar Jobs Using Engine */}
+            {/* Related Links Card */}
+            <div
+              className="transition-all duration-300 mb-6"
+              style={{
+                ...glass,
+                background: 'rgba(248,250,252,0.82)',
+              }}
+            >
+              <div className="p-6">
+                <h3 className="text-[16px] font-black text-[#0F172A] mb-4 flex items-center gap-2">
+                  🔗 Related Jobs
+                </h3>
+                <div className="flex flex-wrap gap-2.5">
+                  {job.location && (
+                    <Link
+                      to={`/jobs/city/${encodeURIComponent(job.location)}`}
+                      className="px-4 py-2.5 rounded-xl text-[13px] font-bold bg-gradient-to-br from-[#E0F2FE] to-[#BAE6FD] text-[#0369A1] border border-[#7DD3FC] hover:shadow-lg transition-all active:scale-95"
+                    >
+                      📍 Jobs in {job.location}
+                    </Link>
+                  )}
+                  {job.category && (
+                    <Link
+                      to={`/jobs/category/${encodeURIComponent(job.category)}`}
+                      className="px-4 py-2.5 rounded-xl text-[13px] font-bold bg-gradient-to-br from-[#F3E8FF] to-[#E9D5FF] text-[#7C3AED] border border-[#C4B5FD] hover:shadow-lg transition-all active:scale-95"
+                    >
+                      💼 {job.category} Jobs
+                    </Link>
+                  )}
+                  {job.location && job.category && (
+                    <Link
+                      to={`/jobs?search=${encodeURIComponent(job.category)}&location=${encodeURIComponent(job.location)}`}
+                      className="px-4 py-2.5 rounded-xl text-[13px] font-bold bg-white text-[#64748B] border border-[#E2E8F0] hover:border-[#CBD5E1] hover:shadow-lg transition-all active:scale-95"
+                    >
+                      {job.category} in {job.location}
+                    </Link>
+                  )}
+                  <Link
+                    to="/jobs"
+                    className="px-4 py-2.5 rounded-xl text-[13px] font-bold bg-white text-[#64748B] border border-[#E2E8F0] hover:border-[#CBD5E1] hover:shadow-lg transition-all active:scale-95"
+                  >
+                    All Jobs
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Similar Jobs */}
             <SimilarJobsList jobId={id} title={job.title} />
           </div>
 
@@ -436,117 +523,219 @@ export default function JobDetail() {
           <div className="lg:col-span-1">
             <div className="sticky top-24">
               {job.is_closed ? (
-                <div className="bg-red-500/20 text-red-300 rounded-2xl p-4 text-center text-base font-semibold border border-red-500/30">משרה זו סגורה</div>
+                <div
+                  className="text-center transition-all duration-300"
+                  style={{
+                    ...glass,
+                    background: 'rgba(254,242,242,0.95)',
+                    border: '1px solid rgba(254,202,202,0.8)',
+                  }}
+                >
+                  <div className="p-6">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#EF4444] to-[#DC2626] flex items-center justify-center text-white text-2xl mx-auto mb-4 shadow-lg">
+                      🚫
+                    </div>
+                    <p className="text-[16px] font-black text-[#DC2626]">This Job is Closed</p>
+                    <p className="text-[13px] font-medium text-[#991B1B] mt-2">This position is no longer active</p>
+                  </div>
+                </div>
               ) : !showApply ? (
-                <button onClick={() => setShowApply(true)} className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-8 py-3 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 mb-6 active:scale-95">
-                  <Send className="w-5 h-5" /> הגש מועמדות
+                <button
+                  onClick={() => setShowApply(true)}
+                  className="w-full h-14 rounded-2xl font-black text-[16px] text-white transition-all duration-300 shadow-[0_20px_45px_rgba(124,58,237,0.35)] hover:shadow-[0_25px_55px_rgba(124,58,237,0.45)] active:scale-[0.98] flex items-center justify-center gap-2.5"
+                  style={{
+                    background: 'linear-gradient(135deg, #8B5CF6 0%, #2F80FF 100%)',
+                  }}
+                >
+                  <Send className="w-5 h-5" />
+                  Apply Now
                 </button>
               ) : submitted ? (
-                <div className="bg-green-500/20 text-green-300 rounded-3xl p-8 text-center border border-green-500/30 space-y-3">
-                  <div className="text-4xl">🎉</div>
-                  <div className="text-xl font-bold text-green-300">המועמדות נשלחה!</div>
-                  <p className="text-sm text-green-400/80">שלחנו אישור לאימייל שלך. הצוות יחזור אליך בהקדם.</p>
-                  <button onClick={() => { setSubmitted(false); setShowApply(false); setForm({ candidate_name: '', candidate_email: '', candidate_phone: '', cover_letter: '', desired_salary_min: '', desired_salary_max: '', location: '', resume_url: '', resume_filename: '', resume_file: null }); }}
-                    className="mt-2 text-sm text-green-300 underline hover:text-green-200">
-                    שלח מועמדות נוספת
-                  </button>
+                <div
+                  className="text-center transition-all duration-300"
+                  style={{
+                    ...glass,
+                    background: 'rgba(240,253,244,0.95)',
+                    border: '1px solid rgba(167,243,208,0.8)',
+                  }}
+                >
+                  <div className="p-8">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center text-white text-3xl mx-auto mb-4 shadow-lg">
+                      🎉
+                    </div>
+                    <h3 className="text-[20px] font-black text-[#047857] mb-2">Application Submitted!</h3>
+                    <p className="text-[14px] font-semibold text-[#059669] mb-6">We've sent a confirmation to your email. The team will get back to you soon.</p>
+                    <button
+                      onClick={() => {
+                        setSubmitted(false);
+                        setShowApply(false);
+                        setForm({ candidate_name: '', candidate_email: '', candidate_phone: '', cover_letter: '', desired_salary_min: '', desired_salary_max: '', location: '', resume_url: '', resume_filename: '', resume_file: null });
+                      }}
+                      className="text-[13px] font-bold text-[#047857] hover:text-[#065F46] underline transition-colors"
+                    >
+                      Submit Another Application
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <form onSubmit={handleApply} className="space-y-4 bg-white/5 rounded-2xl p-6 border border-white/10">
-                <h3 className="text-xl font-bold text-white">הגשת מועמדות</h3>
+                <form onSubmit={handleApply} className="transition-all duration-300" style={glass}>
+                  <div className="p-6 space-y-5">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white shadow-lg">
+                        📝
+                      </div>
+                      <h3 className="text-[18px] font-black text-[#0F172A]">Submit Application</h3>
+                    </div>
 
-                {/* Global apply error */}
-                {applyError && (
-                  <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-300">
-                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span>{applyError}</span>
-                  </div>
-                )}
+                    {/* Global apply error */}
+                    {applyError && (
+                      <div className="flex items-start gap-2.5 bg-[#FEF2F2] border border-[#FECACA] rounded-xl px-4 py-3.5">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#DC2626]" />
+                        <span className="text-[13px] font-semibold text-[#DC2626]">{applyError}</span>
+                      </div>
+                    )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <input placeholder="שם מלא *" value={form.candidate_name}
-                      onChange={e => { setForm({ ...form, candidate_name: e.target.value }); setFormErrors(p => ({ ...p, candidate_name: '' })); }}
-                      className={`w-full border rounded-xl px-4 py-3 text-base bg-white/5 text-white outline-none focus:ring-2 focus:ring-purple-500/30 placeholder:text-gray-500 transition-all ${formErrors.candidate_name ? 'border-red-500/60' : 'border-white/20 focus:border-purple-500/50'}`} />
-                    {formErrors.candidate_name && <p className="text-red-400 text-xs mt-1 pr-1">{formErrors.candidate_name}</p>}
-                  </div>
-                  <div>
-                    <input type="email" placeholder="אימייל *" value={form.candidate_email} dir="ltr"
-                      onChange={e => { setForm({ ...form, candidate_email: e.target.value }); setFormErrors(p => ({ ...p, candidate_email: '' })); }}
-                      className={`w-full border rounded-xl px-4 py-3 text-base bg-white/5 text-white outline-none focus:ring-2 focus:ring-purple-500/30 placeholder:text-gray-500 transition-all ${formErrors.candidate_email ? 'border-red-500/60' : 'border-white/20 focus:border-purple-500/50'}`} />
-                    {formErrors.candidate_email && <p className="text-red-400 text-xs mt-1 pr-1">{formErrors.candidate_email}</p>}
-                  </div>
-                  <div>
-                    <input placeholder="טלפון *" value={form.candidate_phone}
-                      onChange={e => { setForm({ ...form, candidate_phone: e.target.value }); setFormErrors(p => ({ ...p, candidate_phone: '' })); }}
-                      className={`w-full border rounded-xl px-4 py-3 text-base bg-white/5 text-white outline-none focus:ring-2 focus:ring-purple-500/30 placeholder:text-gray-500 transition-all ${formErrors.candidate_phone ? 'border-red-500/60' : 'border-white/20 focus:border-purple-500/50'}`} />
-                    {formErrors.candidate_phone && <p className="text-red-400 text-xs mt-1 pr-1">{formErrors.candidate_phone}</p>}
-                  </div>
-                  <input placeholder="עיר מגורים" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })}
-                   className="border border-white/20 rounded-xl px-4 py-3 text-base bg-white/5 text-white outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500/50 placeholder:text-gray-500" />
-                  <input type="number" placeholder="שכר מינימום (₪)" value={form.desired_salary_min} onChange={e => { setForm({ ...form, desired_salary_min: e.target.value ? parseInt(e.target.value) : '' }); setFormErrors(p => ({ ...p, desired_salary_max: '' })); }}
-                   className="border border-white/20 rounded-xl px-4 py-3 text-base bg-white/5 text-white outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500/50 placeholder:text-gray-500" />
-                  <div>
-                    <input type="number" placeholder="שכר מקסימום (₪)" value={form.desired_salary_max} onChange={e => { setForm({ ...form, desired_salary_max: e.target.value ? parseInt(e.target.value) : '' }); setFormErrors(p => ({ ...p, desired_salary_max: '' })); }}
-                     className={`w-full border rounded-xl px-4 py-3 text-base bg-white/5 text-white outline-none focus:ring-2 focus:ring-purple-500/30 placeholder:text-gray-500 transition-all ${formErrors.desired_salary_max ? 'border-red-500/60' : 'border-white/20 focus:border-purple-500/50'}`} />
-                    {formErrors.desired_salary_max && <p className="text-red-400 text-xs mt-1 pr-1">{formErrors.desired_salary_max}</p>}
-                  </div>
-                </div>
-                <textarea placeholder="מכתב מוטיבציה (אופציונלי)" value={form.cover_letter} onChange={e => setForm({ ...form, cover_letter: e.target.value })}
-                  rows={3} className="w-full border border-white/20 rounded-xl px-4 py-3 text-base bg-white/5 text-white outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500/50 resize-none placeholder:text-gray-500" />
-                
-                {/* Existing resume from profile */}
-                {profileResume && (
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-400 font-medium">קורות חיים:</p>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="space-y-3.5">
+                      <div>
+                        <input
+                          placeholder="Full Name *"
+                          value={form.candidate_name}
+                          onChange={e => { setForm({ ...form, candidate_name: e.target.value }); setFormErrors(p => ({ ...p, candidate_name: '' })); }}
+                          className={`w-full h-11 border rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none transition-all placeholder:text-[#94A3B8] placeholder:font-medium ${formErrors.candidate_name ? 'border-[#F87171] focus:ring-2 focus:ring-[#FCA5A5]' : 'border-[#E2E8F0] focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE]'}`}
+                        />
+                        {formErrors.candidate_name && <p className="text-[#DC2626] text-xs font-semibold mt-1.5 pr-1">{formErrors.candidate_name}</p>}
+                      </div>
+
+                      <div>
+                        <input
+                          type="email"
+                          placeholder="Email *"
+                          value={form.candidate_email}
+                          dir="ltr"
+                          onChange={e => { setForm({ ...form, candidate_email: e.target.value }); setFormErrors(p => ({ ...p, candidate_email: '' })); }}
+                          className={`w-full h-11 border rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none transition-all placeholder:text-[#94A3B8] placeholder:font-medium ${formErrors.candidate_email ? 'border-[#F87171] focus:ring-2 focus:ring-[#FCA5A5]' : 'border-[#E2E8F0] focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE]'}`}
+                        />
+                        {formErrors.candidate_email && <p className="text-[#DC2626] text-xs font-semibold mt-1.5 pr-1">{formErrors.candidate_email}</p>}
+                      </div>
+
+                      <div>
+                        <input
+                          placeholder="Phone *"
+                          value={form.candidate_phone}
+                          onChange={e => { setForm({ ...form, candidate_phone: e.target.value }); setFormErrors(p => ({ ...p, candidate_phone: '' })); }}
+                          className={`w-full h-11 border rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none transition-all placeholder:text-[#94A3B8] placeholder:font-medium ${formErrors.candidate_phone ? 'border-[#F87171] focus:ring-2 focus:ring-[#FCA5A5]' : 'border-[#E2E8F0] focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE]'}`}
+                        />
+                        {formErrors.candidate_phone && <p className="text-[#DC2626] text-xs font-semibold mt-1.5 pr-1">{formErrors.candidate_phone}</p>}
+                      </div>
+
+                      <input
+                        placeholder="City"
+                        value={form.location}
+                        onChange={e => setForm({ ...form, location: e.target.value })}
+                        className="w-full h-11 border border-[#E2E8F0] rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE] transition-all placeholder:text-[#94A3B8] placeholder:font-medium"
+                      />
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <input
+                          type="number"
+                          placeholder="Min Salary (₪)"
+                          value={form.desired_salary_min}
+                          onChange={e => { setForm({ ...form, desired_salary_min: e.target.value ? parseInt(e.target.value) : '' }); setFormErrors(p => ({ ...p, desired_salary_max: '' })); }}
+                          className="w-full h-11 border border-[#E2E8F0] rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE] transition-all placeholder:text-[#94A3B8] placeholder:font-medium"
+                        />
+                        <div>
+                          <input
+                            type="number"
+                            placeholder="Max Salary (₪)"
+                            value={form.desired_salary_max}
+                            onChange={e => { setForm({ ...form, desired_salary_max: e.target.value ? parseInt(e.target.value) : '' }); setFormErrors(p => ({ ...p, desired_salary_max: '' })); }}
+                            className={`w-full h-11 border rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none transition-all placeholder:text-[#94A3B8] placeholder:font-medium ${formErrors.desired_salary_max ? 'border-[#F87171] focus:ring-2 focus:ring-[#FCA5A5]' : 'border-[#E2E8F0] focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE]'}`}
+                          />
+                          {formErrors.desired_salary_max && <p className="text-[#DC2626] text-xs font-semibold mt-1.5 pr-1">{formErrors.desired_salary_max}</p>}
+                        </div>
+                      </div>
+                    </div>
+
+                    <textarea
+                      placeholder="Cover Letter (optional)"
+                      value={form.cover_letter}
+                      onChange={e => setForm({ ...form, cover_letter: e.target.value })}
+                      rows={3}
+                      className="w-full border border-[#E2E8F0] rounded-xl px-4 py-3 text-[14px] font-semibold bg-white text-[#0F172A] outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE] resize-none placeholder:text-[#94A3B8] placeholder:font-medium transition-all"
+                    />
+
+                    {/* Existing resume from profile */}
+                    {profileResume && (
+                      <div className="space-y-2">
+                        <p className="text-[13px] text-[#64748B] font-bold">Resume:</p>
+                        <div className="flex flex-col gap-2">
+                          <button
+                            type="button"
+                            onClick={() => { setUseProfileResume(true); setForm(prev => ({ ...prev, resume_url: profileResume.url, resume_filename: profileResume.filename, resume_file: null })); }}
+                            className={`h-10 px-4 rounded-xl text-[13px] font-bold border transition-all ${useProfileResume ? 'bg-gradient-to-br from-[#F3E8FF] to-[#E9D5FF] border-[#C4B5FD] text-[#7C3AED]' : 'bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#C4B5FD]'}`}
+                          >
+                            ✓ Use Resume from Profile
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setUseProfileResume(false); setForm(prev => ({ ...prev, resume_url: '', resume_filename: '', resume_file: null })); }}
+                            className={`h-10 px-4 rounded-xl text-[13px] font-bold border transition-all ${!useProfileResume ? 'bg-gradient-to-br from-[#F3E8FF] to-[#E9D5FF] border-[#C4B5FD] text-[#7C3AED]' : 'bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#C4B5FD]'}`}
+                          >
+                            📤 Upload New File
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Upload area */}
+                    {!useProfileResume && (
+                      <label className={`block border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${uploadError ? 'border-[#FCA5A5] bg-[#FEF2F2]' : 'border-[#DDD6FE] hover:border-[#C4B5FD] hover:bg-[#FAF5FF]'}`}>
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx"
+                          onChange={e => handleResumeUpload(e.target.files?.[0] || null)}
+                          className="hidden"
+                          disabled={extracting || uploading}
+                        />
+                        <Upload className={`w-7 h-7 mx-auto mb-3 ${uploadError ? 'text-[#DC2626]' : 'text-[#94A3B8]'}`} />
+                        <div className={`text-[14px] font-bold mb-1.5 ${uploadError ? 'text-[#DC2626]' : 'text-[#0F172A]'}`}>
+                          {uploading ? '📤 Uploading...' : extracting ? '🔄 Extracting data...' : form.resume_filename ? `✓ ${form.resume_filename}` : 'Upload Resume'}
+                        </div>
+                        {uploadError ? (
+                          <p className="text-[#DC2626] text-xs font-semibold">{uploadError}</p>
+                        ) : (
+                          <p className="text-[12px] text-[#64748B] font-medium">PDF, Word up to 10MB • Auto-fill</p>
+                        )}
+                      </label>
+                    )}
+
+                    {useProfileResume && form.resume_url && (
+                      <div className="flex items-center gap-2.5 bg-[#F0F9FF] border border-[#BAE6FD] rounded-xl px-4 py-3">
+                        <span className="text-[13px] font-bold text-[#0369A1]">✓ Resume from profile will be used</span>
+                      </div>
+                    )}
+
+                    <div className="flex gap-3 pt-2">
                       <button
                         type="button"
-                        onClick={() => { setUseProfileResume(true); setForm(prev => ({ ...prev, resume_url: profileResume.url, resume_filename: profileResume.filename, resume_file: null })); }}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border transition-all ${useProfileResume ? 'bg-purple-600/30 border-purple-400 text-purple-200' : 'bg-white/5 border-white/20 text-gray-300 hover:border-purple-500/50'}`}
+                        onClick={() => { setShowApply(false); setFormErrors({}); setApplyError(null); setUploadError(null); }}
+                        className="flex-1 h-11 border-2 border-[#E2E8F0] text-[#64748B] rounded-xl text-[14px] font-bold hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all active:scale-95"
                       >
-                        ✓ השתמש בקורות חיים מהפרופיל
+                        Cancel
                       </button>
                       <button
-                        type="button"
-                        onClick={() => { setUseProfileResume(false); setForm(prev => ({ ...prev, resume_url: '', resume_filename: '', resume_file: null })); }}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border transition-all ${!useProfileResume ? 'bg-purple-600/30 border-purple-400 text-purple-200' : 'bg-white/5 border-white/20 text-gray-300 hover:border-purple-500/50'}`}
+                        type="submit"
+                        disabled={applyMutation.isPending || uploading || extracting}
+                        className="flex-1 h-11 rounded-xl text-[14px] font-black text-white shadow-lg hover:shadow-xl transition-all active:scale-95 disabled:opacity-50"
+                        style={{
+                          background: 'linear-gradient(135deg, #8B5CF6 0%, #2F80FF 100%)',
+                        }}
                       >
-                        📤 העלה קובץ חדש
+                        {uploading ? '📤 Uploading...' : extracting ? '🔄 Extracting...' : applyMutation.isPending ? '⏳ Submitting...' : '✓ Submit Application'}
                       </button>
                     </div>
                   </div>
-                )}
-
-                {/* Upload area - show only when not using profile resume */}
-                {!useProfileResume && (
-                <label className={`block border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${uploadError ? 'border-red-500/50 bg-red-500/5' : 'border-purple-500/30 hover:border-purple-500/60 hover:bg-purple-500/5'}`}>
-                  <input type="file" accept=".pdf,.doc,.docx" onChange={e => handleResumeUpload(e.target.files?.[0] || null)}
-                    className="hidden" disabled={extracting || uploading} />
-                  <Upload className={`w-6 h-6 mx-auto mb-3 ${uploadError ? 'text-red-400' : 'text-gray-400'}`} />
-                  <div className="text-base text-gray-300 font-medium">
-                    {uploading ? '📤 מעלה קובץ...' : extracting ? '🔄 מחלץ נתונים...' : form.resume_filename ? `✓ ${form.resume_filename}` : 'העלה קורות חיים (PDF, Word)'}
-                  </div>
-                  {uploadError ? (
-                    <p className="text-red-400 text-xs mt-2">{uploadError}</p>
-                  ) : (
-                    <p className="text-sm text-gray-500 mt-2">נתוני קורות החיים יתמלאו אוטומטית</p>
-                  )}
-                </label>
-                )}
-                {useProfileResume && form.resume_url && (
-                  <div className="flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-xl px-4 py-3 text-sm text-purple-300">
-                    ✓ קורות חיים מהפרופיל ישמשו להגשה
-                  </div>
-                )}
-
-                <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => { setShowApply(false); setFormErrors({}); setApplyError(null); setUploadError(null); }} className="flex-1 border border-white/20 text-gray-300 px-4 h-10 rounded-xl text-base font-semibold hover:bg-white/5 hover:border-white/40 transition-all active:scale-95">ביטול</button>
-                <button type="submit" disabled={applyMutation.isPending || uploading || extracting} className="flex-1 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-6 h-10 rounded-xl text-base font-semibold disabled:opacity-50 shadow-md hover:shadow-lg transition-all active:scale-95">
-                  {uploading ? '📤 מעלה...' : extracting ? '🔄 מחלץ...' : applyMutation.isPending ? '⏳ שולח...' : '✓ שלח מועמדות'}
-                </button>
-                </div>
-              </form>
+                </form>
               )}
             </div>
           </div>

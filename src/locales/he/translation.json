@@ -1057,5 +1057,145 @@
     "pending": "ממתין",
     "paid": "שולם",
     "overdue": "באיחור"
+  },
+  "candidate": {
+    "interviews": {
+      "title": "הראיונות שלי",
+      "subtitle": "כל הראיונות שנקבעו עבורך",
+      "noJobTitle": "ללא כותרת משרה",
+      "upcomingBanner": "ראיון קרוב",
+      "hasFeedback": "יש משוב",
+      "viewJob": "צפה במשרה",
+      "noInterviews": "אין ראיונות מתוכננים",
+      "noInterviewsHint": "כשיזמנו אותך לראיון, תראה אותם כאן",
+      "noResults": "לא נמצאו ראיונות",
+      "noResultsHint": "נסה לשנות את הסינון",
+      "clearFilter": "נקה סינון",
+      "status": {
+        "scheduled": "מתוכנן",
+        "confirmed": "מאושר",
+        "completed": "הושלם",
+        "cancelled": "בוטל",
+        "no_show": "לא הגיע",
+        "rescheduled": "נדחה"
+      },
+      "types": {
+        "phone": "טלפון",
+        "video": "וידאו",
+        "in_person": "פנים אל פנים",
+        "technical": "טכני",
+        "hr": "HR",
+        "final": "סופי"
+      },
+      "filters": {
+        "upcoming": "קרובים",
+        "past": "עברו",
+        "all": "הכל"
+      },
+      "stats": {
+        "total": "סה\"כ ראיונות",
+        "upcoming": "קרובים",
+        "completed": "הושלמו"
+      },
+      "detail": {
+        "date": "תאריך",
+        "time": "שעה",
+        "type": "סוג",
+        "interviewer": "מראיין",
+        "location": "מיקום",
+        "joinLink": "קישור להצטרפות",
+        "notes": "הערות"
+      }
+    }
+  },
+  "company": {
+    "interviews": {
+      "title": "ניהול ראיונות",
+      "subtitle": "כל הראיונות המתוכננים בארגון",
+      "noCandidate": "ללא שם מועמד",
+      "noJobTitle": "ללא כותרת משרה",
+      "upcomingBanner": "ראיון קרוב",
+      "hasFeedback": "יש משוב",
+      "viewCandidate": "צפה במועמד",
+      "viewJob": "צפה במשרה",
+      "scheduleNew": "תזמן ראיון",
+      "scheduleFirst": "תזמן ראיון ראשון",
+      "noInterviews": "אין ראיונות מתוכננים",
+      "noInterviewsHint": "תזמן ראיונות עם מועמדים מעמוד המועמדים",
+      "noResults": "לא נמצאו ראיונות",
+      "noResultsHint": "נסה לשנות את הסינון",
+      "clearFilter": "נקה סינון",
+      "confirmStatusChange": "האם אתה בטוח שברצונך לשנות את סטטוס הראיון?",
+      "minutes": "דקות",
+      "status": {
+        "scheduled": "מתוכנן",
+        "confirmed": "מאושר",
+        "completed": "הושלם",
+        "cancelled": "בוטל",
+        "no_show": "לא הגיע",
+        "rescheduled": "נדחה"
+      },
+      "types": {
+        "phone": "טלפון",
+        "video": "וידאו",
+        "in_person": "פנים אל פנים",
+        "technical": "טכני",
+        "hr": "HR",
+        "final": "סופי"
+      },
+      "stages": {
+        "screening": "סינון",
+        "first": "ראשון",
+        "second": "שני",
+        "third": "שלישי",
+        "technical": "טכני",
+        "hr": "HR",
+        "final": "סופי",
+        "offer": "הצעה"
+      },
+      "filters": {
+        "upcoming": "קרובים",
+        "today": "היום",
+        "completed": "הושלמו",
+        "cancelled": "בוטלו",
+        "all": "הכל"
+      },
+      "stats": {
+        "total": "סה\"כ ראיונות",
+        "upcoming": "קרובים",
+        "completed": "הושלמו",
+        "cancelled": "בוטלו",
+        "noShow": "לא הגיעו"
+      },
+      "actions": {
+        "confirm": "אשר",
+        "complete": "סמן כהושלם",
+        "cancel": "בטל"
+      },
+      "detail": {
+        "date": "תאריך",
+        "time": "שעה",
+        "type": "סוג",
+        "stage": "שלב",
+        "duration": "משך",
+        "interviewer": "מראיין",
+        "contact": "פרטי קשר",
+        "location": "מיקום",
+        "joinLink": "קישור להצטרפות",
+        "notes": "הערות",
+        "feedback": "משוב",
+        "feedbackPlaceholder": "כתוב את המשוב שלך כאן...",
+        "noFeedback": "עדיין לא נוסף משוב",
+        "rating": "דירוג",
+        "recommendation": "המלצה"
+      },
+      "recommendations": {
+        "strong_yes": "כן מאוד",
+        "yes": "כן",
+        "maybe": "אולי",
+        "no": "לא",
+        "strong_no": "בהחלט לא"
+      }
+    }
   }
 }

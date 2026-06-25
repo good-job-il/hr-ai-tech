@@ -1057,5 +1057,145 @@
     "pending": "Pending",
     "paid": "Paid",
     "overdue": "Overdue"
+  },
+  "candidate": {
+    "interviews": {
+      "title": "My Interviews",
+      "subtitle": "All your scheduled interviews",
+      "noJobTitle": "No job title",
+      "upcomingBanner": "Upcoming interview",
+      "hasFeedback": "Has feedback",
+      "viewJob": "View job",
+      "noInterviews": "No scheduled interviews",
+      "noInterviewsHint": "When you get invited to an interview, you'll see them here",
+      "noResults": "No interviews found",
+      "noResultsHint": "Try changing the filter",
+      "clearFilter": "Clear filter",
+      "status": {
+        "scheduled": "Scheduled",
+        "confirmed": "Confirmed",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "no_show": "No show",
+        "rescheduled": "Rescheduled"
+      },
+      "types": {
+        "phone": "Phone",
+        "video": "Video",
+        "in_person": "In Person",
+        "technical": "Technical",
+        "hr": "HR",
+        "final": "Final"
+      },
+      "filters": {
+        "upcoming": "Upcoming",
+        "past": "Past",
+        "all": "All"
+      },
+      "stats": {
+        "total": "Total Interviews",
+        "upcoming": "Upcoming",
+        "completed": "Completed"
+      },
+      "detail": {
+        "date": "Date",
+        "time": "Time",
+        "type": "Type",
+        "interviewer": "Interviewer",
+        "location": "Location",
+        "joinLink": "Join Link",
+        "notes": "Notes"
+      }
+    }
+  },
+  "company": {
+    "interviews": {
+      "title": "Interview Management",
+      "subtitle": "All scheduled interviews in your organization",
+      "noCandidate": "No candidate name",
+      "noJobTitle": "No job title",
+      "upcomingBanner": "Upcoming interview",
+      "hasFeedback": "Has feedback",
+      "viewCandidate": "View candidate",
+      "viewJob": "View job",
+      "scheduleNew": "Schedule Interview",
+      "scheduleFirst": "Schedule First Interview",
+      "noInterviews": "No scheduled interviews",
+      "noInterviewsHint": "Schedule interviews with candidates from the candidates page",
+      "noResults": "No interviews found",
+      "noResultsHint": "Try changing the filter",
+      "clearFilter": "Clear filter",
+      "confirmStatusChange": "Are you sure you want to change the interview status?",
+      "minutes": "minutes",
+      "status": {
+        "scheduled": "Scheduled",
+        "confirmed": "Confirmed",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "no_show": "No show",
+        "rescheduled": "Rescheduled"
+      },
+      "types": {
+        "phone": "Phone",
+        "video": "Video",
+        "in_person": "In Person",
+        "technical": "Technical",
+        "hr": "HR",
+        "final": "Final"
+      },
+      "stages": {
+        "screening": "Screening",
+        "first": "First",
+        "second": "Second",
+        "third": "Third",
+        "technical": "Technical",
+        "hr": "HR",
+        "final": "Final",
+        "offer": "Offer"
+      },
+      "filters": {
+        "upcoming": "Upcoming",
+        "today": "Today",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "all": "All"
+      },
+      "stats": {
+        "total": "Total Interviews",
+        "upcoming": "Upcoming",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "noShow": "No Show"
+      },
+      "actions": {
+        "confirm": "Confirm",
+        "complete": "Mark as Completed",
+        "cancel": "Cancel"
+      },
+      "detail": {
+        "date": "Date",
+        "time": "Time",
+        "type": "Type",
+        "stage": "Stage",
+        "duration": "Duration",
+        "interviewer": "Interviewer",
+        "contact": "Contact Info",
+        "location": "Location",
+        "joinLink": "Join Link",
+        "notes": "Notes",
+        "feedback": "Feedback",
+        "feedbackPlaceholder": "Write your feedback here...",
+        "noFeedback": "No feedback added yet",
+        "rating": "Rating",
+        "recommendation": "Recommendation"
+      },
+      "recommendations": {
+        "strong_yes": "Strong Yes",
+        "yes": "Yes",
+        "maybe": "Maybe",
+        "no": "No",
+        "strong_no": "Strong No"
+      }
+    }
   }
 }
