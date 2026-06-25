@@ -15,7 +15,7 @@ function CopyButton({ text }) {
   return (
     <button
       onClick={handleCopy}
-      title="העתק כתובת"
+      title="Copy address"
       className={`flex-shrink-0 h-6 w-6 rounded-md flex items-center justify-center transition-all ${
         copied ? 'bg-green-100 text-green-600' : 'bg-[#F3EFFF] text-[#7C3AED] hover:bg-[#EDE9FF]'
       }`}
@@ -78,13 +78,13 @@ export default function ManageJobsPage() {
   const closedCount = jobs.filter(j => j.is_closed).length;
 
   return (
-    <div dir="rtl" className="space-y-6">
+    <div dir="ltr" className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-black text-[#0F172A]">ניהול משרות</h1>
+          <h1 className="text-3xl font-black text-[#0F172A]">Manage Jobs</h1>
           <p className="text-[#64748B] font-semibold mt-1">
-            {openCount} פתוחות · {closedCount} סגורות
+            {openCount} open · {closedCount} closed
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -95,7 +95,7 @@ export default function ManageJobsPage() {
           <button onClick={handleNew}
             className="h-10 px-5 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center gap-2 shadow-md hover:opacity-90 transition-all">
             <Plus className="w-4 h-4" />
-            משרה חדשה
+            New Job
           </button>
         </div>
       </div>
@@ -103,18 +103,18 @@ export default function ManageJobsPage() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="חיפוש לפי תפקיד, חברה, מיקום..."
-            className="w-full h-10 pr-9 pl-4 rounded-xl border border-[#E4ECFF] bg-white text-sm outline-none focus:border-[#7C3AED] text-gray-900"
+            placeholder="Search by title, company, location..."
+            className="w-full h-10 pl-9 pr-4 rounded-xl border border-[#E4ECFF] bg-white text-sm outline-none focus:border-[#7C3AED] text-gray-900"
           />
         </div>
         <label className="flex items-center gap-2 text-sm font-semibold text-[#64748B] cursor-pointer">
           <input type="checkbox" checked={showClosed} onChange={e => setShowClosed(e.target.checked)}
             className="w-4 h-4 rounded" />
-          הצג סגורות
+          Show closed
         </label>
       </div>
 
@@ -126,12 +126,12 @@ export default function ManageJobsPage() {
       ) : filtered.length === 0 ? (
         <div className="bg-white rounded-2xl border border-[#E4ECFF] p-12 text-center">
           <Briefcase className="w-12 h-12 text-[#CBD5E1] mx-auto mb-4" />
-          <p className="text-[#64748B] font-bold text-lg">אין משרות</p>
-          <p className="text-[#94A3B8] text-sm mt-1">לחץ "משרה חדשה" ליצירה</p>
+          <p className="text-[#64748B] font-bold text-lg">No jobs</p>
+          <p className="text-[#94A3B8] text-sm mt-1">Click "New Job" to create</p>
           <button onClick={handleNew}
             className="mt-4 h-10 px-5 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center gap-2 mx-auto shadow-md">
             <Plus className="w-4 h-4" />
-            משרה חדשה
+            New Job
           </button>
         </div>
       ) : (
@@ -139,13 +139,13 @@ export default function ManageJobsPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#F1F5F9] bg-[#F7FBFF]">
-                <th className="text-right text-xs font-black text-[#64748B] px-5 py-3">תפקיד</th>
-                <th className="text-right text-xs font-black text-[#64748B] px-5 py-3 hidden md:table-cell">חברה</th>
-                <th className="text-right text-xs font-black text-[#64748B] px-5 py-3 hidden md:table-cell">מיקום</th>
-                <th className="text-right text-xs font-black text-[#64748B] px-5 py-3">קוד / Email / Link</th>
-                <th className="text-right text-xs font-black text-[#64748B] px-5 py-3">תגמול</th>
-                <th className="text-right text-xs font-black text-[#64748B] px-5 py-3">אחריות</th>
-                <th className="text-right text-xs font-black text-[#64748B] px-5 py-3">סטטוס</th>
+                <th className="text-left text-xs font-black text-[#64748B] px-5 py-3">Position</th>
+                <th className="text-left text-xs font-black text-[#64748B] px-5 py-3 hidden md:table-cell">Company</th>
+                <th className="text-left text-xs font-black text-[#64748B] px-5 py-3 hidden md:table-cell">Location</th>
+                <th className="text-left text-xs font-black text-[#64748B] px-5 py-3">Code / Email / Link</th>
+                <th className="text-left text-xs font-black text-[#64748B] px-5 py-3">Compensation</th>
+                <th className="text-left text-xs font-black text-[#64748B] px-5 py-3">Warranty</th>
+                <th className="text-left text-xs font-black text-[#64748B] px-5 py-3">Status</th>
                 <th className="px-5 py-3" />
               </tr>
             </thead>
@@ -193,7 +193,7 @@ export default function ManageJobsPage() {
                         )}
                      </div>
                    ) : (
-                     <span className="text-xs text-[#CBD5E1]">ממתין לקוד...</span>
+                     <span className="text-xs text-[#CBD5E1]">Waiting for code...</span>
                    )}
                   </td>
                   <td className="px-5 py-4">
@@ -223,14 +223,14 @@ export default function ManageJobsPage() {
                       const days = plan.warranty_period_days ?? 30;
                       return (
                         <span className="text-[#374151] text-xs">
-                          {days} ימים
+                          {days} days
                         </span>
                       );
                     })()}
                   </td>
                   <td className="px-5 py-4">
                     <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${job.is_closed ? STATUS_COLORS.closed : STATUS_COLORS.open}`}>
-                      {job.is_closed ? 'סגורה' : 'פתוחה'}
+                      {job.is_closed ? 'Closed' : 'Open'}
                     </span>
                   </td>
                   <td className="px-5 py-4">
@@ -245,7 +245,7 @@ export default function ManageJobsPage() {
                             ? 'border-green-200 text-green-600 hover:bg-green-50'
                             : 'border-red-200 text-red-500 hover:bg-red-50'
                         }`}
-                        title={job.is_closed ? 'פתח מחדש' : 'סגור משרה'}>
+                        title={job.is_closed ? 'Reopen' : 'Close job'}>
                         {job.is_closed ? <CheckCircle className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                       </button>
                     </div>
