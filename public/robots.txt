@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /employer/settings
+Disallow: /messages
+Disallow: /my-applications
+Disallow: /login
+Disallow: /register
+Disallow: /reset-password
+Disallow: /forgot-password
+
+# Crawl delay (ms)
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://headhunter.co.il/sitemap.xml
+Sitemap: https://headhunter.co.il/sitemap-jobs.xml
+Sitemap: https://headhunter.co.il/sitemap-companies.xml

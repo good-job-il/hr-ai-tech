@@ -1,0 +1,18 @@
+{
+  "name": "RoleAlias",
+  "type": "object",
+  "properties": {
+    "alias": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05e0\u05e8\u05d3\u05e3 \u05dc\u05ea\u05e4\u05e7\u05d9\u05d3"
+    },
+    "canonical_role": {
+      "type": "string",
+      "description": "\u05d4\u05e9\u05dd \u05d4\u05e8\u05e9\u05de\u05d9 \u05e9\u05dc \u05d4\u05ea\u05e4\u05e7\u05d9\u05d3"
+    }
+  },
+  "required": [
+    "alias",
+    "canonical_role"
+  ]
+}

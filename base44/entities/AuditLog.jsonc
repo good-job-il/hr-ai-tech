@@ -1,0 +1,104 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05d0\u05e8\u05d2\u05d5\u05df (Multi-Tenant isolation)"
+    },
+    "actor_user_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05de\u05d9 \u05e9\u05d1\u05d9\u05e6\u05e2 \u05d0\u05ea \u05d4\u05e4\u05e2\u05d5\u05dc\u05d4"
+    },
+    "actor_email": {
+      "type": "string",
+      "description": "email \u05e9\u05dc \u05de\u05d9 \u05e9\u05d1\u05d9\u05e6\u05e2 \u05d0\u05ea \u05d4\u05e4\u05e2\u05d5\u05dc\u05d4"
+    },
+    "actor_role": {
+      "type": "string",
+      "description": "\u05ea\u05e4\u05e7\u05d9\u05d3 \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05d1\u05d6\u05de\u05df \u05d4\u05e4\u05e2\u05d5\u05dc\u05d4"
+    },
+    "entity_type": {
+      "type": "string",
+      "enum": [
+        "Candidate",
+        "Application",
+        "Job",
+        "Company",
+        "CandidateDocument",
+        "CompensationPlan",
+        "User",
+        "Organization",
+        "Interview",
+        "CommunicationLog"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4-entity \u05e2\u05dc\u05d9\u05d5 \u05d1\u05d5\u05e6\u05e2\u05d4 \u05d4\u05e4\u05e2\u05d5\u05dc\u05d4"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4-entity"
+    },
+    "entity_label": {
+      "type": "string",
+      "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05e7\u05e8\u05d9\u05d0 (\u05e9\u05dd \u05de\u05d5\u05e2\u05de\u05d3, \u05db\u05d5\u05ea\u05e8\u05ea \u05de\u05e9\u05e8\u05d4 \u05d5\u05db\u05d5')"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "view",
+        "create",
+        "update",
+        "delete",
+        "cv_download",
+        "cv_view",
+        "status_change",
+        "send_to_employer",
+        "export",
+        "compensation_change",
+        "login",
+        "impersonate",
+        "restore"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e4\u05e2\u05d5\u05dc\u05d4"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "\u05de\u05d9\u05d3\u05e2 \u05e0\u05d5\u05e1\u05e3 (old_value, new_value, job_id, etc.)"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "\u05db\u05ea\u05d5\u05d1\u05ea IP \u05e9\u05dc \u05d4\u05de\u05d1\u05e6\u05e2 (\u05d0\u05dd \u05d6\u05de\u05d9\u05e0\u05d4)"
+    },
+    "user_agent": {
+      "type": "string",
+      "description": "User-Agent \u05e9\u05dc \u05d4\u05d3\u05e4\u05d3\u05e4\u05df (\u05d0\u05dd \u05d6\u05de\u05d9\u05df)"
+    }
+  },
+  "required": [
+    "entity_type",
+    "entity_id",
+    "action"
+  ],
+  "rls": {
+    "create": true,
+    "read": {
+      "$or": [
+        {
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

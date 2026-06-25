@@ -1,0 +1,286 @@
+{
+  "name": "Interview",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05d0\u05e8\u05d2\u05d5\u05df (Multi-Tenant isolation)"
+    },
+    "application_id": {
+      "type": "string"
+    },
+    "candidate_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "job_id": {
+      "type": "string"
+    },
+    "job_title": {
+      "type": "string"
+    },
+    "employer_id": {
+      "type": "string",
+      "description": "Email of the employer"
+    },
+    "recruiter_id": {
+      "type": "string",
+      "description": "Email of the recruiter who scheduled"
+    },
+    "candidate_name": {
+      "type": "string"
+    },
+    "candidate_email": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "time": {
+      "type": "string",
+      "description": "HH:MM format"
+    },
+    "duration_minutes": {
+      "type": "number",
+      "default": 45,
+      "description": "\u05de\u05e9\u05da \u05d4\u05e8\u05d0\u05d9\u05d5\u05df \u05d1\u05d3\u05e7\u05d5\u05ea"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "phone",
+        "video",
+        "in_person",
+        "technical",
+        "hr",
+        "final"
+      ],
+      "default": "video"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "screening",
+        "first",
+        "second",
+        "third",
+        "technical",
+        "hr",
+        "final",
+        "offer"
+      ],
+      "default": "first",
+      "description": "\u05e9\u05dc\u05d1 \u05d4\u05e8\u05d0\u05d9\u05d5\u05df"
+    },
+    "location_or_link": {
+      "type": "string",
+      "description": "Address or video link"
+    },
+    "interviewer_name": {
+      "type": "string"
+    },
+    "interviewer_email": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string",
+      "description": "\u05d4\u05e2\u05e8\u05d5\u05ea \u05dc\u05e4\u05e0\u05d9 \u05d4\u05e8\u05d0\u05d9\u05d5\u05df"
+    },
+    "feedback": {
+      "type": "string",
+      "description": "\u05de\u05e9\u05d5\u05d1 \u05d0\u05d7\u05e8\u05d9 \u05d4\u05e8\u05d0\u05d9\u05d5\u05df"
+    },
+    "rating": {
+      "type": "number",
+      "description": "\u05d3\u05d9\u05e8\u05d5\u05d2 1-5"
+    },
+    "recommendation": {
+      "type": "string",
+      "enum": [
+        "strong_yes",
+        "yes",
+        "maybe",
+        "no",
+        "strong_no"
+      ],
+      "description": "\u05d4\u05de\u05dc\u05e6\u05ea \u05d4\u05de\u05e8\u05d0\u05d9\u05d9\u05df"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "confirmed",
+        "completed",
+        "cancelled",
+        "no_show",
+        "rescheduled"
+      ],
+      "default": "scheduled"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "default": false
+    },
+    "candidate_confirmed": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "candidate_name",
+    "date",
+    "time"
+  ],
+  "rls": {
+    "create": {
+      "data.organization_id": "{{user.data.organization_id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "org_admin"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruitment_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "team_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.team_manager_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "hr_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "internal_recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "org_admin"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruitment_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "team_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.team_manager_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "hr_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "internal_recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "org_admin"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruitment_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "team_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.team_manager_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        }
+      ]
+    }
+  }
+}

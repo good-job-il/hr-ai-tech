@@ -1,0 +1,53 @@
+{
+  "name": "UserPositionAccess",
+  "type": "object",
+  "properties": {
+    "company_email": {
+      "type": "string",
+      "description": "Email of the hiring manager who owns this company"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the team manager or recruiter"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Name of the user"
+    },
+    "user_type": {
+      "type": "string",
+      "enum": [
+        "team_manager",
+        "recruiter"
+      ],
+      "description": "Type of user"
+    },
+    "position_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of positions this user can access"
+    },
+    "can_review_applications": {
+      "type": "boolean",
+      "default": true,
+      "description": "Can review applications"
+    },
+    "can_schedule_interviews": {
+      "type": "boolean",
+      "default": true,
+      "description": "Can schedule interviews"
+    },
+    "can_send_messages": {
+      "type": "boolean",
+      "default": true,
+      "description": "Can send messages to candidates"
+    }
+  },
+  "required": [
+    "company_email",
+    "user_email",
+    "user_type"
+  ]
+}

@@ -1,0 +1,259 @@
+{
+  "name": "Job",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05d0\u05e8\u05d2\u05d5\u05df \u05e9\u05de\u05e0\u05d4\u05dc \u05d0\u05ea \u05d4\u05de\u05e9\u05e8\u05d4 (Multi-Tenant isolation)"
+    },
+    "domain_id": {
+      "type": "number",
+      "description": "Domain ID"
+    },
+    "role_id": {
+      "type": "number",
+      "description": "Role ID"
+    },
+    "specialization_id": {
+      "type": "number",
+      "description": "Specialization ID (optional)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Job title"
+    },
+    "company": {
+      "type": "string",
+      "description": "Company name"
+    },
+    "company_initials": {
+      "type": "string",
+      "description": "Company initials for avatar"
+    },
+    "company_color": {
+      "type": "string",
+      "description": "Background color for company avatar"
+    },
+    "location": {
+      "type": "string",
+      "description": "Job location"
+    },
+    "salary_min": {
+      "type": "number"
+    },
+    "salary_max": {
+      "type": "number"
+    },
+    "category": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "full",
+        "part",
+        "daily",
+        "remote"
+      ],
+      "default": "full"
+    },
+    "views": {
+      "type": "number",
+      "default": 0
+    },
+    "description": {
+      "type": "string"
+    },
+    "employer_company_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d7\u05d1\u05e8\u05ea \u05d4\u05dc\u05e7\u05d5\u05d7 (\u05de\u05d9 \u05e2\u05d3\u05df / \u05e0\u05d5\u05d1\u05d5\u05dc\u05d5\u05d2 \u05d5\u05db\u05d5') \u05e9\u05e4\u05e8\u05e1\u05de\u05d4 \u05d0\u05ea \u05d4\u05de\u05e9\u05e8\u05d4"
+    },
+    "agency_company_id": {
+      "type": "string",
+      "description": "[DEPRECATED] \u05d4\u05e9\u05ea\u05de\u05e9 \u05d1-organization_id"
+    },
+    "created_by_user_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05de\u05d9 \u05e9\u05d9\u05e6\u05e8 \u05d0\u05ea \u05d4\u05de\u05e9\u05e8\u05d4 (recruiter / employer)"
+    },
+    "recruiter_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05d4\u05de\u05d2\u05d9\u05d9\u05e1 \u05d4\u05e4\u05e0\u05d9\u05de\u05d9 \u05d4\u05de\u05de\u05d5\u05e0\u05d4 \u05e2\u05dc \u05d4\u05de\u05e9\u05e8\u05d4"
+    },
+    "employer_id": {
+      "type": "string",
+      "description": "[DEPRECATED] \u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05e9\u05dc \u05d4\u05de\u05e2\u05e1\u05d9\u05e7 \u2014 \u05d4\u05e9\u05ea\u05de\u05e9 \u05d1-employer_company_id \u05d1\u05de\u05e7\u05d5\u05dd"
+    },
+    "external_id": {
+      "type": "string",
+      "description": "External ID for deduplication (e.g. jobicy_123)"
+    },
+    "is_closed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the job is closed"
+    },
+    "is_anonymous": {
+      "type": "boolean",
+      "default": false,
+      "description": "Hide company name and details from job listing"
+    },
+    "show_company_name": {
+      "type": "boolean",
+      "default": true,
+      "description": "Display company name"
+    },
+    "show_company_info": {
+      "type": "boolean",
+      "default": true,
+      "description": "Display company information and reviews"
+    },
+    "show_contact_details": {
+      "type": "boolean",
+      "default": false,
+      "description": "Display contact details in job listing"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Contact email for this job"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "Contact phone for this job"
+    },
+    "applications_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Total applications received"
+    },
+    "required_skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Required skills for the job (used by AI Matching)"
+    },
+    "preferred_skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Nice-to-have skills (used by AI Matching)"
+    },
+    "role_domain": {
+      "type": "string",
+      "description": "Domain/field of the role (e.g. Software Engineering, Marketing)"
+    },
+    "seniority": {
+      "type": "string",
+      "enum": [
+        "junior",
+        "mid",
+        "senior",
+        "lead",
+        "manager",
+        "director",
+        "any"
+      ],
+      "default": "any",
+      "description": "Seniority level required"
+    },
+    "years_experience_required": {
+      "type": "number",
+      "description": "Minimum years of experience required"
+    },
+    "ai_keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Additional AI matching keywords"
+    },
+    "job_code": {
+      "type": "string",
+      "description": "Unique job code for email intake (e.g. hh102). Auto-generated."
+    },
+    "apply_email": {
+      "type": "string",
+      "description": "Auto-generated email alias for this job"
+    },
+    "apply_url": {
+      "type": "string",
+      "description": "Public apply URL for this job"
+    },
+    "is_deleted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Soft delete \u2014 \u05d4\u05d0\u05dd \u05d4\u05de\u05e9\u05e8\u05d4 \u05e0\u05de\u05d7\u05e7\u05d4"
+    },
+    "deleted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05d1\u05d5\u05e6\u05e2 \u05d4-soft delete"
+    },
+    "deleted_by": {
+      "type": "string",
+      "description": "user_id \u05e9\u05dc \u05de\u05d9 \u05e9\u05de\u05d7\u05e7"
+    }
+  },
+  "required": [
+    "title",
+    "company"
+  ],
+  "rls": {
+    "create": {
+      "data.organization_id": "{{user.data.organization_id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    }
+  }
+}

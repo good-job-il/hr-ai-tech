@@ -1,0 +1,219 @@
+{
+  "name": "CompensationPlan",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05d0\u05e8\u05d2\u05d5\u05df (Multi-Tenant isolation \u2014 \u05d7\u05d1\u05e8\u05ea \u05d4\u05d4\u05e9\u05de\u05d4)"
+    },
+    "job_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05de\u05e9\u05e8\u05d4 (\u05d0\u05d5\u05e4\u05e6\u05d9\u05d5\u05e0\u05dc\u05d9 \u2014 \u05d0\u05dd \u05e8\u05d9\u05e7, \u05d7\u05dc \u05e2\u05dc \u05dc\u05e7\u05d5\u05d7/\u05d7\u05d1\u05e8\u05d4 \u05db\u05d5\u05dc\u05dc)"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05dc\u05e7\u05d5\u05d7/\u05d7\u05d1\u05e8\u05d4"
+    },
+    "agency_company_id": {
+      "type": "string",
+      "description": "[DEPRECATED] \u05d4\u05e9\u05ea\u05de\u05e9 \u05d1-organization_id"
+    },
+    "total_fee": {
+      "type": "number",
+      "description": "\u05e1\u05db\u05d5\u05dd \u05d4\u05e2\u05de\u05dc\u05d4 \u05d4\u05db\u05d5\u05dc\u05dc \u05e9\u05d4\u05d7\u05d1\u05e8\u05d4 \u05de\u05e9\u05dc\u05de\u05ea (\u05d1\u05e9\u05e7\u05dc\u05d9\u05dd)"
+    },
+    "warranty_period_days": {
+      "type": "number",
+      "description": "\u05ea\u05e7\u05d5\u05e4\u05ea \u05d0\u05d7\u05e8\u05d9\u05d5\u05ea \u05d1\u05d9\u05de\u05d9\u05dd",
+      "default": 30
+    },
+    "recruiter_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05d4\u05de\u05d2\u05d9\u05d9\u05e1 \u05d6\u05db\u05d0\u05d9 \u05dc\u05ea\u05d2\u05de\u05d5\u05dc (\u05d0\u05dd \u05e1\u05e4\u05e6\u05d9\u05e4\u05d9)"
+    },
+    "team_manager_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05de\u05e0\u05d4\u05dc \u05d4\u05e6\u05d5\u05d5\u05ea \u05d6\u05db\u05d0\u05d9 \u05dc\u05ea\u05d2\u05de\u05d5\u05dc (\u05d0\u05dd \u05e1\u05e4\u05e6\u05d9\u05e4\u05d9)"
+    },
+    "recruitment_manager_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05de\u05e0\u05d4\u05dc \u05d4\u05d2\u05d9\u05d5\u05e1 \u05d6\u05db\u05d0\u05d9 \u05dc\u05ea\u05d2\u05de\u05d5\u05dc (\u05d0\u05dd \u05e1\u05e4\u05e6\u05d9\u05e4\u05d9)"
+    },
+    "recruiter_compensation": {
+      "type": "number",
+      "description": "\u05ea\u05d2\u05de\u05d5\u05dc \u05e8\u05db\u05d6 \u05d2\u05d9\u05d5\u05e1 (\u05e9\"\u05d7 \u05d0\u05d5 %)"
+    },
+    "recruiter_compensation_type": {
+      "type": "string",
+      "enum": [
+        "fixed",
+        "percent"
+      ],
+      "default": "percent",
+      "description": "\u05e1\u05d5\u05d2 \u05ea\u05d2\u05de\u05d5\u05dc \u05e8\u05db\u05d6: fixed=\u05e1\u05db\u05d5\u05dd \u05e7\u05d1\u05d5\u05e2, percent=\u05d0\u05d7\u05d5\u05d6"
+    },
+    "team_manager_compensation": {
+      "type": "number",
+      "description": "\u05ea\u05d2\u05de\u05d5\u05dc \u05de\u05e0\u05d4\u05dc \u05e6\u05d5\u05d5\u05ea (\u05e9\"\u05d7 \u05d0\u05d5 %)"
+    },
+    "team_manager_compensation_type": {
+      "type": "string",
+      "enum": [
+        "fixed",
+        "percent"
+      ],
+      "default": "percent"
+    },
+    "recruitment_manager_compensation": {
+      "type": "number",
+      "description": "\u05ea\u05d2\u05de\u05d5\u05dc \u05de\u05e0\u05d4\u05dc \u05d2\u05d9\u05d5\u05e1 (\u05e9\"\u05d7 \u05d0\u05d5 %)"
+    },
+    "recruitment_manager_compensation_type": {
+      "type": "string",
+      "enum": [
+        "fixed",
+        "percent"
+      ],
+      "default": "percent"
+    },
+    "notes": {
+      "type": "string",
+      "description": "\u05d4\u05e2\u05e8\u05d5\u05ea"
+    },
+    "created_by_role": {
+      "type": "string",
+      "description": "\u05ea\u05e4\u05e7\u05d9\u05d3 \u05de\u05d9 \u05e9\u05d9\u05e6\u05e8 \u05d0\u05ea \u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05ea"
+    }
+  },
+  "required": [
+    "client_name"
+  ],
+  "rls": {
+    "create": {
+      "data.organization_id": "{{user.data.organization_id}}",
+      "user_condition": {
+        "org_type": "staffing_agency"
+      }
+    },
+    "read": {
+      "$and": [
+        {
+          "$or": [
+            {
+              "data.organization_id": "{{user.data.organization_id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "super_admin"
+              }
+            }
+          ]
+        },
+        {
+          "$or": [
+            {
+              "user_condition": {
+                "org_type": "staffing_agency"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "super_admin"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "update": {
+      "$and": [
+        {
+          "$or": [
+            {
+              "data.organization_id": "{{user.data.organization_id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "super_admin"
+              }
+            }
+          ]
+        },
+        {
+          "$or": [
+            {
+              "user_condition": {
+                "org_type": "staffing_agency"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "super_admin"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "delete": {
+      "$and": [
+        {
+          "$or": [
+            {
+              "data.organization_id": "{{user.data.organization_id}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "super_admin"
+              }
+            }
+          ]
+        },
+        {
+          "$or": [
+            {
+              "user_condition": {
+                "org_type": "staffing_agency"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "super_admin"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

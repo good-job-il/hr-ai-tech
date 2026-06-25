@@ -1,0 +1,38 @@
+{
+  "name": "EmployerTimeline",
+  "type": "object",
+  "properties": {
+    "employer_email": {
+      "type": "string",
+      "description": "Email of the employer"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "account_created",
+        "job_posted",
+        "application_received",
+        "candidate_viewed",
+        "status_changed",
+        "note_added",
+        "team_member_added",
+        "setting_changed",
+        "import_completed"
+      ],
+      "description": "Type of event"
+    },
+    "description": {
+      "type": "string",
+      "description": "Event description"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional context (job_id, candidate_email, team_member_email, etc.)"
+    }
+  },
+  "required": [
+    "employer_email",
+    "event_type",
+    "description"
+  ]
+}

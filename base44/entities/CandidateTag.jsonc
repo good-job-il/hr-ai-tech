@@ -1,0 +1,26 @@
+{
+  "name": "CandidateTag",
+  "type": "object",
+  "properties": {
+    "candidate_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "tag": {
+      "type": "string",
+      "description": "\u05ea\u05d5\u05d9\u05ea"
+    },
+    "color": {
+      "type": "string",
+      "description": "\u05e6\u05d1\u05e2 \u05d4\u05ea\u05d5\u05d9\u05ea (hex)"
+    },
+    "added_by": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05de\u05d9 \u05e9\u05d4\u05d5\u05e1\u05d9\u05e3"
+    }
+  },
+  "required": [
+    "candidate_id",
+    "tag"
+  ]
+}

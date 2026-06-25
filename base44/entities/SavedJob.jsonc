@@ -1,0 +1,22 @@
+{
+  "name": "SavedJob",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "job_id": {
+      "type": "string"
+    },
+    "job_title": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "job_id"
+  ]
+}

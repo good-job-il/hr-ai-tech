@@ -1,0 +1,23 @@
+{
+  "name": "Specialization",
+  "type": "object",
+  "properties": {
+    "specialization_id": {
+      "type": "number",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05d4\u05ea\u05de\u05d7\u05d5\u05ea"
+    },
+    "role_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05ea\u05e4\u05e7\u05d9\u05d3 \u05d0\u05dc\u05d9\u05d5 \u05e9\u05d9\u05d9\u05db\u05ea \u05d4\u05d4\u05ea\u05de\u05d7\u05d5\u05ea"
+    },
+    "name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05d4\u05ea\u05de\u05d7\u05d5\u05ea"
+    }
+  },
+  "required": [
+    "specialization_id",
+    "role_name",
+    "name"
+  ]
+}

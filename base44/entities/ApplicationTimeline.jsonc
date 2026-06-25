@@ -1,0 +1,87 @@
+{
+  "name": "ApplicationTimeline",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05d0\u05e8\u05d2\u05d5\u05df (Multi-Tenant isolation)"
+    },
+    "application_id": {
+      "type": "string",
+      "description": "Application ID this timeline belongs to"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "status_changed",
+        "note_added",
+        "interview_scheduled",
+        "interview_completed",
+        "offer_made",
+        "rejected",
+        "assigned",
+        "resume_viewed"
+      ],
+      "description": "Type of event"
+    },
+    "previous_value": {
+      "type": "string",
+      "description": "Previous value (for status changes)"
+    },
+    "new_value": {
+      "type": "string",
+      "description": "New value (for status changes)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Event description"
+    },
+    "performed_by": {
+      "type": "string",
+      "description": "Email of the user who performed the action"
+    },
+    "performed_by_role": {
+      "type": "string",
+      "enum": [
+        "candidate",
+        "employer",
+        "recruiter",
+        "team_manager",
+        "recruitment_manager",
+        "org_admin",
+        "admin"
+      ],
+      "description": "Role of the user who performed the action"
+    }
+  },
+  "required": [
+    "application_id",
+    "event_type",
+    "description"
+  ],
+  "rls": {
+    "create": {
+      "data.organization_id": "{{user.data.organization_id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

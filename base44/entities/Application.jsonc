@@ -1,0 +1,307 @@
+{
+  "name": "Application",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05d0\u05e8\u05d2\u05d5\u05df \u05e9\u05de\u05e0\u05d4\u05dc \u05d0\u05ea \u05d4\u05d4\u05d2\u05e9\u05d4 (Multi-Tenant isolation)"
+    },
+    "job_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05de\u05e9\u05e8\u05d4 \u05e9\u05d4\u05d5\u05d2\u05e9\u05d4 \u05d0\u05dc\u05d9\u05d4 \u05de\u05d5\u05e2\u05de\u05d3\u05d5\u05ea"
+    },
+    "candidate_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05de\u05d5\u05e2\u05de\u05d3 (\u05de-Candidate entity)"
+    },
+    "job_title": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05e9\u05e8\u05d4 (\u05e9\u05d3\u05d4 \u05e0\u05d5\u05e8\u05de\u05dc\u05d9)"
+    },
+    "company": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05d7\u05d1\u05e8\u05d4 (\u05e9\u05d3\u05d4 \u05e0\u05d5\u05e8\u05de\u05dc\u05d9)"
+    },
+    "employer_company_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d7\u05d1\u05e8\u05ea \u05d4\u05dc\u05e7\u05d5\u05d7 (employer) \u05e9\u05e4\u05e8\u05e1\u05de\u05d4 \u05d0\u05ea \u05d4\u05de\u05e9\u05e8\u05d4"
+    },
+    "agency_company_id": {
+      "type": "string",
+      "description": "[DEPRECATED] \u05d4\u05e9\u05ea\u05de\u05e9 \u05d1-organization_id"
+    },
+    "recruiter_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05d4\u05de\u05d2\u05d9\u05d9\u05e1 \u05d4\u05e4\u05e0\u05d9\u05de\u05d9 \u05e9\u05de\u05d8\u05e4\u05dc \u05d1\u05d4\u05d2\u05e9\u05d4"
+    },
+    "team_manager_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05de\u05e0\u05d4\u05dc \u05d4\u05e6\u05d5\u05d5\u05ea \u05d4\u05d0\u05d7\u05e8\u05d0\u05d9"
+    },
+    "recruitment_manager_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05de\u05e0\u05d4\u05dc \u05d4\u05d2\u05d9\u05d5\u05e1 \u05d4\u05d0\u05d7\u05e8\u05d0\u05d9"
+    },
+    "candidate_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "candidate_email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05e9\u05dc \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "candidate_phone": {
+      "type": "string",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d8\u05dc\u05e4\u05d5\u05df \u05e9\u05dc \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "resume_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05e8\u05d5\u05ea \u05d7\u05d9\u05d9\u05dd (URL \u05e9\u05dc \u05e7\u05d5\u05d1\u05e5)"
+    },
+    "resume_filename": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05e7\u05d5\u05d1\u05e5 \u05e7\u05d5\u05e8\u05d5\u05ea \u05d4\u05d7\u05d9\u05d9\u05dd \u05d4\u05de\u05e7\u05d5\u05e8\u05d9"
+    },
+    "cover_letter": {
+      "type": "string",
+      "description": "\u05de\u05db\u05ea\u05d1 \u05de\u05d5\u05d8\u05d9\u05d1\u05e6\u05d9\u05d4"
+    },
+    "desired_salary_min": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05e4\u05d9\u05d5\u05ea \u05e9\u05db\u05e8 \u05de\u05d9\u05e0\u05d9\u05de\u05d5\u05dd"
+    },
+    "desired_salary_max": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05e4\u05d9\u05d5\u05ea \u05e9\u05db\u05e8 \u05de\u05e7\u05e1\u05d9\u05de\u05d5\u05dd"
+    },
+    "location": {
+      "type": "string",
+      "description": "\u05e2\u05d9\u05e8 \u05de\u05d2\u05d5\u05e8\u05d9\u05dd \u05e9\u05dc \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "app",
+        "linkedin",
+        "facebook",
+        "jobsite",
+        "pool_assignment",
+        "email_intake",
+        "other"
+      ],
+      "default": "app",
+      "description": "\u05de\u05d0\u05d9\u05e4\u05d4 \u05d4\u05de\u05d5\u05e2\u05de\u05d3 \u05d4\u05d2\u05d9\u05e2"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "reviewed",
+        "phone_interview",
+        "recommended",
+        "employer_interview",
+        "offer",
+        "hired",
+        "probation",
+        "completed",
+        "rejected"
+      ],
+      "default": "new",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05d4\u05de\u05d5\u05e2\u05de\u05d3\u05d5\u05ea"
+    },
+    "match_score": {
+      "type": "number",
+      "description": "\u05e0\u05d9\u05e7\u05d5\u05d3 \u05d4\u05ea\u05d0\u05de\u05d4 AI (0-100)"
+    },
+    "match_reason": {
+      "type": "string",
+      "description": "\u05d4\u05e1\u05d1\u05e8 \u05e2\u05dc \u05e0\u05d9\u05e7\u05d5\u05d3 \u05d4\u05d4\u05ea\u05d0\u05de\u05d4"
+    },
+    "notes": {
+      "type": "string",
+      "description": "\u05d4\u05e2\u05e8\u05d5\u05ea \u05e4\u05e0\u05d9\u05de\u05d9\u05d5\u05ea"
+    },
+    "internal_history": {
+      "type": "string",
+      "description": "\u05d4\u05d9\u05e1\u05d8\u05d5\u05e8\u05d9\u05d9\u05ea \u05e4\u05e2\u05d5\u05dc\u05d5\u05ea \u05e4\u05e0\u05d9\u05de\u05d9\u05d5\u05ea"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05d4\u05de\u05d2\u05d9\u05d9\u05e1 \u05e9\u05de\u05d8\u05e4\u05dc \u05d1\u05de\u05d5\u05e2\u05de\u05d3\u05d5\u05ea"
+    },
+    "employer_id": {
+      "type": "string",
+      "description": "[DEPRECATED] \u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05e9\u05dc \u05d4\u05de\u05e2\u05e1\u05d9\u05e7 \u2014 \u05d4\u05e9\u05ea\u05de\u05e9 \u05d1-employer_company_id \u05d1\u05de\u05e7\u05d5\u05dd"
+    },
+    "is_deleted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Soft delete \u2014 \u05d4\u05d0\u05dd \u05d4\u05d4\u05d2\u05e9\u05d4 \u05e0\u05de\u05d7\u05e7\u05d4"
+    },
+    "deleted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05d1\u05d5\u05e6\u05e2 \u05d4-soft delete"
+    },
+    "deleted_by": {
+      "type": "string",
+      "description": "user_id \u05e9\u05dc \u05de\u05d9 \u05e9\u05de\u05d7\u05e7"
+    }
+  },
+  "required": [
+    "job_id",
+    "candidate_name",
+    "candidate_email"
+  ],
+  "rls": {
+    "create": {
+      "data.organization_id": "{{user.data.organization_id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "org_admin"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruitment_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "team_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.team_manager_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "hr_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "internal_recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "org_admin"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruitment_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "team_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.team_manager_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "hr_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "internal_recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "org_admin"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruitment_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "team_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.team_manager_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        }
+      ]
+    }
+  }
+}

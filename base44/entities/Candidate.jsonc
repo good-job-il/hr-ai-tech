@@ -1,0 +1,429 @@
+{
+  "name": "Candidate",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05d0\u05e8\u05d2\u05d5\u05df \u05e9\u05d0\u05dc\u05d9\u05d5 \u05e9\u05d9\u05d9\u05da \u05d4\u05de\u05d5\u05e2\u05de\u05d3 (Multi-Tenant isolation)"
+    },
+    "full_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05de\u05dc\u05d0 \u05e9\u05dc \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05e9\u05dc \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "phone": {
+      "type": "string",
+      "description": "\u05de\u05e1\u05e4\u05e8 \u05d8\u05dc\u05e4\u05d5\u05df"
+    },
+    "location": {
+      "type": "string",
+      "description": "\u05e2\u05d9\u05e8/\u05d0\u05d6\u05d5\u05e8 \u05de\u05d2\u05d5\u05e8\u05d9\u05dd"
+    },
+    "domain_id": {
+      "type": "number",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05ea\u05d7\u05d5\u05dd"
+    },
+    "domain_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05ea\u05d7\u05d5\u05dd"
+    },
+    "role_id": {
+      "type": "number",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05ea\u05e4\u05e7\u05d9\u05d3"
+    },
+    "role_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05ea\u05e4\u05e7\u05d9\u05d3"
+    },
+    "specialization_id": {
+      "type": "number",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05d4\u05ea\u05de\u05d7\u05d5\u05ea"
+    },
+    "specialization_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05d4\u05ea\u05de\u05d7\u05d5\u05ea"
+    },
+    "experience_years": {
+      "type": "number",
+      "description": "\u05e9\u05e0\u05d5\u05ea \u05e0\u05d9\u05e1\u05d9\u05d5\u05df"
+    },
+    "desired_salary_min": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05e4\u05d9\u05d5\u05ea \u05e9\u05db\u05e8 \u05de\u05d9\u05e0\u05d9\u05de\u05d5\u05dd"
+    },
+    "desired_salary_max": {
+      "type": "number",
+      "description": "\u05e6\u05d9\u05e4\u05d9\u05d5\u05ea \u05e9\u05db\u05e8 \u05de\u05e7\u05e1\u05d9\u05de\u05d5\u05dd"
+    },
+    "resume_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05e8\u05d5\u05ea \u05d7\u05d9\u05d9\u05dd (DOCX converted)"
+    },
+    "original_resume_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05e8\u05d5\u05ea \u05d7\u05d9\u05d9\u05dd \u05d4\u05de\u05e7\u05d5\u05e8\u05d9\u05d9\u05dd (\u05d2\u05d9\u05d1\u05d5\u05d9)"
+    },
+    "converted_resume_url": {
+      "type": "string",
+      "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e7\u05d5\u05e8\u05d5\u05ea \u05d4\u05d7\u05d9\u05d9\u05dd \u05d1\u05e4\u05d5\u05e8\u05de\u05d8 DOCX"
+    },
+    "resume_filename": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05e7\u05d5\u05d1\u05e5 \u05e7\u05d5\u05e8\u05d5\u05ea \u05d4\u05d7\u05d9\u05d9\u05dd \u05d4\u05de\u05e7\u05d5\u05e8\u05d9\u05d9\u05dd"
+    },
+    "original_file_type": {
+      "type": "string",
+      "enum": [
+        "pdf",
+        "doc",
+        "docx",
+        "txt"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e7\u05d5\u05d1\u05e5 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9"
+    },
+    "converted_file_type": {
+      "type": "string",
+      "default": "docx",
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e7\u05d5\u05d1\u05e5 \u05d4\u05de\u05d5\u05de\u05e8 (\u05ea\u05de\u05d9\u05d3 docx)"
+    },
+    "converted_resume_filename": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05e7\u05d5\u05d1\u05e5 \u05e7\u05d5\u05e8\u05d5\u05ea \u05d4\u05d7\u05d9\u05d9\u05dd \u05d1\u05e4\u05d5\u05e8\u05de\u05d8 DOCX"
+    },
+    "original_resume_filename": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d4\u05e7\u05d5\u05d1\u05e5 \u05d4\u05de\u05e7\u05d5\u05e8\u05d9 \u05e9\u05d4\u05d5\u05e2\u05dc\u05d4 (PDF/DOC/DOCX/TXT)"
+    },
+    "resume_file_size": {
+      "type": "number",
+      "description": "\u05d2\u05d5\u05d3\u05dc \u05e7\u05d5\u05d1\u05e5 \u05e7\u05d5\u05e8\u05d5\u05ea \u05d4\u05d7\u05d9\u05d9\u05dd (\u05d1\u05d1\u05d9\u05d9\u05d8\u05d9\u05dd)"
+    },
+    "resume_uploaded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05d4\u05e2\u05dc\u05d0\u05ea \u05e7\u05d5\u05e8\u05d5\u05ea \u05d4\u05d7\u05d9\u05d9\u05dd"
+    },
+    "resume_upload_source": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "import_zip",
+        "api",
+        "crawl"
+      ],
+      "default": "manual",
+      "description": "\u05de\u05e7\u05d5\u05e8 \u05d4\u05e2\u05dc\u05d0\u05ea \u05e7\u05d5\u05e8\u05d5\u05ea \u05d4\u05d7\u05d9\u05d9\u05dd"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "import",
+        "manual",
+        "linkedin",
+        "upload",
+        "crawl"
+      ],
+      "default": "manual",
+      "description": "\u05de\u05e7\u05d5\u05e8 \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "contacted",
+        "interview",
+        "offer",
+        "hired",
+        "rejected",
+        "inactive"
+      ],
+      "default": "new",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "agency_company_id": {
+      "type": "string",
+      "description": "[DEPRECATED] \u05d4\u05e9\u05ea\u05de\u05e9 \u05d1-organization_id"
+    },
+    "recruiter_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05d4\u05de\u05d2\u05d9\u05d9\u05e1 \u05d4\u05e4\u05e0\u05d9\u05de\u05d9 \u05e9\u05de\u05d8\u05e4\u05dc \u05d1\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "team_manager_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05de\u05e0\u05d4\u05dc \u05d4\u05e6\u05d5\u05d5\u05ea \u05e9\u05dc \u05d4\u05de\u05d2\u05d9\u05d9\u05e1"
+    },
+    "recruitment_manager_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05de\u05e0\u05d4\u05dc \u05d4\u05d2\u05d9\u05d5\u05e1 \u05d4\u05d0\u05d7\u05e8\u05d0\u05d9"
+    },
+    "employer_company_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d7\u05d1\u05e8\u05ea \u05d4\u05dc\u05e7\u05d5\u05d7 \u05d0\u05dc\u05d9\u05d4 \u05e0\u05e9\u05dc\u05d7 \u05d4\u05de\u05d5\u05e2\u05de\u05d3 (\u05de\u05d9 \u05e2\u05d3\u05df / \u05e0\u05d5\u05d1\u05d5\u05dc\u05d5\u05d2 \u05d5\u05db\u05d5')"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05db\u05d9\u05e9\u05d5\u05e8\u05d9\u05dd"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05e9\u05e4\u05d5\u05ea"
+    },
+    "previous_companies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05d7\u05d1\u05e8\u05d5\u05ea \u05e7\u05d5\u05d3\u05de\u05d5\u05ea"
+    },
+    "summary": {
+      "type": "string",
+      "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05e7\u05e6\u05e8 \u05e9\u05dc \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "notes": {
+      "type": "string",
+      "description": "\u05d4\u05e2\u05e8\u05d5\u05ea \u05e4\u05e0\u05d9\u05de\u05d9\u05d5\u05ea"
+    },
+    "is_duplicate_suspected": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d7\u05e9\u05d5\u05d3 \u05db\u05e4\u05d9\u05dc\u05d5\u05ea"
+    },
+    "duplicate_of_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05d5\u05e2\u05de\u05d3 \u05d4\u05d3\u05d5\u05de\u05d4"
+    },
+    "import_batch_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05ea\u05d9\u05e7\u05d9\u05d9\u05ea \u05d9\u05d9\u05d1\u05d5\u05d0"
+    },
+    "data_quality_score": {
+      "type": "number",
+      "description": "\u05e0\u05d9\u05e7\u05d5\u05d3 \u05d0\u05d9\u05db\u05d5\u05ea \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd (0-100)",
+      "default": 0
+    },
+    "missing_data": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "\u05e8\u05e9\u05d9\u05de\u05ea \u05e9\u05d3\u05d5\u05ea \u05d7\u05e1\u05e8\u05d9\u05dd"
+    },
+    "parsing_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "success",
+        "partial",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 parsing \u05e9\u05dc \u05e7\u05d5\u05e8\u05d5\u05ea \u05d4\u05d7\u05d9\u05d9\u05dd"
+    },
+    "parsing_confidence": {
+      "type": "number",
+      "description": "\u05e8\u05de\u05ea \u05d1\u05d9\u05d8\u05d7\u05d5\u05df \u05e9\u05dc parsing (0-100)",
+      "default": 0
+    },
+    "conversion_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "success",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05d4\u05d4\u05de\u05e8\u05d4 \u05dc-DOCX"
+    },
+    "review_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05e0\u05d3\u05e8\u05e9\u05ea \u05d1\u05d9\u05e7\u05d5\u05e8\u05ea \u05d9\u05d3\u05e0\u05d9\u05ea"
+    },
+    "imported_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05d4\u05d9\u05d9\u05d1\u05d5\u05d0"
+    },
+    "imported_by": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05e9\u05d9\u05d9\u05d1\u05d0 \u05d0\u05ea \u05d4\u05de\u05d5\u05e2\u05de\u05d3"
+    },
+    "is_deleted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Soft delete \u2014 \u05d4\u05d0\u05dd \u05d4\u05de\u05d5\u05e2\u05de\u05d3 \u05e0\u05de\u05d7\u05e7"
+    },
+    "deleted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u05de\u05ea\u05d9 \u05d1\u05d5\u05e6\u05e2 \u05d4-soft delete"
+    },
+    "deleted_by": {
+      "type": "string",
+      "description": "user_id \u05e9\u05dc \u05de\u05d9 \u05e9\u05de\u05d7\u05e7"
+    }
+  },
+  "required": [
+    "full_name"
+  ],
+  "rls": {
+    "create": {
+      "data.organization_id": "{{user.data.organization_id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "org_admin"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruitment_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "team_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.team_manager_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "hr_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "internal_recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "org_admin"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruitment_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "team_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.team_manager_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "hr_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "internal_recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "org_admin"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruitment_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "team_manager"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.team_manager_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "recruiter"
+          },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.recruiter_id": "{{user.id}}"
+        }
+      ]
+    }
+  }
+}

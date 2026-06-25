@@ -1,0 +1,96 @@
+{
+  "name": "CandidateProfile",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "full_name": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "description": "Current/desired job title"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "experience_years": {
+      "type": "number"
+    },
+    "education": {
+      "type": "string"
+    },
+    "experience": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "company": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "years": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "desired_salary_min": {
+      "type": "number"
+    },
+    "desired_salary_max": {
+      "type": "number"
+    },
+    "job_type": {
+      "type": "string",
+      "enum": [
+        "full",
+        "part",
+        "remote",
+        "any"
+      ],
+      "default": "any"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "is_public": {
+      "type": "boolean",
+      "default": true,
+      "description": "Visible to employers"
+    },
+    "is_open_to_work": {
+      "type": "boolean",
+      "default": false,
+      "description": "Actively looking for a job"
+    },
+    "resume_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "full_name"
+  ]
+}

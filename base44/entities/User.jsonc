@@ -1,0 +1,102 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "candidate",
+        "employer",
+        "recruiter",
+        "team_manager",
+        "recruitment_manager",
+        "org_admin",
+        "admin",
+        "super_admin",
+        "hr_manager",
+        "internal_recruiter"
+      ],
+      "default": "candidate",
+      "description": "User role in the system"
+    },
+    "organization_id": {
+      "type": "string",
+      "description": "ID \u05e9\u05dc \u05d4\u05d0\u05e8\u05d2\u05d5\u05df \u05e9\u05d0\u05dc\u05d9\u05d5 \u05e9\u05d9\u05d9\u05da \u05d4\u05de\u05e9\u05ea\u05de\u05e9"
+    },
+    "company_id": {
+      "type": "string",
+      "description": "[DEPRECATED] Associated company ID \u2014 use organization_id"
+    },
+    "org_type": {
+      "type": "string",
+      "enum": [
+        "staffing_agency",
+        "organization"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05d0\u05e8\u05d2\u05d5\u05df \u05e9\u05dc \u05d4\u05de\u05e9\u05ea\u05de\u05e9"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "team_manager_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05de\u05e0\u05d4\u05dc \u05d4\u05e6\u05d5\u05d5\u05ea \u05d4\u05d9\u05e9\u05d9\u05e8"
+    },
+    "recruitment_manager_id": {
+      "type": "string",
+      "description": "user.id \u05e9\u05dc \u05de\u05e0\u05d4\u05dc \u05d4\u05d2\u05d9\u05d5\u05e1 \u05d4\u05d9\u05e9\u05d9\u05e8"
+    },
+    "display_role_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05ea\u05e4\u05e7\u05d9\u05d3 \u05de\u05d5\u05ea\u05d0\u05dd \u05d0\u05d9\u05e9\u05d9\u05ea (display only) \u2014 \u05dc\u05d0 \u05de\u05e9\u05e4\u05d9\u05e2 \u05e2\u05dc \u05d4\u05e8\u05e9\u05d0\u05d5\u05ea"
+    }
+  },
+  "required": [],
+  "rls": {
+    "create": {
+      "data.organization_id": "{{user.data.organization_id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "data.organization_id": "{{user.data.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "data.id": "{{user.id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

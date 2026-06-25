@@ -1,0 +1,403 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { base44 } from '@/api/base44Client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
+import { toast } from '@/components/ui/use-toast';
+
+export default function Register() {
+  const { t, i18n } = useTranslation();
+  const isRtl = !i18n.language?.startsWith('en');
+
+  const USER_TYPES = [
+    { id: 'candidate', label: isRtl ? 'מועמד (מחפש עבודה)' : 'Candidate (Job Seeker)', requiresOrg: false },
+    { id: 'employer', label: isRtl ? 'מעסיק (חברה)' : 'Employer (Company)', requiresOrg: true },
+    { id: 'recruiter', label: isRtl ? 'רכז גיוס' : 'Recruiter', requiresOrg: true },
+    { id: 'team_manager', label: isRtl ? 'מנהל צוות' : 'Team Manager', requiresOrg: true },
+    { id: 'recruitment_manager', label: isRtl ? 'מנהל גיוס' : 'Recruitment Manager', requiresOrg: true },
+    { id: 'admin', label: isRtl ? 'בעל חברה / אדמין' : 'Company Owner / Admin', requiresOrg: true },
+  ];
+
+  const ORG_TYPES = [
+    {
+      id: 'regular',
+      label: isRtl ? 'ארגון / חברה רגילה' : 'Regular Organization / Company',
+      desc: isRtl ? 'גיוס עצמאי ללא מערכת תגמולים פנימית' : 'Independent hiring without internal compensation system',
+      icon: '🏢',
+    },
+    {
+      id: 'staffing',
+      label: isRtl ? 'חברת השמה / כוח אדם' : 'Staffing Agency',
+      desc: isRtl ? 'כולל מערכת תגמולים, עמלות וניהול היררכי' : 'Includes compensation, commissions and hierarchical management',
+      icon: '🎯',
+    },
+  ];
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const phoneFromUrl = urlParams.get('phone') || '';
+  const inviteToken = urlParams.get('invite') || '';
+  const inviteEmail = urlParams.get('email') || '';
+  const inviteRole = urlParams.get('role') || '';
+
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState(inviteEmail);
+  const [phone, setPhone] = useState(phoneFromUrl);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [userType, setUserType] = useState(inviteRole || 'candidate');
+  const [orgType, setOrgType] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [showOtp, setShowOtp] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const isFromInvite = !!inviteToken;
+
+  const cardRef = useRef(null);
+
+  const showError = (msg) => {
+    setError(msg);
+    cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    toast({ title: msg, variant: 'destructive' });
+  };
+
+  useEffect(() => {
+    if (showOtp) {
+      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [showOtp]);
+
+  const selectedUserType = USER_TYPES.find(u => u.id === userType);
+  const requiresOrg = selectedUserType?.requiresOrg;
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError('');
+    
+    if (!fullName.trim()) {
+      showError(isRtl ? 'יש להזין שם מלא' : 'Please enter your full name');
+      return;
+    }
+    if (!email.trim()) {
+      showError(isRtl ? 'יש להזין כתובת אימייל' : 'Please enter your email');
+      return;
+    }
+    if (!phone.trim()) {
+      showError(isRtl ? 'יש להזין מספר טלפון' : 'Please enter your phone number');
+      return;
+    }
+    if (password !== confirmPassword) {
+      showError(t('errors.passwordMismatch'));
+      return;
+    }
+    if (password.length < 6) {
+      showError(isRtl ? 'הסיסמה חייבת להיות לפחות 6 תווים' : 'Password must be at least 6 characters');
+      return;
+    }
+    if (requiresOrg && !orgType) {
+      showError(isRtl ? 'יש לבחור סוג ארגון' : 'Please select an organization type');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await base44.auth.register({ email, password });
+      setShowOtp(true);
+    } catch (err) {
+      console.error('[Register] register error:', err);
+      const msg = err?.response?.data?.message || err?.message || (isRtl ? 'שגיאה בהרשמה' : 'Registration error');
+      showError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await base44.auth.verifyOtp({ email, otpCode });
+      base44.auth.setToken(res.access_token);
+
+      // Set the user's role via service-role function (bypasses platform restriction)
+      try {
+        await base44.functions.setUserRole.invoke({
+          role: userType,
+          org_type: orgType || null,
+        });
+      } catch (roleErr) {
+        console.warn('[Register] setUserRole failed, falling back to localStorage:', roleErr);
+      }
+
+      // Update profile fields that are allowed without admin rights
+      try {
+        await base44.auth.updateMe({
+          full_name: fullName,
+          phone,
+          org_type: orgType || null,
+          profile_completed: false,
+          is_active: true,
+          last_login: new Date().toISOString(),
+        });
+      } catch (updateErr) {
+        console.warn('[Register] updateMe failed:', updateErr);
+      }
+
+      localStorage.setItem('base44_registered_role', userType);
+
+      const redirects = {
+        candidate: '/candidate/dashboard',
+        employer: '/employer/dashboard',
+        recruiter: '/recruiter/dashboard',
+        team_manager: '/recruitment/jobs',
+        recruitment_manager: '/recruitment/jobs',
+        admin: '/admin/dashboard',
+      };
+
+      window.location.href = redirects[userType] || '/';
+    } catch (err) {
+      console.error('[Register] verifyOtp error:', err);
+      const msg = err?.response?.data?.message || err?.message || (isRtl ? 'קוד שגוי' : 'Invalid code');
+      showError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogle = () => {
+    base44.auth.loginWithProvider('google', '/');
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 py-12" dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'linear-gradient(135deg, #eaf7fb 0%, #d4edfa 100%)' }}>
+      <div className="w-full max-w-md">
+        <div ref={cardRef} className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
+          <div className="text-center mb-6">
+            <img src="https://media.base44.com/images/public/6a00f4b05ae5180d66425437/e31fa83ee_232B9533-1BE6-4299-80F9-1B99BFDA97E1.png" alt="HeadHunter HR-Tech" className="h-16 w-auto object-contain mx-auto mb-4" />
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              {showOtp
+                ? (isRtl ? 'רגע אחד לפני שמתחילים 🎉' : 'One moment before we start 🎉')
+                : (isRtl ? 'הצטרף לHeadHunter' : 'Join HeadHunter')}
+            </h1>
+            <p className="text-sm text-gray-600">
+              {showOtp
+                ? (isRtl ? `שלחנו קוד אימות לכתובת ${email}` : `We sent a verification code to ${email}`)
+                : (isRtl ? 'אלפי משרות מחכות לך — הרשמה לוקחת פחות מדקה' : 'Thousands of jobs await you — registration takes less than a minute')}
+            </p>
+          </div>
+
+          <div className="flex justify-center mb-4">
+            <LanguageSwitcher variant="badge" />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3 mb-6 flex gap-2">
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
+          )}
+
+          {showOtp ? (
+           <form onSubmit={handleVerify} className="space-y-5">
+             <div>
+               <Label className="text-sm font-semibold text-gray-700 block mb-2">
+                 {isRtl ? 'קוד אימות (6 ספרות)' : 'Verification code (6 digits)'}
+               </Label>
+               <Input
+                 value={otpCode}
+                 onChange={(e) => setOtpCode(e.target.value)}
+                 required
+                 className="text-center tracking-[0.2em] text-xl font-semibold h-14 border-gray-300 focus:border-hhblue"
+                 dir="ltr"
+                 placeholder="000000"
+               />
+               <p className="text-xs text-gray-500 mt-1.5">
+                 {isRtl ? 'הסתכל בדוא"ל שלך — הקוד נשלח עכשיו. בדוק גם ספאם.' : 'Check your email — the code was just sent. Also check spam.'}
+               </p>
+             </div>
+               <Button type="submit" disabled={loading} className="w-full bg-red-600 hover:bg-red-700 text-white h-12 font-bold text-base rounded-lg">
+                 {loading ? (
+                   <span className="flex items-center gap-2 justify-center">
+                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                     </svg>
+                     {isRtl ? 'מאמת...' : 'Verifying...'}
+                   </span>
+                 ) : (isRtl ? 'אמת ובוא נתחיל' : "Verify and let's start")}
+               </Button>
+             <button
+               type="button"
+               onClick={() => base44.auth.resendOtp(email)}
+               className="text-hhblue text-sm hover:underline w-full text-center py-2"
+             >
+               {isRtl ? 'לא קיבלת? שלח קוד חדש' : "Didn't receive it? Send a new code"}
+             </button>
+           </form>
+          ) : (
+           <>
+             <form onSubmit={handleRegister} className="space-y-4">
+               <div>
+                 <Label className="text-sm font-semibold text-gray-700 block mb-2">{t('auth.register.fullName')}</Label>
+                 <Input
+                   type="text"
+                   value={fullName}
+                   onChange={(e) => setFullName(e.target.value)}
+                   required
+                   className="h-11 border-gray-300"
+                   placeholder={isRtl ? 'ישראל ישראלי' : 'John Smith'}
+                 />
+               </div>
+               <div>
+                 <Label className="text-sm font-semibold text-gray-700 block mb-2">{t('auth.register.email')}</Label>
+                 <Input
+                   type="email"
+                   value={email}
+                   onChange={(e) => setEmail(e.target.value)}
+                   required
+                   className="h-11 border-gray-300"
+                   placeholder="you@example.com"
+                   dir="ltr"
+                 />
+               </div>
+               <div>
+                 <Label className="text-sm font-semibold text-gray-700 block mb-2">{t('auth.register.phone')}</Label>
+                 <Input
+                   type="tel"
+                   value={phone}
+                   onChange={(e) => setPhone(e.target.value)}
+                   required
+                   className="h-11 border-gray-300"
+                   placeholder="05X-XXX-XXXX"
+                   dir="ltr"
+                 />
+               </div>
+               {!isFromInvite && (
+                 <div>
+                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
+                     {isRtl ? 'אני מצטרף בתור' : 'I am joining as'}
+                   </Label>
+                   <Select value={userType} onValueChange={(v) => { setUserType(v); setOrgType(''); }}>
+                     <SelectTrigger className="h-11 border-gray-300">
+                       <SelectValue />
+                     </SelectTrigger>
+                     <SelectContent>
+                       {USER_TYPES.map(type => (
+                         <SelectItem key={type.id} value={type.id}>{type.label}</SelectItem>
+                       ))}
+                     </SelectContent>
+                   </Select>
+                 </div>
+               )}
+
+               {isFromInvite && (
+                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+                   <p className="font-semibold mb-1">
+                     {isRtl ? `הצטרפות כ${USER_TYPES.find(u => u.id === userType)?.label}` : `Joining as ${USER_TYPES.find(u => u.id === userType)?.label}`}
+                   </p>
+                   <p className="text-xs text-blue-700">
+                     {isRtl ? 'הדוא"ל והתפקיד קבועים לפי ההזמנה' : 'Email and role are fixed by the invitation'}
+                   </p>
+                 </div>
+               )}
+
+               {requiresOrg && !isFromInvite && (
+                 <div>
+                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
+                     {isRtl ? 'סוג הארגון' : 'Organization type'}
+                   </Label>
+                   <div className="grid grid-cols-2 gap-3">
+                     {ORG_TYPES.map(org => (
+                       <button
+                         key={org.id}
+                         type="button"
+                         onClick={() => setOrgType(org.id)}
+                         className={`p-3 rounded-xl border-2 text-${isRtl ? 'right' : 'left'} transition-all ${
+                           orgType === org.id
+                             ? 'border-purple-500 bg-purple-50'
+                             : 'border-gray-200 hover:border-gray-300 bg-white'
+                         }`}
+                       >
+                         <div className="text-xl mb-1">{org.icon}</div>
+                         <div className="text-xs font-bold text-gray-800">{org.label}</div>
+                         <div className="text-[10px] text-gray-500 mt-0.5">{org.desc}</div>
+                       </button>
+                     ))}
+                   </div>
+                 </div>
+               )}
+               <div>
+                 <Label className="text-sm font-semibold text-gray-700 block mb-2">{t('auth.register.password')}</Label>
+                 <Input
+                   type="password"
+                   value={password}
+                   onChange={(e) => setPassword(e.target.value)}
+                   required
+                   className="h-11 border-gray-300"
+                   placeholder="••••••••"
+                 />
+                 <p className="text-xs text-gray-500 mt-1">
+                   {isRtl ? 'לפחות 6 תווים — בחר משהו שתזכור' : 'At least 6 characters — choose something you remember'}
+                 </p>
+               </div>
+               <div>
+                 <Label className="text-sm font-semibold text-gray-700 block mb-2">{t('auth.register.confirmPassword')}</Label>
+                 <Input
+                   type="password"
+                   value={confirmPassword}
+                   onChange={(e) => setConfirmPassword(e.target.value)}
+                   required
+                   className="h-11 border-gray-300"
+                   placeholder="••••••••"
+                 />
+               </div>
+               <Button type="submit" disabled={loading} className="w-full bg-red-600 hover:bg-red-700 text-white h-12 font-bold text-base rounded-lg">
+                 {loading ? (
+                   <span className="flex items-center gap-2 justify-center">
+                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                     </svg>
+                     {t('auth.register.registering')}
+                   </span>
+                 ) : t('auth.register.registerButton')}
+               </Button>
+             </form>
+
+              <div className="relative my-7">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-3 text-xs font-medium text-gray-400">{t('auth.register.or')}</span>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleGoogle}
+                variant="outline"
+                className="w-full h-12 text-sm font-semibold border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg"
+              >
+                🔵 {t('auth.register.continueGoogle')}
+              </Button>
+            </>
+          )}
+
+          <p className="text-center text-sm text-gray-600 mt-7">
+            {t('auth.register.haveAccount')}{' '}
+            <Link to="/login" className="text-hhblue font-bold hover:underline">{t('auth.register.loginLink')}</Link>
+          </p>
+        </div>
+
+        <div className="mt-8 text-center space-y-2 text-xs text-gray-500">
+          <p>🔒 {isRtl ? 'הנתונים שלך מוצפנים ומאובטחים' : 'Your data is encrypted and secure'}</p>
+          <p>✓ {isRtl ? 'בנוי עבור מחפשי עבודה ומעסיקים בישראל' : 'Built for job seekers and employers in Israel'}</p>
+        </div>
+      </div>
+    </div>
+  );
+}

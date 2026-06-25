@@ -1,0 +1,56 @@
+{
+  "name": "CompanyReview",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "reviewer_email": {
+      "type": "string"
+    },
+    "reviewer_name": {
+      "type": "string"
+    },
+    "rating_overall": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "rating_salary": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "rating_management": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "rating_worklife": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "title": {
+      "type": "string"
+    },
+    "pros": {
+      "type": "string"
+    },
+    "cons": {
+      "type": "string"
+    },
+    "is_anonymous": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "company_id",
+    "reviewer_email",
+    "rating_overall"
+  ]
+}
