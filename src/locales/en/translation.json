@@ -227,7 +227,8 @@
       "applications": "My Applications",
       "savedJobs": "Saved Jobs",
       "profile": "My Profile",
-      "interviews": "Interviews"
+      "interviews": "Interviews",
+      "messages": "Messages"
     }
   },
   "auth": {
@@ -657,6 +658,23 @@
         "location": "Location",
         "joinLink": "Join Link",
         "notes": "Notes"
+      }
+    },
+    "messages": {
+      "title": "My Messages",
+      "subtitle": "Conversations with recruiters and employers",
+      "conversations": "Conversations",
+      "viewJob": "View Job",
+      "selectTitle": "Select a conversation",
+      "selectHint": "Choose a conversation from the list to view messages",
+      "noConversations": "No conversations yet",
+      "noConversationsHint": "Conversations with recruiters will appear here",
+      "noMessages": "No messages in this conversation",
+      "noMessagesHint": "Send the first message to start the conversation",
+      "inputPlaceholder": "Write a message...",
+      "stats": {
+        "conversations": "Open conversations",
+        "unread": "Unread messages"
       }
     }
   },

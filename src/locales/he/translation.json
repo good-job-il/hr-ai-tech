@@ -227,7 +227,8 @@
       "applications": "הגשות שלי",
       "savedJobs": "משרות שמורות",
       "profile": "הפרופיל שלי",
-      "interviews": "ראיונות"
+      "interviews": "ראיונות",
+      "messages": "הודעות"
     }
   },
   "auth": {
@@ -657,6 +658,23 @@
         "location": "מיקום",
         "joinLink": "קישור לכניסה",
         "notes": "הערות"
+      }
+    },
+    "messages": {
+      "title": "הודעות שלי",
+      "subtitle": "שיחות עם מגייסים ומעסיקים",
+      "conversations": "שיחות",
+      "viewJob": "צפה במשרה",
+      "selectTitle": "בחר שיחה",
+      "selectHint": "בחר שיחה מהרשימה כדי לצפות בהודעות",
+      "noConversations": "אין שיחות עדיין",
+      "noConversationsHint": "שיחות עם מגייסים יופיעו כאן",
+      "noMessages": "אין הודעות בשיחה זו",
+      "noMessagesHint": "שלח הודעה ראשונה כדי להתחיל שיחה",
+      "inputPlaceholder": "כתוב הודעה...",
+      "stats": {
+        "conversations": "שיחות פתוחות",
+        "unread": "הודעות שלא נקראו"
       }
     }
   },

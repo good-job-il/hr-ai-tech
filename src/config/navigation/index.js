@@ -24,7 +24,7 @@ export const CANDIDATE_NAV = [
   },
   { id: 'candidate-applications', labelKey: 'nav.candidate.applications', route: '/candidate/applications', icon: FileText, badge: 2 },
   { id: 'candidate-interviews', labelKey: 'nav.candidate.interviews', route: '/candidate/interviews', icon: Eye },
-  { id: 'candidate-messages', label: 'Messages', route: '/candidate/messages', icon: MessageSquare, badge: 3 },
+  { id: 'candidate-messages', labelKey: 'nav.candidate.messages', route: '/candidate/messages', icon: MessageSquare },
 ];
 
 // Kept for EmployerLayout (legacy)

@@ -79,6 +79,7 @@ import CandidateProfile from './pages/candidate/CandidateProfile';
 import CandidateApplications from './pages/candidate/CandidateApplications';
 import CandidateSavedJobs from './pages/candidate/CandidateSavedJobs';
 import CandidateInterviews from './pages/candidate/CandidateInterviews';
+import CandidateMessages from './pages/candidate/CandidateMessages';
 
 // ── Employer Pages (legacy) ───────────────────────────────────────────
 import EmployerDashboard from './pages/employer/EmployerDashboard';
@@ -278,7 +279,7 @@ const AuthenticatedApp = () => {
           <Route path="/candidate/jobs/saved" element={<CandidateSavedJobs />} />
           <Route path="/candidate/applications" element={<CandidateApplications />} />
           <Route path="/candidate/interviews" element={<CandidateInterviews />} />
-          <Route path="/candidate/messages" element={<PlaceholderPage title="הודעות" />} />
+          <Route path="/candidate/messages" element={<CandidateMessages />} />
         </Route>
       </Route>
 
