@@ -18,7 +18,7 @@ export const CANDIDATE_NAV = [
     id: 'candidate-jobs', labelKey: 'nav.candidate.jobs', route: '/candidate/jobs', icon: Briefcase,
     children: [
       { id: 'all-jobs', labelKey: 'common.all', route: '/candidate/jobs/all' },
-      { id: 'recommended', label: 'AI', route: '/candidate/jobs/recommended' },
+      { id: 'recommended', label: 'AI Recommended', route: '/candidate/jobs/recommended' },
       { id: 'saved', labelKey: 'candidate.savedJobs.title', route: '/candidate/jobs/saved', badge: 5 },
     ],
   },

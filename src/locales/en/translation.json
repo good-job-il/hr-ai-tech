@@ -597,9 +597,23 @@
     },
     "savedJobs": {
       "title": "Saved Jobs",
-      "noSaved": "You haven't saved any jobs yet",
+      "subtitle": "All jobs you've bookmarked",
+      "search": "Search by title or company...",
+      "noSaved": "No saved jobs yet",
+      "noSavedHint": "Save jobs you're interested in to come back to them easily",
+      "browseJobs": "Browse Available Jobs",
+      "noResults": "No results found",
+      "noResultsHint": "Try searching with different keywords",
+      "clearFilter": "Clear search",
       "remove": "Remove",
-      "apply": "Apply Now"
+      "apply": "Apply Now",
+      "savedOn": "Saved on",
+      "unknownTitle": "Unknown position",
+      "unknownCompany": "Unknown company",
+      "stats": {
+        "total": "Saved Jobs",
+        "companies": "Different Companies"
+      }
     }
   },
   "pipeline": {
