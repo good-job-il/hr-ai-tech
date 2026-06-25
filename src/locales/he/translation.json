@@ -537,23 +537,63 @@
     },
     "applications": {
       "title": "הגשות שלי",
+      "subtitle": "מעקב אחרי כל המועמדויות שלך",
       "status": {
         "new": "נשלחה",
-        "reviewed": "סינון בוצע",
-        "phone_interview": "ראיון טלפוני בוצע",
-        "recommended": "הומלץ למעסיק",
-        "employer_interview": "בראיון אצל מעסיק",
-        "offer": "התקבלה הצעה",
-        "hired": "התקבלת!",
-        "probation": "בתקופת אחריות",
-        "completed": "עבר תקופת אחריות",
-        "rejected": "לא התקדמה"
+        "reviewed": "נסקרה",
+        "phone_interview": "ראיון טלפוני",
+        "recommended": "הומלצתי למעסיק",
+        "employer_interview": "ראיון אצל מעסיק",
+        "offer": "קיבלתי הצעה",
+        "hired": "התקבלתי!",
+        "probation": "תקופת ניסיון",
+        "completed": "תקופת ניסיון הסתיימה",
+        "rejected": "לא התקדמתי"
       },
-      "noApplications": "עדיין לא הגשת מועמדות לאף משרה",
+      "stats": {
+        "total": "סה״כ הגשות",
+        "active": "פעילות",
+        "upcomingInterviews": "ראיונות קרובים"
+      },
+      "search": "חפש לפי משרה או חברה...",
+      "filters": {
+        "all": "הכל",
+        "active": "פעיל",
+        "offers": "הצעות",
+        "rejected": "נדחיתי"
+      },
+      "interviewBanner": "ראיון: {{date}} בשעה {{time}}",
+      "offerBanner": "קיבלת הצעת עבודה — בדוק את המייל",
+      "hiredBanner": "כל הכבוד — התחלת לעבוד! 🎉",
+      "detail": {
+        "appliedDate": "תאריך הגשה",
+        "location": "מיקום",
+        "salary": "שכר",
+        "source": "מקור",
+        "interviews": "ראיונות",
+        "history": "היסטוריה"
+      },
+      "interviewTypes": {
+        "video": "וידאו",
+        "phone": "טלפוני",
+        "in_person": "פגישה פיזית",
+        "default": "ראיון"
+      },
+      "interviewStatus": {
+        "scheduled": "מתוזמן",
+        "completed": "הסתיים",
+        "cancelled": "בוטל"
+      },
+      "viewJob": "צפה במשרה",
+      "noApplications": "עדיין לא הגשת מועמדויות",
+      "noApplicationsHint": "התחל לחפש משרות שמעניינות אותך",
+      "browseJobs": "עיין במשרות",
+      "noResults": "אין תוצאות",
+      "noResultsHint": "נסה לשנות את הסינון",
+      "clearFilter": "נקה סינון",
       "appliedOn": "הוגש בתאריך",
       "jobTitle": "תפקיד",
-      "company": "חברה",
-      "viewJob": "צפה במשרה"
+      "company": "חברה"
     },
     "savedJobs": {
       "title": "משרות שמורות",

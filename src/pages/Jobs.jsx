@@ -17,7 +17,7 @@ const glass = {
   backdropFilter: 'blur(28px)',
   WebkitBackdropFilter: 'blur(28px)',
   border: '1px solid rgba(221,235,255,0.86)',
-  borderRadius: 30,
+  borderRadius: 8,
   boxShadow: '0 28px 80px rgba(79,124,255,0.11), 0 3px 12px rgba(15,23,42,0.04)',
 };
 
@@ -507,7 +507,7 @@ export default function Jobs() {
                 תובנות שוק העבודה
               </h3>
 
-              <div className="rounded-[24px] p-6 bg-gradient-to-br from-[#F3EFFF] to-[#EAF8FF] border border-[#DDEBFF]">
+              <div className="rounded-lg p-6 bg-gradient-to-br from-[#F3EFFF] to-[#EAF8FF] border border-[#DDEBFF]">
                 <div className="text-[42px] leading-none font-black bg-gradient-to-l from-[#8B5CF6] to-[#2F80FF] bg-clip-text text-transparent mb-2">
                   +24%
                 </div>
@@ -524,7 +524,7 @@ export default function Jobs() {
             <div
               className="p-7 text-white relative overflow-hidden"
               style={{
-                borderRadius: 30,
+                borderRadius: 8,
                 background: 'linear-gradient(135deg,#A855F7,#6C4DFF,#2F80FF)',
                 boxShadow: '0 28px 80px rgba(108,77,255,0.30)',
               }}

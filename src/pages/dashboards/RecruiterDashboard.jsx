@@ -15,7 +15,7 @@ const glassCard = {
 
 function StatCard({ icon: Icon, label, value, color }) {
   return (
-    <div className="relative overflow-hidden rounded-[28px] p-7" style={glassCard}>
+    <div className="relative overflow-hidden rounded-lg p-7" style={glassCard}>
       <div className="absolute -top-8 -left-8 w-32 h-32 rounded-full opacity-[0.06]"
         style={{ background: color }} />
       <div className="flex items-start justify-between mb-5">
@@ -32,7 +32,7 @@ function StatCard({ icon: Icon, label, value, color }) {
 
 function QuickLink({ to, icon: Icon, title, desc, color }) {
   return (
-    <Link to={to} className="group rounded-[28px] p-7 flex items-center gap-5 transition-all hover:-translate-y-1"
+    <Link to={to} className="group rounded-lg p-7 flex items-center gap-5 transition-all hover:-translate-y-1"
       style={{ ...glassCard, textDecoration: 'none' }}
       onMouseEnter={e => e.currentTarget.style.boxShadow = `0 16px 48px rgba(79,124,255,0.12), inset 0 1px 0 rgba(255,255,255,0.9)`}
       onMouseLeave={e => e.currentTarget.style.boxShadow = '0 8px 32px rgba(79,124,255,0.07), inset 0 1px 0 rgba(255,255,255,0.9)'}>
@@ -118,7 +118,7 @@ export default function RecruiterDashboard() {
 
           {/* Recent Applications */}
           {applications.length > 0 && (
-            <div className="rounded-[28px] p-8" style={glassCard}>
+            <div className="rounded-lg p-8" style={glassCard}>
               <h2 className="font-black text-[#0F172A] mb-8">מועמדויות אחרונות שלי</h2>
               <div className="space-y-3">
                 {applications.slice(0, 5).map(app => (

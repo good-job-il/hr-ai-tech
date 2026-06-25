@@ -67,7 +67,7 @@ export default function JobsHeader() {
                       transform: 'translateX(50%)',
                       width: 34,
                       height: 3,
-                      borderRadius: 99,
+                      borderRadius: 8,
                       background: 'linear-gradient(90deg,#8B5CF6,#2F80FF)',
                     }}
                   />
@@ -80,7 +80,7 @@ export default function JobsHeader() {
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link
             to="/jobs"
-            className="hidden md:inline-flex items-center gap-2 h-12 px-6 rounded-[16px] font-black text-[#6C4DFF] bg-white border border-[#DDEBFF] shadow-[0_10px_30px_rgba(79,124,255,0.10)]"
+            className="hidden md:inline-flex items-center gap-2 h-12 px-6 rounded-lg font-black text-[#6C4DFF] bg-white border border-[#DDEBFF] shadow-[0_10px_30px_rgba(79,124,255,0.10)]"
           >
             <Search className="w-4 h-4" />
             {t('jobs.searchButton')}
@@ -92,14 +92,14 @@ export default function JobsHeader() {
             <>
               <Link
                 to="/login"
-                className="hidden sm:inline-flex items-center h-12 px-7 text-[15px] font-black rounded-[16px] text-[#6C4DFF] bg-white border border-[#D8E5FF] shadow-[0_10px_30px_rgba(79,124,255,0.08)]"
+                className="hidden sm:inline-flex items-center h-12 px-7 text-[15px] font-black rounded-lg text-[#6C4DFF] bg-white border border-[#D8E5FF] shadow-[0_10px_30px_rgba(79,124,255,0.08)]"
               >
                 {t('common.login')}
               </Link>
 
               <Link
                 to="/register"
-                className="inline-flex items-center gap-2 h-12 px-7 text-[15px] font-black rounded-[16px] text-white transition-all"
+                className="inline-flex items-center gap-2 h-12 px-7 text-[15px] font-black rounded-lg text-white transition-all"
                 style={{
                   background: 'linear-gradient(135deg,#A855F7 0%,#6C4DFF 48%,#2F80FF 100%)',
                   boxShadow: '0 18px 42px rgba(108,77,255,0.35)',
@@ -118,7 +118,7 @@ export default function JobsHeader() {
 
               <Link
                 to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'candidate' ? '/candidate-dashboard' : '/employer/dashboard'}
-                className="inline-flex items-center h-12 px-7 text-[15px] font-black rounded-[16px] text-white"
+                className="inline-flex items-center h-12 px-7 text-[15px] font-black rounded-lg text-white"
                 style={{
                   background: 'linear-gradient(135deg,#8B5CF6,#2F80FF)',
                   boxShadow: '0 18px 42px rgba(108,77,255,0.30)',

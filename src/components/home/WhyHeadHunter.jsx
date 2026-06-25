@@ -52,7 +52,7 @@ export default function WhyHeadHunter() {
             const Icon = f.icon;
             return (
               <div key={i} style={{
-                padding: '32px 28px', borderRadius: 24,
+                padding: '32px 28px', borderRadius: 8,
                 background: 'white',
                 border: '1px solid rgba(108,77,255,0.08)',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
@@ -77,7 +77,7 @@ export default function WhyHeadHunter() {
                   }}>{f.tag}</span>
                 )}
                 <div style={{
-                  width: 52, height: 52, borderRadius: 16, background: f.bg,
+                  width: 52, height: 52, borderRadius: 8, background: f.bg,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 22,
                 }}>
                   <Icon style={{ width: 24, height: 24, color: f.color }} />

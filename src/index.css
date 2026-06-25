@@ -46,11 +46,11 @@
     --shadow-btn: 0 4px 20px rgba(124,58,237,0.35);
 
     /* Radius */
-    --r-sm: 10px;
-    --r-md: 14px;
-    --r-lg: 18px;
-    --r-xl: 24px;
-    --r-2xl: 32px;
+    --r-sm: 8px;
+    --r-md: 8px;
+    --r-lg: 8px;
+    --r-xl: 8px;
+    --r-2xl: 8px;
 
     /* Backward compat */
     --background: 240 100% 97.5%;
@@ -72,7 +72,7 @@
     --border: 220 15% 88%;
     --input: 0 0% 100%;
     --ring: 270 91% 65%;
-    --radius: 1rem;
+    --radius: 0.5rem;
     --chart-1: 270 91% 65%;
     --chart-2: 200 100% 50%;
     --chart-3: 188 100% 50%;
@@ -180,7 +180,7 @@
     background: #ffffff;
     border: 1px solid #F0F1F5;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
-    border-radius: 18px;
+    border-radius: 8px;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
   }
 
@@ -193,7 +193,7 @@
     background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 50%, #2563EB 100%);
     color: white;
     font-weight: 700;
-    border-radius: 14px;
+    border-radius: 8px;
     padding: 10px 24px;
     box-shadow: 0 4px 20px rgba(124,58,237,0.3);
     transition: all 0.2s ease;
@@ -211,7 +211,7 @@
     background: white;
     color: #374151;
     font-weight: 600;
-    border-radius: 14px;
+    border-radius: 8px;
     padding: 10px 24px;
     border: 1.5px solid #E5E7EB;
     transition: all 0.2s ease;

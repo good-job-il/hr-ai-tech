@@ -60,7 +60,7 @@ export default function Footer() {
                 { Icon: Youtube, href: '#' },
               ].map(({ Icon, href }, i) => (
                 <a key={i} href={href} style={{
-                  width: 34, height: 34, borderRadius: 9,
+                  width: 34, height: 34, borderRadius: 8,
                   background: 'rgba(255,255,255,0.07)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: 'rgba(255,255,255,0.5)', textDecoration: 'none', transition: 'all 0.15s',

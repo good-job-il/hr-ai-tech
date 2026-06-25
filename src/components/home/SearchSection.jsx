@@ -38,7 +38,7 @@ export default function SearchSection() {
         <div style={{
           background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)',
           border: '1.5px solid rgba(108,77,255,0.12)',
-          borderRadius: 22, padding: 10,
+          borderRadius: 8, padding: 10,
           display: 'flex', gap: 0, alignItems: 'stretch',
           boxShadow: '0 8px 40px rgba(108,77,255,0.1), 0 2px 12px rgba(0,0,0,0.04)',
           maxWidth: 960, margin: '0 auto 24px',
@@ -75,7 +75,7 @@ export default function SearchSection() {
           </div>
           {/* Button */}
           <button onClick={handleSearch} style={{
-            height: 50, padding: '0 32px', borderRadius: 14,
+            height: 50, padding: '0 32px', borderRadius: 8,
             background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 100%)',
             color: 'white', border: 'none', cursor: 'pointer',
             fontSize: 14, fontWeight: 700, flexShrink: 0,
@@ -95,7 +95,7 @@ export default function SearchSection() {
           <span style={{ fontSize: 12.5, color: '#94A3B8', fontWeight: 600 }}>חיפושים אחרונים:</span>
           {QUICK_TAGS.map(tag => (
             <button key={tag} onClick={() => { setKeyword(tag); handleSearch(); }} style={{
-              padding: '5px 14px', borderRadius: 20,
+              padding: '5px 14px', borderRadius: 8,
               background: 'white', border: '1px solid rgba(108,77,255,0.15)',
               fontSize: 12.5, fontWeight: 600, color: '#6C4DFF',
               cursor: 'pointer', transition: 'all 0.15s',

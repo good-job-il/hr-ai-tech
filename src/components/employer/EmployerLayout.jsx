@@ -114,7 +114,7 @@ export default function EmployerLayout({ children }) {
         </nav>
 
         <div className="p-4 border-t border-[#E4ECFF]">
-          <div className="rounded-[24px] p-5 bg-gradient-to-br from-[#F5F0FF] to-[#EAF8FF] border border-[#DDEBFF] shadow-[0_20px_50px_rgba(108,77,255,0.12)] mb-4">
+          <div className="rounded-lg p-5 bg-gradient-to-br from-[#F5F0FF] to-[#EAF8FF] border border-[#DDEBFF] shadow-[0_20px_50px_rgba(108,77,255,0.12)] mb-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white">
                 <Sparkles className="w-5 h-5" />

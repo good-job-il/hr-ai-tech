@@ -537,23 +537,63 @@
     },
     "applications": {
       "title": "My Applications",
+      "subtitle": "Track all your job applications",
       "status": {
         "new": "Submitted",
         "reviewed": "Reviewed",
-        "phone_interview": "Phone Interview Done",
+        "phone_interview": "Phone Interview",
         "recommended": "Recommended to Employer",
         "employer_interview": "Interview at Employer",
         "offer": "Offer Received",
         "hired": "Hired!",
         "probation": "Probation Period",
-        "completed": "Passed Probation",
+        "completed": "Probation Completed",
         "rejected": "Not Advanced"
       },
+      "stats": {
+        "total": "Total Applications",
+        "active": "Active",
+        "upcomingInterviews": "Upcoming Interviews"
+      },
+      "search": "Search by position or company...",
+      "filters": {
+        "all": "All",
+        "active": "Active",
+        "offers": "Offers",
+        "rejected": "Rejected"
+      },
+      "interviewBanner": "Interview: {{date}} at {{time}}",
+      "offerBanner": "You received a job offer — check your email",
+      "hiredBanner": "Congratulations — you started working! 🎉",
+      "detail": {
+        "appliedDate": "Application Date",
+        "location": "Location",
+        "salary": "Salary",
+        "source": "Source",
+        "interviews": "Interviews",
+        "history": "History"
+      },
+      "interviewTypes": {
+        "video": "Video",
+        "phone": "Phone",
+        "in_person": "In-Person",
+        "default": "Interview"
+      },
+      "interviewStatus": {
+        "scheduled": "Scheduled",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "viewJob": "View Job",
       "noApplications": "You haven't applied to any jobs yet",
+      "noApplicationsHint": "Start searching for jobs that interest you",
+      "browseJobs": "Browse Jobs",
+      "noResults": "No results found",
+      "noResultsHint": "Try changing the filter",
+      "clearFilter": "Clear filter",
       "appliedOn": "Applied on",
       "jobTitle": "Position",
-      "company": "Company",
-      "viewJob": "View Job"
+      "company": "Company"
     },
     "savedJobs": {
       "title": "Saved Jobs",

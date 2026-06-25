@@ -48,7 +48,7 @@ export default function Header() {
           {!user ? (
             <>
               <Link to="/login" style={{
-                height: 40, padding: '0 20px', borderRadius: 12,
+                height: 40, padding: '0 20px', borderRadius: 8,
                 border: '1.5px solid rgba(108,77,255,0.2)',
                 background: 'transparent',
                 fontSize: 14, fontWeight: 600, color: '#374151',
@@ -60,7 +60,7 @@ export default function Header() {
                 {t('common.login')}
               </Link>
               <Link to="/register" style={{
-                height: 40, padding: '0 20px', borderRadius: 12,
+                height: 40, padding: '0 20px', borderRadius: 8,
                 background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 100%)',
                 fontSize: 14, fontWeight: 700, color: 'white',
                 display: 'flex', alignItems: 'center', gap: 8,
@@ -76,7 +76,7 @@ export default function Header() {
             </>
           ) : (
             <Link to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'candidate' ? '/candidate-dashboard' : '/hiring-manager/dashboard'} style={{
-              height: 40, padding: '0 20px', borderRadius: 12,
+              height: 40, padding: '0 20px', borderRadius: 8,
               background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 100%)',
               fontSize: 14, fontWeight: 700, color: 'white', textDecoration: 'none',
               display: 'flex', alignItems: 'center',
@@ -85,7 +85,7 @@ export default function Header() {
               {t('common.dashboard')}
             </Link>
           )}
-          <button className="lg:hidden" onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 10, border: '1.5px solid rgba(108,77,255,0.15)', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#374151' }}>
+          <button className="lg:hidden" onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 8, border: '1.5px solid rgba(108,77,255,0.15)', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#374151' }}>
             {open ? <X style={{ width: 18, height: 18 }} /> : <Menu style={{ width: 18, height: 18 }} />}
           </button>
         </div>
@@ -96,7 +96,7 @@ export default function Header() {
             const active = location.pathname === link.href;
             return (
               <Link key={link.label} to={link.href} style={{
-                padding: '7px 13px', borderRadius: 9, fontSize: 14, fontWeight: active ? 700 : 500,
+                padding: '7px 13px', borderRadius: 8, fontSize: 14, fontWeight: active ? 700 : 500,
                 color: active ? '#6C4DFF' : '#64748B',
                 textDecoration: 'none', transition: 'all 0.15s',
                 background: active ? 'rgba(108,77,255,0.08)' : 'transparent',
@@ -129,8 +129,8 @@ export default function Header() {
             </Link>
           ))}
           <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-            <Link to="/login" style={{ flex: 1, textAlign: 'center', padding: '11px', borderRadius: 12, border: '1.5px solid #E2E4EF', fontSize: 14, fontWeight: 600, color: '#374151', textDecoration: 'none' }} onClick={() => setOpen(false)}>{t('common.login')}</Link>
-            <Link to="/register" style={{ flex: 1, textAlign: 'center', padding: '11px', borderRadius: 12, background: 'linear-gradient(135deg,#6C4DFF,#4F7CFF)', fontSize: 14, fontWeight: 700, color: 'white', textDecoration: 'none' }} onClick={() => setOpen(false)}>{t('common.register')}</Link>
+            <Link to="/login" style={{ flex: 1, textAlign: 'center', padding: '11px', borderRadius: 8, border: '1.5px solid #E2E4EF', fontSize: 14, fontWeight: 600, color: '#374151', textDecoration: 'none' }} onClick={() => setOpen(false)}>{t('common.login')}</Link>
+            <Link to="/register" style={{ flex: 1, textAlign: 'center', padding: '11px', borderRadius: 8, background: 'linear-gradient(135deg,#6C4DFF,#4F7CFF)', fontSize: 14, fontWeight: 700, color: 'white', textDecoration: 'none' }} onClick={() => setOpen(false)}>{t('common.register')}</Link>
           </div>
           <div style={{ marginTop: 16 }}>
             <LanguageSwitcher variant="badge" />

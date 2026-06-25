@@ -22,7 +22,7 @@ const STATUS_COLORS = {
 
 function StatCard({ icon: Icon, label, value, sub, color, gradient }) {
   return (
-    <div className="relative overflow-hidden rounded-[28px] p-7 flex flex-col gap-4"
+    <div className="relative overflow-hidden rounded-lg p-7 flex flex-col gap-4"
       style={{
         background: 'rgba(255,255,255,0.82)',
         backdropFilter: 'blur(24px)',
@@ -137,7 +137,7 @@ export default function EmployerDashboard() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Trend Chart */}
-            <div className="rounded-[28px] p-8" style={{
+            <div className="rounded-lg p-8" style={{
               background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(24px)',
               border: '1px solid rgba(220,235,255,0.7)',
               boxShadow: '0 8px 32px rgba(79,124,255,0.07)',
@@ -156,7 +156,7 @@ export default function EmployerDashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.15)" />
                   <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 12, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ borderRadius: 16, border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', fontSize: 13 }} />
+                  <Tooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', fontSize: 13 }} />
                   <Line type="monotone" dataKey="views" stroke="#6C4DFF" strokeWidth={2.5} dot={false} name="צפיות" />
                   <Line type="monotone" dataKey="applications" stroke="#2F80FF" strokeWidth={2.5} dot={false} name="מועמדויות" />
                 </LineChart>
@@ -164,7 +164,7 @@ export default function EmployerDashboard() {
             </div>
 
             {/* Status Breakdown */}
-            <div className="rounded-[28px] p-8" style={{
+            <div className="rounded-lg p-8" style={{
               background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(24px)',
               border: '1px solid rgba(220,235,255,0.7)',
               boxShadow: '0 8px 32px rgba(79,124,255,0.07)',
@@ -188,7 +188,7 @@ export default function EmployerDashboard() {
           </div>
 
           {/* Recent Applications Table */}
-          <div className="rounded-[28px] p-8" style={{
+          <div className="rounded-lg p-8" style={{
             background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(24px)',
             border: '1px solid rgba(220,235,255,0.7)',
             boxShadow: '0 8px 32px rgba(79,124,255,0.07)',

@@ -53,7 +53,7 @@ export default function HeroNew() {
             {/* AI Badge */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '7px 18px', borderRadius: 40, marginBottom: 28,
+              padding: '7px 18px', borderRadius: 8, marginBottom: 28,
               background: 'rgba(108,77,255,0.08)',
               border: '1px solid rgba(108,77,255,0.2)',
               backdropFilter: 'blur(8px)',
@@ -88,7 +88,7 @@ export default function HeroNew() {
             {/* CTA buttons */}
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 44 }}>
               <button onClick={() => navigate('/register')} style={{
-                height: 52, padding: '0 28px', borderRadius: 14,
+                height: 52, padding: '0 28px', borderRadius: 8,
                 background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 100%)',
                 color: 'white', border: 'none', cursor: 'pointer',
                 fontSize: 15, fontWeight: 700,
@@ -102,7 +102,7 @@ export default function HeroNew() {
                 חיפוש משרות
               </button>
               <button onClick={() => navigate('/register')} style={{
-                height: 52, padding: '0 28px', borderRadius: 14,
+                height: 52, padding: '0 28px', borderRadius: 8,
                 background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)',
                 color: '#0F172A', cursor: 'pointer',
                 border: '1.5px solid rgba(108,77,255,0.2)',
@@ -184,7 +184,7 @@ export default function HeroNew() {
               backdropFilter: 'blur(32px)',
               WebkitBackdropFilter: 'blur(32px)',
               border: '1px solid rgba(255,255,255,0.9)',
-              borderRadius: 24,
+              borderRadius: 8,
               boxShadow: '0 32px 80px rgba(108,77,255,0.15), 0 8px 24px rgba(0,0,0,0.06)',
               padding: 22,
               animation: 'heroCardFloat 6s ease-in-out infinite',
@@ -227,7 +227,7 @@ export default function HeroNew() {
 
               {/* AI button */}
               <button style={{
-                width: '100%', padding: '9px 0', borderRadius: 12,
+                width: '100%', padding: '9px 0', borderRadius: 8,
                 background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 100%)',
                 border: 'none', color: 'white', fontSize: 11.5, fontWeight: 700,
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -241,7 +241,7 @@ export default function HeroNew() {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 14 }}>
                 {['React', 'Node.js', 'TypeScript', 'AWS', 'PostgreSQL'].map(s => (
                   <span key={s} style={{
-                    padding: '3px 8px', borderRadius: 7, fontSize: 10.5, fontWeight: 600,
+                    padding: '3px 8px', borderRadius: 8, fontSize: 10.5, fontWeight: 600,
                     background: 'rgba(108,77,255,0.07)', color: '#6C4DFF',
                     border: '1px solid rgba(108,77,255,0.15)',
                   }}>{s}</span>
@@ -257,7 +257,7 @@ export default function HeroNew() {
               ].map((item, i) => {
                 const Icon = item.icon;
                 return (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '8px 10px', borderRadius: 10, background: 'rgba(248,250,255,0.8)', marginBottom: i === 0 ? 6 : 0 }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, padding: '8px 10px', borderRadius: 8, background: 'rgba(248,250,255,0.8)', marginBottom: i === 0 ? 6 : 0 }}>
                     <div style={{ width: 28, height: 28, borderRadius: 8, background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <Icon style={{ width: 12, height: 12, color: item.color }} />
                     </div>
@@ -275,12 +275,12 @@ export default function HeroNew() {
               position: 'absolute', bottom: '8%', left: '8%', zIndex: 20,
               background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)',
               border: '1px solid rgba(255,255,255,0.95)',
-              borderRadius: 14, padding: '11px 16px',
+              borderRadius: 8, padding: '11px 16px',
               boxShadow: '0 16px 48px rgba(108,77,255,0.18)',
               display: 'flex', alignItems: 'center', gap: 10,
               animation: 'heroCardFloat 5s ease-in-out infinite 1.5s',
             }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CheckCircle style={{ width: 16, height: 16, color: '#059669' }} />
               </div>
               <div>
@@ -294,12 +294,12 @@ export default function HeroNew() {
               position: 'absolute', top: '12%', left: '18%', zIndex: 20,
               background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(20px)',
               border: '1px solid rgba(255,255,255,0.95)',
-              borderRadius: 14, padding: '10px 14px',
+              borderRadius: 8, padding: '10px 14px',
               boxShadow: '0 12px 40px rgba(108,77,255,0.15)',
               display: 'flex', alignItems: 'center', gap: 8,
               animation: 'heroCardFloat 5s ease-in-out infinite 3s',
             }}>
-              <div style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(108,77,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(108,77,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Star style={{ width: 13, height: 13, color: '#6C4DFF', fill: '#6C4DFF' }} />
               </div>
               <div>

@@ -23,7 +23,7 @@ export default function StatsSection() {
             const Icon = s.icon;
             return (
               <div key={i} style={{
-                padding: '36px 28px', borderRadius: 24, textAlign: 'center',
+                padding: '36px 28px', borderRadius: 8, textAlign: 'center',
                 background: 'white',
                 border: '1px solid rgba(108,77,255,0.08)',
                 boxShadow: '0 2px 16px rgba(0,0,0,0.04)',
@@ -31,7 +31,7 @@ export default function StatsSection() {
               }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 20px 56px rgba(108,77,255,0.12)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.04)'; }}>
-                <div style={{ width: 56, height: 56, borderRadius: 18, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <div style={{ width: 56, height: 56, borderRadius: 8, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                   <Icon style={{ width: 26, height: 26, color: s.color }} />
                 </div>
                 <div style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', fontWeight: 900, color: '#0F172A', lineHeight: 1, marginBottom: 10, letterSpacing: '-0.04em' }}>{s.value}</div>

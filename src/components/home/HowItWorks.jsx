@@ -10,7 +10,7 @@ const STEPS = [
 
 const CONNECTOR = (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, flexShrink: 0, paddingTop: 36 }}>
-    <div style={{ height: 2, width: '100%', background: 'linear-gradient(90deg, rgba(108,77,255,0.15), rgba(79,124,255,0.4), rgba(108,77,255,0.15))', borderRadius: 2 }} />
+    <div style={{ height: 2, width: '100%', background: 'linear-gradient(90deg, rgba(108,77,255,0.15), rgba(79,124,255,0.4), rgba(108,77,255,0.15))', borderRadius: 8 }} />
   </div>
 );
 
@@ -31,7 +31,7 @@ export default function HowItWorks() {
             return (
               <React.Fragment key={i}>
                 <div style={{
-                  flex: 1, padding: '32px 24px', borderRadius: 24,
+                  flex: 1, padding: '32px 24px', borderRadius: 8,
                   background: 'white', border: '1px solid rgba(108,77,255,0.08)',
                   boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
                   textAlign: 'center', position: 'relative',
@@ -50,7 +50,7 @@ export default function HowItWorks() {
                   }}>
                     {step.n}
                   </div>
-                  <div style={{ width: 64, height: 64, borderRadius: 20, background: step.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 22px' }}>
+                  <div style={{ width: 64, height: 64, borderRadius: 8, background: step.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 22px' }}>
                     <Icon style={{ width: 30, height: 30, color: step.color }} />
                   </div>
                   <h3 style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', margin: '0 0 10px', letterSpacing: '-0.02em' }}>{step.title}</h3>

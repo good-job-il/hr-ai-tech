@@ -1,8 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { format } from 'date-fns';
-import { heIL } from 'date-fns/locale';
 import { MessageCircle, CheckCircle2, Clock, AlertCircle, FileText, Award, Eye } from 'lucide-react';
 
 const eventIcons = {

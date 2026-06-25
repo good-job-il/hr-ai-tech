@@ -21,7 +21,7 @@ export default function AICenterSection() {
           <div>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '6px 16px', borderRadius: 40, marginBottom: 16,
+              padding: '6px 16px', borderRadius: 8, marginBottom: 16,
               background: 'rgba(108,77,255,0.08)', border: '1px solid rgba(108,77,255,0.18)',
             }}>
               <Sparkles style={{ width: 12, height: 12, color: '#6C4DFF' }} />
@@ -36,7 +36,7 @@ export default function AICenterSection() {
           </div>
           <button onClick={() => navigate('/register')} style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '11px 22px', borderRadius: 13,
+            padding: '11px 22px', borderRadius: 8,
             background: 'linear-gradient(135deg, #6C4DFF, #4F7CFF)',
             color: 'white', border: 'none', cursor: 'pointer',
             fontSize: 13.5, fontWeight: 700,
@@ -54,7 +54,7 @@ export default function AICenterSection() {
             const Icon = s.icon;
             return (
               <div key={i} style={{
-                padding: '32px 28px', borderRadius: 24,
+                padding: '32px 28px', borderRadius: 8,
                 background: 'white', border: '1px solid rgba(108,77,255,0.08)',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
                 cursor: 'default', transition: 'all 0.3s',
@@ -69,7 +69,7 @@ export default function AICenterSection() {
                 e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)';
                 e.currentTarget.style.borderColor = 'rgba(108,77,255,0.08)';
               }}>
-                <div style={{ width: 52, height: 52, borderRadius: 16, background: s.bg, marginBottom: 22, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 52, height: 52, borderRadius: 8, background: s.bg, marginBottom: 22, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Icon style={{ width: 24, height: 24, color: s.color }} />
                 </div>
                 <h3 style={{ fontSize: 15.5, fontWeight: 800, color: '#0F172A', margin: '0 0 10px', letterSpacing: '-0.02em' }}>{s.title}</h3>

@@ -17,7 +17,7 @@ import {
 import AdminLayout from '@/components/admin/AdminLayout';
 
 const glass =
-  'bg-white/80 backdrop-blur-2xl border border-[#DDEBFF] rounded-[30px] shadow-[0_24px_80px_rgba(79,124,255,0.10)]';
+  'bg-white/80 backdrop-blur-2xl border border-[#DDEBFF] rounded-lg shadow-[0_24px_80px_rgba(79,124,255,0.10)]';
 
 const stats = [
   {
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="h-[360px] rounded-[28px] bg-gradient-to-br from-[#F7FAFF] to-[#EEF5FF] border border-[#DDEBFF] relative overflow-hidden">
+              <div className="h-[360px] rounded-lg bg-gradient-to-br from-[#F7FAFF] to-[#EEF5FF] border border-[#DDEBFF] relative overflow-hidden">
                 <div className="absolute inset-0 opacity-60">
                   <svg width="100%" height="100%" viewBox="0 0 900 360" preserveAspectRatio="none">
                     <defs>
@@ -326,7 +326,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-[26px] border border-[#E4ECFF]">
+            <div className="overflow-hidden rounded-lg border border-[#E4ECFF]">
               <table className="w-full">
                 <thead className="bg-[#F8FBFF]">
                   <tr className="text-right">

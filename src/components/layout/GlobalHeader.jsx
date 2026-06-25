@@ -73,7 +73,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
                       transform: 'translateX(50%)',
                       width: '34px',
                       height: '3px',
-                      borderRadius: '99px',
+                      borderRadius: '8px',
                       background: 'linear-gradient(90deg, #8B5CF6, #2F80FF)',
                     }}
                   />
@@ -89,7 +89,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
             <>
               <Link
                 to="/login"
-                className="hidden sm:inline-flex h-12 px-7 items-center justify-center rounded-[16px] border font-black text-[15px] transition-all"
+                className="hidden sm:inline-flex h-12 px-7 items-center justify-center rounded-lg border font-black text-[15px] transition-all"
                 style={{
                   borderColor: '#DDEBFF',
                   color: '#6C4DFF',
@@ -102,7 +102,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
 
               <Link
                 to="/register"
-                className="inline-flex h-12 px-7 items-center justify-center rounded-[16px] text-white font-black text-[15px] transition-all"
+                className="inline-flex h-12 px-7 items-center justify-center rounded-lg text-white font-black text-[15px] transition-all"
                 style={{
                   background: 'linear-gradient(135deg, #A855F7 0%, #6C4DFF 48%, #2F80FF 100%)',
                   boxShadow: '0 18px 42px rgba(108, 77, 255, 0.35)',
@@ -115,7 +115,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
             <>
               <Link
                 to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'candidate' ? '/candidate-dashboard' : '/employer/dashboard'}
-                className="inline-flex h-12 px-7 items-center justify-center rounded-[16px] text-white font-black text-[15px] transition-all"
+                className="inline-flex h-12 px-7 items-center justify-center rounded-lg text-white font-black text-[15px] transition-all"
                 style={{
                   background: 'linear-gradient(135deg, #8B5CF6, #2F80FF)',
                   boxShadow: '0 18px 42px rgba(108, 77, 255, 0.30)',

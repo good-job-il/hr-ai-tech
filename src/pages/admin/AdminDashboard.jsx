@@ -174,7 +174,7 @@ export default function AdminDashboard() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                 <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #E4ECFF', fontSize: 12 }} />
+                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #E4ECFF', fontSize: 12 }} />
                 <Line type="monotone" dataKey={chartView} stroke="#8B5CF6" strokeWidth={2.5} dot={{ fill: '#8B5CF6', r: 4 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
@@ -200,7 +200,7 @@ export default function AdminDashboard() {
                     <Cell key={i} fill={IMPORT_SOURCE_COLORS[i % IMPORT_SOURCE_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(v) => `${v}%`} contentStyle={{ borderRadius: 10, fontSize: 12 }} />
+                <Tooltip formatter={(v) => `${v}%`} contentStyle={{ borderRadius: 8, fontSize: 12 }} />
               </RePieChart>
             </ResponsiveContainer>
             <div className="w-full space-y-1.5 mt-2">

@@ -31,7 +31,7 @@ const gradientText =
   'bg-gradient-to-l from-[#6C4DFF] via-[#5B7CFF] to-[#2FB8FF] bg-clip-text text-transparent';
 
 const glassCard =
-  'bg-white/82 backdrop-blur-2xl border border-[#DDEBFF] shadow-[0_24px_80px_rgba(79,124,255,0.12)] rounded-[28px]';
+  'bg-white/82 backdrop-blur-2xl border border-[#DDEBFF] shadow-[0_24px_80px_rgba(79,124,255,0.12)] rounded-lg';
 
 function HHLogo() {
   return (
@@ -568,7 +568,7 @@ function CTASection() {
   return (
     <section className="bg-[#F6FBFF]" style={{ padding: '80px 0' }}>
       <div className="max-w-[1560px] mx-auto px-8" dir={isRtl ? 'rtl' : 'ltr'}>
-        <div className="rounded-[28px] bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] p-12 text-white shadow-[0_30px_90px_rgba(108,77,255,0.28)] flex flex-col lg:flex-row items-center justify-between gap-8">
+        <div className="rounded-lg bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] p-12 text-white shadow-[0_30px_90px_rgba(108,77,255,0.28)] flex flex-col lg:flex-row items-center justify-between gap-8">
           <div>
             <h2 style={{ fontSize: 48, fontWeight: 900, lineHeight: 1.1, marginBottom: 12 }}>
               {isRtl

@@ -19,7 +19,7 @@ const FUNNEL = [
 
 function KpiCard({ icon: Icon, label, value, sub, color }) {
   return (
-    <div className="relative overflow-hidden rounded-[28px] p-7" style={{
+    <div className="relative overflow-hidden rounded-lg p-7" style={{
       background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(24px)',
       border: '1px solid rgba(220,235,255,0.7)',
       boxShadow: '0 8px 32px rgba(79,124,255,0.07), inset 0 1px 0 rgba(255,255,255,0.9)',
@@ -141,7 +141,7 @@ const RecruitmentDashboard = () => {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Timeline */}
-            <div className="rounded-[28px] p-8" style={glassCard}>
+            <div className="rounded-lg p-8" style={glassCard}>
               <h2 className="font-black text-[#0F172A] mb-2">מועמדים ומועמדויות</h2>
               <p className="text-[#94A3B8] text-sm font-medium mb-6">לפי תאריך יצירה</p>
               <ResponsiveContainer width="100%" height={260}>
@@ -149,7 +149,7 @@ const RecruitmentDashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.15)" />
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ borderRadius: 16, border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.1)', fontSize: 13 }} />
+                  <Tooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.1)', fontSize: 13 }} />
                   <Legend />
                   <Line type="monotone" dataKey="candidates" stroke="#6C4DFF" strokeWidth={2.5} dot={false} name="מועמדים חדשים" />
                   <Line type="monotone" dataKey="applications" stroke="#2F80FF" strokeWidth={2.5} dot={false} name="מועמדויות" />
@@ -158,7 +158,7 @@ const RecruitmentDashboard = () => {
             </div>
 
             {/* Pie */}
-            <div className="rounded-[28px] p-8" style={glassCard}>
+            <div className="rounded-lg p-8" style={glassCard}>
               <h2 className="font-black text-[#0F172A] mb-2">התפלגות סטטוסים</h2>
               <p className="text-[#94A3B8] text-sm font-medium mb-6">פי שלב בתהליך</p>
               <ResponsiveContainer width="100%" height={260}>
@@ -170,21 +170,21 @@ const RecruitmentDashboard = () => {
                       <Cell key={index} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ borderRadius: 16, border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }} />
+                  <Tooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Funnel Summary */}
-          <div className="rounded-[28px] p-8" style={glassCard}>
+          <div className="rounded-lg p-8" style={glassCard}>
             <h2 className="font-black text-[#0F172A] mb-8">פאנל גיוס — סיכום סטטוסים</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {FUNNEL.map(f => {
                 const count = candidates.filter(c => c.status === f.key).length;
                 const pct = candidates.length > 0 ? Math.round((count / candidates.length) * 100) : 0;
                 return (
-                  <div key={f.key} className="rounded-[20px] p-5 text-center" style={{ background: f.bg }}>
+                  <div key={f.key} className="rounded-lg p-5 text-center" style={{ background: f.bg }}>
                     <p className="text-xs font-bold mb-3" style={{ color: f.color }}>{f.label}</p>
                     <p className="text-3xl font-black text-[#0F172A]">{count}</p>
                     <p className="text-xs text-[#94A3B8] mt-1">{pct}%</p>

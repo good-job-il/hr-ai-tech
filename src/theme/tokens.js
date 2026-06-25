@@ -203,13 +203,13 @@ export const SPACING = {
 
 export const RADIUS = {
   none: '0',
-  sm: '10px',
-  md: '14px',
-  lg: '18px',
-  xl: '24px',
-  '2xl': '32px',
+  sm: '8px',
+  md: '8px',
+  lg: '8px',
+  xl: '8px',
+  '2xl': '8px',
   pill: '9999px',
-  glass: '30px',
+  glass: '8px',
 };
 
 export const SHADOWS = {
@@ -265,7 +265,7 @@ export const GLASS_STYLES = {
     backdropFilter: 'blur(28px)',
     WebkitBackdropFilter: 'blur(28px)',
     border: '1px solid rgba(221, 235, 255, 0.86)',
-    borderRadius: '30px',
+    borderRadius: '8px',
     boxShadow: '0 28px 80px rgba(79, 124, 255, 0.11), 0 3px 12px rgba(15, 23, 42, 0.04)',
   },
   panel: {

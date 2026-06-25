@@ -39,7 +39,7 @@ export default function CTASection() {
       <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
-          padding: '6px 18px', borderRadius: 40, marginBottom: 28,
+          padding: '6px 18px', borderRadius: 8, marginBottom: 28,
           background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)',
           backdropFilter: 'blur(8px)',
         }}>
@@ -62,7 +62,7 @@ export default function CTASection() {
 
         <Link to="/register" style={{
           display: 'inline-flex', alignItems: 'center', gap: 10,
-          height: 54, padding: '0 36px', borderRadius: 16,
+          height: 54, padding: '0 36px', borderRadius: 8,
           background: 'white', color: '#6C4DFF',
           fontSize: 15, fontWeight: 800,
           textDecoration: 'none',
