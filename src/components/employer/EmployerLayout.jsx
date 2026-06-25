@@ -6,11 +6,11 @@ import {
   Bell, Sparkles, Home, Settings
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-
+import { useTranslation } from 'react-i18next';
 
 const LOGO = '/headhunter-logo.png';
 
-const navItems = [
+const NAV_ITEMS_HE = [
   { label: 'דשבורד', path: '/employer/dashboard', icon: LayoutDashboard },
   { label: 'דשבורד גיוס', path: '/employer/recruitment', icon: TrendingUp },
   { label: 'משרות', path: '/employer/jobs', icon: Briefcase },
@@ -26,14 +26,38 @@ const navItems = [
   { label: 'הגדרות', path: '/employer/settings', icon: Settings },
 ];
 
+const NAV_ITEMS_EN = [
+  { label: 'Dashboard', path: '/employer/dashboard', icon: LayoutDashboard },
+  { label: 'Recruitment', path: '/employer/recruitment', icon: TrendingUp },
+  { label: 'Jobs', path: '/employer/jobs', icon: Briefcase },
+  {
+    label: 'Candidates',
+    icon: Users,
+    submenu: [
+      { label: 'Candidate List', path: '/employer/candidates' },
+      { label: 'Import Candidates', path: '/employer/candidate-import', icon: Download },
+    ]
+  },
+  { label: 'Messages', path: '/employer/messages', icon: MessageCircle },
+  { label: 'Settings', path: '/employer/settings', icon: Settings },
+];
+
 export default function EmployerLayout({ children }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedSubmenu, setExpandedSubmenu] = useState(null);
+  const { i18n } = useTranslation();
+  const isEn = i18n.language?.startsWith('en');
+  const navItems = isEn ? NAV_ITEMS_EN : NAV_ITEMS_HE;
+  const dir = isEn ? 'ltr' : 'rtl';
 
   return (
-    <div className="min-h-screen bg-[#F5FAFF] flex text-[#0F172A]" dir="rtl">
-      <aside className={`fixed inset-y-0 right-0 z-40 w-[280px] bg-white/82 backdrop-blur-2xl border-l border-[#DDEBFF] shadow-[0_30px_90px_rgba(79,124,255,0.12)] flex flex-col transform transition-transform md:translate-x-0 ${mobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}`}>
+    <div className="min-h-screen bg-[#F5FAFF] flex text-[#0F172A]" dir={dir}>
+      <aside className={`fixed inset-y-0 z-40 w-[280px] bg-white/82 backdrop-blur-2xl flex flex-col transform transition-transform
+        ${isEn
+          ? `left-0 border-r border-[#DDEBFF] shadow-[0_30px_90px_rgba(79,124,255,0.12)] ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`
+          : `right-0 border-l border-[#DDEBFF] shadow-[0_30px_90px_rgba(79,124,255,0.12)] ${mobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}`
+        }`}>
         <Link to="/" className="h-[96px] px-6 border-b border-[#E4ECFF] flex items-center justify-center">
           <img src={LOGO} alt="HeadHunter HR-Tech" className="h-[58px] w-auto object-contain" />
         </Link>
@@ -54,7 +78,7 @@ export default function EmployerLayout({ children }) {
                     className={[
                       'w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all',
                       isActive
-                        ? 'bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white shadow-[0_16px_38px_rgba(108,77,255,0.28)]'
+                        ? `${isEn ? 'bg-gradient-to-r' : 'bg-gradient-to-l'} from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white shadow-[0_16px_38px_rgba(108,77,255,0.28)]`
                         : 'text-[#64748B] hover:bg-[#F1F6FF] hover:text-[#6C4DFF]'
                     ].join(' ')}
                   >
@@ -66,7 +90,7 @@ export default function EmployerLayout({ children }) {
                   </button>
 
                   {isSubmenuOpen && (
-                    <div className="mt-2 mr-4 pr-3 border-r border-[#E4ECFF] space-y-1">
+                    <div className={`mt-2 space-y-1 border-[#E4ECFF] ${isEn ? 'ml-4 pl-3 border-l' : 'mr-4 pr-3 border-r'}`}>
                       {item.submenu.map((subitem) => {
                         const subActive = location.pathname === subitem.path;
                         const SubIcon = subitem.icon;
@@ -102,7 +126,7 @@ export default function EmployerLayout({ children }) {
                 className={[
                   'flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all',
                   active
-                    ? 'bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white shadow-[0_16px_38px_rgba(108,77,255,0.28)]'
+                    ? `${isEn ? 'bg-gradient-to-r' : 'bg-gradient-to-l'} from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white shadow-[0_16px_38px_rgba(108,77,255,0.28)]`
                     : 'text-[#64748B] hover:bg-[#F1F6FF] hover:text-[#6C4DFF]'
                 ].join(' ')}
               >
@@ -120,24 +144,24 @@ export default function EmployerLayout({ children }) {
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-[#0F172A] font-black text-sm">AI למעסיקים</div>
-                <div className="text-[#64748B] text-xs">התאמת מועמדים חכמה</div>
+                <div className="text-[#0F172A] font-black text-sm">{isEn ? 'AI for Employers' : 'AI למעסיקים'}</div>
+                <div className="text-[#64748B] text-xs">{isEn ? 'Smart candidate matching' : 'התאמת מועמדים חכמה'}</div>
               </div>
             </div>
-            <Link to="/employer/recruitment" className="h-10 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white text-sm font-black flex items-center justify-center">
-              כניסה לדשבורד גיוס
+            <Link to="/employer/recruitment" className={`h-10 rounded-xl ${isEn ? 'bg-gradient-to-r' : 'bg-gradient-to-l'} from-[#2F80FF] to-[#8B5CF6] text-white text-sm font-black flex items-center justify-center`}>
+              {isEn ? 'Open Recruitment Dashboard' : 'כניסה לדשבורד גיוס'}
             </Link>
           </div>
 
           <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-[#64748B] hover:bg-[#F1F6FF]">
-            <Home className="w-4 h-4" /> חזרה לאתר
+            <Home className="w-4 h-4" /> {isEn ? 'Back to site' : 'חזרה לאתר'}
           </Link>
 
           <button
             onClick={() => base44.auth.logout('/')}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-[#64748B] hover:bg-red-50 hover:text-red-500"
           >
-            <LogOut className="w-4 h-4" /> יציאה
+            <LogOut className="w-4 h-4" /> {isEn ? 'Sign out' : 'יציאה'}
           </button>
         </div>
       </aside>
@@ -146,7 +170,7 @@ export default function EmployerLayout({ children }) {
         <div className="fixed inset-0 z-30 bg-black/40 md:hidden" onClick={() => setMobileOpen(false)} />
       )}
 
-      <div className="flex-1 md:mr-[280px] min-h-screen flex flex-col">
+      <div className={`flex-1 min-h-screen flex flex-col ${isEn ? 'md:ml-[280px]' : 'md:mr-[280px]'}`}>
         <header className="sticky top-0 z-30 h-16 md:h-[72px] lg:h-[88px] bg-white/70 backdrop-blur-2xl border-b border-white/60 shadow-sm px-4 md:px-6 lg:px-8 flex items-center justify-between" style={{ boxShadow: '0 1px 0 rgba(220,235,255,0.8), 0 4px 24px rgba(79,124,255,0.06)' }}>
           <div className="flex items-center gap-3">
             <button className="md:hidden w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/80 transition" onClick={() => setMobileOpen(!mobileOpen)}>
@@ -157,12 +181,12 @@ export default function EmployerLayout({ children }) {
             <div className="hidden md:flex items-center gap-3">
               <div className="p-[2px] rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] shadow-[0_0_0_3px_rgba(139,92,246,0.15)]">
                 <div className="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] text-white flex items-center justify-center font-black text-lg">
-                  מ
+                  {isEn ? 'E' : 'מ'}
                 </div>
               </div>
               <div>
-                <div className="font-black text-[#0F172A] text-sm leading-tight">שלום, מנהל</div>
-                <div className="text-xs text-[#94A3B8] font-medium">אזור מעסיק</div>
+                <div className="font-black text-[#0F172A] text-sm leading-tight">{isEn ? 'Hello, Manager' : 'שלום, מנהל'}</div>
+                <div className="text-xs text-[#94A3B8] font-medium">{isEn ? 'Employer Area' : 'אזור מעסיק'}</div>
               </div>
             </div>
 
@@ -173,8 +197,8 @@ export default function EmployerLayout({ children }) {
           <div className="hidden lg:flex items-center gap-3 w-[380px] h-11 rounded-full bg-white/80 border border-white/70 px-5 shadow-sm backdrop-blur-xl" style={{ boxShadow: '0 2px 12px rgba(79,124,255,0.07), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
             <Search className="w-4 h-4 text-[#94A3B8] flex-shrink-0" />
             <input
-              dir="rtl"
-              placeholder="חיפוש במערכת..."
+              dir={dir}
+              placeholder={isEn ? 'Search...' : 'חיפוש במערכת...'}
               className="w-full bg-transparent outline-none text-sm font-semibold text-[#0F172A] placeholder:text-[#94A3B8]"
             />
             <kbd className="text-[10px] text-[#94A3B8] bg-white/90 border border-[#E4ECFF] px-2 py-0.5 rounded-md font-mono flex-shrink-0">⌘K</kbd>

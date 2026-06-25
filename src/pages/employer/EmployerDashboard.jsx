@@ -48,10 +48,10 @@ export default function EmployerDashboard() {
   useEffect(() => { load(); }, [user?.email]);
 
   return (
-    <div dir="rtl" className="space-y-6">
+    <div dir="ltr" className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black text-[#0F172A]">מעסיק</h1>
+          <h1 className="text-3xl font-black text-[#0F172A]">Employer</h1>
           <p className="text-lg font-bold text-[#7C3AED] mt-0.5">{user?.full_name || user?.email}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -60,35 +60,35 @@ export default function EmployerDashboard() {
           </button>
           <button onClick={() => setModalOpen(true)} className="h-10 px-5 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            פרסם משרה חדשה
+            Post New Job
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard icon={Briefcase} label="משרות פתוחות" value={stats?.openJobs ?? '—'} color="#7C3AED" loading={loading} />
-        <StatCard icon={Users} label="מועמדים" value={stats?.candidates ?? '—'} color="#2563EB" loading={loading} />
-        <StatCard icon={Clock} label="ראיונות מתוזמנים" value={stats?.interviews ?? '—'} color="#059669" loading={loading} />
-        <StatCard icon={TrendingUp} label="הגשות" value={stats?.applications ?? '—'} color="#EA580C" loading={loading} />
+        <StatCard icon={Briefcase} label="Open Jobs" value={stats?.openJobs ?? '—'} color="#7C3AED" loading={loading} />
+        <StatCard icon={Users} label="Candidates" value={stats?.candidates ?? '—'} color="#2563EB" loading={loading} />
+        <StatCard icon={Clock} label="Scheduled Interviews" value={stats?.interviews ?? '—'} color="#059669" loading={loading} />
+        <StatCard icon={TrendingUp} label="Applications" value={stats?.applications ?? '—'} color="#EA580C" loading={loading} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link to="/employer/candidates" className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200 p-6 hover:shadow-lg transition-all">
           <div className="flex items-center gap-3 mb-2">
             <Users2 className="w-6 h-6 text-blue-600" />
-            <h3 className="text-lg font-black text-blue-900">מועמדים</h3>
+            <h3 className="text-lg font-black text-blue-900">Candidates</h3>
           </div>
           <p className="text-blue-700 font-semibold text-2xl">{stats?.candidates ?? '—'}</p>
-          <p className="text-blue-600 text-sm mt-1">מועמדים שנשלחו אליך</p>
+          <p className="text-blue-600 text-sm mt-1">Candidates sent to you</p>
         </Link>
 
         <Link to="/employer/pipeline" className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200 p-6 hover:shadow-lg transition-all">
           <div className="flex items-center gap-3 mb-2">
             <Target className="w-6 h-6 text-purple-600" />
-            <h3 className="text-lg font-black text-purple-900">תהליך גיוס</h3>
+            <h3 className="text-lg font-black text-purple-900">Hiring Pipeline</h3>
           </div>
           <p className="text-purple-700 font-semibold text-2xl">{stats?.applications ?? '—'}</p>
-          <p className="text-purple-600 text-sm mt-1">הגשות בתהליך</p>
+          <p className="text-purple-600 text-sm mt-1">Applications in progress</p>
         </Link>
       </div>
 

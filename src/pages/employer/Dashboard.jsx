@@ -10,9 +10,9 @@ import ErrorAlert from '@/components/common/ErrorAlert';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const STATUS_LABELS = {
-  new: 'חדש', reviewed: 'בבדיקה', phone_interview: 'ראיון טלפוני',
-  employer_interview: 'ראיון', offer: 'הצעה', hired: 'התקבל',
-  probation: 'בניסיון', completed: 'הושלם', rejected: 'נדחה'
+  new: 'New', reviewed: 'In Review', phone_interview: 'Phone Interview',
+  employer_interview: 'Interview', offer: 'Offer', hired: 'Hired',
+  probation: 'Probation', completed: 'Completed', rejected: 'Rejected'
 };
 
 const STATUS_COLORS = {
@@ -56,7 +56,7 @@ export default function EmployerDashboard() {
     queryFn: async () => {
       try {
         return await base44.entities.Job.filter({ employer_id: user?.email }) || [];
-      } catch (err) { logError(err, 'fetch-employer-jobs'); setError('שגיאה בטעינת המשרות'); return []; }
+      } catch (err) { logError(err, 'fetch-employer-jobs'); setError('Error loading jobs'); return []; }
     },
     enabled: !!user?.email,
   });
@@ -81,24 +81,24 @@ export default function EmployerDashboard() {
   };
 
   const trendData = [
-    { day: 'שני', views: 45, applications: 12 },
-    { day: 'שלישי', views: 52, applications: 15 },
-    { day: 'רביעי', views: 48, applications: 10 },
-    { day: 'חמישי', views: 61, applications: 18 },
-    { day: 'שישי', views: 55, applications: 14 },
-    { day: 'שבת', views: 38, applications: 8 },
-    { day: 'ראשון', views: 67, applications: 22 }
+    { day: 'Mon', views: 45, applications: 12 },
+    { day: 'Tue', views: 52, applications: 15 },
+    { day: 'Wed', views: 48, applications: 10 },
+    { day: 'Thu', views: 61, applications: 18 },
+    { day: 'Fri', views: 55, applications: 14 },
+    { day: 'Sat', views: 38, applications: 8 },
+    { day: 'Sun', views: 67, applications: 22 }
   ];
 
   const statusBreakdown = [
-    { name: 'חדש', value: applications.filter(a => a.status === 'new').length, color: '#6C4DFF' },
-    { name: 'בבדיקה', value: applications.filter(a => a.status === 'reviewed').length, color: '#2F80FF' },
-    { name: 'בראיון', value: applications.filter(a => ['phone_interview','employer_interview'].includes(a.status)).length, color: '#06B6D4' },
-    { name: 'הצעה', value: applications.filter(a => a.status === 'offer').length, color: '#F59E0B' },
-    { name: 'התקבל', value: applications.filter(a => a.status === 'hired').length, color: '#10B981' },
+    { name: 'New', value: applications.filter(a => a.status === 'new').length, color: '#6C4DFF' },
+    { name: 'In Review', value: applications.filter(a => a.status === 'reviewed').length, color: '#2F80FF' },
+    { name: 'Interview', value: applications.filter(a => ['phone_interview','employer_interview'].includes(a.status)).length, color: '#06B6D4' },
+    { name: 'Offer', value: applications.filter(a => a.status === 'offer').length, color: '#F59E0B' },
+    { name: 'Hired', value: applications.filter(a => a.status === 'hired').length, color: '#10B981' },
   ];
 
-  if (loading) return <EmployerLayout><LoadingSpinner text="טוען את לוח המשימות..." /></EmployerLayout>;
+  if (loading) return <EmployerLayout><LoadingSpinner text="Loading dashboard..." /></EmployerLayout>;
 
   return (
     <EmployerLayout>
@@ -107,7 +107,7 @@ export default function EmployerDashboard() {
         <div className="fixed top-32 left-16 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(108,77,255,0.08) 0%, transparent 70%)', zIndex: 0 }} />
         <div className="fixed bottom-32 right-16 w-96 h-96 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(47,128,255,0.07) 0%, transparent 70%)', zIndex: 0 }} />
 
-        <div className="relative z-10 px-6 lg:px-8 xl:px-10 py-10 space-y-10 max-w-[1600px] mx-auto" dir="rtl">
+        <div className="relative z-10 px-6 lg:px-8 xl:px-10 py-10 space-y-10 max-w-[1600px] mx-auto" dir="ltr">
           {error && <ErrorAlert error={error} onDismiss={() => setError('')} onRetry={() => window.location.reload()} />}
 
           {/* Header */}
@@ -116,22 +116,22 @@ export default function EmployerDashboard() {
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold mb-4"
                 style={{ background: 'rgba(108,77,255,0.08)', color: '#6C4DFF', border: '1px solid rgba(108,77,255,0.15)' }}>
                 <Sparkles className="w-3.5 h-3.5" />
-                לוח בקרה מעסיק
+                Employer Dashboard
               </div>
               <h1 className="text-4xl font-black text-[#0F172A] leading-tight">
-                שלום{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''} 👋
+                Hello{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''} 👋
               </h1>
-              <p className="text-[#64748B] text-lg mt-2 font-medium">הנה סיכום פעילות הגיוס שלך</p>
+              <p className="text-[#64748B] text-lg mt-2 font-medium">Here is a summary of your hiring activity</p>
             </div>
           </div>
 
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard icon={Briefcase} label="משרות פעילות" value={stats.jobs} color="#6C4DFF" gradient="linear-gradient(135deg,#6C4DFF,#2F80FF)" />
-            <StatCard icon={Users} label='מועמדויות בסה"כ' value={stats.applications} color="#2F80FF" gradient="linear-gradient(135deg,#2F80FF,#06B6D4)" />
-            <StatCard icon={Eye} label="צפיות כוללות" value={stats.views.toLocaleString()} color="#06B6D4" gradient="linear-gradient(135deg,#06B6D4,#10B981)" />
-            <StatCard icon={Send} label="מועמדויות חדשות" value={stats.newApplications} color="#F59E0B" gradient="linear-gradient(135deg,#F59E0B,#EF4444)"
-              sub={stats.newApplications > 0 ? 'ממתינות לטיפול' : 'אין ממתינות'} />
+            <StatCard icon={Briefcase} label="Active Jobs" value={stats.jobs} color="#6C4DFF" gradient="linear-gradient(135deg,#6C4DFF,#2F80FF)" />
+            <StatCard icon={Users} label="Total Applications" value={stats.applications} color="#2F80FF" gradient="linear-gradient(135deg,#2F80FF,#06B6D4)" />
+            <StatCard icon={Eye} label="Total Views" value={stats.views.toLocaleString()} color="#06B6D4" gradient="linear-gradient(135deg,#06B6D4,#10B981)" />
+            <StatCard icon={Send} label="New Applications" value={stats.newApplications} color="#F59E0B" gradient="linear-gradient(135deg,#F59E0B,#EF4444)"
+              sub={stats.newApplications > 0 ? 'Awaiting review' : 'None pending'} />
           </div>
 
           {/* Charts Row */}
@@ -147,8 +147,8 @@ export default function EmployerDashboard() {
                   <TrendingUp className="w-5 h-5 text-[#6C4DFF]" />
                 </div>
                 <div>
-                  <h2 className="font-black text-[#0F172A]">מגמה השבוע</h2>
-                  <p className="text-xs text-[#94A3B8] font-medium">צפיות ומועמדויות</p>
+                  <h2 className="font-black text-[#0F172A]">This Week's Trend</h2>
+                  <p className="text-xs text-[#94A3B8] font-medium">Views & Applications</p>
                 </div>
               </div>
               <ResponsiveContainer width="100%" height={220}>
@@ -157,8 +157,8 @@ export default function EmployerDashboard() {
                   <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 12, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', fontSize: 13 }} />
-                  <Line type="monotone" dataKey="views" stroke="#6C4DFF" strokeWidth={2.5} dot={false} name="צפיות" />
-                  <Line type="monotone" dataKey="applications" stroke="#2F80FF" strokeWidth={2.5} dot={false} name="מועמדויות" />
+                  <Line type="monotone" dataKey="views" stroke="#6C4DFF" strokeWidth={2.5} dot={false} name="Views" />
+                  <Line type="monotone" dataKey="applications" stroke="#2F80FF" strokeWidth={2.5} dot={false} name="Applications" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -169,7 +169,7 @@ export default function EmployerDashboard() {
               border: '1px solid rgba(220,235,255,0.7)',
               boxShadow: '0 8px 32px rgba(79,124,255,0.07)',
             }}>
-              <h2 className="font-black text-[#0F172A] mb-8">התפלגות סטטוסים</h2>
+              <h2 className="font-black text-[#0F172A] mb-8">Status Breakdown</h2>
               <div className="space-y-5">
                 {statusBreakdown.map((s) => (
                   <div key={s.name}>
@@ -193,19 +193,19 @@ export default function EmployerDashboard() {
             border: '1px solid rgba(220,235,255,0.7)',
             boxShadow: '0 8px 32px rgba(79,124,255,0.07)',
           }}>
-            <h2 className="font-black text-[#0F172A] mb-8">מועמדויות אחרונות</h2>
+            <h2 className="font-black text-[#0F172A] mb-8">Recent Applications</h2>
             {applications.length === 0 ? (
               <div className="text-center py-16 text-[#94A3B8]">
                 <Users className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                <p className="font-semibold">אין מועמדויות עדיין</p>
+                <p className="font-semibold">No applications yet</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(220,235,255,0.8)' }}>
-                      {['שם מועמד', 'משרה', 'תאריך', 'סטטוס'].map(h => (
-                        <th key={h} className="text-right pb-4 text-xs font-bold text-[#94A3B8] uppercase tracking-wide">{h}</th>
+                      {['Candidate', 'Position', 'Date', 'Status'].map(h => (
+                        <th key={h} className="text-left pb-4 text-xs font-bold text-[#94A3B8] uppercase tracking-wide">{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -214,7 +214,7 @@ export default function EmployerDashboard() {
                       <tr key={app.id} className="group" style={{ borderBottom: '1px solid rgba(220,235,255,0.4)' }}>
                         <td className="py-4 font-bold text-[#0F172A]">{app.candidate_name}</td>
                         <td className="py-4 text-[#64748B] font-medium">{app.job_title}</td>
-                        <td className="py-4 text-[#94A3B8] text-sm">{new Date(app.created_date).toLocaleDateString('he-IL')}</td>
+                        <td className="py-4 text-[#94A3B8] text-sm">{new Date(app.created_date).toLocaleDateString('en-US')}</td>
                         <td className="py-4">
                           <span className="px-3 py-1 rounded-full text-xs font-bold" style={{
                             background: `${STATUS_COLORS[app.status] || '#6C4DFF'}14`,
