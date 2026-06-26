@@ -870,6 +870,45 @@
       "draft": "Draft"
     }
   },
+  "permissionsMatrix": {
+    "title": "Permissions Management",
+    "subtitle": "Permission Matrix by Role",
+    "staffingAgency": "Staffing Agency",
+    "organization": "Organization",
+    "saving": "Saving...",
+    "saved": "✓ Saved",
+    "saveChanges": "Save Changes",
+    "loading": "Loading permissions...",
+    "roleColumn": "Role",
+    "save": "Save",
+    "modified": "● Modified",
+    "accessDenied": "Access Denied",
+    "accessDeniedDesc": "Only org_admin and above can manage permissions.",
+    "footer": "Changes are saved per-organization and do not affect other organizations. Defaults are loaded from a global template.",
+    "perms": {
+      "view": "View",
+      "create": "Create",
+      "update": "Edit",
+      "delete": "Delete",
+      "export": "Export",
+      "download_cv": "Download CV",
+      "view_compensation": "View Compensation",
+      "edit_compensation": "Edit Compensation",
+      "manage_users": "Manage Users",
+      "manage_settings": "System Settings"
+    },
+    "staffingRoles": {
+      "org_admin": "Org Admin",
+      "recruitment_manager": "Recruitment Manager",
+      "team_manager": "Team Manager",
+      "recruiter": "Recruiter"
+    },
+    "orgRoles": {
+      "org_admin": "Org Admin",
+      "hr_manager": "HR Manager",
+      "internal_recruiter": "Internal Recruiter"
+    }
+  },
   "settings": {
     "title": "Settings",
     "org": {

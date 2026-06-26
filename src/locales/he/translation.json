@@ -870,6 +870,45 @@
       "draft": "טיוטות"
     }
   },
+  "permissionsMatrix": {
+    "title": "ניהול הרשאות",
+    "subtitle": "Permission Matrix לפי תפקיד",
+    "staffingAgency": "חברת השמה",
+    "organization": "ארגון",
+    "saving": "שומר...",
+    "saved": "✓ נשמר",
+    "saveChanges": "שמור שינויים",
+    "loading": "טוען הרשאות...",
+    "roleColumn": "תפקיד",
+    "save": "שמור",
+    "modified": "● שונה",
+    "accessDenied": "אין הרשאה לדף זה",
+    "accessDeniedDesc": "רק org_admin ומעלה יכולים לנהל הרשאות.",
+    "footer": "שינויים נשמרים per-organization ואינם משפיעים על ארגונים אחרים. ברירות מחדל נטענות מ-template גלובלי.",
+    "perms": {
+      "view": "צפייה",
+      "create": "יצירה",
+      "update": "עריכה",
+      "delete": "מחיקה",
+      "export": "ייצוא",
+      "download_cv": "הורדת CV",
+      "view_compensation": "צפייה בתגמולים",
+      "edit_compensation": "עריכת תגמולים",
+      "manage_users": "ניהול משתמשים",
+      "manage_settings": "הגדרות מערכת"
+    },
+    "staffingRoles": {
+      "org_admin": "מנהל ארגון",
+      "recruitment_manager": "מנהל גיוס",
+      "team_manager": "מנהל צוות",
+      "recruiter": "רכז גיוס"
+    },
+    "orgRoles": {
+      "org_admin": "מנהל ארגון",
+      "hr_manager": "מנהל HR",
+      "internal_recruiter": "מגייס פנימי"
+    }
+  },
   "settings": {
     "title": "הגדרות",
     "org": {

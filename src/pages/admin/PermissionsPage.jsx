@@ -7,32 +7,17 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Save, RefreshCw, ShieldCheck, Lock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 const PERM_KEYS = [
-  { key: 'view',              label: 'צפייה' },
-  { key: 'create',            label: 'יצירה' },
-  { key: 'update',            label: 'עריכה' },
-  { key: 'delete',            label: 'מחיקה' },
-  { key: 'export',            label: 'ייצוא' },
-  { key: 'download_cv',       label: 'הורדת CV' },
-  { key: 'view_compensation', label: 'צפייה בתגמולים' },
-  { key: 'edit_compensation', label: 'עריכת תגמולים' },
-  { key: 'manage_users',      label: 'ניהול משתמשים' },
-  { key: 'manage_settings',   label: 'הגדרות מערכת' },
+  'view', 'create', 'update', 'delete', 'export',
+  'download_cv', 'view_compensation', 'edit_compensation',
+  'manage_users', 'manage_settings',
 ];
 
-const STAFFING_ROLES = [
-  { key: 'org_admin',           label: 'מנהל ארגון' },
-  { key: 'recruitment_manager', label: 'מנהל גיוס' },
-  { key: 'team_manager',        label: 'מנהל צוות' },
-  { key: 'recruiter',           label: 'רכז גיוס' },
-];
-
-const ORG_ROLES = [
-  { key: 'org_admin',         label: 'מנהל ארגון' },
-  { key: 'hr_manager',        label: 'מנהל HR' },
-  { key: 'internal_recruiter',label: 'מגייס פנימי' },
-];
+const STAFFING_ROLE_KEYS = ['org_admin', 'recruitment_manager', 'team_manager', 'recruiter'];
+const ORG_ROLE_KEYS      = ['org_admin', 'hr_manager', 'internal_recruiter'];
 
 const EDITABLE_ROLES = ['super_admin', 'admin', 'org_admin'];
 
@@ -44,6 +29,9 @@ const emptyPerms = () => ({
 
 export default function PermissionsPage() {
   const { user } = useAuth();
+  const { t, i18n } = useTranslation();
+  const isRtl = !i18n.language?.startsWith('en');
+
   const [allRecords, setAllRecords] = useState([]);
   const [matrix, setMatrix] = useState({});   // { role_key: { ...perms } }
   const [orgType, setOrgType] = useState('staffing_agency');
@@ -54,7 +42,12 @@ export default function PermissionsPage() {
 
   const canEdit = EDITABLE_ROLES.includes(user?.role);
   const orgId = user?.organization_id || null;
-  const roles = orgType === 'staffing_agency' ? STAFFING_ROLES : ORG_ROLES;
+
+  const roleKeys = orgType === 'staffing_agency' ? STAFFING_ROLE_KEYS : ORG_ROLE_KEYS;
+  const roleLabel = (key) =>
+    orgType === 'staffing_agency'
+      ? t(`permissionsMatrix.staffingRoles.${key}`)
+      : t(`permissionsMatrix.orgRoles.${key}`);
 
   useEffect(() => { load(); }, []);
 
@@ -69,15 +62,15 @@ export default function PermissionsPage() {
 
   const buildMatrix = (records) => {
     const built = {};
-    for (const role of [...STAFFING_ROLES, ...ORG_ROLES]) {
+    for (const roleKey of [...STAFFING_ROLE_KEYS, ...ORG_ROLE_KEYS]) {
       // Priority: org override > template
       const override = records.find(r =>
-        r.organization_id === orgId && r.role_key === role.key && !r.is_template
+        r.organization_id === orgId && r.role_key === roleKey && !r.is_template
       );
       const template = records.find(r =>
-        r.is_template && r.role_key === role.key
+        r.is_template && r.role_key === roleKey
       );
-      built[role.key] = { ...(override?.permissions || template?.permissions || emptyPerms()) };
+      built[roleKey] = { ...(override?.permissions || template?.permissions || emptyPerms()) };
     }
     setMatrix(built);
   };
@@ -120,7 +113,7 @@ export default function PermissionsPage() {
       actor_role: user.role,
       entity_type: 'Organization',
       entity_id: orgId || 'global',
-      entity_label: `הרשאות תפקיד: ${roleKey}`,
+      entity_label: `Role Permissions: ${roleKey}`,
       action: 'permission_update',
       metadata: { role_key: roleKey, before: oldPerms, after: perms },
     });
@@ -139,41 +132,45 @@ export default function PermissionsPage() {
 
   if (!canEdit) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]" dir="rtl">
+      <div className="flex items-center justify-center min-h-[60vh]" dir={isRtl ? 'rtl' : 'ltr'}>
         <div className="text-center text-gray-500">
           <Lock className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="font-bold text-lg">אין הרשאה לדף זה</p>
-          <p className="text-sm mt-1">רק org_admin ומעלה יכולים לנהל הרשאות.</p>
+          <p className="font-bold text-lg">{t('permissionsMatrix.accessDenied')}</p>
+          <p className="text-sm mt-1">{t('permissionsMatrix.accessDeniedDesc')}</p>
         </div>
       </div>
     );
   }
 
+  const hasDirty = Object.keys(dirty).some(k => dirty[k]);
+  const stickyColClass = isRtl ? 'sticky right-0' : 'sticky left-0';
+
   return (
-    <div dir="rtl" className="p-6 max-w-6xl mx-auto">
+    <div dir={isRtl ? 'rtl' : 'ltr'} className="p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <ShieldCheck className="w-7 h-7 text-purple-600" />
           <div>
-            <h1 className="text-2xl font-black text-gray-900">ניהול הרשאות</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Permission Matrix לפי תפקיד</p>
+            <h1 className="text-2xl font-black text-gray-900">{t('permissionsMatrix.title')}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{t('permissionsMatrix.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <LanguageSwitcher variant="badge" />
           {/* org_type toggle */}
           <div className="flex rounded-xl border border-gray-200 overflow-hidden text-sm">
             <button
               onClick={() => setOrgType('staffing_agency')}
               className={`px-4 py-2 font-semibold transition-all ${orgType === 'staffing_agency' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
             >
-              חברת השמה
+              {t('permissionsMatrix.staffingAgency')}
             </button>
             <button
               onClick={() => setOrgType('organization')}
               className={`px-4 py-2 font-semibold transition-all ${orgType === 'organization' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
             >
-              ארגון
+              {t('permissionsMatrix.organization')}
             </button>
           </div>
           <button onClick={load} disabled={loading}
@@ -182,57 +179,65 @@ export default function PermissionsPage() {
           </button>
           <Button
             onClick={handleSaveAll}
-            disabled={saving || Object.keys(dirty).filter(k => dirty[k]).length === 0}
+            disabled={saving || !hasDirty}
             className="gap-2 bg-purple-600 hover:bg-purple-700 text-white"
           >
             <Save className="w-4 h-4" />
-            {saving ? 'שומר...' : saved ? '✓ נשמר' : 'שמור שינויים'}
+            {saving
+              ? t('permissionsMatrix.saving')
+              : saved
+                ? t('permissionsMatrix.saved')
+                : t('permissionsMatrix.saveChanges')}
           </Button>
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-16 text-gray-400">טוען הרשאות...</div>
+        <div className="text-center py-16 text-gray-400">{t('permissionsMatrix.loading')}</div>
       ) : (
         <div className="bg-white rounded-2xl border border-gray-200 overflow-x-auto shadow-sm">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-right px-5 py-3 font-black text-gray-700 w-40 sticky right-0 bg-gray-50 z-10">תפקיד</th>
-                {PERM_KEYS.map(p => (
-                  <th key={p.key} className="px-3 py-3 font-bold text-gray-600 text-center whitespace-nowrap">
-                    {p.label}
+                <th className={`${isRtl ? 'text-right' : 'text-left'} px-5 py-3 font-black text-gray-700 w-40 ${stickyColClass} bg-gray-50 z-10`}>
+                  {t('permissionsMatrix.roleColumn')}
+                </th>
+                {PERM_KEYS.map(key => (
+                  <th key={key} className="px-3 py-3 font-bold text-gray-600 text-center whitespace-nowrap">
+                    {t(`permissionsMatrix.perms.${key}`)}
                   </th>
                 ))}
-                {Object.keys(dirty).some(k => dirty[k]) && (
-                  <th className="px-3 py-3 text-center font-bold text-gray-600">שמור</th>
+                {hasDirty && (
+                  <th className="px-3 py-3 text-center font-bold text-gray-600">
+                    {t('permissionsMatrix.save')}
+                  </th>
                 )}
               </tr>
             </thead>
             <tbody>
-              {roles.map((role, i) => (
-                <tr key={role.key} className={`border-b border-gray-50 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'} hover:bg-purple-50/20 transition-colors`}>
-                  <td className="px-5 py-4 sticky right-0 bg-inherit z-10">
-                    <div className="font-bold text-gray-900">{role.label}</div>
-                    <div className="text-xs text-gray-400 font-mono">{role.key}</div>
-                    {dirty[role.key] && (
-                      <span className="text-xs text-amber-600 font-semibold">● שונה</span>
+              {roleKeys.map((roleKey, i) => (
+                <tr key={roleKey} className={`border-b border-gray-50 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'} hover:bg-purple-50/20 transition-colors`}>
+                  <td className={`px-5 py-4 ${stickyColClass} bg-inherit z-10`}>
+                    <div className="font-bold text-gray-900">{roleLabel(roleKey)}</div>
+                    <div className="text-xs text-gray-400 font-mono">{roleKey}</div>
+                    {dirty[roleKey] && (
+                      <span className="text-xs text-amber-600 font-semibold">{t('permissionsMatrix.modified')}</span>
                     )}
                   </td>
-                  {PERM_KEYS.map(p => (
-                    <td key={p.key} className="px-3 py-4 text-center">
+                  {PERM_KEYS.map(permKey => (
+                    <td key={permKey} className="px-3 py-4 text-center">
                       <button
-                        onClick={() => toggle(role.key, p.key)}
+                        onClick={() => toggle(roleKey, permKey)}
                         disabled={!canEdit}
                         className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mx-auto transition-all
-                          ${matrix[role.key]?.[p.key]
+                          ${matrix[roleKey]?.[permKey]
                             ? 'bg-purple-600 border-purple-600 text-white'
                             : 'bg-white border-gray-300 hover:border-purple-400'
                           }
                           ${!canEdit ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
                         `}
                       >
-                        {matrix[role.key]?.[p.key] && (
+                        {matrix[roleKey]?.[permKey] && (
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                           </svg>
@@ -240,19 +245,19 @@ export default function PermissionsPage() {
                       </button>
                     </td>
                   ))}
-                  {Object.keys(dirty).some(k => dirty[k]) && (
+                  {hasDirty && (
                     <td className="px-3 py-4 text-center">
-                      {dirty[role.key] && (
+                      {dirty[roleKey] && (
                         <button
                           onClick={async () => {
                             setSaving(true);
-                            await saveRole(role.key);
+                            await saveRole(roleKey);
                             await load();
                             setSaving(false);
                           }}
                           className="text-xs px-3 py-1.5 bg-purple-100 text-purple-700 font-bold rounded-lg hover:bg-purple-200 transition-all"
                         >
-                          שמור
+                          {t('permissionsMatrix.save')}
                         </button>
                       )}
                     </td>
@@ -265,8 +270,7 @@ export default function PermissionsPage() {
       )}
 
       <p className="text-xs text-gray-400 mt-4 text-center">
-        שינויים נשמרים per-organization ואינם משפיעים על ארגונים אחרים.
-        ברירות מחדל נטענות מ-template גלובלי.
+        {t('permissionsMatrix.footer')}
       </p>
     </div>
   );
