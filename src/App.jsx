@@ -64,6 +64,7 @@ import PlatformDashboard from './pages/platform/PlatformDashboard';
 import PlaceholderPlatform from './pages/platform/PlaceholderPlatform';
 import SubscriptionsPage from './pages/platform/SubscriptionsPage';
 import InvoicesPage from './pages/platform/InvoicesPage';
+import FlagsPage from './pages/platform/FlagsPage';
 import OrganizationsPage from './pages/platform/OrganizationsPage';
 import UsersManagementPage from './pages/platform/UsersManagementPage';
 
@@ -139,7 +140,7 @@ const AuthenticatedApp = () => {
           <Route path="/platform/billing" element={<SubscriptionsPage />} />
           <Route path="/platform/billing/subscriptions" element={<SubscriptionsPage />} />
           <Route path="/platform/billing/invoices" element={<InvoicesPage />} />
-          <Route path="/platform/billing/flags" element={<PlaceholderPlatform />} />
+          <Route path="/platform/billing/flags" element={<FlagsPage />} />
           <Route path="/platform/marketplace" element={<PlaceholderPlatform />} />
           <Route path="/platform/marketplace/candidates" element={<PlaceholderPlatform />} />
           <Route path="/platform/marketplace/exposure" element={<PlaceholderPlatform />} />
