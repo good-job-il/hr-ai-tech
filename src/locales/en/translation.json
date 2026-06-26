@@ -1178,6 +1178,51 @@
     }
   },
   "company": {
+    "team": {
+      "title": "HR Team",
+      "subtitle": "Manage your HR team members and internal recruiters",
+      "members": "Team Members",
+      "membersSubtitle": "HR managers and organization admins",
+      "recruiters": "Internal Recruiters",
+      "recruitersSubtitle": "Internal recruiters managing candidates",
+      "invite": "Invite Member",
+      "inviteNew": "Invite New Team Member",
+      "editMember": "Edit Member",
+      "totalMembers": "Total Members",
+      "hrManagers": "HR Managers",
+      "internalRecruiters": "Internal Recruiters",
+      "orgAdmins": "Org Admins",
+      "noMembers": "No team members yet",
+      "noMembersHint": "Invite team members to get started",
+      "noResults": "No results found",
+      "noResultsHint": "Try adjusting your search",
+      "searchPlaceholder": "Search by name or email...",
+      "confirmDelete": "Are you sure you want to remove this member from the team?",
+      "deletedSuccess": "Member removed successfully",
+      "savedSuccess": "Member saved successfully",
+      "filters": {
+        "all": "All Members",
+        "org_admin": "Org Admins",
+        "hr_manager": "HR Managers",
+        "internal_recruiter": "Internal Recruiters"
+      },
+      "roles": {
+        "org_admin": "Org Admin",
+        "hr_manager": "HR Manager",
+        "internal_recruiter": "Internal Recruiter"
+      },
+      "form": {
+        "fullName": "Full Name",
+        "email": "Email",
+        "phone": "Phone",
+        "role": "Role",
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "fullNamePlaceholder": "e.g. Sarah Cohen",
+        "phonePlaceholder": "050-123-4567"
+      }
+    },
     "interviews": {
       "title": "Interview Management",
       "subtitle": "All scheduled interviews in your organization",

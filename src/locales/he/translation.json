@@ -1178,6 +1178,51 @@
     }
   },
   "company": {
+    "team": {
+      "title": "צוות HR",
+      "subtitle": "נהל את חברי צוות ה-HR והמגייסים הפנימיים בארגון",
+      "members": "חברי צוות",
+      "membersSubtitle": "מנהלי HR ומנהלי ארגון",
+      "recruiters": "מגייסים פנימיים",
+      "recruitersSubtitle": "מגייסים פנימיים המנהלים מועמדים",
+      "invite": "הזמן חבר",
+      "inviteNew": "הזמן חבר חדש לצוות",
+      "editMember": "ערוך חבר צוות",
+      "totalMembers": "סה\"כ חברים",
+      "hrManagers": "מנהלי HR",
+      "internalRecruiters": "מגייסים פנימיים",
+      "orgAdmins": "מנהלי ארגון",
+      "noMembers": "אין חברי צוות עדיין",
+      "noMembersHint": "הזמן חברי צוות כדי להתחיל",
+      "noResults": "לא נמצאו תוצאות",
+      "noResultsHint": "נסה לשנות את החיפוש",
+      "searchPlaceholder": "חפש לפי שם או אימייל...",
+      "confirmDelete": "האם אתה בטוח שברצונך להסיר את החבר מהצוות?",
+      "deletedSuccess": "החבר הוסר בהצלחה",
+      "savedSuccess": "החבר נשמר בהצלחה",
+      "filters": {
+        "all": "כל החברים",
+        "org_admin": "מנהלי ארגון",
+        "hr_manager": "מנהלי HR",
+        "internal_recruiter": "מגייסים פנימיים"
+      },
+      "roles": {
+        "org_admin": "מנהל ארגון",
+        "hr_manager": "מנהל HR",
+        "internal_recruiter": "מגייס פנימי"
+      },
+      "form": {
+        "fullName": "שם מלא",
+        "email": "אימייל",
+        "phone": "טלפון",
+        "role": "תפקיד",
+        "save": "שמור",
+        "saving": "שומר...",
+        "cancel": "ביטול",
+        "fullNamePlaceholder": "למשל: שרה כהן",
+        "phonePlaceholder": "050-123-4567"
+      }
+    },
     "interviews": {
       "title": "ניהול ראיונות",
       "subtitle": "כל הראיונות המתוכננים בארגון",
