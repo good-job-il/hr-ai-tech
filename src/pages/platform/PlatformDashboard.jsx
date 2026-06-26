@@ -88,32 +88,32 @@ export default function PlatformDashboard() {
   };
 
   return (
-    <div dir="rtl" className="space-y-8 max-w-7xl mx-auto">
+    <div dir="ltr" className="space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black text-slate-900">לוח בקרה — פלטפורמה</h1>
-        <p className="text-slate-500 mt-1 font-semibold">סקירה כוללת של כל הפלטפורמה</p>
+        <h1 className="text-3xl font-black text-slate-900">Platform Dashboard</h1>
+        <p className="text-slate-500 mt-1 font-semibold">Overview of the entire platform</p>
       </div>
 
       {/* KPI Grid — Platform metrics only */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <StatCard icon={Building2} label="ארגונים פעילים" value={stats.activeOrgs?.length} color="purple" loading={loading} to="/platform/organizations" />
-        <StatCard icon={Users} label="סה״כ משתמשים" value={stats.users?.length} color="blue" loading={loading} to="/platform/analytics/users" />
-        <StatCard icon={Globe} label="חברות השמה" value={stats.agencies?.length} color="green" loading={loading} to="/platform/organizations/staffing" />
-        <StatCard icon={Activity} label="חברות / HR" value={stats.companies?.length} color="slate" loading={loading} to="/platform/organizations/companies" />
-        <StatCard icon={ShieldCheck} label="מושהים" value={stats.suspended?.length ?? 0} color="red" loading={loading} to="/platform/organizations" />
+        <StatCard icon={Building2} label="Active Organizations" value={stats.activeOrgs?.length} color="purple" loading={loading} to="/platform/organizations" />
+        <StatCard icon={Users} label="Total Users" value={stats.users?.length} color="blue" loading={loading} to="/platform/analytics/users" />
+        <StatCard icon={Globe} label="Staffing Agencies" value={stats.agencies?.length} color="green" loading={loading} to="/platform/organizations/staffing" />
+        <StatCard icon={Activity} label="Companies / HR" value={stats.companies?.length} color="slate" loading={loading} to="/platform/organizations/companies" />
+        <StatCard icon={ShieldCheck} label="Suspended" value={stats.suspended?.length ?? 0} color="red" loading={loading} to="/platform/organizations" />
       </div>
 
       {/* Organizations breakdown */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-black text-gray-900">ארגונים לפי סוג</h2>
+            <h2 className="text-lg font-black text-gray-900">Organizations by Type</h2>
             <button
               onClick={() => setShowOrgModal(true)}
               className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold hover:bg-purple-700"
             >
-              + ארגון חדש
+              + New Organization
             </button>
           </div>
           {loading ? (
@@ -123,15 +123,15 @@ export default function PlatformDashboard() {
           ) : (
             <div className="space-y-3">
               <div className="flex justify-between items-center p-3 bg-purple-50 rounded-xl">
-                <span className="font-bold text-purple-800">חברות השמה</span>
+                <span className="font-bold text-purple-800">Staffing Agencies</span>
                 <span className="font-black text-purple-900">{stats.agencies?.length ?? 0}</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-xl">
-                <span className="font-bold text-emerald-800">חברות / HR פנימי</span>
+                <span className="font-bold text-emerald-800">Companies / Internal HR</span>
                 <span className="font-black text-emerald-900">{stats.companies?.length ?? 0}</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
-                <span className="font-bold text-blue-800">סה״כ ארגונים</span>
+                <span className="font-bold text-blue-800">Total Organizations</span>
                 <span className="font-black text-blue-900">{stats.orgs?.length ?? 0}</span>
               </div>
             </div>
@@ -140,7 +140,7 @@ export default function PlatformDashboard() {
 
         {/* Recent Audit */}
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-          <h2 className="text-lg font-black text-gray-900 mb-4">פעילות אחרונה (Audit)</h2>
+          <h2 className="text-lg font-black text-gray-900 mb-4">Recent Activity (Audit)</h2>
           {loading ? (
             <div className="space-y-3">
               {[1,2,3,4,5].map(i => <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />)}
@@ -154,7 +154,7 @@ export default function PlatformDashboard() {
                 </div>
               ))}
               {!stats.recentAudit?.length && (
-                <p className="text-gray-400 text-center py-4">אין פעילות אחרונה</p>
+                <p className="text-gray-400 text-center py-4">No recent activity</p>
               )}
             </div>
           )}
@@ -183,27 +183,27 @@ export default function PlatformDashboard() {
       {showOrgModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-lg">
-            <h3 className="text-xl font-black text-gray-900 mb-4">ארגון חדש</h3>
+            <h3 className="text-xl font-black text-gray-900 mb-4">New Organization</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">שם הארגון</label>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Organization Name</label>
                 <input
                   type="text"
                   value={newOrgName}
                   onChange={(e) => setNewOrgName(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:border-purple-400"
-                  placeholder="לדוגמה: TechStaff Ltd"
+                  placeholder="e.g.: TechStaff Ltd"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">סוג ארגון</label>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Organization Type</label>
                 <select
                   value={newOrgType}
                   onChange={(e) => setNewOrgType(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:border-purple-400"
                 >
-                  <option value="staffing_agency">חברת השמה</option>
-                  <option value="organization">חברה / HR פנימי</option>
+                  <option value="staffing_agency">Staffing Agency</option>
+                  <option value="organization">Company / Internal HR</option>
                 </select>
               </div>
               <div className="flex gap-3 pt-2">
@@ -212,14 +212,14 @@ export default function PlatformDashboard() {
                   className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50"
                   disabled={creatingOrg}
                 >
-                  ביטול
+                  Cancel
                 </button>
                 <button
                   onClick={handleCreateOrg}
                   className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 disabled:opacity-50"
                   disabled={creatingOrg || !newOrgName.trim()}
                 >
-                  {creatingOrg ? 'יוצר...' : 'צור'}
+                  {creatingOrg ? 'Creating...' : 'Create'}
                 </button>
               </div>
             </div>
