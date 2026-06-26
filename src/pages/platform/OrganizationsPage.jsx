@@ -4,9 +4,9 @@ import { base44 } from '@/api/base44Client';
 import { Building2, Search, Plus, Users, Briefcase, CheckCircle, XCircle, Clock, Edit2 } from 'lucide-react';
 
 const STATUS_CONFIG = {
-  active:    { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'פעיל',     icon: CheckCircle },
-  suspended: { bg: 'bg-red-50',     text: 'text-red-700',     label: 'מושהה',   icon: XCircle },
-  inactive:  { bg: 'bg-gray-50',    text: 'text-gray-500',    label: 'לא פעיל', icon: Clock },
+  active:    { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Active',   icon: CheckCircle },
+  suspended: { bg: 'bg-red-50',     text: 'text-red-700',     label: 'Suspended', icon: XCircle },
+  inactive:  { bg: 'bg-gray-50',    text: 'text-gray-500',    label: 'Inactive',  icon: Clock },
 };
 
 export default function OrganizationsPage() {
@@ -54,25 +54,25 @@ export default function OrganizationsPage() {
   };
 
   return (
-    <div dir="rtl" className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">ארגונים</h1>
-          <p className="text-slate-500 mt-1 font-semibold">ניהול כל הארגונים בפלטפורמה</p>
+          <h1 className="text-2xl font-black text-slate-900">Organizations</h1>
+          <p className="text-slate-500 mt-1 font-semibold">Manage all organizations on the platform</p>
         </div>
         <button onClick={() => setShowModal(true)}
           className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors">
-          <Plus className="w-4 h-4" /> ארגון חדש
+          <Plus className="w-4 h-4" /> New Organization
         </button>
       </div>
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'סה״כ', value: stats.total, color: 'bg-purple-50 text-purple-700' },
-          { label: 'פעילים', value: stats.active, color: 'bg-emerald-50 text-emerald-700' },
-          { label: 'חברות השמה', value: stats.agencies, color: 'bg-blue-50 text-blue-700' },
-          { label: 'HR פנימי', value: stats.companies, color: 'bg-amber-50 text-amber-700' },
+          { label: 'Total', value: stats.total, color: 'bg-purple-50 text-purple-700' },
+          { label: 'Active', value: stats.active, color: 'bg-emerald-50 text-emerald-700' },
+          { label: 'Staffing Agencies', value: stats.agencies, color: 'bg-blue-50 text-blue-700' },
+          { label: 'Internal HR', value: stats.companies, color: 'bg-amber-50 text-amber-700' },
         ].map(s => (
           <div key={s.label} className={`rounded-2xl p-5 ${s.color}`}>
             <p className="text-3xl font-black">{isLoading ? '...' : s.value}</p>
@@ -86,15 +86,15 @@ export default function OrganizationsPage() {
         <div className="flex items-center gap-2 flex-1 min-w-48 border border-gray-200 rounded-xl px-3 py-2">
           <Search className="w-4 h-4 text-gray-400" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="חיפוש ארגון..." className="outline-none text-sm w-full bg-transparent" />
+            placeholder="Search organization..." className="outline-none text-sm w-full bg-transparent" />
         </div>
         <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}
           className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold outline-none">
-          <option value="all">כל הסוגים</option>
-          <option value="staffing_agency">חברות השמה</option>
-          <option value="organization">HR פנימי</option>
+          <option value="all">All Types</option>
+          <option value="staffing_agency">Staffing Agencies</option>
+          <option value="organization">Internal HR</option>
         </select>
-        <span className="text-sm text-gray-400 font-semibold">{filtered.length} ארגונים</span>
+        <span className="text-sm text-gray-400 font-semibold">{filtered.length} organizations</span>
       </div>
 
       {/* Table */}
@@ -102,12 +102,12 @@ export default function OrganizationsPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              <th className="text-right font-black text-gray-600 px-5 py-3">שם</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">סוג</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">מייל</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">תוכנית</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">סטטוס</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">פעולות</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">Name</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">Type</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">Email</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">Plan</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">Status</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -120,7 +120,7 @@ export default function OrganizationsPage() {
                 </tr>
               ))
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={6} className="px-5 py-12 text-center text-gray-400">אין ארגונים תואמים</td></tr>
+              <tr><td colSpan={6} className="px-5 py-12 text-center text-gray-400">No matching organizations</td></tr>
             ) : filtered.map(org => {
               const st = STATUS_CONFIG[org.status] || STATUS_CONFIG.inactive;
               const StIcon = st.icon;
@@ -135,7 +135,7 @@ export default function OrganizationsPage() {
                     </div>
                   </td>
                   <td className="px-5 py-4 text-gray-600 font-semibold">
-                    {org.org_type === 'staffing_agency' ? '🏢 השמה' : '🏗️ HR פנימי'}
+                    {org.org_type === 'staffing_agency' ? '🏢 Staffing' : '🏗️ Internal HR'}
                   </td>
                   <td className="px-5 py-4 text-gray-500">{org.contact_email || '—'}</td>
                   <td className="px-5 py-4">
@@ -156,7 +156,7 @@ export default function OrganizationsPage() {
                           ? 'bg-red-50 text-red-600 hover:bg-red-100'
                           : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
                       }`}>
-                      {org.status === 'active' ? 'השהה' : 'הפעל'}
+                      {org.status === 'active' ? 'Suspend' : 'Activate'}
                     </button>
                   </td>
                 </tr>
@@ -169,25 +169,25 @@ export default function OrganizationsPage() {
       {/* Create Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl" dir="rtl">
-            <h3 className="text-xl font-black text-gray-900 mb-5">ארגון חדש</h3>
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+            <h3 className="text-xl font-black text-gray-900 mb-5">New Organization</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">שם הארגון *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Organization Name *</label>
                 <input type="text" value={newOrg.name} onChange={e => setNewOrg(p => ({ ...p, name: e.target.value }))}
-                  placeholder="לדוגמה: TechStaff Ltd"
+                  placeholder="e.g., TechStaff Ltd"
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm" />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">סוג ארגון</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Organization Type</label>
                 <select value={newOrg.org_type} onChange={e => setNewOrg(p => ({ ...p, org_type: e.target.value }))}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm">
-                  <option value="staffing_agency">חברת השמה</option>
-                  <option value="organization">חברה / HR פנימי</option>
+                  <option value="staffing_agency">Staffing Agency</option>
+                  <option value="organization">Company / Internal HR</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">מייל ראשי</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Primary Email</label>
                 <input type="email" value={newOrg.contact_email} onChange={e => setNewOrg(p => ({ ...p, contact_email: e.target.value }))}
                   placeholder="info@company.com"
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm" />
@@ -195,11 +195,11 @@ export default function OrganizationsPage() {
               <div className="flex gap-3 pt-2">
                 <button onClick={() => setShowModal(false)} disabled={creating}
                   className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 text-sm">
-                  ביטול
+                  Cancel
                 </button>
                 <button onClick={handleCreate} disabled={creating || !newOrg.name.trim()}
                   className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 disabled:opacity-50 text-sm transition-colors">
-                  {creating ? 'יוצר...' : 'צור ארגון'}
+                  {creating ? 'Creating...' : 'Create Organization'}
                 </button>
               </div>
             </div>
