@@ -1021,6 +1021,36 @@
       "revenue": "Revenue",
       "mrr": "MRR",
       "arr": "ARR"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "subtitle": "Billing history by organization",
+      "stats": {
+        "totalInvoices": "Total Invoices",
+        "paid": "Paid",
+        "pending": "Pending",
+        "revenue": "Revenue (₪)"
+      },
+      "status": {
+        "paid": "Paid",
+        "pending": "Pending",
+        "overdue": "Overdue"
+      },
+      "filters": {
+        "allStatuses": "All Statuses",
+        "searchPlaceholder": "Search by organization or invoice number...",
+        "invoicesCount": "invoices"
+      },
+      "table": {
+        "invoiceNumber": "Invoice Number",
+        "organization": "Organization",
+        "plan": "Plan",
+        "period": "Period",
+        "amount": "Amount",
+        "status": "Status",
+        "download": "Download"
+      },
+      "noInvoices": "No invoices"
     }
   },
   "import": {

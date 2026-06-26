@@ -1021,6 +1021,36 @@
       "revenue": "הכנסות",
       "mrr": "MRR",
       "arr": "ARR"
+    },
+    "invoices": {
+      "title": "חשבוניות",
+      "subtitle": "היסטוריית חיובים לפי ארגון",
+      "stats": {
+        "totalInvoices": "סה״כ חשבוניות",
+        "paid": "שולמו",
+        "pending": "בהמתנה",
+        "revenue": "הכנסות (₪)"
+      },
+      "status": {
+        "paid": "שולם",
+        "pending": "בהמתנה",
+        "overdue": "באיחור"
+      },
+      "filters": {
+        "allStatuses": "כל הסטטוסים",
+        "searchPlaceholder": "חיפוש לפי ארגון או מספר חשבונית...",
+        "invoicesCount": "חשבוניות"
+      },
+      "table": {
+        "invoiceNumber": "מספר חשבונית",
+        "organization": "ארגון",
+        "plan": "תוכנית",
+        "period": "תקופה",
+        "amount": "סכום",
+        "status": "סטטוס",
+        "download": "הורדה"
+      },
+      "noInvoices": "אין חשבוניות"
     }
   },
   "import": {

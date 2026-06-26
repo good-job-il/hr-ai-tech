@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { Receipt, Download, Search, CheckCircle, Clock, XCircle, TrendingUp, DollarSign } from 'lucide-react';
 
 const PLAN_PRICES = { trial: 0, starter: 499, pro: 1499, enterprise: 2999 };
 
 // Generate mock invoices from real orgs
-function generateInvoices(orgs) {
+function generateInvoices(orgs, locale = 'he-IL') {
   const result = [];
   let num = 1;
   const now = new Date();
@@ -20,7 +21,7 @@ function generateInvoices(orgs) {
         org_id: org.id,
         plan: org.plan,
         amount: PLAN_PRICES[org.plan] || 0,
-        date: d.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' }),
+        date: d.toLocaleDateString(locale, { month: 'long', year: 'numeric' }),
         date_raw: d,
         status: isPast ? 'paid' : (i === 0 ? 'pending' : 'paid'),
       });
@@ -30,14 +31,17 @@ function generateInvoices(orgs) {
 }
 
 const STATUS = {
-  paid:    { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'שולם',    icon: CheckCircle },
-  pending: { bg: 'bg-amber-50',   text: 'text-amber-700',   label: 'בהמתנה', icon: Clock },
-  overdue: { bg: 'bg-red-50',     text: 'text-red-700',     label: 'באיחור', icon: XCircle },
+  paid:    { bg: 'bg-emerald-50', text: 'text-emerald-700', icon: CheckCircle },
+  pending: { bg: 'bg-amber-50',   text: 'text-amber-700',   icon: Clock },
+  overdue: { bg: 'bg-red-50',     text: 'text-red-700',     icon: XCircle },
 };
 
 export default function InvoicesPage() {
+  const { t, i18n } = useTranslation();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'he';
+  const dir = currentLang === 'he' ? 'rtl' : 'ltr';
 
   const { data: orgs = [], isLoading } = useQuery({
     queryKey: ['platform-orgs'],
@@ -45,7 +49,8 @@ export default function InvoicesPage() {
     staleTime: 2 * 60 * 1000,
   });
 
-  const invoices = useMemo(() => generateInvoices(orgs), [orgs]);
+  const locale = currentLang === 'he' ? 'he-IL' : 'en-US';
+  const invoices = useMemo(() => generateInvoices(orgs, locale), [orgs, locale]);
 
   const filtered = invoices.filter(inv => {
     const matchSearch = !search || inv.org_name?.toLowerCase().includes(search.toLowerCase()) || inv.id.includes(search);
@@ -61,19 +66,19 @@ export default function InvoicesPage() {
   };
 
   return (
-    <div dir="rtl" className="space-y-6 max-w-7xl mx-auto">
+    <div dir={dir} className="space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-black text-slate-900">חשבוניות</h1>
-        <p className="text-slate-500 mt-1 font-semibold">היסטוריית חיובים לפי ארגון</p>
+        <h1 className="text-2xl font-black text-slate-900">{t('platform.invoices.title')}</h1>
+        <p className="text-slate-500 mt-1 font-semibold">{t('platform.invoices.subtitle')}</p>
       </div>
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'סה״כ חשבוניות', value: stats.total, color: 'bg-purple-50 text-purple-700', icon: Receipt },
-          { label: 'שולמו', value: stats.paid, color: 'bg-emerald-50 text-emerald-700', icon: CheckCircle },
-          { label: 'בהמתנה', value: stats.pending, color: 'bg-amber-50 text-amber-700', icon: Clock },
-          { label: 'הכנסות (₪)', value: `₪${stats.revenue.toLocaleString()}`, color: 'bg-blue-50 text-blue-700', icon: DollarSign },
+          { label: t('platform.invoices.stats.totalInvoices'), value: stats.total, color: 'bg-purple-50 text-purple-700', icon: Receipt },
+          { label: t('platform.invoices.stats.paid'), value: stats.paid, color: 'bg-emerald-50 text-emerald-700', icon: CheckCircle },
+          { label: t('platform.invoices.stats.pending'), value: stats.pending, color: 'bg-amber-50 text-amber-700', icon: Clock },
+          { label: t('platform.invoices.stats.revenue'), value: `₪${stats.revenue.toLocaleString()}`, color: 'bg-blue-50 text-blue-700', icon: DollarSign },
         ].map(s => {
           const Icon = s.icon;
           return (
@@ -93,17 +98,17 @@ export default function InvoicesPage() {
         <div className="flex items-center gap-2 flex-1 min-w-48 border border-gray-200 rounded-xl px-3 py-2">
           <Search className="w-4 h-4 text-gray-400" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="חיפוש לפי ארגון או מספר חשבונית..."
+            placeholder={t('platform.invoices.filters.searchPlaceholder')}
             className="outline-none text-sm w-full bg-transparent" />
         </div>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
           className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold outline-none">
-          <option value="all">כל הסטטוסים</option>
-          <option value="paid">שולם</option>
-          <option value="pending">בהמתנה</option>
-          <option value="overdue">באיחור</option>
+          <option value="all">{t('platform.invoices.filters.allStatuses')}</option>
+          <option value="paid">{t('platform.invoices.status.paid')}</option>
+          <option value="pending">{t('platform.invoices.status.pending')}</option>
+          <option value="overdue">{t('platform.invoices.status.overdue')}</option>
         </select>
-        <span className="text-sm text-gray-400 font-semibold">{filtered.length} חשבוניות</span>
+        <span className="text-sm text-gray-400 font-semibold">{filtered.length} {t('platform.invoices.filters.invoicesCount')}</span>
       </div>
 
       {/* Table */}
@@ -111,13 +116,13 @@ export default function InvoicesPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              <th className="text-right font-black text-gray-600 px-5 py-3">מספר חשבונית</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">ארגון</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">תוכנית</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">תקופה</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">סכום</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">סטטוס</th>
-              <th className="text-right font-black text-gray-600 px-5 py-3">הורדה</th>
+              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.invoiceNumber')}</th>
+              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.organization')}</th>
+              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.plan')}</th>
+              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.period')}</th>
+              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.amount')}</th>
+              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.status')}</th>
+              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.download')}</th>
             </tr>
           </thead>
           <tbody>
@@ -130,10 +135,11 @@ export default function InvoicesPage() {
                 </tr>
               ))
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={7} className="px-5 py-12 text-center text-gray-400">אין חשבוניות</td></tr>
+              <tr><td colSpan={7} className="px-5 py-12 text-center text-gray-400">{t('platform.invoices.noInvoices')}</td></tr>
             ) : filtered.map(inv => {
               const st = STATUS[inv.status] || STATUS.pending;
               const StIcon = st.icon;
+              const statusLabel = t(`platform.invoices.status.${inv.status}`);
               return (
                 <tr key={inv.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                   <td className="px-5 py-4 font-mono font-bold text-gray-700">{inv.id}</td>
@@ -148,7 +154,7 @@ export default function InvoicesPage() {
                   <td className="px-5 py-4">
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${st.bg} ${st.text}`}>
                       <StIcon className="w-3 h-3" />
-                      {st.label}
+                      {statusLabel}
                     </div>
                   </td>
                   <td className="px-5 py-4">
