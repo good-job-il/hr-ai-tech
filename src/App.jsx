@@ -67,6 +67,9 @@ import InvoicesPage from './pages/platform/InvoicesPage';
 import FlagsPage from './pages/platform/FlagsPage';
 import OrganizationsPage from './pages/platform/OrganizationsPage';
 import UsersManagementPage from './pages/platform/UsersManagementPage';
+import MarketplacePage from './pages/platform/marketplace/MarketplacePage';
+import MarketplaceCandidatesPage from './pages/platform/marketplace/MarketplaceCandidatesPage';
+import MarketplaceExposurePage from './pages/platform/marketplace/MarketplaceExposurePage';
 
 // ── Agency Pages (Staffing Agency) ────────────────────────────────────
 import AgencyDashboard from './pages/agency/AgencyDashboard';
@@ -141,9 +144,9 @@ const AuthenticatedApp = () => {
           <Route path="/platform/billing/subscriptions" element={<SubscriptionsPage />} />
           <Route path="/platform/billing/invoices" element={<InvoicesPage />} />
           <Route path="/platform/billing/flags" element={<FlagsPage />} />
-          <Route path="/platform/marketplace" element={<PlaceholderPlatform />} />
-          <Route path="/platform/marketplace/candidates" element={<PlaceholderPlatform />} />
-          <Route path="/platform/marketplace/exposure" element={<PlaceholderPlatform />} />
+          <Route path="/platform/marketplace" element={<MarketplacePage />} />
+          <Route path="/platform/marketplace/candidates" element={<MarketplaceCandidatesPage />} />
+          <Route path="/platform/marketplace/exposure" element={<MarketplaceExposurePage />} />
           <Route path="/platform/analytics" element={<PlaceholderPlatform />} />
           <Route path="/platform/analytics/users" element={<UsersManagementPage />} />
           <Route path="/platform/analytics/ai" element={<PlaceholderPlatform />} />

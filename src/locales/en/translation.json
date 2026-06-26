@@ -1266,5 +1266,34 @@
         "strong_no": "Strong No"
       }
     }
+  },
+  "roleSettings": {
+    "title": "Role Management",
+    "subtitle": "Role Templates — display names only",
+    "accessDenied": "Access Denied",
+    "accessDeniedDesc": "Only org_admin and above can manage roles.",
+    "infoBanner": "<strong>Note:</strong> Changing a display name does not affect permissions — the PermissionMatrix continues to work by <code>system_role_key</code> only.",
+    "staffingAgency": "Staffing Agency",
+    "organization": "Organization",
+    "loading": "Loading roles...",
+    "noRoles": "No roles to display",
+    "saved": "\"{{name}}\" saved",
+    "footer": "Display name changes are logged in the AuditLog and do not affect system permissions.",
+    "columns": {
+      "level": "Level",
+      "systemRoleKey": "system_role_key",
+      "displayName": "Display Name",
+      "parentRole": "Parent Role",
+      "status": "Status",
+      "active": "Active"
+    },
+    "levels": {
+      "1": "Top",
+      "2": "Senior",
+      "3": "Middle",
+      "4": "Basic"
+    },
+    "required": "Required",
+    "optional": "Optional"
   }
 }

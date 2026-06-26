@@ -9,10 +9,11 @@ import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Save, RefreshCw, Users, Lock, Pencil, Check, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 const EDITABLE_ROLES = ['super_admin', 'admin', 'org_admin'];
 
-const LEVEL_LABELS = { 1: 'עליון', 2: 'בכיר', 3: 'ביניים', 4: 'בסיסי' };
 const LEVEL_COLORS = {
   1: 'bg-purple-100 text-purple-700 border-purple-200',
   2: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -20,7 +21,7 @@ const LEVEL_COLORS = {
   4: 'bg-gray-100 text-gray-600 border-gray-200',
 };
 
-function RoleRow({ record, canEdit, onSave }) {
+function RoleRow({ record, canEdit, onSave, t }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(record.display_name);
   const [saving, setSaving] = useState(false);
@@ -42,7 +43,7 @@ function RoleRow({ record, canEdit, onSave }) {
       {/* Hierarchy Level */}
       <td className="px-4 py-3 text-center">
         <span className={`text-xs font-bold px-2 py-1 rounded-full border ${levelColor}`}>
-          {LEVEL_LABELS[record.hierarchy_level] || record.hierarchy_level}
+          {t(`roleSettings.levels.${record.hierarchy_level}`, { defaultValue: String(record.hierarchy_level) })}
         </span>
       </td>
 
@@ -98,9 +99,9 @@ function RoleRow({ record, canEdit, onSave }) {
       {/* is_system_required */}
       <td className="px-4 py-3 text-center">
         {record.is_system_required ? (
-          <span className="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-2 py-0.5 rounded-full font-semibold">חובה</span>
+          <span className="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-2 py-0.5 rounded-full font-semibold">{t('roleSettings.required')}</span>
         ) : (
-          <span className="text-xs bg-gray-50 text-gray-400 border border-gray-200 px-2 py-0.5 rounded-full">אופציונלי</span>
+          <span className="text-xs bg-gray-50 text-gray-400 border border-gray-200 px-2 py-0.5 rounded-full">{t('roleSettings.optional')}</span>
         )}
       </td>
 
@@ -114,6 +115,8 @@ function RoleRow({ record, canEdit, onSave }) {
 
 export default function RoleSettingsPage() {
   const { user } = useAuth();
+  const { t, i18n } = useTranslation();
+  const isRtl = !i18n.language?.startsWith('en');
   const [records, setRecords] = useState([]);
   const [orgType, setOrgType] = useState('staffing_agency');
   const [loading, setLoading] = useState(true);
@@ -192,17 +195,17 @@ export default function RoleSettingsPage() {
     });
 
     await load();
-    setSavedMsg(`"${newDisplayName}" נשמר`);
+    setSavedMsg(t('roleSettings.saved', { name: newDisplayName }));
     setTimeout(() => setSavedMsg(''), 2500);
   };
 
   if (!canEdit) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]" dir="rtl">
+      <div className="flex items-center justify-center min-h-[60vh]" dir={isRtl ? 'rtl' : 'ltr'}>
         <div className="text-center text-gray-500">
           <Lock className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="font-bold text-lg">אין הרשאה לדף זה</p>
-          <p className="text-sm mt-1">רק org_admin ומעלה יכולים לנהל תפקידים.</p>
+          <p className="font-bold text-lg">{t('roleSettings.accessDenied')}</p>
+          <p className="text-sm mt-1">{t('roleSettings.accessDeniedDesc')}</p>
         </div>
       </div>
     );
@@ -211,30 +214,31 @@ export default function RoleSettingsPage() {
   const displayRecords = getDisplayRecords();
 
   return (
-    <div dir="rtl" className="p-6 max-w-4xl mx-auto">
+    <div dir={isRtl ? 'rtl' : 'ltr'} className="p-6 max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <Users className="w-7 h-7 text-purple-600" />
           <div>
-            <h1 className="text-2xl font-black text-gray-900">ניהול תפקידים</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Role Templates — שמות תצוגה בלבד</p>
+            <h1 className="text-2xl font-black text-gray-900">{t('roleSettings.title')}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{t('roleSettings.subtitle')}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <LanguageSwitcher variant="badge" />
           {/* org_type toggle */}
           <div className="flex rounded-xl border border-gray-200 overflow-hidden text-sm">
             <button
               onClick={() => setOrgType('staffing_agency')}
               className={`px-4 py-2 font-semibold transition-all ${orgType === 'staffing_agency' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
             >
-              חברת השמה
+              {t('roleSettings.staffingAgency')}
             </button>
             <button
               onClick={() => setOrgType('organization')}
               className={`px-4 py-2 font-semibold transition-all ${orgType === 'organization' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
             >
-              ארגון
+              {t('roleSettings.organization')}
             </button>
           </div>
           <button onClick={load} disabled={loading}
@@ -250,23 +254,23 @@ export default function RoleSettingsPage() {
       </div>
 
       {/* Info banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 text-sm text-blue-700">
-        <strong>חשוב:</strong> שינוי שם תצוגה אינו משפיע על הרשאות — PermissionMatrix ממשיך לעבוד לפי <code className="font-mono bg-blue-100 px-1 rounded">system_role_key</code> בלבד.
-      </div>
+      <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 text-sm text-blue-700"
+        dangerouslySetInnerHTML={{ __html: t('roleSettings.infoBanner') }}
+      />
 
       {loading ? (
-        <div className="text-center py-16 text-gray-400">טוען תפקידים...</div>
+        <div className="text-center py-16 text-gray-400">{t('roleSettings.loading')}</div>
       ) : (
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="px-4 py-3 font-bold text-gray-600 text-center">רמה</th>
-                <th className="px-4 py-3 font-bold text-gray-600 text-right">system_role_key</th>
-                <th className="px-4 py-3 font-bold text-gray-600 text-right">שם תצוגה</th>
-                <th className="px-4 py-3 font-bold text-gray-600 text-center">תפקיד הורה</th>
-                <th className="px-4 py-3 font-bold text-gray-600 text-center">סטטוס</th>
-                <th className="px-4 py-3 font-bold text-gray-600 text-center">פעיל</th>
+                <th className="px-4 py-3 font-bold text-gray-600 text-center">{t('roleSettings.columns.level')}</th>
+                <th className={`px-4 py-3 font-bold text-gray-600 ${isRtl ? 'text-right' : 'text-left'}`}>{t('roleSettings.columns.systemRoleKey')}</th>
+                <th className={`px-4 py-3 font-bold text-gray-600 ${isRtl ? 'text-right' : 'text-left'}`}>{t('roleSettings.columns.displayName')}</th>
+                <th className="px-4 py-3 font-bold text-gray-600 text-center">{t('roleSettings.columns.parentRole')}</th>
+                <th className="px-4 py-3 font-bold text-gray-600 text-center">{t('roleSettings.columns.status')}</th>
+                <th className="px-4 py-3 font-bold text-gray-600 text-center">{t('roleSettings.columns.active')}</th>
               </tr>
             </thead>
             <tbody>
@@ -276,11 +280,12 @@ export default function RoleSettingsPage() {
                   record={record}
                   canEdit={canEdit}
                   onSave={handleSave}
+                  t={t}
                 />
               ))}
               {displayRecords.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-gray-400">אין תפקידים להצגה</td>
+                  <td colSpan={6} className="text-center py-12 text-gray-400">{t('roleSettings.noRoles')}</td>
                 </tr>
               )}
             </tbody>
@@ -289,7 +294,7 @@ export default function RoleSettingsPage() {
       )}
 
       <p className="text-xs text-gray-400 mt-4 text-center">
-        שינויים בשם תצוגה מתעדים ב-AuditLog ואינם משפיעים על הרשאות המערכת.
+        {t('roleSettings.footer')}
       </p>
     </div>
   );

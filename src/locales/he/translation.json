@@ -1266,5 +1266,34 @@
         "strong_no": "בהחלט לא"
       }
     }
+  },
+  "roleSettings": {
+    "title": "ניהול תפקידים",
+    "subtitle": "Role Templates — שמות תצוגה בלבד",
+    "accessDenied": "אין הרשאה לדף זה",
+    "accessDeniedDesc": "רק org_admin ומעלה יכולים לנהל תפקידים.",
+    "infoBanner": "<strong>חשוב:</strong> שינוי שם תצוגה אינו משפיע על הרשאות — PermissionMatrix ממשיך לעבוד לפי <code>system_role_key</code> בלבד.",
+    "staffingAgency": "חברת השמה",
+    "organization": "ארגון",
+    "loading": "טוען תפקידים...",
+    "noRoles": "אין תפקידים להצגה",
+    "saved": "\"{{name}}\" נשמר",
+    "footer": "שינויים בשם תצוגה מתעדים ב-AuditLog ואינם משפיעים על הרשאות המערכת.",
+    "columns": {
+      "level": "רמה",
+      "systemRoleKey": "system_role_key",
+      "displayName": "שם תצוגה",
+      "parentRole": "תפקיד הורה",
+      "status": "סטטוס",
+      "active": "פעיל"
+    },
+    "levels": {
+      "1": "עליון",
+      "2": "בכיר",
+      "3": "ביניים",
+      "4": "בסיסי"
+    },
+    "required": "חובה",
+    "optional": "אופציונלי"
   }
 }
