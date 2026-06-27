@@ -82,7 +82,7 @@ function MemberCard({ member, onEdit, onDelete, isRtl, t }) {
   const style = ROLE_STYLE[member.role] || ROLE_STYLE.hr_manager;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5 flex items-start gap-4 hover:shadow-md hover:border-gray-200 transition-all group">
+    <div className="bg-white rounded-xl border border-gray-100 p-5 flex items-start gap-4 hover:shadow-md hover:border-emerald-200 transition-all group">
       {/* Avatar */}
       <div
         className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0"
@@ -236,8 +236,7 @@ function MemberModal({ open, onOpenChange, member, onSubmit, loading, isRtl, t }
             <Button
               type="submit"
               disabled={loading}
-              className="text-white"
-              style={{ backgroundColor: '#7C3AED' }}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               {loading ? t('company.team.form.saving') : t('company.team.form.save')}
             </Button>
@@ -446,135 +445,131 @@ export default function CompanyTeamPage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={isRtl ? 'rtl' : 'ltr'}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <div dir={isRtl ? 'rtl' : 'ltr'} className="space-y-6 max-w-7xl mx-auto">
 
-        {/* Header */}
-        <div className={`flex items-start justify-between gap-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
-          <div>
-            <h1 className="text-2xl font-black text-gray-900">{pageTitle}</h1>
-            <p className="text-sm text-gray-500 mt-1">{pageSubtitle}</p>
-          </div>
-          <Button
-            onClick={() => { setEditingMember(null); setShowModal(true); }}
-            className="flex items-center gap-2 text-white flex-shrink-0"
-            style={{ backgroundColor: '#7C3AED' }}
-          >
-            <Plus className="w-4 h-4" />
-            {t('company.team.invite')}
-          </Button>
+      {/* Header */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black text-gray-900">{pageTitle}</h1>
+          <p className="text-gray-500 font-semibold mt-1">{pageSubtitle}</p>
+        </div>
+        <Button
+          onClick={() => { setEditingMember(null); setShowModal(true); }}
+          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white flex-shrink-0"
+        >
+          <Plus className="w-4 h-4" />
+          {t('company.team.invite')}
+        </Button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          icon={Users}
+          label={t('company.team.totalMembers')}
+          value={stats.total}
+          color="#059669"
+          loading={isLoading}
+        />
+        <StatCard
+          icon={Crown}
+          label={t('company.team.orgAdmins')}
+          value={stats.admins}
+          color="#7C3AED"
+          loading={isLoading}
+        />
+        <StatCard
+          icon={ShieldCheck}
+          label={t('company.team.hrManagers')}
+          value={stats.hrManagers}
+          color="#2563EB"
+          loading={isLoading}
+        />
+        <StatCard
+          icon={Briefcase}
+          label={t('company.team.internalRecruiters')}
+          value={stats.recruiters}
+          color="#EA580C"
+          loading={isLoading}
+        />
+      </div>
+
+      {/* Search + Filter */}
+      <div className={`flex items-center gap-3 flex-wrap ${isRtl ? 'flex-row-reverse' : ''}`}>
+        {/* Search */}
+        <div className="relative flex-1 min-w-48">
+          <Search
+            className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none ${isRtl ? 'right-3' : 'left-3'}`}
+          />
+          <Input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder={t('company.team.searchPlaceholder')}
+            className={isRtl ? 'pr-9' : 'pl-9'}
+          />
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            icon={Users}
-            label={t('company.team.totalMembers')}
-            value={stats.total}
-            color="#7C3AED"
-            loading={isLoading}
-          />
-          <StatCard
-            icon={Crown}
-            label={t('company.team.orgAdmins')}
-            value={stats.admins}
-            color="#9333EA"
-            loading={isLoading}
-          />
-          <StatCard
-            icon={ShieldCheck}
-            label={t('company.team.hrManagers')}
-            value={stats.hrManagers}
-            color="#2563EB"
-            loading={isLoading}
-          />
-          <StatCard
-            icon={Briefcase}
-            label={t('company.team.internalRecruiters')}
-            value={stats.recruiters}
-            color="#059669"
-            loading={isLoading}
-          />
-        </div>
-
-        {/* Search + Filter */}
-        <div className={`flex items-center gap-3 flex-wrap ${isRtl ? 'flex-row-reverse' : ''}`}>
-          {/* Search */}
-          <div className="relative flex-1 min-w-48">
-            <Search
-              className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none ${isRtl ? 'right-3' : 'left-3'}`}
-            />
-            <Input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder={t('company.team.searchPlaceholder')}
-              className={isRtl ? 'pr-9' : 'pl-9'}
-            />
-          </div>
-
-          {/* Role filter tabs — only visible on /company/team root */}
-          {routeFilter === 'all' && (
-            <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-xl p-1 flex-wrap">
-              {filterTabs.map(tab => (
-                <button
-                  key={tab.key}
-                  type="button"
-                  onClick={() => setRoleFilter(tab.key)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
-                    roleFilter === tab.key
-                      ? 'bg-purple-600 text-white shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Member grid */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => <MemberSkeleton key={i} />)}
-          </div>
-        ) : filteredList.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-gray-100 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mb-4">
-              <UserPlus className="w-8 h-8 text-purple-400" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-1">
-              {search ? t('company.team.noResults') : t('company.team.noMembers')}
-            </h3>
-            <p className="text-sm text-gray-500 mb-4">
-              {search ? t('company.team.noResultsHint') : t('company.team.noMembersHint')}
-            </p>
-            {!search && (
-              <Button
-                onClick={() => { setEditingMember(null); setShowModal(true); }}
-                className="text-white flex items-center gap-2"
-                style={{ backgroundColor: '#7C3AED' }}
+        {/* Role filter tabs — only visible on /company/team root */}
+        {routeFilter === 'all' && (
+          <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-xl p-1 flex-wrap">
+            {filterTabs.map(tab => (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setRoleFilter(tab.key)}
+                className={`px-3 py-1.5 text-sm font-bold rounded-lg transition-colors whitespace-nowrap ${
+                  roleFilter === tab.key
+                    ? 'bg-white text-emerald-600 shadow-sm border border-gray-200'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
               >
-                <Plus className="w-4 h-4" />
-                {t('company.team.invite')}
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredList.map(member => (
-              <MemberCard
-                key={member.id}
-                member={member}
-                onEdit={handleEdit}
-                onDelete={setDeletingMember}
-                isRtl={isRtl}
-                t={t}
-              />
+                {tab.label}
+              </button>
             ))}
           </div>
         )}
       </div>
+
+      {/* Member grid */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => <MemberSkeleton key={i} />)}
+        </div>
+      ) : filteredList.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4">
+            <UserPlus className="w-8 h-8 text-emerald-600" />
+          </div>
+          <h3 className="font-black text-gray-900 text-lg mb-1">
+            {search ? t('company.team.noResults') : t('company.team.noMembers')}
+          </h3>
+          <p className="text-sm text-gray-500 font-semibold mb-4">
+            {search ? t('company.team.noResultsHint') : t('company.team.noMembersHint')}
+          </p>
+          {!search && (
+            <Button
+              onClick={() => { setEditingMember(null); setShowModal(true); }}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              {t('company.team.invite')}
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredList.map(member => (
+            <MemberCard
+              key={member.id}
+              member={member}
+              onEdit={handleEdit}
+              onDelete={setDeletingMember}
+              isRtl={isRtl}
+              t={t}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Modals */}
       <MemberModal
