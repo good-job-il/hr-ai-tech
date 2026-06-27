@@ -7,8 +7,12 @@ import { X, Briefcase, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { base44 } from '@/api/base44Client';
+import { useTranslation } from 'react-i18next';
 
 export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }) {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'he';
+  const isRTL = currentLang === 'he';
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,7 +69,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
       );
 
       if (existing.length > 0) {
-        setResult({ success: false, message: 'כבר קיימת מועמדות למשרה זו' });
+        setResult({ success: false, message: t('candidateCRM.assignToJob.alreadyExists') });
         setAssigning(false);
         return;
       }
@@ -102,17 +106,17 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
         },
       });
 
-      setResult({ success: true, message: `המועמד שוייך בהצלחה למשרה "${selectedJob.title}"` });
+      setResult({ success: true, message: t('candidateCRM.assignToJob.successMessage', { jobTitle: selectedJob.title }) });
       if (onAssignSuccess) onAssignSuccess(application.id);
     } catch (err) {
-      setResult({ success: false, message: err.message || 'שגיאה בשיוך מועמד' });
+      setResult({ success: false, message: err.message || t('candidateCRM.assignToJob.errorMessage') });
     } finally {
       setAssigning(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" dir="rtl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" onClick={!assigning ? onClose : undefined} />
 
@@ -125,7 +129,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
               <Briefcase className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-[#0F172A]">שייך מועמד למשרה</h2>
+              <h2 className="text-lg font-black text-[#0F172A]">{t('candidateCRM.assignToJob.title')}</h2>
               <p className="text-xs text-[#7C3AED] font-semibold">{candidate?.full_name}</p>
             </div>
           </div>
@@ -145,7 +149,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
               : <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />}
             <p className={`text-sm font-bold ${result.success ? 'text-green-700' : 'text-red-600'}`}>{result.message}</p>
             {result.success && (
-              <Button size="sm" variant="ghost" onClick={onClose} className="mr-auto text-xs">סגור</Button>
+              <Button size="sm" variant="ghost" onClick={onClose} className="mr-auto text-xs">{t('candidateCRM.assignToJob.close')}</Button>
             )}
           </div>
         )}
@@ -154,11 +158,11 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           {/* Search */}
           <div>
-            <label className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2 block">חפש משרה</label>
+            <label className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2 block">{t('candidateCRM.assignToJob.searchJob')}</label>
             <Input
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="חפש לפי שם משרה, חברה, קטגוריה..."
+              placeholder={t('candidateCRM.assignToJob.searchPlaceholder')}
               className="text-sm h-10"
             />
           </div>
@@ -167,13 +171,13 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
           {loading ? (
             <div className="flex items-center justify-center py-10">
               <Loader2 className="w-6 h-6 animate-spin text-[#7C3AED]" />
-              <span className="mr-2 text-sm text-[#94A3B8]">טוען משרות...</span>
+              <span className={`${isRTL ? 'mr-2' : 'ml-2'} text-sm text-[#94A3B8]`}>{t('candidateCRM.assignToJob.loading')}</span>
             </div>
           ) : filteredJobs.length === 0 ? (
             <div className="text-center py-10 text-[#94A3B8]">
               <Briefcase className="w-8 h-8 mx-auto mb-2 opacity-40" />
-              <p className="text-sm font-semibold">לא נמצאו משרות</p>
-              <p className="text-xs mt-1">נסה מונחי חיפוש אחרים</p>
+              <p className="text-sm font-semibold">{t('candidateCRM.assignToJob.noJobs')}</p>
+              <p className="text-xs mt-1">{t('candidateCRM.assignToJob.tryDifferentSearch')}</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -212,7 +216,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
         {/* Footer */}
         <div className="px-6 py-4 border-t border-[#E4ECFF] flex items-center justify-end gap-3 bg-[#F7F8FC]">
           <Button variant="ghost" size="sm" onClick={onClose} disabled={assigning} className="text-xs">
-            ביטול
+            {t('candidateCRM.assignToJob.cancel')}
           </Button>
           <Button
             size="sm"
@@ -221,9 +225,9 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
             className="bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-xs gap-2 px-5"
           >
             {assigning ? (
-              <><Loader2 className="w-3.5 h-3.5 animate-spin" /> משייך...</>
+              <><Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('candidateCRM.assignToJob.assigning')}</>
             ) : (
-              <><Briefcase className="w-3.5 h-3.5" /> שייך למשרה</>
+              <><Briefcase className="w-3.5 h-3.5" /> {t('candidateCRM.assignToJob.assign')}</>
             )}
           </Button>
         </div>

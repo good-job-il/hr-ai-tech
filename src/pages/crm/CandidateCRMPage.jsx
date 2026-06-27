@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useCandidateCRM } from '@/hooks/useCandidateCRM';
 import { useAuth } from '@/lib/AuthContext';
 import CandidateProfileHeader from '@/components/crm/candidate/CandidateProfileHeader';
@@ -10,20 +11,24 @@ import RecruiterWorkspacePanel from '@/components/crm/candidate/RecruiterWorkspa
 import DocumentsPanel from '@/components/crm/candidate/DocumentsPanel';
 import ApplicationsPanel from '@/components/crm/candidate/ApplicationsPanel';
 import WhatsAppPanel from '@/components/crm/candidate/WhatsAppPanel';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { ArrowRight, RefreshCw, AlertCircle, Trash2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
-const TABS = [
-  { id: 'overview',    label: 'סקירה' },
-  { id: 'notes',       label: 'הערות' },
-  { id: 'interviews',  label: 'ראיונות' },
-  { id: 'applications',label: 'מועמדויות' },
-  { id: 'documents',   label: 'מסמכים' },
-  { id: 'whatsapp',    label: '💬 WhatsApp' },
-  { id: 'timeline',    label: 'היסטוריה' },
-];
-
 export default function CandidateCRMPage() {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'he';
+  const isRTL = currentLang === 'he';
+
+  const TABS = [
+    { id: 'overview',    label: t('candidateCRM.tabs.overview') },
+    { id: 'notes',       label: t('candidateCRM.tabs.notes') },
+    { id: 'interviews',  label: t('candidateCRM.tabs.interviews') },
+    { id: 'applications',label: t('candidateCRM.tabs.applications') },
+    { id: 'documents',   label: t('candidateCRM.tabs.documents') },
+    { id: 'whatsapp',    label: t('candidateCRM.tabs.whatsapp') },
+    { id: 'timeline',    label: t('candidateCRM.tabs.timeline') },
+  ];
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -36,7 +41,7 @@ export default function CandidateCRMPage() {
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!window.confirm(`האם למחוק את המועמד לצמיתות? פעולה זו תמחק גם את כל המועמדויות, הראיונות, ההערות והמסמכים הקשורים. לא ניתן לבטל.`)) return;
+    if (!window.confirm(t('candidateCRM.deleteConfirm'))) return;
     setDeleting(true);
     await base44.functions.invoke('deleteCandidate', { candidate_id: candidateId });
     navigate(-1);
@@ -65,8 +70,8 @@ export default function CandidateCRMPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-[#94A3B8]">
         <AlertCircle className="w-12 h-12 mb-3 opacity-40" />
-        <p className="font-bold text-lg">לא נבחר מועמד</p>
-        <p className="text-sm mt-1">נווט דרך רשימת המועמדים</p>
+        <p className="font-bold text-lg">{t('candidateCRM.noCandidateSelected')}</p>
+        <p className="text-sm mt-1">{t('candidateCRM.navigatePrompt')}</p>
       </div>
     );
   }
@@ -85,25 +90,30 @@ export default function CandidateCRMPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-red-500">
         <AlertCircle className="w-12 h-12 mb-3" />
-        <p className="font-bold">שגיאה בטעינת נתונים</p>
+        <p className="font-bold">{t('candidateCRM.loadingError')}</p>
         <p className="text-sm mt-1 text-[#94A3B8]">{error}</p>
         <button onClick={reload} className="mt-4 flex items-center gap-2 text-sm font-bold text-[#7C3AED] hover:underline">
-          <RefreshCw className="w-4 h-4" /> נסה שוב
+          <RefreshCw className="w-4 h-4" /> {t('candidateCRM.tryAgain')}
         </button>
       </div>
     );
   }
 
   return (
-    <div dir="rtl" className="bg-[#F7F8FC] -m-6 p-0">
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="bg-[#F7F8FC] -m-6 p-0">
       {/* Back Button */}
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-sm font-bold text-[#64748B] hover:text-[#7C3AED] transition-colors">
-            <ArrowRight className="w-4 h-4" /> חזרה
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-sm font-bold text-[#64748B] hover:text-[#7C3AED] transition-colors">
+              {isRTL ? <ArrowRight className="w-4 h-4" /> : null}
+              {t('candidateCRM.back')}
+              {!isRTL ? <ArrowRight className="w-4 h-4 rotate-180" /> : null}
+            </button>
+            <LanguageSwitcher variant="badge" />
+          </div>
           <button onClick={handleDelete} disabled={deleting} className="flex items-center gap-1.5 text-sm font-bold text-red-500 hover:text-red-700 transition-colors disabled:opacity-50">
-            <Trash2 className="w-4 h-4" /> {deleting ? 'מוחק...' : 'מחק מועמד'}
+            <Trash2 className="w-4 h-4" /> {deleting ? t('candidateCRM.deleting') : t('candidateCRM.deleteCandidate')}
           </button>
         </div>
       </div>
@@ -144,14 +154,14 @@ export default function CandidateCRMPage() {
                   {/* Summary */}
                   {candidate?.summary && (
                     <div>
-                      <h3 className="text-sm font-black text-[#0F172A] mb-2">סיכום</h3>
+                      <h3 className="text-sm font-black text-[#0F172A] mb-2">{t('candidateCRM.overview.summary')}</h3>
                       <p className="text-sm text-[#64748B] leading-relaxed">{candidate.summary}</p>
                     </div>
                   )}
                   {/* Previous Companies */}
                   {candidate?.previous_companies?.length > 0 && (
                     <div>
-                      <h3 className="text-sm font-black text-[#0F172A] mb-2">חברות קודמות</h3>
+                      <h3 className="text-sm font-black text-[#0F172A] mb-2">{t('candidateCRM.overview.previousCompanies')}</h3>
                       <div className="flex flex-wrap gap-2">
                         {candidate.previous_companies.map((c, i) => (
                           <span key={i} className="text-sm bg-[#F7F8FC] border border-[#E4ECFF] text-[#64748B] font-semibold px-3 py-1.5 rounded-lg">{c}</span>
@@ -162,7 +172,7 @@ export default function CandidateCRMPage() {
                   {/* Languages */}
                   {candidate?.languages?.length > 0 && (
                     <div>
-                      <h3 className="text-sm font-black text-[#0F172A] mb-2">שפות</h3>
+                      <h3 className="text-sm font-black text-[#0F172A] mb-2">{t('candidateCRM.overview.languages')}</h3>
                       <div className="flex flex-wrap gap-2">
                         {candidate.languages.map((l, i) => (
                           <span key={i} className="text-sm bg-[#EEF4FF] text-[#4F46E5] font-semibold px-3 py-1.5 rounded-lg">{l}</span>
@@ -172,7 +182,7 @@ export default function CandidateCRMPage() {
                   )}
                   {/* Recent Timeline */}
                   <div>
-                    <h3 className="text-sm font-black text-[#0F172A] mb-3">פעילות אחרונה</h3>
+                    <h3 className="text-sm font-black text-[#0F172A] mb-3">{t('candidateCRM.overview.recentActivity')}</h3>
                     <CandidateTimeline timeline={timeline.slice(0, 5)} loading={false} />
                   </div>
                 </div>
@@ -220,7 +230,7 @@ export default function CandidateCRMPage() {
           {/* Sidebar — Recruiter Workspace */}
           <div className="space-y-4">
             <div className="bg-white rounded-2xl border border-[#E4ECFF] p-5">
-              <h3 className="text-sm font-black text-[#0F172A] mb-4">פעולות מגייס</h3>
+              <h3 className="text-sm font-black text-[#0F172A] mb-4">{t('candidateCRM.recruiterActions')}</h3>
               <RecruiterWorkspacePanel
                 candidate={candidate}
                 documents={documents}
@@ -240,14 +250,14 @@ export default function CandidateCRMPage() {
 
             {/* Quick Stats */}
             <div className="bg-white rounded-2xl border border-[#E4ECFF] p-5">
-              <h3 className="text-sm font-black text-[#0F172A] mb-3">סטטיסטיקה</h3>
+              <h3 className="text-sm font-black text-[#0F172A] mb-3">{t('candidateCRM.statistics')}</h3>
               <div className="space-y-2">
                 {[
-                  { label: 'מועמדויות', value: applications.length },
-                  { label: 'ראיונות', value: interviews.length },
-                  { label: 'הערות', value: notes.length },
-                  { label: 'מסמכים', value: documents.length },
-                  { label: 'אירועי ציר זמן', value: timeline.length },
+                  { label: t('candidateCRM.stats.applications'), value: applications.length },
+                  { label: t('candidateCRM.stats.interviews'), value: interviews.length },
+                  { label: t('candidateCRM.stats.notes'), value: notes.length },
+                  { label: t('candidateCRM.stats.documents'), value: documents.length },
+                  { label: t('candidateCRM.stats.timelineEvents'), value: timeline.length },
                 ].map(stat => (
                   <div key={stat.label} className="flex items-center justify-between py-1.5 border-b border-[#F0F1F5] last:border-0">
                     <span className="text-xs font-semibold text-[#64748B]">{stat.label}</span>

@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { ChevronDown, UserCheck, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function RecruiterDropdown({ currentEmail, onSelect }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [recruiters, setRecruiters] = useState([]);
   const [search, setSearch] = useState('');
@@ -41,7 +43,7 @@ export default function RecruiterDropdown({ currentEmail, onSelect }) {
         <div className="flex items-center gap-2">
           <UserCheck className="w-4 h-4 text-[#7C3AED]" />
           <span className={currentEmail ? 'text-[#7C3AED]' : 'text-[#94A3B8]'}>
-            {currentEmail || 'בחר מגייס...'}
+            {currentEmail || t('candidateCRM.recruiterDropdown.selectRecruiter')}
           </span>
         </div>
         <ChevronDown className={`w-4 h-4 text-[#94A3B8] transition-transform ${open ? 'rotate-180' : ''}`} />
@@ -56,16 +58,16 @@ export default function RecruiterDropdown({ currentEmail, onSelect }) {
                 autoFocus
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="חיפוש מגייס..."
+                placeholder={t('candidateCRM.recruiterDropdown.search')}
                 className="bg-transparent text-xs font-semibold text-[#374151] flex-1 outline-none placeholder:text-[#94A3B8]"
               />
             </div>
           </div>
           <div className="overflow-y-auto flex-1">
             {loading ? (
-              <div className="py-4 text-center text-xs text-[#94A3B8]">טוען...</div>
+              <div className="py-4 text-center text-xs text-[#94A3B8]">{t('candidateCRM.recruiterDropdown.loading')}</div>
             ) : filtered.length === 0 ? (
-              <div className="py-4 text-center text-xs text-[#94A3B8]">לא נמצאו מגייסים</div>
+              <div className="py-4 text-center text-xs text-[#94A3B8]">{t('candidateCRM.recruiterDropdown.noRecruiters')}</div>
             ) : (
               filtered.map(r => (
                 <button key={r.id}

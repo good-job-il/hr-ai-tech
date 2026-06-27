@@ -1480,5 +1480,332 @@
       "impersonate": "Impersonate",
       "restore": "Restore"
     }
+  },
+  "candidateCRM": {
+    "tabs": {
+      "overview": "Overview",
+      "notes": "Notes",
+      "interviews": "Interviews",
+      "applications": "Applications",
+      "documents": "Documents",
+      "whatsapp": "💬 WhatsApp",
+      "timeline": "History"
+    },
+    "back": "Back",
+    "deleteCandidate": "Delete Candidate",
+    "deleting": "Deleting...",
+    "deleteConfirm": "Are you sure you want to permanently delete this candidate? This action will also delete all related applications, interviews, notes, and documents. This cannot be undone.",
+    "noCandidateSelected": "No candidate selected",
+    "navigatePrompt": "Navigate through the candidates list",
+    "loadingError": "Error loading data",
+    "tryAgain": "Try again",
+    "overview": {
+      "summary": "Summary",
+      "previousCompanies": "Previous Companies",
+      "languages": "Languages",
+      "recentActivity": "Recent Activity"
+    },
+    "recruiterActions": "Recruiter Actions",
+    "statistics": "Statistics",
+    "stats": {
+      "applications": "Applications",
+      "interviews": "Interviews",
+      "notes": "Notes",
+      "documents": "Documents",
+      "timelineEvents": "Timeline Events"
+    },
+    "applicationsPanel": {
+      "noApplications": "No applications",
+      "noName": "No name",
+      "statuses": {
+        "new": "New",
+        "reviewed": "Reviewed",
+        "phone_interview": "Phone Call",
+        "recommended": "Recommended",
+        "employer_interview": "Employer Interview",
+        "offer": "Offer",
+        "hired": "Hired",
+        "probation": "Probation",
+        "completed": "Completed",
+        "rejected": "Rejected"
+      }
+    },
+    "assignToJob": {
+      "title": "Assign Candidate to Job",
+      "searchJob": "Search Job",
+      "searchPlaceholder": "Search by job title, company, category...",
+      "loading": "Loading jobs...",
+      "noJobs": "No jobs found",
+      "tryDifferentSearch": "Try different search terms",
+      "cancel": "Cancel",
+      "assign": "Assign to Job",
+      "assigning": "Assigning...",
+      "alreadyExists": "Application already exists for this job",
+      "successMessage": "Candidate successfully assigned to \"{jobTitle}\"",
+      "errorMessage": "Error assigning candidate",
+      "close": "Close"
+    },
+    "notesPanel": {
+      "addNote": "Add Note",
+      "writeNote": "Write a note...",
+      "save": "Save Note",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "pinned": "Pinned",
+      "noNotes": "No notes yet",
+      "pin": "Pin",
+      "pinned": "Pinned",
+      "visibility": {
+        "internal": "Internal",
+        "employer_visible": "Visible to Employer",
+        "all": "Visible to All"
+      },
+      "types": {
+        "general": "General",
+        "interview_feedback": "Interview Feedback",
+        "status_change": "Status Change",
+        "document_request": "Document Request",
+        "system": "System"
+      }
+    },
+    "profileHeader": {
+      "yearsExperience": "years experience",
+      "needsReview": "Needs Review",
+      "aiScore": "AI Score",
+      "source": "Source",
+      "assignedTo": "Assigned to {count} {count, plural, one {job} other {jobs}}",
+      "notAssigned": "Not assigned to any job yet",
+      "assignToJob": "Assign to Job",
+      "resume": "Resume",
+      "edit": "Edit",
+      "more": "+{count} more",
+      "statuses": {
+        "new": "New",
+        "contacted": "Contacted",
+        "interview": "Interview",
+        "offer": "Offer",
+        "hired": "Hired",
+        "rejected": "Rejected",
+        "inactive": "Inactive"
+      },
+      "sources": {
+        "import": "Import",
+        "manual": "Manual",
+        "linkedin": "LinkedIn",
+        "upload": "Upload",
+        "crawl": "Crawl"
+      }
+    },
+    "timeline": {
+      "all": "All",
+      "filter": "Filter",
+      "noEvents": "No events to display",
+      "visibleToEmployer": "Visible to Employer",
+      "events": {
+        "registered": "Registered",
+        "resume_uploaded": "Resume Uploaded",
+        "application_submitted": "Application Submitted",
+        "interview_scheduled": "Interview Scheduled",
+        "interview_completed": "Interview Completed",
+        "interview_cancelled": "Interview Cancelled",
+        "status_changed": "Status Changed",
+        "note_added": "Note Added",
+        "tag_added": "Tag Added",
+        "tag_removed": "Tag Removed",
+        "recruiter_assigned": "Recruiter Assigned",
+        "document_uploaded": "Document Uploaded",
+        "sent_to_employer": "Sent to Employer",
+        "hired": "Hired",
+        "rejected": "Rejected",
+        "imported": "Imported"
+      }
+    },
+    "documents": {
+      "uploadFile": "Upload File",
+      "uploading": "Uploading...",
+      "fromSystem": "Resume (From System)",
+      "noDocuments": "No documents",
+      "uploadToStart": "Upload a file to start",
+      "types": {
+        "cv": "Resume",
+        "cover_letter": "Cover Letter",
+        "portfolio": "Portfolio",
+        "certificate": "Certificate",
+        "contract": "Contract",
+        "id": "ID",
+        "other": "Other"
+      }
+    },
+    "interviews": {
+      "schedule": "Schedule Interview",
+      "scheduleNew": "Schedule New Interview",
+      "save": "Schedule Interview",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "noInterviews": "No interviews yet",
+      "feedback": "Feedback",
+      "saveFeedback": "Save Feedback",
+      "feedbackPlaceholder": "Interview feedback...",
+      "cancelInterview": "Cancel",
+      "date": "Date *",
+      "time": "Time *",
+      "type": "Interview Type",
+      "stage": "Stage",
+      "link": "Link / Location",
+      "linkPlaceholder": "https://meet.google.com/... or address",
+      "interviewer": "Interviewer Name",
+      "job": "Job",
+      "types": {
+        "phone": "Phone",
+        "video": "Video",
+        "in_person": "In-Person",
+        "technical": "Technical",
+        "hr": "HR",
+        "final": "Final"
+      },
+      "stages": {
+        "screening": "Screening",
+        "first": "First",
+        "second": "Second",
+        "third": "Third",
+        "technical": "Technical",
+        "hr": "HR",
+        "final": "Final",
+        "offer": "Offer"
+      },
+      "statuses": {
+        "scheduled": "Scheduled",
+        "confirmed": "Confirmed",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "no_show": "No Show",
+        "rescheduled": "Rescheduled"
+      }
+    },
+    "recruiterDropdown": {
+      "selectRecruiter": "Select recruiter...",
+      "search": "Search recruiter...",
+      "loading": "Loading...",
+      "noRecruiters": "No recruiters found"
+    },
+    "workspace": {
+      "candidateStatus": "Candidate Status",
+      "tags": "Tags",
+      "newTag": "New tag...",
+      "assignedRecruiter": "Assigned Recruiter",
+      "requestDocuments": "Request Documents",
+      "requestFromCandidate": "Request document from candidate",
+      "sendRequest": "Send Request",
+      "sending": "Sending...",
+      "assignToJob": "Assign to Job",
+      "assignCandidateToJob": "Assign candidate to job",
+      "sendToEmployer": "Send to Employer",
+      "sendCandidateToEmployer": "Send to Employer",
+      "reject": "Reject Candidate",
+      "statuses": {
+        "new": "New",
+        "contacted": "Contacted",
+        "interview": "Interview",
+        "offer": "Offer",
+        "hired": "Hired",
+        "inactive": "Inactive"
+      },
+      "docRequests": {
+        "updated_cv": "Updated Resume",
+        "education": "Education Certificates",
+        "recommendations": "Recommendations",
+        "portfolio": "Portfolio",
+        "other": "Other"
+      }
+    },
+    "rejectModal": {
+      "title": "Reject Candidate",
+      "selectReason": "Select rejection reason:",
+      "cancel": "Cancel",
+      "confirm": "Confirm Rejection",
+      "confirming": "Processing...",
+      "customReasonPlaceholder": "Specify the reason...",
+      "reasons": {
+        "no_match": "Not a match for the role",
+        "salary_high": "Salary expectations too high",
+        "no_experience": "Lack of relevant experience",
+        "location": "Location not suitable",
+        "bad_interview": "Interview didn't go well",
+        "technical": "Did not meet technical requirements",
+        "other_offer": "Accepted offer elsewhere",
+        "other": "Other"
+      }
+    },
+    "resumeModal": {
+      "title": "Resume —",
+      "open": "Open",
+      "download": "Download",
+      "downloadDocx": "Download DOCX",
+      "downloadOriginal": "Download Original",
+      "professionalSummary": "Professional Summary",
+      "details": "Details",
+      "role": "Role",
+      "domain": "Domain",
+      "experience": "Experience",
+      "years": "years",
+      "location": "Location",
+      "salaryExpectations": "Salary Expectations",
+      "skills": "Skills",
+      "previousCompanies": "Previous Companies",
+      "languages": "Languages",
+      "notes": "Notes",
+      "noData": "No parsed data",
+      "notExtracted": "Data has not been extracted from the resume yet"
+    },
+    "sendToEmployer": {
+      "title": "Send Candidate to Employer",
+      "to": "To:",
+      "cc": "CC:",
+      "subject": "Subject:",
+      "recruiterNote": "Recruiter Note (will appear in email body)",
+      "notePlaceholder": "Notes, recommendations, key points...",
+      "attachments": "Attachments",
+      "noDocuments": "No documents available",
+      "requireCV": "⚠️ Resume required",
+      "preview": "Preview",
+      "hidePreview": "Hide Preview",
+      "selected": "{count} documents selected",
+      "cancel": "Cancel",
+      "send": "Send Email",
+      "sending": "Sending...",
+      "sendAgain": "Send Again",
+      "sent": "Sent successfully",
+      "close": "Close",
+      "infoNote": "Who will receive the email?",
+      "infoText": "The email will be sent from the system ({email}) to the employer you entered.",
+      "infoJob": "The candidate will be sent for the position: {jobTitle}"
+    },
+    "whatsapp": {
+      "noPhone": "No phone number — add number to candidate profile",
+      "templates": "Message Templates",
+      "message": "Message",
+      "messagePlaceholder": "Write a message...",
+      "openWhatsApp": "Open in WhatsApp",
+      "logConversation": "📝 Log the conversation",
+      "logPlaceholder": "What was discussed? Conversation outcome...",
+      "logManually": "Log WhatsApp conversation manually",
+      "saveLog": "Save Log",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "history": "History",
+      "outcomes": {
+        "sent": "Talked",
+        "read": "Answered",
+        "failed": "No Answer"
+      },
+      "messageTemplates": {
+        "intro": "First Introduction",
+        "interview": "Interview Invitation",
+        "followup": "Follow-up",
+        "offer": "Offer"
+      }
+    }
   }
 }

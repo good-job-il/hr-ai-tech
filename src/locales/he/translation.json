@@ -1480,5 +1480,332 @@
       "impersonate": "התחזות",
       "restore": "שחזור"
     }
+  },
+  "candidateCRM": {
+    "tabs": {
+      "overview": "סקירה",
+      "notes": "הערות",
+      "interviews": "ראיונות",
+      "applications": "מועמדויות",
+      "documents": "מסמכים",
+      "whatsapp": "💬 WhatsApp",
+      "timeline": "היסטוריה"
+    },
+    "back": "חזרה",
+    "deleteCandidate": "מחק מועמד",
+    "deleting": "מוחק...",
+    "deleteConfirm": "האם למחוק את המועמד לצמיתות? פעולה זו תמחק גם את כל המועמדויות, הראיונות, ההערות והמסמכים הקשורים. לא ניתן לבטל.",
+    "noCandidateSelected": "לא נבחר מועמד",
+    "navigatePrompt": "נווט דרך רשימת המועמדים",
+    "loadingError": "שגיאה בטעינת נתונים",
+    "tryAgain": "נסה שוב",
+    "overview": {
+      "summary": "סיכום",
+      "previousCompanies": "חברות קודמות",
+      "languages": "שפות",
+      "recentActivity": "פעילות אחרונה"
+    },
+    "recruiterActions": "פעולות מגייס",
+    "statistics": "סטטיסטיקה",
+    "stats": {
+      "applications": "מועמדויות",
+      "interviews": "ראיונות",
+      "notes": "הערות",
+      "documents": "מסמכים",
+      "timelineEvents": "אירועי ציר זמן"
+    },
+    "applicationsPanel": {
+      "noApplications": "אין מועמדויות",
+      "noName": "ללא שם",
+      "statuses": {
+        "new": "חדש",
+        "reviewed": "נסקר",
+        "phone_interview": "שיחת טלפון",
+        "recommended": "מומלץ",
+        "employer_interview": "ראיון מעסיק",
+        "offer": "הצעה",
+        "hired": "גויס",
+        "probation": "מבחן",
+        "completed": "הושלם",
+        "rejected": "נדחה"
+      }
+    },
+    "assignToJob": {
+      "title": "שייך מועמד למשרה",
+      "searchJob": "חפש משרה",
+      "searchPlaceholder": "חפש לפי שם משרה, חברה, קטגוריה...",
+      "loading": "טוען משרות...",
+      "noJobs": "לא נמצאו משרות",
+      "tryDifferentSearch": "נסה מונחי חיפוש אחרים",
+      "cancel": "ביטול",
+      "assign": "שייך למשרה",
+      "assigning": "משייך...",
+      "alreadyExists": "כבר קיימת מועמדות למשרה זו",
+      "successMessage": "המועמד שוייך בהצלחה למשרה \"{jobTitle}\"",
+      "errorMessage": "שגיאה בשיוך מועמד",
+      "close": "סגור"
+    },
+    "notesPanel": {
+      "addNote": "הוסף הערה",
+      "writeNote": "כתוב הערה...",
+      "save": "שמור הערה",
+      "saving": "שומר...",
+      "cancel": "ביטול",
+      "pinned": "מוצמדות",
+      "noNotes": "אין הערות עדיין",
+      "pin": "הצמד",
+      "pinned": "מוצמד",
+      "visibility": {
+        "internal": "פנימי",
+        "employer_visible": "גלוי למעסיק",
+        "all": "גלוי לכל"
+      },
+      "types": {
+        "general": "כללי",
+        "interview_feedback": "משוב ראיון",
+        "status_change": "שינוי סטטוס",
+        "document_request": "בקשת מסמך",
+        "system": "מערכת"
+      }
+    },
+    "profileHeader": {
+      "yearsExperience": "שנות ניסיון",
+      "needsReview": "נדרשת בדיקה",
+      "aiScore": "ציון AI",
+      "source": "מקור",
+      "assignedTo": "משויך ל-{count} {count, plural, one {משרה} other {משרות}}",
+      "notAssigned": "לא משויך עדיין למשרה",
+      "assignToJob": "שייך למשרה",
+      "resume": "קורות חיים",
+      "edit": "עריכה",
+      "more": "+{count} עוד",
+      "statuses": {
+        "new": "חדש",
+        "contacted": "פנייה נשלחה",
+        "interview": "בראיון",
+        "offer": "הצעה",
+        "hired": "גויס",
+        "rejected": "נדחה",
+        "inactive": "לא פעיל"
+      },
+      "sources": {
+        "import": "ייבוא",
+        "manual": "ידני",
+        "linkedin": "LinkedIn",
+        "upload": "העלאה",
+        "crawl": "סריקה"
+      }
+    },
+    "timeline": {
+      "all": "הכל",
+      "filter": "סנן",
+      "noEvents": "אין אירועים להצגה",
+      "visibleToEmployer": "גלוי למעסיק",
+      "events": {
+        "registered": "נרשם",
+        "resume_uploaded": "קורות חיים הועלו",
+        "application_submitted": "הגשת מועמדות",
+        "interview_scheduled": "ראיון נקבע",
+        "interview_completed": "ראיון הושלם",
+        "interview_cancelled": "ראיון בוטל",
+        "status_changed": "שינוי סטטוס",
+        "note_added": "הערה נוספה",
+        "tag_added": "תגית נוספה",
+        "tag_removed": "תגית הוסרה",
+        "recruiter_assigned": "מגייס הוקצה",
+        "document_uploaded": "מסמך הועלה",
+        "sent_to_employer": "נשלח למעסיק",
+        "hired": "גויס",
+        "rejected": "נדחה",
+        "imported": "יובא למערכת"
+      }
+    },
+    "documents": {
+      "uploadFile": "העלה קובץ",
+      "uploading": "מעלה...",
+      "fromSystem": "קורות חיים (מהמערכת)",
+      "noDocuments": "אין מסמכים",
+      "uploadToStart": "העלה קובץ כדי להתחיל",
+      "types": {
+        "cv": "קורות חיים",
+        "cover_letter": "מכתב מוטיבציה",
+        "portfolio": "תיק עבודות",
+        "certificate": "תעודה",
+        "contract": "חוזה",
+        "id": "תעודת זהות",
+        "other": "אחר"
+      }
+    },
+    "interviews": {
+      "schedule": "קבע ראיון",
+      "scheduleNew": "קביעת ראיון חדש",
+      "save": "קבע ראיון",
+      "saving": "שומר...",
+      "cancel": "ביטול",
+      "upcoming": "קרובים",
+      "past": "עבר",
+      "noInterviews": "אין ראיונות עדיין",
+      "feedback": "משוב",
+      "saveFeedback": "שמור משוב",
+      "feedbackPlaceholder": "משוב על הראיון...",
+      "cancelInterview": "בטל",
+      "date": "תאריך *",
+      "time": "שעה *",
+      "type": "סוג ראיון",
+      "stage": "שלב",
+      "link": "קישור / מיקום",
+      "linkPlaceholder": "https://meet.google.com/... או כתובת",
+      "interviewer": "שם המראיין",
+      "job": "משרה",
+      "types": {
+        "phone": "טלפוני",
+        "video": "וידאו",
+        "in_person": "פרונטלי",
+        "technical": "טכני",
+        "hr": "HR",
+        "final": "סופי"
+      },
+      "stages": {
+        "screening": "סינון",
+        "first": "ראשון",
+        "second": "שני",
+        "third": "שלישי",
+        "technical": "טכני",
+        "hr": "HR",
+        "final": "סופי",
+        "offer": "הצעה"
+      },
+      "statuses": {
+        "scheduled": "מתוכנן",
+        "confirmed": "מאושר",
+        "completed": "הושלם",
+        "cancelled": "בוטל",
+        "no_show": "לא הגיע",
+        "rescheduled": "נקבע מחדש"
+      }
+    },
+    "recruiterDropdown": {
+      "selectRecruiter": "בחר מגייס...",
+      "search": "חיפוש מגייס...",
+      "loading": "טוען...",
+      "noRecruiters": "לא נמצאו מגייסים"
+    },
+    "workspace": {
+      "candidateStatus": "סטטוס מועמד",
+      "tags": "תגיות",
+      "newTag": "תגית חדשה...",
+      "assignedRecruiter": "מגייס אחראי",
+      "requestDocuments": "בקשת מסמכים",
+      "requestFromCandidate": "בקש מסמך מהמועמד",
+      "sendRequest": "שלח בקשה",
+      "sending": "שולח...",
+      "assignToJob": "שיוך למשרה",
+      "assignCandidateToJob": "שייך מועמד למשרה",
+      "sendToEmployer": "שליחה למעסיק",
+      "sendCandidateToEmployer": "שלח למעסיק",
+      "reject": "דחה מועמד",
+      "statuses": {
+        "new": "חדש",
+        "contacted": "פנייה נשלחה",
+        "interview": "בראיון",
+        "offer": "הצעה",
+        "hired": "גויס",
+        "inactive": "לא פעיל"
+      },
+      "docRequests": {
+        "updated_cv": "קורות חיים מעודכנים",
+        "education": "תעודות השכלה",
+        "recommendations": "המלצות",
+        "portfolio": "תיק עבודות",
+        "other": "אחר"
+      }
+    },
+    "rejectModal": {
+      "title": "דחיית מועמד",
+      "selectReason": "בחר סיבת דחייה:",
+      "cancel": "ביטול",
+      "confirm": "אשר דחייה",
+      "confirming": "מבצע...",
+      "customReasonPlaceholder": "פרט את הסיבה...",
+      "reasons": {
+        "no_match": "אין התאמה לתפקיד",
+        "salary_high": "ציפיות שכר גבוהות מדי",
+        "no_experience": "חוסר ניסיון רלוונטי",
+        "location": "מיקום גאוגרפי לא מתאים",
+        "bad_interview": "ראיון לא מוצלח",
+        "technical": "לא עמד בדרישות טכניות",
+        "other_offer": "הצעה קיבל ממקום אחר",
+        "other": "אחר"
+      }
+    },
+    "resumeModal": {
+      "title": "קורות חיים —",
+      "open": "פתח",
+      "download": "הורד",
+      "downloadDocx": "הורד DOCX",
+      "downloadOriginal": "הורד מקור",
+      "professionalSummary": "סיכום מקצועי",
+      "details": "פרטים",
+      "role": "תפקיד",
+      "domain": "תחום",
+      "experience": "ניסיון",
+      "years": "שנים",
+      "location": "מיקום",
+      "salaryExpectations": "ציפיות שכר",
+      "skills": "כישורים",
+      "previousCompanies": "חברות קודמות",
+      "languages": "שפות",
+      "notes": "הערות",
+      "noData": "אין נתונים מפורסרים",
+      "notExtracted": "הנתונים טרם נחלצו מקורות החיים"
+    },
+    "sendToEmployer": {
+      "title": "שלח מועמד למעסיק",
+      "to": "אל:",
+      "cc": "CC:",
+      "subject": "נושא:",
+      "recruiterNote": "הערת מגייס (תופיע בגוף המייל)",
+      "notePlaceholder": "הערות, המלצה, נקודות חשובות...",
+      "attachments": "מסמכים לצירוף",
+      "noDocuments": "אין מסמכים זמינים",
+      "requireCV": "⚠️ יש לצרף קורות חיים",
+      "preview": "תצוגה מקדימה",
+      "hidePreview": "הסתר תצוגה",
+      "selected": "{count} מסמכים נבחרו",
+      "cancel": "ביטול",
+      "send": "שלח מייל",
+      "sending": "שולח...",
+      "sendAgain": "שלח שוב",
+      "sent": "נשלח בהצלחה",
+      "close": "סגור",
+      "infoNote": "למי נשלח המייל?",
+      "infoText": "המייל יישלח מהמערכת ({email}) למעסיק שהזנת.",
+      "infoJob": "המועמד יישלח עבור המשרה: {jobTitle}"
+    },
+    "whatsapp": {
+      "noPhone": "אין מספר טלפון — הוסף מספר לפרופיל המועמד",
+      "templates": "תבניות הודעה",
+      "message": "הודעה",
+      "messagePlaceholder": "כתוב הודעה...",
+      "openWhatsApp": "פתח ב-WhatsApp",
+      "logConversation": "📝 תעד את השיחה",
+      "logPlaceholder": "מה דובר? תוצאת השיחה...",
+      "logManually": "תעד שיחת WhatsApp ידנית",
+      "saveLog": "שמור תיעוד",
+      "saving": "שומר...",
+      "cancel": "ביטול",
+      "history": "היסטוריה",
+      "outcomes": {
+        "sent": "שוחח",
+        "read": "נענה",
+        "failed": "לא ענה"
+      },
+      "messageTemplates": {
+        "intro": "היכרות ראשונה",
+        "interview": "זימון לראיון",
+        "followup": "follow-up",
+        "offer": "הצעה"
+      }
+    }
   }
 }
