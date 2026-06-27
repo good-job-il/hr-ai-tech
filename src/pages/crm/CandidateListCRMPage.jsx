@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Search, RefreshCw, User, ChevronLeft } from 'lucide-react';
@@ -15,10 +16,6 @@ const STATUS_COLORS = {
   rejected: 'bg-red-100 text-red-700',
   inactive: 'bg-gray-100 text-gray-500',
 };
-const STATUS_LABELS = {
-  new: 'חדש', contacted: 'פנייה', interview: 'ראיון',
-  offer: 'הצעה', hired: 'גויס', rejected: 'נדחה', inactive: 'לא פעיל',
-};
 
 const PAGE_SIZE = 50; // Performance: Load only 50 candidates at a time
 
@@ -26,6 +23,7 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { t, i18n } = useTranslation();
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -33,6 +31,8 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
   const [hasMore, setHasMore] = useState(false);
   const [lastCandidateId, setLastCandidateId] = useState(null);
   const [appendLoading, setAppendLoading] = useState(false);
+  
+  const isRTL = i18n.language === 'he';
 
   const loadCandidates = async (append = false) => {
     if (!user) return;
@@ -103,31 +103,31 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
   }, [candidates, search]);
 
   return (
-    <div dir="rtl" className="p-4">
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-black text-[#0F172A]">CRM מועמדים</h1>
-            <p className="text-sm text-[#64748B] mt-1">{filtered.length} מועמדים</p>
+            <h1 className="text-2xl font-black text-[#0F172A]">{t('crm.candidatesCrm')}</h1>
+            <p className="text-sm text-[#64748B] mt-1">{t('crm.candidatesCount', { count: filtered.length })}</p>
           </div>
           <Button size="sm" variant="outline" onClick={loadCandidates} className="gap-1.5 text-xs">
-            <RefreshCw className="w-3.5 h-3.5" /> רענן
+            <RefreshCw className="w-3.5 h-3.5" /> {t('crm.refresh')}
           </Button>
         </div>
 
         {/* Filters */}
         <div className="bg-white rounded-xl border border-[#E4ECFF] p-4 mb-4 flex flex-wrap gap-3 items-center">
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]`} />
             <Input value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="חפש לפי שם, אימייל, תפקיד..." className="pr-9 text-sm" />
+              placeholder={t('crm.searchPlaceholder')} className={`${isRTL ? 'pr-9' : 'pl-9'} text-sm`} />
           </div>
           <div className="flex gap-1.5 flex-wrap">
             {['all', 'new', 'contacted', 'interview', 'offer', 'hired', 'rejected'].map(s => (
               <button key={s} onClick={() => setStatusFilter(s)}
                 className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all ${statusFilter === s ? (s === 'all' ? 'bg-[#7C3AED] text-white' : `${STATUS_COLORS[s]} border border-current`) : 'bg-[#F0F1F5] text-[#64748B] hover:bg-[#E4ECFF]'}`}>
-                {s === 'all' ? 'הכל' : STATUS_LABELS[s]}
+                {s === 'all' ? t('crm.filterAll') : t(`crm.status${s.charAt(0).toUpperCase() + s.slice(1)}`)}
               </button>
             ))}
           </div>
@@ -144,24 +144,26 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
           ) : filtered.length === 0 ? (
             <div className="text-center py-16 text-[#94A3B8]">
               <User className="w-10 h-10 mx-auto mb-3 opacity-40" />
-              <p className="font-bold">לא נמצאו מועמדים</p>
+              <p className="font-bold">{t('crm.noCandidates')}</p>
             </div>
           ) : (
             <div>
               {/* Header Row */}
               <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-[#F7F8FC] border-b border-[#E4ECFF] text-xs font-black text-[#94A3B8] uppercase tracking-wide">
-                <div className="col-span-4">מועמד</div>
-                <div className="col-span-2">תפקיד</div>
-                <div className="col-span-2">תחום</div>
-                <div className="col-span-1 text-center">ניסיון</div>
-                <div className="col-span-1 text-center">ציון</div>
-                <div className="col-span-2 text-center">סטטוס</div>
+                <div className="col-span-4">{t('crm.columnCandidate')}</div>
+                <div className="col-span-2">{t('crm.columnRole')}</div>
+                <div className="col-span-2">{t('crm.columnDomain')}</div>
+                <div className="col-span-1 text-center">{t('crm.columnExperience')}</div>
+                <div className="col-span-1 text-center">{t('crm.columnScore')}</div>
+                <div className="col-span-2 text-center">{t('crm.columnStatus')}</div>
               </div>
               {filtered.map(candidate => (
                 <CandidateRowMemo
                   key={candidate.id}
                   candidate={candidate}
                   onClick={() => navigate(`${candidateRoute}?id=${candidate.id}`)}
+                  t={t}
+                  isRTL={isRTL}
                 />
               ))}
               {/* Infinite Scroll Loading */}
@@ -170,11 +172,11 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      טוען עוד...
+                      {t('crm.loadingMore')}
                     </div>
                   ) : (
                     <button onClick={() => loadCandidates(true)} className="text-purple-600 font-bold hover:underline">
-                      טען עוד מועמדים
+                      {t('crm.loadMore')}
                     </button>
                   )}
                 </div>
@@ -187,7 +189,7 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
   );
 }
 
-const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick }) {
+const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick, t, isRTL }) {
   const initials = candidate.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '??';
   const score = candidate.data_quality_score || candidate.parsing_confidence || 0;
 
@@ -211,7 +213,7 @@ const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick }
       {/* Experience */}
       <div className="col-span-1 text-center">
         <span className="text-sm font-bold text-[#0F172A]">{candidate.experience_years ?? '—'}</span>
-        {candidate.experience_years && <span className="text-xs text-[#94A3B8]">y</span>}
+        {candidate.experience_years && <span className="text-xs text-[#94A3B8]">{t('crm.experienceYears')}</span>}
       </div>
       {/* Score */}
       <div className="col-span-1 text-center">
@@ -222,9 +224,15 @@ const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick }
       {/* Status */}
       <div className="col-span-2 flex items-center justify-center gap-2">
         <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${STATUS_COLORS[candidate.status] || 'bg-gray-100 text-gray-600'}`}>
-          {STATUS_LABELS[candidate.status] || candidate.status}
+          {t(`crm.status${candidate.status?.charAt(0).toUpperCase() + candidate.status?.slice(1)}`) || candidate.status}
         </span>
-        <ChevronLeft className="w-4 h-4 text-[#CBD5E1] group-hover:text-[#7C3AED] transition-colors" />
+        {isRTL ? (
+          <ChevronLeft className="w-4 h-4 text-[#CBD5E1] group-hover:text-[#7C3AED] transition-colors" />
+        ) : (
+          <svg className="w-4 h-4 text-[#CBD5E1] group-hover:text-[#7C3AED] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        )}
       </div>
     </div>
   );
