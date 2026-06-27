@@ -4,6 +4,7 @@
  * recommendations, screening questions, next action.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   CheckCircle2, XCircle, AlertTriangle, Lightbulb,
   MessageSquare, Zap, ChevronDown, ChevronUp
@@ -34,11 +35,13 @@ function Section({ icon: Icon, title, items, color, emptyText }) {
 }
 
 export default function MatchExplanationCard({ explanation, candidateName, jobTitle, collapsed = false }) {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'he';
   const [open, setOpen] = useState(!collapsed);
   if (!explanation) return null;
 
   return (
-    <div className="rounded-2xl border border-[#E4ECFF] bg-white overflow-hidden">
+    <div className="rounded-2xl border border-[#E4ECFF] bg-white overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <button
         onClick={() => setOpen(o => !o)}
@@ -46,13 +49,13 @@ export default function MatchExplanationCard({ explanation, candidateName, jobTi
       >
         <div className="flex items-center gap-3">
           <Zap className="w-5 h-5 text-[#7C3AED]" />
-          <div className="text-right">
+          <div className={isRTL ? 'text-right' : 'text-left'}>
             <div className="font-black text-[#0F172A] text-sm">
-              ניתוח AI-Assisted Matching
+              {t('aiMatching.explanationCard.title')}
             </div>
             {(candidateName || jobTitle) && (
               <div className="text-xs text-[#64748B]">
-                {candidateName}{candidateName && jobTitle ? ' ← ' : ''}{jobTitle}
+                {candidateName}{candidateName && jobTitle ? (isRTL ? ' ← ' : ' → ') : ''}{jobTitle}
               </div>
             )}
           </div>
@@ -71,7 +74,7 @@ export default function MatchExplanationCard({ explanation, candidateName, jobTi
             <div className="flex items-start gap-3 p-3 rounded-xl bg-red-50 border border-red-200">
               <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
               <div>
-                <div className="text-sm font-black text-red-700">חסרות דרישות חובה</div>
+                <div className="text-sm font-black text-red-700">{t('aiMatching.explanationCard.missingRequirements')}</div>
                 {explanation.missingRequired.map((m, i) => (
                   <div key={i} className="text-xs text-red-600 mt-0.5">{m}</div>
                 ))}
@@ -81,19 +84,19 @@ export default function MatchExplanationCard({ explanation, candidateName, jobTi
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <Section
-              icon={CheckCircle2} title="נקודות חוזק" color="text-green-600"
+              icon={CheckCircle2} title={t('aiMatching.explanationCard.strengths')} color="text-green-600"
               items={explanation.strengths}
             />
             <Section
-              icon={XCircle} title="פערים וחסרים" color="text-red-500"
+              icon={XCircle} title={t('aiMatching.explanationCard.gaps')} color="text-red-500"
               items={explanation.gaps}
             />
             <Section
-              icon={AlertTriangle} title="סיכונים" color="text-amber-500"
+              icon={AlertTriangle} title={t('aiMatching.explanationCard.risks')} color="text-amber-500"
               items={explanation.risks}
             />
             <Section
-              icon={Lightbulb} title="המלצות" color="text-blue-500"
+              icon={Lightbulb} title={t('aiMatching.explanationCard.recommendations')} color="text-blue-500"
               items={explanation.recommendations}
             />
           </div>
@@ -103,7 +106,7 @@ export default function MatchExplanationCard({ explanation, candidateName, jobTi
             <div className="border-t border-[#F1F5F9] pt-4">
               <div className="flex items-center gap-2 mb-3">
                 <MessageSquare className="w-4 h-4 text-[#7C3AED]" />
-                <span className="text-sm font-black text-[#0F172A]">שאלות מומלצות לסינון</span>
+                <span className="text-sm font-black text-[#0F172A]">{t('aiMatching.explanationCard.screeningQuestions')}</span>
               </div>
               <ol className="space-y-2">
                 {explanation.screeningQuestions.map((q, i) => (
@@ -121,8 +124,8 @@ export default function MatchExplanationCard({ explanation, candidateName, jobTi
           {/* Next action */}
           {explanation.nextAction && (
             <div className="flex items-center justify-between p-3 rounded-xl bg-[#F7FBFF] border border-[#E4ECFF]">
-              <span className="text-sm text-[#64748B] font-semibold">פעולה מומלצת הבאה</span>
-              <span className="text-sm font-black text-[#7C3AED]">← {explanation.nextAction}</span>
+              <span className="text-sm text-[#64748B] font-semibold">{t('aiMatching.explanationCard.nextAction')}</span>
+              <span className="text-sm font-black text-[#7C3AED]">{isRTL ? '← ' : '→ '}{explanation.nextAction}</span>
             </div>
           )}
         </div>

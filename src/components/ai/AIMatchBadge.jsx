@@ -2,9 +2,12 @@
  * AIMatchBadge — compact score pill used in cards and tables.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sparkles, AlertTriangle } from 'lucide-react';
 
 export default function AIMatchBadge({ score, missingRequired = false, size = 'sm' }) {
+  const { t } = useTranslation();
+  
   if (score == null) return null;
 
   const color = score >= 85 ? { bg: '#DCFCE7', text: '#16A34A', border: '#BBF7D0' }
@@ -18,7 +21,7 @@ export default function AIMatchBadge({ score, missingRequired = false, size = 's
     <div
       className={`inline-flex items-center rounded-full font-black border ${pxClass}`}
       style={{ background: color.bg, color: color.text, borderColor: color.border }}
-      title={`ציון התאמה AI: ${score}%`}
+      title={t('aiMatching.matchBadge.aiMatchScore', { score })}
     >
       {missingRequired
         ? <AlertTriangle className="w-3 h-3" />

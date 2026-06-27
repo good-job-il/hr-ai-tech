@@ -815,7 +815,54 @@
     "location": "Location",
     "why": "Why this match?",
     "strengths": "Strengths",
-    "gaps": "Gaps"
+    "gaps": "Gaps",
+    "page": {
+      "title": "AI Matching Engine",
+      "subtitle": "Smart matching between candidates and jobs",
+      "modeCandidateToJobs": "Candidate → Jobs",
+      "modeJobToCandidates": "Job → Candidates",
+      "minScore": "Minimum score:",
+      "all": "All",
+      "searchCandidate": "Search candidate...",
+      "searchJob": "Search job...",
+      "loading": "Loading...",
+      "selectCandidatePrompt": "Select a candidate from the list to see matching jobs",
+      "selectJobPrompt": "Select a job from the list to see matching candidates",
+      "yearsExperience": "years experience",
+      "assignedSuccess": "{{candidateName}} assigned to {{jobTitle}} and added to Pipeline!",
+      "applicationExists": "Application already exists for {{candidateName}} on {{jobTitle}}",
+      "addedToPipeline": "{{candidateName}} added to Pipeline for {{jobTitle}}!",
+      "error": "Error: {{message}}"
+    },
+    "candidatePanel": {
+      "noJobsFound": "No suitable jobs found",
+      "jobsRanked": "{{count}} jobs ranked by AI matching",
+      "gaps": "Gaps",
+      "recommendation": "Recommendation",
+      "assignToJob": "Assign to this job",
+      "missingRequirements": "Missing required qualifications"
+    },
+    "jobPanel": {
+      "noCandidatesFound": "No suitable candidates found",
+      "candidatesRanked": "{{count}} candidates ranked by AI matching",
+      "gaps": "Gaps",
+      "recommendation": "Recommendation",
+      "addToPipeline": "Add to Pipeline",
+      "missingRequirements": "Missing required qualifications"
+    },
+    "matchBadge": {
+      "aiMatchScore": "AI Match Score: {{score}}%"
+    },
+    "explanationCard": {
+      "title": "AI-Assisted Matching Analysis",
+      "missingRequirements": "Missing required qualifications",
+      "strengths": "Strengths",
+      "gaps": "Gaps & Missing",
+      "risks": "Risks",
+      "recommendations": "Recommendations",
+      "screeningQuestions": "Recommended Screening Questions",
+      "nextAction": "Recommended Next Action"
+    }
   },
   "interviews": {
     "title": "Interviews",

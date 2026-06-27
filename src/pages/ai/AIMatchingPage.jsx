@@ -4,6 +4,7 @@
  * Role-filtered: recruiter sees own candidates, manager sees all team, etc.
  */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { rankJobsForCandidate, rankCandidatesForJob } from '@/lib/aiMatching';
@@ -11,12 +12,8 @@ import AIMatchBadge from '@/components/ai/AIMatchBadge';
 import MatchExplanationCard from '@/components/ai/MatchExplanationCard';
 import CandidateRecommendationsPanel from '@/components/ai/CandidateRecommendationsPanel';
 import JobRecommendationsPanel from '@/components/ai/JobRecommendationsPanel';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { Sparkles, Users, Briefcase, Search, SlidersHorizontal, CheckCircle2, AlertTriangle, X } from 'lucide-react';
-
-const MODES = [
-  { id: 'candidate', label: 'מועמד → משרות', icon: Users },
-  { id: 'job', label: 'משרה → מועמדים', icon: Briefcase },
-];
 
 function Toast({ message, type, onClose }) {
   useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
@@ -31,6 +28,8 @@ function Toast({ message, type, onClose }) {
 
 export default function AIMatchingPage() {
   const { user } = useAuth();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'he';
   const [toast, setToast] = useState(null);
   const showToast = (message, type = 'success') => setToast({ message, type });
   const [mode, setMode] = useState('candidate');
@@ -41,6 +40,11 @@ export default function AIMatchingPage() {
   const [searchQ, setSearchQ] = useState('');
   const [minScore, setMinScore] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const MODES = [
+    { id: 'candidate', label: t('aiMatching.page.modeCandidateToJobs'), icon: Users },
+    { id: 'job', label: t('aiMatching.page.modeJobToCandidates'), icon: Briefcase },
+  ];
 
   useEffect(() => {
     if (!user) return;
@@ -100,7 +104,7 @@ export default function AIMatchingPage() {
   );
 
   return (
-    <div dir="rtl" className="bg-[#F7FBFF] -m-6 p-0">
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="bg-[#F7FBFF] -m-6 p-0">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       {/* Header */}
       <div className="bg-white border-b border-[#E4ECFF] px-8 py-5">
@@ -108,10 +112,11 @@ export default function AIMatchingPage() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <h1 className="text-2xl font-black text-[#0F172A]">AI Matching Engine</h1>
-            <p className="text-sm text-[#64748B] font-semibold">התאמה חכמה בין מועמדים למשרות</p>
+          <div className="flex-1">
+            <h1 className="text-2xl font-black text-[#0F172A]">{t('aiMatching.page.title')}</h1>
+            <p className="text-sm text-[#64748B] font-semibold">{t('aiMatching.page.subtitle')}</p>
           </div>
+          <LanguageSwitcher variant="badge" />
         </div>
 
         {/* Mode Tabs */}
@@ -134,15 +139,15 @@ export default function AIMatchingPage() {
             );
           })}
 
-          <div className="flex items-center gap-2 mr-auto">
+          <div className={`flex items-center gap-2 ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
             <SlidersHorizontal className="w-4 h-4 text-[#94A3B8]" />
-            <span className="text-xs text-[#64748B] font-semibold">ציון מינימלי:</span>
+            <span className="text-xs text-[#64748B] font-semibold">{t('aiMatching.page.minScore')}</span>
             <select
               value={minScore}
               onChange={e => setMinScore(Number(e.target.value))}
               className="h-9 px-3 rounded-xl border border-[#E4ECFF] text-sm font-bold text-[#0F172A] outline-none bg-white"
             >
-              <option value={0}>הכל</option>
+              <option value={0}>{t('aiMatching.page.all')}</option>
               <option value={50}>50%+</option>
               <option value={70}>70%+</option>
               <option value={85}>85%+</option>
@@ -155,25 +160,25 @@ export default function AIMatchingPage() {
         {/* Left: selector list */}
         <div className="space-y-3">
           <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]`} />
             <input
               value={searchQ}
               onChange={e => setSearchQ(e.target.value)}
-              placeholder={mode === 'candidate' ? 'חפש מועמד...' : 'חפש משרה...'}
-              className="w-full h-10 pr-9 pl-4 rounded-xl border border-[#E4ECFF] bg-white text-sm font-semibold text-[#0F172A] outline-none focus:border-[#C4B5FD]"
+              placeholder={mode === 'candidate' ? t('aiMatching.page.searchCandidate') : t('aiMatching.page.searchJob')}
+              className={`w-full h-10 ${isRTL ? 'pr-9 pl-4' : 'pl-9 pr-4'} rounded-xl border border-[#E4ECFF] bg-white text-sm font-semibold text-[#0F172A] outline-none focus:border-[#C4B5FD]`}
             />
           </div>
 
           <div className="space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto">
             {loading && (
-              <div className="text-center py-8 text-[#94A3B8] text-sm">טוען...</div>
+              <div className="text-center py-8 text-[#94A3B8] text-sm">{t('aiMatching.page.loading')}</div>
             )}
 
             {mode === 'candidate' && filteredCandidates.map(c => (
               <button
                 key={c.id}
                 onClick={() => setSelectedCandidate(c)}
-                className={`w-full text-right p-3 rounded-xl border transition-all ${
+                className={`w-full ${isRTL ? 'text-right' : 'text-left'} p-3 rounded-xl border transition-all ${
                   selectedCandidate?.id === c.id
                     ? 'border-[#C4B5FD] bg-[#F3EFFF]'
                     : 'border-[#E4ECFF] bg-white hover:border-[#C4B5FD]'
@@ -189,7 +194,7 @@ export default function AIMatchingPage() {
               <button
                 key={j.id}
                 onClick={() => setSelectedJob(j)}
-                className={`w-full text-right p-3 rounded-xl border transition-all ${
+                className={`w-full ${isRTL ? 'text-right' : 'text-left'} p-3 rounded-xl border transition-all ${
                   selectedJob?.id === j.id
                     ? 'border-[#C4B5FD] bg-[#F3EFFF]'
                     : 'border-[#E4ECFF] bg-white hover:border-[#C4B5FD]'
@@ -206,10 +211,10 @@ export default function AIMatchingPage() {
         {/* Right: results panel */}
         <div>
           {mode === 'candidate' && !selectedCandidate && (
-            <EmptyState text="בחר מועמד מהרשימה כדי לראות משרות מתאימות" icon={Users} />
+            <EmptyState text={t('aiMatching.page.selectCandidatePrompt')} icon={Users} />
           )}
           {mode === 'job' && !selectedJob && (
-            <EmptyState text="בחר משרה מהרשימה כדי לראות מועמדים מתאימים" icon={Briefcase} />
+            <EmptyState text={t('aiMatching.page.selectJobPrompt')} icon={Briefcase} />
           )}
 
           {mode === 'candidate' && selectedCandidate && (
@@ -217,7 +222,7 @@ export default function AIMatchingPage() {
               <div className="mb-4 p-4 rounded-2xl bg-white border border-[#E4ECFF]">
                 <div className="font-black text-[#0F172A]">{selectedCandidate.full_name}</div>
                 <div className="text-sm text-[#7C3AED] font-semibold">{selectedCandidate.role_name}</div>
-                <div className="text-xs text-[#94A3B8]">{selectedCandidate.location} • {selectedCandidate.experience_years} שנות ניסיון</div>
+                <div className="text-xs text-[#94A3B8]">{selectedCandidate.location} • {selectedCandidate.experience_years} {t('aiMatching.page.yearsExperience')}</div>
               </div>
               <CandidateRecommendationsPanel
                 candidate={selectedCandidate}
@@ -228,7 +233,10 @@ export default function AIMatchingPage() {
                       { job_id: job.id, candidate_email: selectedCandidate.email }, '', 1
                     );
                     if (existing.length > 0) {
-                      showToast(`מועמדות כבר קיימת עבור ${selectedCandidate.full_name} במשרת ${job.title}`, 'info');
+                      showToast(t('aiMatching.page.applicationExists', { 
+                        candidateName: selectedCandidate.full_name, 
+                        jobTitle: job.title 
+                      }), 'info');
                       return;
                     }
                     await base44.entities.Application.create({
@@ -245,9 +253,12 @@ export default function AIMatchingPage() {
                       status: 'new',
                       assigned_to: selectedCandidate.recruiter_id || '',
                     });
-                    showToast(`${selectedCandidate.full_name} שויך למשרת ${job.title} והוכנס ל-Pipeline!`);
+                    showToast(t('aiMatching.page.assignedSuccess', { 
+                      candidateName: selectedCandidate.full_name, 
+                      jobTitle: job.title 
+                    }));
                   } catch (e) {
-                    showToast(`שגיאה: ${e.message}`, 'error');
+                    showToast(t('aiMatching.page.error', { message: e.message }), 'error');
                   }
                 }}
               />
@@ -279,9 +290,12 @@ export default function AIMatchingPage() {
                      status: 'new',
                      assigned_to: candidate.recruiter_id || '',
                    });
-                   showToast(`${candidate.full_name} הוסף ל-Pipeline עבור ${selectedJob.title}!`);
+                   showToast(t('aiMatching.page.addedToPipeline', { 
+                     candidateName: candidate.full_name, 
+                     jobTitle: selectedJob.title 
+                   }));
                  } catch (e) {
-                   showToast(`שגיאה: ${e.message}`, 'error');
+                   showToast(t('aiMatching.page.error', { message: e.message }), 'error');
                  }
                }}
               />

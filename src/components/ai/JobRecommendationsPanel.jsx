@@ -3,12 +3,15 @@
  * Shows top matching Candidates for a given Job.
  */
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { rankCandidatesForJob } from '@/lib/aiMatching';
 import AIMatchBadge from './AIMatchBadge';
 import { UserPlus, MapPin, ChevronRight, Loader2, AlertTriangle } from 'lucide-react';
 
 export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'he';
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
@@ -33,14 +36,14 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
 
   if (!results.length) return (
     <div className="py-8 text-center text-[#94A3B8] text-sm font-semibold">
-      לא נמצאו מועמדים מתאימים
+      {t('aiMatching.jobPanel.noCandidatesFound')}
     </div>
   );
 
   return (
-    <div className="space-y-3" dir="rtl">
+    <div className="space-y-3" dir={isRTL ? 'rtl' : 'ltr'}>
       <p className="text-xs text-[#94A3B8] font-semibold">
-        {results.length} מועמדים דורגו לפי התאמה AI
+        {t('aiMatching.jobPanel.candidatesRanked', { count: results.length })}
       </p>
       {results.map(({ candidate, score, explanation }) => (
         <div key={candidate.id} className="rounded-2xl border border-[#E4ECFF] bg-white overflow-hidden">
@@ -55,7 +58,7 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
               <div className="flex items-center gap-2">
                 <span className="font-black text-[#0F172A] text-sm">{candidate.full_name}</span>
                 {!explanation.requiredMet && (
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500" title="חסרות דרישות חובה" />
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500" title={t('aiMatching.jobPanel.missingRequirements')} />
                 )}
               </div>
               <div className="text-xs text-[#7C3AED] font-semibold">{candidate.role_name || candidate.domain_name}</div>
@@ -81,18 +84,18 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
             <div className="border-t border-[#E4ECFF] px-4 pb-4 pt-3 space-y-3 bg-[#FAFBFF]">
               {explanation.gaps.length > 0 && (
                 <div>
-                  <div className="text-xs font-black text-red-500 mb-1">פערים</div>
+                  <div className="text-xs font-black text-red-500 mb-1">{t('aiMatching.jobPanel.gaps')}</div>
                   {explanation.gaps.map((g, i) => <div key={i} className="text-xs text-[#374151]">• {g}</div>)}
                 </div>
               )}
               {explanation.recommendations.length > 0 && (
                 <div>
-                  <div className="text-xs font-black text-[#7C3AED] mb-1">המלצה</div>
+                  <div className="text-xs font-black text-[#7C3AED] mb-1">{t('aiMatching.jobPanel.recommendation')}</div>
                   {explanation.recommendations.slice(0, 2).map((r, i) => <div key={i} className="text-xs text-[#374151]">• {r}</div>)}
                 </div>
               )}
               {explanation.nextAction && (
-                <div className="text-xs font-black text-[#2F80FF]">← {explanation.nextAction}</div>
+                <div className={`text-xs font-black text-[#2F80FF] ${isRTL ? '' : 'text-left'}`}>{isRTL ? '← ' : '→ '}{explanation.nextAction}</div>
               )}
               {onAddToPipeline && (
                 <button
@@ -100,7 +103,7 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
                   className="w-full h-9 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white text-xs font-black flex items-center justify-center gap-1"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
-                  הוסף ל-Pipeline
+                  {t('aiMatching.jobPanel.addToPipeline')}
                 </button>
               )}
             </div>

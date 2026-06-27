@@ -815,7 +815,54 @@
     "location": "מיקום",
     "why": "למה ההתאמה הזו?",
     "strengths": "חוזקות",
-    "gaps": "פערים"
+    "gaps": "פערים",
+    "page": {
+      "title": "AI Matching Engine",
+      "subtitle": "התאמה חכמה בין מועמדים למשרות",
+      "modeCandidateToJobs": "מועמד → משרות",
+      "modeJobToCandidates": "משרה → מועמדים",
+      "minScore": "ציון מינימלי:",
+      "all": "הכל",
+      "searchCandidate": "חפש מועמד...",
+      "searchJob": "חפש משרה...",
+      "loading": "טוען...",
+      "selectCandidatePrompt": "בחר מועמד מהרשימה כדי לראות משרות מתאימות",
+      "selectJobPrompt": "בחר משרה מהרשימה כדי לראות מועמדים מתאימים",
+      "yearsExperience": "שנות ניסיון",
+      "assignedSuccess": "{{candidateName}} שויך למשרת {{jobTitle}} והוכנס ל-Pipeline!",
+      "applicationExists": "מועמדות כבר קיימת עבור {{candidateName}} במשרת {{jobTitle}}",
+      "addedToPipeline": "{{candidateName}} הוסף ל-Pipeline עבור {{jobTitle}}!",
+      "error": "שגיאה: {{message}}"
+    },
+    "candidatePanel": {
+      "noJobsFound": "לא נמצאו משרות מתאימות",
+      "jobsRanked": "{{count}} משרות דורגו לפי התאמה AI",
+      "gaps": "פערים",
+      "recommendation": "המלצה",
+      "assignToJob": "שייך למשרה זו",
+      "missingRequirements": "חסרות דרישות חובה"
+    },
+    "jobPanel": {
+      "noCandidatesFound": "לא נמצאו מועמדים מתאימים",
+      "candidatesRanked": "{{count}} מועמדים דורגו לפי התאמה AI",
+      "gaps": "פערים",
+      "recommendation": "המלצה",
+      "addToPipeline": "הוסף ל-Pipeline",
+      "missingRequirements": "חסרות דרישות חובה"
+    },
+    "matchBadge": {
+      "aiMatchScore": "ציון התאמה AI: {{score}}%"
+    },
+    "explanationCard": {
+      "title": "ניתוח AI-Assisted Matching",
+      "missingRequirements": "חסרות דרישות חובה",
+      "strengths": "נקודות חוזק",
+      "gaps": "פערים וחסרים",
+      "risks": "סיכונים",
+      "recommendations": "המלצות",
+      "screeningQuestions": "שאלות מומלצות לסינון",
+      "nextAction": "פעולה מומלצת הבאה"
+    }
   },
   "interviews": {
     "title": "ראיונות",
