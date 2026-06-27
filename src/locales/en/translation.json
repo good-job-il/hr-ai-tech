@@ -1211,6 +1211,39 @@
     }
   },
   "company": {
+    "dashboard": {
+      "title": "Internal Recruitment Dashboard",
+      "myOrganization": "My Organization",
+      "postJob": "Post Job",
+      "candidates": "Candidates",
+      "stats": {
+        "openJobs": "Open Jobs",
+        "totalCandidates": "Candidates",
+        "upcomingInterviews": "Upcoming Interviews",
+        "inProcess": "In Process",
+        "hired": "Hired",
+        "newCandidates": "New Candidates"
+      },
+      "recentJobs": {
+        "title": "Open Positions",
+        "viewAll": "All Jobs",
+        "empty": "No open positions",
+        "noLocation": "No location specified",
+        "applicants": "applicants"
+      },
+      "upcomingInterviews": {
+        "title": "Upcoming Interviews",
+        "viewAll": "All Interviews",
+        "empty": "No scheduled interviews"
+      },
+      "quickActions": {
+        "title": "Quick Actions",
+        "postJob": "Post Job",
+        "candidateList": "Candidate List",
+        "aiMatching": "AI Matching",
+        "analytics": "Analytics"
+      }
+    },
     "team": {
       "title": "HR Team",
       "subtitle": "Manage your HR team members and internal recruiters",

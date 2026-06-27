@@ -1211,6 +1211,39 @@
     }
   },
   "company": {
+    "dashboard": {
+      "title": "דשבורד ניהול גיוס פנימי",
+      "myOrganization": "הארגון שלי",
+      "postJob": "פרסם משרה",
+      "candidates": "מועמדים",
+      "stats": {
+        "openJobs": "משרות פתוחות",
+        "totalCandidates": "מועמדים",
+        "upcomingInterviews": "ראיונות קרובים",
+        "inProcess": "בתהליך",
+        "hired": "גויסו",
+        "newCandidates": "מועמדים חדשים"
+      },
+      "recentJobs": {
+        "title": "משרות פתוחות",
+        "viewAll": "כל המשרות",
+        "empty": "אין משרות פתוחות",
+        "noLocation": "לא צוין מיקום",
+        "applicants": "מגישים"
+      },
+      "upcomingInterviews": {
+        "title": "ראיונות קרובים",
+        "viewAll": "כל הראיונות",
+        "empty": "אין ראיונות מתוכננים"
+      },
+      "quickActions": {
+        "title": "פעולות מהירות",
+        "postJob": "פרסם משרה",
+        "candidateList": "רשימת מועמדים",
+        "aiMatching": "AI התאמה",
+        "analytics": "אנליטיקה"
+      }
+    },
     "team": {
       "title": "צוות HR",
       "subtitle": "נהל את חברי צוות ה-HR והמגייסים הפנימיים בארגון",

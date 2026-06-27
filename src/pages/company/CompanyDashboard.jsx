@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Briefcase, Users, Calendar, TrendingUp, Sparkles,
   ArrowLeft, CheckCircle2, Clock, UserCheck, Activity
@@ -37,7 +38,9 @@ function StatCard({ icon: Icon, label, value, color = 'green', loading, to }) {
 
 export default function CompanyDashboard() {
   const { user, organization } = useAuth();
+  const { t, i18n } = useTranslation();
   const orgId = user?.organization_id;
+  const isRTL = i18n.language === 'he';
 
   const { data: jobs = [], isLoading: jobsLoading } = useQuery({
     queryKey: ['company-jobs', orgId],
@@ -81,38 +84,38 @@ export default function CompanyDashboard() {
   const recentJobs = useMemo(() => jobs.filter(j => !j.is_closed).slice(0, 5), [jobs]);
   const upcomingInterviews = useMemo(() => interviews.filter(i => i.status === 'scheduled').slice(0, 5), [interviews]);
 
-  const orgName = organization?.name || 'הארגון שלי';
+  const orgName = organization?.name || t('company.dashboard.myOrganization');
 
   return (
-    <div dir="rtl" className="space-y-8 max-w-7xl mx-auto">
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-900">{orgName}</h1>
-          <p className="text-gray-500 mt-1 font-semibold">דשבורד ניהול גיוס פנימי</p>
+          <p className="text-gray-500 mt-1 font-semibold">{t('company.dashboard.title')}</p>
         </div>
         <div className="flex gap-2">
           <Link to="/company/jobs"
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors">
             <Briefcase className="w-4 h-4" />
-            פרסם משרה
+            {t('company.dashboard.postJob')}
           </Link>
           <Link to="/company/candidates"
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:border-emerald-300 transition-colors">
             <Users className="w-4 h-4" />
-            מועמדים
+            {t('company.dashboard.candidates')}
           </Link>
         </div>
       </div>
 
       {/* KPI Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatCard icon={Briefcase}    label="משרות פתוחות"    value={stats.openJobs}           color="green"  loading={loading} to="/company/jobs" />
-        <StatCard icon={Users}        label="מועמדים"          value={stats.totalCandidates}    color="blue"   loading={loading} to="/company/candidates" />
-        <StatCard icon={Calendar}     label="ראיונות קרובים"  value={stats.upcomingInterviews}  color="purple" loading={loading} to="/company/interviews" />
-        <StatCard icon={Activity}     label="בתהליך"          value={stats.inProcess}           color="amber"  loading={loading} />
-        <StatCard icon={CheckCircle2} label="גויסו"            value={stats.hired}              color="green"  loading={loading} />
-        <StatCard icon={UserCheck}    label="מועמדים חדשים"   value={stats.newCandidates}       color="blue"   loading={loading} to="/company/candidates" />
+        <StatCard icon={Briefcase}    label={t('company.dashboard.stats.openJobs')}           value={stats.openJobs}           color="green"  loading={loading} to="/company/jobs" />
+        <StatCard icon={Users}        label={t('company.dashboard.stats.totalCandidates')}    value={stats.totalCandidates}    color="blue"   loading={loading} to="/company/candidates" />
+        <StatCard icon={Calendar}     label={t('company.dashboard.stats.upcomingInterviews')} value={stats.upcomingInterviews} color="purple" loading={loading} to="/company/interviews" />
+        <StatCard icon={Activity}     label={t('company.dashboard.stats.inProcess')}          value={stats.inProcess}          color="amber"  loading={loading} />
+        <StatCard icon={CheckCircle2} label={t('company.dashboard.stats.hired')}              value={stats.hired}              color="green"  loading={loading} />
+        <StatCard icon={UserCheck}    label={t('company.dashboard.stats.newCandidates')}      value={stats.newCandidates}      color="blue"   loading={loading} to="/company/candidates" />
       </div>
 
       {/* Two columns */}
@@ -120,25 +123,25 @@ export default function CompanyDashboard() {
         {/* Recent Jobs */}
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-black text-gray-900">משרות פתוחות</h2>
+            <h2 className="text-lg font-black text-gray-900">{t('company.dashboard.recentJobs.title')}</h2>
             <Link to="/company/jobs" className="text-sm text-emerald-600 font-bold flex items-center gap-1 hover:underline">
-              כל המשרות <ArrowLeft className="w-3.5 h-3.5" />
+              {t('company.dashboard.recentJobs.viewAll')} <ArrowLeft className="w-3.5 h-3.5" />
             </Link>
           </div>
           {loading ? (
             <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-12 bg-gray-50 rounded-xl animate-pulse" />)}</div>
           ) : recentJobs.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-6">אין משרות פתוחות</p>
+            <p className="text-gray-400 text-sm text-center py-6">{t('company.dashboard.recentJobs.empty')}</p>
           ) : (
             <div className="space-y-2">
               {recentJobs.map(job => (
                 <div key={job.id} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-gray-50 hover:bg-emerald-50 transition-colors">
                   <div>
                     <p className="font-bold text-sm text-gray-800">{job.title}</p>
-                    <p className="text-xs text-gray-400">{job.location || 'לא צוין מיקום'}</p>
+                    <p className="text-xs text-gray-400">{job.location || t('company.dashboard.recentJobs.noLocation')}</p>
                   </div>
                   <span className="text-xs bg-emerald-100 text-emerald-700 font-bold px-2.5 py-1 rounded-full">
-                    {job.applications_count || 0} מגישים
+                    {job.applications_count || 0} {t('company.dashboard.recentJobs.applicants')}
                   </span>
                 </div>
               ))}
@@ -149,15 +152,15 @@ export default function CompanyDashboard() {
         {/* Upcoming Interviews */}
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-black text-gray-900">ראיונות קרובים</h2>
+            <h2 className="text-lg font-black text-gray-900">{t('company.dashboard.upcomingInterviews.title')}</h2>
             <Link to="/company/interviews" className="text-sm text-purple-600 font-bold flex items-center gap-1 hover:underline">
-              כל הראיונות <ArrowLeft className="w-3.5 h-3.5" />
+              {t('company.dashboard.upcomingInterviews.viewAll')} <ArrowLeft className="w-3.5 h-3.5" />
             </Link>
           </div>
           {loading ? (
             <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-12 bg-gray-50 rounded-xl animate-pulse" />)}</div>
           ) : upcomingInterviews.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-6">אין ראיונות מתוכננים</p>
+            <p className="text-gray-400 text-sm text-center py-6">{t('company.dashboard.upcomingInterviews.empty')}</p>
           ) : (
             <div className="space-y-2">
               {upcomingInterviews.map(iv => (
@@ -179,13 +182,13 @@ export default function CompanyDashboard() {
 
       {/* Quick Actions */}
       <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-        <h2 className="text-lg font-black text-gray-900 mb-4">פעולות מהירות</h2>
+        <h2 className="text-lg font-black text-gray-900 mb-4">{t('company.dashboard.quickActions.title')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { icon: Briefcase,  label: 'פרסם משרה',       to: '/company/jobs',            color: 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' },
-            { icon: Users,      label: 'רשימת מועמדים',   to: '/company/candidates',      color: 'bg-blue-50 text-blue-600 hover:bg-blue-100' },
-            { icon: Sparkles,   label: 'AI התאמה',         to: '/company/ai-matching',     color: 'bg-violet-50 text-violet-600 hover:bg-violet-100' },
-            { icon: TrendingUp, label: 'אנליטיקה',         to: '/company/analytics',       color: 'bg-amber-50 text-amber-600 hover:bg-amber-100' },
+            { icon: Briefcase,  label: t('company.dashboard.quickActions.postJob'),       to: '/company/jobs',            color: 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' },
+            { icon: Users,      label: t('company.dashboard.quickActions.candidateList'), to: '/company/candidates',      color: 'bg-blue-50 text-blue-600 hover:bg-blue-100' },
+            { icon: Sparkles,   label: t('company.dashboard.quickActions.aiMatching'),    to: '/company/ai-matching',     color: 'bg-violet-50 text-violet-600 hover:bg-violet-100' },
+            { icon: TrendingUp, label: t('company.dashboard.quickActions.analytics'),     to: '/company/analytics',       color: 'bg-amber-50 text-amber-600 hover:bg-amber-100' },
           ].map(a => (
             <Link key={a.to} to={a.to}
               className={`flex items-center gap-2 p-4 rounded-xl font-bold text-sm transition-colors ${a.color}`}>
