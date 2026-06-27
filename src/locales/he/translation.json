@@ -1036,6 +1036,39 @@
       "churn": "אחוז נטישה",
       "systemHealth": "בריאות המערכת"
     },
+    "usersManagement": {
+      "title": "ניהול משתמשים",
+      "subtitle": "כל המשתמשים בפלטפורמה",
+      "stats": {
+        "totalUsers": "סה״כ משתמשים",
+        "admins": "אדמינים",
+        "recruiters": "מגייסים",
+        "candidates": "מועמדים"
+      },
+      "search": "חיפוש שם או אימייל...",
+      "filters": {
+        "allRoles": "כל התפקידים"
+      },
+      "usersCount": "משתמשים",
+      "table": {
+        "user": "משתמש",
+        "role": "תפקיד",
+        "organization": "ארגון",
+        "created": "נוצר"
+      },
+      "noUsers": "אין משתמשים תואמים",
+      "roles": {
+        "admin": "Admin",
+        "super_admin": "Super Admin",
+        "org_admin": "Org Admin",
+        "recruitment_manager": "מנהל גיוס",
+        "team_manager": "מנהל צוות",
+        "recruiter": "מגייס",
+        "hr_manager": "HR Manager",
+        "internal_recruiter": "מגייס פנימי",
+        "candidate": "מועמד"
+      }
+    },
     "orgs": {
       "title": "ארגונים",
       "staffing": "חברות השמה",
@@ -1340,5 +1373,50 @@
     },
     "required": "חובה",
     "optional": "אופציונלי"
+  },
+  "auditLog": {
+    "title": "יומן אודיט",
+    "subtitle": "ניטור פעילויות משתמשים ושינויים במערכת",
+    "exportCSV": "יצוא CSV",
+    "filters": "פילטרים",
+    "entity": "ישות",
+    "allEntities": "כל הישויות",
+    "action": "פעולה",
+    "allActions": "כל הפעולות",
+    "userEmail": "אימייל משתמש",
+    "searchPlaceholder": "חיפוש...",
+    "fromDate": "מתאריך",
+    "toDate": "עד תאריך",
+    "clearFilters": "נקה פילטרים",
+    "recordsInPage": "רשומות בעמוד",
+    "previous": "הקודם",
+    "next": "הבא",
+    "tableHeaders": {
+      "date": "תאריך",
+      "user": "משתמש",
+      "action": "פעולה",
+      "entity": "ישות",
+      "description": "תיאור"
+    },
+    "loading": "טוען...",
+    "noRecords": "אין רשומות אודיט להצגה",
+    "details": "פרטים",
+    "entityId": "מזהה ישות",
+    "actorRole": "תפקיד מבצע",
+    "actions": {
+      "view": "צפייה",
+      "create": "יצירה",
+      "update": "עדכון",
+      "delete": "מחיקה",
+      "cv_download": "הורדת CV",
+      "cv_view": "צפייה ב-CV",
+      "status_change": "שינוי סטטוס",
+      "send_to_employer": "שליחה למעסיק",
+      "export": "יצוא",
+      "compensation_change": "שינוי תגמול",
+      "login": "כניסה",
+      "impersonate": "התחזות",
+      "restore": "שחזור"
+    }
   }
 }

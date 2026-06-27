@@ -1036,6 +1036,39 @@
       "churn": "Churn Rate",
       "systemHealth": "System Health"
     },
+    "usersManagement": {
+      "title": "Users Management",
+      "subtitle": "All platform users",
+      "stats": {
+        "totalUsers": "Total Users",
+        "admins": "Admins",
+        "recruiters": "Recruiters",
+        "candidates": "Candidates"
+      },
+      "search": "Search by name or email...",
+      "filters": {
+        "allRoles": "All Roles"
+      },
+      "usersCount": "users",
+      "table": {
+        "user": "User",
+        "role": "Role",
+        "organization": "Organization",
+        "created": "Created"
+      },
+      "noUsers": "No matching users",
+      "roles": {
+        "admin": "Admin",
+        "super_admin": "Super Admin",
+        "org_admin": "Org Admin",
+        "recruitment_manager": "Recruitment Manager",
+        "team_manager": "Team Manager",
+        "recruiter": "Recruiter",
+        "hr_manager": "HR Manager",
+        "internal_recruiter": "Internal Recruiter",
+        "candidate": "Candidate"
+      }
+    },
     "orgs": {
       "title": "Organizations",
       "staffing": "Staffing Agencies",
@@ -1340,5 +1373,50 @@
     },
     "required": "Required",
     "optional": "Optional"
+  },
+  "auditLog": {
+    "title": "Audit Log",
+    "subtitle": "Monitor user activities and system changes",
+    "exportCSV": "Export CSV",
+    "filters": "Filters",
+    "entity": "Entity",
+    "allEntities": "All Entities",
+    "action": "Action",
+    "allActions": "All Actions",
+    "userEmail": "User Email",
+    "searchPlaceholder": "Search...",
+    "fromDate": "From Date",
+    "toDate": "To Date",
+    "clearFilters": "Clear Filters",
+    "recordsInPage": "records on page",
+    "previous": "Previous",
+    "next": "Next",
+    "tableHeaders": {
+      "date": "Date",
+      "user": "User",
+      "action": "Action",
+      "entity": "Entity",
+      "description": "Description"
+    },
+    "loading": "Loading...",
+    "noRecords": "No audit records to display",
+    "details": "Details",
+    "entityId": "Entity ID",
+    "actorRole": "Actor Role",
+    "actions": {
+      "view": "View",
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "cv_download": "CV Download",
+      "cv_view": "CV View",
+      "status_change": "Status Change",
+      "send_to_employer": "Send to Employer",
+      "export": "Export",
+      "compensation_change": "Compensation Change",
+      "login": "Login",
+      "impersonate": "Impersonate",
+      "restore": "Restore"
+    }
   }
 }
