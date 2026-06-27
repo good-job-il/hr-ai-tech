@@ -6,21 +6,40 @@ import RecruiterDropdown from './RecruiterDropdown';
 import RejectModal from './RejectModal';
 import SendToEmployerModal from './SendToEmployerModal';
 import AssignToJobModal from './AssignToJobModal';
-
-const STATUS_OPTIONS = [
-  { value: 'new',       label: 'חדש',           color: '#2563EB' },
-  { value: 'contacted', label: 'פנייה נשלחה',   color: '#F59E0B' },
-  { value: 'interview', label: 'בראיון',         color: '#8B5CF6' },
-  { value: 'offer',     label: 'הצעה',           color: '#F97316' },
-  { value: 'hired',     label: 'גויס',           color: '#10B981' },
-  { value: 'inactive',  label: 'לא פעיל',        color: '#94A3B8' },
-];
-
-const PRESET_TAGS = ['מומלץ', 'Senior', 'Junior', 'Mid-Level', 'דחוף', 'VIP', 'Passive', 'Open to Relocation', 'Remote Only'];
-
-const DOC_REQUESTS = ['קורות חיים מעודכנים', 'תעודות השכלה', 'המלצות', 'תיק עבודות', 'אחר'];
+import { useTranslation } from 'react-i18next';
 
 export default function RecruiterWorkspacePanel({ candidate, documents, tags, onUpdateStatus, onAssignRecruiter, onAddTag, onRemoveTag, onSendToEmployer, onRequestDocuments, userRole, currentUser, onReload }) {
+  const { t } = useTranslation();
+
+  const STATUS_OPTIONS = [
+    { value: 'new',       label: t('candidateCRM.workspace.statuses.new'), color: '#2563EB' },
+    { value: 'contacted', label: t('candidateCRM.workspace.statuses.contacted'), color: '#F59E0B' },
+    { value: 'interview', label: t('candidateCRM.workspace.statuses.interview'), color: '#8B5CF6' },
+    { value: 'offer',     label: t('candidateCRM.workspace.statuses.offer'), color: '#F97316' },
+    { value: 'hired',     label: t('candidateCRM.workspace.statuses.hired'), color: '#10B981' },
+    { value: 'inactive',  label: t('candidateCRM.workspace.statuses.inactive'), color: '#94A3B8' },
+  ];
+
+  const PRESET_TAGS = [
+    t('candidateCRM.workspace.presetTags.recommended'),
+    'Senior',
+    'Junior',
+    'Mid-Level',
+    t('candidateCRM.workspace.presetTags.urgent'),
+    'VIP',
+    'Passive',
+    t('candidateCRM.workspace.presetTags.openToRelocation'),
+    t('candidateCRM.workspace.presetTags.remoteOnly'),
+  ];
+
+  const DOC_REQUESTS = [
+    t('candidateCRM.workspace.docRequests.updatedCV'),
+    t('candidateCRM.workspace.docRequests.certificates'),
+    t('candidateCRM.workspace.docRequests.recommendations'),
+    t('candidateCRM.workspace.docRequests.portfolio'),
+    t('candidateCRM.workspace.docRequests.other'),
+  ];
+
   const [tagInput, setTagInput] = useState('');
   const [showSendModal, setShowSendModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
@@ -45,8 +64,6 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
     setSavingKey('tag', false);
   };
 
-
-
   const handleReject = async (reason) => {
     await onUpdateStatus('rejected', reason);
     setShowRejectModal(false);
@@ -67,7 +84,7 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
     <div className="space-y-5">
       {/* Status */}
       <div>
-        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">סטטוס מועמד</div>
+        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">{t('candidateCRM.workspace.candidateStatus')}</div>
         <div className="grid grid-cols-2 gap-1.5">
           {STATUS_OPTIONS.map(opt => (
             <button key={opt.value} onClick={() => handleStatus(opt.value)}
@@ -82,7 +99,7 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
 
       {/* Tags */}
       <div>
-        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">תגיות</div>
+        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">{t('candidateCRM.workspace.tags')}</div>
         <div className="flex flex-wrap gap-1.5 mb-2">
           {tags.map(t => (
             <span key={t.id} className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full"
@@ -97,7 +114,7 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
         <div className="flex gap-2 mb-2">
           <Input value={tagInput} onChange={e => setTagInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAddTag(tagInput)}
-            placeholder="תגית חדשה..." className="text-xs h-8 flex-1" />
+            placeholder={t('candidateCRM.workspace.newTag')} className="text-xs h-8 flex-1" />
           <Button size="sm" onClick={() => handleAddTag(tagInput)} disabled={!tagInput.trim() || saving.tag}
             className="h-8 text-xs bg-[#7C3AED] text-white hover:bg-[#6D28D9]">
             <Tag className="w-3 h-3" />
@@ -115,7 +132,7 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
 
       {/* Assign Recruiter — Dropdown */}
       <div>
-        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">מגייס אחראי</div>
+        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">{t('candidateCRM.workspace.responsibleRecruiter')}</div>
         <RecruiterDropdown
           currentEmail={candidate?.recruiter_id}
           onSelect={(email, name) => onAssignRecruiter(email, name)}
@@ -124,11 +141,11 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
 
       {/* Request Documents */}
       <div>
-        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">בקשת מסמכים</div>
+        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">{t('candidateCRM.workspace.documentRequest')}</div>
         {!showDocRequest ? (
           <button onClick={() => setShowDocRequest(true)}
             className="w-full flex items-center gap-2 text-sm font-semibold text-[#94A3B8] hover:text-[#2563EB] px-4 py-2.5 rounded-xl border border-dashed border-[#E4ECFF] hover:border-[#2563EB] transition-all">
-            <FileText className="w-4 h-4" /> בקש מסמך מהמועמד
+            <FileText className="w-4 h-4" /> {t('candidateCRM.workspace.requestDocument')}
           </button>
         ) : (
           <div className="space-y-2 bg-[#EFF6FF] rounded-xl p-3 border border-blue-100">
@@ -143,9 +160,9 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
             <div className="flex gap-2 mt-2">
               <Button size="sm" onClick={handleRequestDocuments} disabled={!docRequestType || saving.docReq}
                 className="h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white flex-1">
-                {saving.docReq ? 'שולח...' : 'שלח בקשה'}
+                {saving.docReq ? t('candidateCRM.workspace.sending') : t('candidateCRM.workspace.sendRequest')}
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setShowDocRequest(false)} className="h-8 text-xs">ביטול</Button>
+              <Button size="sm" variant="ghost" onClick={() => setShowDocRequest(false)} className="h-8 text-xs">{t('candidateCRM.workspace.cancel')}</Button>
             </div>
           </div>
         )}
@@ -153,20 +170,20 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
 
       {/* Assign to Job (General Pool) */}
       <div>
-        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">שיוך למשרה</div>
+        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">{t('candidateCRM.workspace.jobAssignment')}</div>
         <button onClick={() => setShowAssignModal(true)}
           className="w-full flex items-center gap-2 text-sm font-semibold text-[#94A3B8] hover:text-[#8B5CF6] px-4 py-2.5 rounded-xl border border-dashed border-[#E4ECFF] hover:border-[#8B5CF6] transition-all">
-          <UserCheck className="w-4 h-4" /> שייך מועמד למשרה
+          <UserCheck className="w-4 h-4" /> {t('candidateCRM.workspace.assignToJob')}
         </button>
       </div>
 
       {/* Send to Employer */}
       {canSendToEmployer && (
         <div>
-          <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">שליחה למעסיק</div>
+          <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">{t('candidateCRM.workspace.sendToEmployer')}</div>
           <button onClick={() => setShowSendModal(true)}
             className="w-full flex items-center gap-2 text-sm font-semibold text-[#94A3B8] hover:text-[#10B981] px-4 py-2.5 rounded-xl border border-dashed border-[#E4ECFF] hover:border-[#10B981] transition-all">
-            <Send className="w-4 h-4" /> שלח למעסיק
+            <Send className="w-4 h-4" /> {t('candidateCRM.workspace.sendToEmployerButton')}
           </button>
         </div>
       )}
@@ -188,7 +205,7 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
         <SendToEmployerModal
           candidate={candidate}
           documents={documents || []}
-          job={null} // Can be passed from parent if needed
+          job={null}
           onClose={() => setShowSendModal(false)}
           onSuccess={() => setShowSendModal(false)}
         />
@@ -199,7 +216,7 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
         <button onClick={() => setShowRejectModal(true)}
           disabled={candidate?.status === 'rejected' || saving.status}
           className="w-full flex items-center justify-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 px-4 py-2.5 rounded-xl border border-dashed border-red-200 hover:border-red-400 hover:bg-red-50 transition-all disabled:opacity-40">
-          <AlertTriangle className="w-4 h-4" /> דחה מועמד
+          <AlertTriangle className="w-4 h-4" /> {t('candidateCRM.workspace.rejectCandidate')}
         </button>
       </div>
 

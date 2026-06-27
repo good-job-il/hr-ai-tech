@@ -1570,6 +1570,7 @@
     },
     "profileHeader": {
       "yearsExperience": "שנות ניסיון",
+      "reviewRequired": "נדרשת בדיקה",
       "needsReview": "נדרשת בדיקה",
       "aiScore": "ציון AI",
       "source": "מקור",
@@ -1578,7 +1579,7 @@
       "assignToJob": "שייך למשרה",
       "resume": "קורות חיים",
       "edit": "עריכה",
-      "more": "+{count} עוד",
+      "more": "עוד",
       "statuses": {
         "new": "חדש",
         "contacted": "פנייה נשלחה",
@@ -1639,6 +1640,7 @@
     "interviews": {
       "schedule": "קבע ראיון",
       "scheduleNew": "קביעת ראיון חדש",
+      "scheduleInterview": "קבע ראיון",
       "save": "קבע ראיון",
       "saving": "שומר...",
       "cancel": "ביטול",
@@ -1657,6 +1659,16 @@
       "linkPlaceholder": "https://meet.google.com/... או כתובת",
       "interviewer": "שם המראיין",
       "job": "משרה",
+      "form": {
+        "date": "תאריך",
+        "time": "שעה",
+        "type": "סוג ראיון",
+        "stage": "שלב",
+        "locationLink": "קישור / מיקום",
+        "locationPlaceholder": "https://meet.google.com/... או כתובת",
+        "interviewer": "שם המראיין",
+        "job": "משרה"
+      },
       "types": {
         "phone": "טלפוני",
         "video": "וידאו",
@@ -1694,16 +1706,29 @@
       "candidateStatus": "סטטוס מועמד",
       "tags": "תגיות",
       "newTag": "תגית חדשה...",
+      "responsibleRecruiter": "מגייס אחראי",
       "assignedRecruiter": "מגייס אחראי",
+      "documentRequest": "בקשת מסמכים",
       "requestDocuments": "בקשת מסמכים",
+      "requestDocument": "בקש מסמך מהמועמד",
       "requestFromCandidate": "בקש מסמך מהמועמד",
       "sendRequest": "שלח בקשה",
       "sending": "שולח...",
-      "assignToJob": "שיוך למשרה",
+      "cancel": "ביטול",
+      "jobAssignment": "שיוך למשרה",
+      "assignToJob": "שייך מועמד למשרה",
       "assignCandidateToJob": "שייך מועמד למשרה",
       "sendToEmployer": "שליחה למעסיק",
+      "sendToEmployerButton": "שלח למעסיק",
       "sendCandidateToEmployer": "שלח למעסיק",
+      "rejectCandidate": "דחה מועמד",
       "reject": "דחה מועמד",
+      "presetTags": {
+        "recommended": "מומלץ",
+        "urgent": "דחוף",
+        "openToRelocation": "פתוח למעבר דירה",
+        "remoteOnly": "עבודה מרחוק בלבד"
+      },
       "statuses": {
         "new": "חדש",
         "contacted": "פנייה נשלחה",
@@ -1713,7 +1738,9 @@
         "inactive": "לא פעיל"
       },
       "docRequests": {
+        "updatedCV": "קורות חיים מעודכנים",
         "updated_cv": "קורות חיים מעודכנים",
+        "certificates": "תעודות השכלה",
         "education": "תעודות השכלה",
         "recommendations": "המלצות",
         "portfolio": "תיק עבודות",
@@ -1739,11 +1766,28 @@
       }
     },
     "resumeModal": {
-      "title": "קורות חיים —",
+      "title": "קורות חיים",
       "open": "פתח",
       "download": "הורד",
       "downloadDocx": "הורד DOCX",
-      "downloadOriginal": "הורד מקור",
+      "downloadOriginal": "הורד מקור ({type})",
+      "file": "קובץ",
+      "sections": {
+        "summary": "סיכום מקצועי",
+        "details": "פרטים",
+        "skills": "כישורים",
+        "previousCompanies": "חברות קודמות",
+        "languages": "שפות",
+        "notes": "הערות"
+      },
+      "fields": {
+        "role": "תפקיד",
+        "domain": "תחום",
+        "experience": "ניסיון",
+        "location": "מיקום",
+        "salaryExpectations": "ציפיות שכר"
+      },
+      "yearsValue": "{count} שנים",
       "professionalSummary": "סיכום מקצועי",
       "details": "פרטים",
       "role": "תפקיד",
@@ -1756,49 +1800,102 @@
       "previousCompanies": "חברות קודמות",
       "languages": "שפות",
       "notes": "הערות",
+      "noParsedData": "אין נתונים מפורסרים",
       "noData": "אין נתונים מפורסרים",
+      "dataNotExtracted": "הנתונים טרם נחלצו מקורות החיים",
       "notExtracted": "הנתונים טרם נחלצו מקורות החיים"
     },
     "sendToEmployer": {
       "title": "שלח מועמד למעסיק",
-      "to": "אל:",
-      "cc": "CC:",
-      "subject": "נושא:",
+      "to": "אל",
+      "cc": "CC",
+      "subject": "נושא",
+      "defaultSubject": "מועמדות: {name}{job}",
+      "candidacyPrefix": "מועמדות: ",
       "recruiterNote": "הערת מגייס (תופיע בגוף המייל)",
       "notePlaceholder": "הערות, המלצה, נקודות חשובות...",
+      "documentsToAttach": "מסמכים לצירוף",
       "attachments": "מסמכים לצירוף",
       "noDocuments": "אין מסמכים זמינים",
+      "cvRequired": "⚠️ יש לצרף קורות חיים",
       "requireCV": "⚠️ יש לצרף קורות חיים",
+      "mustAttachCV": "יש לצרף לפחות קורות חיים",
       "preview": "תצוגה מקדימה",
+      "showPreview": "תצוגה מקדימה",
       "hidePreview": "הסתר תצוגה",
+      "documentsSelected": "{count} מסמכים נבחרו",
       "selected": "{count} מסמכים נבחרו",
       "cancel": "ביטול",
+      "sendEmail": "שלח מייל",
       "send": "שלח מייל",
       "sending": "שולח...",
       "sendAgain": "שלח שוב",
+      "sentSuccessfully": "נשלח בהצלחה",
       "sent": "נשלח בהצלחה",
+      "sendError": "שגיאה בשליחה",
       "close": "סגור",
+      "infoTitle": "למי נשלח המייל?",
       "infoNote": "למי נשלח המייל?",
+      "infoDescription": "המייל יישלח מהמערכת ({email}) למעסיק שהזנת.",
       "infoText": "המייל יישלח מהמערכת ({email}) למעסיק שהזנת.",
-      "infoJob": "המועמד יישלח עבור המשרה: {jobTitle}"
+      "recruiter": "המגייס",
+      "jobInfo": "המועמד יישלח עבור המשרה: {title}",
+      "infoJob": "המועמד יישלח עבור המשרה: {jobTitle}",
+      "ccPlaceholder": "colleague@company.com (אופציונלי)",
+      "resumeFile": "קורות חיים",
+      "resumeDocx": "קורות חיים DOCX",
+      "document": "מסמך",
+      "previewContent": "אל: {to}\nCC: {cc}\nנושא: {subject}\n\n---\n\nשלום,\n\nמצורפת מועמדות עבור {name}.\n\nשם המועמד: {name}\n{email}\n\n{note}\n{documents}",
+      "docTypes": {
+        "cv": "קורות חיים",
+        "cover_letter": "מכתב מוטיבציה",
+        "portfolio": "תיק עבודות",
+        "certificate": "תעודה מקצועית",
+        "contract": "חוזה",
+        "id": "תעודת זהות",
+        "other": "קובץ נוסף"
+      }
     },
     "whatsapp": {
       "noPhone": "אין מספר טלפון — הוסף מספר לפרופיל המועמד",
+      "messageTemplates": "תבניות הודעה",
       "templates": "תבניות הודעה",
       "message": "הודעה",
+      "writePlaceholder": "כתוב הודעה...",
       "messagePlaceholder": "כתוב הודעה...",
       "openWhatsApp": "פתח ב-WhatsApp",
+      "documentConversation": "📝 תעד את השיחה",
       "logConversation": "📝 תעד את השיחה",
+      "conversationPlaceholder": "מה דובר? תוצאת השיחה...",
       "logPlaceholder": "מה דובר? תוצאת השיחה...",
       "logManually": "תעד שיחת WhatsApp ידנית",
       "saveLog": "שמור תיעוד",
       "saving": "שומר...",
       "cancel": "ביטול",
       "history": "היסטוריה",
+      "defaultName": "שלום",
       "outcomes": {
         "sent": "שוחח",
         "read": "נענה",
         "failed": "לא ענה"
+      },
+      "templates": {
+        "intro": {
+          "label": "היכרות ראשונה",
+          "text": "שלום {name},\nאני מגייס של HeadHunter ואשמח לדבר איתך על הזדמנות מעניינת בתחומך.\nמתי נוח לדבר?"
+        },
+        "interview": {
+          "label": "זימון לראיון",
+          "text": "שלום {name},\nאשמח לתאם איתך ראיון טלפוני קצר.\nמה הזמינות שלך השבוע?"
+        },
+        "followup": {
+          "label": "follow-up",
+          "text": "שלום {name},\nרציתי לבדוק אם קיבלת את הפרטים ששלחתי.\nיש שאלות?"
+        },
+        "offer": {
+          "label": "הצעה",
+          "text": "שלום {name},\nיש לי עדכון טוב — יש הצעה לתפקיד שדיברנו עליו.\nנוח לדבר עכשיו?"
+        }
       },
       "messageTemplates": {
         "intro": "היכרות ראשונה",

@@ -1570,6 +1570,7 @@
     },
     "profileHeader": {
       "yearsExperience": "years experience",
+      "reviewRequired": "Needs Review",
       "needsReview": "Needs Review",
       "aiScore": "AI Score",
       "source": "Source",
@@ -1578,7 +1579,7 @@
       "assignToJob": "Assign to Job",
       "resume": "Resume",
       "edit": "Edit",
-      "more": "+{count} more",
+      "more": "more",
       "statuses": {
         "new": "New",
         "contacted": "Contacted",
@@ -1639,6 +1640,7 @@
     "interviews": {
       "schedule": "Schedule Interview",
       "scheduleNew": "Schedule New Interview",
+      "scheduleInterview": "Schedule Interview",
       "save": "Schedule Interview",
       "saving": "Saving...",
       "cancel": "Cancel",
@@ -1657,6 +1659,16 @@
       "linkPlaceholder": "https://meet.google.com/... or address",
       "interviewer": "Interviewer Name",
       "job": "Job",
+      "form": {
+        "date": "Date",
+        "time": "Time",
+        "type": "Interview Type",
+        "stage": "Stage",
+        "locationLink": "Link / Location",
+        "locationPlaceholder": "https://meet.google.com/... or address",
+        "interviewer": "Interviewer Name",
+        "job": "Job"
+      },
       "types": {
         "phone": "Phone",
         "video": "Video",
@@ -1694,16 +1706,29 @@
       "candidateStatus": "Candidate Status",
       "tags": "Tags",
       "newTag": "New tag...",
+      "responsibleRecruiter": "Responsible Recruiter",
       "assignedRecruiter": "Assigned Recruiter",
+      "documentRequest": "Document Request",
       "requestDocuments": "Request Documents",
+      "requestDocument": "Request document from candidate",
       "requestFromCandidate": "Request document from candidate",
       "sendRequest": "Send Request",
       "sending": "Sending...",
-      "assignToJob": "Assign to Job",
+      "cancel": "Cancel",
+      "jobAssignment": "Job Assignment",
+      "assignToJob": "Assign candidate to job",
       "assignCandidateToJob": "Assign candidate to job",
       "sendToEmployer": "Send to Employer",
+      "sendToEmployerButton": "Send to Employer",
       "sendCandidateToEmployer": "Send to Employer",
+      "rejectCandidate": "Reject Candidate",
       "reject": "Reject Candidate",
+      "presetTags": {
+        "recommended": "Recommended",
+        "urgent": "Urgent",
+        "openToRelocation": "Open to Relocation",
+        "remoteOnly": "Remote Only"
+      },
       "statuses": {
         "new": "New",
         "contacted": "Contacted",
@@ -1713,7 +1738,9 @@
         "inactive": "Inactive"
       },
       "docRequests": {
+        "updatedCV": "Updated Resume",
         "updated_cv": "Updated Resume",
+        "certificates": "Education Certificates",
         "education": "Education Certificates",
         "recommendations": "Recommendations",
         "portfolio": "Portfolio",
@@ -1739,11 +1766,28 @@
       }
     },
     "resumeModal": {
-      "title": "Resume —",
+      "title": "Resume",
       "open": "Open",
       "download": "Download",
       "downloadDocx": "Download DOCX",
-      "downloadOriginal": "Download Original",
+      "downloadOriginal": "Download Original ({type})",
+      "file": "file",
+      "sections": {
+        "summary": "Professional Summary",
+        "details": "Details",
+        "skills": "Skills",
+        "previousCompanies": "Previous Companies",
+        "languages": "Languages",
+        "notes": "Notes"
+      },
+      "fields": {
+        "role": "Role",
+        "domain": "Domain",
+        "experience": "Experience",
+        "location": "Location",
+        "salaryExpectations": "Salary Expectations"
+      },
+      "yearsValue": "{count} years",
       "professionalSummary": "Professional Summary",
       "details": "Details",
       "role": "Role",
@@ -1756,49 +1800,102 @@
       "previousCompanies": "Previous Companies",
       "languages": "Languages",
       "notes": "Notes",
+      "noParsedData": "No parsed data",
       "noData": "No parsed data",
+      "dataNotExtracted": "Data has not been extracted from the resume yet",
       "notExtracted": "Data has not been extracted from the resume yet"
     },
     "sendToEmployer": {
       "title": "Send Candidate to Employer",
-      "to": "To:",
-      "cc": "CC:",
-      "subject": "Subject:",
+      "to": "To",
+      "cc": "CC",
+      "subject": "Subject",
+      "defaultSubject": "Candidacy: {name}{job}",
+      "candidacyPrefix": "Candidacy: ",
       "recruiterNote": "Recruiter Note (will appear in email body)",
       "notePlaceholder": "Notes, recommendations, key points...",
+      "documentsToAttach": "Documents to Attach",
       "attachments": "Attachments",
       "noDocuments": "No documents available",
+      "cvRequired": "⚠️ Resume required",
       "requireCV": "⚠️ Resume required",
+      "mustAttachCV": "You must attach at least a resume",
       "preview": "Preview",
+      "showPreview": "Preview",
       "hidePreview": "Hide Preview",
+      "documentsSelected": "{count} documents selected",
       "selected": "{count} documents selected",
       "cancel": "Cancel",
+      "sendEmail": "Send Email",
       "send": "Send Email",
       "sending": "Sending...",
       "sendAgain": "Send Again",
+      "sentSuccessfully": "Sent successfully",
       "sent": "Sent successfully",
+      "sendError": "Error sending",
       "close": "Close",
+      "infoTitle": "Who will receive the email?",
       "infoNote": "Who will receive the email?",
+      "infoDescription": "The email will be sent from the system ({email}) to the employer you entered.",
       "infoText": "The email will be sent from the system ({email}) to the employer you entered.",
-      "infoJob": "The candidate will be sent for the position: {jobTitle}"
+      "recruiter": "the recruiter",
+      "jobInfo": "The candidate will be sent for the position: {title}",
+      "infoJob": "The candidate will be sent for the position: {jobTitle}",
+      "ccPlaceholder": "colleague@company.com (optional)",
+      "resumeFile": "Resume",
+      "resumeDocx": "Resume DOCX",
+      "document": "Document",
+      "previewContent": "To: {to}\nCC: {cc}\nSubject: {subject}\n\n---\n\nHello,\n\nAttached is a candidacy for {name}.\n\nCandidate name: {name}\n{email}\n\n{note}\n{documents}",
+      "docTypes": {
+        "cv": "Resume",
+        "cover_letter": "Cover Letter",
+        "portfolio": "Portfolio",
+        "certificate": "Certificate",
+        "contract": "Contract",
+        "id": "ID",
+        "other": "Other"
+      }
     },
     "whatsapp": {
       "noPhone": "No phone number — add number to candidate profile",
+      "messageTemplates": "Message Templates",
       "templates": "Message Templates",
       "message": "Message",
+      "writePlaceholder": "Write a message...",
       "messagePlaceholder": "Write a message...",
       "openWhatsApp": "Open in WhatsApp",
+      "documentConversation": "📝 Log the conversation",
       "logConversation": "📝 Log the conversation",
+      "conversationPlaceholder": "What was discussed? Conversation outcome...",
       "logPlaceholder": "What was discussed? Conversation outcome...",
       "logManually": "Log WhatsApp conversation manually",
       "saveLog": "Save Log",
       "saving": "Saving...",
       "cancel": "Cancel",
       "history": "History",
+      "defaultName": "Hello",
       "outcomes": {
         "sent": "Talked",
         "read": "Answered",
         "failed": "No Answer"
+      },
+      "templates": {
+        "intro": {
+          "label": "First Introduction",
+          "text": "Hello {name},\nI'm a recruiter at HeadHunter and I'd like to discuss an interesting opportunity in your field.\nWhen is a good time to talk?"
+        },
+        "interview": {
+          "label": "Interview Invitation",
+          "text": "Hello {name},\nI'd like to schedule a brief phone interview with you.\nWhat's your availability this week?"
+        },
+        "followup": {
+          "label": "Follow-up",
+          "text": "Hello {name},\nI wanted to check if you received the information I sent.\nAny questions?"
+        },
+        "offer": {
+          "label": "Offer",
+          "text": "Hello {name},\nI have good news — there's an offer for the position we discussed.\nIs now a good time to talk?"
+        }
       },
       "messageTemplates": {
         "intro": "First Introduction",

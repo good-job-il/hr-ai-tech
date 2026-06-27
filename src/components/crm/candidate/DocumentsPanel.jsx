@@ -1,12 +1,7 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Upload, Download, Eye, Trash2, File, Plus } from 'lucide-react';
-
-const DOC_TYPE_LABELS = {
-  cv: 'קורות חיים', cover_letter: 'מכתב מוטיבציה',
-  portfolio: 'תיק עבודות', certificate: 'תעודה',
-  contract: 'חוזה', id: 'תעודת זהות', other: 'אחר',
-};
+import { useTranslation } from 'react-i18next';
 
 const DOC_COLORS = {
   cv: '#7C3AED', cover_letter: '#2563EB', portfolio: '#10B981',
@@ -21,6 +16,18 @@ function formatBytes(bytes) {
 }
 
 export default function DocumentsPanel({ documents, candidate, onUpload }) {
+  const { t } = useTranslation();
+  
+  const DOC_TYPE_LABELS = {
+    cv: t('candidateCRM.documents.types.cv'),
+    cover_letter: t('candidateCRM.documents.types.cover_letter'),
+    portfolio: t('candidateCRM.documents.types.portfolio'),
+    certificate: t('candidateCRM.documents.types.certificate'),
+    contract: t('candidateCRM.documents.types.contract'),
+    id: t('candidateCRM.documents.types.id'),
+    other: t('candidateCRM.documents.types.other'),
+  };
+
   const [uploading, setUploading] = useState(false);
   const [docType, setDocType] = useState('cv');
   const fileRef = useRef();
@@ -55,7 +62,7 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
           disabled={uploading}
           className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs gap-1.5 h-9">
           <Upload className="w-3.5 h-3.5" />
-          {uploading ? 'מעלה...' : 'העלה קובץ'}
+          {uploading ? t('candidateCRM.documents.uploading') : t('candidateCRM.documents.uploadFile')}
         </Button>
         <input ref={fileRef} type="file" className="hidden"
           accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
@@ -65,7 +72,7 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
       {/* Entity CV */}
       {hasResumeEntity && (
         <div className="mb-4">
-          <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">קורות חיים (מהמערכת)</div>
+          <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">{t('candidateCRM.documents.fromSystem')}</div>
           <div className="space-y-2">
             {(candidate.original_resume_url || (!candidate.converted_resume_url && candidate.resume_url)) && (
               <DocRow
@@ -89,8 +96,8 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
       {Object.keys(grouped).length === 0 && !hasResumeEntity && (
         <div className="text-center py-10 text-[#94A3B8]">
           <File className="w-8 h-8 mx-auto mb-2 opacity-40" />
-          <p className="text-sm font-semibold">אין מסמכים</p>
-          <p className="text-xs mt-1">העלה קובץ כדי להתחיל</p>
+          <p className="text-sm font-semibold">{t('candidateCRM.documents.noDocuments')}</p>
+          <p className="text-xs mt-1">{t('candidateCRM.documents.uploadToStart')}</p>
         </div>
       )}
 

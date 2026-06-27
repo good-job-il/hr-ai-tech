@@ -3,30 +3,30 @@ import {
   FileText, Calendar, MessageSquare, Tag, User, Star,
   CheckCircle, XCircle, Send, Upload, Filter
 } from 'lucide-react';
-
-const EVENT_CONFIG = {
-  registered:          { icon: User,          color: '#7C3AED', label: 'נרשם' },
-  resume_uploaded:     { icon: Upload,         color: '#2563EB', label: 'קורות חיים הועלו' },
-  application_submitted:{ icon: Send,          color: '#0EA5E9', label: 'הגשת מועמדות' },
-  interview_scheduled: { icon: Calendar,       color: '#8B5CF6', label: 'ראיון נקבע' },
-  interview_completed: { icon: CheckCircle,    color: '#10B981', label: 'ראיון הושלם' },
-  interview_cancelled: { icon: XCircle,        color: '#EF4444', label: 'ראיון בוטל' },
-  status_changed:      { icon: Star,           color: '#F59E0B', label: 'שינוי סטטוס' },
-  note_added:          { icon: MessageSquare,  color: '#64748B', label: 'הערה נוספה' },
-  tag_added:           { icon: Tag,            color: '#7C3AED', label: 'תגית נוספה' },
-  tag_removed:         { icon: Tag,            color: '#94A3B8', label: 'תגית הוסרה' },
-  recruiter_assigned:  { icon: User,           color: '#4F46E5', label: 'מגייס הוקצה' },
-  document_uploaded:   { icon: FileText,       color: '#0EA5E9', label: 'מסמך הועלה' },
-  sent_to_employer:    { icon: Send,           color: '#10B981', label: 'נשלח למעסיק' },
-  hired:               { icon: CheckCircle,    color: '#10B981', label: 'גויס' },
-  rejected:            { icon: XCircle,        color: '#EF4444', label: 'נדחה' },
-  imported:            { icon: Upload,         color: '#94A3B8', label: 'יובא למערכת' },
-};
-
-const ALL_TYPES = Object.keys(EVENT_CONFIG);
+import { useTranslation } from 'react-i18next';
 
 export default function CandidateTimeline({ timeline, loading }) {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState('all');
+
+  const EVENT_CONFIG = {
+    registered:          { icon: User,          color: '#7C3AED', label: t('candidateCRM.timeline.events.registered') },
+    resume_uploaded:     { icon: Upload,         color: '#2563EB', label: t('candidateCRM.timeline.events.resume_uploaded') },
+    application_submitted:{ icon: Send,          color: '#0EA5E9', label: t('candidateCRM.timeline.events.application_submitted') },
+    interview_scheduled: { icon: Calendar,       color: '#8B5CF6', label: t('candidateCRM.timeline.events.interview_scheduled') },
+    interview_completed: { icon: CheckCircle,    color: '#10B981', label: t('candidateCRM.timeline.events.interview_completed') },
+    interview_cancelled: { icon: XCircle,        color: '#EF4444', label: t('candidateCRM.timeline.events.interview_cancelled') },
+    status_changed:      { icon: Star,           color: '#F59E0B', label: t('candidateCRM.timeline.events.status_changed') },
+    note_added:          { icon: MessageSquare,  color: '#64748B', label: t('candidateCRM.timeline.events.note_added') },
+    tag_added:           { icon: Tag,            color: '#7C3AED', label: t('candidateCRM.timeline.events.tag_added') },
+    tag_removed:         { icon: Tag,            color: '#94A3B8', label: t('candidateCRM.timeline.events.tag_removed') },
+    recruiter_assigned:  { icon: User,           color: '#4F46E5', label: t('candidateCRM.timeline.events.recruiter_assigned') },
+    document_uploaded:   { icon: FileText,       color: '#0EA5E9', label: t('candidateCRM.timeline.events.document_uploaded') },
+    sent_to_employer:    { icon: Send,           color: '#10B981', label: t('candidateCRM.timeline.events.sent_to_employer') },
+    hired:               { icon: CheckCircle,    color: '#10B981', label: t('candidateCRM.timeline.events.hired') },
+    rejected:            { icon: XCircle,        color: '#EF4444', label: t('candidateCRM.timeline.events.rejected') },
+    imported:            { icon: Upload,         color: '#94A3B8', label: t('candidateCRM.timeline.events.imported') },
+  };
 
   const filtered = filter === 'all' ? timeline : timeline.filter(e => e.event_type === filter);
 
@@ -45,7 +45,7 @@ export default function CandidateTimeline({ timeline, loading }) {
         <Filter className="w-4 h-4 text-[#94A3B8] flex-shrink-0" />
         <button onClick={() => setFilter('all')}
           className={`text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap transition-all ${filter === 'all' ? 'bg-[#7C3AED] text-white' : 'bg-[#F0F1F5] text-[#64748B] hover:bg-[#E4ECFF]'}`}>
-          הכל ({timeline.length})
+          {t('candidateCRM.timeline.all')} ({timeline.length})
         </button>
         {['interview_scheduled', 'status_changed', 'note_added', 'document_uploaded', 'sent_to_employer'].map(type => {
           const count = timeline.filter(e => e.event_type === type).length;
@@ -65,7 +65,7 @@ export default function CandidateTimeline({ timeline, loading }) {
       {filtered.length === 0 ? (
         <div className="text-center py-10 text-[#94A3B8]">
           <FileText className="w-8 h-8 mx-auto mb-2 opacity-40" />
-          <p className="text-sm font-semibold">אין אירועים להצגה</p>
+          <p className="text-sm font-semibold">{t('candidateCRM.timeline.noEvents')}</p>
         </div>
       ) : (
         <div className="relative">
@@ -98,7 +98,7 @@ export default function CandidateTimeline({ timeline, loading }) {
                         </span>
                       )}
                       {event.is_visible_to_employer && (
-                        <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-semibold">גלוי למעסיק</span>
+                        <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-semibold">{t('candidateCRM.timeline.visibleToEmployer')}</span>
                       )}
                     </div>
                   </div>

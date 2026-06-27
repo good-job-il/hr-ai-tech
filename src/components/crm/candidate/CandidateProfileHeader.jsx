@@ -1,31 +1,41 @@
 import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Phone, Mail, Briefcase, Star, Calendar, UserCheck, FileText, Edit2, Plus } from 'lucide-react';
 import ResumePreviewModal from './ResumePreviewModal';
 import AssignToJobModal from './AssignToJobModal';
-
-const STATUS_COLORS = {
-  new: 'bg-blue-100 text-blue-700',
-  contacted: 'bg-yellow-100 text-yellow-700',
-  interview: 'bg-purple-100 text-purple-700',
-  offer: 'bg-orange-100 text-orange-700',
-  hired: 'bg-green-100 text-green-700',
-  rejected: 'bg-red-100 text-red-700',
-  inactive: 'bg-gray-100 text-gray-500',
-};
-
-const STATUS_LABELS = {
-  new: 'חדש', contacted: 'פנייה נשלחה', interview: 'בראיון',
-  offer: 'הצעה', hired: 'גויס', rejected: 'נדחה', inactive: 'לא פעיל',
-};
-
-const SOURCE_LABELS = {
-  import: 'ייבוא', manual: 'ידני', linkedin: 'LinkedIn',
-  upload: 'העלאה', crawl: 'סריקה',
-};
+import { useTranslation } from 'react-i18next';
 
 export default function CandidateProfileHeader({ candidate, tags, applications = [], onStatusChange, onEdit, onAssignSuccess }) {
+  const { t } = useTranslation();
+
+  const STATUS_COLORS = {
+    new: 'bg-blue-100 text-blue-700',
+    contacted: 'bg-yellow-100 text-yellow-700',
+    interview: 'bg-purple-100 text-purple-700',
+    offer: 'bg-orange-100 text-orange-700',
+    hired: 'bg-green-100 text-green-700',
+    rejected: 'bg-red-100 text-red-700',
+    inactive: 'bg-gray-100 text-gray-500',
+  };
+
+  const STATUS_LABELS = {
+    new: t('candidateCRM.profileHeader.statuses.new'),
+    contacted: t('candidateCRM.profileHeader.statuses.contacted'),
+    interview: t('candidateCRM.profileHeader.statuses.interview'),
+    offer: t('candidateCRM.profileHeader.statuses.offer'),
+    hired: t('candidateCRM.profileHeader.statuses.hired'),
+    rejected: t('candidateCRM.profileHeader.statuses.rejected'),
+    inactive: t('candidateCRM.profileHeader.statuses.inactive'),
+  };
+
+  const SOURCE_LABELS = {
+    import: t('candidateCRM.profileHeader.sources.import'),
+    manual: t('candidateCRM.profileHeader.sources.manual'),
+    linkedin: t('candidateCRM.profileHeader.sources.linkedin'),
+    upload: t('candidateCRM.profileHeader.sources.upload'),
+    crawl: t('candidateCRM.profileHeader.sources.crawl'),
+  };
+
   const [changingStatus, setChangingStatus] = useState(false);
   const [showResume, setShowResume] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -58,14 +68,14 @@ export default function CandidateProfileHeader({ candidate, tags, applications =
               {STATUS_LABELS[candidate.status] || candidate.status}
             </span>
             {candidate.review_required && (
-              <span className="text-xs font-bold px-3 py-1 rounded-full bg-orange-100 text-orange-700">נדרשת בדיקה</span>
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-orange-100 text-orange-700">{t('candidateCRM.profileHeader.reviewRequired')}</span>
             )}
           </div>
 
           <div className="text-base font-semibold text-[#64748B] mb-3">
             {candidate.role_name && <span>{candidate.role_name}</span>}
             {candidate.domain_name && <span> · {candidate.domain_name}</span>}
-            {candidate.experience_years && <span> · {candidate.experience_years} שנות ניסיון</span>}
+            {candidate.experience_years && <span> · {candidate.experience_years} {t('candidateCRM.profileHeader.yearsExperience')}</span>}
           </div>
 
           <div className="flex flex-wrap gap-3 text-sm text-[#64748B]">
@@ -111,12 +121,12 @@ export default function CandidateProfileHeader({ candidate, tags, applications =
             <div className={`text-2xl font-black ${score >= 70 ? 'text-green-600' : score >= 40 ? 'text-yellow-600' : 'text-gray-400'}`}>
               {score}%
             </div>
-            <div className="text-xs text-[#94A3B8] font-semibold">ציון AI</div>
+            <div className="text-xs text-[#94A3B8] font-semibold">{t('candidateCRM.profileHeader.aiScore')}</div>
           </div>
 
           {/* Source + Date */}
           <div className="text-right">
-            <div className="text-xs text-[#94A3B8]">מקור: <span className="font-semibold text-[#64748B]">{SOURCE_LABELS[candidate.source] || candidate.source || '—'}</span></div>
+            <div className="text-xs text-[#94A3B8]">{t('candidateCRM.profileHeader.source')}: <span className="font-semibold text-[#64748B]">{SOURCE_LABELS[candidate.source] || candidate.source || '—'}</span></div>
             {candidate.created_date && (
               <div className="text-xs text-[#94A3B8] flex items-center justify-end gap-1 mt-0.5">
                 <Calendar className="w-3 h-3" />
@@ -135,10 +145,10 @@ export default function CandidateProfileHeader({ candidate, tags, applications =
           <div className="mt-1">
             {applications.length > 0 ? (
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200">
-                משויך ל-{applications.length} {applications.length === 1 ? 'משרה' : 'משרות'}
+                {t('candidateCRM.profileHeader.assignedTo', { count: applications.length })}
               </span>
             ) : (
-              <span className="text-xs font-semibold text-[#94A3B8]">לא משויך עדיין למשרה</span>
+              <span className="text-xs font-semibold text-[#94A3B8]">{t('candidateCRM.profileHeader.notAssigned')}</span>
             )}
           </div>
 
@@ -149,16 +159,16 @@ export default function CandidateProfileHeader({ candidate, tags, applications =
               onClick={() => setShowAssignModal(true)}
               className="text-xs gap-1 bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white border-0"
             >
-              <Plus className="w-3.5 h-3.5" /> שייך למשרה
+              <Plus className="w-3.5 h-3.5" /> {t('candidateCRM.profileHeader.assignToJob')}
             </Button>
             {(candidate.resume_url || candidate.summary || candidate.skills?.length > 0) && (
               <Button size="sm" variant="outline" onClick={() => setShowResume(true)} className="text-xs gap-1">
-                <FileText className="w-3.5 h-3.5" /> קורות חיים
+                <FileText className="w-3.5 h-3.5" /> {t('candidateCRM.profileHeader.resume')}
               </Button>
             )}
             {onEdit && (
               <Button size="sm" variant="outline" onClick={onEdit} className="text-xs gap-1">
-                <Edit2 className="w-3.5 h-3.5" /> עריכה
+                <Edit2 className="w-3.5 h-3.5" /> {t('candidateCRM.profileHeader.edit')}
               </Button>
             )}
           </div>
@@ -186,7 +196,7 @@ export default function CandidateProfileHeader({ candidate, tags, applications =
             <span key={i} className="text-xs bg-[#EEF4FF] text-[#4F46E5] font-semibold px-2.5 py-1 rounded-lg">{skill}</span>
           ))}
           {candidate.skills.length > 12 && (
-            <span className="text-xs text-[#94A3B8] font-semibold px-2 py-1">+{candidate.skills.length - 12} עוד</span>
+            <span className="text-xs text-[#94A3B8] font-semibold px-2 py-1">+{candidate.skills.length - 12} {t('candidateCRM.profileHeader.more')}</span>
           )}
         </div>
       )}
