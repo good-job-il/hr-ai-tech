@@ -5,6 +5,8 @@
  * Ready for LLM upgrade (swap scoreWithLLM in the future).
  */
 
+import i18n from '@/i18n';
+
 // ─── Weights (must sum to 100) ───────────────────────────────────────────────
 const WEIGHTS = {
   domain:        18,   // same domain/category
@@ -126,72 +128,102 @@ function scoreJobType(candidate, job) {
 // ─── Explanation builder ──────────────────────────────────────────────────────
 
 function buildExplanation(candidate, job, breakdown, score) {
+  const t = i18n.t.bind(i18n);
   const strengths = [];
   const gaps = [];
+  const missingRequired = [];
   const risks = [];
   const recommendations = [];
   const screeningQuestions = [];
 
-  // Strengths
-  if (breakdown.domain >= 80) strengths.push(`תחום מקצועי תואם (${candidate.domain_name || 'תחום זהה'})`);
-  if (breakdown.role >= 75) strengths.push(`תפקיד קודם רלוונטי: ${candidate.role_name || candidate.job_title || ''}`);
-  if (breakdown.skills >= 60) strengths.push(`כישורים תואמים: ${(candidate.skills || []).slice(0, 3).join(', ')}`);
-  if (breakdown.experience >= 75) strengths.push(`ניסיון מספק: ${candidate.experience_years} שנים`);
-  if (breakdown.location >= 80) strengths.push(`מיקום תואם`);
-  if (breakdown.salary >= 70) strengths.push(`ציפיות שכר בטווח`);
+  if (breakdown.domain >= 80) {
+    strengths.push(t('aiMatching.engine.strengths.domainMatch', {
+      domain: candidate.domain_name || t('aiMatching.engine.strengths.sameDomain'),
+    }));
+  }
+  if (breakdown.role >= 75) {
+    strengths.push(t('aiMatching.engine.strengths.relevantRole', {
+      role: candidate.role_name || candidate.job_title || '',
+    }));
+  }
+  if (breakdown.skills >= 60) {
+    strengths.push(t('aiMatching.engine.strengths.matchingSkills', {
+      skills: (candidate.skills || []).slice(0, 3).join(', '),
+    }));
+  }
+  if (breakdown.experience >= 75) {
+    strengths.push(t('aiMatching.engine.strengths.sufficientExperience', {
+      years: candidate.experience_years,
+    }));
+  }
+  if (breakdown.location >= 80) strengths.push(t('aiMatching.engine.strengths.locationMatch'));
+  if (breakdown.salary >= 70) strengths.push(t('aiMatching.engine.strengths.salaryInRange'));
 
-  // Gaps
-  if (breakdown.domain < 50) gaps.push('תחום מקצועי שונה — נדרש בדיקה');
-  if (breakdown.role < 50) gaps.push('תפקיד קודם לא זהה לדרישה');
-  if (breakdown.skills < 40) gaps.push('פער בכישורים נדרשים');
+  if (breakdown.domain < 50) {
+    const gap = t('aiMatching.engine.gaps.domainMismatch');
+    gaps.push(gap);
+    missingRequired.push(gap);
+  }
+  if (breakdown.role < 50) gaps.push(t('aiMatching.engine.gaps.roleMismatch'));
+  if (breakdown.skills < 40) gaps.push(t('aiMatching.engine.gaps.skillsGap'));
   if (breakdown.experience < 50) {
     const req = job.required_experience || extractExpFromDesc(job.description) || 3;
-    const gap = req - (candidate.experience_years || 0);
-    if (gap > 0) gaps.push(`חסר ${gap} שנות ניסיון (נדרש ${req}, יש ${candidate.experience_years || 0})`);
+    const gapYears = req - (candidate.experience_years || 0);
+    if (gapYears > 0) {
+      const gap = t('aiMatching.engine.gaps.experienceGap', {
+        gap: gapYears,
+        required: req,
+        has: candidate.experience_years || 0,
+      });
+      gaps.push(gap);
+      missingRequired.push(gap);
+    }
   }
-  if (breakdown.salary < 40) gaps.push('ציפיות שכר מחוץ לטווח המוצע');
-  if (breakdown.location < 40) gaps.push('מיקום לא תואם — בדוק נכונות לנסוע');
+  if (breakdown.salary < 40) gaps.push(t('aiMatching.engine.gaps.salaryOutOfRange'));
+  if (breakdown.location < 40) gaps.push(t('aiMatching.engine.gaps.locationMismatch'));
 
-  // Risks
   if (breakdown.experience > 90 && (candidate.experience_years || 0) > (job.required_experience || 3) + 4) {
-    risks.push('המועמד בעל ניסיון רב מאוד — בדוק ציפיות תפקיד');
+    risks.push(t('aiMatching.engine.risks.overqualified'));
   }
-  if (breakdown.salary < 30) risks.push('פערי שכר גבוהים — סיכוי גבוה לנשור');
-  if (score < 50) risks.push('ציון התאמה נמוך — מומלץ לשקול מועמדים אחרים');
+  if (breakdown.salary < 30) risks.push(t('aiMatching.engine.risks.salaryGap'));
+  if (score < 50) risks.push(t('aiMatching.engine.risks.lowScore'));
 
-  // Recommendations
-  if (breakdown.skills < 60) recommendations.push('שלח שאלון מקדים לבדיקת כישורים טכניים');
-  if (breakdown.salary < 60) recommendations.push('בדוק גמישות שכר עם המועמד לפני קידום');
-  if (breakdown.location < 60) recommendations.push('הבהר תנאי עבודה מרחוק/היברידי');
-  if (score >= 80) recommendations.push('מועמד מומלץ — קדם לראיון טלפוני');
-  else if (score >= 60) recommendations.push('כדאי לסנן בשיחה קצרה לפני קידום');
+  if (breakdown.skills < 60) recommendations.push(t('aiMatching.engine.recommendations.sendSkillsQuestionnaire'));
+  if (breakdown.salary < 60) recommendations.push(t('aiMatching.engine.recommendations.checkSalaryFlexibility'));
+  if (breakdown.location < 60) recommendations.push(t('aiMatching.engine.recommendations.clarifyRemoteHybrid'));
+  if (score >= 80) recommendations.push(t('aiMatching.engine.recommendations.advanceToPhoneInterview'));
+  else if (score >= 60) recommendations.push(t('aiMatching.engine.recommendations.shortScreeningCall'));
 
-  // Screening questions
   if (breakdown.skills < 70) {
     const skills = (candidate.skills || []).slice(0, 2);
-    if (skills.length > 0) screeningQuestions.push(`ספר על ניסיונך עם ${skills.join(' ו-')}`);
+    if (skills.length > 0) {
+      screeningQuestions.push(t('aiMatching.engine.screeningQuestions.experienceWithSkills', {
+        skills: skills.join(t('aiMatching.engine.screeningQuestions.skillsJoiner')),
+      }));
+    }
   }
-  if (breakdown.experience < 75) screeningQuestions.push('מה הפרויקט הגדול ביותר שניהלת בתחום?');
-  if (breakdown.salary < 70) screeningQuestions.push('מהן ציפיות השכר שלך לתפקיד זה?');
-  screeningQuestions.push('מה מניע אותך לעבור תפקיד כרגע?');
+  if (breakdown.experience < 75) screeningQuestions.push(t('aiMatching.engine.screeningQuestions.largestProject'));
+  if (breakdown.salary < 70) screeningQuestions.push(t('aiMatching.engine.screeningQuestions.salaryExpectations'));
+  screeningQuestions.push(t('aiMatching.engine.screeningQuestions.motivation'));
 
-  const label = score >= 85 ? 'התאמה מצוינת' :
-                score >= 70 ? 'התאמה טובה' :
-                score >= 50 ? 'התאמה חלקית' : 'התאמה נמוכה';
+  const label = score >= 85 ? t('aiMatching.engine.labels.excellent') :
+                score >= 70 ? t('aiMatching.engine.labels.good') :
+                score >= 50 ? t('aiMatching.engine.labels.partial') : t('aiMatching.engine.labels.low');
 
   return {
     label,
     score,
-    strengths: strengths.length ? strengths : ['נדרשת בדיקה נוספת'],
+    strengths: strengths.length ? strengths : [t('aiMatching.engine.strengths.needsReview')],
     gaps,
     risks,
     recommendations,
     screeningQuestions,
     requiredMet: breakdown.experience >= 50 && breakdown.domain >= 50,
-    missingRequired: gaps.filter(g => g.includes('ניסיון') || g.includes('תחום')),
-    nextAction: score >= 80 ? 'העבר לראיון טלפוני' :
-                score >= 60 ? 'סנן בשיחה קצרה' :
-                score >= 40 ? 'שקול מול מועמדים אחרים' : 'לא מומלץ לקידום',
+    missingRequired,
+    nextAction: score >= 80 ? t('aiMatching.engine.nextActions.phoneInterview') :
+                score >= 60 ? t('aiMatching.engine.nextActions.shortScreening') :
+                score >= 40 ? t('aiMatching.engine.nextActions.compareOthers') :
+                t('aiMatching.engine.nextActions.notRecommended'),
   };
 }
 

@@ -697,6 +697,29 @@
     "slaOverdue": "SLA Overdue",
     "dragToMove": "Drag to move between stages",
     "emptyStage": "No candidates in this stage",
+    "sources": {
+      "linkedin": "LinkedIn",
+      "app": "Application",
+      "jobsite": "Job Board",
+      "import": "Import",
+      "facebook": "Facebook",
+      "other": "Other"
+    },
+    "time": {
+      "now": "Now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}} hr ago",
+      "daysAgo": "{{count}} days ago",
+      "lessThanHour": "Less than an hour"
+    },
+    "activityTimeline": {
+      "applicationCreated": "Application created",
+      "applicationCreatedDesc": "Application created for {{jobTitle}}",
+      "aiAnalysisComplete": "AI analysis complete",
+      "matchScore": "Match score: {{score}}%",
+      "stageChange": "Stage change: {{from}} → {{to}}",
+      "noActivity": "No activity yet"
+    },
     "candidateCard": {
       "matchScore": "Match",
       "moveStage": "Move to Stage",
@@ -704,7 +727,101 @@
       "addNote": "Add Note",
       "schedule": "Schedule Interview",
       "reject": "Reject",
-      "source": "Source"
+      "source": "Source",
+      "missingRequired": "Missing required qualifications",
+      "unassigned": "Unassigned",
+      "hoursInStage": "{{count}}h",
+      "daysInStage": "{{count}}d"
+    },
+    "drawer": {
+      "stage": "Stage:",
+      "tabs": {
+        "details": "Details",
+        "ai": "AI Analysis",
+        "timeline": "Timeline",
+        "notes": "Notes"
+      },
+      "contactDetails": "Contact Details",
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location",
+      "experience": "Experience",
+      "experienceYears": "{{count}} years",
+      "recruiter": "Recruiter",
+      "skills": "Skills",
+      "missingRequiredWarning": "Missing required qualifications — review before advancing",
+      "noMatchData": "No match data available",
+      "addNotePlaceholder": "Add a note...",
+      "save": "Save",
+      "sendMessage": "Send Message",
+      "scheduleInterview": "Schedule Interview"
+    },
+    "mobile": {
+      "moveToStage": "Move to stage:",
+      "cancel": "Cancel",
+      "noCandidates": "No candidates",
+      "changeStage": "Change stage"
+    },
+    "notifications": {
+      "title": "Pipeline Notifications",
+      "newCount": "{{count}} new",
+      "markAllRead": "Mark all as read",
+      "empty": "No notifications yet",
+      "defaultCandidate": "Candidate",
+      "stageChange": {
+        "hiredTitle": "🎉 {{name}} was hired!",
+        "rejectedTitle": "{{name}} was rejected from the process",
+        "movedTitle": "{{name}} moved to stage: {{stage}}",
+        "content": "{{name}} was moved from \"{{from}}\" to \"{{to}}\" by {{changedBy}}."
+      },
+      "sla": {
+        "title": "⏰ {{name}} stuck for {{hours}} hours in \"{{stage}}\"",
+        "content": "Candidate {{name}} has been in \"{{stage}}\" for {{hours}} hours and may miss the opportunity window."
+      }
+    },
+    "stageColumn": {
+      "dragHere": "Drag candidate here",
+      "slaBreached": "SLA breached"
+    },
+    "filters": {
+      "searchByRole": "Search by role...",
+      "allSources": "All sources",
+      "aiMin": "AI min:",
+      "advancedFilter": "Advanced filter",
+      "clearAll": "Clear all",
+      "recruiterName": "Recruiter name...",
+      "fromDate": "From date:",
+      "toDate": "To date:",
+      "experienceYears": "Experience (years):",
+      "from": "From",
+      "to": "To"
+    },
+    "data": {
+      "defaultRecruiter": "Recruiter",
+      "mock": {
+        "candidate1Name": "Daniel Cohen",
+        "candidate2Name": "Michal Barak",
+        "candidate3Name": "Avi Shapira",
+        "candidate4Name": "Noa Alon",
+        "candidate5Name": "Ron Katz",
+        "recruiter1": "Yossi Levi",
+        "recruiter2": "Sarah Mizrahi",
+        "locationTelAviv": "Tel Aviv",
+        "locationHerzliya": "Herzliya",
+        "locationRamatGan": "Ramat Gan",
+        "locationHaifa": "Haifa",
+        "noteStrongCandidate": "Very strong candidate",
+        "noteGreatInterview": "Great interview"
+      }
+    },
+    "page": {
+      "title": "Recruitment Pipeline",
+      "candidatesCount": "{{count}} candidates",
+      "stagesCount": "{{count}} stages",
+      "filter": "Filter",
+      "refresh": "Refresh",
+      "loading": "Loading...",
+      "demoDataBanner": "Demo Data — No real Applications yet. Import candidates to see real data."
     }
   },
   "crm": {
@@ -863,6 +980,57 @@
       "recommendations": "Recommendations",
       "screeningQuestions": "Recommended Screening Questions",
       "nextAction": "Recommended Next Action"
+    },
+    "engine": {
+      "labels": {
+        "excellent": "Excellent match",
+        "good": "Good match",
+        "partial": "Partial match",
+        "low": "Low match"
+      },
+      "strengths": {
+        "domainMatch": "Matching professional domain ({{domain}})",
+        "sameDomain": "same domain",
+        "relevantRole": "Relevant previous role: {{role}}",
+        "matchingSkills": "Matching skills: {{skills}}",
+        "sufficientExperience": "Sufficient experience: {{years}} years",
+        "locationMatch": "Location matches",
+        "salaryInRange": "Salary expectations in range",
+        "needsReview": "Further review required"
+      },
+      "gaps": {
+        "domainMismatch": "Different professional domain — verification required",
+        "roleMismatch": "Previous role doesn't match requirement",
+        "skillsGap": "Gap in required skills",
+        "experienceGap": "Missing {{gap}} years of experience (required {{required}}, has {{has}})",
+        "salaryOutOfRange": "Salary expectations outside offered range",
+        "locationMismatch": "Location doesn't match — check willingness to commute"
+      },
+      "risks": {
+        "overqualified": "Candidate is highly experienced — check role expectations",
+        "salaryGap": "Large salary gap — high risk of drop-off",
+        "lowScore": "Low match score — consider other candidates"
+      },
+      "recommendations": {
+        "sendSkillsQuestionnaire": "Send a pre-screen questionnaire for technical skills",
+        "checkSalaryFlexibility": "Check salary flexibility with candidate before advancing",
+        "clarifyRemoteHybrid": "Clarify remote/hybrid work terms",
+        "advanceToPhoneInterview": "Recommended candidate — advance to phone interview",
+        "shortScreeningCall": "Worth a brief screening call before advancing"
+      },
+      "screeningQuestions": {
+        "experienceWithSkills": "Tell us about your experience with {{skills}}",
+        "skillsJoiner": " and ",
+        "largestProject": "What is the largest project you've managed in this field?",
+        "salaryExpectations": "What are your salary expectations for this role?",
+        "motivation": "What motivates you to change roles right now?"
+      },
+      "nextActions": {
+        "phoneInterview": "Move to phone interview",
+        "shortScreening": "Screen with a brief call",
+        "compareOthers": "Consider against other candidates",
+        "notRecommended": "Not recommended for advancement"
+      }
     }
   },
   "interviews": {

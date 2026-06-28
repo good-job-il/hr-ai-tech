@@ -1,35 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, ArrowRight, MessageSquare, Sparkles, Clock } from 'lucide-react';
+import { UserPlus, ArrowRight, Sparkles, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 
-const STAGE_LABELS = {
-  new: 'חדש', screening: 'סינון ראשוני', phone_interview: 'ראיון טלפוני',
-  professional_interview: 'ראיון מקצועי', client_stage: 'שלב לקוח',
-  hired: 'התקבל', rejected: 'נדחה',
-};
-
-function timeAgo(dateStr) {
+function timeAgo(dateStr, t, locale) {
   if (!dateStr) return '';
-  // Parse the date — DB timestamps are UTC ISO strings
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return '';
   const diffMs = Date.now() - date.getTime();
   const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return 'עכשיו';
-  if (diffMin < 60) return `לפני ${diffMin} דקות`;
+  if (diffMin < 1) return t('pipeline.time.now');
+  if (diffMin < 60) return t('pipeline.time.minutesAgo', { count: diffMin });
   const diffH = Math.floor(diffMin / 60);
-  if (diffH < 24) return `לפני ${diffH} שעות`;
+  if (diffH < 24) return t('pipeline.time.hoursAgo', { count: diffH });
   const diffD = Math.floor(diffH / 24);
-  if (diffD < 7) return `לפני ${diffD} ימים`;
-  // Format as local Israel date for older events
-  return date.toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem', day: 'numeric', month: 'short', year: 'numeric' });
+  if (diffD < 7) return t('pipeline.time.daysAgo', { count: diffD });
+  return date.toLocaleDateString(locale, { timeZone: 'Asia/Jerusalem', day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function formatTime(dateStr) {
+function formatTime(dateStr, locale) {
   if (!dateStr) return '';
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return '';
-  return date.toLocaleTimeString('he-IL', {
+  return date.toLocaleTimeString(locale, {
     timeZone: 'Asia/Jerusalem',
     hour: '2-digit',
     minute: '2-digit',
@@ -38,12 +31,14 @@ function formatTime(dateStr) {
 }
 
 export default function ActivityTimeline({ application }) {
+  const { t, i18n } = useTranslation();
   const [dbEvents, setDbEvents] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch timeline from DB. Uses application.id as the stable key.
-  // Polls every 4s while the drawer is open so new status_changed events
-  // appear without requiring a manual reload — and always reads server timestamps.
+  const locale = i18n.language?.startsWith('en') ? 'en-US' : 'he-IL';
+
+  const stageLabel = (id) => t(`pipeline.stages.${id}`, { defaultValue: id || '?' });
+
   useEffect(() => {
     if (!application?.id) return;
     let cancelled = false;
@@ -55,7 +50,6 @@ export default function ActivityTimeline({ application }) {
         .catch(() => {});
     };
 
-    // Initial load with a short delay to let the DB commit any in-flight write
     setLoading(true);
     const initialTimer = setTimeout(() => {
       if (cancelled) return;
@@ -65,7 +59,6 @@ export default function ActivityTimeline({ application }) {
         .catch(() => { if (!cancelled) setLoading(false); });
     }, 600);
 
-    // Poll every 4s for new events (status changes written by moveApplication)
     const pollInterval = setInterval(fetchEvents, 4000);
 
     return () => {
@@ -73,15 +66,14 @@ export default function ActivityTimeline({ application }) {
       clearTimeout(initialTimer);
       clearInterval(pollInterval);
     };
-  }, [application?.id]); // only re-mount when switching to a different application
+  }, [application?.id]);
 
-  // Build base events from the application object itself
   const baseEvents = [
     {
       icon: UserPlus,
       color: '#8B5CF6',
-      title: 'מועמדות נוצרה',
-      desc: `נוצרה מועמדות עבור ${application?.job_title || ''}`,
+      title: t('pipeline.activityTimeline.applicationCreated'),
+      desc: t('pipeline.activityTimeline.applicationCreatedDesc', { jobTitle: application?.job_title || '' }),
       time: application?.created_date,
     },
   ];
@@ -90,24 +82,25 @@ export default function ActivityTimeline({ application }) {
     baseEvents.push({
       icon: Sparkles,
       color: '#10B981',
-      title: 'ניתוח AI הושלם',
-      desc: `ציון התאמה: ${application.match_score}%`,
+      title: t('pipeline.activityTimeline.aiAnalysisComplete'),
+      desc: t('pipeline.activityTimeline.matchScore', { score: application.match_score }),
       time: application.created_date,
     });
   }
 
-  // Map DB events to display format
   const dbMapped = dbEvents.map(ev => ({
     icon: ArrowRight,
     color: '#2F80FF',
     title: ev.event_type === 'status_changed'
-      ? `שינוי שלב: ${STAGE_LABELS[ev.old_value] || ev.old_value || '?'} → ${STAGE_LABELS[ev.new_value] || ev.new_value || '?'}`
+      ? t('pipeline.activityTimeline.stageChange', {
+          from: stageLabel(ev.old_value),
+          to: stageLabel(ev.new_value),
+        })
       : (ev.title || ev.event_type),
     desc: ev.description || ev.performed_by || '',
     time: ev.created_date,
   }));
 
-  // Merge: DB events first (newest), then base events
   const allEvents = [...dbMapped, ...baseEvents].sort(
     (a, b) => new Date(b.time || 0) - new Date(a.time || 0)
   );
@@ -125,7 +118,7 @@ export default function ActivityTimeline({ application }) {
       {allEvents.length === 0 && (
         <div className="text-center py-8 text-[#94A3B8]">
           <Clock className="w-8 h-8 mx-auto mb-2" />
-          <p className="text-sm font-semibold">אין פעילות עדיין</p>
+          <p className="text-sm font-semibold">{t('pipeline.activityTimeline.noActivity')}</p>
         </div>
       )}
       {allEvents.map((ev, i) => {
@@ -145,8 +138,8 @@ export default function ActivityTimeline({ application }) {
               <div className="font-bold text-sm text-[#0F172A]">{ev.title}</div>
               {ev.desc && <div className="text-xs text-[#64748B] mt-0.5">{ev.desc}</div>}
               <div className="text-xs text-[#94A3B8] mt-1 flex items-center gap-1.5">
-                <span>{timeAgo(ev.time)}</span>
-                {ev.time && <span className="opacity-60">• {formatTime(ev.time)}</span>}
+                <span>{timeAgo(ev.time, t, locale)}</span>
+                {ev.time && <span className="opacity-60">• {formatTime(ev.time, locale)}</span>}
               </div>
             </div>
           </div>

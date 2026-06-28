@@ -157,7 +157,7 @@ export default function SidebarLayout({ navItems = [], roleTitle = '', sidebarTh
         </div>
       </aside>
 
-      <div className={`flex-1 ${isRtl ? 'md:mr-64' : 'md:ml-64'} flex flex-col min-h-screen`}>
+      <div className={`flex-1 min-w-0 ${isRtl ? 'md:mr-64' : 'md:ml-64'} flex flex-col min-h-screen`}>
         <DashboardHeader
           user={user}
           roleTitle={roleTitle}
@@ -165,8 +165,8 @@ export default function SidebarLayout({ navItems = [], roleTitle = '', sidebarTh
           onLogout={handleLogout}
           showMenuButton={true}
         />
-        <main className="flex-1 overflow-auto">
-          <div className="p-6">
+        <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto">
+          <div className="p-6 min-w-0">
             <Outlet />
           </div>
         </main>

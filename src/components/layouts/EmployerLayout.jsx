@@ -97,7 +97,7 @@ export default function EmployerLayout() {
         </div>
       </aside>
 
-      <div className={`flex-1 flex flex-col min-h-screen ${isEn ? 'md:ml-64' : 'md:mr-64'}`}>
+      <div className={`flex-1 min-w-0 flex flex-col min-h-screen ${isEn ? 'md:ml-64' : 'md:mr-64'}`}>
         <header className="h-16 bg-white border-b border-[#E4ECFF] flex items-center justify-between px-6">
           <button onClick={() => setMobileOpen(true)} className="md:hidden">
             <Menu className="w-5 h-5" />
@@ -107,7 +107,7 @@ export default function EmployerLayout() {
             <span className="text-[#7C3AED]">{user?.full_name}</span>
           </div>
         </header>
-        <main className="flex-1 p-6 max-w-[1600px] w-full mx-auto">
+        <main className="flex-1 min-w-0 overflow-x-hidden p-6 max-w-[1600px] w-full mx-auto">
           <Outlet />
         </main>
       </div>

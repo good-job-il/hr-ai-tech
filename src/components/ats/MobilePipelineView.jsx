@@ -4,9 +4,11 @@
  */
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowRightLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import AIMatchBadge from '@/components/ai/AIMatchBadge';
 
-export default function MobilePipelineView({ stages, applications, onCandidateClick, onMove }) {
+export default function MobilePipelineView({ stages, applications, onCandidateClick, onMove, isRTL = true }) {
+  const { t } = useTranslation();
   const [movingApp, setMovingApp] = useState(null);
   const [movingFromStage, setMovingFromStage] = useState(null);
   const containerRef = useRef(null);
@@ -23,52 +25,39 @@ export default function MobilePipelineView({ stages, applications, onCandidateCl
     setMovingFromStage(null);
   };
 
-  // Scroll to first stage on load - RTL compatible
   useEffect(() => {
     if (!containerRef.current || scrollInitialized.current || applications.length === 0) return;
-    
+
     const timer = setTimeout(() => {
-      // RTL: scroll to max (rightmost = first stage)
-      containerRef.current.scrollLeft = 99999;
+      if (!containerRef.current) return;
+      containerRef.current.scrollLeft = isRTL ? 99999 : 0;
       scrollInitialized.current = true;
     }, 100);
-    
+
     return () => clearTimeout(timer);
-  }, [applications.length]);
+  }, [applications.length, isRTL]);
 
   return (
-    <div dir="rtl">
-      {/* TRUE horizontal scroll - fixed width columns */}
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="w-full min-w-0 overflow-hidden">
       <div
         ref={containerRef}
-        className="flex gap-3 overflow-x-auto pb-4"
+        className="mobile-pipeline-scroll w-full min-w-0 overflow-x-auto overflow-y-hidden pb-4"
         style={{
-          // CRITICAL: True horizontal scroll
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          // Snap for better UX
           scrollSnapType: 'x mandatory',
           scrollBehavior: 'smooth',
-          // iOS smooth scrolling
           WebkitOverflowScrolling: 'touch',
-          // Hide scrollbar
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
-          // RTL direction
-          direction: 'rtl',
-          // Prevent wrapping
-          flexWrap: 'nowrap',
-          // Min width
-          minWidth: 'max-content',
+          direction: isRTL ? 'rtl' : 'ltr',
         }}
       >
-        {/* Hide scrollbar for Chrome/Safari */}
         <style>{`
           .mobile-pipeline-scroll::-webkit-scrollbar {
             display: none;
           }
         `}</style>
-        
+
+        <div className="flex flex-nowrap gap-3 items-start w-max min-w-full">
         {stages.map(stage => {
           const stageApps = applications.filter(a => a.status === stage.id);
           return (
@@ -78,19 +67,21 @@ export default function MobilePipelineView({ stages, applications, onCandidateCl
               applications={stageApps}
               onCandidateClick={onCandidateClick}
               onMoveRequest={handleMoveRequest}
+              emptyLabel={t('pipeline.mobile.noCandidates')}
+              changeStageLabel={t('pipeline.mobile.changeStage')}
             />
           );
         })}
+        </div>
       </div>
 
-      {/* Move stage bottom sheet */}
       {movingApp && (
         <>
           <div className="fixed inset-0 bg-black/40 z-40" onClick={() => setMovingApp(null)} />
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl p-6 shadow-2xl" dir="rtl">
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl p-6 shadow-2xl" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="w-10 h-1 rounded-full bg-[#E4ECFF] mx-auto mb-4" />
             <p className="text-base font-black text-[#0F172A] mb-1">{movingApp.candidate_name}</p>
-            <p className="text-sm text-[#64748B] mb-4">העבר לשלב:</p>
+            <p className="text-sm text-[#64748B] mb-4">{t('pipeline.mobile.moveToStage')}</p>
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {stages.filter(s => s.id !== movingFromStage).map(s => (
                 <button
@@ -107,7 +98,7 @@ export default function MobilePipelineView({ stages, applications, onCandidateCl
               onClick={() => setMovingApp(null)}
               className="w-full h-11 mt-3 rounded-xl border border-[#E4ECFF] text-[#64748B] font-bold text-sm"
             >
-              ביטול
+              {t('pipeline.mobile.cancel')}
             </button>
           </div>
         </>
@@ -116,29 +107,22 @@ export default function MobilePipelineView({ stages, applications, onCandidateCl
   );
 }
 
-function CompactStageColumn({ stage, applications, onCandidateClick, onMoveRequest }) {
+function CompactStageColumn({ stage, applications, onCandidateClick, onMoveRequest, emptyLabel, changeStageLabel }) {
   return (
     <div
       className="flex-shrink-0 flex flex-col"
       style={{
-        // FIXED width for mobile - 280px perfect for cards
         width: '280px',
         minWidth: '280px',
         maxWidth: '280px',
-        // Prevent compression
         flex: '0 0 auto',
-        // Snap alignment
         scrollSnapAlign: 'start',
-        // RTL spacing
-        marginRight: 0,
-        marginLeft: '12px',
       }}
     >
-      {/* Column header - STICKY */}
       <div
         className="sticky top-0 z-10 flex items-center justify-between px-3 py-2.5 rounded-t-2xl mb-1"
-        style={{ 
-          background: `${stage.color}14`, 
+        style={{
+          background: `${stage.color}14`,
           borderTop: `3px solid ${stage.color}`,
           position: 'sticky',
         }}
@@ -152,14 +136,13 @@ function CompactStageColumn({ stage, applications, onCandidateClick, onMoveReque
         </div>
       </div>
 
-      {/* Cards */}
       <div
         className="flex-1 rounded-b-2xl bg-white/60 border border-[#E4ECFF] border-t-0 p-2 space-y-2"
         style={{ minHeight: 120 }}
       >
         {applications.length === 0 && (
           <div className="flex items-center justify-center py-8">
-            <p className="text-xs text-[#CBD5E1] font-semibold">אין מועמדים</p>
+            <p className="text-xs text-[#CBD5E1] font-semibold">{emptyLabel}</p>
           </div>
         )}
         {applications.map(app => (
@@ -170,6 +153,7 @@ function CompactStageColumn({ stage, applications, onCandidateClick, onMoveReque
             stageId={stage.id}
             onClick={() => onCandidateClick(app)}
             onMoveRequest={onMoveRequest}
+            changeStageLabel={changeStageLabel}
           />
         ))}
       </div>
@@ -177,7 +161,7 @@ function CompactStageColumn({ stage, applications, onCandidateClick, onMoveReque
   );
 }
 
-function CompactCard({ app, stageColor, stageId, onClick, onMoveRequest }) {
+function CompactCard({ app, stageColor, stageId, onClick, onMoveRequest, changeStageLabel }) {
   return (
     <div className="bg-white rounded-xl border border-[#E4ECFF] p-3 shadow-sm">
       <div className="flex items-start justify-between mb-2" onClick={onClick}>
@@ -201,7 +185,7 @@ function CompactCard({ app, stageColor, stageId, onClick, onMoveRequest }) {
         className="w-full h-7 rounded-lg border border-[#E4ECFF] bg-[#F7FBFF] text-[#7C3AED] font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-[#F3EFFF] transition-all"
       >
         <ArrowRightLeft className="w-3 h-3" />
-        שנה שלב
+        {changeStageLabel}
       </button>
     </div>
   );

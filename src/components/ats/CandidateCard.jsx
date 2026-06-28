@@ -1,25 +1,29 @@
 import React, { useMemo } from 'react';
 import { Clock, MapPin, User, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import AIMatchBadge from '@/components/ai/AIMatchBadge';
 import { scoreMatch } from '@/lib/aiMatching';
 
-const SOURCE_LABELS = {
-  linkedin: 'LinkedIn', app: 'אפליקציה', jobsite: 'אתר דרושים',
-  import: 'יבוא', facebook: 'פייסבוק', other: 'אחר',
-};
+const SOURCE_KEYS = ['linkedin', 'app', 'jobsite', 'import', 'facebook', 'other'];
 
-function timeInStage(enteredAt) {
+function timeInStage(enteredAt, t) {
   if (!enteredAt) return null;
   const hours = Math.floor((Date.now() - new Date(enteredAt)) / 3600000);
-  if (hours < 1) return 'פחות משעה';
-  if (hours < 24) return `${hours}ש'`;
-  return `${Math.floor(hours / 24)}י'`;
+  if (hours < 1) return t('pipeline.time.lessThanHour');
+  if (hours < 24) return t('pipeline.candidateCard.hoursInStage', { count: hours });
+  return t('pipeline.candidateCard.daysInStage', { count: Math.floor(hours / 24) });
 }
 
 export default function CandidateCard({ application, stageColor, slaHours, onClick, isDragging }) {
-  const timeLabel = timeInStage(application.stage_entered_at);
+  const { t } = useTranslation();
+  const timeLabel = timeInStage(application.stage_entered_at, t);
 
-  // Compute AI match on the fly from application fields
+  const sourceLabel = (source) => {
+    if (!source) return source;
+    const key = `pipeline.sources.${source}`;
+    return SOURCE_KEYS.includes(source) ? t(key) : source;
+  };
+
   const aiData = useMemo(() => {
     const candidate = {
       role_name: application.job_title,
@@ -36,7 +40,6 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
       location: application.location,
     };
     const { score, explanation } = scoreMatch(candidate, job);
-    // Prefer stored match_score if available (from AI backend), fallback to rule-based
     const finalScore = application.match_score != null ? application.match_score : score;
     return { score: finalScore, missingRequired: !explanation.requiredMet, nextAction: explanation.nextAction };
   }, [application.id]);
@@ -54,7 +57,6 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
           : '0 2px 8px rgba(0,0,0,0.04)',
       }}
     >
-      {/* Top row */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <div
@@ -73,11 +75,9 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
           </div>
         </div>
 
-        {/* AI Match Badge */}
         <AIMatchBadge score={aiData.score} missingRequired={aiData.missingRequired} />
       </div>
 
-      {/* Meta row */}
       <div className="flex flex-wrap gap-2 mb-2">
         {application.location && (
           <span className="flex items-center gap-1 text-xs text-[#94A3B8] font-semibold">
@@ -87,12 +87,11 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
         )}
         {application.source && (
           <span className="text-xs bg-[#F3EFFF] text-[#7C3AED] px-2 py-0.5 rounded-full font-bold">
-            {SOURCE_LABELS[application.source] || application.source}
+            {sourceLabel(application.source)}
           </span>
         )}
       </div>
 
-      {/* Tags */}
       {application.tags && application.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2">
           {application.tags.slice(0, 3).map(tag => (
@@ -103,19 +102,17 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
         </div>
       )}
 
-      {/* Missing required warning */}
       {aiData.missingRequired && (
         <div className="flex items-center gap-1 text-xs text-amber-600 font-bold mb-1">
           <AlertTriangle className="w-3 h-3" />
-          חסרות דרישות חובה
+          {t('pipeline.candidateCard.missingRequired')}
         </div>
       )}
 
-      {/* Bottom row */}
       <div className="flex items-center justify-between pt-2 border-t border-[#F1F5F9]">
         <div className="flex items-center gap-1 text-xs text-[#94A3B8] font-semibold">
           <User className="w-3 h-3" />
-          {application.recruiter || 'לא הוקצה'}
+          {application.recruiter || t('pipeline.candidateCard.unassigned')}
         </div>
         {timeLabel && (
           <div
@@ -130,7 +127,6 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
         )}
       </div>
 
-      {/* Recommended next action */}
       {aiData.nextAction && (
         <div className="mt-2 text-xs text-[#7C3AED] font-bold opacity-80 truncate">
           ← {aiData.nextAction}

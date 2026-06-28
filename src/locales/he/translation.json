@@ -697,6 +697,29 @@
     "slaOverdue": "SLA חרג",
     "dragToMove": "גרור כדי לעבור בין שלבים",
     "emptyStage": "אין מועמדים בשלב זה",
+    "sources": {
+      "linkedin": "LinkedIn",
+      "app": "אפליקציה",
+      "jobsite": "אתר דרושים",
+      "import": "יבוא",
+      "facebook": "פייסבוק",
+      "other": "אחר"
+    },
+    "time": {
+      "now": "עכשיו",
+      "minutesAgo": "לפני {{count}} דקות",
+      "hoursAgo": "לפני {{count}} שעות",
+      "daysAgo": "לפני {{count}} ימים",
+      "lessThanHour": "פחות משעה"
+    },
+    "activityTimeline": {
+      "applicationCreated": "מועמדות נוצרה",
+      "applicationCreatedDesc": "נוצרה מועמדות עבור {{jobTitle}}",
+      "aiAnalysisComplete": "ניתוח AI הושלם",
+      "matchScore": "ציון התאמה: {{score}}%",
+      "stageChange": "שינוי שלב: {{from}} → {{to}}",
+      "noActivity": "אין פעילות עדיין"
+    },
     "candidateCard": {
       "matchScore": "התאמה",
       "moveStage": "העבר לשלב",
@@ -704,7 +727,101 @@
       "addNote": "הוסף הערה",
       "schedule": "קבע ראיון",
       "reject": "דחה",
-      "source": "מקור"
+      "source": "מקור",
+      "missingRequired": "חסרות דרישות חובה",
+      "unassigned": "לא הוקצה",
+      "hoursInStage": "{{count}}ש'",
+      "daysInStage": "{{count}}י'"
+    },
+    "drawer": {
+      "stage": "שלב:",
+      "tabs": {
+        "details": "פרטים",
+        "ai": "AI ניתוח",
+        "timeline": "ציר זמן",
+        "notes": "הערות"
+      },
+      "contactDetails": "פרטי קשר",
+      "email": "אימייל",
+      "phone": "טלפון",
+      "location": "מיקום",
+      "experience": "ניסיון",
+      "experienceYears": "{{count}} שנים",
+      "recruiter": "מגייס",
+      "skills": "כישורים",
+      "missingRequiredWarning": "חסרות דרישות חובה — בדוק לפני קידום",
+      "noMatchData": "אין נתוני התאמה זמינים",
+      "addNotePlaceholder": "הוסף הערה...",
+      "save": "שמור",
+      "sendMessage": "שלח הודעה",
+      "scheduleInterview": "קבע ראיון"
+    },
+    "mobile": {
+      "moveToStage": "העבר לשלב:",
+      "cancel": "ביטול",
+      "noCandidates": "אין מועמדים",
+      "changeStage": "שנה שלב"
+    },
+    "notifications": {
+      "title": "התראות Pipeline",
+      "newCount": "{{count}} חדש",
+      "markAllRead": "סמן הכל כנקרא",
+      "empty": "אין התראות עדיין",
+      "defaultCandidate": "מועמד",
+      "stageChange": {
+        "hiredTitle": "🎉 {{name}} התקבל לתפקיד!",
+        "rejectedTitle": "{{name}} נדחה מהתהליך",
+        "movedTitle": "{{name}} עבר לשלב: {{stage}}",
+        "content": "{{name}} הועבר מ\"{{from}}\" ל\"{{to}}\" על ידי {{changedBy}}."
+      },
+      "sla": {
+        "title": "⏰ {{name}} תקוע {{hours}} שעות בשלב \"{{stage}}\"",
+        "content": "המועמד {{name}} נמצא בשלב \"{{stage}}\" כבר {{hours}} שעות ועלול לפספס את חלון ההזדמנויות."
+      }
+    },
+    "stageColumn": {
+      "dragHere": "גרור מועמד לכאן",
+      "slaBreached": "SLA חרג"
+    },
+    "filters": {
+      "searchByRole": "חיפוש לפי תפקיד...",
+      "allSources": "כל המקורות",
+      "aiMin": "AI מינ׳:",
+      "advancedFilter": "סינון מתקדם",
+      "clearAll": "נקה הכל",
+      "recruiterName": "שם מגייס...",
+      "fromDate": "מתאריך:",
+      "toDate": "עד תאריך:",
+      "experienceYears": "ניסיון (שנים):",
+      "from": "מ",
+      "to": "עד"
+    },
+    "data": {
+      "defaultRecruiter": "מגייס",
+      "mock": {
+        "candidate1Name": "דניאל כהן",
+        "candidate2Name": "מיכל ברק",
+        "candidate3Name": "אבי שפירא",
+        "candidate4Name": "נועה אלון",
+        "candidate5Name": "רון כץ",
+        "recruiter1": "יוסי לוי",
+        "recruiter2": "שרה מזרחי",
+        "locationTelAviv": "תל אביב",
+        "locationHerzliya": "הרצליה",
+        "locationRamatGan": "רמת גן",
+        "locationHaifa": "חיפה",
+        "noteStrongCandidate": "מועמדת חזקה מאוד",
+        "noteGreatInterview": "ראיון מצוין"
+      }
+    },
+    "page": {
+      "title": "תהליך גיוס",
+      "candidatesCount": "{{count}} מועמדים",
+      "stagesCount": "{{count}} שלבים",
+      "filter": "סינון",
+      "refresh": "רענון",
+      "loading": "טוען...",
+      "demoDataBanner": "Demo Data — אין Applications אמיתיים עדיין. ייבא מועמדים כדי לראות נתונים אמיתיים."
     }
   },
   "crm": {
@@ -863,6 +980,57 @@
       "recommendations": "המלצות",
       "screeningQuestions": "שאלות מומלצות לסינון",
       "nextAction": "פעולה מומלצת הבאה"
+    },
+    "engine": {
+      "labels": {
+        "excellent": "התאמה מצוינת",
+        "good": "התאמה טובה",
+        "partial": "התאמה חלקית",
+        "low": "התאמה נמוכה"
+      },
+      "strengths": {
+        "domainMatch": "תחום מקצועי תואם ({{domain}})",
+        "sameDomain": "תחום זהה",
+        "relevantRole": "תפקיד קודם רלוונטי: {{role}}",
+        "matchingSkills": "כישורים תואמים: {{skills}}",
+        "sufficientExperience": "ניסיון מספק: {{years}} שנים",
+        "locationMatch": "מיקום תואם",
+        "salaryInRange": "ציפיות שכר בטווח",
+        "needsReview": "נדרשת בדיקה נוספת"
+      },
+      "gaps": {
+        "domainMismatch": "תחום מקצועי שונה — נדרש בדיקה",
+        "roleMismatch": "תפקיד קודם לא זהה לדרישה",
+        "skillsGap": "פער בכישורים נדרשים",
+        "experienceGap": "חסר {{gap}} שנות ניסיון (נדרש {{required}}, יש {{has}})",
+        "salaryOutOfRange": "ציפיות שכר מחוץ לטווח המוצע",
+        "locationMismatch": "מיקום לא תואם — בדוק נכונות לנסוע"
+      },
+      "risks": {
+        "overqualified": "המועמד בעל ניסיון רב מאוד — בדוק ציפיות תפקיד",
+        "salaryGap": "פערי שכר גבוהים — סיכוי גבוה לנשור",
+        "lowScore": "ציון התאמה נמוך — מומלץ לשקול מועמדים אחרים"
+      },
+      "recommendations": {
+        "sendSkillsQuestionnaire": "שלח שאלון מקדים לבדיקת כישורים טכניים",
+        "checkSalaryFlexibility": "בדוק גמישות שכר עם המועמד לפני קידום",
+        "clarifyRemoteHybrid": "הבהר תנאי עבודה מרחוק/היברידי",
+        "advanceToPhoneInterview": "מועמד מומלץ — קדם לראיון טלפוני",
+        "shortScreeningCall": "כדאי לסנן בשיחה קצרה לפני קידום"
+      },
+      "screeningQuestions": {
+        "experienceWithSkills": "ספר על ניסיונך עם {{skills}}",
+        "skillsJoiner": " ו-",
+        "largestProject": "מה הפרויקט הגדול ביותר שניהלת בתחום?",
+        "salaryExpectations": "מהן ציפיות השכר שלך לתפקיד זה?",
+        "motivation": "מה מניע אותך לעבור תפקיד כרגע?"
+      },
+      "nextActions": {
+        "phoneInterview": "העבר לראיון טלפוני",
+        "shortScreening": "סנן בשיחה קצרה",
+        "compareOthers": "שקול מול מועמדים אחרים",
+        "notRecommended": "לא מומלץ לקידום"
+      }
     }
   },
   "interviews": {

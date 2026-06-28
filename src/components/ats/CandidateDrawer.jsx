@@ -1,29 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import {
   X, User, Phone, Mail, MapPin, Briefcase, Sparkles, Clock,
-  MessageSquare, Calendar, Send, CheckCircle2, AlertTriangle
+  MessageSquare, Calendar, Send, AlertTriangle
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ActivityTimeline from './ActivityTimeline';
 import MatchExplanationCard from '@/components/ai/MatchExplanationCard';
 import { scoreMatch } from '@/lib/aiMatching';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-const STAGE_OPTIONS = [
-  { value: 'new', label: 'חדש' },
-  { value: 'screening', label: 'סינון ראשוני' },
-  { value: 'phone_interview', label: 'ראיון טלפוני' },
-  { value: 'professional_interview', label: 'ראיון מקצועי' },
-  { value: 'client_stage', label: 'שלב לקוח' },
-  { value: 'hired', label: 'התקבל' },
-  { value: 'rejected', label: 'נדחה' },
-];
+const STAGE_VALUES = ['new', 'screening', 'phone_interview', 'professional_interview', 'client_stage', 'hired', 'rejected'];
 
-const TABS = [
-  { id: 'details', label: 'פרטים', icon: User },
-  { id: 'ai', label: 'AI ניתוח', icon: Sparkles },
-  { id: 'timeline', label: 'ציר זמן', icon: Clock },
-  { id: 'notes', label: 'הערות', icon: MessageSquare },
-];
+const TAB_IDS = ['details', 'ai', 'timeline', 'notes'];
 
 function matchColor(score) {
   if (score >= 90) return 'text-green-600 bg-green-50';
@@ -32,15 +20,23 @@ function matchColor(score) {
 }
 
 export default function CandidateDrawer({ application, open, onClose, onStageChange, job }) {
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('details');
   const [note, setNote] = useState('');
   const [notes, setNotes] = useState([]);
   const isMobile = useIsMobile();
 
-  // Compute AI match explanation when both application and job are available
+  const isRTL = !i18n.language?.startsWith('en');
+  const locale = isRTL ? 'he-IL' : 'en-US';
+
+  const tabs = TAB_IDS.map(id => ({
+    id,
+    label: t(`pipeline.drawer.tabs.${id}`),
+    icon: { details: User, ai: Sparkles, timeline: Clock, notes: MessageSquare }[id],
+  }));
+
   const aiMatch = useMemo(() => {
     if (!application) return null;
-    // Build a candidate-like object from application fields
     const candidate = {
       id: application.candidate_id || application.id,
       full_name: application.candidate_name,
@@ -68,28 +64,32 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
 
   const addNote = () => {
     if (!note.trim()) return;
-    setNotes(prev => [...prev, { text: note, time: new Date().toLocaleTimeString('he-IL') }]);
+    setNotes(prev => [...prev, { text: note, time: new Date().toLocaleTimeString(locale) }]);
     setNote('');
   };
 
   return (
     <>
-      {/* Overlay */}
       <div
         className="fixed inset-0 bg-black/40 z-40 transition-opacity"
         onClick={onClose}
       />
 
-      {/* Drawer */}
       <div
-        dir="rtl"
+        dir={isRTL ? 'rtl' : 'ltr'}
         className="fixed bg-white z-50 flex flex-col shadow-2xl"
         style={isMobile
-          ? { inset: 0 }  // full screen on mobile
-          : { top: 0, right: 0, height: '100%', width: '520px', maxWidth: '95vw', borderLeft: '1px solid #E4ECFF' }
+          ? { inset: 0 }
+          : {
+              top: 0,
+              ...(isRTL ? { right: 0 } : { left: 0 }),
+              height: '100%',
+              width: '520px',
+              maxWidth: '95vw',
+              ...(isRTL ? { borderLeft: '1px solid #E4ECFF' } : { borderRight: '1px solid #E4ECFF' }),
+            }
         }
       >
-        {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-[#E4ECFF]">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white text-2xl font-black">
@@ -105,16 +105,17 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
           </button>
         </div>
 
-        {/* Stage Selector */}
         <div className="px-6 py-3 bg-[#F7FBFF] border-b border-[#E4ECFF]">
           <div className="flex items-center gap-3">
-            <span className="text-sm font-bold text-[#64748B]">שלב:</span>
+            <span className="text-sm font-bold text-[#64748B]">{t('pipeline.drawer.stage')}</span>
             <select
               value={application.status}
               onChange={e => onStageChange(application.id, e.target.value)}
               className="flex-1 h-9 px-3 rounded-xl border border-[#E4ECFF] bg-white text-sm font-bold text-[#0F172A] outline-none"
             >
-              {STAGE_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+              {STAGE_VALUES.map(value => (
+                <option key={value} value={value}>{t(`pipeline.stages.${value}`)}</option>
+              ))}
             </select>
             {application.match_score != null && (
               <div className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-black ${matchColor(application.match_score)}`}>
@@ -125,9 +126,8 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
           </div>
         </div>
 
-        {/* Tabs — scrollable on mobile */}
         <div className="flex border-b border-[#E4ECFF] px-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-          {TABS.map(tab => {
+          {tabs.map(tab => {
             const Icon = tab.icon;
             return (
               <button
@@ -146,20 +146,23 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
           })}
         </div>
 
-        {/* Tab Content */}
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'details' && (
             <div className="space-y-5">
-              <Section title="פרטי קשר">
-                <InfoRow icon={Mail} label="אימייל" value={application.candidate_email} />
-                <InfoRow icon={Phone} label="טלפון" value={application.candidate_phone} />
-                <InfoRow icon={MapPin} label="מיקום" value={application.location} />
-                <InfoRow icon={Briefcase} label="ניסיון" value={application.experience_years ? `${application.experience_years} שנים` : null} />
-                <InfoRow icon={User} label="מגייס" value={application.recruiter} />
+              <Section title={t('pipeline.drawer.contactDetails')}>
+                <InfoRow icon={Mail} label={t('pipeline.drawer.email')} value={application.candidate_email} />
+                <InfoRow icon={Phone} label={t('pipeline.drawer.phone')} value={application.candidate_phone} />
+                <InfoRow icon={MapPin} label={t('pipeline.drawer.location')} value={application.location} />
+                <InfoRow
+                  icon={Briefcase}
+                  label={t('pipeline.drawer.experience')}
+                  value={application.experience_years ? t('pipeline.drawer.experienceYears', { count: application.experience_years }) : null}
+                />
+                <InfoRow icon={User} label={t('pipeline.drawer.recruiter')} value={application.recruiter} />
               </Section>
 
               {application.skills && application.skills.length > 0 && (
-                <Section title="כישורים">
+                <Section title={t('pipeline.drawer.skills')}>
                   <div className="flex flex-wrap gap-2">
                     {application.skills.map(skill => (
                       <span key={skill} className="px-3 py-1.5 rounded-full bg-[#F3EFFF] text-[#7C3AED] text-sm font-bold border border-[#E2D8FF]">
@@ -174,11 +177,10 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
 
           {activeTab === 'ai' && (
             <div className="space-y-4">
-              {/* Missing required warning */}
               {aiMatch && !aiMatch.explanation.requiredMet && (
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
                   <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm font-bold text-amber-700">חסרות דרישות חובה — בדוק לפני קידום</span>
+                  <span className="text-sm font-bold text-amber-700">{t('pipeline.drawer.missingRequiredWarning')}</span>
                 </div>
               )}
 
@@ -190,7 +192,7 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
                   collapsed={false}
                 />
               ) : (
-                <p className="text-sm text-[#94A3B8] text-center py-8">אין נתוני התאמה זמינים</p>
+                <p className="text-sm text-[#94A3B8] text-center py-8">{t('pipeline.drawer.noMatchData')}</p>
               )}
             </div>
           )}
@@ -205,7 +207,7 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
                 <textarea
                   value={note}
                   onChange={e => setNote(e.target.value)}
-                  placeholder="הוסף הערה..."
+                  placeholder={t('pipeline.drawer.addNotePlaceholder')}
                   rows={3}
                   className="flex-1 p-3 rounded-xl border border-[#E4ECFF] text-sm font-semibold text-[#0F172A] outline-none resize-none focus:border-[#C4B5FD]"
                 />
@@ -213,7 +215,7 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
                   onClick={addNote}
                   className="self-end h-10 px-4 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm"
                 >
-                  שמור
+                  {t('pipeline.drawer.save')}
                 </button>
               </div>
               {application.notes && (
@@ -231,15 +233,14 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
           )}
         </div>
 
-        {/* Footer Actions */}
         <div className="p-4 border-t border-[#E4ECFF] flex gap-3">
           <button className="flex-1 h-11 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center justify-center gap-2">
             <Send className="w-4 h-4" />
-            שלח הודעה
+            {t('pipeline.drawer.sendMessage')}
           </button>
           <button className="flex-1 h-11 rounded-xl border border-[#E4ECFF] bg-white text-[#64748B] font-bold text-sm flex items-center justify-center gap-2 hover:border-[#C4B5FD]">
             <Calendar className="w-4 h-4" />
-            קבע ראיון
+            {t('pipeline.drawer.scheduleInterview')}
           </button>
         </div>
       </div>

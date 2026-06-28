@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Search, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const SOURCES = ['linkedin', 'app', 'jobsite', 'import', 'facebook'];
-const SOURCE_LABELS = {
-  linkedin: 'LinkedIn', app: 'אפליקציה', jobsite: 'אתר דרושים',
-  import: 'יבוא', facebook: 'פייסבוק',
-};
 
 const DEFAULT_FILTERS = { role: '', recruiter: '', aiMin: 0, source: '', dateFrom: '', dateTo: '', expMin: '', expMax: '' };
 
 export default function PipelineFilters({ filters, onChange }) {
+  const { t, i18n } = useTranslation();
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const isRTL = !i18n.language?.startsWith('en');
 
   const update = (key, value) => onChange({ ...filters, [key]: value });
   const reset = () => onChange(DEFAULT_FILTERS);
@@ -20,34 +20,30 @@ export default function PipelineFilters({ filters, onChange }) {
   const hasActive = hasBasic || hasAdvanced;
 
   return (
-    <div className="space-y-3" dir="rtl">
-      {/* Basic filters row */}
+    <div className="space-y-3" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex flex-wrap items-center gap-3">
-        {/* Role search */}
         <div className="flex items-center gap-2 h-10 px-4 rounded-xl border border-[#E4ECFF] bg-white">
           <Search className="w-4 h-4 text-[#94A3B8]" />
           <input
             type="text"
-            placeholder="חיפוש לפי תפקיד..."
+            placeholder={t('pipeline.filters.searchByRole')}
             value={filters.role}
             onChange={e => update('role', e.target.value)}
             className="w-40 outline-none text-sm font-semibold text-[#0F172A] placeholder:text-[#94A3B8] bg-transparent"
           />
         </div>
 
-        {/* Source */}
         <select
           value={filters.source}
           onChange={e => update('source', e.target.value)}
           className="h-10 px-3 rounded-xl border border-[#E4ECFF] bg-white text-sm font-semibold text-[#64748B] outline-none"
         >
-          <option value="">כל המקורות</option>
-          {SOURCES.map(s => <option key={s} value={s}>{SOURCE_LABELS[s]}</option>)}
+          <option value="">{t('pipeline.filters.allSources')}</option>
+          {SOURCES.map(s => <option key={s} value={s}>{t(`pipeline.sources.${s}`)}</option>)}
         </select>
 
-        {/* AI min score */}
         <div className="flex items-center gap-2 h-10 px-4 rounded-xl border border-[#E4ECFF] bg-white">
-          <span className="text-xs font-bold text-[#64748B]">AI מינ׳:</span>
+          <span className="text-xs font-bold text-[#64748B]">{t('pipeline.filters.aiMin')}</span>
           <input
             type="number"
             min={0} max={100}
@@ -59,7 +55,6 @@ export default function PipelineFilters({ filters, onChange }) {
           <span className="text-xs text-[#94A3B8]">%</span>
         </div>
 
-        {/* Advanced toggle */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
           className={`h-10 px-4 rounded-xl border font-bold text-sm flex items-center gap-2 transition-all ${
@@ -69,7 +64,7 @@ export default function PipelineFilters({ filters, onChange }) {
           }`}
         >
           {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          סינון מתקדם
+          {t('pipeline.filters.advancedFilter')}
           {hasAdvanced && <span className="w-2 h-2 rounded-full bg-[#7C3AED]" />}
         </button>
 
@@ -79,29 +74,26 @@ export default function PipelineFilters({ filters, onChange }) {
             className="h-10 px-4 rounded-xl bg-red-50 border border-red-200 text-red-500 text-sm font-bold flex items-center gap-2 hover:bg-red-100 transition-all"
           >
             <X className="w-4 h-4" />
-            נקה הכל
+            {t('pipeline.filters.clearAll')}
           </button>
         )}
       </div>
 
-      {/* Advanced filters */}
       {showAdvanced && (
         <div className="flex flex-wrap items-center gap-3 p-4 bg-[#F7FBFF] rounded-xl border border-[#E4ECFF]">
-          {/* Recruiter name */}
           <div className="flex items-center gap-2 h-10 px-4 rounded-xl border border-[#E4ECFF] bg-white">
             <Search className="w-4 h-4 text-[#94A3B8]" />
             <input
               type="text"
-              placeholder="שם מגייס..."
+              placeholder={t('pipeline.filters.recruiterName')}
               value={filters.recruiter || ''}
               onChange={e => update('recruiter', e.target.value)}
               className="w-32 outline-none text-sm font-semibold text-[#0F172A] placeholder:text-[#94A3B8] bg-transparent"
             />
           </div>
 
-          {/* Date range */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-[#64748B]">מתאריך:</span>
+            <span className="text-xs font-bold text-[#64748B]">{t('pipeline.filters.fromDate')}</span>
             <input
               type="date"
               value={filters.dateFrom || ''}
@@ -110,7 +102,7 @@ export default function PipelineFilters({ filters, onChange }) {
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-[#64748B]">עד תאריך:</span>
+            <span className="text-xs font-bold text-[#64748B]">{t('pipeline.filters.toDate')}</span>
             <input
               type="date"
               value={filters.dateTo || ''}
@@ -119,15 +111,14 @@ export default function PipelineFilters({ filters, onChange }) {
             />
           </div>
 
-          {/* Experience range */}
           <div className="flex items-center gap-2 h-10 px-4 rounded-xl border border-[#E4ECFF] bg-white">
-            <span className="text-xs font-bold text-[#64748B]">ניסיון (שנים):</span>
+            <span className="text-xs font-bold text-[#64748B]">{t('pipeline.filters.experienceYears')}</span>
             <input
               type="number"
               min={0} max={30}
               value={filters.expMin || ''}
               onChange={e => update('expMin', e.target.value)}
-              placeholder="מ"
+              placeholder={t('pipeline.filters.from')}
               className="w-10 outline-none text-sm font-bold text-[#0F172A] bg-transparent text-center"
             />
             <span className="text-xs text-[#94A3B8]">—</span>
@@ -136,7 +127,7 @@ export default function PipelineFilters({ filters, onChange }) {
               min={0} max={30}
               value={filters.expMax || ''}
               onChange={e => update('expMax', e.target.value)}
-              placeholder="עד"
+              placeholder={t('pipeline.filters.to')}
               className="w-10 outline-none text-sm font-bold text-[#0F172A] bg-transparent text-center"
             />
           </div>

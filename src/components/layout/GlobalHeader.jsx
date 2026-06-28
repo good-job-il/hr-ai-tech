@@ -4,24 +4,31 @@
  */
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Menu, X } from 'lucide-react';
 import { SPACING, SHADOWS, RADIUS, COLORS } from '@/theme/tokens';
 import Logo from '@/components/branding/Logo';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 const HEADER_HEIGHT = 88;
 const HEADER_PADDING = SPACING[6]; // 24px
 
-const navLinks = [
-  { label: 'משרות', href: '/jobs' },
-  { label: 'חברות', href: '/companies' },
-  { label: 'AI לקריירה', href: '/#ai' },
-  { label: 'איך זה עובד?', href: '/#how' },
-  { label: 'אודות', href: '/#about' },
-];
-
 export default function GlobalHeader({ user, variant = 'public' }) {
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Get current language direction
+  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'he';
+  const isRTL = currentLang === 'he';
+
+  const navLinks = [
+    { label: isRTL ? 'משרות' : 'Jobs', href: '/jobs' },
+    { label: isRTL ? 'חברות' : 'Companies', href: '/companies' },
+    { label: isRTL ? 'AI לקריירה' : 'AI Career', href: '/#ai' },
+    { label: isRTL ? 'איך זה עובד?' : 'How it works?', href: '/#how' },
+    { label: isRTL ? 'אודות' : 'About', href: '/#about' },
+  ];
 
   const isDarkBg = location.pathname.startsWith('/admin') || 
                    location.pathname.startsWith('/employer') ||
@@ -29,7 +36,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
 
   return (
     <header
-      dir="rtl"
+      dir={isRTL ? 'rtl' : 'ltr'}
       className="sticky top-0 z-50 transition-all duration-200"
       style={{
         height: `${HEADER_HEIGHT}px`,
@@ -85,6 +92,9 @@ export default function GlobalHeader({ user, variant = 'public' }) {
 
         {/* Right Actions */}
         <div className="flex items-center gap-3">
+          {/* Language Switcher */}
+          <LanguageSwitcher variant="badge" />
+
           {!user ? (
             <>
               <Link
@@ -97,7 +107,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
                   boxShadow: SHADOWS['glass-card'],
                 }}
               >
-                התחברות
+                {isRTL ? 'התחברות' : 'Login'}
               </Link>
 
               <Link
@@ -108,7 +118,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
                   boxShadow: '0 18px 42px rgba(108, 77, 255, 0.35)',
                 }}
               >
-                הרשמה
+                {isRTL ? 'הרשמה' : 'Sign Up'}
               </Link>
             </>
           ) : (
@@ -121,7 +131,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
                   boxShadow: '0 18px 42px rgba(108, 77, 255, 0.30)',
                 }}
               >
-                לוח בקרה
+                {isRTL ? 'לוח בקרה' : 'Dashboard'}
               </Link>
             </>
           )}

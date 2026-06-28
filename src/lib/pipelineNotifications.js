@@ -4,16 +4,7 @@
  * Determines recipients based on role and stage type.
  */
 import { base44 } from '@/api/base44Client';
-
-const STAGE_LABELS = {
-  new: 'חדש',
-  screening: 'סינון ראשוני',
-  phone_interview: 'ראיון טלפוני',
-  professional_interview: 'ראיון מקצועי',
-  client_stage: 'שלב לקוח',
-  hired: 'התקבל',
-  rejected: 'נדחה',
-};
+import i18n from '@/i18n';
 
 // Employer is relevant only from client_stage onward
 const EMPLOYER_RELEVANT_STAGES = ['client_stage', 'hired', 'rejected'];
@@ -21,16 +12,34 @@ const EMPLOYER_RELEVANT_STAGES = ['client_stage', 'hired', 'rejected'];
 // Admin gets notified only on exceptional events
 const ADMIN_ALERT_STAGES = ['hired', 'rejected'];
 
+function t(key, options) {
+  return i18n.t(key, options);
+}
+
+function stageLabel(id) {
+  return t(`pipeline.stages.${id}`, { defaultValue: id });
+}
+
 function buildTitle(candidateName, newStage) {
-  if (newStage === 'hired') return `🎉 ${candidateName} התקבל לתפקיד!`;
-  if (newStage === 'rejected') return `${candidateName} נדחה מהתהליך`;
-  return `${candidateName} עבר לשלב: ${STAGE_LABELS[newStage] || newStage}`;
+  if (newStage === 'hired') {
+    return t('pipeline.notifications.stageChange.hiredTitle', { name: candidateName });
+  }
+  if (newStage === 'rejected') {
+    return t('pipeline.notifications.stageChange.rejectedTitle', { name: candidateName });
+  }
+  return t('pipeline.notifications.stageChange.movedTitle', {
+    name: candidateName,
+    stage: stageLabel(newStage),
+  });
 }
 
 function buildContent(candidateName, oldStage, newStage, changedBy) {
-  const oldLabel = STAGE_LABELS[oldStage] || oldStage;
-  const newLabel = STAGE_LABELS[newStage] || newStage;
-  return `${candidateName} הועבר מ"${oldLabel}" ל"${newLabel}" על ידי ${changedBy || 'מגייס'}.`;
+  return t('pipeline.notifications.stageChange.content', {
+    name: candidateName,
+    from: stageLabel(oldStage),
+    to: stageLabel(newStage),
+    changedBy: changedBy || t('pipeline.data.defaultRecruiter'),
+  });
 }
 
 /**
@@ -46,7 +55,7 @@ export async function createStageChangeNotifications({
 }) {
   if (!application || !newStage || oldStage === newStage) return;
 
-  const candidateName = application.candidate_name || 'מועמד';
+  const candidateName = application.candidate_name || t('pipeline.notifications.defaultCandidate');
   const title = buildTitle(candidateName, newStage);
   const content = buildContent(candidateName, oldStage, newStage, changedBy);
 
@@ -66,7 +75,6 @@ export async function createStageChangeNotifications({
 
   const recipients = collectRecipients({ application, newStage, user });
 
-  // Create one notification per unique recipient
   const seen = new Set();
   const creates = [];
 
@@ -86,15 +94,14 @@ export async function createStageChangeNotifications({
     );
   }
 
-  // Fire all creates in parallel, silently ignore errors
   await Promise.allSettled(creates);
 }
 
 /**
  * SLA exceeded notification
  */
-export async function createSlaNotification({ application, stageLabel, hoursInStage, user }) {
-  const candidateName = application.candidate_name || 'מועמד';
+export async function createSlaNotification({ application, stageLabel: stage, hoursInStage, user }) {
+  const candidateName = application.candidate_name || t('pipeline.notifications.defaultCandidate');
   const recipients = collectRecipients({ application, newStage: application.status, user });
 
   const seen = new Set();
@@ -108,8 +115,16 @@ export async function createSlaNotification({ application, stageLabel, hoursInSt
       base44.entities.Notification.create({
         recipient_email: email,
         type: 'job_closed', // repurpose as system alert
-        title: `⏰ ${candidateName} תקוע ${hoursInStage} שעות בשלב "${stageLabel}"`,
-        content: `המועמד ${candidateName} נמצא בשלב "${stageLabel}" כבר ${hoursInStage} שעות ועלול לפספס את חלון ההזדמנויות.`,
+        title: t('pipeline.notifications.sla.title', {
+          name: candidateName,
+          hours: hoursInStage,
+          stage,
+        }),
+        content: t('pipeline.notifications.sla.content', {
+          name: candidateName,
+          hours: hoursInStage,
+          stage,
+        }),
         metadata: {
           application_id: application.id,
           candidate_name: candidateName,
@@ -132,20 +147,15 @@ export async function createSlaNotification({ application, stageLabel, hoursInSt
 function collectRecipients({ application, newStage, user }) {
   const recipients = [];
 
-  // 1. Recruiter assigned to this application
   const recruiterEmail = application.assigned_to || application.recruiter_id;
   if (recruiterEmail) {
     recipients.push({ email: recruiterEmail, role_target: 'recruiter' });
   }
 
-  // 2. Recruitment manager — always notified (use current user's manager or app-level)
-  //    We send to the current user if they are a recruitment_manager,
-  //    otherwise we also add a generic recruitment_manager placeholder.
   if (user?.role === 'recruitment_manager') {
     recipients.push({ email: user.email, role_target: 'recruitment_manager' });
   }
 
-  // 3. Employer — only for relevant stages
   if (EMPLOYER_RELEVANT_STAGES.includes(newStage)) {
     const employerEmail = application.employer_id;
     if (employerEmail) {
@@ -153,14 +163,10 @@ function collectRecipients({ application, newStage, user }) {
     }
   }
 
-  // 4. Admin — only for exceptional stages
   if (ADMIN_ALERT_STAGES.includes(newStage)) {
-    // We record this; the actual admin email must exist in the User entity
-    // We'll create a notification with a placeholder that the admin can filter
     recipients.push({ email: 'admin', role_target: 'admin' });
   }
 
-  // 5. Always notify the person who made the change (so they have a receipt)
   if (user?.email && !recipients.find(r => r.email === user.email)) {
     recipients.push({ email: user.email, role_target: user.role || 'recruiter' });
   }
