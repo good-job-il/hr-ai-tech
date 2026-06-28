@@ -119,6 +119,7 @@
       "crm": "CRM מועמדים",
       "pipeline": "תהליך גיוס",
       "aiMatching": "AI התאמה",
+      "clients": "לקוחות",
       "financial": "פיננסי",
       "compensation": "תגמולים",
       "importCandidates": "ייבוא מועמדים",
@@ -1320,6 +1321,54 @@
         "analytics": "אנליטיקה"
       }
     },
+    "analytics": {
+      "title": "אנליטיקה",
+      "subtitle": "נתוני גיוס ופעילות הארגון",
+      "vsLastPeriod": "לעומת תקופה קודמת",
+      "noData": "אין נתונים לתצוגה",
+      "ranges": {
+        "week": "שבוע",
+        "month": "חודש",
+        "quarter": "רבעון",
+        "year": "שנה"
+      },
+      "stats": {
+        "newApplications": "מועמדויות חדשות",
+        "openJobs": "משרות פתוחות",
+        "scheduledInterviews": "ראיונות",
+        "hired": "גויסו",
+        "totalCandidates": "מועמדים חדשים",
+        "conversionRate": "אחוז המרה"
+      },
+      "charts": {
+        "applicationsOverTime": "מועמדויות לאורך זמן",
+        "recruitmentFunnel": "משפך גיוס",
+        "candidateSources": "מקורות מועמדים",
+        "topJobs": "משרות מובילות"
+      },
+      "funnel": {
+        "new": "חדש",
+        "phone_interview": "שיחת טלפון",
+        "recommended": "מומלץ",
+        "employer_interview": "ראיון",
+        "offer": "הצעה",
+        "probation": "ניסיון",
+        "hired": "גויס",
+        "rejected": "נדחה"
+      },
+      "sources": {
+        "app": "האפליקציה",
+        "jobsite": "אתר דרושים",
+        "other": "אחר"
+      },
+      "topJobs": {
+        "job": "משרה",
+        "applications": "מועמדויות",
+        "views": "צפיות",
+        "conversion": "המרה",
+        "empty": "אין נתונים לתצוגה"
+      }
+    },
     "team": {
       "title": "צוות HR",
       "subtitle": "נהל את חברי צוות ה-HR והמגייסים הפנימיים בארגון",
@@ -1949,6 +1998,61 @@
         "interview": "זימון לראיון",
         "followup": "follow-up",
         "offer": "הצעה"
+      }
+    },
+    "agencyClients": {
+      "title": "לקוחות",
+      "subtitle": "חברות שאנחנו מגייסים עבורן",
+      "newClient": "לקוח חדש",
+      "createModal": {
+        "title": "לקוח חדש",
+        "clientName": "שם הלקוח",
+        "clientNameRequired": "שם לקוח הוא שדה חובה",
+        "namePlaceholder": "לדוגמה: TechCorp Israel",
+        "industry": "תעשייה",
+        "selectIndustry": "בחר תעשייה",
+        "contactEmail": "אימייל איש קשר",
+        "website": "אתר אינטרנט",
+        "color": "צבע",
+        "cancel": "ביטול",
+        "creating": "יוצר...",
+        "create": "צור לקוח",
+        "errorCreating": "שגיאה ביצירת לקוח"
+      },
+      "industries": {
+        "hitech": "הייטק",
+        "finance": "פיננסים",
+        "manufacturing": "ייצור",
+        "retail": "קמעונאות",
+        "services": "שירותים",
+        "healthcare": "בריאות",
+        "education": "חינוך",
+        "realestate": "נדל״ן",
+        "logistics": "לוגיסטיקה",
+        "communications": "תקשורת",
+        "other": "אחר"
+      },
+      "stats": {
+        "jobs": "משרות",
+        "inProcess": "בתהליך",
+        "hired": "גויסו",
+        "totalClients": "סה״כ לקוחות",
+        "activeClients": "לקוחות פעילים",
+        "openJobs": "משרות פתוחות",
+        "candidatesInProcess": "מועמדים בתהליך"
+      },
+      "filters": {
+        "searchPlaceholder": "חיפוש לפי שם חברה...",
+        "allIndustries": "כל התעשיות",
+        "all": "הכל",
+        "active": "פעילים",
+        "inactive": "ללא פעילות"
+      },
+      "results": {
+        "clients": "לקוחות",
+        "noMatchingClients": "לא נמצאו לקוחות התואמים את החיפוש",
+        "noClients": "אין לקוחות עדיין",
+        "addFirstClient": "הוסף את הלקוח הראשון שלך ופרסם משרה עבורו"
       }
     }
   }

@@ -119,6 +119,7 @@
       "crm": "Candidates CRM",
       "pipeline": "Recruitment Pipeline",
       "aiMatching": "AI Matching",
+      "clients": "Clients",
       "financial": "Financial",
       "compensation": "Compensation",
       "importCandidates": "Import Candidates",
@@ -1320,6 +1321,54 @@
         "analytics": "Analytics"
       }
     },
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "Recruitment data and organization activity",
+      "vsLastPeriod": "vs previous period",
+      "noData": "No data to display",
+      "ranges": {
+        "week": "Week",
+        "month": "Month",
+        "quarter": "Quarter",
+        "year": "Year"
+      },
+      "stats": {
+        "newApplications": "New Applications",
+        "openJobs": "Open Jobs",
+        "scheduledInterviews": "Interviews",
+        "hired": "Hired",
+        "totalCandidates": "New Candidates",
+        "conversionRate": "Conversion Rate"
+      },
+      "charts": {
+        "applicationsOverTime": "Applications Over Time",
+        "recruitmentFunnel": "Recruitment Funnel",
+        "candidateSources": "Candidate Sources",
+        "topJobs": "Top Jobs"
+      },
+      "funnel": {
+        "new": "New",
+        "phone_interview": "Phone Interview",
+        "recommended": "Recommended",
+        "employer_interview": "Interview",
+        "offer": "Offer",
+        "probation": "Probation",
+        "hired": "Hired",
+        "rejected": "Rejected"
+      },
+      "sources": {
+        "app": "Application",
+        "jobsite": "Job Board",
+        "other": "Other"
+      },
+      "topJobs": {
+        "job": "Job",
+        "applications": "Applications",
+        "views": "Views",
+        "conversion": "Conversion",
+        "empty": "No data to display"
+      }
+    },
     "team": {
       "title": "HR Team",
       "subtitle": "Manage your HR team members and internal recruiters",
@@ -1949,6 +1998,61 @@
         "interview": "Interview Invitation",
         "followup": "Follow-up",
         "offer": "Offer"
+      }
+    },
+    "agencyClients": {
+      "title": "Clients",
+      "subtitle": "Companies we recruit for",
+      "newClient": "New Client",
+      "createModal": {
+        "title": "New Client",
+        "clientName": "Client Name",
+        "clientNameRequired": "Client name is required",
+        "namePlaceholder": "e.g.: TechCorp Israel",
+        "industry": "Industry",
+        "selectIndustry": "Select Industry",
+        "contactEmail": "Contact Email",
+        "website": "Website",
+        "color": "Color",
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "create": "Create Client",
+        "errorCreating": "Error creating client"
+      },
+      "industries": {
+        "hitech": "Hi-Tech",
+        "finance": "Finance",
+        "manufacturing": "Manufacturing",
+        "retail": "Retail",
+        "services": "Services",
+        "healthcare": "Healthcare",
+        "education": "Education",
+        "realestate": "Real Estate",
+        "logistics": "Logistics",
+        "communications": "Communications",
+        "other": "Other"
+      },
+      "stats": {
+        "jobs": "Jobs",
+        "inProcess": "In Process",
+        "hired": "Hired",
+        "totalClients": "Total Clients",
+        "activeClients": "Active Clients",
+        "openJobs": "Open Jobs",
+        "candidatesInProcess": "Candidates In Process"
+      },
+      "filters": {
+        "searchPlaceholder": "Search by company name...",
+        "allIndustries": "All Industries",
+        "all": "All",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "results": {
+        "clients": "clients",
+        "noMatchingClients": "No clients match the search",
+        "noClients": "No clients yet",
+        "addFirstClient": "Add your first client and publish a job for them"
       }
     }
   }

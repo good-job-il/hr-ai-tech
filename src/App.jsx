@@ -73,11 +73,14 @@ import MarketplaceExposurePage from './pages/platform/marketplace/MarketplaceExp
 
 // ── Agency Pages (Staffing Agency) ────────────────────────────────────
 import AgencyDashboard from './pages/agency/AgencyDashboard';
+import AgencyClients from './pages/agency/AgencyClients';
+import AgencyClientDetail from './pages/agency/AgencyClientDetail';
 
 // ── Company Pages (Company HR) ────────────────────────────────────────
 import CompanyDashboard from './pages/company/CompanyDashboard';
 import CompanyInterviews from './pages/company/CompanyInterviews';
 import CompanyTeamPage from './pages/company/CompanyTeamPage';
+import CompanyAnalyticsPage from './pages/company/CompanyAnalyticsPage';
 
 // ── Candidate Pages ───────────────────────────────────────────────────
 import CandidateDashboard from './pages/candidate/CandidateDashboard';
@@ -189,7 +192,8 @@ const AuthenticatedApp = () => {
           <Route path="/agency/ai-matching" element={<AIMatchingPage />} />
           <Route path="/agency/compensation" element={<CompensationPage />} />
           <Route path="/agency/import" element={<ImportDashboard />} />
-          <Route path="/agency/clients" element={<PlaceholderPage title="לקוחות" />} />
+          <Route path="/agency/clients" element={<AgencyClients />} />
+          <Route path="/agency/clients/:id" element={<AgencyClientDetail />} />
           <Route path="/agency/teams" element={<PlaceholderPage title="צוותים ומשתמשים" />} />
           <Route path="/agency/reports" element={<PlaceholderPage title="דוחות ותובנות" />} />
           <Route path="/agency/activity" element={<PlaceholderPage title="יומן פעילות" />} />
@@ -251,7 +255,7 @@ const AuthenticatedApp = () => {
           <Route path="/company/team" element={<CompanyTeamPage />} />
           <Route path="/company/team/members" element={<CompanyTeamPage />} />
           <Route path="/company/team/recruiters" element={<CompanyTeamPage />} />
-          <Route path="/company/analytics" element={<PlaceholderPage title="אנליטיקה" />} />
+          <Route path="/company/analytics" element={<CompanyAnalyticsPage />} />
           <Route path="/company/settings/permissions" element={<PermissionsPage />} />
           <Route path="/company/settings/integrations" element={<IntegrationsSettings />} />
           <Route path="/company/settings/careers" element={<PlaceholderPage title="דף קריירה" />} />

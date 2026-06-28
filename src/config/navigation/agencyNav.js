@@ -1,6 +1,7 @@
 import {
   LayoutDashboard, Users, Briefcase, Kanban, FileText, DollarSign,
   ContactRound, Sparkles, PieChart, Activity, Settings, ShieldCheck,
+  Building2,
 } from 'lucide-react';
 
 // Staffing Agency Admin / Recruitment Manager Navigation
@@ -19,6 +20,8 @@ export const AGENCY_ADMIN_NAV = [
   { id: 'agency-crm', labelKey: 'nav.agency.crm', route: '/agency/crm', icon: ContactRound },
   { id: 'agency-pipeline', labelKey: 'nav.agency.pipeline', route: '/agency/pipeline', icon: Kanban },
   { id: 'agency-ai-matching', labelKey: 'nav.agency.aiMatching', route: '/agency/ai-matching', icon: Sparkles },
+
+  { id: 'agency-clients', labelKey: 'nav.agency.clients', route: '/agency/clients', icon: Building2 },
 
   {
     separatorKey: 'nav.agency.financial',
