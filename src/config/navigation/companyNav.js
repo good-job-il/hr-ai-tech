@@ -8,7 +8,6 @@ export const COMPANY_ADMIN_NAV = [
   { id: 'company-dashboard', labelKey: 'nav.company.dashboard', route: '/company/dashboard', icon: LayoutDashboard },
 
   {
-    separatorKey: 'nav.company.recruitment',
     id: 'company-jobs', labelKey: 'nav.company.openJobs', route: '/company/jobs', icon: Briefcase,
     children: [
       { id: 'company-jobs-all', labelKey: 'nav.company.allJobs', route: '/company/jobs/all' },
@@ -21,7 +20,6 @@ export const COMPANY_ADMIN_NAV = [
   { id: 'company-ai-matching', labelKey: 'nav.company.aiMatching', route: '/company/ai-matching', icon: Sparkles },
 
   {
-    separatorKey: 'nav.company.team',
     id: 'company-hr-team', labelKey: 'nav.company.hrTeam', route: '/company/team', icon: UserCheck,
     children: [
       { id: 'company-team-members', labelKey: 'nav.company.teamMembers', route: '/company/team/members' },
@@ -30,12 +28,10 @@ export const COMPANY_ADMIN_NAV = [
   },
 
   {
-    separatorKey: 'nav.company.analysis',
     id: 'company-analytics', labelKey: 'nav.company.analytics', route: '/company/analytics', icon: BarChart3,
   },
 
   {
-    separatorKey: 'nav.company.settings',
     id: 'company-settings', labelKey: 'nav.company.orgSettings', route: '/company/settings', icon: Settings,
     children: [
       { id: 'company-settings-permissions', labelKey: 'nav.company.permissions', route: '/company/settings/permissions' },
@@ -50,7 +46,6 @@ export const COMPANY_ADMIN_NAV = [
 export const INTERNAL_RECRUITER_NAV = [
   { id: 'ir-dashboard', labelKey: 'nav.internalRecruiter.dashboard', route: '/company/recruiter/dashboard', icon: LayoutDashboard },
   {
-    separatorKey: 'nav.internalRecruiter.jobs',
     id: 'ir-jobs', labelKey: 'nav.internalRecruiter.jobs', route: '/company/recruiter/jobs', icon: Briefcase,
   },
   { id: 'ir-candidates', labelKey: 'nav.internalRecruiter.candidates', route: '/company/recruiter/candidates', icon: Users },

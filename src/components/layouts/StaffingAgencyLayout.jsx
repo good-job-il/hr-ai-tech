@@ -5,7 +5,7 @@ import SidebarLayout from './SidebarLayout';
 
 export default function StaffingAgencyLayout() {
   const { user } = useAuth();
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const isRtl = !i18n.language?.startsWith('en');
   const role = user?.role;
 
@@ -14,5 +14,5 @@ export default function StaffingAgencyLayout() {
     ? (isRtl ? 'מנהל צוות' : 'Team Manager')
     : (isRtl ? 'מנהל גיוס' : 'Recruitment Manager');
 
-  return <SidebarLayout navItems={nav} roleTitle={title} sidebarTheme="agency" />;
+  return <SidebarLayout navItems={nav} roleTitle={title} />;
 }

@@ -9,7 +9,6 @@ export const AGENCY_ADMIN_NAV = [
   { id: 'agency-dashboard', labelKey: 'nav.agency.dashboard', route: '/agency/dashboard', icon: LayoutDashboard },
 
   {
-    separatorKey: 'nav.agency.recruitment',
     id: 'agency-jobs', labelKey: 'nav.agency.jobs', route: '/agency/jobs', icon: Briefcase,
     children: [
       { id: 'jobs-open', labelKey: 'nav.agency.jobsOpen', route: '/agency/jobs/open' },
@@ -24,19 +23,16 @@ export const AGENCY_ADMIN_NAV = [
   { id: 'agency-clients', labelKey: 'nav.agency.clients', route: '/agency/clients', icon: Building2 },
 
   {
-    separatorKey: 'nav.agency.financial',
     id: 'agency-compensation', labelKey: 'nav.agency.compensation', route: '/agency/compensation', icon: DollarSign,
   },
   { id: 'agency-import', labelKey: 'nav.agency.importCandidates', route: '/agency/import', icon: FileText },
 
   {
-    separatorKey: 'nav.agency.analysis',
     id: 'agency-reports', labelKey: 'nav.agency.reportsInsights', route: '/agency/reports', icon: PieChart,
   },
   { id: 'agency-activity', labelKey: 'nav.agency.activityLog', route: '/agency/activity', icon: Activity },
 
   {
-    separatorKey: 'nav.agency.settings',
     id: 'agency-settings', labelKey: 'nav.agency.orgSettings', route: '/agency/settings', icon: Settings,
     children: [
       { id: 'agency-settings-permissions', labelKey: 'nav.agency.permissions', route: '/agency/settings/permissions' },
@@ -51,7 +47,6 @@ export const AGENCY_ADMIN_NAV = [
 export const AGENCY_RECRUITER_NAV = [
   { id: 'rec-dashboard', labelKey: 'nav.recruiter.dashboard', route: '/agency/recruiter/dashboard', icon: LayoutDashboard },
   {
-    separatorKey: 'nav.recruiter.candidates',
     id: 'rec-candidates', labelKey: 'nav.recruiter.candidates', route: '/agency/recruiter/candidates', icon: Users,
     children: [
       { id: 'rec-candidates-all', labelKey: 'nav.recruiter.allCandidates', route: '/agency/recruiter/candidates/all' },

@@ -14,5 +14,5 @@ export default function CompanyHRLayout() {
     ? (isRtl ? 'מגייס פנימי' : 'Internal Recruiter')
     : (isRtl ? 'מנהל HR' : 'HR Manager');
 
-  return <SidebarLayout navItems={nav} roleTitle={title} sidebarTheme="company" />;
+  return <SidebarLayout navItems={nav} roleTitle={title} />;
 }
