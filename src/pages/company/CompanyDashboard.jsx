@@ -102,7 +102,7 @@ export default function CompanyDashboard() {
             {t('company.dashboard.postJob')}
           </Link>
           <Link to="/company/candidates"
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:border-emerald-300 transition-colors">
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:border-purple-300 transition-colors">
             <Users className="w-4 h-4" />
             {t('company.dashboard.candidates')}
           </Link>
@@ -111,11 +111,11 @@ export default function CompanyDashboard() {
 
       {/* KPI Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatCard icon={Briefcase}    label={t('company.dashboard.stats.openJobs')}           value={stats.openJobs}           color="green"  loading={loading} to="/company/jobs" />
+        <StatCard icon={Briefcase}    label={t('company.dashboard.stats.openJobs')}           value={stats.openJobs}           color="purple" loading={loading} to="/company/jobs" />
         <StatCard icon={Users}        label={t('company.dashboard.stats.totalCandidates')}    value={stats.totalCandidates}    color="blue"   loading={loading} to="/company/candidates" />
         <StatCard icon={Calendar}     label={t('company.dashboard.stats.upcomingInterviews')} value={stats.upcomingInterviews} color="purple" loading={loading} to="/company/interviews" />
         <StatCard icon={Activity}     label={t('company.dashboard.stats.inProcess')}          value={stats.inProcess}          color="amber"  loading={loading} />
-        <StatCard icon={CheckCircle2} label={t('company.dashboard.stats.hired')}              value={stats.hired}              color="green"  loading={loading} />
+        <StatCard icon={CheckCircle2} label={t('company.dashboard.stats.hired')}              value={stats.hired}              color="purple" loading={loading} />
         <StatCard icon={UserCheck}    label={t('company.dashboard.stats.newCandidates')}      value={stats.newCandidates}      color="blue"   loading={loading} to="/company/candidates" />
       </div>
 
@@ -125,7 +125,7 @@ export default function CompanyDashboard() {
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-black text-gray-900">{t('company.dashboard.recentJobs.title')}</h2>
-            <Link to="/company/jobs" className="text-sm text-emerald-600 font-bold flex items-center gap-1 hover:underline">
+            <Link to="/company/jobs" className="text-sm text-purple-600 font-bold flex items-center gap-1 hover:underline">
               {t('company.dashboard.recentJobs.viewAll')} <ArrowLeft className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -136,12 +136,12 @@ export default function CompanyDashboard() {
           ) : (
             <div className="space-y-2">
               {recentJobs.map(job => (
-                <div key={job.id} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-gray-50 hover:bg-emerald-50 transition-colors">
+                <div key={job.id} className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors">
                   <div>
                     <p className="font-bold text-sm text-gray-800">{job.title}</p>
                     <p className="text-xs text-gray-400">{job.location || t('company.dashboard.recentJobs.noLocation')}</p>
                   </div>
-                  <span className="text-xs bg-emerald-100 text-emerald-700 font-bold px-2.5 py-1 rounded-full">
+                  <span className="text-xs bg-purple-100 text-purple-700 font-bold px-2.5 py-1 rounded-full">
                     {job.applications_count || 0} {t('company.dashboard.recentJobs.applicants')}
                   </span>
                 </div>
@@ -186,7 +186,7 @@ export default function CompanyDashboard() {
         <h2 className="text-lg font-black text-gray-900 mb-4">{t('company.dashboard.quickActions.title')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { icon: Briefcase,  label: t('company.dashboard.quickActions.postJob'),       to: '/company/jobs',            color: 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' },
+            { icon: Briefcase,  label: t('company.dashboard.quickActions.postJob'),       to: '/company/jobs',            color: 'bg-purple-50 text-purple-600 hover:bg-purple-100' },
             { icon: Users,      label: t('company.dashboard.quickActions.candidateList'), to: '/company/candidates',      color: 'bg-blue-50 text-blue-600 hover:bg-blue-100' },
             { icon: Sparkles,   label: t('company.dashboard.quickActions.aiMatching'),    to: '/company/ai-matching',     color: 'bg-violet-50 text-violet-600 hover:bg-violet-100' },
             { icon: TrendingUp, label: t('company.dashboard.quickActions.analytics'),     to: '/company/analytics',       color: 'bg-amber-50 text-amber-600 hover:bg-amber-100' },

@@ -15,8 +15,8 @@ import {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const STALE = 3 * 60 * 1000;
-const EMERALD = '#059669';
-const COLORS = ['#059669', '#2563EB', '#7C3AED', '#EA580C', '#0891B2', '#DC2626'];
+const EMERALD = '#7C3AED';
+const COLORS = ['#7C3AED', '#2563EB', '#059669', '#EA580C', '#0891B2', '#DC2626'];
 
 const APPLICATION_STATUSES = [
   'new', 'phone_interview', 'recommended', 'employer_interview',
@@ -84,7 +84,7 @@ function RangeTabs({ value, onChange, t }) {
           onClick={() => onChange(tab.id)}
           className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-colors ${
             value === tab.id
-              ? 'bg-white text-emerald-700 shadow-sm'
+              ? 'bg-white text-purple-700 shadow-sm'
               : 'text-gray-500 hover:text-gray-700'
           }`}
         >
@@ -327,7 +327,7 @@ export default function CompanyAnalyticsPage() {
           icon={Briefcase}
           label={t('company.analytics.stats.openJobs')}
           value={stats.openJobs}
-          color="green"
+          color="purple"
           loading={loading}
         />
         <KpiCard
@@ -344,7 +344,7 @@ export default function CompanyAnalyticsPage() {
           label={t('company.analytics.stats.hired')}
           value={stats.hiredNow}
           pct={stats.pctHired}
-          color="green"
+          color="purple"
           loading={loading}
           sub={vsLabel}
         />
@@ -490,12 +490,12 @@ export default function CompanyAnalyticsPage() {
                       <div className="font-semibold text-gray-800 truncate max-w-[200px]">{job.title}</div>
                       <div className="text-xs text-gray-400">{job.location || '—'}</div>
                     </td>
-                    <td className="text-center font-bold text-emerald-600">{job.appCount}</td>
+                     <td className="text-center font-bold text-purple-600">{job.appCount}</td>
                     <td className="text-center text-gray-500">{(job.views || 0).toLocaleString()}</td>
                     <td className="text-center">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                         parseFloat(job.convRate) >= 5
-                          ? 'bg-emerald-50 text-emerald-600'
+                          ? 'bg-purple-50 text-purple-600'
                           : parseFloat(job.convRate) >= 2
                             ? 'bg-amber-50 text-amber-600'
                             : 'bg-gray-100 text-gray-500'

@@ -26,7 +26,7 @@ import {
 const ROLE_STYLE = {
   org_admin:          { color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE', Icon: Crown },
   hr_manager:         { color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE', Icon: ShieldCheck },
-  internal_recruiter: { color: '#059669', bg: '#ECFDF5', border: '#A7F3D0', Icon: Briefcase },
+  internal_recruiter: { color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE', Icon: Briefcase },
 };
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
@@ -82,7 +82,7 @@ function MemberCard({ member, onEdit, onDelete, isRtl, t }) {
   const style = ROLE_STYLE[member.role] || ROLE_STYLE.hr_manager;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5 flex items-start gap-4 hover:shadow-md hover:border-emerald-200 transition-all group">
+    <div className="bg-white rounded-xl border border-gray-100 p-5 flex items-start gap-4 hover:shadow-md hover:border-purple-200 transition-all group">
       {/* Avatar */}
       <div
         className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0"
@@ -236,7 +236,7 @@ function MemberModal({ open, onOpenChange, member, onSubmit, loading, isRtl, t }
             <Button
               type="submit"
               disabled={loading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-purple-600 hover:bg-purple-700 text-white"
             >
               {loading ? t('company.team.form.saving') : t('company.team.form.save')}
             </Button>
@@ -455,7 +455,7 @@ export default function CompanyTeamPage() {
         </div>
         <Button
           onClick={() => { setEditingMember(null); setShowModal(true); }}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white flex-shrink-0"
+          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white flex-shrink-0"
         >
           <Plus className="w-4 h-4" />
           {t('company.team.invite')}
@@ -519,7 +519,7 @@ export default function CompanyTeamPage() {
                 onClick={() => setRoleFilter(tab.key)}
                 className={`px-3 py-1.5 text-sm font-bold rounded-lg transition-colors whitespace-nowrap ${
                   roleFilter === tab.key
-                    ? 'bg-white text-emerald-600 shadow-sm border border-gray-200'
+                    ? 'bg-white text-purple-600 shadow-sm border border-gray-200'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -537,8 +537,8 @@ export default function CompanyTeamPage() {
         </div>
       ) : filteredList.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4">
-            <UserPlus className="w-8 h-8 text-emerald-600" />
+          <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mb-4">
+            <UserPlus className="w-8 h-8 text-purple-600" />
           </div>
           <h3 className="font-black text-gray-900 text-lg mb-1">
             {search ? t('company.team.noResults') : t('company.team.noMembers')}
@@ -549,7 +549,7 @@ export default function CompanyTeamPage() {
           {!search && (
             <Button
               onClick={() => { setEditingMember(null); setShowModal(true); }}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2"
+              className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               {t('company.team.invite')}

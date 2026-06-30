@@ -91,21 +91,21 @@ function InterviewCard({ interview, isSelected, onSelect }) {
       onClick={() => onSelect(isSelected ? null : interview)}
       className={`w-full text-right p-5 rounded-2xl border transition-all text-start ${
         isSelected
-          ? 'border-emerald-500 bg-emerald-50 shadow-md shadow-emerald-500/10'
-          : 'border-gray-200 bg-white hover:border-emerald-300 hover:shadow-sm'
+          ? 'border-purple-500 bg-purple-50 shadow-md shadow-purple-500/10'
+          : 'border-gray-200 bg-white hover:border-purple-300 hover:shadow-sm'
       }`}
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         {/* Type icon */}
-        <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <TypeIcon type={interview.type} className="w-5 h-5 text-emerald-600" />
+        <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <TypeIcon type={interview.type} className="w-5 h-5 text-purple-600" />
         </div>
 
         <div className="flex-1 min-w-0">
           <h3 className="font-black text-gray-900 text-sm leading-tight truncate">
             {interview.candidate_name || t('company.interviews.noCandidate')}
           </h3>
-          <p className="text-xs font-semibold text-emerald-600 mt-0.5 truncate">
+          <p className="text-xs font-semibold text-purple-600 mt-0.5 truncate">
             {interview.job_title || t('company.interviews.noJobTitle')}
           </p>
         </div>
@@ -142,7 +142,7 @@ function InterviewCard({ interview, isSelected, onSelect }) {
 
       {/* Upcoming highlight */}
       {isUpcoming && (
-        <div className="mt-3 flex items-center gap-2 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
+        <div className="mt-3 flex items-center gap-2 text-xs font-bold text-purple-600 bg-purple-50 border border-purple-200 rounded-lg px-3 py-1.5">
           <AlertCircle className="w-3.5 h-3.5" />
           {t('company.interviews.upcomingBanner')}
         </div>
@@ -195,14 +195,14 @@ function DetailPanel({ interview, onClose, onUpdate }) {
       {/* Header */}
       <div className="flex items-start justify-between gap-3 p-5 border-b border-gray-100">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
-            <TypeIcon type={interview.type} className="w-5 h-5 text-emerald-600" />
+          <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
+            <TypeIcon type={interview.type} className="w-5 h-5 text-purple-600" />
           </div>
           <div className="min-w-0">
             <h2 className="font-black text-gray-900 text-base leading-tight truncate">
               {interview.candidate_name || t('company.interviews.noCandidate')}
             </h2>
-            <p className="text-sm font-semibold text-emerald-600 mt-0.5">
+            <p className="text-sm font-semibold text-purple-600 mt-0.5">
               {interview.job_title || t('company.interviews.noJobTitle')}
             </p>
           </div>
@@ -211,7 +211,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
           <StatusBadge status={interview.status || 'scheduled'} />
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:border-emerald-300 transition-colors"
+            className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:border-purple-300 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -297,7 +297,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
             <div className="text-xs font-medium text-gray-500 mb-1">{t('company.interviews.detail.contact')}</div>
             <a
               href={`mailto:${interview.candidate_email}`}
-              className="flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:underline"
+              className="flex items-center gap-2 text-sm font-semibold text-purple-600 hover:underline"
             >
               <Mail className="w-4 h-4" />
               {interview.candidate_email}
@@ -315,7 +315,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
             </div>
             {interview.type === 'in_person' ? (
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 bg-gray-50 rounded-lg p-3">
-                <MapPin className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-purple-600 flex-shrink-0" />
                 {interview.location_or_link}
               </div>
             ) : (
@@ -323,7 +323,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
                 href={interview.location_or_link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:underline break-all bg-emerald-50 rounded-lg p-3"
+                className="flex items-center gap-2 text-sm font-semibold text-purple-600 hover:underline break-all bg-purple-50 rounded-lg p-3"
               >
                 <Video className="w-4 h-4 flex-shrink-0" />
                 {interview.location_or_link}
@@ -352,7 +352,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
             {interview.status === 'completed' && !isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
-                className="text-xs font-bold text-emerald-600 hover:underline flex items-center gap-1"
+                className="text-xs font-bold text-purple-600 hover:underline flex items-center gap-1"
               >
                 <Edit className="w-3 h-3" />
                 {t('common.edit')}
@@ -388,7 +388,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder={t('company.interviews.detail.feedbackPlaceholder')}
-                  className="w-full min-h-[120px] p-3 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full min-h-[120px] p-3 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   dir="rtl"
                 />
               </div>
@@ -464,7 +464,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
         {interview.candidate_id && (
           <Link
             to={`/company/candidates/${interview.candidate_id}`}
-            className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 hover:border-emerald-300 hover:text-emerald-600 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 hover:border-purple-300 hover:text-purple-600 transition-colors"
           >
             <User className="w-4 h-4" />
             {t('company.interviews.viewCandidate')}
@@ -473,7 +473,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
         {interview.job_id && (
           <Link
             to={`/company/jobs/${interview.job_id}`}
-            className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 hover:border-emerald-300 hover:text-emerald-600 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 hover:border-purple-300 hover:text-purple-600 transition-colors"
           >
             <Briefcase className="w-4 h-4" />
             {t('company.interviews.viewJob')}
@@ -551,7 +551,7 @@ export default function CompanyInterviews() {
           <button
             onClick={() => refetch()}
             disabled={isLoading}
-            className="h-9 w-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:border-emerald-300 disabled:opacity-50 transition-colors"
+            className="h-9 w-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:border-purple-300 disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
@@ -585,7 +585,7 @@ export default function CompanyInterviews() {
               onClick={() => { setFilterTab(tab.key); setSelected(null); }}
               className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-colors ${
                 filterTab === tab.key
-                  ? 'bg-white text-emerald-600 shadow-sm border border-gray-200'
+                  ? 'bg-white text-purple-600 shadow-sm border border-gray-200'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -607,8 +607,8 @@ export default function CompanyInterviews() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4">
-                <Calendar className="w-8 h-8 text-emerald-600" />
+              <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mb-4">
+                <Calendar className="w-8 h-8 text-purple-600" />
               </div>
               {interviews.length === 0 ? (
                 <>
@@ -629,7 +629,7 @@ export default function CompanyInterviews() {
                   <p className="text-gray-500 font-semibold text-sm mt-1">{t('company.interviews.noResultsHint')}</p>
                   <button
                     onClick={() => setFilterTab('all')}
-                    className="mt-4 text-sm font-bold text-emerald-600 hover:underline"
+                    className="mt-4 text-sm font-bold text-purple-600 hover:underline"
                   >
                     {t('company.interviews.clearFilter')}
                   </button>
