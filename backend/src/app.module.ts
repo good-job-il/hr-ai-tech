@@ -7,35 +7,33 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { TaxonomyModule } from './modules/taxonomy/taxonomy.module';
+import { CandidatesModule } from './modules/candidates/candidates.module';
+import { JobsModule } from './modules/jobs/jobs.module';
+import { ApplicationsModule } from './modules/applications/applications.module';
+import { InterviewsModule } from './modules/interviews/interviews.module';
+import { MessagesModule } from './modules/messages/messages.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { CompaniesModule } from './modules/companies/companies.module';
 
 @Module({
   imports: [
-    // ─── Config ─────────────────────────────────────────────────────
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
-    }),
-
-    // ─── Rate limiting ───────────────────────────────────────────────
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 100,
-      },
-    ]),
-
-    // ─── Cron / Scheduling ──────────────────────────────────────────
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     ScheduleModule.forRoot(),
-
-    // ─── Database ───────────────────────────────────────────────────
     DatabaseModule,
-
-    // ─── Feature modules ────────────────────────────────────────────
+    // Phase 1
     AuthModule,
     UsersModule,
     OrganizationsModule,
     TaxonomyModule,
+    // Phase 2
+    CandidatesModule,
+    JobsModule,
+    ApplicationsModule,
+    InterviewsModule,
+    MessagesModule,
+    NotificationsModule,
+    CompaniesModule,
   ],
 })
 export class AppModule {}
-

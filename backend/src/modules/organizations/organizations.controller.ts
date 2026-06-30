@@ -18,7 +18,7 @@ import {
   UpdateOrganizationDto,
   QueryOrganizationsDto,
 } from './dto/organizations.dto';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import { UserEntity } from '../users/user.entity';
 
 @ApiTags('Organizations')

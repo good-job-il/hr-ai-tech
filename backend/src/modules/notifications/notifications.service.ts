@@ -1,0 +1,46 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { NotificationEntity } from './notification.entity';
+import { CreateNotificationDto, QueryNotificationsDto } from './dto/notifications.dto';
+import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
+
+@Injectable()
+export class NotificationsService {
+  constructor(@InjectRepository(NotificationEntity) private readonly repo: Repository<NotificationEntity>) {}
+
+  async findAll(query: QueryNotificationsDto) {
+    const { page, limit, sort, order, recipient_email, is_read, type, organization_id } = query;
+    const where: Record<string, any> = {};
+    if (recipient_email) where.recipient_email = recipient_email;
+    if (is_read !== undefined) where.is_read = is_read;
+    if (type) where.type = type;
+    if (organization_id) where.organization_id = organization_id;
+    const { skip, take } = getSkipTake(page, limit);
+    const [data, total] = await this.repo.findAndCount({ where, order: { [sort]: order }, skip, take });
+    return buildPaginatedResponse(data, total, { page, limit });
+  }
+
+  async create(dto: CreateNotificationDto): Promise<NotificationEntity> {
+    const n = this.repo.create(dto as any);
+    return this.repo.save(n) as unknown as Promise<NotificationEntity>;
+  }
+
+  async markRead(id: string): Promise<NotificationEntity> {
+    const n = await this.repo.findOne({ where: { id } as any });
+    if (!n) throw new NotFoundException(`Notification ${id} not found`);
+    n.is_read = true;
+    return this.repo.save(n) as unknown as Promise<NotificationEntity>;
+  }
+
+  async markAllRead(recipientEmail: string): Promise<void> {
+    await this.repo.update({ recipient_email: recipientEmail, is_read: false } as any, { is_read: true });
+  }
+
+  async remove(id: string): Promise<void> {
+    const n = await this.repo.findOne({ where: { id } as any });
+    if (!n) throw new NotFoundException(`Notification ${id} not found`);
+    await this.repo.remove(n);
+  }
+}
+
