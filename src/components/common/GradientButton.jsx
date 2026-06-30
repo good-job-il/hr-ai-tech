@@ -8,8 +8,8 @@ export function GradientButton({ children, className, ...props }) {
         className
       )}
       style={{
-        background: 'linear-gradient(135deg, #A855F7 0%, #6C4DFF 48%, #2F80FF 100%)',
-        boxShadow: '0 18px 42px rgba(108, 77, 255, 0.35)',
+        background: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
+        boxShadow: '0 18px 42px rgba(124, 77, 255, 0.35)',
       }}
       {...props}
     >

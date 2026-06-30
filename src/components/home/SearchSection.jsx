@@ -76,7 +76,7 @@ export default function SearchSection() {
           {/* Button */}
           <button onClick={handleSearch} style={{
             height: 50, padding: '0 32px', borderRadius: 8,
-            background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 100%)',
+            background: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
             color: 'white', border: 'none', cursor: 'pointer',
             fontSize: 14, fontWeight: 700, flexShrink: 0,
             display: 'flex', alignItems: 'center', gap: 8,

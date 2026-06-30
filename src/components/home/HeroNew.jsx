@@ -74,7 +74,7 @@ export default function HeroNew() {
               fontSize: 'clamp(3rem, 5.5vw, 4.8rem)',
               fontWeight: 900, letterSpacing: '-0.04em',
               lineHeight: 1.0, margin: '0 0 28px',
-              background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 60%, #8B5CF6 100%)',
+              background: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 60%, #7C4DFF 100%)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
             }}>
               מתחילה כאן.
@@ -89,7 +89,7 @@ export default function HeroNew() {
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 44 }}>
               <button onClick={() => navigate('/register')} style={{
                 height: 52, padding: '0 28px', borderRadius: 8,
-                background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 100%)',
+                background: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
                 color: 'white', border: 'none', cursor: 'pointer',
                 fontSize: 15, fontWeight: 700,
                 boxShadow: '0 8px 28px rgba(108,77,255,0.45), 0 2px 8px rgba(108,77,255,0.2)',
@@ -228,7 +228,7 @@ export default function HeroNew() {
               {/* AI button */}
               <button style={{
                 width: '100%', padding: '9px 0', borderRadius: 8,
-                background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 100%)',
+                background: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
                 border: 'none', color: 'white', fontSize: 11.5, fontWeight: 700,
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 marginBottom: 14, boxShadow: '0 4px 14px rgba(108,77,255,0.4)',

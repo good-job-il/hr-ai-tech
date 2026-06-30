@@ -4,7 +4,7 @@
 
 export const GRADIENTS = {
   // Primary brand gradient
-  primary: 'linear-gradient(135deg, #A855F7 0%, #6C4DFF 48%, #2F80FF 100%)',
+  primary: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
   
   // Soft violet to blue
   soft: 'linear-gradient(135deg, #8B5CF6 0%, #4F7CFF 100%)',

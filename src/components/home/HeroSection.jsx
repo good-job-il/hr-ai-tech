@@ -92,7 +92,7 @@ export default function HeroSection() {
               className="bg-white border border-blue-100 text-gray-900 text-base h-14 rounded-lg flex-1 px-5 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all placeholder-gray-400"
               dir={isRtl ? 'rtl' : 'ltr'}
             />
-            <button onClick={handleSubmit} className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white h-14 px-8 text-base font-bold rounded-lg whitespace-nowrap transition-all shadow-lg hover:shadow-xl active:scale-95">
+            <button onClick={handleSubmit} className="bg-gradient-to-r from-[#7C4DFF] to-[#4F7CFF] hover:from-[#6B3EEE] hover:to-[#4070EE] text-white h-14 px-8 text-base font-bold rounded-lg whitespace-nowrap transition-all shadow-lg hover:shadow-xl active:scale-95">
               {t('home.hero.searchButton')}
             </button>
           </div>
@@ -113,7 +113,7 @@ export default function HeroSection() {
              onClick={() => handleStatClick('/jobs')}
              className="group hover:scale-105 active:scale-95 transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-white border border-purple-200 rounded-2xl px-6 py-6 hover:shadow-lg hover:border-purple-400 relative min-h-28"
            >
-             <div className={`absolute -top-4 ${isRtl ? '-right-4' : '-left-4'} bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 flex-row-reverse shadow-lg`}>
+             <div className={`absolute -top-4 ${isRtl ? '-right-4' : '-left-4'} bg-gradient-to-r from-[#7C4DFF] to-[#4F7CFF] text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 flex-row-reverse shadow-lg`}>
                <Sparkles className="w-4 h-4" />
                {t('home.stats.openJobs')}
              </div>

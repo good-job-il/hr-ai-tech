@@ -81,7 +81,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
                       width: '34px',
                       height: '3px',
                       borderRadius: '8px',
-                      background: 'linear-gradient(90deg, #8B5CF6, #2F80FF)',
+                      background: 'linear-gradient(90deg, #7C4DFF, #4F7CFF)',
                     }}
                   />
                 )}
@@ -114,7 +114,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
                 to="/register"
                 className="inline-flex h-12 px-7 items-center justify-center rounded-lg text-white font-black text-[15px] transition-all"
                 style={{
-                  background: 'linear-gradient(135deg, #A855F7 0%, #6C4DFF 48%, #2F80FF 100%)',
+                  background: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
                   boxShadow: '0 18px 42px rgba(108, 77, 255, 0.35)',
                 }}
               >
@@ -127,7 +127,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
                 to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'candidate' ? '/candidate-dashboard' : '/employer/dashboard'}
                 className="inline-flex h-12 px-7 items-center justify-center rounded-lg text-white font-black text-[15px] transition-all"
                 style={{
-                  background: 'linear-gradient(135deg, #8B5CF6, #2F80FF)',
+                  background: 'linear-gradient(135deg, #7C4DFF, #4F7CFF)',
                   boxShadow: '0 18px 42px rgba(108, 77, 255, 0.30)',
                 }}
               >

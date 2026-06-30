@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 const buttonVariants = {
   // Primary button with gradient
   primary: {
-    bg: 'linear-gradient(135deg, #A855F7 0%, #6C4DFF 48%, #2F80FF 100%)',
+    bg: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
     text: '#FFFFFF',
     shadow: SHADOWS['button-primary'],
     hover: {

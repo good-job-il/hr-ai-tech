@@ -61,7 +61,7 @@ export default function Header() {
               </Link>
               <Link to="/register" style={{
                 height: 40, padding: '0 20px', borderRadius: 8,
-                background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 100%)',
+                background: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
                 fontSize: 14, fontWeight: 700, color: 'white',
                 display: 'flex', alignItems: 'center', gap: 8,
                 textDecoration: 'none',
@@ -77,7 +77,7 @@ export default function Header() {
           ) : (
             <Link to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'candidate' ? '/candidate-dashboard' : '/hiring-manager/dashboard'} style={{
               height: 40, padding: '0 20px', borderRadius: 8,
-              background: 'linear-gradient(135deg, #6C4DFF 0%, #4F7CFF 100%)',
+              background: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
               fontSize: 14, fontWeight: 700, color: 'white', textDecoration: 'none',
               display: 'flex', alignItems: 'center',
               boxShadow: '0 4px 16px rgba(108,77,255,0.4)',
@@ -130,7 +130,7 @@ export default function Header() {
           ))}
           <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
             <Link to="/login" style={{ flex: 1, textAlign: 'center', padding: '11px', borderRadius: 8, border: '1.5px solid #E2E4EF', fontSize: 14, fontWeight: 600, color: '#374151', textDecoration: 'none' }} onClick={() => setOpen(false)}>{t('common.login')}</Link>
-            <Link to="/register" style={{ flex: 1, textAlign: 'center', padding: '11px', borderRadius: 8, background: 'linear-gradient(135deg,#6C4DFF,#4F7CFF)', fontSize: 14, fontWeight: 700, color: 'white', textDecoration: 'none' }} onClick={() => setOpen(false)}>{t('common.register')}</Link>
+            <Link to="/register" style={{ flex: 1, textAlign: 'center', padding: '11px', borderRadius: 8, background: 'linear-gradient(135deg,#7C4DFF,#4F7CFF)', fontSize: 14, fontWeight: 700, color: 'white', textDecoration: 'none' }} onClick={() => setOpen(false)}>{t('common.register')}</Link>
           </div>
           <div style={{ marginTop: 16 }}>
             <LanguageSwitcher variant="badge" />
