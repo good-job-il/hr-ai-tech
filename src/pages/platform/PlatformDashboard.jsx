@@ -130,10 +130,6 @@ export default function PlatformDashboard() {
                 <span className="font-bold text-emerald-800">Companies / Internal HR</span>
                 <span className="font-black text-emerald-900">{stats.companies?.length ?? 0}</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
-                <span className="font-bold text-blue-800">Total Organizations</span>
-                <span className="font-black text-blue-900">{stats.orgs?.length ?? 0}</span>
-              </div>
             </div>
           )}
         </div>

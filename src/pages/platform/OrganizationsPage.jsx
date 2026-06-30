@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Building2, Search, Plus, Users, Briefcase, CheckCircle, XCircle, Clock, Edit2 } from 'lucide-react';
+import { Building2, Search, Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+const TABS = [
+  { id: 'staffing', route: '/platform/organizations/staffing', orgType: 'staffing_agency', labelKey: 'platform.orgs.staffing' },
+  { id: 'companies', route: '/platform/organizations/companies', orgType: 'organization', labelKey: 'platform.orgs.companies' },
+];
 
 const STATUS_CONFIG = {
   active:    { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Active',   icon: CheckCircle },
@@ -10,12 +17,13 @@ const STATUS_CONFIG = {
 };
 
 export default function OrganizationsPage() {
+  const { t } = useTranslation();
+  const location = useLocation();
+  const activeTab = TABS.find(tab => location.pathname.startsWith(tab.route)) ?? TABS[0];
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
-  const [newOrg, setNewOrg] = useState({ name: '', org_type: 'staffing_agency', contact_email: '' });
+  const [newOrg, setNewOrg] = useState({ name: '', contact_email: '' });
   const [creating, setCreating] = useState(false);
-  const [editOrg, setEditOrg] = useState(null);
   const qc = useQueryClient();
 
   const { data: orgs = [], isLoading } = useQuery({
@@ -24,18 +32,19 @@ export default function OrganizationsPage() {
     staleTime: 2 * 60 * 1000,
   });
 
-  const filtered = orgs.filter(o => {
+  const tabOrgs = orgs.filter(o => o.org_type === activeTab.orgType);
+
+  const filtered = tabOrgs.filter(o => {
     const matchSearch = !search || o.name?.toLowerCase().includes(search.toLowerCase()) || o.contact_email?.toLowerCase().includes(search.toLowerCase());
-    const matchType = typeFilter === 'all' || o.org_type === typeFilter;
-    return matchSearch && matchType;
+    return matchSearch;
   });
 
   const handleCreate = async () => {
     if (!newOrg.name.trim()) return;
     setCreating(true);
-    await base44.entities.Organization.create({ ...newOrg, status: 'active', plan: 'trial' });
+    await base44.entities.Organization.create({ ...newOrg, org_type: activeTab.orgType, status: 'active', plan: 'trial' });
     await qc.invalidateQueries(['platform-orgs']);
-    setNewOrg({ name: '', org_type: 'staffing_agency', contact_email: '' });
+    setNewOrg({ name: '', contact_email: '' });
     setShowModal(false);
     setCreating(false);
   };
@@ -47,10 +56,10 @@ export default function OrganizationsPage() {
   };
 
   const stats = {
-    total: orgs.length,
-    agencies: orgs.filter(o => o.org_type === 'staffing_agency').length,
-    companies: orgs.filter(o => o.org_type === 'organization').length,
-    active: orgs.filter(o => o.status === 'active').length,
+    total: tabOrgs.length,
+    active: tabOrgs.filter(o => o.status === 'active').length,
+    suspended: tabOrgs.filter(o => o.status === 'suspended').length,
+    inactive: tabOrgs.filter(o => o.status !== 'active' && o.status !== 'suspended').length,
   };
 
   return (
@@ -60,10 +69,30 @@ export default function OrganizationsPage() {
           <h1 className="text-2xl font-black text-slate-900">Organizations</h1>
           <p className="text-slate-500 mt-1 font-semibold">Manage all organizations on the platform</p>
         </div>
-        <button onClick={() => setShowModal(true)}
+        <button onClick={() => { setNewOrg({ name: '', contact_email: '' }); setShowModal(true); }}
           className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors">
           <Plus className="w-4 h-4" /> New Organization
         </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-gray-200">
+        {TABS.map(tab => {
+          const active = location.pathname.startsWith(tab.route);
+          return (
+            <Link
+              key={tab.id}
+              to={tab.route}
+              className={`px-5 py-3 text-sm font-bold border-b-2 transition-colors ${
+                active
+                  ? 'border-purple-600 text-purple-700'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t(tab.labelKey)}
+            </Link>
+          );
+        })}
       </div>
 
       {/* KPI */}
@@ -71,8 +100,8 @@ export default function OrganizationsPage() {
         {[
           { label: 'Total', value: stats.total, color: 'bg-purple-50 text-purple-700' },
           { label: 'Active', value: stats.active, color: 'bg-emerald-50 text-emerald-700' },
-          { label: 'Staffing Agencies', value: stats.agencies, color: 'bg-blue-50 text-blue-700' },
-          { label: 'Internal HR', value: stats.companies, color: 'bg-amber-50 text-amber-700' },
+          { label: 'Suspended', value: stats.suspended, color: 'bg-red-50 text-red-700' },
+          { label: 'Inactive', value: stats.inactive, color: 'bg-gray-50 text-gray-600' },
         ].map(s => (
           <div key={s.label} className={`rounded-2xl p-5 ${s.color}`}>
             <p className="text-3xl font-black">{isLoading ? '...' : s.value}</p>
@@ -88,12 +117,6 @@ export default function OrganizationsPage() {
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search organization..." className="outline-none text-sm w-full bg-transparent" />
         </div>
-        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}
-          className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold outline-none">
-          <option value="all">All Types</option>
-          <option value="staffing_agency">Staffing Agencies</option>
-          <option value="organization">Internal HR</option>
-        </select>
         <span className="text-sm text-gray-400 font-semibold">{filtered.length} organizations</span>
       </div>
 
@@ -179,12 +202,8 @@ export default function OrganizationsPage() {
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm" />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Organization Type</label>
-                <select value={newOrg.org_type} onChange={e => setNewOrg(p => ({ ...p, org_type: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm">
-                  <option value="staffing_agency">Staffing Agency</option>
-                  <option value="organization">Company / Internal HR</option>
-                </select>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Type</label>
+                <p className="text-sm font-semibold text-gray-600">{t(activeTab.labelKey)}</p>
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Primary Email</label>

@@ -8,17 +8,10 @@ export const PLATFORM_NAV = [
   { id: 'platform-dashboard', labelKey: 'nav.platform.controlPanel', route: '/platform/dashboard', icon: LayoutDashboard },
 
   {
-    separatorKey: 'nav.platform.organizations',
     id: 'platform-orgs', labelKey: 'nav.platform.organizations', route: '/platform/organizations', icon: Building2,
-    children: [
-      { id: 'orgs-all', labelKey: 'nav.platform.allOrgs', route: '/platform/organizations' },
-      { id: 'orgs-staffing', labelKey: 'nav.platform.staffingCompanies', route: '/platform/organizations/staffing' },
-      { id: 'orgs-companies', labelKey: 'nav.platform.hrCompanies', route: '/platform/organizations/companies' },
-    ],
   },
 
   {
-    separatorKey: 'nav.platform.businessManagement',
     id: 'platform-billing', labelKey: 'nav.platform.billingSubscriptions', route: '/platform/billing', icon: CreditCard,
     children: [
       { id: 'billing-subs', labelKey: 'nav.platform.subscriptions', route: '/platform/billing/subscriptions' },
@@ -35,7 +28,6 @@ export const PLATFORM_NAV = [
   },
 
   {
-    separatorKey: 'nav.platform.monitoring',
     id: 'platform-analytics', labelKey: 'nav.platform.systemAnalytics', route: '/platform/analytics', icon: BarChart3,
     children: [
       { id: 'analytics-users', labelKey: 'nav.platform.activeUsers', route: '/platform/analytics/users' },
@@ -46,7 +38,6 @@ export const PLATFORM_NAV = [
   },
 
   {
-    separatorKey: 'nav.platform.security',
     id: 'platform-security', labelKey: 'nav.platform.security', route: '/platform/security', icon: ShieldCheck,
     children: [
       { id: 'security-audit', labelKey: 'nav.platform.activityLog', route: '/platform/security/audit' },
@@ -58,7 +49,6 @@ export const PLATFORM_NAV = [
   },
 
   {
-    separatorKey: 'nav.platform.settings',
     id: 'platform-settings', labelKey: 'nav.platform.platformSettings', route: '/platform/settings', icon: Settings,
     children: [
       { id: 'settings-templates', labelKey: 'nav.platform.globalTemplates', route: '/platform/settings/templates' },

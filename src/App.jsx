@@ -141,7 +141,7 @@ const AuthenticatedApp = () => {
       <Route element={<ProtectedRoute superAdminOnly />}>
         <Route element={<SuperAdminLayout />}>
           <Route path="/platform/dashboard" element={<PlatformDashboard />} />
-          <Route path="/platform/organizations" element={<OrganizationsPage />} />
+          <Route path="/platform/organizations" element={<Navigate to="/platform/organizations/staffing" replace />} />
           <Route path="/platform/organizations/staffing" element={<OrganizationsPage />} />
           <Route path="/platform/organizations/companies" element={<OrganizationsPage />} />
           <Route path="/platform/billing" element={<SubscriptionsPage />} />
