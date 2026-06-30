@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Building2, Search, Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
 
 const TABS = [
@@ -69,10 +70,13 @@ export default function OrganizationsPage() {
           <h1 className="text-2xl font-black text-slate-900">Organizations</h1>
           <p className="text-slate-500 mt-1 font-semibold">Manage all organizations on the platform</p>
         </div>
-        <button onClick={() => { setNewOrg({ name: '', contact_email: '' }); setShowModal(true); }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors">
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => { setNewOrg({ name: '', contact_email: '' }); setShowModal(true); }}
+        >
           <Plus className="w-4 h-4" /> New Organization
-        </button>
+        </Button>
       </div>
 
       {/* Tabs */}
@@ -212,14 +216,24 @@ export default function OrganizationsPage() {
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm" />
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setShowModal(false)} disabled={creating}
-                  className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 text-sm">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setShowModal(false)}
+                  disabled={creating}
+                >
                   Cancel
-                </button>
-                <button onClick={handleCreate} disabled={creating || !newOrg.name.trim()}
-                  className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 disabled:opacity-50 text-sm transition-colors">
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="flex-1"
+                  onClick={handleCreate}
+                  disabled={creating || !newOrg.name.trim()}
+                >
                   {creating ? 'Creating...' : 'Create Organization'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

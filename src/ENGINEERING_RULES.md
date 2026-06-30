@@ -244,25 +244,100 @@ export const candidateMapper = {
 - **Typography:** `typographyClasses` only
 - **Border Radius:** `RADIUS` scale only
 
+---
+
+## 6a. BUTTON RULES (MANDATORY)
+
+### ❌ NEVER use raw `<button>` with Tailwind color classes
+
+```jsx
+// ❌ FORBIDDEN — raw button with Tailwind bg colors
+<button className="bg-purple-600 text-white hover:bg-purple-700 rounded-lg px-4 py-2">
+  Save
+</button>
+
+// ❌ FORBIDDEN — raw button with inline gradient
+<button style={{ background: 'linear-gradient(...)' }}>
+  Save
+</button>
+```
+
+### ✅ ALWAYS use the shared `Button` component
+
+```jsx
+import { Button } from '@/components/ui/Button';
+
+// ✅ Primary action (gradient: #9136f0 → #575de8 → #5a8eee)
+<Button variant="primary" size="md" onClick={handleSave}>
+  Save
+</Button>
+
+// ✅ With icon — icon inherits white color automatically
+<Button variant="primary" size="sm" onClick={handleCreate}>
+  <Plus className="w-4 h-4" /> New Organization
+</Button>
+
+// ✅ Secondary (white + border)
+<Button variant="secondary" size="sm" onClick={handleCancel}>
+  Cancel
+</Button>
+
+// ✅ With disabled + loading state
+<Button variant="primary" size="md" onClick={handleSubmit} disabled={isLoading}>
+  {isLoading ? 'Saving...' : 'Save'}
+</Button>
+
+// ✅ Danger action (red — semantic, do NOT use gradient here)
+<Button variant="danger" size="sm" onClick={handleDelete}>
+  Delete
+</Button>
+```
+
+### Available Variants
+| Variant | Use case | Style |
+|---|---|---|
+| `primary` | Main CTA, form submit, create | Gradient `#9136f0 → #575de8 → #5a8eee`, white text |
+| `secondary` | Cancel, back, secondary action | White bg, gray border |
+| `ghost` | Toolbar, icon actions, minimal | Transparent |
+| `outline` | Outlined CTA | Transparent + colored border |
+| `danger` | Delete, suspend, destructive | Red — semantic |
+| `success` | Approve, activate | Green — semantic |
+
+### Available Sizes
+| Size | Height | Use case |
+|---|---|---|
+| `xs` | 32px | Table actions, tags |
+| `sm` | 40px | Modals, compact UI |
+| `md` | 48px | Default, forms |
+| `lg` | 56px | Hero CTA, landing |
+
+### Primary Gradient (source of truth)
+```css
+background: linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%);
+border-radius: 12px; /* md size */
+color: #ffffff;
+```
+Defined once in: `src/components/ui/Button.jsx` → `buttonVariants.primary`  
+CSS class: `.btn-primary` in `src/index.css`  
+CSS variable: `--gradient-brand` in `src/index.css`
+
+### Rules
+- ✅ Use `<Button variant="primary">` for all main action buttons
+- ✅ Use `<Button variant="secondary">` for Cancel/Back buttons
+- ✅ Use `<Button variant="danger">` for destructive actions (delete, suspend)
+- ✅ Icons inside `<Button>` inherit white color automatically — no extra styling needed
+- ✅ Pass `disabled={isLoading}` — the component handles `opacity: 0.5` + `cursor: not-allowed`
+- ❌ Never add `bg-purple-*`, `bg-blue-*`, `hover:bg-*` classes to `<button>` elements
+- ❌ Never override the gradient with `className` or `style` on a `<button>` directly
+- ❌ Never create a new button component — extend `Button.jsx` variants instead
+
 ### Variant System (for complex components)
 ```typescript
 interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 'success';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   disabled?: boolean;
 }
-
-const variantClasses = {
-  primary: 'bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white',
-  secondary: 'bg-white border border-[#DDEBFF] text-[#6C4DFF]',
-  ghost: 'text-[#6C4DFF] hover:bg-[#F3EFFF]',
-};
-
-const sizeClasses = {
-  sm: 'px-4 py-2 text-sm',
-  md: 'px-6 py-3 text-base',
-  lg: 'px-8 py-4 text-lg',
-};
 ```
 
 ---
@@ -450,6 +525,7 @@ Before shipping ANY feature:
 - [ ] Architecture documented
 - [ ] All components < 300 lines
 - [ ] Zero inline styles
+- [ ] **All primary buttons use `<Button variant="primary">` — no raw `<button className="bg-purple-*">` allowed**
 - [ ] Full TypeScript types
 - [ ] React Query hooks used
 - [ ] Error handling implemented
@@ -472,6 +548,7 @@ Before shipping ANY feature:
 - 🚫 Builds **fail** on ESLint violations
 - 🚫 Commits **rejected** without proper messaging
 - 🚫 Features **not shipped** without documentation
+- 🚫 **Raw `<button className="bg-purple-*">` is BLOCKED** — use `<Button variant="primary">` from `@/components/ui/Button`
 
 **This is not optional.**
 

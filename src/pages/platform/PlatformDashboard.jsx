@@ -7,7 +7,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { Building2, Users, Activity, Globe, ShieldCheck, Clock } from 'lucide-react';
+import { Building2, Users, Activity, Globe, ShieldCheck } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 function StatCard({ icon: Icon, label, value, sub, color = 'purple', loading, to }) {
   const colors = {
@@ -109,12 +110,13 @@ export default function PlatformDashboard() {
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-black text-gray-900">Organizations by Type</h2>
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               onClick={() => setShowOrgModal(true)}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold hover:bg-purple-700"
             >
               + New Organization
-            </button>
+            </Button>
           </div>
           {loading ? (
             <div className="space-y-3">
@@ -203,20 +205,24 @@ export default function PlatformDashboard() {
                 </select>
               </div>
               <div className="flex gap-3 pt-2">
-                <button
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="flex-1"
                   onClick={() => setShowOrgModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50"
                   disabled={creatingOrg}
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="flex-1"
                   onClick={handleCreateOrg}
-                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 disabled:opacity-50"
                   disabled={creatingOrg || !newOrgName.trim()}
                 >
                   {creatingOrg ? 'Creating...' : 'Create'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>

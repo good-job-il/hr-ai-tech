@@ -228,8 +228,8 @@ export const SHADOWS = {
   // Glow effects
   'glow-purple': '0 0 40px rgba(124, 58, 237, 0.3), 0 0 80px rgba(124, 58, 237, 0.1)',
   'glow-blue': '0 0 40px rgba(47, 184, 255, 0.25), 0 0 80px rgba(47, 184, 255, 0.08)',
-  'button-primary': '0 18px 42px rgba(124, 77, 255, 0.35)',
-  'button-primary-hover': '0 6px 28px rgba(124, 77, 255, 0.45)',
+  'button-primary': '0 4px 20px rgba(145, 54, 240, 0.4)',
+  'button-primary-hover': '0 6px 28px rgba(145, 54, 240, 0.55)',
 };
 
 export const TRANSITIONS = {

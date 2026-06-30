@@ -2,17 +2,15 @@
  * Unified Button Component System
  * Centralized styling using design tokens
  */
-import { COLORS, SHADOWS, RADIUS, SPACING, TRANSITIONS } from '@/theme/tokens';
+import { SHADOWS, SPACING, TRANSITIONS } from '@/theme/tokens';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = {
   // Primary button with gradient
   primary: {
-    bg: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
+    bg: 'linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%)',
     text: '#FFFFFF',
-    shadow: SHADOWS['button-primary'],
     hover: {
-      shadow: SHADOWS['button-primary-hover'],
       transform: 'translateY(-1px)',
     },
   },
@@ -78,28 +76,28 @@ const sizes = {
     padding: `${SPACING[2]} ${SPACING[3]}`,
     fontSize: '12px',
     fontWeight: 700,
-    borderRadius: RADIUS.md,
+    borderRadius: '10px',
     height: '32px',
   },
   sm: {
     padding: `${SPACING[2]} ${SPACING[4]}`,
     fontSize: '14px',
     fontWeight: 700,
-    borderRadius: RADIUS.md,
+    borderRadius: '10px',
     height: '40px',
   },
   md: {
     padding: `${SPACING[3]} ${SPACING[6]}`,
     fontSize: '15px',
     fontWeight: 700,
-    borderRadius: RADIUS.lg,
+    borderRadius: '12px',
     height: '48px',
   },
   lg: {
     padding: `${SPACING[4]} ${SPACING[8]}`,
     fontSize: '16px',
     fontWeight: 700,
-    borderRadius: RADIUS.xl,
+    borderRadius: '14px',
     height: '56px',
   },
 };
@@ -126,7 +124,7 @@ export function Button({
     transition: TRANSITIONS.base,
     opacity: disabled ? 0.5 : 1,
     ...sizeStyles,
-    backgroundColor: variantStyles.bg,
+    background: variantStyles.bg,
     color: variantStyles.text,
     ...(variantStyles.border && { border: variantStyles.border }),
     ...(variantStyles.shadow && { boxShadow: variantStyles.shadow }),

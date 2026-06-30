@@ -35,7 +35,7 @@
     --bg-card: #FFFFFF;
 
     /* Gradients */
-    --gradient-brand: linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%);
+    --gradient-brand: linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%);
     --gradient-soft: linear-gradient(135deg, rgba(124,58,237,0.06) 0%, rgba(37,99,235,0.06) 100%);
 
     /* Shadows */
@@ -159,11 +159,11 @@
 /* Premium utility classes */
 @layer utilities {
   .gradient-brand {
-    background: linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%);
+    background: linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%);
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%);
+    background: linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -190,12 +190,11 @@
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%);
+    background: linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%);
     color: white;
     font-weight: 700;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 10px 24px;
-    box-shadow: 0 4px 20px rgba(124, 77, 255, 0.35);
     transition: all 0.2s ease;
     border: none;
     cursor: pointer;
@@ -203,7 +202,6 @@
 
   .btn-primary:hover {
     opacity: 0.92;
-    box-shadow: 0 6px 28px rgba(124,58,237,0.4);
     transform: translateY(-1px);
   }
 
