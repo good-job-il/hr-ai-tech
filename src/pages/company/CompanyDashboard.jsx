@@ -96,7 +96,8 @@ export default function CompanyDashboard() {
         </div>
         <div className="flex gap-2">
           <Link to="/company/jobs"
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors">
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-xl text-sm font-bold transition-all hover:opacity-90 hover:-translate-y-px"
+            style={{ background: 'linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%)' }}>
             <Briefcase className="w-4 h-4" />
             {t('company.dashboard.postJob')}
           </Link>
