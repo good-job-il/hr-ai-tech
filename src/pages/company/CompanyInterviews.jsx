@@ -4,11 +4,12 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
+import { Button } from '@/components/ui/Button';
 import {
   Calendar, RefreshCw, Clock, Video, Phone, MapPin,
   X, Briefcase, User, CheckCircle2, XCircle, AlertCircle,
   RotateCcw, UserX, Plus, Edit, FileText, ThumbsUp, ThumbsDown,
-  Mail, MessageSquare, Star, Filter
+  Mail, Star, Filter
 } from 'lucide-react';
 
 // ─── Status config ─────────────────────────────────────────────────────────────
@@ -48,7 +49,7 @@ function StatusBadge({ status }) {
   const style = STATUS_STYLE[status] || { color: '#64748B', bg: '#F8FAFC', border: '#E2E8F0' };
   const label = t(`company.interviews.status.${status}`, { defaultValue: status });
   const Icon = STATUS_ICON[status] || Calendar;
-  
+
   return (
     <span
       className="text-xs px-2.5 py-1 rounded-lg font-bold whitespace-nowrap flex items-center gap-1"
@@ -394,20 +395,22 @@ function DetailPanel({ interview, onClose, onUpdate }) {
 
               {/* Actions */}
               <div className="flex gap-2">
-                <button
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="flex-1"
                   onClick={handleSaveFeedback}
                   disabled={updateMutation.isPending}
-                  className="flex-1 h-9 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 disabled:opacity-50 transition-colors"
                 >
                   {t('common.save')}
-                </button>
+                </Button>
                 <button
                   onClick={() => {
                     setIsEditing(false);
                     setFeedback(interview.feedback || '');
                     setRating(interview.rating || 0);
                   }}
-                  className="px-4 h-9 border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:border-emerald-300 transition-colors"
+                  className="px-4 h-9 border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:border-gray-300 transition-colors"
                 >
                   {t('common.cancel')}
                 </button>
@@ -518,7 +521,7 @@ export default function CompanyInterviews() {
 
   const filtered = useMemo(() => {
     const todayDate = new Date().toISOString().split('T')[0];
-    
+
     return interviews.filter(i => {
       if (filterTab === 'upcoming') {
         return i.date >= todayDate && i.status !== 'cancelled' && i.status !== 'completed';
@@ -554,7 +557,8 @@ export default function CompanyInterviews() {
           </button>
           <Link
             to="/company/candidates"
-            className="flex items-center gap-2 h-9 px-4 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors"
+            className="flex items-center gap-2 h-9 px-4 text-white rounded-xl text-sm font-bold transition-all hover:opacity-90 hover:-translate-y-px"
+            style={{ background: 'linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%)' }}
           >
             <Plus className="w-4 h-4" />
             {t('company.interviews.scheduleNew')}
@@ -612,7 +616,8 @@ export default function CompanyInterviews() {
                   <p className="text-gray-500 font-semibold text-sm mt-1 mb-4">{t('company.interviews.noInterviewsHint')}</p>
                   <Link
                     to="/company/candidates"
-                    className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-white rounded-xl text-sm font-bold transition-all hover:opacity-90 hover:-translate-y-px"
+                    style={{ background: 'linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%)' }}
                   >
                     <Plus className="w-4 h-4" />
                     {t('company.interviews.scheduleFirst')}
