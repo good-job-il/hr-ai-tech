@@ -1,0 +1,136 @@
+import {
+  Entity,
+  Column,
+  Index,
+  BeforeInsert,
+  BeforeUpdate,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { BaseEntity } from '../../common/entities/base.entity';
+import { UserRole } from '../../common/enums/user-role.enum';
+import { OrgType } from '../../common/enums/org-type.enum';
+
+@Entity('users')
+@Index(['email'], { unique: true })
+@Index(['organization_id'])
+@Index(['role'])
+export class UserEntity extends BaseEntity {
+  @Column({ type: 'varchar', length: 255, unique: true })
+  email: string;
+
+  @Column({ name: 'password_hash', type: 'varchar', length: 255 })
+  @Exclude()
+  password_hash: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  full_name: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.CANDIDATE,
+  })
+  role: UserRole;
+
+  @Column({
+    name: 'organization_id',
+    type: 'varchar',
+    length: 36,
+    nullable: true,
+  })
+  organization_id: string | null;
+
+  /** DEPRECATED in Base44 — keep for backward compat, maps to organization_id */
+  @Column({ name: 'company_id', type: 'varchar', length: 36, nullable: true })
+  company_id: string | null;
+
+  @Column({
+    name: 'org_type',
+    type: 'enum',
+    enum: OrgType,
+    nullable: true,
+  })
+  org_type: OrgType | null;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  phone: string | null;
+
+  @Column({
+    name: 'team_manager_id',
+    type: 'varchar',
+    length: 36,
+    nullable: true,
+  })
+  team_manager_id: string | null;
+
+  @Column({
+    name: 'recruitment_manager_id',
+    type: 'varchar',
+    length: 36,
+    nullable: true,
+  })
+  recruitment_manager_id: string | null;
+
+  /** Custom display name for their role (UI only) */
+  @Column({
+    name: 'display_role_name',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
+  display_role_name: string | null;
+
+  /** Employer-specific: which company they represent */
+  @Column({
+    name: 'employer_company_id',
+    type: 'varchar',
+    length: 36,
+    nullable: true,
+  })
+  employer_company_id: string | null;
+
+  @Column({ name: 'is_active', type: 'boolean', default: true })
+  is_active: boolean;
+
+  @Column({ name: 'last_login', type: 'datetime', nullable: true })
+  last_login: Date | null;
+
+  /** Hashed refresh token for token rotation */
+  @Column({
+    name: 'refresh_token_hash',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  @Exclude()
+  refresh_token_hash: string | null;
+
+  /** Password reset token (hashed) */
+  @Column({
+    name: 'reset_token_hash',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  @Exclude()
+  reset_token_hash: string | null;
+
+  @Column({ name: 'reset_token_expires', type: 'datetime', nullable: true })
+  @Exclude()
+  reset_token_expires: Date | null;
+
+  @BeforeInsert()
+  normalizeEmail() {
+    if (this.email) {
+      this.email = this.email.toLowerCase().trim();
+    }
+  }
+
+  @BeforeUpdate()
+  normalizeEmailOnUpdate() {
+    if (this.email) {
+      this.email = this.email.toLowerCase().trim();
+    }
+  }
+}
+
