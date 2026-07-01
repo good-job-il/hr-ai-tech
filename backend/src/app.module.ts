@@ -14,6 +14,12 @@ import { InterviewsModule } from './modules/interviews/interviews.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { CompaniesModule } from './modules/companies/companies.module';
+import { AuditModule } from './modules/audit/audit.module';
+import { CommunicationModule } from './modules/communication/communication.module';
+import { CompensationModule } from './modules/compensation/compensation.module';
+import { PermissionsModule } from './modules/permissions/permissions.module';
+import { ImportSourcesModule } from './modules/import-sources/import-sources.module';
+import { SalaryModule } from './modules/salary/salary.module';
 
 @Module({
   imports: [
@@ -28,6 +34,13 @@ import { CompaniesModule } from './modules/companies/companies.module';
     TaxonomyModule,
     // Phase 2
     CandidatesModule,
+    // Phase 3
+    AuditModule,
+    CommunicationModule,
+    CompensationModule,
+    PermissionsModule,
+    ImportSourcesModule,
+    SalaryModule,
     JobsModule,
     ApplicationsModule,
     InterviewsModule,
