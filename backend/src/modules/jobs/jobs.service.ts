@@ -91,8 +91,10 @@ export class JobsService {
   }
 
   // ─── Saved Jobs ──────────────────────────────────────────────────────────
-  async getSavedJobs(userEmail: string) {
-    return this.savedJobRepo.find({ where: { user_email: userEmail }, order: { created_date: 'DESC' } as any });
+  async getSavedJobs(userEmail: string, jobId?: string) {
+    const where: any = { user_email: userEmail };
+    if (jobId) where.job_id = jobId;
+    return this.savedJobRepo.find({ where, order: { created_date: 'DESC' } as any });
   }
 
   async saveJob(dto: CreateSavedJobDto): Promise<SavedJobEntity> {

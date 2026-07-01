@@ -61,9 +61,9 @@ export class JobsController {
 
   // ─── Saved Jobs ───────────────────────────────────────────────────────────
   @Get('saved')
-  @ApiOperation({ summary: 'Get saved jobs for current user' })
-  getSavedJobs(@CurrentUser() user: UserEntity) {
-    return this.svc.getSavedJobs(user.email);
+  @ApiOperation({ summary: 'Get saved jobs for current user (optionally filtered by job_id)' })
+  getSavedJobs(@Query('job_id') jobId: string | undefined, @CurrentUser() user: UserEntity) {
+    return this.svc.getSavedJobs(user.email, jobId);
   }
 
   @Post('saved')

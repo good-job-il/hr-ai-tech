@@ -38,6 +38,10 @@ export class TaxonomyService {
     return this.roleRepo.find({ where, order: { name: 'ASC' } });
   }
 
+  getRole(roleId: number) {
+    return this.roleRepo.findOne({ where: { role_id: roleId } });
+  }
+
   getSpecializations(roleName?: string) {
     const where: any = roleName ? { role_name: roleName } : {};
     return this.specRepo.find({ where, order: { name: 'ASC' } });

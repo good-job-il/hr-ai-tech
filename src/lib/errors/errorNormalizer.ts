@@ -214,3 +214,11 @@ export class ErrorNormalizer {
     return error && error.isAxiosError === true;
   }
 }
+
+/**
+ * Functional convenience wrapper around `ErrorNormalizer.normalize`, used by
+ * `httpClient` and other consumers that just need a normalized `AppError`.
+ */
+export function normalizeError(error: unknown, requestId?: string): AppError {
+  return ErrorNormalizer.normalize(error, requestId);
+}

@@ -39,6 +39,13 @@ export class TaxonomyController {
   }
 
   @Public()
+  @Get('roles/:id')
+  @ApiOperation({ summary: 'Get role by ID' })
+  getRole(@Param('id', ParseIntPipe) id: number) {
+    return this.service.getRole(id);
+  }
+
+  @Public()
   @Get('specializations')
   @ApiOperation({ summary: 'List specializations, optionally filtered by role_name' })
   @ApiQuery({ name: 'role_name', required: false, type: String })

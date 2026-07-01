@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { appParams } from '@/lib/app-params';
-import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
+import { tokenStorage } from '@/api/client/tokenStorage';
 
 const AuthContext = createContext();
 
@@ -9,10 +8,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(true);
+  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(false);
   const [authError, setAuthError] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
-  const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
+  const [appPublicSettings, setAppPublicSettings] = useState(null); // unused with NestJS backend, kept for API compat
   const [organization, setOrganization] = useState(null);
   const [orgType, setOrgType] = useState(null); // 'staffing_agency' | 'organization' | null (platform)
 
@@ -21,62 +20,14 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAppState = async () => {
-    try {
-      setIsLoadingPublicSettings(true);
-      setAuthError(null);
-      
-      // First, check app public settings (with token if available)
-      // This will tell us if auth is required, user not registered, etc.
-      const appClient = createAxiosClient({
-        baseURL: `/api/apps/public`,
-        headers: {
-          'X-App-Id': appParams.appId
-        },
-        token: appParams.token, // Include token if available
-        interceptResponses: true
-      });
-      
-      try {
-        const publicSettings = await appClient.get(`/prod/public-settings/by-id/${appParams.appId}`);
-        setAppPublicSettings(publicSettings);
-      } catch (appError) {
-        // 404 means the endpoint doesn't exist — not a fatal error, continue normally
-        if (appError.status !== 404) {
-          console.warn('App public settings fetch failed:', appError.message);
-        }
-        // Only treat specific 403 reasons as blocking errors
-        if (appError.status === 403 && appError.data?.extra_data?.reason) {
-          const reason = appError.data.extra_data.reason;
-          if (reason === 'auth_required') {
-            setAuthError({ type: 'auth_required', message: 'Authentication required' });
-          } else if (reason === 'user_not_registered') {
-            setAuthError({ type: 'user_not_registered', message: 'User not registered for this app' });
-          } else {
-            setAuthError({ type: reason, message: appError.message });
-          }
-          setIsLoadingPublicSettings(false);
-          setIsLoadingAuth(false);
-          return;
-        }
-      }
-
-      // Check user auth regardless of whether public-settings succeeded
-      setIsLoadingPublicSettings(false);
-      if (appParams.token) {
-        await checkUserAuth();
-      } else {
-        setIsLoadingAuth(false);
-        setIsAuthenticated(false);
-        setAuthChecked(true);
-      }
-    } catch (error) {
-      console.error('Unexpected error:', error);
-      setAuthError({
-        type: 'unknown',
-        message: error.message || 'An unexpected error occurred'
-      });
-      setIsLoadingPublicSettings(false);
+    // With the NestJS JWT backend there's no separate "app public settings"
+    // handshake — we simply check whether a stored access token is valid.
+    if (tokenStorage.hasToken()) {
+      await checkUserAuth();
+    } else {
       setIsLoadingAuth(false);
+      setIsAuthenticated(false);
+      setAuthChecked(true);
     }
   };
 
@@ -115,8 +66,7 @@ export const AuthProvider = ({ children }) => {
       // 401 / 403 just means the stored token is stale — not an app-level error.
       // Clear the stale token from storage and treat the user as unauthenticated.
       if (error.status === 401 || error.status === 403) {
-        localStorage.removeItem('base44_access_token');
-        localStorage.removeItem('token');
+        tokenStorage.clearTokens();
       } else {
         console.error('User auth check failed:', error);
       }
@@ -129,13 +79,13 @@ export const AuthProvider = ({ children }) => {
   const logout = (shouldRedirect = true) => {
     setUser(null);
     setIsAuthenticated(false);
-    
+
     if (shouldRedirect) {
-      // Use the SDK's logout method which handles token cleanup and redirect
-      base44.auth.logout(window.location.href);
+      const from = encodeURIComponent(window.location.pathname + window.location.search);
+      base44.auth.logout(`/login?from_url=${from}`);
     } else {
-      // Just remove the token without redirect
-      base44.auth.logout();
+      // Just clear tokens, no navigation
+      tokenStorage.clearTokens();
     }
   };
 

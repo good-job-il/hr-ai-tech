@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
@@ -50,8 +50,6 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userType, setUserType] = useState(inviteRole || 'candidate');
   const [orgType, setOrgType] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [showOtp, setShowOtp] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const isFromInvite = !!inviteToken;
@@ -63,12 +61,6 @@ export default function Register() {
     cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     toast({ title: msg, variant: 'destructive' });
   };
-
-  useEffect(() => {
-    if (showOtp) {
-      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [showOtp]);
 
   const selectedUserType = USER_TYPES.find(u => u.id === userType);
   const requiresOrg = selectedUserType?.requiresOrg;
@@ -93,8 +85,8 @@ export default function Register() {
       showError(t('errors.passwordMismatch'));
       return;
     }
-    if (password.length < 6) {
-      showError(isRtl ? 'הסיסמה חייבת להיות לפחות 6 תווים' : 'Password must be at least 6 characters');
+    if (password.length < 8) {
+      showError(isRtl ? 'הסיסמה חייבת להיות לפחות 8 תווים' : 'Password must be at least 8 characters');
       return;
     }
     if (requiresOrg && !orgType) {
@@ -104,47 +96,21 @@ export default function Register() {
 
     setLoading(true);
     try {
-      await base44.auth.register({ email, password });
-      setShowOtp(true);
-    } catch (err) {
-      console.error('[Register] register error:', err);
-      const msg = err?.response?.data?.message || err?.message || (isRtl ? 'שגיאה בהרשמה' : 'Registration error');
-      showError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
+      await base44.auth.register({
+        email,
+        password,
+        full_name: fullName,
+        phone,
+        role: userType,
+      });
 
-  const handleVerify = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const res = await base44.auth.verifyOtp({ email, otpCode });
-      base44.auth.setToken(res.access_token);
-
-      // Set the user's role via service-role function (bypasses platform restriction)
-      try {
-        await base44.functions.setUserRole.invoke({
-          role: userType,
-          org_type: orgType || null,
-        });
-      } catch (roleErr) {
-        console.warn('[Register] setUserRole failed, falling back to localStorage:', roleErr);
-      }
-
-      // Update profile fields that are allowed without admin rights
-      try {
-        await base44.auth.updateMe({
-          full_name: fullName,
-          phone,
-          org_type: orgType || null,
-          profile_completed: false,
-          is_active: true,
-          last_login: new Date().toISOString(),
-        });
-      } catch (updateErr) {
-        console.warn('[Register] updateMe failed:', updateErr);
+      // Set org_type separately — not part of the core register payload
+      if (requiresOrg && orgType) {
+        try {
+          await base44.auth.updateMe({ org_type: orgType });
+        } catch (updateErr) {
+          console.warn('[Register] updateMe(org_type) failed:', updateErr);
+        }
       }
 
       localStorage.setItem('base44_registered_role', userType);
@@ -160,8 +126,8 @@ export default function Register() {
 
       window.location.href = redirects[userType] || '/';
     } catch (err) {
-      console.error('[Register] verifyOtp error:', err);
-      const msg = err?.response?.data?.message || err?.message || (isRtl ? 'קוד שגוי' : 'Invalid code');
+      console.error('[Register] register error:', err);
+      const msg = err?.response?.data?.message || err?.message || (isRtl ? 'שגיאה בהרשמה' : 'Registration error');
       showError(msg);
     } finally {
       setLoading(false);
@@ -179,14 +145,10 @@ export default function Register() {
           <div className="text-center mb-6">
             <img src="https://media.base44.com/images/public/6a00f4b05ae5180d66425437/e31fa83ee_232B9533-1BE6-4299-80F9-1B99BFDA97E1.png" alt="HeadHunter HR-Tech" className="h-16 w-auto object-contain mx-auto mb-4" />
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              {showOtp
-                ? (isRtl ? 'רגע אחד לפני שמתחילים 🎉' : 'One moment before we start 🎉')
-                : (isRtl ? 'הצטרף לHeadHunter' : 'Join HeadHunter')}
+              {isRtl ? 'הצטרף לHeadHunter' : 'Join HeadHunter'}
             </h1>
             <p className="text-sm text-gray-600">
-              {showOtp
-                ? (isRtl ? `שלחנו קוד אימות לכתובת ${email}` : `We sent a verification code to ${email}`)
-                : (isRtl ? 'אלפי משרות מחכות לך — הרשמה לוקחת פחות מדקה' : 'Thousands of jobs await you — registration takes less than a minute')}
+              {isRtl ? 'אלפי משרות מחכות לך — הרשמה לוקחת פחות מדקה' : 'Thousands of jobs await you — registration takes less than a minute'}
             </p>
           </div>
 
@@ -201,45 +163,7 @@ export default function Register() {
             </div>
           )}
 
-          {showOtp ? (
-           <form onSubmit={handleVerify} className="space-y-5">
-             <div>
-               <Label className="text-sm font-semibold text-gray-700 block mb-2">
-                 {isRtl ? 'קוד אימות (6 ספרות)' : 'Verification code (6 digits)'}
-               </Label>
-               <Input
-                 value={otpCode}
-                 onChange={(e) => setOtpCode(e.target.value)}
-                 required
-                 className="text-center tracking-[0.2em] text-xl font-semibold h-14 border-gray-300 focus:border-hhblue"
-                 dir="ltr"
-                 placeholder="000000"
-               />
-               <p className="text-xs text-gray-500 mt-1.5">
-                 {isRtl ? 'הסתכל בדוא"ל שלך — הקוד נשלח עכשיו. בדוק גם ספאם.' : 'Check your email — the code was just sent. Also check spam.'}
-               </p>
-             </div>
-               <Button type="submit" disabled={loading} className="w-full bg-red-600 hover:bg-red-700 text-white h-12 font-bold text-base rounded-lg">
-                 {loading ? (
-                   <span className="flex items-center gap-2 justify-center">
-                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                     </svg>
-                     {isRtl ? 'מאמת...' : 'Verifying...'}
-                   </span>
-                 ) : (isRtl ? 'אמת ובוא נתחיל' : "Verify and let's start")}
-               </Button>
-             <button
-               type="button"
-               onClick={() => base44.auth.resendOtp(email)}
-               className="text-hhblue text-sm hover:underline w-full text-center py-2"
-             >
-               {isRtl ? 'לא קיבלת? שלח קוד חדש' : "Didn't receive it? Send a new code"}
-             </button>
-           </form>
-          ) : (
-           <>
+          <>
              <form onSubmit={handleRegister} className="space-y-4">
                <div>
                  <Label className="text-sm font-semibold text-gray-700 block mb-2">{t('auth.register.fullName')}</Label>
@@ -385,7 +309,6 @@ export default function Register() {
                 🔵 {t('auth.register.continueGoogle')}
               </Button>
             </>
-          )}
 
           <p className="text-center text-sm text-gray-600 mt-7">
             {t('auth.register.haveAccount')}{' '}
