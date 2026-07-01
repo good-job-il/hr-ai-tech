@@ -119,6 +119,22 @@ export class UserEntity extends BaseEntity {
   @Exclude()
   reset_token_expires: Date | null;
 
+  // ─── Employer company profile fields (used by updateCompanyProfile) ─────
+  @Column({ name: 'company_culture', type: 'text', nullable: true })
+  company_culture: string | null;
+
+  @Column({ type: 'json', nullable: true })
+  benefits: string[] | null;
+
+  @Column({ name: 'gallery_urls', type: 'json', nullable: true })
+  gallery_urls: string[] | null;
+
+  @Column({ name: 'video_url', type: 'text', nullable: true })
+  video_url: string | null;
+
+  @Column({ type: 'json', nullable: true })
+  testimonials: Record<string, any>[] | null;
+
   @BeforeInsert()
   normalizeEmail() {
     if (this.email) {

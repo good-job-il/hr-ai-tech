@@ -1,0 +1,292 @@
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as XLSX from 'xlsx';
+import { CandidateEntity } from '../../candidates/entities/candidate.entity';
+import { CandidateImportBatchEntity } from '../../candidates/entities/candidate-import-batch.entity';
+import { CandidateDocumentEntity } from '../../candidates/entities/candidate-document.entity';
+import { UserEntity } from '../../users/user.entity';
+import { ResumeExtractionService } from './resume-extraction.service';
+import {
+  ImportCandidatesFromFileDto,
+  CreateBulkCandidatesDto,
+  ValidateImportBatchDto,
+  ImportResumeFilesDto,
+  ParseResumeBatchDto,
+} from '../dto/functions.dto';
+
+@Injectable()
+export class ImportService {
+  private readonly logger = new Logger(ImportService.name);
+
+  constructor(
+    @InjectRepository(CandidateEntity) private readonly candidateRepo: Repository<CandidateEntity>,
+    @InjectRepository(CandidateImportBatchEntity) private readonly batchRepo: Repository<CandidateImportBatchEntity>,
+    @InjectRepository(CandidateDocumentEntity) private readonly documentRepo: Repository<CandidateDocumentEntity>,
+    private readonly resumeExtraction: ResumeExtractionService,
+  ) {}
+
+  // ─── importCandidatesFromFile — parses CSV/XLSX spreadsheets ─────────────
+  async importCandidatesFromFile(dto: ImportCandidatesFromFileDto, user: UserEntity) {
+    const batch = await this.batchRepo.findOne({ where: { id: dto.batchId } });
+    if (!batch) throw new NotFoundException('Import batch not found');
+
+    batch.status = 'processing';
+    batch.processing_started_at = new Date();
+    await this.batchRepo.save(batch);
+
+    let successful = 0;
+    let duplicates = 0;
+    let failed = 0;
+    let missingEmail = 0;
+
+    try {
+      const res = await fetch(dto.fileUrl);
+      const buffer = Buffer.from(await res.arrayBuffer());
+      const workbook = XLSX.read(buffer, { type: 'buffer' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows: Record<string, any>[] = XLSX.utils.sheet_to_json(sheet);
+
+      for (const row of rows) {
+        try {
+          const email = row.email || row.Email || row['אימייל'];
+          const fullName = row.full_name || row.name || row['שם מלא'] || 'לא ידוע';
+
+          if (!email) missingEmail++;
+
+          if (email) {
+            const existing = await this.candidateRepo.findOne({ where: { email, is_deleted: false } });
+            if (existing) {
+              duplicates++;
+              continue;
+            }
+          }
+
+          const candidate = this.candidateRepo.create({
+            full_name: fullName,
+            email: email || null,
+            phone: row.phone || row['טלפון'] || null,
+            location: row.location || row['מיקום'] || null,
+            role_name: row.role || row.role_name || row['תפקיד'] || null,
+            experience_years: row.experience_years || null,
+            skills: row.skills ? String(row.skills).split(',').map((s: string) => s.trim()) : [],
+            source: 'import' as any,
+            recruiter_id: dto ? user.id : null,
+            organization_id: user.organization_id,
+            import_batch_id: dto.batchId,
+            imported_at: new Date(),
+            imported_by: user.email,
+          } as any);
+          await this.candidateRepo.save(candidate);
+          successful++;
+        } catch (rowErr) {
+          this.logger.warn(`Row import failed: ${(rowErr as Error).message}`);
+          failed++;
+        }
+      }
+
+      batch.total_records = rows.length;
+      batch.successful_imports = successful;
+      batch.failed_imports = failed;
+      batch.duplicate_found = duplicates;
+      batch.missing_email = missingEmail;
+      batch.status = failed > 0 ? 'partial' : 'completed';
+      batch.processing_completed_at = new Date();
+      await this.batchRepo.save(batch);
+
+      return { message: `Import completed: ${successful} succeeded, ${failed} failed`, successful, duplicates, failed, missingEmail };
+    } catch (err) {
+      batch.status = 'failed';
+      batch.error_log = [{ message: (err as Error).message }];
+      await this.batchRepo.save(batch);
+      throw err;
+    }
+  }
+
+  // ─── createBulkCandidates — creates candidates from pre-parsed data ──────
+  async createBulkCandidates(dto: CreateBulkCandidatesDto, user: UserEntity) {
+    const created: any[] = [];
+    const failed: any[] = [];
+
+    for (const data of dto.candidates_data) {
+      try {
+        const candidate = this.candidateRepo.create({
+          ...data,
+          organization_id: user.organization_id,
+          import_batch_id: dto.import_batch_id ?? null,
+          imported_at: new Date(),
+          imported_by: user.email,
+          source: 'import',
+        } as any);
+        const saved = await this.candidateRepo.save(candidate);
+        created.push(saved);
+      } catch (err) {
+        failed.push({ data, error: (err as Error).message });
+      }
+    }
+
+    if (dto.import_batch_id) {
+      const batch = await this.batchRepo.findOne({ where: { id: dto.import_batch_id } });
+      if (batch) {
+        batch.successful_imports += created.length;
+        batch.failed_imports += failed.length;
+        await this.batchRepo.save(batch);
+      }
+    }
+
+    return { created, failed };
+  }
+
+  // ─── validateImportBatch — readiness checks for a batch ──────────────────
+  async validateImportBatch(dto: ValidateImportBatchDto) {
+    const batch = await this.batchRepo.findOne({ where: { id: dto.import_batch_id } });
+    if (!batch) throw new NotFoundException('Batch not found');
+
+    const candidates = await this.candidateRepo.find({ where: { import_batch_id: dto.import_batch_id } });
+    const total = candidates.length || 1;
+
+    const checks = {
+      resume_upload: this.check(candidates, (c) => !!c.resume_url),
+      docx_conversion: this.check(candidates, (c) => !!c.converted_resume_url),
+      parsing_success: this.check(candidates, (c) => c.parsing_status === 'success'),
+      email_validation: this.check(candidates, (c) => !!c.email),
+      phone_validation: this.check(candidates, (c) => !!c.phone),
+      role_validation: this.check(candidates, (c) => !!c.role_name),
+      duplicate_detection: this.check(candidates, (c) => !c.is_duplicate_suspected),
+      recruiter_assignment: this.check(candidates, (c) => !!c.recruiter_id),
+      data_quality: {
+        passed: candidates.every((c) => (c.data_quality_score ?? 0) >= 50),
+        avg_score: Math.round(candidates.reduce((s, c) => s + (c.data_quality_score || 0), 0) / total),
+      },
+    };
+
+    const passedChecks = Object.values(checks).filter((c: any) => c.passed).length;
+    const totalChecks = Object.values(checks).length;
+    const readinessScore = Math.round((passedChecks / totalChecks) * 100);
+
+    const recommendations: string[] = [];
+    if (!checks.email_validation.passed) recommendations.push(`⚠️ ${candidates.filter((c) => !c.email).length} candidates missing email`);
+    if (!checks.phone_validation.passed) recommendations.push(`⚠️ ${candidates.filter((c) => !c.phone).length} candidates missing phone`);
+    if (!checks.role_validation.passed) recommendations.push(`⚠️ ${candidates.filter((c) => !c.role_name).length} candidates missing role`);
+    if (!checks.duplicate_detection.passed) recommendations.push(`⚠️ ${candidates.filter((c) => c.is_duplicate_suspected).length} suspected duplicates`);
+    if (checks.data_quality.avg_score < 60) recommendations.push(`⚠️ Average data quality is ${checks.data_quality.avg_score}%`);
+
+    return {
+      batch_id: dto.import_batch_id,
+      readiness_score: readinessScore,
+      passed_checks: passedChecks,
+      total_checks: totalChecks,
+      is_production_ready: readinessScore >= 80 && recommendations.length === 0,
+      checks,
+      recommendations,
+      summary: { total_candidates: candidates.length },
+    };
+  }
+
+  private check(candidates: CandidateEntity[], predicate: (c: CandidateEntity) => boolean) {
+    const passing = candidates.filter(predicate).length;
+    return { passed: passing === candidates.length, total: candidates.length, success: passing, failed: candidates.length - passing };
+  }
+
+  // ─── importResumeFiles — bulk resume upload + extraction ────────────────
+  async importResumeFiles(dto: ImportResumeFilesDto, user: UserEntity) {
+    const results: any[] = [];
+    let successful = 0;
+    let failed = 0;
+    let duplicates = 0;
+
+    for (const file of dto.files) {
+      try {
+        const existingDoc = await this.documentRepo.findOne({ where: { file_url: file.file_url } });
+        if (existingDoc) {
+          duplicates++;
+          results.push({ filename: file.filename, status: 'duplicate' });
+          continue;
+        }
+
+        const extraction = await this.resumeExtraction.extractAndTranslate({ file_url: file.file_url });
+
+        const candidate = this.candidateRepo.create({
+          full_name: extraction.data.full_name || file.filename || 'לא ידוע',
+          email: extraction.data.email || null,
+          phone: extraction.data.phone || null,
+          location: extraction.data.location || null,
+          experience_years: extraction.data.experience_years || null,
+          skills: extraction.data.skills || [],
+          summary: extraction.data.summary || null,
+          resume_url: file.file_url,
+          resume_filename: file.filename,
+          resume_file_size: file.file_size ?? null,
+          resume_upload_source: 'import_zip',
+          source: 'upload' as any,
+          organization_id: user.organization_id,
+          recruiter_id: dto.recruiter_id || user.id,
+          import_batch_id: dto.batchId ?? null,
+          parsing_status: 'success' as any,
+          imported_at: new Date(),
+          imported_by: user.email,
+        } as any) as unknown as CandidateEntity;
+        const saved = (await this.candidateRepo.save(candidate)) as unknown as CandidateEntity;
+
+        await this.documentRepo.save(
+          this.documentRepo.create({
+            candidate_id: saved.id,
+            candidate_email: saved.email,
+            doc_type: 'resume',
+            filename: file.filename,
+            file_url: file.file_url,
+            file_size: file.file_size ?? null,
+            uploaded_by: user.email,
+            uploaded_at: new Date(),
+            is_latest_cv: true,
+            import_batch_id: dto.batchId ?? null,
+          } as any),
+        );
+
+        successful++;
+        results.push({ filename: file.filename, status: 'success', candidate_id: saved.id });
+      } catch (err) {
+        failed++;
+        results.push({ filename: file.filename, status: 'failed', error: (err as Error).message });
+      }
+    }
+
+    return { results, successful, failed, duplicates, conversionFailed: 0, parsingFailed: failed };
+  }
+
+  // ─── parseResumeBatch — parse a ZIP of resumes (metadata pass) ───────────
+  async parseResumeBatch(dto: ParseResumeBatchDto, user: UserEntity) {
+    // NOTE: Actual ZIP extraction requires unzip on the server (e.g. `unzipper`
+    // or `adm-zip`). This implementation validates the batch shell and
+    // prepares it for `importResumeFiles` once individual file URLs are known
+    // (typically after client-side unzip + upload, matching the frontend flow
+    // in ResumeZipUploader.jsx which uploads extracted files individually).
+    let batch: CandidateImportBatchEntity | null = null;
+    if (dto.import_batch_id) {
+      batch = await this.batchRepo.findOne({ where: { id: dto.import_batch_id } });
+    }
+    if (!batch) {
+      batch = this.batchRepo.create({
+        batch_name: `ZIP Import ${new Date().toISOString()}`,
+        source_file: dto.zip_file_url,
+        file_type: 'zip',
+        imported_by: user.email,
+        recruiter_id: dto.recruiter_id ?? user.id,
+        employer_id: dto.employer_id ?? null,
+        status: 'pending',
+      } as any) as unknown as CandidateImportBatchEntity;
+      batch = (await this.batchRepo.save(batch)) as unknown as CandidateImportBatchEntity;
+    }
+
+    return {
+      import_batch_id: batch.id,
+      candidates: [],
+      duplicates: [],
+      errors: [],
+      message: 'Batch registered. Upload extracted resume files via importResumeFiles with this batchId.',
+    };
+  }
+}
+
+
+
