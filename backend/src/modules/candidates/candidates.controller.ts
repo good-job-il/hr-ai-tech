@@ -10,6 +10,7 @@ import {
   CreateCandidateNoteDto, UpdateCandidateNoteDto,
   CreateCandidateTagDto,
   CreateCandidateProfileDto, UpdateCandidateProfileDto,
+  CreateCandidateDocumentDto,
 } from './dto/candidates.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserEntity } from '../users/user.entity';
@@ -20,17 +21,113 @@ import { UserEntity } from '../users/user.entity';
 export class CandidatesController {
   constructor(private readonly svc: CandidatesService) {}
 
-  // ─── Candidates ──────────────────────────────────────────────────────────
+  // ─── Static top-level sub-resources (MUST be declared before ':id') ──────
+
+  // ─── Import Batches ───────────────────────────────────────────────────────
+  @Get('import-batches')
+  getBatches(@CurrentUser() user: UserEntity) {
+    return this.svc.getBatches(user);
+  }
+
+  @Get('import-batches/:id')
+  getBatch(@Param('id', ParseUUIDPipe) id: string) {
+    return this.svc.getBatch(id);
+  }
+
+  @Post('import-batches')
+  @HttpCode(HttpStatus.CREATED)
+  createBatch(@Body() data: Record<string, any>) {
+    return this.svc.createBatch(data);
+  }
+
+  @Patch('import-batches/:id')
+  updateBatch(@Param('id', ParseUUIDPipe) id: string, @Body() data: Record<string, any>) {
+    return this.svc.updateBatch(id, data);
+  }
+
+  // ─── Profile ─────────────────────────────────────────────────────────────
+  @Get('profiles')
+  @ApiOperation({ summary: 'List candidate profiles (filter by user_email / is_public)' })
+  listProfiles(@Query('user_email') userEmail?: string, @Query('is_public') isPublic?: string) {
+    return this.svc.findAllProfiles({
+      user_email: userEmail,
+      is_public: isPublic !== undefined ? isPublic === 'true' : undefined,
+    });
+  }
+
+  @Get('profiles/:email')
+  @ApiOperation({ summary: 'Get candidate profile by email' })
+  getProfile(@Param('email') email: string) {
+    return this.svc.getProfile(email);
+  }
+
+  @Post('profiles')
+  @HttpCode(HttpStatus.CREATED)
+  createProfile(@Body() dto: CreateCandidateProfileDto) {
+    return this.svc.upsertProfile(dto);
+  }
+
+  @Patch('profiles/:key')
+  @ApiOperation({ summary: 'Update candidate profile by id or by email' })
+  updateProfile(
+    @Param('key') key: string,
+    @Body() dto: UpdateCandidateProfileDto,
+  ) {
+    return this.svc.updateProfileByKey(key, dto as any);
+  }
+
+  // ─── Access ──────────────────────────────────────────────────────────────
+  @Get('access')
+  @ApiOperation({ summary: 'List candidate access grants (marketplace)' })
+  listAccess(@Query('candidate_id') candidateId?: string) {
+    return this.svc.findAllAccess({ candidate_id: candidateId });
+  }
+
+  @Post('access')
+  @HttpCode(HttpStatus.CREATED)
+  createAccess(@Body() data: Record<string, any>) {
+    return this.svc.createAccess(data);
+  }
+
+  @Patch('access/:id')
+  updateAccess(@Param('id', ParseUUIDPipe) id: string, @Body() data: Record<string, any>) {
+    return this.svc.updateAccess(id, data);
+  }
+
+  @Delete('access/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteAccess(@Param('id', ParseUUIDPipe) id: string) {
+    return this.svc.deleteAccess(id);
+  }
+
+  // ─── Notes (static prefix routes) ─────────────────────────────────────────
+  @Patch('notes/:noteId')
+  updateNote(
+    @Param('noteId', ParseUUIDPipe) noteId: string,
+    @Body() dto: UpdateCandidateNoteDto,
+    @CurrentUser() user: UserEntity,
+  ) {
+    return this.svc.updateNote(noteId, dto, user);
+  }
+
+  @Delete('notes/:noteId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteNote(@Param('noteId', ParseUUIDPipe) noteId: string, @CurrentUser() user: UserEntity) {
+    return this.svc.deleteNote(noteId, user);
+  }
+
+  // ─── Tags (static prefix routes) ──────────────────────────────────────────
+  @Delete('tags/:tagId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteTag(@Param('tagId', ParseUUIDPipe) tagId: string, @CurrentUser() user: UserEntity) {
+    return this.svc.deleteTag(tagId, user);
+  }
+
+  // ─── Candidates (base CRUD) ────────────────────────────────────────────────
   @Get()
   @ApiOperation({ summary: 'List candidates (RLS scoped)' })
   findAll(@Query() query: QueryCandidatesDto, @CurrentUser() user: UserEntity) {
     return this.svc.findAll(query, user);
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get candidate by ID' })
-  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
-    return this.svc.findById(id, user);
   }
 
   @Post()
@@ -38,6 +135,12 @@ export class CandidatesController {
   @ApiOperation({ summary: 'Create candidate' })
   create(@Body() dto: CreateCandidateDto, @CurrentUser() user: UserEntity) {
     return this.svc.create(dto, user);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get candidate by ID' })
+  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
+    return this.svc.findById(id, user);
   }
 
   @Patch(':id')
@@ -73,21 +176,6 @@ export class CandidatesController {
     return this.svc.createNote({ ...dto, candidate_id: id }, user);
   }
 
-  @Patch('notes/:noteId')
-  updateNote(
-    @Param('noteId', ParseUUIDPipe) noteId: string,
-    @Body() dto: UpdateCandidateNoteDto,
-    @CurrentUser() user: UserEntity,
-  ) {
-    return this.svc.updateNote(noteId, dto, user);
-  }
-
-  @Delete('notes/:noteId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  deleteNote(@Param('noteId', ParseUUIDPipe) noteId: string, @CurrentUser() user: UserEntity) {
-    return this.svc.deleteNote(noteId, user);
-  }
-
   // ─── Tags ─────────────────────────────────────────────────────────────────
   @Get(':id/tags')
   getTags(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
@@ -104,16 +192,16 @@ export class CandidatesController {
     return this.svc.createTag({ ...dto, candidate_id: id }, user);
   }
 
-  @Delete('tags/:tagId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  deleteTag(@Param('tagId', ParseUUIDPipe) tagId: string, @CurrentUser() user: UserEntity) {
-    return this.svc.deleteTag(tagId, user);
-  }
-
   // ─── Timeline ────────────────────────────────────────────────────────────
   @Get(':id/timeline')
   getTimeline(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
     return this.svc.getTimeline(id, user);
+  }
+
+  @Post(':id/timeline')
+  @HttpCode(HttpStatus.CREATED)
+  createTimelineEvent(@Param('id', ParseUUIDPipe) id: string, @Body() data: Record<string, any>) {
+    return this.svc.createTimelineEvent({ ...data, candidate_id: id });
   }
 
   // ─── Documents ───────────────────────────────────────────────────────────
@@ -122,36 +210,14 @@ export class CandidatesController {
     return this.svc.getDocuments(id, user);
   }
 
-  // ─── Import Batches ───────────────────────────────────────────────────────
-  @Get('import-batches')
-  getBatches(@CurrentUser() user: UserEntity) {
-    return this.svc.getBatches(user);
-  }
-
-  @Get('import-batches/:id')
-  getBatch(@Param('id', ParseUUIDPipe) id: string) {
-    return this.svc.getBatch(id);
-  }
-
-  // ─── Profile ─────────────────────────────────────────────────────────────
-  @Get('profiles/:email')
-  @ApiOperation({ summary: 'Get candidate profile by email' })
-  getProfile(@Param('email') email: string) {
-    return this.svc.getProfile(email);
-  }
-
-  @Post('profiles')
+  @Post(':id/documents')
   @HttpCode(HttpStatus.CREATED)
-  createProfile(@Body() dto: CreateCandidateProfileDto) {
-    return this.svc.upsertProfile(dto);
-  }
-
-  @Patch('profiles/:email')
-  updateProfile(
-    @Param('email') email: string,
-    @Body() dto: UpdateCandidateProfileDto,
+  createDocument(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: CreateCandidateDocumentDto,
+    @CurrentUser() user: UserEntity,
   ) {
-    return this.svc.upsertProfile({ ...dto, user_email: email } as any);
+    return this.svc.createDocument({ ...dto, candidate_id: id, uploaded_by: dto.uploaded_by ?? user.email } as any, user);
   }
 }
 

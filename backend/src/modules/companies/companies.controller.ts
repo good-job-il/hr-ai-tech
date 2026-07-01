@@ -29,3 +29,17 @@ export class CompaniesController {
   @Delete('staff/:id') @HttpCode(HttpStatus.NO_CONTENT) deleteStaff(@Param('id', ParseUUIDPipe) id: string) { return this.svc.deleteStaff(id); }
 }
 
+@ApiTags('Staff')
+@ApiBearerAuth()
+@Controller('staff')
+export class StaffController {
+  constructor(private readonly svc: CompaniesService) {}
+
+  @Get() findAll(@Query('organization_id') organizationId?: string, @Query('company_id') companyId?: string) {
+    return this.svc.findAllStaff({ organization_id: organizationId, company_id: companyId });
+  }
+  @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateStaffDto) { return this.svc.createStaff(dto); }
+  @Patch(':id') update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateStaffDto) { return this.svc.updateStaff(id, dto); }
+  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseUUIDPipe) id: string) { return this.svc.deleteStaff(id); }
+}
+

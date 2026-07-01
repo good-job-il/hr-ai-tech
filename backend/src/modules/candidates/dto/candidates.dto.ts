@@ -125,3 +125,15 @@ export class CreateCandidateProfileDto extends createZodDto(CreateCandidateProfi
 export const UpdateCandidateProfileSchema = CreateCandidateProfileSchema.partial();
 export class UpdateCandidateProfileDto extends createZodDto(UpdateCandidateProfileSchema) {}
 
+// ─── Create Candidate Document ────────────────────────────────────────────
+export const CreateCandidateDocumentSchema = z.object({
+  candidate_email: z.string().email().optional().nullable(),
+  doc_type: z.string().min(1).default('cv'),
+  filename: z.string().min(1),
+  file_url: z.string().min(1),
+  file_size: z.number().optional().nullable(),
+  uploaded_by: z.string().optional().nullable(),
+  is_latest_cv: z.boolean().optional().default(false),
+});
+export class CreateCandidateDocumentDto extends createZodDto(CreateCandidateDocumentSchema) {}
+

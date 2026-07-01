@@ -120,6 +120,8 @@ export class AuthService {
       'phone',
       'display_role_name',
       'last_login',
+      'org_type',
+      'is_active',
     ];
 
     const safeUpdates: Partial<UserEntity> = {};

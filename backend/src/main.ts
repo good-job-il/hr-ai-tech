@@ -1,4 +1,6 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -7,13 +9,19 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['log', 'error', 'warn', 'debug'],
   });
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT', 3001);
   const frontendUrl = configService.get<string>('FRONTEND_URL', 'http://localhost:5173');
+
+  // ─── Static file serving (uploads) ────────────────────────────────────
+  // Served OUTSIDE the /api prefix so file_url values are directly usable
+  // by <img>/<a> tags without going through the REST interceptors.
+  const uploadDir = configService.get<string>('UPLOAD_DIR', './uploads');
+  app.useStaticAssets(join(process.cwd(), uploadDir), { prefix: '/uploads/' });
 
   // ─── Global prefix ────────────────────────────────────────────────────
   app.setGlobalPrefix('api');

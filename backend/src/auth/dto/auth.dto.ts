@@ -59,6 +59,9 @@ export const UpdateMeSchema = z.object({
   phone: z.string().optional(),
   display_role_name: z.string().optional(),
   last_login: z.string().datetime().optional(),
+  org_type: z.enum(['organization', 'staffing_agency']).optional().nullable(),
+  profile_completed: z.boolean().optional(),
+  is_active: z.boolean().optional(),
 });
 export class UpdateMeDto extends createZodDto(UpdateMeSchema) {}
 

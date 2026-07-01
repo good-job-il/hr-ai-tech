@@ -70,6 +70,15 @@ export class CompaniesService {
     return this.staffRepo.find({ where: { company_id: companyId } as any });
   }
 
+  /** Flat list — mirrors base44.entities.Staff.list()/.filter(...) */
+  async findAllStaff(filters: Record<string, any> = {}) {
+    const where: Record<string, any> = {};
+    // StaffEntity only has company_id; treat organization_id filter as an alias for it.
+    if (filters.company_id) where.company_id = filters.company_id;
+    if (filters.organization_id) where.company_id = filters.organization_id;
+    return this.staffRepo.find({ where, order: { created_date: 'DESC' } as any });
+  }
+
   async createStaff(dto: CreateStaffDto): Promise<StaffEntity> {
     const s = this.staffRepo.create(dto as any);
     return this.staffRepo.save(s) as unknown as Promise<StaffEntity>;

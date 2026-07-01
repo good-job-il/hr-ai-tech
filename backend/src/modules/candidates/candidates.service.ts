@@ -237,6 +237,14 @@ export class CandidatesService {
     return this.profileRepo.findOne({ where: { user_email: userEmail } });
   }
 
+  /** Flat list with optional filters — mirrors base44.entities.CandidateProfile.filter(...) */
+  async findAllProfiles(filters: { user_email?: string; is_public?: boolean }) {
+    const where: Record<string, any> = {};
+    if (filters.user_email) where.user_email = filters.user_email;
+    if (filters.is_public !== undefined) where.is_public = filters.is_public;
+    return this.profileRepo.find({ where, order: { created_date: 'DESC' } as any });
+  }
+
   async upsertProfile(dto: CreateCandidateProfileDto | UpdateCandidateProfileDto) {
     const existing = await this.profileRepo.findOne({ where: { user_email: (dto as any).user_email } });
     if (existing) {
@@ -247,13 +255,37 @@ export class CandidatesService {
     return this.profileRepo.save(profile);
   }
 
+  /** Update by profile id OR user_email — mirrors base44's `.update(profile.id, data)` usage */
+  async updateProfileByKey(key: string, dto: Partial<CandidateProfileEntity>) {
+    let existing = await this.profileRepo.findOne({ where: { id: key } });
+    if (!existing) existing = await this.profileRepo.findOne({ where: { user_email: key } });
+    if (!existing) throw new NotFoundException(`Candidate profile ${key} not found`);
+    Object.assign(existing, dto);
+    return this.profileRepo.save(existing);
+  }
+
   // ─── Access ──────────────────────────────────────────────────────────────
   async getAccess(candidateId: string) {
     return this.accessRepo.find({ where: { candidate_id: candidateId } });
   }
 
+  /** Flat list — mirrors base44.entities.CandidateAccess.list(...) */
+  async findAllAccess(filters: Record<string, any> = {}) {
+    const where: Record<string, any> = {};
+    if (filters.candidate_id) where.candidate_id = filters.candidate_id;
+    if (filters.granted_to_organization_id) where.granted_to_organization_id = filters.granted_to_organization_id;
+    return this.accessRepo.find({ where, order: { created_date: 'DESC' } as any });
+  }
+
   async createAccess(data: Partial<CandidateAccessEntity>) {
     const access = this.accessRepo.create(data);
+    return this.accessRepo.save(access);
+  }
+
+  async updateAccess(id: string, data: Partial<CandidateAccessEntity>) {
+    const access = await this.accessRepo.findOne({ where: { id } });
+    if (!access) throw new NotFoundException(`Access ${id} not found`);
+    Object.assign(access, data);
     return this.accessRepo.save(access);
   }
 

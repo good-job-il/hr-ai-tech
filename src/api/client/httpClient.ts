@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { base44 } from '@/api/base44Client';
 import { MemoryCacheStore } from './cacheStore';
+import { tokenStorage } from './tokenStorage';
 import { normalizeError } from '@/lib/errors/errorNormalizer';
 import { AppError } from '@/lib/errors/AppError';
 import { ApiResponse, RequestConfig } from '@/types/api';
@@ -9,6 +9,7 @@ export class HttpClient {
   private axiosInstance: AxiosInstance;
   private cache = new MemoryCacheStore();
   private pendingRequests = new Map<string, Promise<any>>();
+  private refreshPromise: Promise<string | null> | null = null;
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -20,10 +21,10 @@ export class HttpClient {
   }
 
   private setupInterceptors(): void {
-    // Request interceptor
+    // Request interceptor — attach JWT access token from storage
     this.axiosInstance.interceptors.request.use(
-      async (config) => {
-        const token = await base44.auth.me().then(u => u?.id).catch(() => null);
+      (config) => {
+        const token = tokenStorage.getAccessToken();
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -32,17 +33,52 @@ export class HttpClient {
       (error) => Promise.reject(error)
     );
 
-    // Response interceptor
+    // Response interceptor — transparently refresh access token on 401 once,
+    // then retry the original request. If refresh fails, clear tokens and
+    // redirect to login.
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       async (error) => {
-        if (error.response?.status === 401) {
-          await base44.auth.logout();
-          window.location.href = '/login';
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest?._retry && !originalRequest?.url?.includes('/auth/')) {
+          originalRequest._retry = true;
+          const newToken = await this.refreshAccessToken();
+          if (newToken) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            return this.axiosInstance(originalRequest);
+          }
+
+          tokenStorage.clearTokens();
+          if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(error);
       }
     );
+  }
+
+  /** Refresh access token using the stored refresh token. Deduplicates concurrent calls. */
+  private async refreshAccessToken(): Promise<string | null> {
+    const refreshToken = tokenStorage.getRefreshToken();
+    if (!refreshToken) return null;
+
+    if (!this.refreshPromise) {
+      this.refreshPromise = axios
+        .post('/api/auth/refresh', { refresh_token: refreshToken })
+        .then((res) => {
+          const tokens = res.data?.data || res.data;
+          tokenStorage.setTokens(tokens.access_token, tokens.refresh_token);
+          return tokens.access_token as string;
+        })
+        .catch(() => null)
+        .finally(() => {
+          this.refreshPromise = null;
+        });
+    }
+
+    return this.refreshPromise;
   }
 
   private generateCacheKey(method: string, url: string, params?: any): string {

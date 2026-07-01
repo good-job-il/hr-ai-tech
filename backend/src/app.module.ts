@@ -21,6 +21,7 @@ import { PermissionsModule } from './modules/permissions/permissions.module';
 import { ImportSourcesModule } from './modules/import-sources/import-sources.module';
 import { SalaryModule } from './modules/salary/salary.module';
 import { FunctionsModule } from './modules/functions/functions.module';
+import { IntegrationsModule } from './modules/integrations/integrations.module';
 
 @Module({
   imports: [
@@ -50,6 +51,8 @@ import { FunctionsModule } from './modules/functions/functions.module';
     CompaniesModule,
     // Phase 4
     FunctionsModule,
+    // Phase 5
+    IntegrationsModule,
   ],
 })
 export class AppModule {}
