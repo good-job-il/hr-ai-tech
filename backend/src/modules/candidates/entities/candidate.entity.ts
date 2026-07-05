@@ -17,6 +17,8 @@ export enum CandidateSource {
   LINKEDIN = 'linkedin',
   UPLOAD = 'upload',
   CRAWL = 'crawl',
+  /** General talent pool assignment (see docs/GENERAL_POOL_FLOW.md) */
+  POOL = 'pool',
 }
 
 export enum ParsingStatus {

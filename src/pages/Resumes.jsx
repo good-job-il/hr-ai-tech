@@ -1,24 +1,22 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
+import { useAuth } from '@/lib/AuthContext';
 import { FileText, Download, Trash2 } from 'lucide-react';
 import Navbar from '@/components/home/Navbar';
 
 export default function Resumes() {
-  const [filter, setFilter] = useState('incoming'); // incoming | mine
-
-  const { data: user } = useQuery({
-    queryKey: ['current-user'],
-    queryFn: () => base44.auth.me(),
-  });
+  const [filter, setFilter] = useState('incoming'); // incoming | mine | submitted
+  const { user } = useAuth();
 
   // קורות חיים שהגיעו למעסיקים שלך (אם אתה מעסיק)
   const { data: incomingResumes = [] } = useQuery({
     queryKey: ['incoming-resumes', user?.email],
     queryFn: async () => {
       if (!user) return [];
-      const applications = await base44.entities.Application.filter({ employer_id: user.email });
-      return applications.filter(a => a.resume_url).map(a => ({
+      const applications = await httpClient.get(`/applications?employer_id=${encodeURIComponent(user.email)}`, { cache: false });
+      const arr = Array.isArray(applications) ? applications : (applications?.data || []);
+      return arr.filter(a => a.resume_url).map(a => ({
         id: a.id,
         name: a.candidate_name,
         email: a.candidate_email,
@@ -36,7 +34,8 @@ export default function Resumes() {
     queryKey: ['my-resumes', user?.email],
     queryFn: async () => {
       if (!user) return [];
-      const profiles = await base44.entities.CandidateProfile.filter({ user_email: user.email });
+      const raw = await httpClient.get(`/candidates/profiles?user_email=${encodeURIComponent(user.email)}`, { cache: false });
+      const profiles = Array.isArray(raw) ? raw : (raw?.data || []);
       const profile = profiles[0];
       if (!profile || !profile.resume_url) return [];
       return [{
@@ -57,8 +56,9 @@ export default function Resumes() {
     queryKey: ['submitted-resumes', user?.email],
     queryFn: async () => {
       if (!user) return [];
-      const applications = await base44.entities.Application.filter({ candidate_email: user.email });
-      return applications.filter(a => a.resume_url).map(a => ({
+      const applications = await httpClient.get(`/applications?candidate_email=${encodeURIComponent(user.email)}`, { cache: false });
+      const arr = Array.isArray(applications) ? applications : (applications?.data || []);
+      return arr.filter(a => a.resume_url).map(a => ({
         id: a.id,
         name: a.candidate_name,
         email: a.candidate_email,

@@ -6,15 +6,34 @@
  *                           communications (when 'whatsapp' tab opened)
  *
  * All mutations stamp organization_id.
+ *
+ * Talks directly to the NestJS REST API via `httpClient` (see
+ * `backend/src/modules/candidates`, `.../interviews`, `.../applications`,
+ * `.../communication`) — no Base44 SDK/compatibility layer involved.
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { useAuth } from '@/lib/AuthContext';
 
 const EAGER_STALE_MS = 3 * 60 * 1000; // 3 min
 
 // Simple per-candidate in-memory cache
 const _cache = new Map();
+
+/** Builds a query string, skipping undefined/null/empty values. */
+function qs(params = {}) {
+  const sp = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') return;
+    sp.append(key, String(value));
+  });
+  const s = sp.toString();
+  return s ? `?${s}` : '';
+}
+
+function isNotFound(e) {
+  return e?.response?.status === 404 || e?.status === 404;
+}
 
 export function useCandidateCRM(candidateId) {
   const { user } = useAuth();
@@ -57,18 +76,21 @@ export function useCandidateCRM(candidateId) {
     commsLoadedRef.current = false;
 
     try {
-      const candList = await base44.entities.Candidate.filter({ id: candidateId }, '-created_date', 1);
-      const cand = candList[0] || null;
+      let cand = null;
+      try {
+        cand = await httpClient.get(`/candidates/${candidateId}`, { cache: false });
+      } catch (e) {
+        if (!isNotFound(e)) throw e;
+      }
       setCandidate(cand);
 
+      const appsFilter = cand?.email ? { candidate_email: cand.email } : { candidate_id: candidateId };
       const [notesData, interviewsData, tagsData, docsData, appsData] = await Promise.all([
-        base44.entities.CandidateNote.filter({ candidate_id: candidateId }, '-created_date', 50),
-        base44.entities.Interview.filter({ candidate_id: candidateId }, '-date', 20),
-        base44.entities.CandidateTag.filter({ candidate_id: candidateId }, '', 30),
-        base44.entities.CandidateDocument.filter({ candidate_id: candidateId }, '-created_date', 20),
-        cand?.email
-          ? base44.entities.Application.filter({ candidate_email: cand.email }, '-created_date', 20)
-          : base44.entities.Application.filter({ candidate_id: candidateId }, '-created_date', 20),
+        httpClient.get(`/candidates/${candidateId}/notes${qs({ sort: 'created_date', order: 'DESC', limit: 50 })}`, { cache: false }),
+        httpClient.get(`/interviews${qs({ candidate_id: candidateId, sort: 'date', order: 'DESC', limit: 20 })}`, { cache: false }),
+        httpClient.get(`/candidates/${candidateId}/tags${qs({ limit: 30 })}`, { cache: false }),
+        httpClient.get(`/candidates/${candidateId}/documents${qs({ sort: 'created_date', order: 'DESC', limit: 20 })}`, { cache: false }),
+        httpClient.get(`/applications${qs({ ...appsFilter, sort: 'created_date', order: 'DESC', limit: 20 })}`, { cache: false }),
       ]);
 
       setNotes(notesData);
@@ -101,8 +123,9 @@ export function useCandidateCRM(candidateId) {
     timelineLoadedRef.current = true;
     setTimelineLoading(true);
     try {
-      const data = await base44.entities.CandidateTimeline.filter(
-        { candidate_id: candidateId }, '-created_date', 50
+      const data = await httpClient.get(
+        `/candidates/${candidateId}/timeline${qs({ sort: 'created_date', order: 'DESC', limit: 50 })}`,
+        { cache: false }
       );
       setTimeline(data);
     } finally {
@@ -116,8 +139,9 @@ export function useCandidateCRM(candidateId) {
     commsLoadedRef.current = true;
     setCommsLoading(true);
     try {
-      const data = await base44.entities.CommunicationLog.filter(
-        { candidate_id: candidateId }, '-created_date', 30
+      const data = await httpClient.get(
+        `/communication-logs${qs({ candidate_id: candidateId, sort: 'created_date', order: 'DESC', limit: 30 })}`,
+        { cache: false }
       );
       setCommunications(data);
     } finally {
@@ -143,8 +167,7 @@ export function useCandidateCRM(candidateId) {
 
   const addTimelineEvent = useCallback(async (eventType, description, metadata = {}, visibilityOpts = {}) => {
     if (!candidateId || !user?.email) return;
-    const event = await base44.entities.CandidateTimeline.create({
-      candidate_id: candidateId,
+    const event = await httpClient.post(`/candidates/${candidateId}/timeline`, {
       candidate_email: candidate?.email || '',
       organization_id: orgId(),
       event_type: eventType,
@@ -162,8 +185,7 @@ export function useCandidateCRM(candidateId) {
 
   // ── NOTES ─────────────────────────────────────────────────────────────────
   const addNote = useCallback(async ({ content, visibility = 'internal', note_type = 'general', is_pinned = false, related_application_id, related_interview_id }) => {
-    const note = await base44.entities.CandidateNote.create({
-      candidate_id: candidateId,
+    const note = await httpClient.post(`/candidates/${candidateId}/notes`, {
       candidate_email: candidate?.email || '',
       organization_id: orgId(),
       author_email: user.email,
@@ -179,21 +201,21 @@ export function useCandidateCRM(candidateId) {
   }, [candidateId, candidate, user, addTimelineEvent, invalidateCache]);
 
   const updateNote = useCallback(async (noteId, updates) => {
-    const updated = await base44.entities.CandidateNote.update(noteId, updates);
+    const updated = await httpClient.patch(`/candidates/notes/${noteId}`, updates);
     setNotes(prev => prev.map(n => n.id === noteId ? updated : n));
     invalidateCache();
     return updated;
   }, [invalidateCache]);
 
   const deleteNote = useCallback(async (noteId) => {
-    await base44.entities.CandidateNote.delete(noteId);
+    await httpClient.delete(`/candidates/notes/${noteId}`);
     setNotes(prev => prev.filter(n => n.id !== noteId));
     invalidateCache();
   }, [invalidateCache]);
 
   // ── INTERVIEWS ────────────────────────────────────────────────────────────
   const scheduleInterview = useCallback(async (interviewData) => {
-    const interview = await base44.entities.Interview.create({
+    const interview = await httpClient.post('/interviews', {
       ...interviewData,
       candidate_id: candidateId,
       candidate_email: candidate?.email || '',
@@ -214,7 +236,7 @@ export function useCandidateCRM(candidateId) {
   }, [candidateId, candidate, user, addTimelineEvent, invalidateCache]);
 
   const updateInterview = useCallback(async (interviewId, updates) => {
-    const updated = await base44.entities.Interview.update(interviewId, updates);
+    const updated = await httpClient.patch(`/interviews/${interviewId}`, updates);
     setInterviews(prev => prev.map(i => i.id === interviewId ? updated : i));
     if (updates.status) {
       const statusMap = { completed: 'interview_completed', cancelled: 'interview_cancelled' };
@@ -227,7 +249,7 @@ export function useCandidateCRM(candidateId) {
   // ── STATUS ────────────────────────────────────────────────────────────────
   const updateStatus = useCallback(async (newStatus, rejectReason) => {
     const oldStatus = candidate?.status;
-    const updated = await base44.entities.Candidate.update(candidateId, { status: newStatus });
+    const updated = await httpClient.patch(`/candidates/${candidateId}`, { status: newStatus });
     setCandidate(updated);
     invalidateCache();
     const description = newStatus === 'rejected' && rejectReason
@@ -239,7 +261,7 @@ export function useCandidateCRM(candidateId) {
 
   // ── RECRUITER ASSIGNMENT ──────────────────────────────────────────────────
   const assignRecruiter = useCallback(async (recruiterEmail, recruiterName) => {
-    const updated = await base44.entities.Candidate.update(candidateId, { recruiter_id: recruiterEmail });
+    const updated = await httpClient.patch(`/candidates/${candidateId}`, { recruiter_id: recruiterEmail });
     setCandidate(updated);
     invalidateCache();
     await addTimelineEvent('recruiter_assigned', `הוקצה מגייס: ${recruiterName || recruiterEmail}`, { recruiter_email: recruiterEmail });
@@ -250,8 +272,7 @@ export function useCandidateCRM(candidateId) {
   const addTag = useCallback(async (tag, color = '#7C3AED') => {
     const existing = tags.find(t => t.tag === tag);
     if (existing) return existing;
-    const newTag = await base44.entities.CandidateTag.create({
-      candidate_id: candidateId,
+    const newTag = await httpClient.post(`/candidates/${candidateId}/tags`, {
       organization_id: orgId(),
       tag, color, added_by: user.email,
     });
@@ -262,7 +283,7 @@ export function useCandidateCRM(candidateId) {
   }, [candidateId, tags, user, addTimelineEvent, invalidateCache]);
 
   const removeTag = useCallback(async (tagId, tagName) => {
-    await base44.entities.CandidateTag.delete(tagId);
+    await httpClient.delete(`/candidates/tags/${tagId}`);
     setTags(prev => prev.filter(t => t.id !== tagId));
     invalidateCache();
     await addTimelineEvent('tag_removed', `תגית הוסרה: ${tagName}`, { tag: tagName });
@@ -270,9 +291,10 @@ export function useCandidateCRM(candidateId) {
 
   // ── DOCUMENTS ─────────────────────────────────────────────────────────────
   const uploadDocument = useCallback(async (file, docType = 'cv') => {
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    const doc = await base44.entities.CandidateDocument.create({
-      candidate_id: candidateId,
+    const formData = new FormData();
+    formData.append('file', file);
+    const { file_url } = await httpClient.post('/integrations/upload', formData);
+    const doc = await httpClient.post(`/candidates/${candidateId}/documents`, {
       candidate_email: candidate?.email || '',
       organization_id: orgId(),
       doc_type: docType,
@@ -291,11 +313,11 @@ export function useCandidateCRM(candidateId) {
   // ── SEND TO EMPLOYER ──────────────────────────────────────────────────────
   const sendToEmployer = useCallback(async (employerId, jobId, jobTitle) => {
     if (!employerId?.trim()) throw new Error('נדרש אימייל מעסיק');
-    const updated = await base44.entities.Candidate.update(candidateId, { employer_id: employerId.trim() });
+    const updated = await httpClient.patch(`/candidates/${candidateId}`, { employer_id: employerId.trim() });
     setCandidate(updated);
     invalidateCache();
     await addTimelineEvent('sent_to_employer', `מועמד נשלח למעסיק עבור: ${jobTitle || jobId}`, { employer_id: employerId, job_id: jobId, job_title: jobTitle }, { employer: true });
-    base44.functions.invoke('createCompanyNotification', {
+    httpClient.post('/functions/createCompanyNotification', {
       employer_id: employerId,
       type: 'candidate_sent',
       title: 'מועמד חדש נשלח אליך',

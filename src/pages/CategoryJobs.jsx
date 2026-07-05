@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { Briefcase } from 'lucide-react';
 import Navbar from '@/components/home/Navbar';
 import SEOHead from '@/components/SEOHead';
@@ -16,8 +16,9 @@ export default function CategoryJobs() {
   const { data: jobs = [], isLoading } = useQuery({
     queryKey: ['category-jobs', decodedCategory],
     queryFn: async () => {
-      const allJobs = await base44.entities.Job.list('-created_date', 500);
-      return allJobs.filter(j => !j.is_closed && j.category === decodedCategory);
+      const allJobs = await httpClient.get('/jobs?sort=created_date&order=DESC&limit=500', { cache: false });
+      const arr = Array.isArray(allJobs) ? allJobs : (allJobs?.data || []);
+      return arr.filter(j => !j.is_closed && j.category === decodedCategory);
     },
   });
 

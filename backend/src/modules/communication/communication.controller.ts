@@ -8,7 +8,12 @@ import {
   QueryEmployerTimelineDto,
 } from './dto/communication.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
+
+/** Internal agency/employer notes — only org staff & admins may write */
+const COMMUNICATION_WRITE_ROLES = [...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
 
 @ApiTags('Communication')
 @ApiBearerAuth()
@@ -22,6 +27,7 @@ export class CommunicationController {
   }
 
   @Post()
+  @Roles(...COMMUNICATION_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() dto: CreateCommunicationLogDto, @CurrentUser() u: UserEntity) {
     return this.svc.create(dto, u);
@@ -40,6 +46,7 @@ export class EmployerTimelineController {
   }
 
   @Post()
+  @Roles(...COMMUNICATION_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() dto: CreateEmployerTimelineDto) {
     return this.svc.createEmployerTimelineEvent(dto);

@@ -32,6 +32,19 @@ import { InterviewEntity } from '../modules/interviews/interview.entity';
 import { MessageEntity } from '../modules/messages/message.entity';
 import { NotificationEntity } from '../modules/notifications/notification.entity';
 import { CompanyEntity, CompanyReviewEntity, StaffEntity } from '../modules/companies/company.entity';
+// Phase 3 — Advanced modules
+import { AuditLogEntity } from '../modules/audit/audit-log.entity';
+import { CompensationPlanEntity } from '../modules/compensation/compensation-plan.entity';
+import { CommunicationLogEntity, EmployerTimelineEntity } from '../modules/communication/communication-log.entity';
+import { ImportSourceEntity } from '../modules/import-sources/import-source.entity';
+import { SalaryDataEntity } from '../modules/salary/salary-data.entity';
+import {
+  PermissionMatrixEntity,
+  RoleTemplateEntity,
+  RoleAliasEntity,
+  UserPositionAccessEntity,
+  PositionEntity,
+} from '../modules/permissions/permissions.entities';
 
 const ALL_ENTITIES = [
   // Phase 1
@@ -46,6 +59,12 @@ const ALL_ENTITIES = [
   ApplicationEntity, ApplicationTimelineEntity, ApplicationPipelineEntity,
   InterviewEntity, MessageEntity, NotificationEntity,
   CompanyEntity, CompanyReviewEntity, StaffEntity,
+  // Phase 3
+  AuditLogEntity, CompensationPlanEntity,
+  CommunicationLogEntity, EmployerTimelineEntity,
+  ImportSourceEntity, SalaryDataEntity,
+  PermissionMatrixEntity, RoleTemplateEntity, RoleAliasEntity,
+  UserPositionAccessEntity, PositionEntity,
 ];
 
 @Module({

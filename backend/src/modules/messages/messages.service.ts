@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { MessageEntity } from './message.entity';
 import { CreateMessageDto, UpdateMessageDto, QueryMessagesDto } from './dto/messages.dto';
 import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
+import { UserEntity } from '../users/user.entity';
 
 @Injectable()
 export class MessagesService {
@@ -26,8 +27,14 @@ export class MessagesService {
     return msg;
   }
 
-  async create(dto: CreateMessageDto): Promise<MessageEntity> {
-    const msg = this.repo.create(dto as any);
+  async create(dto: CreateMessageDto, user: UserEntity): Promise<MessageEntity> {
+    // Prevent identity spoofing: sender identity is always derived from the authenticated user,
+    // never trusted from the request body.
+    const msg = this.repo.create({
+      ...dto,
+      sender_email: user.email,
+      sender_role: dto.sender_role ?? user.role,
+    } as any);
     return this.repo.save(msg) as unknown as Promise<MessageEntity>;
   }
 

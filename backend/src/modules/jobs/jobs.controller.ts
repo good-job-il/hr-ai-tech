@@ -7,7 +7,12 @@ import { JobsService } from './jobs.service';
 import { CreateJobDto, UpdateJobDto, QueryJobsDto, CreateSavedJobDto, CreateJobAlertDto, UpdateJobAlertDto } from './dto/jobs.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
+
+/** Roles allowed to create/modify job postings (employers & agency staff only) */
+const JOB_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
 
 @ApiTags('Jobs')
 @ApiBearerAuth()
@@ -28,6 +33,7 @@ export class JobsController {
   }
 
   @Post()
+  @Roles(...JOB_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create job' })
   create(@Body() dto: CreateJobDto, @CurrentUser() user: UserEntity) {
@@ -35,6 +41,7 @@ export class JobsController {
   }
 
   @Patch(':id')
+  @Roles(...JOB_WRITE_ROLES)
   @ApiOperation({ summary: 'Update job' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -45,6 +52,7 @@ export class JobsController {
   }
 
   @Delete(':id')
+  @Roles(...JOB_WRITE_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft-delete job' })
   remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {

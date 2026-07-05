@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -44,28 +44,28 @@ export default function CompanyDashboard() {
 
   const { data: jobs = [], isLoading: jobsLoading } = useQuery({
     queryKey: ['company-jobs', orgId],
-    queryFn: () => base44.entities.Job.filter({ organization_id: orgId, is_deleted: false }, '-created_date', 100),
+    queryFn: () => httpClient.get(`/jobs?organization_id=${encodeURIComponent(orgId)}&is_deleted=false&sort=created_date&order=DESC&limit=100`, { cache: false }),
     enabled: !!orgId,
     staleTime: STALE,
   });
 
   const { data: candidates = [], isLoading: candidatesLoading } = useQuery({
     queryKey: ['company-candidates', orgId],
-    queryFn: () => base44.entities.Candidate.filter({ organization_id: orgId, is_deleted: false }, '-created_date', 100),
+    queryFn: () => httpClient.get(`/candidates?organization_id=${encodeURIComponent(orgId)}&is_deleted=false&sort=created_date&order=DESC&limit=100`, { cache: false }),
     enabled: !!orgId,
     staleTime: STALE,
   });
 
   const { data: interviews = [], isLoading: interviewsLoading } = useQuery({
     queryKey: ['company-interviews', orgId],
-    queryFn: () => base44.entities.Interview.filter({ organization_id: orgId }, '-created_date', 50),
+    queryFn: () => httpClient.get(`/interviews?organization_id=${encodeURIComponent(orgId)}&sort=created_date&order=DESC&limit=50`, { cache: false }),
     enabled: !!orgId,
     staleTime: STALE,
   });
 
   const { data: applications = [], isLoading: applicationsLoading } = useQuery({
     queryKey: ['company-applications', orgId],
-    queryFn: () => base44.entities.Application.filter({ organization_id: orgId, is_deleted: false }, '-created_date', 100),
+    queryFn: () => httpClient.get(`/applications?organization_id=${encodeURIComponent(orgId)}&is_deleted=false&sort=created_date&order=DESC&limit=100`, { cache: false }),
     enabled: !!orgId,
     staleTime: STALE,
   });

@@ -3,7 +3,12 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto, QueryNotificationsDto } from './dto/notifications.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
+
+/** Roles allowed to create notifications on behalf of the system/other users */
+const NOTIFICATION_CREATE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
 
 @ApiTags('Notifications')
 @ApiBearerAuth()
@@ -13,16 +18,18 @@ export class NotificationsController {
 
   @Get()
   findAll(@Query() q: QueryNotificationsDto, @CurrentUser() u: UserEntity) {
-    // Default to current user's notifications
-    return this.svc.findAll({ ...q, recipient_email: q.recipient_email || u.email });
+    // Non-admins may only ever see their own notifications, regardless of query override (IDOR fix)
+    const isAdmin = u.role === UserRole.ADMIN || u.role === UserRole.SUPER_ADMIN;
+    const recipient_email = isAdmin ? q.recipient_email || u.email : u.email;
+    return this.svc.findAll({ ...q, recipient_email });
   }
 
-  @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateNotificationDto) { return this.svc.create(dto); }
+  @Post() @Roles(...NOTIFICATION_CREATE_ROLES) @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateNotificationDto) { return this.svc.create(dto); }
 
-  @Patch(':id/read') markRead(@Param('id', ParseUUIDPipe) id: string) { return this.svc.markRead(id); }
+  @Patch(':id/read') markRead(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() u: UserEntity) { return this.svc.markRead(id, u); }
 
   @Patch('read-all') markAllRead(@CurrentUser() u: UserEntity) { return this.svc.markAllRead(u.email); }
 
-  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseUUIDPipe) id: string) { return this.svc.remove(id); }
+  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() u: UserEntity) { return this.svc.remove(id, u); }
 }
 

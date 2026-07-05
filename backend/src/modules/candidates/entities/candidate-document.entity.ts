@@ -50,7 +50,7 @@ export class CandidateDocumentEntity extends BaseEntity {
   @Column({ name: 'is_latest_cv', type: 'boolean', default: false })
   is_latest_cv: boolean;
 
-  @Column({ name: 'conversion_status', type: 'enum', enum: ['pending', 'success', 'failed'], default: 'pending', nullable: true })
+  @Column({ name: 'conversion_status', type: 'enum', enum: ['pending', 'success', 'failed', 'not_needed'], default: 'pending', nullable: true })
   conversion_status: string | null;
 
   @Column({ name: 'conversion_error', type: 'text', nullable: true })

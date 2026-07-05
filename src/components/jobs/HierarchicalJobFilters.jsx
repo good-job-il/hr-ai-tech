@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, Search, X } from 'lucide-react';
 
@@ -20,37 +20,37 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
   // Fetch data
   const { data: domains = [] } = useQuery({
     queryKey: ['domains'],
-    queryFn: () => base44.entities.Domain.list('-domain_id', 1000),
+    queryFn: () => httpClient.get('/taxonomy/domains?limit=1000', { cache: false }),
     enabled,
   });
 
   const { data: roles = [] } = useQuery({
     queryKey: ['roles'],
-    queryFn: () => base44.entities.Role.list('-role_id', 1000),
+    queryFn: () => httpClient.get('/taxonomy/roles?limit=1000', { cache: false }),
     enabled,
   });
 
   const { data: specializations = [] } = useQuery({
     queryKey: ['specializations'],
-    queryFn: () => base44.entities.Specialization.list('-specialization_id', 1000),
+    queryFn: () => httpClient.get('/taxonomy/specializations?limit=1000', { cache: false }),
     enabled,
   });
 
   const { data: employmentTypes = [] } = useQuery({
     queryKey: ['employment-types'],
-    queryFn: () => base44.entities.EmploymentType.list('-type_id', 1000),
+    queryFn: () => httpClient.get('/taxonomy/employment-types?limit=1000', { cache: false }),
     enabled,
   });
 
   const { data: workModes = [] } = useQuery({
     queryKey: ['work-modes'],
-    queryFn: () => base44.entities.WorkMode.list('-mode_id', 1000),
+    queryFn: () => httpClient.get('/taxonomy/work-modes?limit=1000', { cache: false }),
     enabled,
   });
 
   const { data: levels = [] } = useQuery({
     queryKey: ['experience-levels'],
-    queryFn: () => base44.entities.ExperienceLevel.list('-level_id', 1000),
+    queryFn: () => httpClient.get('/taxonomy/experience-levels?limit=1000', { cache: false }),
     enabled,
   });
 

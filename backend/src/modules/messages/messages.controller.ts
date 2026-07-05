@@ -2,6 +2,8 @@ import { Controller, Get, Post, Patch, Param, Body, Query, ParseUUIDPipe, HttpCo
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto, UpdateMessageDto, QueryMessagesDto } from './dto/messages.dto';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { UserEntity } from '../users/user.entity';
 
 @ApiTags('Messages')
 @ApiBearerAuth()
@@ -10,7 +12,7 @@ export class MessagesController {
   constructor(private readonly svc: MessagesService) {}
   @Get() findAll(@Query() q: QueryMessagesDto) { return this.svc.findAll(q); }
   @Get(':id') findOne(@Param('id', ParseUUIDPipe) id: string) { return this.svc.findById(id); }
-  @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateMessageDto) { return this.svc.create(dto); }
+  @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateMessageDto, @CurrentUser() u: UserEntity) { return this.svc.create(dto, u); }
   @Patch(':id') update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateMessageDto) { return this.svc.update(id, dto); }
   @Patch('read-all/:applicationId') markAllRead(@Param('applicationId', ParseUUIDPipe) id: string) { return this.svc.markAllRead(id); }
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { ArrowRight, Bookmark, Send, FileText, Download } from 'lucide-react';
 import Navbar from '@/components/home/Navbar';
 import { useAuth } from '@/lib/AuthContext';
@@ -43,21 +43,21 @@ export default function MyProfile() {
   // Saved jobs
   const { data: saved = [] } = useQuery({
     queryKey: ['saved-jobs', user?.email],
-    queryFn: () => base44.entities.SavedJob.filter({ user_email: user.email }, '-created_date', 50),
+    queryFn: () => httpClient.get(`/jobs/saved?user_email=${encodeURIComponent(user.email)}&sort=created_date&order=DESC&limit=50`, { cache: false }),
     enabled: !!user,
   });
 
   // Applications
   const { data: applications = [] } = useQuery({
     queryKey: ['my-applications', user?.email],
-    queryFn: () => base44.entities.Application.filter({ candidate_email: user.email }, '-created_date', 50),
+    queryFn: () => httpClient.get(`/applications?candidate_email=${encodeURIComponent(user.email)}&sort=created_date&order=DESC&limit=50`, { cache: false }),
     enabled: !!user,
   });
 
   // Interviews
   const { data: interviews = [] } = useQuery({
     queryKey: ['my-interviews', user?.email],
-    queryFn: () => base44.entities.Interview.filter({ candidate_email: user.email }, '-created_date', 50),
+    queryFn: () => httpClient.get(`/interviews?candidate_email=${encodeURIComponent(user.email)}&sort=created_date&order=DESC&limit=50`, { cache: false }),
     enabled: !!user,
   });
 
@@ -66,8 +66,9 @@ export default function MyProfile() {
     queryKey: ['my-resumes', user?.email],
     queryFn: async () => {
       if (!user) return [];
-      const profiles = await base44.entities.CandidateProfile.filter({ user_email: user.email });
-      const profile = profiles[0];
+      const profiles = await httpClient.get(`/candidates/profiles?user_email=${encodeURIComponent(user.email)}`, { cache: false });
+      const arr = Array.isArray(profiles) ? profiles : (profiles?.data || []);
+      const profile = arr[0];
       if (!profile || !profile.resume_url) return [];
       return [{
         id: profile.id,

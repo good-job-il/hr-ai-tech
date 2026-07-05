@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { X, Briefcase, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { useTranslation } from 'react-i18next';
 
 export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }) {
@@ -25,7 +25,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const openJobs = await base44.entities.Job.filter({ is_closed: false }, '-created_date', 100);
+        const openJobs = await httpClient.get('/jobs?is_closed=false&sort=created_date&order=DESC&limit=100', { cache: false });
         setJobs(openJobs);
         setFilteredJobs(openJobs);
       } catch (err) {
@@ -62,10 +62,9 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
 
     try {
       // Check if application already exists
-      const existing = await base44.entities.Application.filter(
-        { job_id: selectedJob.id, candidate_email: candidate.email },
-        '-created_date',
-        1
+      const existing = await httpClient.get(
+        `/applications?job_id=${selectedJob.id}&candidate_email=${encodeURIComponent(candidate.email)}&sort=created_date&order=DESC&limit=1`,
+        { cache: false }
       );
 
       if (existing.length > 0) {
@@ -75,7 +74,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
       }
 
       // Create Application
-      const application = await base44.entities.Application.create({
+      const application = await httpClient.post('/applications', {
         job_id: selectedJob.id,
         job_title: selectedJob.title,
         company: selectedJob.company,
@@ -90,8 +89,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
       });
 
       // Create Timeline event
-      await base44.functions.invoke('createCandidateTimeline', {
-        candidate_id: candidate.id,
+      await httpClient.post(`/candidates/${candidate.id}/timeline`, {
         candidate_email: candidate.email,
         event_type: 'application_submitted',
         description: `מועמדות נוצרה למשרת ${selectedJob.title} ב-${selectedJob.company} (שיוך ידני מהמאגר הכללי)`,

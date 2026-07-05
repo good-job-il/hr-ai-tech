@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { useAuth } from '@/lib/AuthContext';
 import Navbar from '@/components/home/Navbar';
 import { Bell, Plus, Trash2, BellOff } from 'lucide-react';
@@ -16,22 +16,22 @@ export default function JobAlerts() {
 
   const { data: alerts = [] } = useQuery({
     queryKey: ['job-alerts', user?.email],
-    queryFn: () => base44.entities.JobAlert.filter({ user_email: user.email }),
+    queryFn: () => httpClient.get(`/jobs/alerts?user_email=${encodeURIComponent(user.email)}`, { cache: false }),
     enabled: !!user,
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.JobAlert.create({ ...data, user_email: user.email, is_active: true }),
+    mutationFn: (data) => httpClient.post('/jobs/alerts', { ...data, user_email: user.email, is_active: true }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['job-alerts'] }); setShowForm(false); setForm({ keywords: '', location: '', category: '', job_type: 'any', salary_min: '', frequency: 'daily' }); }
   });
 
   const toggleMutation = useMutation({
-    mutationFn: (a) => base44.entities.JobAlert.update(a.id, { is_active: !a.is_active }),
+    mutationFn: (a) => httpClient.patch(`/jobs/alerts/${a.id}`, { is_active: !a.is_active }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['job-alerts'] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.JobAlert.delete(id),
+    mutationFn: (id) => httpClient.delete(`/jobs/alerts/${id}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['job-alerts'] }),
   });
 

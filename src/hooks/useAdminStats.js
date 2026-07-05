@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 
 export function getDateRange(range, customFrom, customTo) {
   const now = new Date();
@@ -54,22 +54,22 @@ function inRange(dateStr, from, to) {
 export function useAdminStats(range, customFrom, customTo) {
   const { data: jobs = [], isLoading: l1 } = useQuery({
     queryKey: ['admin-stats-jobs'],
-    queryFn: () => base44.entities.Job.list('-created_date', 1000),
+    queryFn: () => httpClient.get('/jobs?sort=created_date&order=DESC&limit=1000', { cache: false }),
     staleTime: 60_000,
   });
   const { data: applications = [], isLoading: l2 } = useQuery({
     queryKey: ['admin-stats-apps'],
-    queryFn: () => base44.entities.Application.list('-created_date', 1000),
+    queryFn: () => httpClient.get('/applications?sort=created_date&order=DESC&limit=1000', { cache: false }),
     staleTime: 60_000,
   });
   const { data: candidates = [], isLoading: l3 } = useQuery({
     queryKey: ['admin-stats-candidates'],
-    queryFn: () => base44.entities.CandidateProfile.list('-created_date', 1000),
+    queryFn: () => httpClient.get('/candidates/profiles?sort=created_date&order=DESC&limit=1000', { cache: false }),
     staleTime: 60_000,
   });
   const { data: savedJobs = [], isLoading: l4 } = useQuery({
     queryKey: ['admin-stats-saved'],
-    queryFn: () => base44.entities.SavedJob.list('-created_date', 1000),
+    queryFn: () => httpClient.get('/jobs/saved?sort=created_date&order=DESC&limit=1000', { cache: false }),
     staleTime: 60_000,
   });
 

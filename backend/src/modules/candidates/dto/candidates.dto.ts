@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 
 const statusEnum = z.enum(['new', 'contacted', 'interview', 'offer', 'hired', 'rejected', 'inactive']);
-const sourceEnum = z.enum(['import', 'manual', 'linkedin', 'upload', 'crawl']);
+const sourceEnum = z.enum(['import', 'manual', 'linkedin', 'upload', 'crawl', 'pool']);
 const parsingStatusEnum = z.enum(['pending', 'success', 'partial', 'failed']);
 const conversionStatusEnum = z.enum(['pending', 'success', 'failed']);
 
@@ -82,7 +82,7 @@ export const CreateCandidateNoteSchema = z.object({
   author_name: z.string().optional().nullable(),
   author_role: z.string().optional().nullable(),
   content: z.string().min(1),
-  visibility: z.enum(['private', 'team', 'all']).default('team').optional(),
+  visibility: z.enum(['private', 'team', 'all', 'internal']).default('team').optional(),
   is_pinned: z.boolean().optional().default(false),
   note_type: z.string().optional().nullable(),
   related_application_id: z.string().uuid().optional().nullable(),

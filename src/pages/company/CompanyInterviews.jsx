@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/Button';
 import {
@@ -170,7 +170,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
-    mutationFn: (updates) => base44.entities.Interview.update(interview.id, updates),
+    mutationFn: (updates) => httpClient.patch(`/interviews/${interview.id}`, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-interviews'] });
       setIsEditing(false);

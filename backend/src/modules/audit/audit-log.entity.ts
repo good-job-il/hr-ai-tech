@@ -9,7 +9,7 @@ export const AUDIT_ENTITY_TYPES = [
 export const AUDIT_ACTIONS = [
   'view', 'create', 'update', 'delete', 'cv_download', 'cv_view',
   'status_change', 'send_to_employer', 'export', 'compensation_change',
-  'login', 'impersonate', 'restore',
+  'login', 'impersonate', 'restore', 'role_display_name_update', 'permission_update',
 ] as const;
 
 @Entity('audit_logs')

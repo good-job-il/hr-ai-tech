@@ -7,7 +7,7 @@ import { useState, useMemo } from 'react';
 import { X, Send, Eye, Paperclip, CheckSquare, Square, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { useAuth } from '@/lib/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -94,7 +94,7 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
     setSending(true);
     setResult(null);
     try {
-      const res = await base44.functions.invoke('sendCandidateToEmployer', {
+      const res = await httpClient.post('/functions/sendCandidateToEmployer', {
         candidateId: candidate.id,
         to: to.trim(),
         cc: cc.trim(),
@@ -110,7 +110,7 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
           doc_type: d.doc_type,
         })),
       });
-      setResult({ success: true, message: res.data?.message || t('candidateCRM.sendToEmployer.sentSuccessfully') });
+      setResult({ success: true, message: res?.message || t('candidateCRM.sendToEmployer.sentSuccessfully') });
       if (onSuccess) onSuccess();
     } catch (e) {
       const errorMsg = e.response?.data?.error || e.message || t('candidateCRM.sendToEmployer.sendError');

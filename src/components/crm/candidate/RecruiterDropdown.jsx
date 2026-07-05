@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { ChevronDown, UserCheck, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +14,7 @@ export default function RecruiterDropdown({ currentEmail, onSelect }) {
   useEffect(() => {
     if (!open) return;
     setLoading(true);
-    base44.entities.User.list()
+    httpClient.get('/users?limit=200', { cache: false })
       .then(users => {
         const RECRUITER_ROLES = ['recruiter', 'team_manager', 'recruitment_manager', 'admin'];
         const filtered = users.filter(u =>

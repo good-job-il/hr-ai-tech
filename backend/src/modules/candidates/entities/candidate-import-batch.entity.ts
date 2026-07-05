@@ -58,7 +58,7 @@ export class CandidateImportBatchEntity extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: ['pending', 'processing', 'completed', 'failed', 'partial'],
+    enum: ['pending', 'processing', 'in_progress', 'completed', 'failed', 'partial'],
     default: 'pending',
   })
   status: string;

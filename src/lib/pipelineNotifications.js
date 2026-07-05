@@ -3,7 +3,7 @@
  * Creates Notification records when application stage changes.
  * Determines recipients based on role and stage type.
  */
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import i18n from '@/i18n';
 
 // Employer is relevant only from client_stage onward
@@ -83,7 +83,7 @@ export async function createStageChangeNotifications({
     seen.add(email);
 
     creates.push(
-      base44.entities.Notification.create({
+      httpClient.post('/notifications', {
         recipient_email: email,
         type: mapNotificationType(newStage),
         title,
@@ -112,7 +112,7 @@ export async function createSlaNotification({ application, stageLabel: stage, ho
     seen.add(email);
 
     creates.push(
-      base44.entities.Notification.create({
+      httpClient.post('/notifications', {
         recipient_email: email,
         type: 'job_closed', // repurpose as system alert
         title: t('pipeline.notifications.sla.title', {

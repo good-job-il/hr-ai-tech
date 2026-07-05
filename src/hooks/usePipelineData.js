@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { createStageChangeNotifications } from '@/lib/pipelineNotifications';
 
 function getDefaultStages(t) {
@@ -82,7 +82,8 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const apps = await base44.entities.Application.list('-created_date', 500);
+      const raw = await httpClient.get('/applications?sort=created_date&order=DESC&limit=500', { cache: false });
+      const apps = Array.isArray(raw) ? raw : (raw?.data || []);
       const isReal = apps && apps.length > 0;
       setIsMockData(!isReal);
       const filtered = applyFilters(isReal ? apps : mockApplications, filters, user);
@@ -126,13 +127,13 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
     if (appId.startsWith('demo-')) return;
 
     try {
-      await base44.entities.Application.update(appId, {
+      await httpClient.patch(`/applications/${appId}`, {
         status: newStage,
         stage_entered_at: new Date().toISOString(),
       });
 
       if (application && oldStage && oldStage !== newStage) {
-        base44.functions.invoke('createApplicationTimeline', {
+        httpClient.post('/functions/createApplicationTimeline', {
           application_id: appId,
           event_type: 'status_changed',
           previous_value: oldStage,

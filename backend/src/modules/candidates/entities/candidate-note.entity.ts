@@ -26,7 +26,7 @@ export class CandidateNoteEntity extends BaseEntity {
   @Column({ type: 'text' })
   content: string;
 
-  @Column({ type: 'enum', enum: ['private', 'team', 'all'], default: 'team', nullable: true })
+  @Column({ type: 'enum', enum: ['private', 'team', 'all', 'internal'], default: 'team', nullable: true })
   visibility: string | null;
 
   @Column({ name: 'is_pinned', type: 'boolean', default: false })

@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { MessageCircle, Plus, Clock, CheckCircle2, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { useAuth } from '@/lib/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -76,7 +76,7 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
     if (!logSummary.trim()) return;
     setSaving(true);
     try {
-      await base44.entities.CommunicationLog.create({
+      await httpClient.post('/communication-logs', {
         candidate_id: candidate.id,
         candidate_email: candidate.email || '',
         channel: 'whatsapp',
@@ -86,15 +86,14 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
         content: logSummary,
         status: logOutcome,
       });
-      
+
       const outcomeLabels = {
         sent: t('candidateCRM.whatsapp.outcomes.sent'),
         read: t('candidateCRM.whatsapp.outcomes.read'),
         failed: t('candidateCRM.whatsapp.outcomes.failed'),
       };
 
-      await base44.entities.CandidateTimeline.create({
-        candidate_id: candidate.id,
+      await httpClient.post(`/candidates/${candidate.id}/timeline`, {
         candidate_email: candidate.email || '',
         event_type: 'message_sent',
         description: `WhatsApp — ${outcomeLabels[logOutcome]}: ${logSummary}`,

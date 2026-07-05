@@ -8,7 +8,7 @@
  *   if (can('download_cv')) { ... }
  */
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { useAuth } from '@/lib/AuthContext';
 
 // Roles that always have all permissions (bypass matrix)
@@ -63,9 +63,11 @@ export function usePermissionMatrix() {
     // Filter by org — avoids loading all 200 records
     const [orgRecords, templateRecords] = await Promise.all([
       orgId
-        ? base44.entities.PermissionMatrix.filter({ organization_id: orgId, role_key: roleKey }, '', 5)
+        ? httpClient.get(`/permission-matrices?organization_id=${encodeURIComponent(orgId)}&role_key=${encodeURIComponent(roleKey)}&limit=5`, { cache: false })
+            .then(r => Array.isArray(r) ? r : (r?.data || []))
         : Promise.resolve([]),
-      base44.entities.PermissionMatrix.filter({ is_template: true, role_key: roleKey, org_type: orgType }, '', 3),
+      httpClient.get(`/permission-matrices?is_template=true&role_key=${encodeURIComponent(roleKey)}&org_type=${encodeURIComponent(orgType)}&limit=3`, { cache: false })
+        .then(r => Array.isArray(r) ? r : (r?.data || [])),
     ]);
 
     const orgOverride = orgRecords.find(r => !r.is_template);

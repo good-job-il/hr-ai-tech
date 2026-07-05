@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { useAuth } from '@/lib/AuthContext';
 import { useTranslation } from 'react-i18next';
 import {
@@ -168,28 +168,28 @@ export default function CompanyAnalyticsPage() {
 
   const { data: jobs = [], isLoading: jobsLoading } = useQuery({
     queryKey: ['analytics-jobs', orgId],
-    queryFn: () => base44.entities.Job.filter({ organization_id: orgId, is_deleted: false }, '-created_date', 500),
+    queryFn: () => httpClient.get(`/jobs?organization_id=${encodeURIComponent(orgId)}&is_deleted=false&sort=created_date&order=DESC&limit=500`, { cache: false }),
     enabled: !!orgId,
     staleTime: STALE,
   });
 
   const { data: applications = [], isLoading: appsLoading } = useQuery({
     queryKey: ['analytics-apps', orgId],
-    queryFn: () => base44.entities.Application.filter({ organization_id: orgId, is_deleted: false }, '-created_date', 500),
+    queryFn: () => httpClient.get(`/applications?organization_id=${encodeURIComponent(orgId)}&is_deleted=false&sort=created_date&order=DESC&limit=500`, { cache: false }),
     enabled: !!orgId,
     staleTime: STALE,
   });
 
   const { data: candidates = [], isLoading: candidatesLoading } = useQuery({
     queryKey: ['analytics-candidates', orgId],
-    queryFn: () => base44.entities.Candidate.filter({ organization_id: orgId, is_deleted: false }, '-created_date', 500),
+    queryFn: () => httpClient.get(`/candidates?organization_id=${encodeURIComponent(orgId)}&is_deleted=false&sort=created_date&order=DESC&limit=500`, { cache: false }),
     enabled: !!orgId,
     staleTime: STALE,
   });
 
   const { data: interviews = [], isLoading: interviewsLoading } = useQuery({
     queryKey: ['analytics-interviews', orgId],
-    queryFn: () => base44.entities.Interview.filter({ organization_id: orgId }, '-created_date', 300),
+    queryFn: () => httpClient.get(`/interviews?organization_id=${encodeURIComponent(orgId)}&sort=created_date&order=DESC&limit=300`, { cache: false }),
     enabled: !!orgId,
     staleTime: STALE,
   });

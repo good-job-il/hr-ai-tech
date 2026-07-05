@@ -1,13 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotificationEntity } from './notification.entity';
 import { CreateNotificationDto, QueryNotificationsDto } from './dto/notifications.dto';
 import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
+import { UserEntity } from '../users/user.entity';
+import { UserRole } from '../../common/enums/user-role.enum';
 
 @Injectable()
 export class NotificationsService {
   constructor(@InjectRepository(NotificationEntity) private readonly repo: Repository<NotificationEntity>) {}
+
+  private assertOwner(n: NotificationEntity, user: UserEntity) {
+    const isAdmin = user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN;
+    if (!isAdmin && n.recipient_email !== user.email) {
+      throw new ForbiddenException('Access denied');
+    }
+  }
 
   async findAll(query: QueryNotificationsDto) {
     const { page, limit, sort, order, recipient_email, is_read, type, organization_id } = query;
@@ -26,9 +35,10 @@ export class NotificationsService {
     return this.repo.save(n) as unknown as Promise<NotificationEntity>;
   }
 
-  async markRead(id: string): Promise<NotificationEntity> {
+  async markRead(id: string, user: UserEntity): Promise<NotificationEntity> {
     const n = await this.repo.findOne({ where: { id } as any });
     if (!n) throw new NotFoundException(`Notification ${id} not found`);
+    this.assertOwner(n, user);
     n.is_read = true;
     return this.repo.save(n) as unknown as Promise<NotificationEntity>;
   }
@@ -37,9 +47,10 @@ export class NotificationsService {
     await this.repo.update({ recipient_email: recipientEmail, is_read: false } as any, { is_read: true });
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string, user: UserEntity): Promise<void> {
     const n = await this.repo.findOne({ where: { id } as any });
     if (!n) throw new NotFoundException(`Notification ${id} not found`);
+    this.assertOwner(n, user);
     await this.repo.remove(n);
   }
 }

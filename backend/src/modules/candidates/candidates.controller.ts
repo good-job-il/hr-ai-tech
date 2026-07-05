@@ -13,7 +13,12 @@ import {
   CreateCandidateDocumentDto,
 } from './dto/candidates.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
+
+/** Roles allowed to create/modify candidate records (agency & admin staff only) */
+const CANDIDATE_WRITE_ROLES = [...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
 
 @ApiTags('Candidates')
 @ApiBearerAuth()
@@ -131,6 +136,7 @@ export class CandidatesController {
   }
 
   @Post()
+  @Roles(...CANDIDATE_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create candidate' })
   create(@Body() dto: CreateCandidateDto, @CurrentUser() user: UserEntity) {
@@ -144,6 +150,7 @@ export class CandidatesController {
   }
 
   @Patch(':id')
+  @Roles(...CANDIDATE_WRITE_ROLES)
   @ApiOperation({ summary: 'Update candidate' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -154,6 +161,7 @@ export class CandidatesController {
   }
 
   @Delete(':id')
+  @Roles(...CANDIDATE_WRITE_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft-delete candidate' })
   remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
