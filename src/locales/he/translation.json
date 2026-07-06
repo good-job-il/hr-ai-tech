@@ -443,239 +443,52 @@
     "following": "עוקב"
   },
   "candidate": {
-    "dashboard": {
-      "title": "הדשבורד שלי",
-      "welcome": "ברוך שובך",
-      "activeApplications": "הגשות פעילות",
-      "savedJobs": "משרות שמורות",
-      "profileViews": "צפיות בפרופיל",
-      "matchScore": "ציון התאמה",
-      "recentApplications": "הגשות אחרונות",
-      "recommendedJobs": "משרות מומלצות",
-      "completeProfile": "השלם את הפרופיל לקבלת התאמות טובות יותר",
-      "profileCompletion": "השלמת פרופיל"
-    },
-    "profile": {
-      "title": "הפרופיל שלי",
-      "personalInfo": "פרטים אישיים",
-      "resume": "קורות חיים",
-      "skills": "כישורים",
-      "experience": "ניסיון תעסוקתי",
-      "education": "השכלה",
-      "languages": "שפות",
-      "preferences": "העדפות תעסוקה",
-      "uploadResume": "העלה קורות חיים",
-      "editProfile": "ערוך פרופיל",
-      "saveProfile": "שמור פרופיל",
-      "addSkill": "הוסף כישור",
-      "addExperience": "הוסף ניסיון",
-      "addEducation": "הוסף השכלה",
-      "currentPosition": "תפקיד נוכחי",
-      "company": "חברה",
-      "startDate": "תאריך התחלה",
-      "endDate": "תאריך סיום",
-      "present": "הווה",
-      "degree": "תואר",
-      "institution": "מוסד לימודים",
-      "fieldOfStudy": "תחום לימוד",
-      "fullName": "שם מלא",
-      "title": "כותרת מקצועית",
-      "location": "מיקום",
-      "bio": "סיכום מקצועי",
-      "linkedIn": "LinkedIn",
-      "github": "GitHub",
-      "website": "אתר",
-      "subtitle": "נהל את קורות החיים ומידע המועמדות שלך",
-      "completeness": "השלמת פרופיל",
-      "completeBasics": "מלא את הפרטים הבסיסיים כדי שמעסיקים יוכלו למצוא אותך",
-      "almostThere": "כמעט שם! השלם עוד כמה פרטים",
-      "nearlyComplete": "הוסף תיאור ניסיון לפרופיל חזק יותר",
-      "visibleToEmployers": "גלוי למעסיקים",
-      "openToWork": "פעיל/ה לחיפוש",
-      "activelyLooking": "מחפש/ת עבודה",
-      "desiredTitle": "תפקיד מבוקש",
-      "summaryPlaceholder": "תאר/י את עצמך בקצרה למעסיקים...",
-      "noSkills": "עדיין לא נוספו כישורים",
-      "addSkillPlaceholder": "הוסף כישור (Enter לאישור)...",
-      "addJob": "הוסף משרה",
-      "companyPlaceholder": "שם החברה",
-      "rolePlaceholder": "תפקיד",
-      "periodPlaceholder": "למשל: ינואר 2020 – מרץ 2023",
-      "descriptionPlaceholder": "תיאור קצר של התפקיד והישגים...",
-      "remove": "הסר",
-      "experienceYears": "שנות ניסיון",
-      "jobType": "סוג משרה",
-      "minSalary": "שכר רצוי (מינימום)",
-      "maxSalary": "שכר רצוי (מקסימום)",
-      "categories": "תחומי עיסוק",
-      "resumeSection": "קורות חיים (PDF / Word)",
-      "replaceFile": "החלף קובץ קורות חיים",
-      "fileTypes": "PDF, DOC, DOCX עד 10MB",
-      "fileUploaded": "קובץ קורות חיים הועלה — לחץ לצפייה",
-      "saving": "שומר...",
-      "saved": "נשמר!",
-      "saveError": "שגיאה בשמירה",
-      "saveChanges": "שמור שינויים",
-      "jobTypes": {
-        "any": "כל הסוגים",
-        "full": "משרה מלאה",
-        "part": "משרה חלקית",
-        "remote": "עבודה מרחוק"
-      },
-      "categoryList": {
-        "software": "פיתוח תוכנה",
-        "design": "עיצוב UX/UI",
-        "marketing": "שיווק",
-        "sales": "מכירות",
-        "finance": "כספים וחשבונאות",
-        "hr": "HR",
-        "engineering": "הנדסה",
-        "medical": "רפואה ובריאות",
-        "education": "חינוך",
-        "logistics": "לוגיסטיקה",
-        "management": "ניהול",
-        "other": "אחר"
-      }
-    },
-    "applications": {
-      "title": "הגשות שלי",
-      "subtitle": "מעקב אחרי כל המועמדויות שלך",
-      "status": {
-        "new": "נשלחה",
-        "reviewed": "נסקרה",
-        "phone_interview": "ראיון טלפוני",
-        "recommended": "הומלצתי למעסיק",
-        "employer_interview": "ראיון אצל מעסיק",
-        "offer": "קיבלתי הצעה",
-        "hired": "התקבלתי!",
-        "probation": "תקופת ניסיון",
-        "completed": "תקופת ניסיון הסתיימה",
-        "rejected": "לא התקדמתי"
-      },
-      "stats": {
-        "total": "סה״כ הגשות",
-        "active": "פעילות",
-        "upcomingInterviews": "ראיונות קרובים"
-      },
-      "search": "חפש לפי משרה או חברה...",
-      "filters": {
-        "all": "הכל",
-        "active": "פעיל",
-        "offers": "הצעות",
-        "rejected": "נדחיתי"
-      },
-      "interviewBanner": "ראיון: {{date}} בשעה {{time}}",
-      "offerBanner": "קיבלת הצעת עבודה — בדוק את המייל",
-      "hiredBanner": "כל הכבוד — התחלת לעבוד! 🎉",
-      "detail": {
-        "appliedDate": "תאריך הגשה",
-        "location": "מיקום",
-        "salary": "שכר",
-        "source": "מקור",
-        "interviews": "ראיונות",
-        "history": "היסטוריה"
-      },
-      "interviewTypes": {
-        "video": "וידאו",
-        "phone": "טלפוני",
-        "in_person": "פגישה פיזית",
-        "default": "ראיון"
-      },
-      "interviewStatus": {
-        "scheduled": "מתוזמן",
-        "completed": "הסתיים",
-        "cancelled": "בוטל"
-      },
-      "viewJob": "צפה במשרה",
-      "noApplications": "עדיין לא הגשת מועמדויות",
-      "noApplicationsHint": "התחל לחפש משרות שמעניינות אותך",
-      "browseJobs": "עיין במשרות",
-      "noResults": "אין תוצאות",
-      "noResultsHint": "נסה לשנות את הסינון",
-      "clearFilter": "נקה סינון",
-      "appliedOn": "הוגש בתאריך",
-      "jobTitle": "תפקיד",
-      "company": "חברה"
-    },
-    "savedJobs": {
-      "title": "משרות שמורות",
-      "subtitle": "כל המשרות שסימנת לשמירה",
-      "search": "חפש לפי תפקיד או חברה...",
-      "noSaved": "עדיין לא שמרת משרות",
-      "noSavedHint": "שמור משרות שמעניינות אותך כדי לחזור אליהן בקלות",
-      "browseJobs": "עיין במשרות זמינות",
-      "noResults": "לא נמצאו תוצאות",
-      "noResultsHint": "נסה לחפש עם מילות מפתח אחרות",
-      "clearFilter": "נקה חיפוש",
-      "remove": "הסר",
-      "apply": "הגש מועמדות",
-      "savedOn": "נשמר בתאריך",
-      "unknownTitle": "תפקיד לא ידוע",
-      "unknownCompany": "חברה לא ידועה",
-      "stats": {
-        "total": "משרות שמורות",
-        "companies": "חברות שונות"
-      }
-    },
     "interviews": {
-      "title": "ראיונות שלי",
-      "subtitle": "כל הראיונות המתוזמנים שלך",
-      "noJobTitle": "תפקיד לא ידוע",
-      "upcomingBanner": "ראיון קרוב — הכן את עצמך!",
+      "title": "הראיונות שלי",
+      "subtitle": "כל הראיונות שנקבעו עבורך",
+      "noJobTitle": "ללא כותרת משרה",
+      "upcomingBanner": "ראיון קרוב",
+      "hasFeedback": "יש משוב",
       "viewJob": "צפה במשרה",
       "noInterviews": "אין ראיונות מתוכננים",
-      "noInterviewsHint": "ראיונות שיתוזמנו יופיעו כאן",
+      "noInterviewsHint": "כשיזמנו אותך לראיון, תראה אותם כאן",
       "noResults": "לא נמצאו ראיונות",
       "noResultsHint": "נסה לשנות את הסינון",
-      "clearFilter": "הצג הכל",
-      "stats": {
-        "total": "סה״כ ראיונות",
-        "upcoming": "ראיונות קרובים",
-        "completed": "הושלמו"
+      "clearFilter": "נקה סינון",
+      "status": {
+        "scheduled": "מתוכנן",
+        "confirmed": "מאושר",
+        "completed": "הושלם",
+        "cancelled": "בוטל",
+        "no_show": "לא הגיע",
+        "rescheduled": "נדחה"
+      },
+      "types": {
+        "phone": "טלפון",
+        "video": "וידאו",
+        "in_person": "פנים אל פנים",
+        "technical": "טכני",
+        "hr": "HR",
+        "final": "סופי"
       },
       "filters": {
         "upcoming": "קרובים",
-        "past": "שעברו",
+        "past": "עברו",
         "all": "הכל"
       },
-      "types": {
-        "phone": "ראיון טלפוני",
-        "video": "ראיון וידאו",
-        "in_person": "ראיון פנים מול פנים"
-      },
-      "status": {
-        "scheduled": "מתוזמן",
-        "confirmed": "אושר",
-        "completed": "הושלם",
-        "cancelled": "בוטל",
-        "no_show": "לא הגעתי",
-        "rescheduled": "נדחה"
+      "stats": {
+        "total": "סה\"כ ראיונות",
+        "upcoming": "קרובים",
+        "completed": "הושלמו"
       },
       "detail": {
         "date": "תאריך",
         "time": "שעה",
-        "type": "סוג ראיון",
+        "type": "סוג",
         "interviewer": "מראיין",
         "location": "מיקום",
-        "joinLink": "קישור לכניסה",
+        "joinLink": "קישור להצטרפות",
         "notes": "הערות"
-      }
-    },
-    "messages": {
-      "title": "הודעות שלי",
-      "subtitle": "שיחות עם מגייסים ומעסיקים",
-      "conversations": "שיחות",
-      "viewJob": "צפה במשרה",
-      "selectTitle": "בחר שיחה",
-      "selectHint": "בחר שיחה מהרשימה כדי לצפות בהודעות",
-      "noConversations": "אין שיחות עדיין",
-      "noConversationsHint": "שיחות עם מגייסים יופיעו כאן",
-      "noMessages": "אין הודעות בשיחה זו",
-      "noMessagesHint": "שלח הודעה ראשונה כדי להתחיל שיחה",
-      "inputPlaceholder": "כתוב הודעה...",
-      "stats": {
-        "conversations": "שיחות פתוחות",
-        "unread": "הודעות שלא נקראו"
       }
     }
   },
@@ -1361,7 +1174,33 @@
       "loginAs": "כנס בתור",
       "suspend": "השהה",
       "activate": "הפעל",
-      "delete": "מחק"
+      "delete": "מחק",
+      "subtitle": "ניהול כל הארגונים בפלטפורמה",
+      "newOrg": "ארגון חדש",
+      "total": "סה\"כ",
+      "active": "פעיל",
+      "suspended": "מושהה",
+      "inactive": "לא פעיל",
+      "searchPlaceholder": "חפש ארגון...",
+      "orgCount": "{{count}} ארגונים",
+      "colName": "שם",
+      "colType": "סוג",
+      "colEmail": "אימייל",
+      "noResults": "לא נמצאו ארגונים תואמים",
+      "statusActive": "פעיל",
+      "statusSuspended": "מושהה",
+      "statusInactive": "לא פעיל",
+      "typeStaffing": "השמה",
+      "typeInternalHR": "HR פנימי",
+      "modalTitle": "ארגון חדש",
+      "labelOrgName": "שם ארגון *",
+      "labelType": "סוג",
+      "labelEmail": "אימייל ראשי",
+      "btnCancel": "ביטול",
+      "btnCreate": "צור ארגון",
+      "btnCreating": "יוצר...",
+      "placeholderOrgName": "לדוגמה, TechStaff בע\"מ",
+      "placeholderEmail": "info@company.com"
     },
     "billing": {
       "title": "חיוב ומנויים",
@@ -1437,56 +1276,6 @@
     "pending": "ממתין",
     "paid": "שולם",
     "overdue": "באיחור"
-  },
-  "candidate": {
-    "interviews": {
-      "title": "הראיונות שלי",
-      "subtitle": "כל הראיונות שנקבעו עבורך",
-      "noJobTitle": "ללא כותרת משרה",
-      "upcomingBanner": "ראיון קרוב",
-      "hasFeedback": "יש משוב",
-      "viewJob": "צפה במשרה",
-      "noInterviews": "אין ראיונות מתוכננים",
-      "noInterviewsHint": "כשיזמנו אותך לראיון, תראה אותם כאן",
-      "noResults": "לא נמצאו ראיונות",
-      "noResultsHint": "נסה לשנות את הסינון",
-      "clearFilter": "נקה סינון",
-      "status": {
-        "scheduled": "מתוכנן",
-        "confirmed": "מאושר",
-        "completed": "הושלם",
-        "cancelled": "בוטל",
-        "no_show": "לא הגיע",
-        "rescheduled": "נדחה"
-      },
-      "types": {
-        "phone": "טלפון",
-        "video": "וידאו",
-        "in_person": "פנים אל פנים",
-        "technical": "טכני",
-        "hr": "HR",
-        "final": "סופי"
-      },
-      "filters": {
-        "upcoming": "קרובים",
-        "past": "עברו",
-        "all": "הכל"
-      },
-      "stats": {
-        "total": "סה\"כ ראיונות",
-        "upcoming": "קרובים",
-        "completed": "הושלמו"
-      },
-      "detail": {
-        "date": "תאריך",
-        "time": "שעה",
-        "type": "סוג",
-        "interviewer": "מראיין",
-        "location": "מיקום",
-        "joinLink": "קישור להצטרפות",
-        "notes": "הערות"
-      }
-    }
   },
   "company": {
     "dashboard": {
@@ -1848,10 +1637,9 @@
       "save": "שמור הערה",
       "saving": "שומר...",
       "cancel": "ביטול",
-      "pinned": "מוצמדות",
+      "pinned": "מוצמד",
       "noNotes": "אין הערות עדיין",
       "pin": "הצמד",
-      "pinned": "מוצמד",
       "visibility": {
         "internal": "פנימי",
         "employer_visible": "גלוי למעסיק",
@@ -2155,26 +1943,11 @@
     },
     "whatsapp": {
       "noPhone": "אין מספר טלפון — הוסף מספר לפרופיל המועמד",
-      "messageTemplates": "תבניות הודעה",
-      "templates": "תבניות הודעה",
-      "message": "הודעה",
-      "writePlaceholder": "כתוב הודעה...",
-      "messagePlaceholder": "כתוב הודעה...",
-      "openWhatsApp": "פתח ב-WhatsApp",
-      "documentConversation": "📝 תעד את השיחה",
-      "logConversation": "📝 תעד את השיחה",
-      "conversationPlaceholder": "מה דובר? תוצאת השיחה...",
-      "logPlaceholder": "מה דובר? תוצאת השיחה...",
-      "logManually": "תעד שיחת WhatsApp ידנית",
-      "saveLog": "שמור תיעוד",
-      "saving": "שומר...",
-      "cancel": "ביטול",
-      "history": "היסטוריה",
-      "defaultName": "שלום",
-      "outcomes": {
-        "sent": "שוחח",
-        "read": "נענה",
-        "failed": "לא ענה"
+      "messageTemplates": {
+        "intro": "היכרות ראשונה",
+        "interview": "זימון לראיון",
+        "followup": "follow-up",
+        "offer": "הצעה"
       },
       "templates": {
         "intro": {
@@ -2194,11 +1967,24 @@
           "text": "שלום {name},\nיש לי עדכון טוב — יש הצעה לתפקיד שדיברנו עליו.\nנוח לדבר עכשיו?"
         }
       },
-      "messageTemplates": {
-        "intro": "היכרות ראשונה",
-        "interview": "זימון לראיון",
-        "followup": "follow-up",
-        "offer": "הצעה"
+      "message": "הודעה",
+      "writePlaceholder": "כתוב הודעה...",
+      "messagePlaceholder": "כתוב הודעה...",
+      "openWhatsApp": "פתח ב-WhatsApp",
+      "documentConversation": "📝 תעד את השיחה",
+      "logConversation": "📝 תעד את השיחה",
+      "conversationPlaceholder": "מה דובר? תוצאת השיחה...",
+      "logPlaceholder": "מה דובר? תוצאת השיחה...",
+      "logManually": "תעד שיחת WhatsApp ידנית",
+      "saveLog": "שמור תיעוד",
+      "saving": "שומר...",
+      "cancel": "ביטול",
+      "history": "היסטוריה",
+      "defaultName": "שלום",
+      "outcomes": {
+        "sent": "שוחח",
+        "read": "נענה",
+        "failed": "לא ענה"
       }
     },
     "agencyClients": {

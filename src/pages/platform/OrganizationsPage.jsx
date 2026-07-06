@@ -11,12 +11,6 @@ const TABS = [
   { id: 'companies', route: '/platform/organizations/companies', orgType: 'organization', labelKey: 'platform.orgs.companies' },
 ];
 
-const STATUS_CONFIG = {
-  active:    { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Active',   icon: CheckCircle },
-  suspended: { bg: 'bg-red-50',     text: 'text-red-700',     label: 'Suspended', icon: XCircle },
-  inactive:  { bg: 'bg-gray-50',    text: 'text-gray-500',    label: 'Inactive',  icon: Clock },
-};
-
 export default function OrganizationsPage() {
   const { t } = useTranslation();
   const location = useLocation();
@@ -26,6 +20,12 @@ export default function OrganizationsPage() {
   const [newOrg, setNewOrg] = useState({ name: '', contact_email: '' });
   const [creating, setCreating] = useState(false);
   const qc = useQueryClient();
+
+  const STATUS_CONFIG = {
+    active:    { bg: 'bg-emerald-50', text: 'text-emerald-700', label: t('platform.orgs.statusActive'),   icon: CheckCircle },
+    suspended: { bg: 'bg-red-50',     text: 'text-red-700',     label: t('platform.orgs.statusSuspended'), icon: XCircle },
+    inactive:  { bg: 'bg-gray-50',    text: 'text-gray-500',    label: t('platform.orgs.statusInactive'),  icon: Clock },
+  };
 
   const { data: orgs = [], isLoading } = useQuery({
     queryKey: ['platform-orgs'],
@@ -65,18 +65,21 @@ export default function OrganizationsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Page Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">Organizations</h1>
-          <p className="text-slate-500 mt-1 font-semibold">Manage all organizations on the platform</p>
+          <h1 className="text-2xl font-black text-slate-900">{t('platform.orgs.title')}</h1>
+          <p className="text-slate-500 mt-1 font-semibold">{t('platform.orgs.subtitle')}</p>
         </div>
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={() => { setNewOrg({ name: '', contact_email: '' }); setShowModal(true); }}
-        >
-          <Plus className="w-4 h-4" /> New Organization
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => { setNewOrg({ name: '', contact_email: '' }); setShowModal(true); }}
+          >
+            <Plus className="w-4 h-4" /> {t('platform.orgs.newOrg')}
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -102,14 +105,14 @@ export default function OrganizationsPage() {
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total', value: stats.total, color: 'bg-purple-50 text-purple-700' },
-          { label: 'Active', value: stats.active, color: 'bg-emerald-50 text-emerald-700' },
-          { label: 'Suspended', value: stats.suspended, color: 'bg-red-50 text-red-700' },
-          { label: 'Inactive', value: stats.inactive, color: 'bg-gray-50 text-gray-600' },
+          { labelKey: 'platform.orgs.total',     value: stats.total,     color: 'bg-purple-50 text-purple-700' },
+          { labelKey: 'platform.orgs.active',     value: stats.active,    color: 'bg-emerald-50 text-emerald-700' },
+          { labelKey: 'platform.orgs.suspended',  value: stats.suspended, color: 'bg-red-50 text-red-700' },
+          { labelKey: 'platform.orgs.inactive',   value: stats.inactive,  color: 'bg-gray-50 text-gray-600' },
         ].map(s => (
-          <div key={s.label} className={`rounded-2xl p-5 ${s.color}`}>
+          <div key={s.labelKey} className={`rounded-2xl p-5 ${s.color}`}>
             <p className="text-3xl font-black">{isLoading ? '...' : s.value}</p>
-            <p className="text-sm font-semibold mt-1 opacity-80">{s.label}</p>
+            <p className="text-sm font-semibold mt-1 opacity-80">{t(s.labelKey)}</p>
           </div>
         ))}
       </div>
@@ -119,9 +122,9 @@ export default function OrganizationsPage() {
         <div className="flex items-center gap-2 flex-1 min-w-48 border border-gray-200 rounded-xl px-3 py-2">
           <Search className="w-4 h-4 text-gray-400" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search organization..." className="outline-none text-sm w-full bg-transparent" />
+            placeholder={t('platform.orgs.searchPlaceholder')} className="outline-none text-sm w-full bg-transparent" />
         </div>
-        <span className="text-sm text-gray-400 font-semibold">{filtered.length} organizations</span>
+        <span className="text-sm text-gray-400 font-semibold">{t('platform.orgs.orgCount', { count: filtered.length })}</span>
       </div>
 
       {/* Table */}
@@ -129,12 +132,12 @@ export default function OrganizationsPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Name</th>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Type</th>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Email</th>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Plan</th>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Status</th>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Actions</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">{t('platform.orgs.colName')}</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">{t('platform.orgs.colType')}</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">{t('platform.orgs.colEmail')}</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">{t('platform.orgs.plan')}</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">{t('platform.orgs.status')}</th>
+              <th className="text-left font-black text-gray-600 px-5 py-3">{t('platform.orgs.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -147,7 +150,7 @@ export default function OrganizationsPage() {
                 </tr>
               ))
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={6} className="px-5 py-12 text-center text-gray-400">No matching organizations</td></tr>
+              <tr><td colSpan={6} className="px-5 py-12 text-center text-gray-400">{t('platform.orgs.noResults')}</td></tr>
             ) : filtered.map(org => {
               const st = STATUS_CONFIG[org.status] || STATUS_CONFIG.inactive;
               const StIcon = st.icon;
@@ -162,7 +165,9 @@ export default function OrganizationsPage() {
                     </div>
                   </td>
                   <td className="px-5 py-4 text-gray-600 font-semibold">
-                    {org.org_type === 'staffing_agency' ? '🏢 Staffing' : '🏗️ Internal HR'}
+                    {org.org_type === 'staffing_agency'
+                      ? `🏢 ${t('platform.orgs.typeStaffing')}`
+                      : `🏗️ ${t('platform.orgs.typeInternalHR')}`}
                   </td>
                   <td className="px-5 py-4 text-gray-500">{org.contact_email || '—'}</td>
                   <td className="px-5 py-4">
@@ -183,7 +188,7 @@ export default function OrganizationsPage() {
                           ? 'bg-red-50 text-red-600 hover:bg-red-100'
                           : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
                       }`}>
-                      {org.status === 'active' ? 'Suspend' : 'Activate'}
+                      {org.status === 'active' ? t('platform.orgs.suspend') : t('platform.orgs.activate')}
                     </button>
                   </td>
                 </tr>
@@ -197,22 +202,22 @@ export default function OrganizationsPage() {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
-            <h3 className="text-xl font-black text-gray-900 mb-5">New Organization</h3>
+            <h3 className="text-xl font-black text-gray-900 mb-5">{t('platform.orgs.modalTitle')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Organization Name *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.orgs.labelOrgName')}</label>
                 <input type="text" value={newOrg.name} onChange={e => setNewOrg(p => ({ ...p, name: e.target.value }))}
-                  placeholder="e.g., TechStaff Ltd"
+                  placeholder={t('platform.orgs.placeholderOrgName')}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm" />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Type</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.orgs.labelType')}</label>
                 <p className="text-sm font-semibold text-gray-600">{t(activeTab.labelKey)}</p>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Primary Email</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.orgs.labelEmail')}</label>
                 <input type="email" value={newOrg.contact_email} onChange={e => setNewOrg(p => ({ ...p, contact_email: e.target.value }))}
-                  placeholder="info@company.com"
+                  placeholder={t('platform.orgs.placeholderEmail')}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm" />
               </div>
               <div className="flex gap-3 pt-2">
@@ -223,7 +228,7 @@ export default function OrganizationsPage() {
                   onClick={() => setShowModal(false)}
                   disabled={creating}
                 >
-                  Cancel
+                  {t('platform.orgs.btnCancel')}
                 </Button>
                 <Button
                   variant="primary"
@@ -232,7 +237,7 @@ export default function OrganizationsPage() {
                   onClick={handleCreate}
                   disabled={creating || !newOrg.name.trim()}
                 >
-                  {creating ? 'Creating...' : 'Create Organization'}
+                  {creating ? t('platform.orgs.btnCreating') : t('platform.orgs.btnCreate')}
                 </Button>
               </div>
             </div>

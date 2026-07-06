@@ -443,239 +443,52 @@
     "following": "Following"
   },
   "candidate": {
-    "dashboard": {
-      "title": "My Dashboard",
-      "welcome": "Welcome back",
-      "activeApplications": "Active Applications",
-      "savedJobs": "Saved Jobs",
-      "profileViews": "Profile Views",
-      "matchScore": "Match Score",
-      "recentApplications": "Recent Applications",
-      "recommendedJobs": "Recommended Jobs",
-      "completeProfile": "Complete your profile to get better matches",
-      "profileCompletion": "Profile Completion"
-    },
-    "profile": {
-      "title": "My Profile",
-      "personalInfo": "Personal Information",
-      "resume": "Resume",
-      "skills": "Skills",
-      "experience": "Work Experience",
-      "education": "Education",
-      "languages": "Languages",
-      "preferences": "Job Preferences",
-      "uploadResume": "Upload Resume",
-      "editProfile": "Edit Profile",
-      "saveProfile": "Save Profile",
-      "addSkill": "Add Skill",
-      "addExperience": "Add Experience",
-      "addEducation": "Add Education",
-      "currentPosition": "Current Position",
-      "company": "Company",
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "present": "Present",
-      "degree": "Degree",
-      "institution": "Institution",
-      "fieldOfStudy": "Field of Study",
-      "fullName": "Full Name",
-      "title": "Professional Title",
-      "location": "Location",
-      "bio": "Professional Summary",
-      "linkedIn": "LinkedIn",
-      "github": "GitHub",
-      "website": "Website",
-      "subtitle": "Manage your resume and job application information",
-      "completeness": "Profile Completion",
-      "completeBasics": "Fill in the basic details so employers can find you",
-      "almostThere": "Almost there! Fill in a few more details",
-      "nearlyComplete": "Add an experience description for a stronger profile",
-      "visibleToEmployers": "Visible to Employers",
-      "openToWork": "Open to Work",
-      "activelyLooking": "Actively Looking",
-      "desiredTitle": "Desired Position",
-      "summaryPlaceholder": "Describe yourself briefly to employers...",
-      "noSkills": "No skills added yet",
-      "addSkillPlaceholder": "Add a skill (press Enter)...",
-      "addJob": "Add Position",
-      "companyPlaceholder": "Company Name",
-      "rolePlaceholder": "Position",
-      "periodPlaceholder": "e.g. January 2020 – March 2023",
-      "descriptionPlaceholder": "Brief description of the role and achievements...",
-      "remove": "Remove",
-      "experienceYears": "Years of Experience",
-      "jobType": "Job Type",
-      "minSalary": "Desired Salary (Min)",
-      "maxSalary": "Desired Salary (Max)",
-      "categories": "Fields of Work",
-      "resumeSection": "Resume (PDF / Word)",
-      "replaceFile": "Replace resume file",
-      "fileTypes": "PDF, DOC, DOCX up to 10MB",
-      "fileUploaded": "Resume uploaded — click to view",
-      "saving": "Saving...",
-      "saved": "Saved!",
-      "saveError": "Save Error",
-      "saveChanges": "Save Changes",
-      "jobTypes": {
-        "any": "All Types",
-        "full": "Full-time",
-        "part": "Part-time",
-        "remote": "Remote"
-      },
-      "categoryList": {
-        "software": "Software Development",
-        "design": "UX/UI Design",
-        "marketing": "Marketing",
-        "sales": "Sales",
-        "finance": "Finance & Accounting",
-        "hr": "HR",
-        "engineering": "Engineering",
-        "medical": "Healthcare & Medicine",
-        "education": "Education",
-        "logistics": "Logistics",
-        "management": "Management",
-        "other": "Other"
-      }
-    },
-    "applications": {
-      "title": "My Applications",
-      "subtitle": "Track all your job applications",
-      "status": {
-        "new": "Submitted",
-        "reviewed": "Reviewed",
-        "phone_interview": "Phone Interview",
-        "recommended": "Recommended to Employer",
-        "employer_interview": "Interview at Employer",
-        "offer": "Offer Received",
-        "hired": "Hired!",
-        "probation": "Probation Period",
-        "completed": "Probation Completed",
-        "rejected": "Not Advanced"
-      },
-      "stats": {
-        "total": "Total Applications",
-        "active": "Active",
-        "upcomingInterviews": "Upcoming Interviews"
-      },
-      "search": "Search by position or company...",
-      "filters": {
-        "all": "All",
-        "active": "Active",
-        "offers": "Offers",
-        "rejected": "Rejected"
-      },
-      "interviewBanner": "Interview: {{date}} at {{time}}",
-      "offerBanner": "You received a job offer — check your email",
-      "hiredBanner": "Congratulations — you started working! 🎉",
-      "detail": {
-        "appliedDate": "Application Date",
-        "location": "Location",
-        "salary": "Salary",
-        "source": "Source",
-        "interviews": "Interviews",
-        "history": "History"
-      },
-      "interviewTypes": {
-        "video": "Video",
-        "phone": "Phone",
-        "in_person": "In-Person",
-        "default": "Interview"
-      },
-      "interviewStatus": {
-        "scheduled": "Scheduled",
-        "completed": "Completed",
-        "cancelled": "Cancelled"
-      },
-      "viewJob": "View Job",
-      "noApplications": "You haven't applied to any jobs yet",
-      "noApplicationsHint": "Start searching for jobs that interest you",
-      "browseJobs": "Browse Jobs",
-      "noResults": "No results found",
-      "noResultsHint": "Try changing the filter",
-      "clearFilter": "Clear filter",
-      "appliedOn": "Applied on",
-      "jobTitle": "Position",
-      "company": "Company"
-    },
-    "savedJobs": {
-      "title": "Saved Jobs",
-      "subtitle": "All jobs you've bookmarked",
-      "search": "Search by title or company...",
-      "noSaved": "No saved jobs yet",
-      "noSavedHint": "Save jobs you're interested in to come back to them easily",
-      "browseJobs": "Browse Available Jobs",
-      "noResults": "No results found",
-      "noResultsHint": "Try searching with different keywords",
-      "clearFilter": "Clear search",
-      "remove": "Remove",
-      "apply": "Apply Now",
-      "savedOn": "Saved on",
-      "unknownTitle": "Unknown position",
-      "unknownCompany": "Unknown company",
-      "stats": {
-        "total": "Saved Jobs",
-        "companies": "Different Companies"
-      }
-    },
     "interviews": {
       "title": "My Interviews",
       "subtitle": "All your scheduled interviews",
-      "noJobTitle": "Unknown position",
-      "upcomingBanner": "Upcoming interview — get prepared!",
-      "viewJob": "View Job",
-      "noInterviews": "No interviews scheduled",
-      "noInterviewsHint": "Interviews that get scheduled will appear here",
+      "noJobTitle": "No job title",
+      "upcomingBanner": "Upcoming interview",
+      "hasFeedback": "Has feedback",
+      "viewJob": "View job",
+      "noInterviews": "No scheduled interviews",
+      "noInterviewsHint": "When you get invited to an interview, you'll see them here",
       "noResults": "No interviews found",
       "noResultsHint": "Try changing the filter",
-      "clearFilter": "Show all",
-      "stats": {
-        "total": "Total Interviews",
-        "upcoming": "Upcoming",
-        "completed": "Completed"
+      "clearFilter": "Clear filter",
+      "status": {
+        "scheduled": "Scheduled",
+        "confirmed": "Confirmed",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "no_show": "No show",
+        "rescheduled": "Rescheduled"
+      },
+      "types": {
+        "phone": "Phone",
+        "video": "Video",
+        "in_person": "In Person",
+        "technical": "Technical",
+        "hr": "HR",
+        "final": "Final"
       },
       "filters": {
         "upcoming": "Upcoming",
         "past": "Past",
         "all": "All"
       },
-      "types": {
-        "phone": "Phone Interview",
-        "video": "Video Interview",
-        "in_person": "In-Person Interview"
-      },
-      "status": {
-        "scheduled": "Scheduled",
-        "confirmed": "Confirmed",
-        "completed": "Completed",
-        "cancelled": "Cancelled",
-        "no_show": "No Show",
-        "rescheduled": "Rescheduled"
+      "stats": {
+        "total": "Total Interviews",
+        "upcoming": "Upcoming",
+        "completed": "Completed"
       },
       "detail": {
         "date": "Date",
         "time": "Time",
-        "type": "Interview Type",
+        "type": "Type",
         "interviewer": "Interviewer",
         "location": "Location",
         "joinLink": "Join Link",
         "notes": "Notes"
-      }
-    },
-    "messages": {
-      "title": "My Messages",
-      "subtitle": "Conversations with recruiters and employers",
-      "conversations": "Conversations",
-      "viewJob": "View Job",
-      "selectTitle": "Select a conversation",
-      "selectHint": "Choose a conversation from the list to view messages",
-      "noConversations": "No conversations yet",
-      "noConversationsHint": "Conversations with recruiters will appear here",
-      "noMessages": "No messages in this conversation",
-      "noMessagesHint": "Send the first message to start the conversation",
-      "inputPlaceholder": "Write a message...",
-      "stats": {
-        "conversations": "Open conversations",
-        "unread": "Unread messages"
       }
     }
   },
@@ -1361,7 +1174,33 @@
       "loginAs": "Login As",
       "suspend": "Suspend",
       "activate": "Activate",
-      "delete": "Delete"
+      "delete": "Delete",
+      "subtitle": "Manage all organizations on the platform",
+      "newOrg": "New Organization",
+      "total": "Total",
+      "active": "Active",
+      "suspended": "Suspended",
+      "inactive": "Inactive",
+      "searchPlaceholder": "Search organization...",
+      "orgCount": "{{count}} organizations",
+      "colName": "Name",
+      "colType": "Type",
+      "colEmail": "Email",
+      "noResults": "No matching organizations",
+      "statusActive": "Active",
+      "statusSuspended": "Suspended",
+      "statusInactive": "Inactive",
+      "typeStaffing": "Staffing",
+      "typeInternalHR": "Internal HR",
+      "modalTitle": "New Organization",
+      "labelOrgName": "Organization Name *",
+      "labelType": "Type",
+      "labelEmail": "Primary Email",
+      "btnCancel": "Cancel",
+      "btnCreate": "Create Organization",
+      "btnCreating": "Creating...",
+      "placeholderOrgName": "e.g., TechStaff Ltd",
+      "placeholderEmail": "info@company.com"
     },
     "billing": {
       "title": "Billing & Subscriptions",
@@ -1437,56 +1276,6 @@
     "pending": "Pending",
     "paid": "Paid",
     "overdue": "Overdue"
-  },
-  "candidate": {
-    "interviews": {
-      "title": "My Interviews",
-      "subtitle": "All your scheduled interviews",
-      "noJobTitle": "No job title",
-      "upcomingBanner": "Upcoming interview",
-      "hasFeedback": "Has feedback",
-      "viewJob": "View job",
-      "noInterviews": "No scheduled interviews",
-      "noInterviewsHint": "When you get invited to an interview, you'll see them here",
-      "noResults": "No interviews found",
-      "noResultsHint": "Try changing the filter",
-      "clearFilter": "Clear filter",
-      "status": {
-        "scheduled": "Scheduled",
-        "confirmed": "Confirmed",
-        "completed": "Completed",
-        "cancelled": "Cancelled",
-        "no_show": "No show",
-        "rescheduled": "Rescheduled"
-      },
-      "types": {
-        "phone": "Phone",
-        "video": "Video",
-        "in_person": "In Person",
-        "technical": "Technical",
-        "hr": "HR",
-        "final": "Final"
-      },
-      "filters": {
-        "upcoming": "Upcoming",
-        "past": "Past",
-        "all": "All"
-      },
-      "stats": {
-        "total": "Total Interviews",
-        "upcoming": "Upcoming",
-        "completed": "Completed"
-      },
-      "detail": {
-        "date": "Date",
-        "time": "Time",
-        "type": "Type",
-        "interviewer": "Interviewer",
-        "location": "Location",
-        "joinLink": "Join Link",
-        "notes": "Notes"
-      }
-    }
   },
   "company": {
     "dashboard": {
@@ -1851,7 +1640,6 @@
       "pinned": "Pinned",
       "noNotes": "No notes yet",
       "pin": "Pin",
-      "pinned": "Pinned",
       "visibility": {
         "internal": "Internal",
         "employer_visible": "Visible to Employer",
@@ -2155,26 +1943,11 @@
     },
     "whatsapp": {
       "noPhone": "No phone number — add number to candidate profile",
-      "messageTemplates": "Message Templates",
-      "templates": "Message Templates",
-      "message": "Message",
-      "writePlaceholder": "Write a message...",
-      "messagePlaceholder": "Write a message...",
-      "openWhatsApp": "Open in WhatsApp",
-      "documentConversation": "📝 Log the conversation",
-      "logConversation": "📝 Log the conversation",
-      "conversationPlaceholder": "What was discussed? Conversation outcome...",
-      "logPlaceholder": "What was discussed? Conversation outcome...",
-      "logManually": "Log WhatsApp conversation manually",
-      "saveLog": "Save Log",
-      "saving": "Saving...",
-      "cancel": "Cancel",
-      "history": "History",
-      "defaultName": "Hello",
-      "outcomes": {
-        "sent": "Talked",
-        "read": "Answered",
-        "failed": "No Answer"
+      "messageTemplates": {
+        "intro": "First Introduction",
+        "interview": "Interview Invitation",
+        "followup": "Follow-up",
+        "offer": "Offer"
       },
       "templates": {
         "intro": {
@@ -2194,11 +1967,24 @@
           "text": "Hello {name},\nI have good news — there's an offer for the position we discussed.\nIs now a good time to talk?"
         }
       },
-      "messageTemplates": {
-        "intro": "First Introduction",
-        "interview": "Interview Invitation",
-        "followup": "Follow-up",
-        "offer": "Offer"
+      "message": "Message",
+      "writePlaceholder": "Write a message...",
+      "messagePlaceholder": "Write a message...",
+      "openWhatsApp": "Open in WhatsApp",
+      "documentConversation": "📝 Log the conversation",
+      "logConversation": "📝 Log the conversation",
+      "conversationPlaceholder": "What was discussed? Conversation outcome...",
+      "logPlaceholder": "What was discussed? Conversation outcome...",
+      "logManually": "Log WhatsApp conversation manually",
+      "saveLog": "Save Log",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "history": "History",
+      "defaultName": "Hello",
+      "outcomes": {
+        "sent": "Talked",
+        "read": "Answered",
+        "failed": "No Answer"
       }
     },
     "agencyClients": {
