@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
-import { Users, Search, Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, X } from 'lucide-react';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 const ROLE_CONFIG = {
@@ -40,10 +40,12 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
       ? { full_name: user.full_name || '', email: user.email || '', password: '', phone: user.phone || '', role: user.role || 'candidate', organization_id: user.organization_id || '', is_active: user.is_active ?? true }
       : { ...EMPTY_FORM }
   );
+  const [errors, setErrors] = useState({});
 
   // Sync form when user prop changes
   React.useEffect(() => {
     if (open) {
+      setErrors({});
       setForm(
         isEdit
           ? { full_name: user.full_name || '', email: user.email || '', password: '', phone: user.phone || '', role: user.role || 'candidate', organization_id: user.organization_id || '', is_active: user.is_active ?? true }
@@ -52,7 +54,24 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
     }
   }, [open, user?.id]);
 
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const set = (k, v) => {
+    setForm(f => ({ ...f, [k]: v }));
+    if (errors[k]) setErrors(e => ({ ...e, [k]: null }));
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!form.full_name?.trim()) e.full_name = t('platform.usersManagement.modal.required', 'Required');
+    if (!form.email?.trim()) e.email = t('platform.usersManagement.modal.required', 'Required');
+    if (!isEdit && (!form.password || form.password.length < 8)) e.password = t('platform.usersManagement.modal.passwordHint');
+    return e;
+  };
+
+  const handleSubmit = () => {
+    const e = validate();
+    if (Object.keys(e).length > 0) { setErrors(e); return; }
+    onSave(form);
+  };
 
   if (!open) return null;
 
@@ -75,7 +94,8 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.usersManagement.modal.fullName')} *</label>
             <input value={form.full_name} onChange={e => set('full_name', e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300" />
+              className={`w-full border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300 ${errors.full_name ? 'border-red-400 bg-red-50' : 'border-gray-200'}`} />
+            {errors.full_name && <p className="text-xs text-red-500 mt-1">{errors.full_name}</p>}
           </div>
 
           {/* Email */}
@@ -83,7 +103,8 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
             <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.usersManagement.modal.email')} *</label>
             <input type="email" value={form.email} onChange={e => set('email', e.target.value)}
               disabled={isEdit}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300 disabled:bg-gray-50 disabled:text-gray-400" />
+              className={`w-full border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300 disabled:bg-gray-50 disabled:text-gray-400 ${errors.email ? 'border-red-400 bg-red-50' : 'border-gray-200'}`} />
+            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
           </div>
 
           {/* Password (create only) */}
@@ -91,8 +112,10 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.usersManagement.modal.password')} *</label>
               <input type="password" value={form.password} onChange={e => set('password', e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300" />
-              <p className="text-xs text-gray-400 mt-1">{t('platform.usersManagement.modal.passwordHint')}</p>
+                className={`w-full border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300 ${errors.password ? 'border-red-400 bg-red-50' : 'border-gray-200'}`} />
+              <p className={`text-xs mt-1 ${errors.password ? 'text-red-500 font-semibold' : 'text-gray-400'}`}>
+                {errors.password || t('platform.usersManagement.modal.passwordHint')}
+              </p>
             </div>
           )}
 
@@ -137,7 +160,7 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
 
         {/* Footer */}
         <div className={`flex gap-3 px-6 py-4 border-t border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <button onClick={() => onSave(form)} disabled={isSaving}
+          <button onClick={handleSubmit} disabled={isSaving}
             className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-60 text-white font-bold py-2.5 rounded-xl transition-colors text-sm">
             {isSaving
               ? (isEdit ? t('platform.usersManagement.modal.saving') : t('platform.usersManagement.modal.creating'))
@@ -257,11 +280,28 @@ export default function UsersManagementPage() {
   });
 
   const handleSave = (form) => {
+    // Sanitize: empty string → null for UUID fields, trim strings
+    const sanitized = {
+      ...form,
+      full_name: form.full_name?.trim(),
+      email: form.email?.trim(),
+      phone: form.phone?.trim() || undefined,
+      organization_id: form.organization_id || null,
+    };
+
     if (editUser?.id) {
-      const { email, password, ...rest } = form;
+      const { email, password, ...rest } = sanitized;
       updateMutation.mutate({ id: editUser.id, data: rest });
     } else {
-      createMutation.mutate(form);
+      if (!sanitized.password || sanitized.password.length < 8) {
+        showToast(t('platform.usersManagement.modal.passwordHint'), 'error');
+        return;
+      }
+      if (!sanitized.full_name) {
+        showToast(t('platform.usersManagement.modal.fullName') + ' — required', 'error');
+        return;
+      }
+      createMutation.mutate(sanitized);
     }
   };
 
