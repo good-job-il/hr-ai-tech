@@ -7,12 +7,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { rankJobsForCandidate, rankCandidatesForJob } from '@/lib/aiMatching';
-import AIMatchBadge from '@/components/ai/AIMatchBadge';
-import MatchExplanationCard from '@/components/ai/MatchExplanationCard';
 import CandidateRecommendationsPanel from '@/components/ai/CandidateRecommendationsPanel';
 import JobRecommendationsPanel from '@/components/ai/JobRecommendationsPanel';
-import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { Sparkles, Users, Briefcase, Search, SlidersHorizontal, CheckCircle2, AlertTriangle, X } from 'lucide-react';
 
 function Toast({ message, type, onClose }) {
@@ -116,7 +112,6 @@ export default function AIMatchingPage() {
             <h1 className="text-2xl font-black text-[#0F172A]">{t('aiMatching.page.title')}</h1>
             <p className="text-sm text-[#64748B] font-semibold">{t('aiMatching.page.subtitle')}</p>
           </div>
-          <LanguageSwitcher variant="badge" />
         </div>
 
         {/* Mode Tabs */}
@@ -233,9 +228,9 @@ export default function AIMatchingPage() {
                       { job_id: job.id, candidate_email: selectedCandidate.email }, '', 1
                     );
                     if (existing.length > 0) {
-                      showToast(t('aiMatching.page.applicationExists', { 
-                        candidateName: selectedCandidate.full_name, 
-                        jobTitle: job.title 
+                      showToast(t('aiMatching.page.applicationExists', {
+                        candidateName: selectedCandidate.full_name,
+                        jobTitle: job.title
                       }), 'info');
                       return;
                     }
@@ -253,9 +248,9 @@ export default function AIMatchingPage() {
                       status: 'new',
                       assigned_to: selectedCandidate.recruiter_id || '',
                     });
-                    showToast(t('aiMatching.page.assignedSuccess', { 
-                      candidateName: selectedCandidate.full_name, 
-                      jobTitle: job.title 
+                    showToast(t('aiMatching.page.assignedSuccess', {
+                      candidateName: selectedCandidate.full_name,
+                      jobTitle: job.title
                     }));
                   } catch (e) {
                     showToast(t('aiMatching.page.error', { message: e.message }), 'error');
@@ -290,9 +285,9 @@ export default function AIMatchingPage() {
                      status: 'new',
                      assigned_to: candidate.recruiter_id || '',
                    });
-                   showToast(t('aiMatching.page.addedToPipeline', { 
-                     candidateName: candidate.full_name, 
-                     jobTitle: selectedJob.title 
+                   showToast(t('aiMatching.page.addedToPipeline', {
+                     candidateName: candidate.full_name,
+                     jobTitle: selectedJob.title
                    }));
                  } catch (e) {
                    showToast(t('aiMatching.page.error', { message: e.message }), 'error');
