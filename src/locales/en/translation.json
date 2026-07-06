@@ -1202,6 +1202,7 @@
       "placeholderOrgName": "e.g., TechStaff Ltd",
       "placeholderEmail": "info@company.com",
       "editModalTitle": "Edit Organization",
+      "btnOpen": "Open",
       "btnEdit": "Edit",
       "btnSave": "Save Changes",
       "btnSaving": "Saving...",

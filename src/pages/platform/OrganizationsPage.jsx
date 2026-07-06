@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Building2, Search, Plus, CheckCircle, XCircle, Clock, Pencil, Trash2 } from 'lucide-react';
+import { Building2, Search, Plus, CheckCircle, XCircle, Clock, Pencil, Trash2, MoreVertical, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 
 const TABS = [
   { id: 'staffing', route: '/platform/organizations/staffing', orgType: 'staffing_agency', labelKey: 'platform.orgs.staffing' },
@@ -14,6 +20,7 @@ const TABS = [
 export default function OrganizationsPage() {
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const activeTab = TABS.find(tab => location.pathname.startsWith(tab.route)) ?? TABS[0];
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -219,14 +226,38 @@ export default function OrganizationsPage() {
                         }`}>
                         {org.status === 'active' ? t('platform.orgs.suspend') : t('platform.orgs.activate')}
                       </button>
-                      <button onClick={() => handleEdit(org)}
-                        className="text-xs px-2.5 py-1.5 rounded-lg font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-1">
-                        <Pencil className="w-3 h-3" /> {t('platform.orgs.btnEdit')}
-                      </button>
-                      <button onClick={() => setDeleteOrg(org)}
-                        className="text-xs px-2.5 py-1.5 rounded-lg font-bold bg-gray-50 text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center gap-1">
-                        <Trash2 className="w-3 h-3" /> {t('platform.orgs.delete')}
-                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700">
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="min-w-[150px]">
+                          {org.org_type === 'staffing_agency' && (
+                            <DropdownMenuItem
+                              onClick={() => navigate(`/company/dashboard?orgId=${org.id}`)}
+                              className="flex items-center gap-2 cursor-pointer focus:bg-gray-100 focus:text-gray-900"
+                            >
+                              <ExternalLink className="w-4 h-4 text-purple-500" />
+                              <span>{t('platform.orgs.btnOpen')}</span>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            onClick={() => handleEdit(org)}
+                            className="flex items-center gap-2 cursor-pointer focus:bg-gray-100 focus:text-gray-900"
+                          >
+                            <Pencil className="w-4 h-4 text-blue-500" />
+                            <span>{t('platform.orgs.btnEdit')}</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setDeleteOrg(org)}
+                            className="flex items-center gap-2 cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>{t('platform.orgs.delete')}</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </td>
                 </tr>
