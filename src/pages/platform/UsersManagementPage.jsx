@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { Search, Plus, Pencil, Trash2, X } from 'lucide-react';
-import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 const ROLE_CONFIG = {
   admin:                { bg: 'bg-red-50',     text: 'text-red-700' },
@@ -364,7 +363,6 @@ export default function UsersManagementPage() {
             <Plus className="w-4 h-4" />
             {t('platform.usersManagement.addUser')}
           </button>
-          <LanguageSwitcher variant="badge" />
         </div>
       </div>
 
