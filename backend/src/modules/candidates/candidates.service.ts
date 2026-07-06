@@ -209,7 +209,7 @@ export class CandidatesService {
   // ─── Import Batches ──────────────────────────────────────────────────────
   async getBatches(user: UserEntity) {
     const where: Record<string, any> = {};
-    if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
+    if (user.role !== UserRole.ADMIN) {
       where.recruiter_id = user.id;
     }
     return this.batchRepo.find({ where, order: { created_date: 'DESC' } });
@@ -297,7 +297,7 @@ export class CandidatesService {
 
   // ─── Private helpers ─────────────────────────────────────────────────────
   private checkAccess(candidate: CandidateEntity, user: UserEntity) {
-    if (user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN) return;
+    if (user.role === UserRole.ADMIN) return;
     if (candidate.organization_id !== user.organization_id) {
       throw new ForbiddenException('Access denied');
     }

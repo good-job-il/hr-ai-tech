@@ -21,7 +21,7 @@ export class CompensationService {
 
   /** Only staffing_agency org_type (or admin) may access compensation plans */
   private assertAgencyAccess(user: UserEntity) {
-    if (user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN) return;
+    if (user.role === UserRole.ADMIN) return;
     if (user.org_type !== OrgType.STAFFING_AGENCY) {
       throw new ForbiddenException('Compensation plans are only available to staffing agencies');
     }
@@ -31,7 +31,7 @@ export class CompensationService {
     this.assertAgencyAccess(user);
     const { page, limit, sort, order, job_id, recruiter_id } = query;
     const where: Record<string, any> = {};
-    if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
+    if (user.role !== UserRole.ADMIN) {
       where.organization_id = user.organization_id;
     }
     if (job_id) where.job_id = job_id;
@@ -53,7 +53,6 @@ export class CompensationService {
     if (!plan) throw new NotFoundException(`Compensation plan ${id} not found`);
     if (
       user.role !== UserRole.ADMIN &&
-      user.role !== UserRole.SUPER_ADMIN &&
       plan.organization_id !== user.organization_id
     ) {
       throw new ForbiddenException('Access denied');

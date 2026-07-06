@@ -29,7 +29,7 @@ export class OrganizationsService {
     const { page, limit, sort, order, org_type, status, search } = query;
 
     // Non-admin users can only see their own org
-    if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
+    if (user.role !== UserRole.ADMIN) {
       const org = user.organization_id
         ? await this.repo.findOne({ where: { id: user.organization_id } })
         : null;
@@ -69,7 +69,6 @@ export class OrganizationsService {
     // Non-admins can only view their own org
     if (
       user.role !== UserRole.ADMIN &&
-      user.role !== UserRole.SUPER_ADMIN &&
       user.organization_id !== id
     ) {
       throw new ForbiddenException('Access denied');
@@ -79,7 +78,7 @@ export class OrganizationsService {
   }
 
   async create(dto: CreateOrganizationDto, user: UserEntity): Promise<OrganizationEntity> {
-    if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
+    if (user.role !== UserRole.ADMIN) {
       throw new ForbiddenException('Only admins can create organizations');
     }
 
@@ -96,7 +95,6 @@ export class OrganizationsService {
 
     if (
       user.role !== UserRole.ADMIN &&
-      user.role !== UserRole.SUPER_ADMIN &&
       user.role !== UserRole.ORG_ADMIN
     ) {
       throw new ForbiddenException('Insufficient permissions to update organization');
@@ -107,7 +105,7 @@ export class OrganizationsService {
   }
 
   async remove(id: string, user: UserEntity): Promise<void> {
-    if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
+    if (user.role !== UserRole.ADMIN) {
       throw new ForbiddenException('Only admins can delete organizations');
     }
 

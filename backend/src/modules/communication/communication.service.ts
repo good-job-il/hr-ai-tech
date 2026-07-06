@@ -25,7 +25,7 @@ export class CommunicationService {
   async findAll(query: QueryCommunicationLogsDto, user: UserEntity) {
     const { page, limit, sort, order, candidate_id, channel } = query;
     const where: Record<string, any> = {};
-    if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
+    if (user.role !== UserRole.ADMIN) {
       where.organization_id = user.organization_id;
     }
     if (candidate_id) where.candidate_id = candidate_id;

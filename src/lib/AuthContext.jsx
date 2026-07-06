@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
       authChecked,
       organization,
       orgType,         // 'staffing_agency' | 'organization' | null
-      isSuperAdmin: user?.role === 'super_admin' || user?.role === 'admin',
+      isSuperAdmin: user?.role === 'admin',
       isAgency: orgType === 'staffing_agency',
       isCompany: orgType === 'organization',
       logout,

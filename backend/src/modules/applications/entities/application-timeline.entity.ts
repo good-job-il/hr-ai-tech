@@ -33,7 +33,7 @@ export class ApplicationTimelineEntity extends BaseEntity {
   @Column({
     name: 'performed_by_role',
     type: 'enum',
-    enum: ['candidate', 'employer', 'recruiter', 'team_manager', 'recruitment_manager', 'org_admin', 'admin', 'super_admin'],
+    enum: ['candidate', 'employer', 'recruiter', 'team_manager', 'recruitment_manager', 'org_admin', 'admin'],
     nullable: true,
   })
   performed_by_role: string | null;

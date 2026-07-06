@@ -13,7 +13,7 @@ import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
 
 /** Internal agency/employer notes — only org staff & admins may write */
-const COMMUNICATION_WRITE_ROLES = [...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
+const COMMUNICATION_WRITE_ROLES = [...ORG_ROLES, UserRole.ADMIN];
 
 @ApiTags('Communication')
 @ApiBearerAuth()

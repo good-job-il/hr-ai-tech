@@ -1,7 +1,7 @@
 /**
  * RoleSettingsPage — Phase B-3
  * Editable Role Display Names per org_type
- * Accessible by: super_admin, admin, org_admin
+ * Accessible by: admin, org_admin
  */
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { RefreshCw, Users, Lock, Pencil, Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const EDITABLE_ROLES = ['super_admin', 'admin', 'org_admin'];
+const EDITABLE_ROLES = ['admin', 'org_admin'];
 
 const LEVEL_COLORS = {
   1: 'bg-purple-100 text-purple-700 border-purple-200',

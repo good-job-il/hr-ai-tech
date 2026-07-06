@@ -11,9 +11,9 @@ import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
 
 /** Candidates apply for themselves; agency/admin staff can also create on behalf of a candidate */
-const APPLICATION_CREATE_ROLES = [UserRole.CANDIDATE, ...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
+const APPLICATION_CREATE_ROLES = [UserRole.CANDIDATE, ...ORG_ROLES, UserRole.ADMIN];
 /** Only agency staff / employer / admin manage application status & pipeline */
-const APPLICATION_MANAGE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
+const APPLICATION_MANAGE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN];
 
 @ApiTags('Applications')
 @ApiBearerAuth()

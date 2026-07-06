@@ -5,8 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { Search, Plus, Pencil, Trash2, X } from 'lucide-react';
 
 const ROLE_CONFIG = {
-  admin:                { bg: 'bg-red-50',     text: 'text-red-700' },
-  super_admin:          { bg: 'bg-red-100',    text: 'text-red-800' },
+  admin:                { bg: 'bg-red-100',    text: 'text-red-800' },
   org_admin:            { bg: 'bg-purple-50',  text: 'text-purple-700' },
   recruitment_manager:  { bg: 'bg-blue-50',    text: 'text-blue-700' },
   team_manager:         { bg: 'bg-indigo-50',  text: 'text-indigo-700' },
@@ -17,7 +16,7 @@ const ROLE_CONFIG = {
 };
 
 const ALL_ROLES = [
-  'super_admin', 'org_admin', 'recruitment_manager', 'team_manager',
+  'admin', 'org_admin', 'recruitment_manager', 'team_manager',
   'recruiter', 'hr_manager', 'internal_recruiter', 'candidate',
 ];
 
@@ -318,7 +317,7 @@ export default function UsersManagementPage() {
 
   const stats = {
     total: users.length,
-    admins: users.filter(u => ['admin', 'super_admin', 'org_admin'].includes(u.role)).length,
+    admins: users.filter(u => ['admin', 'org_admin'].includes(u.role)).length,
     recruiters: users.filter(u => ['recruiter', 'team_manager', 'recruitment_manager', 'internal_recruiter'].includes(u.role)).length,
     candidates: users.filter(u => u.role === 'candidate').length,
   };

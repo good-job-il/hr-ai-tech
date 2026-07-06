@@ -12,7 +12,7 @@ import { httpClient } from '@/api/client/httpClient';
 import { useAuth } from '@/lib/AuthContext';
 
 // Roles that always have all permissions (bypass matrix)
-const SUPER_ROLES = ['admin', 'super_admin'];
+const SUPER_ROLES = ['admin'];
 
 // Map app roles → org_type for template lookup
 const ROLE_TO_ORG_TYPE = {

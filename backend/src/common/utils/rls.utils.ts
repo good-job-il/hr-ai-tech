@@ -20,14 +20,6 @@ export interface UserContext {
 /** Sentinel value that indicates the query should return no results */
 export const BLOCKED_FILTER = { id: '__BLOCKED__' };
 
-/** Platform-only entities accessible by super_admin without org context */
-const PLATFORM_ENTITIES = [
-  'Organization',
-  'AuditLog',
-  'PermissionMatrix',
-  'RoleTemplate',
-];
-
 /** Entities supporting soft delete — adds is_deleted: false automatically */
 const SOFT_DELETE_ENTITIES = ['Candidate', 'Application', 'Job', 'Company'];
 
@@ -66,13 +58,6 @@ export function getRlsWhere(
     return buildFinal(entityName, {}, extraFilters);
   }
 
-  // ─── Super Admin — platform entities only ─────────────────────────────
-  if (role === UserRole.SUPER_ADMIN) {
-    if (PLATFORM_ENTITIES.includes(entityName)) {
-      return buildFinal(entityName, {}, extraFilters);
-    }
-    return BLOCKED_FILTER;
-  }
 
   // ─── Org-based roles ──────────────────────────────────────────────────
   switch (role) {

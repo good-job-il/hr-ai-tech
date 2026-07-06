@@ -4,7 +4,6 @@ import { useAuth } from '@/lib/AuthContext';
 
 const ROLE_HOME = {
   admin: '/platform/dashboard',
-  super_admin: '/platform/dashboard',
   org_admin: '/agency/dashboard',
   recruitment_manager: '/agency/dashboard',
   team_manager: '/agency/team/dashboard',

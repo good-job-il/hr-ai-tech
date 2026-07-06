@@ -8,7 +8,7 @@ import { UserRole } from '../../common/enums/user-role.enum';
 @ApiTags('Import Sources')
 @ApiBearerAuth()
 @Controller('import-sources')
-@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+@Roles(UserRole.ADMIN)
 export class ImportSourcesController {
   constructor(private readonly svc: ImportSourcesService) {}
 

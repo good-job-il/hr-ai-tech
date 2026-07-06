@@ -18,8 +18,8 @@ export class AuditService {
     const { page, limit, sort, order, entity_type, entity_id, action, actor_user_id } = query;
     const where: Record<string, any> = {};
 
-    // Only admin/super_admin see all logs; others are scoped to their org
-    if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
+    // Only admin sees all logs; others are scoped to their org
+    if (user.role !== UserRole.ADMIN) {
       where.organization_id = user.organization_id;
     }
     if (entity_type) where.entity_type = entity_type;

@@ -30,7 +30,7 @@ export class JobsService {
     if (isBlocked(rlsWhere)) return buildPaginatedResponse([], 0, { page, limit });
 
     const where: Record<string, any> = { ...rlsWhere };
-    if (organization_id && (user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN)) {
+    if (organization_id && user.role === UserRole.ADMIN) {
       where.organization_id = organization_id;
     }
     if (employer_company_id) where.employer_company_id = employer_company_id;

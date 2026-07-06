@@ -6,15 +6,10 @@ export enum UserRole {
   RECRUITMENT_MANAGER = 'recruitment_manager',
   ORG_ADMIN = 'org_admin',
   ADMIN = 'admin',
-  SUPER_ADMIN = 'super_admin',
   HR_MANAGER = 'hr_manager',
   INTERNAL_RECRUITER = 'internal_recruiter',
 }
 
-export const PRIVILEGED_ROLES = [
-  UserRole.ADMIN,
-  UserRole.SUPER_ADMIN,
-];
 
 export const ORG_ROLES = [
   UserRole.ORG_ADMIN,

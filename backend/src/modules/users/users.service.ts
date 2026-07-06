@@ -28,15 +28,12 @@ export class UsersService {
     const where: Record<string, any> = {};
 
     // Admins see all; org users see their org only
-    if (
-      requestingUser.role !== UserRole.ADMIN &&
-      requestingUser.role !== UserRole.SUPER_ADMIN
-    ) {
+    if (requestingUser.role !== UserRole.ADMIN) {
       where.organization_id = requestingUser.organization_id;
     }
 
     if (role) where.role = role;
-    if (organization_id && (requestingUser.role === UserRole.ADMIN || requestingUser.role === UserRole.SUPER_ADMIN)) {
+    if (organization_id && requestingUser.role === UserRole.ADMIN) {
       where.organization_id = organization_id;
     }
     if (is_active !== undefined) where.is_active = is_active;
@@ -73,7 +70,6 @@ export class UsersService {
     // Can only view own user or same org (admins unrestricted)
     if (
       requestingUser.role !== UserRole.ADMIN &&
-      requestingUser.role !== UserRole.SUPER_ADMIN &&
       user.id !== requestingUser.id &&
       user.organization_id !== requestingUser.organization_id
     ) {
@@ -93,8 +89,7 @@ export class UsersService {
     // Only admins can change roles
     if (
       dto.role &&
-      requestingUser.role !== UserRole.ADMIN &&
-      requestingUser.role !== UserRole.SUPER_ADMIN
+      requestingUser.role !== UserRole.ADMIN
     ) {
       throw new ForbiddenException('Only admins can change user roles');
     }
@@ -106,8 +101,7 @@ export class UsersService {
 
   async create(dto: CreateUserDto, requestingUser: UserEntity): Promise<any> {
     if (
-      requestingUser.role !== UserRole.ADMIN &&
-      requestingUser.role !== UserRole.SUPER_ADMIN
+      requestingUser.role !== UserRole.ADMIN
     ) {
       throw new ForbiddenException('Only admins can create users');
     }
@@ -137,8 +131,7 @@ export class UsersService {
 
   async remove(id: string, requestingUser: UserEntity): Promise<void> {
     if (
-      requestingUser.role !== UserRole.ADMIN &&
-      requestingUser.role !== UserRole.SUPER_ADMIN
+      requestingUser.role !== UserRole.ADMIN
     ) {
       throw new ForbiddenException('Only admins can delete users');
     }
@@ -164,4 +157,3 @@ export class UsersService {
     return rest;
   }
 }
-

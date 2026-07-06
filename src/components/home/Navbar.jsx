@@ -79,7 +79,6 @@ export default function Navbar() {
       hiring_manager: '/employer/dashboard',
       candidate: '/candidate/dashboard',
       admin: '/platform/dashboard',
-      super_admin: '/platform/dashboard',
     };
     return map[role] || '/';
   };

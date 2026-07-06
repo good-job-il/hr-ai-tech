@@ -14,13 +14,13 @@ export class SalaryController {
   @Get() @Public() findAll(@Query() q: QuerySalaryDataDto) { return this.svc.findAll(q); }
   @Get(':id') @Public() findOne(@Param('id', ParseUUIDPipe) id: string) { return this.svc.findById(id); }
 
-  @Post() @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN) @HttpCode(HttpStatus.CREATED)
+  @Post() @Roles(UserRole.ADMIN) @HttpCode(HttpStatus.CREATED)
   create(@Body() dto: CreateSalaryDataDto) { return this.svc.create(dto); }
 
-  @Patch(':id') @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Patch(':id') @Roles(UserRole.ADMIN)
   update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateSalaryDataDto) { return this.svc.update(id, dto); }
 
-  @Delete(':id') @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN) @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete(':id') @Roles(UserRole.ADMIN) @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseUUIDPipe) id: string) { return this.svc.remove(id); }
 }
 

@@ -1,6 +1,6 @@
 /**
  * PermissionsPage — Organization Permission Matrix Editor
- * Accessible only by: super_admin, admin, org_admin
+ * Accessible only by: admin, org_admin
  */
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
@@ -18,7 +18,7 @@ const PERM_KEYS = [
 const STAFFING_ROLE_KEYS = ['org_admin', 'recruitment_manager', 'team_manager', 'recruiter'];
 const ORG_ROLE_KEYS      = ['org_admin', 'hr_manager', 'internal_recruiter'];
 
-const EDITABLE_ROLES = ['super_admin', 'admin', 'org_admin'];
+const EDITABLE_ROLES = ['admin', 'org_admin'];
 
 const emptyPerms = () => ({
   view: false, create: false, update: false, delete: false,

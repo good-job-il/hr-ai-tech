@@ -3,7 +3,7 @@ import { createZodDto } from 'nestjs-zod';
 
 const ROLES = [
   'candidate', 'employer', 'recruiter', 'team_manager',
-  'recruitment_manager', 'org_admin', 'admin', 'super_admin',
+  'recruitment_manager', 'org_admin', 'admin',
   'hr_manager', 'internal_recruiter',
 ] as const;
 

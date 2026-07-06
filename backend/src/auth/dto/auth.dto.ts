@@ -25,7 +25,6 @@ export const RegisterSchema = z.object({
       'recruitment_manager',
       'org_admin',
       'admin',
-      'super_admin',
       'hr_manager',
       'internal_recruiter',
     ])

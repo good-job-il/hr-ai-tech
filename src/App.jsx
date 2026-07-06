@@ -136,8 +136,8 @@ const AuthenticatedApp = () => {
       <Route path="/how-it-works" element={<HowItWorksPage />} />
       <Route path="/resources" element={<ResourcesPage />} />
 
-      {/* ── PLATFORM (Super Admin / Admin ONLY) ─────────────────────── */}
-      {/* ALL platform routes require super_admin role — no org access */}
+      {/* ── PLATFORM (Admin ONLY) ─────────────────────────────────────── */}
+      {/* ALL platform routes require admin role — no org access */}
       <Route element={<ProtectedRoute superAdminOnly />}>
         <Route element={<SuperAdminLayout />}>
           <Route path="/platform/dashboard" element={<PlatformDashboard />} />

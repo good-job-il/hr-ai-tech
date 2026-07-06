@@ -11,8 +11,6 @@
  *
  * employer → entity חיצוני (employer_company_id בלבד)
  * admin    → גלובלי, ללא סינון (platform operator)
- * super_admin → רואה רק platform data (organizations, audit, billing)
- *               לא רואה tenant-sensitive data ללא impersonation
  *
  * FALLBACK_ORG_ID = ID של "תעסוקה טובה" — מולא לאחר יצירת הארגון.
  * משמש migration זמני לרשומות ישנות ללא organization_id.
@@ -20,9 +18,6 @@
  */
 
 // Migration fallback removed — all records now have organization_id stamped at creation.
-
-// Platform-only entities that super_admin can access without org context
-const PLATFORM_ENTITIES = ['Organization', 'AuditLog', 'PermissionMatrix', 'RoleTemplate'];
 
 /**
  * @param {string} role        - user.role
@@ -36,12 +31,6 @@ export const getRLSFilter = (role, entityName, userId, userMeta = {}) => {
   // ─── Admin (platform operator) — גלובלי ────────────────────
   if (role === 'admin') return {};
 
-  // ─── Super Admin — רק platform entities ───────────────────
-  if (role === 'super_admin') {
-    if (PLATFORM_ENTITIES.includes(entityName)) return {};
-    // חסום ל-tenant-sensitive data ללא impersonation
-    return { id: '__BLOCKED__' };
-  }
 
   switch (role) {
 

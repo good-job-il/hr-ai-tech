@@ -12,7 +12,7 @@ import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
 
 /** Roles allowed to create/modify job postings (employers & agency staff only) */
-const JOB_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
+const JOB_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN];
 
 @ApiTags('Jobs')
 @ApiBearerAuth()

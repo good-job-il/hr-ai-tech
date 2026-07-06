@@ -8,7 +8,7 @@ import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
 
 /** Only agency staff / employer / admin schedule & manage interviews */
-const INTERVIEW_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
+const INTERVIEW_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN];
 
 @ApiTags('Interviews')
 @ApiBearerAuth()

@@ -2,14 +2,14 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 
 // Roles that bypass all checks
-const SUPER_ROLES = ['admin', 'super_admin'];
+const SUPER_ROLES = ['admin'];
 
 /**
  * ProtectedRoute
  * Supports:
  * - requiredRoles: string[]   — user.role must be in list
  * - requiredOrgTypes: string[] — orgType must be in list ('staffing_agency' | 'organization')
- * - superAdminOnly: boolean   — only admin/super_admin
+ * - superAdminOnly: boolean   — only admin
  * Super roles bypass requiredRoles but NOT requiredOrgTypes (by design).
  */
 export default function ProtectedRoute({
@@ -46,7 +46,7 @@ export default function ProtectedRoute({
     return unauthorizedElement;
   }
 
-  // OrgType check (never bypassed — even super_admin must be explicit)
+  // OrgType check (never bypassed — even admin must be explicit)
   if (requiredOrgTypes.length > 0 && !requiredOrgTypes.includes(orgType)) {
     // Super admin has no org, allow them through org-type gates
     if (!isSuperAdmin) {

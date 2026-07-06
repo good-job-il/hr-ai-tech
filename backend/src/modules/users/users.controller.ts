@@ -45,7 +45,7 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a new user (admin only)' })
   create(
     @Body() dto: CreateUserDto,
@@ -66,7 +66,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete a user (admin only)' })
   async remove(
     @Param('id', ParseUUIDPipe) id: string,

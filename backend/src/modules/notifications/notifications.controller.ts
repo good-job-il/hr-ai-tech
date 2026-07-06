@@ -8,7 +8,7 @@ import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
 
 /** Roles allowed to create notifications on behalf of the system/other users */
-const NOTIFICATION_CREATE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
+const NOTIFICATION_CREATE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN];
 
 @ApiTags('Notifications')
 @ApiBearerAuth()
@@ -19,7 +19,7 @@ export class NotificationsController {
   @Get()
   findAll(@Query() q: QueryNotificationsDto, @CurrentUser() u: UserEntity) {
     // Non-admins may only ever see their own notifications, regardless of query override (IDOR fix)
-    const isAdmin = u.role === UserRole.ADMIN || u.role === UserRole.SUPER_ADMIN;
+    const isAdmin = u.role === UserRole.ADMIN;
     const recipient_email = isAdmin ? q.recipient_email || u.email : u.email;
     return this.svc.findAll({ ...q, recipient_email });
   }

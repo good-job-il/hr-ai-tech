@@ -91,7 +91,7 @@ export class FunctionsController {
   }
 
   @Post('loadTaxonomy')
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Roles(UserRole.ADMIN)
   loadTaxonomy() {
     return this.misc.loadTaxonomy();
   }
@@ -129,7 +129,7 @@ export class FunctionsController {
   }
 
   @Post('getDashboardStats')
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Roles(UserRole.ADMIN)
   getDashboardStats() {
     return this.dashboard.getDashboardStats();
   }
@@ -150,7 +150,7 @@ export class FunctionsController {
   }
 
   @Post('validateImportBatch')
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Roles(UserRole.ADMIN)
   validateImportBatch(@Body() dto: ValidateImportBatchDto) {
     return this.importService.validateImportBatch(dto);
   }
@@ -166,7 +166,7 @@ export class FunctionsController {
   }
 
   @Post('crawlCareerPage')
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Roles(UserRole.ADMIN)
   crawlCareerPage(@Body() dto: CrawlCareerPageDto, @CurrentUser() user: UserEntity) {
     return this.crawler.crawlCareerPage(dto, user);
   }

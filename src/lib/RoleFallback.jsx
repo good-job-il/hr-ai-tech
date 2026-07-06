@@ -4,14 +4,14 @@ import PageNotFound from '@/lib/PageNotFound';
 
 /**
  * New tenant-aware role routing.
- * super_admin / admin → /platform/dashboard
+ * admin → /platform/dashboard
  * staffing_agency roles → /agency/...
  * organization roles → /company/...
  * candidate → /candidate/dashboard
  */
 function getRoleHome(role, orgType) {
   // Platform operators
-  if (role === 'super_admin' || role === 'admin') return '/platform/dashboard';
+  if (role === 'admin') return '/platform/dashboard';
 
   // Candidate
   if (role === 'candidate') return '/candidate/dashboard';

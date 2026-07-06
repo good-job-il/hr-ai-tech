@@ -12,7 +12,7 @@ export class NotificationsService {
   constructor(@InjectRepository(NotificationEntity) private readonly repo: Repository<NotificationEntity>) {}
 
   private assertOwner(n: NotificationEntity, user: UserEntity) {
-    const isAdmin = user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN;
+    const isAdmin = user.role === UserRole.ADMIN;
     if (!isAdmin && n.recipient_email !== user.email) {
       throw new ForbiddenException('Access denied');
     }

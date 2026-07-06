@@ -42,7 +42,7 @@ export class PermissionsService {
   ) {}
 
   private isPrivileged(user: UserEntity) {
-    return user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN;
+    return user.role === UserRole.ADMIN;
   }
 
   // ─── Permission Matrix ────────────────────────────────────────────────────

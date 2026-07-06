@@ -9,7 +9,7 @@ import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
 
 /** Company profile is managed by the employer's own staff or agency/admin staff */
-const COMPANY_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN, UserRole.SUPER_ADMIN];
+const COMPANY_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN];
 
 @ApiTags('Companies')
 @ApiBearerAuth()

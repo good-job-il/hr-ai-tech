@@ -31,7 +31,6 @@ export default function Login() {
         team_manager: '/recruitment/jobs',
         recruitment_manager: '/recruitment/jobs',
         admin: '/admin/dashboard',
-        super_admin: '/admin/dashboard',
       };
       
       window.location.href = redirects[role] || '/';
