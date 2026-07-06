@@ -7,7 +7,6 @@ import {
   Param,
   Body,
   Query,
-  ParseUUIDPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -39,7 +38,7 @@ export class OrganizationsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get organization by ID' })
   findOne(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @CurrentUser() user: UserEntity,
   ) {
     return this.service.findById(id, user);
@@ -58,7 +57,7 @@ export class OrganizationsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update organization' })
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateOrganizationDto,
     @CurrentUser() user: UserEntity,
   ) {
@@ -69,7 +68,7 @@ export class OrganizationsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete organization (admin only)' })
   remove(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @CurrentUser() user: UserEntity,
   ) {
     return this.service.remove(id, user);

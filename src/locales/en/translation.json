@@ -1200,7 +1200,15 @@
       "btnCreate": "Create Organization",
       "btnCreating": "Creating...",
       "placeholderOrgName": "e.g., TechStaff Ltd",
-      "placeholderEmail": "info@company.com"
+      "placeholderEmail": "info@company.com",
+      "editModalTitle": "Edit Organization",
+      "btnEdit": "Edit",
+      "btnSave": "Save Changes",
+      "btnSaving": "Saving...",
+      "confirmDeleteTitle": "Delete Organization",
+      "confirmDeleteMsg": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+      "btnConfirmDelete": "Yes, Delete",
+      "btnDeleting": "Deleting..."
     },
     "billing": {
       "title": "Billing & Subscriptions",

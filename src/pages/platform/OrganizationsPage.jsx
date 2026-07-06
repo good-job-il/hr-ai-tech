@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Building2, Search, Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Building2, Search, Plus, CheckCircle, XCircle, Clock, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
 
@@ -19,6 +19,10 @@ export default function OrganizationsPage() {
   const [showModal, setShowModal] = useState(false);
   const [newOrg, setNewOrg] = useState({ name: '', contact_email: '' });
   const [creating, setCreating] = useState(false);
+  const [editOrg, setEditOrg] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [deleteOrg, setDeleteOrg] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const qc = useQueryClient();
 
   const STATUS_CONFIG = {
@@ -54,6 +58,30 @@ export default function OrganizationsPage() {
     const next = org.status === 'active' ? 'suspended' : 'active';
     await base44.entities.Organization.update(org.id, { status: next });
     qc.invalidateQueries(['platform-orgs']);
+  };
+
+  const handleEdit = (org) => {
+    setEditOrg({ id: org.id, name: org.name, contact_email: org.contact_email || '', plan: org.plan || 'trial' });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editOrg.name.trim()) return;
+    setSaving(true);
+    const payload = { name: editOrg.name, plan: editOrg.plan };
+    if (editOrg.contact_email.trim()) payload.contact_email = editOrg.contact_email.trim();
+    await base44.entities.Organization.update(editOrg.id, payload);
+    await qc.invalidateQueries(['platform-orgs']);
+    setEditOrg(null);
+    setSaving(false);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteOrg) return;
+    setDeleting(true);
+    await base44.entities.Organization.delete(deleteOrg.id);
+    await qc.invalidateQueries(['platform-orgs']);
+    setDeleteOrg(null);
+    setDeleting(false);
   };
 
   const stats = {
@@ -182,14 +210,24 @@ export default function OrganizationsPage() {
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <button onClick={() => handleStatusToggle(org)}
-                      className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors ${
-                        org.status === 'active'
-                          ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                          : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                      }`}>
-                      {org.status === 'active' ? t('platform.orgs.suspend') : t('platform.orgs.activate')}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => handleStatusToggle(org)}
+                        className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors ${
+                          org.status === 'active'
+                            ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                            : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                        }`}>
+                        {org.status === 'active' ? t('platform.orgs.suspend') : t('platform.orgs.activate')}
+                      </button>
+                      <button onClick={() => handleEdit(org)}
+                        className="text-xs px-2.5 py-1.5 rounded-lg font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-1">
+                        <Pencil className="w-3 h-3" /> {t('platform.orgs.btnEdit')}
+                      </button>
+                      <button onClick={() => setDeleteOrg(org)}
+                        className="text-xs px-2.5 py-1.5 rounded-lg font-bold bg-gray-50 text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center gap-1">
+                        <Trash2 className="w-3 h-3" /> {t('platform.orgs.delete')}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -240,6 +278,69 @@ export default function OrganizationsPage() {
                   {creating ? t('platform.orgs.btnCreating') : t('platform.orgs.btnCreate')}
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Edit Modal */}
+      {editOrg && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+            <h3 className="text-xl font-black text-gray-900 mb-5">{t('platform.orgs.editModalTitle')}</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.orgs.labelOrgName')}</label>
+                <input type="text" value={editOrg.name} onChange={e => setEditOrg(p => ({ ...p, name: e.target.value }))}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.orgs.labelEmail')}</label>
+                <input type="email" value={editOrg.contact_email} onChange={e => setEditOrg(p => ({ ...p, contact_email: e.target.value }))}
+                  placeholder={t('platform.orgs.placeholderEmail')}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.orgs.plan')}</label>
+                <select value={editOrg.plan} onChange={e => setEditOrg(p => ({ ...p, plan: e.target.value }))}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm">
+                  {['trial', 'starter', 'pro', 'enterprise'].map(p => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button variant="secondary" size="sm" className="flex-1" onClick={() => setEditOrg(null)} disabled={saving}>
+                  {t('platform.orgs.btnCancel')}
+                </Button>
+                <Button variant="primary" size="sm" className="flex-1" onClick={handleSaveEdit} disabled={saving || !editOrg.name.trim()}>
+                  {saving ? t('platform.orgs.btnSaving') : t('platform.orgs.btnSave')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteOrg && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <h3 className="text-lg font-black text-gray-900">{t('platform.orgs.confirmDeleteTitle')}</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-6">
+              {t('platform.orgs.confirmDeleteMsg', { name: deleteOrg.name })}
+            </p>
+            <div className="flex gap-3">
+              <Button variant="secondary" size="sm" className="flex-1" onClick={() => setDeleteOrg(null)} disabled={deleting}>
+                {t('platform.orgs.btnCancel')}
+              </Button>
+              <Button variant="primary" size="sm" className="flex-1 !bg-red-600 hover:!bg-red-700" onClick={handleDelete} disabled={deleting}>
+                {deleting ? t('platform.orgs.btnDeleting') : t('platform.orgs.btnConfirmDelete')}
+              </Button>
             </div>
           </div>
         </div>

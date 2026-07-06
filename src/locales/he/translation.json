@@ -1200,7 +1200,15 @@
       "btnCreate": "צור ארגון",
       "btnCreating": "יוצר...",
       "placeholderOrgName": "לדוגמה, TechStaff בע\"מ",
-      "placeholderEmail": "info@company.com"
+      "placeholderEmail": "info@company.com",
+      "editModalTitle": "ערוך ארגון",
+      "btnEdit": "ערוך",
+      "btnSave": "שמור שינויים",
+      "btnSaving": "שומר...",
+      "confirmDeleteTitle": "מחיקת ארגון",
+      "confirmDeleteMsg": "האם אתה בטוח שברצונך למחוק את \"{{name}}\"? לא ניתן לבטל פעולה זו.",
+      "btnConfirmDelete": "כן, מחק",
+      "btnDeleting": "מוחק..."
     },
     "billing": {
       "title": "חיוב ומנויים",

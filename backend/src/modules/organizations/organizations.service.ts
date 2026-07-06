@@ -107,7 +107,7 @@ export class OrganizationsService {
   }
 
   async remove(id: string, user: UserEntity): Promise<void> {
-    if (user.role !== UserRole.ADMIN) {
+    if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
       throw new ForbiddenException('Only admins can delete organizations');
     }
 
