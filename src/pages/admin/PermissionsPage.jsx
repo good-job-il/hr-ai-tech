@@ -8,7 +8,6 @@ import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Save, RefreshCw, ShieldCheck, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 const PERM_KEYS = [
   'view', 'create', 'update', 'delete', 'export',
@@ -157,7 +156,6 @@ export default function PermissionsPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <LanguageSwitcher variant="badge" />
           {/* org_type toggle */}
           <div className="flex rounded-xl border border-gray-200 overflow-hidden text-sm">
             <button

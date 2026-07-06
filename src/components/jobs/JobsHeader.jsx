@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, UserPlus, Search, Bell } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
-import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 export default function JobsHeader() {
   const { user } = useAuth();
@@ -86,8 +85,6 @@ export default function JobsHeader() {
             {t('jobs.searchButton')}
           </Link>
 
-          <LanguageSwitcher variant="minimal" className="text-[#6C4DFF] hidden md:flex" />
-
           {!user ? (
             <>
               <Link
@@ -150,9 +147,6 @@ export default function JobsHeader() {
               {link.label}
             </Link>
           ))}
-          <div className="pt-3 border-t border-[#DDEBFF]">
-            <LanguageSwitcher variant="badge" />
-          </div>
         </div>
       )}
     </header>

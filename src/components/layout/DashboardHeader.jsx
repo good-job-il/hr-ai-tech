@@ -3,25 +3,25 @@ import { useTranslation } from 'react-i18next';
 import EditNameModal from './EditNameModal';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
-export default function DashboardHeader({ 
-  user, 
-  roleTitle, 
-  onMenuToggle, 
+export default function DashboardHeader({
+  user,
+  roleTitle,
+  onMenuToggle,
   onLogout,
-  showMenuButton = false 
+  showMenuButton = false
 }) {
   const { t, i18n } = useTranslation();
   const isRtl = !i18n.language?.startsWith('en');
 
   return (
-    <header 
+    <header
       className="h-[68px] bg-white border-b border-[#E4ECFF] flex items-center justify-between px-6 gap-4"
       style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
     >
       {/* Right: hamburger + user info */}
       <div className="flex items-center gap-3">
         {showMenuButton && (
-          <button 
+          <button
             onClick={onMenuToggle}
             className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center hover:bg-[#F7FBFF] transition-all"
           >
@@ -29,7 +29,7 @@ export default function DashboardHeader({
           </button>
         )}
         <div className="hidden sm:flex items-center gap-3">
-        <div 
+        <div
           className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white text-sm font-black flex-shrink-0"
           title={user?.full_name || user?.email}
         >

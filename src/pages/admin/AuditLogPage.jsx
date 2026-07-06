@@ -7,14 +7,13 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import {
-  ShieldCheck, Filter, Download, Search, Eye, Calendar, User, FileText,
+  ShieldCheck, Filter, Download, Eye, FileText,
   Activity, ChevronDown, ChevronUp, XCircle, CheckCircle2, AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { he, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 const getActionConfig = (t) => ({
   view: { label: t('auditLog.actions.view'), icon: Eye, color: '#64748B' },
@@ -50,7 +49,7 @@ export default function AuditLogPage() {
   const isRTL = i18n.language === 'he';
   const dateLocale = i18n.language === 'he' ? he : enUS;
   const ACTION_CONFIG = getActionConfig(t);
-  
+
   const [filters, setFilters] = useState({
     entity_type: '',
     action: '',
@@ -96,12 +95,12 @@ export default function AuditLogPage() {
 
   const exportToCSV = () => {
     const headers = [
-      t('auditLog.tableHeaders.date'), 
-      t('auditLog.tableHeaders.user'), 
-      t('auditLog.tableHeaders.action'), 
-      t('auditLog.tableHeaders.entity'), 
-      t('auditLog.entityId'), 
-      t('auditLog.tableHeaders.description'), 
+      t('auditLog.tableHeaders.date'),
+      t('auditLog.tableHeaders.user'),
+      t('auditLog.tableHeaders.action'),
+      t('auditLog.tableHeaders.entity'),
+      t('auditLog.entityId'),
+      t('auditLog.tableHeaders.description'),
       'IP'
     ];
     const rows = logs.map(log => [
@@ -141,7 +140,6 @@ export default function AuditLogPage() {
             <p className="text-sm text-[#64748B] mt-0.5">{t('auditLog.subtitle')}</p>
           </div>
           <div className="flex items-center gap-2">
-            <LanguageSwitcher variant="badge" />
             <Button onClick={exportToCSV} variant="outline" className="gap-1.5 text-sm">
               <Download className="w-4 h-4" /> {t('auditLog.exportCSV')}
             </Button>

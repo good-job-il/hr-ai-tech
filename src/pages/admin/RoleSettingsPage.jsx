@@ -6,11 +6,9 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Save, RefreshCw, Users, Lock, Pencil, Check, X } from 'lucide-react';
+import { RefreshCw, Users, Lock, Pencil, Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 const EDITABLE_ROLES = ['super_admin', 'admin', 'org_admin'];
 
@@ -225,7 +223,6 @@ export default function RoleSettingsPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <LanguageSwitcher variant="badge" />
           {/* org_type toggle */}
           <div className="flex rounded-xl border border-gray-200 overflow-hidden text-sm">
             <button
