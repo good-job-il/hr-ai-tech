@@ -2,14 +2,15 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, FindManyOptions } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { UserEntity } from './user.entity';
-import { UpdateUserDto, QueryUsersDto } from './dto/users.dto';
+import { CreateUserDto, UpdateUserDto, QueryUsersDto } from './dto/users.dto';
 import { UserRole } from '../../common/enums/user-role.enum';
 import {
-  parsePagination,
   buildPaginatedResponse,
   getSkipTake,
 } from '../../common/utils/pagination.utils';
@@ -100,7 +101,56 @@ export class UsersService {
 
     Object.assign(user, dto);
     const saved = await this.repo.save(user);
-    return saved;
+    return this.sanitize(saved);
+  }
+
+  async create(dto: CreateUserDto, requestingUser: UserEntity): Promise<any> {
+    if (
+      requestingUser.role !== UserRole.ADMIN &&
+      requestingUser.role !== UserRole.SUPER_ADMIN
+    ) {
+      throw new ForbiddenException('Only admins can create users');
+    }
+
+    const existing = await this.repo.findOne({
+      where: { email: dto.email.toLowerCase().trim() },
+    });
+    if (existing) {
+      throw new ConflictException('A user with this email already exists');
+    }
+
+    const password_hash = await bcrypt.hash(dto.password, 10);
+
+    const user = this.repo.create({
+      email: dto.email.toLowerCase().trim(),
+      password_hash,
+      full_name: dto.full_name,
+      phone: dto.phone ?? null,
+      role: dto.role as any,
+      organization_id: dto.organization_id ?? null,
+      is_active: dto.is_active ?? true,
+    });
+
+    const saved = await this.repo.save(user);
+    return this.sanitize(saved);
+  }
+
+  async remove(id: string, requestingUser: UserEntity): Promise<void> {
+    if (
+      requestingUser.role !== UserRole.ADMIN &&
+      requestingUser.role !== UserRole.SUPER_ADMIN
+    ) {
+      throw new ForbiddenException('Only admins can delete users');
+    }
+
+    if (id === requestingUser.id) {
+      throw new ForbiddenException('You cannot delete your own account');
+    }
+
+    const user = await this.repo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException(`User ${id} not found`);
+
+    await this.repo.remove(user);
   }
 
   sanitize(user: UserEntity): any {

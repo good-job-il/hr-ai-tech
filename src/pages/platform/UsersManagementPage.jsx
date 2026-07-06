@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
-import { Users, Search, Shield, UserCheck, Building2 } from 'lucide-react';
+import { Users, Search, Plus, Pencil, Trash2, X } from 'lucide-react';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 const ROLE_CONFIG = {
@@ -17,11 +17,198 @@ const ROLE_CONFIG = {
   candidate:            { bg: 'bg-gray-50',    text: 'text-gray-600' },
 };
 
+const ALL_ROLES = [
+  'super_admin', 'org_admin', 'recruitment_manager', 'team_manager',
+  'recruiter', 'hr_manager', 'internal_recruiter', 'candidate',
+];
+
+const EMPTY_FORM = {
+  full_name: '',
+  email: '',
+  password: '',
+  phone: '',
+  role: 'candidate',
+  organization_id: '',
+  is_active: true,
+};
+
+// ─── User Form Modal ─────────────────────────────────────────────────────────
+function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
+  const isEdit = !!user?.id;
+  const [form, setForm] = useState(
+    isEdit
+      ? { full_name: user.full_name || '', email: user.email || '', password: '', phone: user.phone || '', role: user.role || 'candidate', organization_id: user.organization_id || '', is_active: user.is_active ?? true }
+      : { ...EMPTY_FORM }
+  );
+
+  // Sync form when user prop changes
+  React.useEffect(() => {
+    if (open) {
+      setForm(
+        isEdit
+          ? { full_name: user.full_name || '', email: user.email || '', password: '', phone: user.phone || '', role: user.role || 'candidate', organization_id: user.organization_id || '', is_active: user.is_active ?? true }
+          : { ...EMPTY_FORM }
+      );
+    }
+  }, [open, user?.id]);
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-lg font-black text-slate-900">
+            {isEdit ? t('platform.usersManagement.modal.editTitle') : t('platform.usersManagement.modal.createTitle')}
+          </h2>
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+            <X className="w-4 h-4 text-gray-500" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5 space-y-4">
+          {/* Full Name */}
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.usersManagement.modal.fullName')} *</label>
+            <input value={form.full_name} onChange={e => set('full_name', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300" />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.usersManagement.modal.email')} *</label>
+            <input type="email" value={form.email} onChange={e => set('email', e.target.value)}
+              disabled={isEdit}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300 disabled:bg-gray-50 disabled:text-gray-400" />
+          </div>
+
+          {/* Password (create only) */}
+          {!isEdit && (
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.usersManagement.modal.password')} *</label>
+              <input type="password" value={form.password} onChange={e => set('password', e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300" />
+              <p className="text-xs text-gray-400 mt-1">{t('platform.usersManagement.modal.passwordHint')}</p>
+            </div>
+          )}
+
+          {/* Phone */}
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.usersManagement.modal.phone')}</label>
+            <input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300" />
+          </div>
+
+          {/* Role */}
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.usersManagement.modal.role')}</label>
+            <select value={form.role} onChange={e => set('role', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300">
+              {ALL_ROLES.map(r => (
+                <option key={r} value={r}>{t(`platform.usersManagement.roles.${r}`, r)}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Organization */}
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">{t('platform.usersManagement.modal.organization')}</label>
+            <select value={form.organization_id} onChange={e => set('organization_id', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300">
+              <option value="">—</option>
+              {orgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+            </select>
+          </div>
+
+          {/* Status */}
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-bold text-gray-700">{t('platform.usersManagement.modal.status')}</label>
+            <button type="button" onClick={() => set('is_active', !form.is_active)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.is_active ? 'bg-green-500' : 'bg-gray-300'}`}>
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.is_active ? (isRTL ? '-translate-x-1' : 'translate-x-6') : (isRTL ? '-translate-x-6' : 'translate-x-1')}`} />
+            </button>
+            <span className="text-sm text-gray-500">{form.is_active ? t('platform.usersManagement.modal.active') : t('platform.usersManagement.modal.inactive')}</span>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className={`flex gap-3 px-6 py-4 border-t border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <button onClick={() => onSave(form)} disabled={isSaving}
+            className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-60 text-white font-bold py-2.5 rounded-xl transition-colors text-sm">
+            {isSaving
+              ? (isEdit ? t('platform.usersManagement.modal.saving') : t('platform.usersManagement.modal.creating'))
+              : t('platform.usersManagement.modal.save')}
+          </button>
+          <button onClick={onClose} disabled={isSaving}
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition-colors text-sm">
+            {t('platform.usersManagement.modal.cancel')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Delete Confirmation ──────────────────────────────────────────────────────
+function DeleteConfirm({ open, onClose, user, onConfirm, isDeleting, t, isRTL }) {
+  if (!open || !user) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+          <Trash2 className="w-6 h-6 text-red-600" />
+        </div>
+        <h3 className="text-lg font-black text-center text-slate-900 mb-2">{t('platform.usersManagement.deleteConfirm.title')}</h3>
+        <p className="text-sm text-gray-500 text-center mb-6">
+          {t('platform.usersManagement.deleteConfirm.message', { name: user.full_name || user.email })}
+        </p>
+        <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <button onClick={onConfirm} disabled={isDeleting}
+            className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white font-bold py-2.5 rounded-xl transition-colors text-sm">
+            {isDeleting ? t('platform.usersManagement.deleteConfirm.deleting') : t('platform.usersManagement.deleteConfirm.confirm')}
+          </button>
+          <button onClick={onClose} disabled={isDeleting}
+            className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition-colors text-sm">
+            {t('platform.usersManagement.deleteConfirm.cancel')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Toast Notification ───────────────────────────────────────────────────────
+function Toast({ message, type, onClose }) {
+  React.useEffect(() => {
+    const timer = setTimeout(onClose, 3500);
+    return () => clearTimeout(timer);
+  }, [message]);
+  if (!message) return null;
+  return (
+    <div className={`fixed bottom-6 right-6 z-[60] px-5 py-3 rounded-2xl shadow-xl text-sm font-bold flex items-center gap-2 transition-all ${type === 'error' ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}`}>
+      {message}
+      <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100"><X className="w-4 h-4" /></button>
+    </div>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function UsersManagementPage() {
   const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editUser, setEditUser] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [toast, setToast] = useState(null);
   const isRTL = i18n.language?.startsWith('he');
+
+  const showToast = (message, type = 'success') => setToast({ message, type });
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['platform-users'],
@@ -36,6 +223,51 @@ export default function UsersManagementPage() {
   });
 
   const orgMap = Object.fromEntries(orgs.map(o => [o.id, o.name]));
+
+  // ── Mutations ──
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.User.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['platform-users'] });
+      setModalOpen(false);
+      showToast(t('platform.usersManagement.toast.created'));
+    },
+    onError: () => showToast(t('platform.usersManagement.toast.error'), 'error'),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.User.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['platform-users'] });
+      setModalOpen(false);
+      setEditUser(null);
+      showToast(t('platform.usersManagement.toast.updated'));
+    },
+    onError: () => showToast(t('platform.usersManagement.toast.error'), 'error'),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.User.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['platform-users'] });
+      setDeleteTarget(null);
+      showToast(t('platform.usersManagement.toast.deleted'));
+    },
+    onError: () => showToast(t('platform.usersManagement.toast.error'), 'error'),
+  });
+
+  const handleSave = (form) => {
+    if (editUser?.id) {
+      const { email, password, ...rest } = form;
+      updateMutation.mutate({ id: editUser.id, data: rest });
+    } else {
+      createMutation.mutate(form);
+    }
+  };
+
+  const openCreate = () => { setEditUser(null); setModalOpen(true); };
+  const openEdit = (u) => { setEditUser(u); setModalOpen(true); };
+  const openDelete = (u) => setDeleteTarget(u);
 
   const filtered = users.filter(u => {
     const matchSearch = !search ||
@@ -52,18 +284,48 @@ export default function UsersManagementPage() {
     candidates: users.filter(u => u.role === 'candidate').length,
   };
 
-  const getRoleLabel = (role) => {
-    return t(`platform.usersManagement.roles.${role}`, role);
-  };
+  const getRoleLabel = (role) => t(`platform.usersManagement.roles.${role}`, role);
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="space-y-6 max-w-7xl mx-auto">
+      {/* Modals */}
+      <UserModal
+        open={modalOpen}
+        onClose={() => { setModalOpen(false); setEditUser(null); }}
+        user={editUser}
+        orgs={orgs}
+        onSave={handleSave}
+        isSaving={isSaving}
+        t={t}
+        isRTL={isRTL}
+      />
+      <DeleteConfirm
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        user={deleteTarget}
+        onConfirm={() => deleteMutation.mutate(deleteTarget.id)}
+        isDeleting={deleteMutation.isPending}
+        t={t}
+        isRTL={isRTL}
+      />
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-slate-900">{t('platform.usersManagement.title')}</h1>
           <p className="text-slate-500 mt-1 font-semibold">{t('platform.usersManagement.subtitle')}</p>
         </div>
-        <LanguageSwitcher variant="badge" />
+        <div className="flex items-center gap-3">
+          <button onClick={openCreate}
+            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2.5 rounded-xl transition-colors text-sm shadow-sm">
+            <Plus className="w-4 h-4" />
+            {t('platform.usersManagement.addUser')}
+          </button>
+          <LanguageSwitcher variant="badge" />
+        </div>
       </div>
 
       {/* KPI */}
@@ -91,14 +353,9 @@ export default function UsersManagementPage() {
         <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)}
           className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold outline-none">
           <option value="all">{t('platform.usersManagement.filters.allRoles')}</option>
-          <option value="super_admin">{getRoleLabel('super_admin')}</option>
-          <option value="org_admin">{getRoleLabel('org_admin')}</option>
-          <option value="recruitment_manager">{getRoleLabel('recruitment_manager')}</option>
-          <option value="team_manager">{getRoleLabel('team_manager')}</option>
-          <option value="recruiter">{getRoleLabel('recruiter')}</option>
-          <option value="hr_manager">{getRoleLabel('hr_manager')}</option>
-          <option value="internal_recruiter">{getRoleLabel('internal_recruiter')}</option>
-          <option value="candidate">{getRoleLabel('candidate')}</option>
+          {ALL_ROLES.map(r => (
+            <option key={r} value={r}>{getRoleLabel(r)}</option>
+          ))}
         </select>
         <span className="text-sm text-gray-400 font-semibold">{filtered.length} {t('platform.usersManagement.usersCount')}</span>
       </div>
@@ -112,19 +369,20 @@ export default function UsersManagementPage() {
               <th className={`${isRTL ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.usersManagement.table.role')}</th>
               <th className={`${isRTL ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.usersManagement.table.organization')}</th>
               <th className={`${isRTL ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.usersManagement.table.created')}</th>
+              <th className={`${isRTL ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.usersManagement.table.actions')}</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               Array(6).fill(0).map((_, i) => (
                 <tr key={i} className="border-b border-gray-50">
-                  {Array(4).fill(0).map((_, j) => (
+                  {Array(5).fill(0).map((_, j) => (
                     <td key={j} className="px-5 py-4"><div className="h-4 bg-gray-100 rounded animate-pulse" /></td>
                   ))}
                 </tr>
               ))
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={4} className="px-5 py-12 text-center text-gray-400">{t('platform.usersManagement.noUsers')}</td></tr>
+              <tr><td colSpan={5} className="px-5 py-12 text-center text-gray-400">{t('platform.usersManagement.noUsers')}</td></tr>
             ) : filtered.map(u => {
               const role = ROLE_CONFIG[u.role] || { bg: 'bg-gray-50', text: 'text-gray-600' };
               const roleLabel = getRoleLabel(u.role);
@@ -151,6 +409,18 @@ export default function UsersManagementPage() {
                   <td className="px-5 py-4 text-gray-600 font-semibold">{orgName}</td>
                   <td className="px-5 py-4 text-gray-400 text-xs">
                     {u.created_date ? new Date(u.created_date).toLocaleDateString(locale) : '—'}
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => openEdit(u)}
+                        className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors" title="Edit">
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => openDelete(u)}
+                        className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors" title="Delete">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

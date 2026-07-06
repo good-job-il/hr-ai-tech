@@ -1284,6 +1284,7 @@
     "usersManagement": {
       "title": "ניהול משתמשים",
       "subtitle": "כל המשתמשים בפלטפורמה",
+      "addUser": "הוסף משתמש",
       "stats": {
         "totalUsers": "סה״כ משתמשים",
         "admins": "אדמינים",
@@ -1299,7 +1300,8 @@
         "user": "משתמש",
         "role": "תפקיד",
         "organization": "ארגון",
-        "created": "נוצר"
+        "created": "נוצר",
+        "actions": "פעולות"
       },
       "noUsers": "אין משתמשים תואמים",
       "roles": {
@@ -1312,6 +1314,37 @@
         "hr_manager": "HR Manager",
         "internal_recruiter": "מגייס פנימי",
         "candidate": "מועמד"
+      },
+      "modal": {
+        "createTitle": "הוספת משתמש חדש",
+        "editTitle": "עריכת משתמש",
+        "fullName": "שם מלא",
+        "email": "אימייל",
+        "password": "סיסמה",
+        "passwordHint": "לפחות 8 תווים",
+        "phone": "טלפון",
+        "role": "תפקיד",
+        "organization": "ארגון",
+        "status": "סטטוס",
+        "active": "פעיל",
+        "inactive": "לא פעיל",
+        "save": "שמור",
+        "cancel": "ביטול",
+        "creating": "יוצר...",
+        "saving": "שומר..."
+      },
+      "deleteConfirm": {
+        "title": "מחיקת משתמש",
+        "message": "האם אתה בטוח שברצונך למחוק את {{name}}? פעולה זו אינה ניתנת לביטול.",
+        "confirm": "מחק",
+        "cancel": "ביטול",
+        "deleting": "מוחק..."
+      },
+      "toast": {
+        "created": "המשתמש נוצר בהצלחה",
+        "updated": "המשתמש עודכן בהצלחה",
+        "deleted": "המשתמש נמחק בהצלחה",
+        "error": "אירעה שגיאה. נסה שוב."
       }
     },
     "orgs": {

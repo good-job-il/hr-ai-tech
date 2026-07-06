@@ -1284,6 +1284,7 @@
     "usersManagement": {
       "title": "Users Management",
       "subtitle": "All platform users",
+      "addUser": "Add User",
       "stats": {
         "totalUsers": "Total Users",
         "admins": "Admins",
@@ -1299,7 +1300,8 @@
         "user": "User",
         "role": "Role",
         "organization": "Organization",
-        "created": "Created"
+        "created": "Created",
+        "actions": "Actions"
       },
       "noUsers": "No matching users",
       "roles": {
@@ -1312,6 +1314,37 @@
         "hr_manager": "HR Manager",
         "internal_recruiter": "Internal Recruiter",
         "candidate": "Candidate"
+      },
+      "modal": {
+        "createTitle": "Add New User",
+        "editTitle": "Edit User",
+        "fullName": "Full Name",
+        "email": "Email",
+        "password": "Password",
+        "passwordHint": "Minimum 8 characters",
+        "phone": "Phone",
+        "role": "Role",
+        "organization": "Organization",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "save": "Save",
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "saving": "Saving..."
+      },
+      "deleteConfirm": {
+        "title": "Delete User",
+        "message": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel",
+        "deleting": "Deleting..."
+      },
+      "toast": {
+        "created": "User created successfully",
+        "updated": "User updated successfully",
+        "deleted": "User deleted successfully",
+        "error": "An error occurred. Please try again."
       }
     },
     "orgs": {

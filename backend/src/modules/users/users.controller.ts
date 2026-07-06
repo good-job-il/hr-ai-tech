@@ -1,15 +1,19 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
+  Delete,
   Param,
   Body,
   Query,
   ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { UpdateUserDto, QueryUsersDto } from './dto/users.dto';
+import { CreateUserDto, UpdateUserDto, QueryUsersDto } from './dto/users.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserEntity } from './user.entity';
@@ -39,6 +43,17 @@ export class UsersController {
     return this.usersService.findById(id, user);
   }
 
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Create a new user (admin only)' })
+  create(
+    @Body() dto: CreateUserDto,
+    @CurrentUser() user: UserEntity,
+  ) {
+    return this.usersService.create(dto, user);
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Update user' })
   update(
@@ -47,6 +62,17 @@ export class UsersController {
     @CurrentUser() user: UserEntity,
   ) {
     return this.usersService.update(id, dto, user);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Delete a user (admin only)' })
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: UserEntity,
+  ) {
+    await this.usersService.remove(id, user);
   }
 }
 
