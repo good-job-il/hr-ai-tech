@@ -61,20 +61,14 @@ export default function OrganizationsPage() {
     setCreating(false);
   };
 
-  const handleStatusToggle = async (org) => {
-    const next = org.status === 'active' ? 'suspended' : 'active';
-    await base44.entities.Organization.update(org.id, { status: next });
-    qc.invalidateQueries(['platform-orgs']);
-  };
-
   const handleEdit = (org) => {
-    setEditOrg({ id: org.id, name: org.name, contact_email: org.contact_email || '', plan: org.plan || 'trial' });
+    setEditOrg({ id: org.id, name: org.name, contact_email: org.contact_email || '', plan: org.plan || 'trial', status: org.status || 'active' });
   };
 
   const handleSaveEdit = async () => {
     if (!editOrg.name.trim()) return;
     setSaving(true);
-    const payload = { name: editOrg.name, plan: editOrg.plan };
+    const payload = { name: editOrg.name, plan: editOrg.plan, status: editOrg.status };
     if (editOrg.contact_email.trim()) payload.contact_email = editOrg.contact_email.trim();
     await base44.entities.Organization.update(editOrg.id, payload);
     await qc.invalidateQueries(['platform-orgs']);
@@ -218,21 +212,13 @@ export default function OrganizationsPage() {
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => handleStatusToggle(org)}
-                        className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-colors ${
-                          org.status === 'active'
-                            ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                            : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                        }`}>
-                        {org.status === 'active' ? t('platform.orgs.suspend') : t('platform.orgs.activate')}
-                      </button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700">
                             <MoreVertical className="w-4 h-4" />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-[150px]">
+                        <DropdownMenuContent align="end" className="min-w-[160px]">
                           {org.org_type === 'staffing_agency' && (
                             <DropdownMenuItem
                               onClick={() => navigate(`/company/dashboard?orgId=${org.id}`)}
@@ -338,6 +324,30 @@ export default function OrganizationsPage() {
                     <option key={p} value={p}>{p}</option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">{t('platform.orgs.status')}</label>
+                <div className="flex gap-2">
+                  {['active', 'suspended', 'inactive'].map(s => {
+                    const cfg = STATUS_CONFIG[s];
+                    const isSelected = editOrg.status === s;
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setEditOrg(p => ({ ...p, status: s }))}
+                        className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border-2 transition-colors ${
+                          isSelected
+                            ? `${cfg.bg} ${cfg.text} border-current`
+                            : 'bg-gray-50 text-gray-400 border-transparent hover:bg-gray-100'
+                        }`}
+                      >
+                        <cfg.icon className="w-3.5 h-3.5" />
+                        {cfg.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <div className="flex gap-3 pt-2">
                 <Button variant="secondary" size="sm" className="flex-1" onClick={() => setEditOrg(null)} disabled={saving}>
