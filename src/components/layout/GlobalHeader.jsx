@@ -30,7 +30,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
     { label: isRTL ? 'אודות' : 'About', href: '/#about' },
   ];
 
-  const isDarkBg = location.pathname.startsWith('/admin') || 
+  const isDarkBg = location.pathname.startsWith('/admin') ||
                    location.pathname.startsWith('/employer') ||
                    location.pathname.startsWith('/dashboard');
 
@@ -40,7 +40,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
       className="sticky top-0 z-50 transition-all duration-200"
       style={{
         height: `${HEADER_HEIGHT}px`,
-        background: isDarkBg 
+        background: isDarkBg
           ? `${COLORS.neutral[0]}/70`
           : `${COLORS.glass.bg}`,
         backdropFilter: 'blur(26px)',
@@ -54,7 +54,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
         style={{ paddingLeft: HEADER_PADDING, paddingRight: HEADER_PADDING }}
       >
         {/* Logo */}
-        <Logo size="lg" href="/" />
+        <Logo href="/" />
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-2">

@@ -77,7 +77,7 @@ export default function EmployerLayout() {
           : `right-0 border-l border-[#E4ECFF] ${mobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}`
         }`}>
         <div className="h-20 border-b border-[#E4ECFF] flex items-center px-6">
-          <Logo size="md" />
+          <Logo />
         </div>
         <div className="px-4 py-3 border-b border-[#E4ECFF]">
           <div className="text-xs font-bold text-[#94A3B8] uppercase tracking-wide">

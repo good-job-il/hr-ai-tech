@@ -121,8 +121,8 @@ export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
       <aside className={`fixed inset-y-0 ${isRtl ? 'right-0 border-l' : 'left-0 border-r'} z-40 w-64 flex flex-col transform transition-transform md:translate-x-0 ${THEME.sidebarBg} ${mobileOpen ? 'translate-x-0' : isRtl ? 'translate-x-full md:translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
 
         {/* Logo */}
-        <div className="h-16 border-b border-[#EDE9FE] flex items-center px-5">
-          <Logo size="md" />
+        <div className="h-20 border-b border-[#EDE9FE] flex items-center px-5">
+          <Logo />
         </div>
 
         {/* Nav */}
