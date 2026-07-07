@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 
 export const CreateNotificationSchema = z.object({
-  organization_id: z.string().uuid().optional().nullable(),
+  organization_id: z.number().int().optional().nullable(),
   recipient_email: z.string().email(),
   type: z.enum(['new_application', 'interview_scheduled', 'message', 'job_closed', 'job_match', 'interview_reminder']),
   title: z.string().min(1),
@@ -20,7 +20,7 @@ export const QueryNotificationsSchema = z.object({
   recipient_email: z.string().email().optional(),
   is_read: z.coerce.boolean().optional(),
   type: z.string().optional(),
-  organization_id: z.string().uuid().optional(),
+  organization_id: z.coerce.number().int().optional(),
 });
 export class QueryNotificationsDto extends createZodDto(QueryNotificationsSchema) {}
 

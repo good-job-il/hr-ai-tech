@@ -18,7 +18,7 @@ export const PermissionSetSchema = z.object({
 });
 
 export const CreatePermissionMatrixSchema = z.object({
-  organization_id: z.string().optional().nullable(),
+  organization_id: z.number().int().optional().nullable(),
   org_type: OrgTypeEnum.optional().nullable(),
   role_key: z.string().min(1),
   is_template: z.boolean().default(false),
@@ -32,7 +32,7 @@ export class UpdatePermissionMatrixDto extends createZodDto(UpdatePermissionMatr
 export const QueryPermissionMatricesSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(500).default(50),
-  organization_id: z.string().optional(),
+  organization_id: z.coerce.number().int().optional(),
   role_key: z.string().optional(),
   is_template: z.coerce.boolean().optional(),
 });
@@ -40,7 +40,7 @@ export class QueryPermissionMatricesDto extends createZodDto(QueryPermissionMatr
 
 // ─── RoleTemplate ───────────────────────────────────────────────────────────
 export const CreateRoleTemplateSchema = z.object({
-  organization_id: z.string().optional().nullable(),
+  organization_id: z.number().int().optional().nullable(),
   org_type: OrgTypeEnum,
   system_role_key: z.string().min(1),
   display_name: z.string().min(1),
@@ -48,7 +48,7 @@ export const CreateRoleTemplateSchema = z.object({
   hierarchy_level: z.number().int().optional().nullable(),
   is_editable_name: z.boolean().default(true),
   is_system_required: z.boolean().default(true),
-  permissions_template_id: z.string().optional().nullable(),
+  permissions_template_id: z.number().int().optional().nullable(),
   is_active: z.boolean().default(true),
 });
 export class CreateRoleTemplateDto extends createZodDto(CreateRoleTemplateSchema) {}
@@ -59,7 +59,7 @@ export class UpdateRoleTemplateDto extends createZodDto(UpdateRoleTemplateSchema
 export const QueryRoleTemplatesSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(500).default(50),
-  organization_id: z.string().optional(),
+  organization_id: z.coerce.number().int().optional(),
   org_type: OrgTypeEnum.optional(),
 });
 export class QueryRoleTemplatesDto extends createZodDto(QueryRoleTemplatesSchema) {}
@@ -77,7 +77,7 @@ export const CreateUserPositionAccessSchema = z.object({
   user_email: z.string().email(),
   user_name: z.string().optional().nullable(),
   user_type: z.enum(['team_manager', 'recruiter']),
-  position_ids: z.array(z.string()).optional().nullable(),
+  position_ids: z.array(z.number().int()).optional().nullable(),
   can_review_applications: z.boolean().default(true),
   can_schedule_interviews: z.boolean().default(true),
   can_send_messages: z.boolean().default(true),
@@ -111,4 +111,3 @@ export const QueryPositionsSchema = z.object({
   is_active: z.coerce.boolean().optional(),
 });
 export class QueryPositionsDto extends createZodDto(QueryPositionsSchema) {}
-

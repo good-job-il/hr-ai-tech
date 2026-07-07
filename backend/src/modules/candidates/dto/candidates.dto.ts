@@ -25,16 +25,16 @@ export const CreateCandidateSchema = z.object({
   resume_filename: z.string().optional().nullable(),
   source: sourceEnum.optional(),
   status: statusEnum.optional().default('new'),
-  recruiter_id: z.string().uuid().optional().nullable(),
-  team_manager_id: z.string().uuid().optional().nullable(),
-  recruitment_manager_id: z.string().uuid().optional().nullable(),
-  employer_company_id: z.string().uuid().optional().nullable(),
+  recruiter_id: z.number().int().optional().nullable(),
+  team_manager_id: z.number().int().optional().nullable(),
+  recruitment_manager_id: z.number().int().optional().nullable(),
+  employer_company_id: z.number().int().optional().nullable(),
   skills: z.array(z.string()).optional().nullable(),
   languages: z.array(z.string()).optional().nullable(),
   previous_companies: z.array(z.string()).optional().nullable(),
   summary: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
-  import_batch_id: z.string().uuid().optional().nullable(),
+  import_batch_id: z.number().int().optional().nullable(),
   parsing_status: parsingStatusEnum.optional(),
   conversion_status: conversionStatusEnum.optional(),
   review_required: z.boolean().optional(),
@@ -48,7 +48,7 @@ export const UpdateCandidateSchema = CreateCandidateSchema.partial().extend({
   data_quality_score: z.number().int().min(0).max(100).optional(),
   parsing_confidence: z.number().int().min(0).max(100).optional(),
   is_duplicate_suspected: z.boolean().optional(),
-  duplicate_of_id: z.string().uuid().optional().nullable(),
+  duplicate_of_id: z.number().int().optional().nullable(),
   original_resume_url: z.string().optional().nullable(),
   converted_resume_url: z.string().optional().nullable(),
 });
@@ -64,19 +64,19 @@ export const QueryCandidatesSchema = z.object({
   status: statusEnum.optional(),
   domain_id: z.coerce.number().int().optional(),
   role_id: z.coerce.number().int().optional(),
-  recruiter_id: z.string().uuid().optional(),
-  team_manager_id: z.string().uuid().optional(),
-  organization_id: z.string().uuid().optional(),
+  recruiter_id: z.coerce.number().int().optional(),
+  team_manager_id: z.coerce.number().int().optional(),
+  organization_id: z.coerce.number().int().optional(),
   is_deleted: z.coerce.boolean().optional().default(false),
   parsing_status: parsingStatusEnum.optional(),
   review_required: z.coerce.boolean().optional(),
-  import_batch_id: z.string().uuid().optional(),
+  import_batch_id: z.coerce.number().int().optional(),
 });
 export class QueryCandidatesDto extends createZodDto(QueryCandidatesSchema) {}
 
 // ─── Create Candidate Note ────────────────────────────────────────────────
 export const CreateCandidateNoteSchema = z.object({
-  candidate_id: z.string().uuid(),
+  candidate_id: z.number().int(),
   candidate_email: z.string().email().optional().nullable(),
   author_email: z.string().email(),
   author_name: z.string().optional().nullable(),
@@ -85,8 +85,8 @@ export const CreateCandidateNoteSchema = z.object({
   visibility: z.enum(['private', 'team', 'all', 'internal']).default('team').optional(),
   is_pinned: z.boolean().optional().default(false),
   note_type: z.string().optional().nullable(),
-  related_application_id: z.string().uuid().optional().nullable(),
-  related_interview_id: z.string().uuid().optional().nullable(),
+  related_application_id: z.number().int().optional().nullable(),
+  related_interview_id: z.number().int().optional().nullable(),
 });
 export class CreateCandidateNoteDto extends createZodDto(CreateCandidateNoteSchema) {}
 export const UpdateCandidateNoteSchema = CreateCandidateNoteSchema.partial();
@@ -94,7 +94,7 @@ export class UpdateCandidateNoteDto extends createZodDto(UpdateCandidateNoteSche
 
 // ─── Create Candidate Tag ─────────────────────────────────────────────────
 export const CreateCandidateTagSchema = z.object({
-  candidate_id: z.string().uuid(),
+  candidate_id: z.number().int(),
   tag: z.string().min(1).max(100),
   color: z.string().optional().nullable(),
   added_by: z.string().optional().nullable(),

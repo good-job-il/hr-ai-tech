@@ -30,7 +30,7 @@ export class OrganizationsService {
 
     // Non-admin users can only see their own org
     if (user.role !== UserRole.ADMIN) {
-      const org = user.organization_id
+      const org = user.organization_id != null
         ? await this.repo.findOne({ where: { id: user.organization_id } })
         : null;
       const data = org ? [org] : [];
@@ -62,7 +62,7 @@ export class OrganizationsService {
     return buildPaginatedResponse(data, total, { page, limit, sort, order });
   }
 
-  async findById(id: string, user: UserEntity): Promise<OrganizationEntity> {
+  async findById(id: number, user: UserEntity): Promise<OrganizationEntity> {
     const org = await this.repo.findOne({ where: { id } });
     if (!org) throw new NotFoundException(`Organization ${id} not found`);
 
@@ -87,7 +87,7 @@ export class OrganizationsService {
   }
 
   async update(
-    id: string,
+    id: number,
     dto: UpdateOrganizationDto,
     user: UserEntity,
   ): Promise<OrganizationEntity> {
@@ -104,7 +104,7 @@ export class OrganizationsService {
     return this.repo.save(org);
   }
 
-  async remove(id: string, user: UserEntity): Promise<void> {
+  async remove(id: number, user: UserEntity): Promise<void> {
     if (user.role !== UserRole.ADMIN) {
       throw new ForbiddenException('Only admins can delete organizations');
     }

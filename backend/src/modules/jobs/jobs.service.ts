@@ -56,7 +56,7 @@ export class JobsService {
     return buildPaginatedResponse(data, total, { page, limit, sort, order });
   }
 
-  async findById(id: string, user: UserEntity): Promise<JobEntity> {
+  async findById(id: number, user: UserEntity): Promise<JobEntity> {
     const job = await this.jobRepo.findOne({ where: { id } as any });
     if (!job) throw new NotFoundException(`Job ${id} not found`);
     return job;
@@ -72,7 +72,7 @@ export class JobsService {
     return this.jobRepo.save(job) as unknown as Promise<JobEntity>;
   }
 
-  async update(id: string, dto: UpdateJobDto, user: UserEntity): Promise<JobEntity> {
+  async update(id: number, dto: UpdateJobDto, user: UserEntity): Promise<JobEntity> {
     const job = await this.findById(id, user);
     Object.assign(job, dto);
     if (dto.is_deleted && !job.deleted_at) {
@@ -82,11 +82,11 @@ export class JobsService {
     return this.jobRepo.save(job) as unknown as Promise<JobEntity>;
   }
 
-  async softDelete(id: string, user: UserEntity): Promise<void> {
+  async softDelete(id: number, user: UserEntity): Promise<void> {
     await this.update(id, { is_deleted: true } as any, user);
   }
 
-  async incrementViews(id: string): Promise<void> {
+  async incrementViews(id: number): Promise<void> {
     await this.jobRepo.increment({ id } as any, 'views', 1);
   }
 
@@ -104,7 +104,7 @@ export class JobsService {
     return this.savedJobRepo.save(saved) as unknown as Promise<SavedJobEntity>;
   }
 
-  async unsaveJob(id: string, userEmail: string): Promise<void> {
+  async unsaveJob(id: number, userEmail: string): Promise<void> {
     const saved = await this.savedJobRepo.findOne({ where: { id } });
     if (!saved) throw new NotFoundException('Saved job not found');
     if (saved.user_email !== userEmail) throw new ForbiddenException('Access denied');
@@ -121,14 +121,14 @@ export class JobsService {
     return this.alertRepo.save(alert) as unknown as Promise<JobAlertEntity>;
   }
 
-  async updateAlert(id: string, dto: UpdateJobAlertDto): Promise<JobAlertEntity> {
+  async updateAlert(id: number, dto: UpdateJobAlertDto): Promise<JobAlertEntity> {
     const alert = await this.alertRepo.findOne({ where: { id } as any });
     if (!alert) throw new NotFoundException(`Alert ${id} not found`);
     Object.assign(alert, dto);
     return this.alertRepo.save(alert) as unknown as Promise<JobAlertEntity>;
   }
 
-  async deleteAlert(id: string): Promise<void> {
+  async deleteAlert(id: number): Promise<void> {
     const alert = await this.alertRepo.findOne({ where: { id } as any });
     if (!alert) throw new NotFoundException(`Alert ${id} not found`);
     await this.alertRepo.remove(alert);

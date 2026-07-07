@@ -51,7 +51,7 @@ export class ApplicationsService {
     return buildPaginatedResponse(data, total, { page, limit, sort, order });
   }
 
-  async findById(id: string): Promise<ApplicationEntity> {
+  async findById(id: number): Promise<ApplicationEntity> {
     const app = await this.appRepo.findOne({ where: { id } as any });
     if (!app) throw new NotFoundException(`Application ${id} not found`);
     return app;
@@ -66,7 +66,7 @@ export class ApplicationsService {
     return this.appRepo.save(app) as unknown as Promise<ApplicationEntity>;
   }
 
-  async update(id: string, dto: UpdateApplicationDto, user: UserEntity): Promise<ApplicationEntity> {
+  async update(id: number, dto: UpdateApplicationDto, user: UserEntity): Promise<ApplicationEntity> {
     const app = await this.findById(id);
     const prev = app.status;
     Object.assign(app, dto);
@@ -91,12 +91,12 @@ export class ApplicationsService {
     return saved;
   }
 
-  async softDelete(id: string, user: UserEntity): Promise<void> {
+  async softDelete(id: number, user: UserEntity): Promise<void> {
     await this.update(id, { is_deleted: true } as any, user);
   }
 
   // ─── Timeline ────────────────────────────────────────────────────────────
-  async getTimeline(applicationId: string) {
+  async getTimeline(applicationId: number) {
     return this.timelineRepo.find({ where: { application_id: applicationId }, order: { created_date: 'DESC' } });
   }
 
@@ -115,14 +115,14 @@ export class ApplicationsService {
     return this.pipelineRepo.save(stage) as unknown as Promise<ApplicationPipelineEntity>;
   }
 
-  async updatePipelineStage(id: string, dto: UpdatePipelineStageDto): Promise<ApplicationPipelineEntity> {
+  async updatePipelineStage(id: number, dto: UpdatePipelineStageDto): Promise<ApplicationPipelineEntity> {
     const stage = await this.pipelineRepo.findOne({ where: { id } as any });
     if (!stage) throw new NotFoundException(`Stage ${id} not found`);
     Object.assign(stage, dto);
     return this.pipelineRepo.save(stage) as unknown as Promise<ApplicationPipelineEntity>;
   }
 
-  async deletePipelineStage(id: string): Promise<void> {
+  async deletePipelineStage(id: number): Promise<void> {
     const stage = await this.pipelineRepo.findOne({ where: { id } as any });
     if (!stage) throw new NotFoundException(`Stage ${id} not found`);
     await this.pipelineRepo.remove(stage);

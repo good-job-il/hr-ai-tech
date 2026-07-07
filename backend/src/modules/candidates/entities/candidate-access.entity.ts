@@ -5,14 +5,14 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Index(['candidate_id'])
 @Index(['owner_organization_id'])
 export class CandidateAccessEntity extends BaseEntity {
-  @Column({ name: 'candidate_id', type: 'varchar', length: 36 })
-  candidate_id: string;
+  @Column({ name: 'candidate_id', type: 'int' })
+  candidate_id: number;
 
-  @Column({ name: 'owner_organization_id', type: 'varchar', length: 36 })
-  owner_organization_id: string;
+  @Column({ name: 'owner_organization_id', type: 'int' })
+  owner_organization_id: number;
 
-  @Column({ name: 'accessor_organization_id', type: 'varchar', length: 36, nullable: true })
-  accessor_organization_id: string | null;
+  @Column({ name: 'accessor_organization_id', type: 'int', nullable: true })
+  accessor_organization_id: number | null;
 
   @Column({
     name: 'access_type',
@@ -22,8 +22,8 @@ export class CandidateAccessEntity extends BaseEntity {
   })
   access_type: string;
 
-  @Column({ name: 'granted_by', type: 'varchar', length: 36, nullable: true })
-  granted_by: string | null;
+  @Column({ name: 'granted_by', type: 'int', nullable: true })
+  granted_by: number | null;
 
   @Column({ name: 'granted_at', type: 'datetime', nullable: true })
   granted_at: Date | null;

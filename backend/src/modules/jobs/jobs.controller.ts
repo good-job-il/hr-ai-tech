@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, Query, ParseUUIDPipe, HttpCode, HttpStatus,
+  Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JobsService } from './jobs.service';
@@ -28,7 +28,7 @@ export class JobsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get job by ID' })
-  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
+  findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.findById(id, user);
   }
 
@@ -44,7 +44,7 @@ export class JobsController {
   @Roles(...JOB_WRITE_ROLES)
   @ApiOperation({ summary: 'Update job' })
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateJobDto,
     @CurrentUser() user: UserEntity,
   ) {
@@ -55,7 +55,7 @@ export class JobsController {
   @Roles(...JOB_WRITE_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft-delete job' })
-  remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.softDelete(id, user);
   }
 
@@ -63,7 +63,7 @@ export class JobsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Public()
   @ApiOperation({ summary: 'Increment job view count' })
-  incrementViews(@Param('id', ParseUUIDPipe) id: string) {
+  incrementViews(@Param('id', ParseIntPipe) id: number) {
     return this.svc.incrementViews(id);
   }
 
@@ -84,7 +84,7 @@ export class JobsController {
   @Delete('saved/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Unsave a job' })
-  unsaveJob(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
+  unsaveJob(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.unsaveJob(id, user.email);
   }
 
@@ -101,13 +101,13 @@ export class JobsController {
   }
 
   @Patch('alerts/:id')
-  updateAlert(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateJobAlertDto) {
+  updateAlert(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateJobAlertDto) {
     return this.svc.updateAlert(id, dto);
   }
 
   @Delete('alerts/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteAlert(@Param('id', ParseUUIDPipe) id: string) {
+  deleteAlert(@Param('id', ParseIntPipe) id: number) {
     return this.svc.deleteAlert(id);
   }
 }

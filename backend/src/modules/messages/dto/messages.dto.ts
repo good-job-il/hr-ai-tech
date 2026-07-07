@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 
 export const CreateMessageSchema = z.object({
-  application_id: z.string().uuid(),
+  application_id: z.number().int(),
   sender_email: z.string().email(),
   sender_role: z.enum(['employer', 'candidate', 'recruiter']).optional().nullable(),
   content: z.string().min(1),
@@ -18,9 +18,8 @@ export const QueryMessagesSchema = z.object({
   limit: z.coerce.number().min(1).max(500).default(50),
   sort: z.string().default('created_date'),
   order: z.enum(['ASC', 'DESC']).default('ASC'),
-  application_id: z.string().uuid().optional(),
+  application_id: z.coerce.number().int().optional(),
   sender_email: z.string().optional(),
   is_read: z.coerce.boolean().optional(),
 });
 export class QueryMessagesDto extends createZodDto(QueryMessagesSchema) {}
-

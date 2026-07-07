@@ -30,7 +30,7 @@ export class CompaniesService {
     return buildPaginatedResponse(data, total, { page, limit });
   }
 
-  async findById(id: string): Promise<CompanyEntity> {
+  async findById(id: number): Promise<CompanyEntity> {
     const c = await this.companyRepo.findOne({ where: { id } as any });
     if (!c) throw new NotFoundException(`Company ${id} not found`);
     return c;
@@ -41,7 +41,7 @@ export class CompaniesService {
     return this.companyRepo.save(c) as unknown as Promise<CompanyEntity>;
   }
 
-  async update(id: string, dto: UpdateCompanyDto, user: UserEntity): Promise<CompanyEntity> {
+  async update(id: number, dto: UpdateCompanyDto, user: UserEntity): Promise<CompanyEntity> {
     const c = await this.findById(id);
     Object.assign(c, dto);
     if (dto.is_deleted && !c.deleted_at) {
@@ -51,12 +51,12 @@ export class CompaniesService {
     return this.companyRepo.save(c) as unknown as Promise<CompanyEntity>;
   }
 
-  async softDelete(id: string, user: UserEntity): Promise<void> {
+  async softDelete(id: number, user: UserEntity): Promise<void> {
     await this.update(id, { is_deleted: true } as any, user);
   }
 
   // ─── Reviews ──────────────────────────────────────────────────────────────
-  async getReviews(companyId: string) {
+  async getReviews(companyId: number) {
     return this.reviewRepo.find({ where: { company_id: companyId } as any, order: { created_date: 'DESC' } as any });
   }
 
@@ -66,7 +66,7 @@ export class CompaniesService {
   }
 
   // ─── Staff ────────────────────────────────────────────────────────────────
-  async getStaff(companyId: string) {
+  async getStaff(companyId: number) {
     return this.staffRepo.find({ where: { company_id: companyId } as any });
   }
 
@@ -84,14 +84,14 @@ export class CompaniesService {
     return this.staffRepo.save(s) as unknown as Promise<StaffEntity>;
   }
 
-  async updateStaff(id: string, dto: UpdateStaffDto): Promise<StaffEntity> {
+  async updateStaff(id: number, dto: UpdateStaffDto): Promise<StaffEntity> {
     const s = await this.staffRepo.findOne({ where: { id } as any });
     if (!s) throw new NotFoundException(`Staff ${id} not found`);
     Object.assign(s, dto);
     return this.staffRepo.save(s) as unknown as Promise<StaffEntity>;
   }
 
-  async deleteStaff(id: string): Promise<void> {
+  async deleteStaff(id: number): Promise<void> {
     const s = await this.staffRepo.findOne({ where: { id } as any });
     if (!s) throw new NotFoundException(`Staff ${id} not found`);
     await this.staffRepo.remove(s);

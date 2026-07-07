@@ -13,8 +13,8 @@ export const CreateJobSchema = z.object({
   category: z.string().optional().nullable(),
   type: z.enum(['full', 'part', 'daily', 'remote']).default('full'),
   description: z.string().optional().nullable(),
-  employer_company_id: z.string().uuid().optional().nullable(),
-  recruiter_id: z.string().uuid().optional().nullable(),
+  employer_company_id: z.number().int().optional().nullable(),
+  recruiter_id: z.number().int().optional().nullable(),
   domain_id: z.number().int().optional().nullable(),
   role_id: z.number().int().optional().nullable(),
   specialization_id: z.number().int().optional().nullable(),
@@ -54,22 +54,22 @@ export const QueryJobsSchema = z.object({
   sort: z.string().default('created_date'),
   order: z.enum(['ASC', 'DESC']).default('DESC'),
   search: z.string().optional(),
-  organization_id: z.string().uuid().optional(),
-  employer_company_id: z.string().uuid().optional(),
-  recruiter_id: z.string().uuid().optional(),
+  organization_id: z.coerce.number().int().optional(),
+  employer_company_id: z.coerce.number().int().optional(),
+  recruiter_id: z.coerce.number().int().optional(),
   domain_id: z.coerce.number().int().optional(),
   type: z.enum(['full', 'part', 'daily', 'remote']).optional(),
   is_closed: z.coerce.boolean().optional(),
   is_deleted: z.coerce.boolean().optional().default(false),
   seniority: z.enum(['junior', 'mid', 'senior', 'lead', 'manager', 'director', 'any']).optional(),
-  recommended_for: z.string().uuid().optional(),
+  recommended_for: z.coerce.number().int().optional(),
 });
 export class QueryJobsDto extends createZodDto(QueryJobsSchema) {}
 
 // ─── SavedJob ────────────────────────────────────────────────────────────
 export const CreateSavedJobSchema = z.object({
   user_email: z.string().email(),
-  job_id: z.string().uuid(),
+  job_id: z.number().int(),
   job_title: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
 });

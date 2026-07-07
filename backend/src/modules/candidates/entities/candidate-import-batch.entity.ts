@@ -17,11 +17,11 @@ export class CandidateImportBatchEntity extends BaseEntity {
   @Column({ name: 'imported_by', type: 'varchar', length: 255 })
   imported_by: string;
 
-  @Column({ name: 'employer_id', type: 'varchar', length: 36, nullable: true })
-  employer_id: string | null;
+  @Column({ name: 'employer_id', type: 'int', nullable: true })
+  employer_id: number | null;
 
-  @Column({ name: 'recruiter_id', type: 'varchar', length: 36, nullable: true })
-  recruiter_id: string | null;
+  @Column({ name: 'recruiter_id', type: 'int', nullable: true })
+  recruiter_id: number | null;
 
   @Column({ name: 'total_records', type: 'int', default: 0 })
   total_records: number;

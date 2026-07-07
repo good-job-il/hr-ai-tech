@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, Query, ParseUUIDPipe, HttpCode, HttpStatus,
+  Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { ApplicationsService } from './applications.service';
@@ -22,7 +22,7 @@ export class ApplicationsController {
   constructor(private readonly svc: ApplicationsService) {}
 
   @Get() findAll(@Query() q: QueryApplicationsDto, @CurrentUser() u: UserEntity) { return this.svc.findAll(q, u); }
-  @Get(':id') findOne(@Param('id', ParseUUIDPipe) id: string) { return this.svc.findById(id); }
+  @Get(':id') findOne(@Param('id', ParseIntPipe) id: number) { return this.svc.findById(id); }
 
   @Post()
   @Roles(...APPLICATION_CREATE_ROLES)
@@ -31,18 +31,18 @@ export class ApplicationsController {
 
   @Patch(':id')
   @Roles(...APPLICATION_MANAGE_ROLES)
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateApplicationDto, @CurrentUser() u: UserEntity) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateApplicationDto, @CurrentUser() u: UserEntity) {
     return this.svc.update(id, dto, u);
   }
 
   @Delete(':id')
   @Roles(...APPLICATION_MANAGE_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() u: UserEntity) { return this.svc.softDelete(id, u); }
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.softDelete(id, u); }
 
   // ─── Timeline ────────────────────────────────────────────────────────────
   @Get(':id/timeline')
-  getTimeline(@Param('id', ParseUUIDPipe) id: string) { return this.svc.getTimeline(id); }
+  getTimeline(@Param('id', ParseIntPipe) id: number) { return this.svc.getTimeline(id); }
 
   // ─── Pipeline ────────────────────────────────────────────────────────────
   @Get('pipeline/:employerId')
@@ -56,13 +56,13 @@ export class ApplicationsController {
 
   @Patch('pipeline/:id')
   @Roles(...APPLICATION_MANAGE_ROLES)
-  updateStage(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdatePipelineStageDto) {
+  updateStage(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePipelineStageDto) {
     return this.svc.updatePipelineStage(id, dto);
   }
 
   @Delete('pipeline/:id')
   @Roles(...APPLICATION_MANAGE_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteStage(@Param('id', ParseUUIDPipe) id: string) { return this.svc.deletePipelineStage(id); }
+  deleteStage(@Param('id', ParseIntPipe) id: number) { return this.svc.deletePipelineStage(id); }
 }
 

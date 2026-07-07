@@ -4,14 +4,14 @@ import { createZodDto } from 'nestjs-zod';
 const CompTypeEnum = z.enum(['fixed', 'percent']);
 
 export const CreateCompensationPlanSchema = z.object({
-  organization_id: z.string().optional().nullable(),
-  job_id: z.string().optional().nullable(),
+  organization_id: z.number().int().optional().nullable(),
+  job_id: z.number().int().optional().nullable(),
   client_name: z.string().min(1),
   total_fee: z.number().optional().nullable(),
   warranty_period_days: z.number().int().default(30),
-  recruiter_id: z.string().optional().nullable(),
-  team_manager_id: z.string().optional().nullable(),
-  recruitment_manager_id: z.string().optional().nullable(),
+  recruiter_id: z.number().int().optional().nullable(),
+  team_manager_id: z.number().int().optional().nullable(),
+  recruitment_manager_id: z.number().int().optional().nullable(),
   recruiter_compensation: z.number().optional().nullable(),
   recruiter_compensation_type: CompTypeEnum.default('percent'),
   team_manager_compensation: z.number().optional().nullable(),
@@ -30,8 +30,7 @@ export const QueryCompensationPlansSchema = z.object({
   limit: z.coerce.number().min(1).max(500).default(20),
   sort: z.string().default('created_date'),
   order: z.enum(['ASC', 'DESC']).default('DESC'),
-  job_id: z.string().optional(),
-  recruiter_id: z.string().optional(),
+  job_id: z.coerce.number().int().optional(),
+  recruiter_id: z.coerce.number().int().optional(),
 });
 export class QueryCompensationPlansDto extends createZodDto(QueryCompensationPlansSchema) {}
-

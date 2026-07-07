@@ -21,7 +21,7 @@ export class MessagesService {
     return buildPaginatedResponse(data, total, { page, limit });
   }
 
-  async findById(id: string): Promise<MessageEntity> {
+  async findById(id: number): Promise<MessageEntity> {
     const msg = await this.repo.findOne({ where: { id } as any });
     if (!msg) throw new NotFoundException(`Message ${id} not found`);
     return msg;
@@ -38,14 +38,13 @@ export class MessagesService {
     return this.repo.save(msg) as unknown as Promise<MessageEntity>;
   }
 
-  async update(id: string, dto: UpdateMessageDto): Promise<MessageEntity> {
+  async update(id: number, dto: UpdateMessageDto): Promise<MessageEntity> {
     const msg = await this.findById(id);
     Object.assign(msg, dto);
     return this.repo.save(msg) as unknown as Promise<MessageEntity>;
   }
 
-  async markAllRead(applicationId: string): Promise<void> {
+  async markAllRead(applicationId: number): Promise<void> {
     await this.repo.update({ application_id: applicationId, is_read: false }, { is_read: true });
   }
 }
-

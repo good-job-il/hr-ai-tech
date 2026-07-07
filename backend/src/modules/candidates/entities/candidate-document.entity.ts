@@ -5,11 +5,11 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Index(['candidate_id'])
 @Index(['organization_id'])
 export class CandidateDocumentEntity extends BaseEntity {
-  @Column({ name: 'organization_id', type: 'varchar', length: 36, nullable: true })
-  organization_id: string | null;
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
 
-  @Column({ name: 'candidate_id', type: 'varchar', length: 36 })
-  candidate_id: string;
+  @Column({ name: 'candidate_id', type: 'int' })
+  candidate_id: number;
 
   @Column({ name: 'candidate_email', type: 'varchar', length: 255, nullable: true })
   candidate_email: string | null;
@@ -65,8 +65,8 @@ export class CandidateDocumentEntity extends BaseEntity {
   @Column({ name: 'parsed_data', type: 'json', nullable: true })
   parsed_data: Record<string, any> | null;
 
-  @Column({ name: 'import_batch_id', type: 'varchar', length: 36, nullable: true })
-  import_batch_id: string | null;
+  @Column({ name: 'import_batch_id', type: 'int', nullable: true })
+  import_batch_id: number | null;
 
   @Column({ type: 'text', nullable: true })
   notes: string | null;

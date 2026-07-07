@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseUUIDPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto, QueryNotificationsDto } from './dto/notifications.dto';
@@ -26,10 +26,10 @@ export class NotificationsController {
 
   @Post() @Roles(...NOTIFICATION_CREATE_ROLES) @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateNotificationDto) { return this.svc.create(dto); }
 
-  @Patch(':id/read') markRead(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() u: UserEntity) { return this.svc.markRead(id, u); }
+  @Patch(':id/read') markRead(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.markRead(id, u); }
 
   @Patch('read-all') markAllRead(@CurrentUser() u: UserEntity) { return this.svc.markAllRead(u.email); }
 
-  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() u: UserEntity) { return this.svc.remove(id, u); }
+  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.remove(id, u); }
 }
 

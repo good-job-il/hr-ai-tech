@@ -5,8 +5,8 @@ import { BaseEntity } from '../../common/entities/base.entity';
 @Index(['application_id'])
 @Index(['sender_email'])
 export class MessageEntity extends BaseEntity {
-  @Column({ name: 'application_id', type: 'varchar', length: 36 })
-  application_id: string;
+  @Column({ name: 'application_id', type: 'int' })
+  application_id: number;
 
   @Column({ name: 'sender_email', type: 'varchar', length: 255 })
   sender_email: string;

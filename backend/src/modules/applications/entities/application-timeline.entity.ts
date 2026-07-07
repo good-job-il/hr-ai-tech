@@ -5,11 +5,11 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Index(['application_id'])
 @Index(['organization_id'])
 export class ApplicationTimelineEntity extends BaseEntity {
-  @Column({ name: 'organization_id', type: 'varchar', length: 36, nullable: true })
-  organization_id: string | null;
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
 
-  @Column({ name: 'application_id', type: 'varchar', length: 36 })
-  application_id: string;
+  @Column({ name: 'application_id', type: 'int' })
+  application_id: number;
 
   @Column({
     name: 'event_type',

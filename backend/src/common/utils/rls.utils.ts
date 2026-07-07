@@ -9,10 +9,10 @@ import { UserRole } from '../enums/user-role.enum';
  */
 
 export interface UserContext {
-  id: string;
+  id: number;
   role: UserRole;
-  organization_id: string | null;
-  employer_company_id?: string | null;
+  organization_id: number | null;
+  employer_company_id?: number | null;
   email: string;
   org_type?: string | null;
 }
@@ -117,9 +117,9 @@ export function getRlsWhere(
 
 function getOrgFilter(
   entityName: string,
-  orgId: string,
-  recruiterId: string | null,
-  teamManagerId: string | null,
+  orgId: number,
+  recruiterId: number | null,
+  teamManagerId: number | null,
 ): Record<string, any> {
   if (entityName === 'CompensationPlan') {
     return { organization_id: orgId };

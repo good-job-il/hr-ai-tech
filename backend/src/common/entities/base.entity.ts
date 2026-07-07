@@ -5,13 +5,12 @@ import {
 } from 'typeorm';
 
 /**
- * Base entity with UUID pk + timestamps.
- * Field names match Base44 convention (created_date / updated_date)
- * so the frontend receives the same JSON structure.
+ * Base entity with auto-increment integer pk + timestamps.
+ * Migrated from UUID (varchar 36) to INT AUTO_INCREMENT for MySQL performance.
  */
 export abstract class BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @CreateDateColumn({ name: 'created_date' })
   created_date: Date;

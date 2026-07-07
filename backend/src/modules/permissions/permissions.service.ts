@@ -73,7 +73,7 @@ export class PermissionsService {
     return this.matrixRepo.save(matrix) as unknown as Promise<PermissionMatrixEntity>;
   }
 
-  async updateMatrix(id: string, dto: UpdatePermissionMatrixDto, user: UserEntity): Promise<PermissionMatrixEntity> {
+  async updateMatrix(id: number, dto: UpdatePermissionMatrixDto, user: UserEntity): Promise<PermissionMatrixEntity> {
     const matrix = await this.matrixRepo.findOne({ where: { id } });
     if (!matrix) throw new NotFoundException(`Permission matrix ${id} not found`);
     if (!this.isPrivileged(user) && matrix.organization_id !== user.organization_id) {
@@ -83,7 +83,7 @@ export class PermissionsService {
     return this.matrixRepo.save(matrix);
   }
 
-  async removeMatrix(id: string, user: UserEntity): Promise<void> {
+  async removeMatrix(id: number, user: UserEntity): Promise<void> {
     if (!this.isPrivileged(user)) throw new ForbiddenException('Only admins can delete permission matrices');
     const matrix = await this.matrixRepo.findOne({ where: { id } });
     if (!matrix) throw new NotFoundException(`Permission matrix ${id} not found`);
@@ -112,7 +112,7 @@ export class PermissionsService {
     return this.templateRepo.save(tpl) as unknown as Promise<RoleTemplateEntity>;
   }
 
-  async updateRoleTemplate(id: string, dto: UpdateRoleTemplateDto, user: UserEntity): Promise<RoleTemplateEntity> {
+  async updateRoleTemplate(id: number, dto: UpdateRoleTemplateDto, user: UserEntity): Promise<RoleTemplateEntity> {
     const tpl = await this.templateRepo.findOne({ where: { id } });
     if (!tpl) throw new NotFoundException(`Role template ${id} not found`);
     if (!this.isPrivileged(user) && !(user.role === UserRole.ORG_ADMIN && tpl.organization_id === user.organization_id)) {
@@ -122,7 +122,7 @@ export class PermissionsService {
     return this.templateRepo.save(tpl);
   }
 
-  async removeRoleTemplate(id: string, user: UserEntity): Promise<void> {
+  async removeRoleTemplate(id: number, user: UserEntity): Promise<void> {
     if (!this.isPrivileged(user)) throw new ForbiddenException('Only admins can delete role templates');
     const tpl = await this.templateRepo.findOne({ where: { id } });
     if (!tpl) throw new NotFoundException(`Role template ${id} not found`);
@@ -149,14 +149,14 @@ export class PermissionsService {
     return this.accessRepo.save(access) as unknown as Promise<UserPositionAccessEntity>;
   }
 
-  async updateUserPositionAccess(id: string, dto: UpdateUserPositionAccessDto): Promise<UserPositionAccessEntity> {
+  async updateUserPositionAccess(id: number, dto: UpdateUserPositionAccessDto): Promise<UserPositionAccessEntity> {
     const access = await this.accessRepo.findOne({ where: { id } });
     if (!access) throw new NotFoundException(`User position access ${id} not found`);
     Object.assign(access, dto);
     return this.accessRepo.save(access);
   }
 
-  async removeUserPositionAccess(id: string): Promise<void> {
+  async removeUserPositionAccess(id: number): Promise<void> {
     const access = await this.accessRepo.findOne({ where: { id } });
     if (!access) throw new NotFoundException(`User position access ${id} not found`);
     await this.accessRepo.remove(access);
@@ -179,17 +179,16 @@ export class PermissionsService {
     return this.positionRepo.save(position) as unknown as Promise<PositionEntity>;
   }
 
-  async updatePosition(id: string, dto: UpdatePositionDto): Promise<PositionEntity> {
+  async updatePosition(id: number, dto: UpdatePositionDto): Promise<PositionEntity> {
     const position = await this.positionRepo.findOne({ where: { id } });
     if (!position) throw new NotFoundException(`Position ${id} not found`);
     Object.assign(position, dto);
     return this.positionRepo.save(position);
   }
 
-  async removePosition(id: string): Promise<void> {
+  async removePosition(id: number): Promise<void> {
     const position = await this.positionRepo.findOne({ where: { id } });
     if (!position) throw new NotFoundException(`Position ${id} not found`);
     await this.positionRepo.remove(position);
   }
 }
-

@@ -9,14 +9,14 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Index(['status'])
 @Index(['is_deleted'])
 export class ApplicationEntity extends BaseEntity {
-  @Column({ name: 'organization_id', type: 'varchar', length: 36, nullable: true })
-  organization_id: string | null;
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
 
-  @Column({ name: 'job_id', type: 'varchar', length: 36 })
-  job_id: string;
+  @Column({ name: 'job_id', type: 'int' })
+  job_id: number;
 
-  @Column({ name: 'candidate_id', type: 'varchar', length: 36, nullable: true })
-  candidate_id: string | null;
+  @Column({ name: 'candidate_id', type: 'int', nullable: true })
+  candidate_id: number | null;
 
   @Column({ name: 'job_title', type: 'varchar', length: 255, nullable: true })
   job_title: string | null;
@@ -24,21 +24,21 @@ export class ApplicationEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   company: string | null;
 
-  @Column({ name: 'employer_company_id', type: 'varchar', length: 36, nullable: true })
-  employer_company_id: string | null;
+  @Column({ name: 'employer_company_id', type: 'int', nullable: true })
+  employer_company_id: number | null;
 
   /** @deprecated use organization_id */
-  @Column({ name: 'agency_company_id', type: 'varchar', length: 36, nullable: true })
-  agency_company_id: string | null;
+  @Column({ name: 'agency_company_id', type: 'int', nullable: true })
+  agency_company_id: number | null;
 
-  @Column({ name: 'recruiter_id', type: 'varchar', length: 36, nullable: true })
-  recruiter_id: string | null;
+  @Column({ name: 'recruiter_id', type: 'int', nullable: true })
+  recruiter_id: number | null;
 
-  @Column({ name: 'team_manager_id', type: 'varchar', length: 36, nullable: true })
-  team_manager_id: string | null;
+  @Column({ name: 'team_manager_id', type: 'int', nullable: true })
+  team_manager_id: number | null;
 
-  @Column({ name: 'recruitment_manager_id', type: 'varchar', length: 36, nullable: true })
-  recruitment_manager_id: string | null;
+  @Column({ name: 'recruitment_manager_id', type: 'int', nullable: true })
+  recruitment_manager_id: number | null;
 
   @Column({ name: 'candidate_name', type: 'varchar', length: 255 })
   candidate_name: string;
@@ -94,8 +94,8 @@ export class ApplicationEntity extends BaseEntity {
   @Column({ name: 'internal_history', type: 'text', nullable: true })
   internal_history: string | null;
 
-  @Column({ name: 'assigned_to', type: 'varchar', length: 36, nullable: true })
-  assigned_to: string | null;
+  @Column({ name: 'assigned_to', type: 'int', nullable: true })
+  assigned_to: number | null;
 
   /** @deprecated use employer_company_id */
   @Column({ name: 'employer_id', type: 'varchar', length: 255, nullable: true })
@@ -108,7 +108,7 @@ export class ApplicationEntity extends BaseEntity {
   @Column({ name: 'deleted_at', type: 'datetime', nullable: true })
   deleted_at: Date | null;
 
-  @Column({ name: 'deleted_by', type: 'varchar', length: 36, nullable: true })
-  deleted_by: string | null;
+  @Column({ name: 'deleted_by', type: 'int', nullable: true })
+  deleted_by: number | null;
 }
 

@@ -24,7 +24,7 @@ export class SalaryService {
     return buildPaginatedResponse(data, total, { page, limit });
   }
 
-  async findById(id: string): Promise<SalaryDataEntity> {
+  async findById(id: number): Promise<SalaryDataEntity> {
     const record = await this.repo.findOne({ where: { id } });
     if (!record) throw new NotFoundException(`Salary data ${id} not found`);
     return record;
@@ -35,15 +35,14 @@ export class SalaryService {
     return this.repo.save(record) as unknown as Promise<SalaryDataEntity>;
   }
 
-  async update(id: string, dto: UpdateSalaryDataDto): Promise<SalaryDataEntity> {
+  async update(id: number, dto: UpdateSalaryDataDto): Promise<SalaryDataEntity> {
     const record = await this.findById(id);
     Object.assign(record, dto);
     return this.repo.save(record);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const record = await this.findById(id);
     await this.repo.remove(record);
   }
 }
-

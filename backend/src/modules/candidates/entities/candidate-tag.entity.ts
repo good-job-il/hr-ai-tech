@@ -4,8 +4,8 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Entity('candidate_tags')
 @Index(['candidate_id'])
 export class CandidateTagEntity extends BaseEntity {
-  @Column({ name: 'candidate_id', type: 'varchar', length: 36 })
-  candidate_id: string;
+  @Column({ name: 'candidate_id', type: 'int' })
+  candidate_id: number;
 
   @Column({ type: 'varchar', length: 100 })
   tag: string;

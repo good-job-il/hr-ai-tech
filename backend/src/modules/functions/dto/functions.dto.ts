@@ -13,7 +13,7 @@ export class CreateCompanyNotificationDto extends createZodDto(CreateCompanyNoti
 
 // ─── createApplicationTimeline ──────────────────────────────────────────────
 export const CreateApplicationTimelineFnSchema = z.object({
-  application_id: z.string(),
+  application_id: z.number().int(),
   event_type: z.enum([
     'submitted', 'status_changed', 'note_added', 'interview_scheduled',
     'interview_completed', 'offer_made', 'rejected', 'assigned', 'resume_viewed',
@@ -22,24 +22,24 @@ export const CreateApplicationTimelineFnSchema = z.object({
   new_value: z.string().optional().nullable(),
   description: z.string().min(1),
   performed_by_role: z.string().optional(),
-  organization_id: z.string().optional().nullable(),
+  organization_id: z.number().int().optional().nullable(),
 });
 export class CreateApplicationTimelineFnDto extends createZodDto(CreateApplicationTimelineFnSchema) {}
 
 // ─── createCandidateTimeline ─────────────────────────────────────────────────
 export const CreateCandidateTimelineFnSchema = z.object({
-  candidate_id: z.string().optional().nullable(),
+  candidate_id: z.number().int().optional().nullable(),
   candidate_email: z.string().email(),
   event_type: z.string().min(1),
   description: z.string().min(1),
   metadata: z.record(z.any()).optional().default({}),
-  organization_id: z.string().optional().nullable(),
+  organization_id: z.number().int().optional().nullable(),
 });
 export class CreateCandidateTimelineFnDto extends createZodDto(CreateCandidateTimelineFnSchema) {}
 
 // ─── deleteCandidate ────────────────────────────────────────────────────────
 export const DeleteCandidateFnSchema = z.object({
-  candidate_id: z.string(),
+  candidate_id: z.number().int(),
 });
 export class DeleteCandidateFnDto extends createZodDto(DeleteCandidateFnSchema) {}
 
@@ -56,14 +56,14 @@ export class UpdateCompanyProfileFnDto extends createZodDto(UpdateCompanyProfile
 
 // ─── sendCandidateToEmployer ─────────────────────────────────────────────────
 export const SendCandidateToEmployerSchema = z.object({
-  candidateId: z.string(),
+  candidateId: z.number().int(),
   to: z.string().email(),
   cc: z.string().optional().nullable(),
   subject: z.string().optional().nullable(),
   recruiterNote: z.string().optional().nullable(),
   candidateName: z.string().min(1),
   candidateEmail: z.string().email().optional().nullable(),
-  jobId: z.string().optional().nullable(),
+  jobId: z.number().int().optional().nullable(),
   jobTitle: z.string().optional().nullable(),
   attachmentUrls: z
     .array(z.object({ url: z.string(), filename: z.string().optional(), doc_type: z.string().optional() }))
@@ -74,14 +74,14 @@ export class SendCandidateToEmployerDto extends createZodDto(SendCandidateToEmpl
 
 // ─── getJobRecommendations ───────────────────────────────────────────────────
 export const GetJobRecommendationsSchema = z.object({
-  job_id: z.string(),
+  job_id: z.number().int(),
   limit: z.coerce.number().int().min(1).max(20).default(5),
 });
 export class GetJobRecommendationsDto extends createZodDto(GetJobRecommendationsSchema) {}
 
 // ─── scoreApplication ────────────────────────────────────────────────────────
 export const ScoreApplicationFnSchema = z.object({
-  application_id: z.string(),
+  application_id: z.number().int(),
 });
 export class ScoreApplicationFnDto extends createZodDto(ScoreApplicationFnSchema) {}
 
@@ -113,7 +113,7 @@ export class ExtractResumeFnDto extends createZodDto(ExtractResumeFnSchema) {}
 // ─── importCandidatesFromFile ────────────────────────────────────────────────
 export const ImportCandidatesFromFileSchema = z.object({
   fileUrl: z.string().url(),
-  batchId: z.string(),
+  batchId: z.number().int().optional().nullable(),
   fileName: z.string().optional(),
 });
 export class ImportCandidatesFromFileDto extends createZodDto(ImportCandidatesFromFileSchema) {}
@@ -121,13 +121,13 @@ export class ImportCandidatesFromFileDto extends createZodDto(ImportCandidatesFr
 // ─── createBulkCandidates ────────────────────────────────────────────────────
 export const CreateBulkCandidatesSchema = z.object({
   candidates_data: z.array(z.record(z.any())).min(1),
-  import_batch_id: z.string().optional().nullable(),
+  import_batch_id: z.number().int().optional().nullable(),
 });
 export class CreateBulkCandidatesDto extends createZodDto(CreateBulkCandidatesSchema) {}
 
 // ─── validateImportBatch ─────────────────────────────────────────────────────
 export const ValidateImportBatchSchema = z.object({
-  import_batch_id: z.string(),
+  import_batch_id: z.number().int(),
 });
 export class ValidateImportBatchDto extends createZodDto(ValidateImportBatchSchema) {}
 
@@ -140,18 +140,18 @@ export const ImportResumeFilesSchema = z.object({
       file_size: z.number().optional(),
     }),
   ),
-  batchId: z.string().optional().nullable(),
-  employer_id: z.string().optional().default(''),
-  recruiter_id: z.string().optional().nullable(),
+  batchId: z.number().int().optional().nullable(),
+  employer_id: z.number().int().optional().nullable(),
+  recruiter_id: z.number().int().optional().nullable(),
 });
 export class ImportResumeFilesDto extends createZodDto(ImportResumeFilesSchema) {}
 
 // ─── parseResumeBatch ────────────────────────────────────────────────────────
 export const ParseResumeBatchSchema = z.object({
   zip_file_url: z.string().url(),
-  import_batch_id: z.string().optional().nullable(),
-  employer_id: z.string().optional().nullable(),
-  recruiter_id: z.string().optional().nullable(),
+  import_batch_id: z.number().int().optional().nullable(),
+  employer_id: z.number().int().optional().nullable(),
+  recruiter_id: z.number().int().optional().nullable(),
   source: z.string().optional().default('import_zip'),
   initial_status: z.string().optional().default('new'),
 });
@@ -160,8 +160,7 @@ export class ParseResumeBatchDto extends createZodDto(ParseResumeBatchSchema) {}
 // ─── crawlCareerPage ──────────────────────────────────────────────────────────
 export const CrawlCareerPageSchema = z.object({
   url: z.string().url(),
-  source_id: z.string().optional().nullable(),
+  source_id: z.number().int().optional().nullable(),
   company_name: z.string().optional().default('חברה'),
 });
 export class CrawlCareerPageDto extends createZodDto(CrawlCareerPageSchema) {}
-

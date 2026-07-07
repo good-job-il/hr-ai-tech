@@ -7,7 +7,7 @@ import {
   Param,
   Body,
   Query,
-  ParseUUIDPipe,
+  ParseIntPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -37,7 +37,7 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID' })
   findOne(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: UserEntity,
   ) {
     return this.usersService.findById(id, user);
@@ -57,7 +57,7 @@ export class UsersController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update user' })
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateUserDto,
     @CurrentUser() user: UserEntity,
   ) {
@@ -69,7 +69,7 @@ export class UsersController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete a user (admin only)' })
   async remove(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: UserEntity,
   ) {
     await this.usersService.remove(id, user);

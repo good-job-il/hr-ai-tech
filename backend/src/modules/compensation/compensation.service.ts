@@ -47,7 +47,7 @@ export class CompensationService {
     return buildPaginatedResponse(data, total, { page, limit });
   }
 
-  async findById(id: string, user: UserEntity): Promise<CompensationPlanEntity> {
+  async findById(id: number, user: UserEntity): Promise<CompensationPlanEntity> {
     this.assertAgencyAccess(user);
     const plan = await this.repo.findOne({ where: { id } });
     if (!plan) throw new NotFoundException(`Compensation plan ${id} not found`);
@@ -70,13 +70,13 @@ export class CompensationService {
     return this.repo.save(plan) as unknown as Promise<CompensationPlanEntity>;
   }
 
-  async update(id: string, dto: UpdateCompensationPlanDto, user: UserEntity): Promise<CompensationPlanEntity> {
+  async update(id: number, dto: UpdateCompensationPlanDto, user: UserEntity): Promise<CompensationPlanEntity> {
     const plan = await this.findById(id, user);
     Object.assign(plan, dto);
     return this.repo.save(plan);
   }
 
-  async remove(id: string, user: UserEntity): Promise<void> {
+  async remove(id: number, user: UserEntity): Promise<void> {
     const plan = await this.findById(id, user);
     await this.repo.remove(plan);
   }

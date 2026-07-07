@@ -95,7 +95,7 @@ export class CandidatesService {
     return buildPaginatedResponse(data, total, { page, limit, sort, order });
   }
 
-  async findById(id: string, user: UserEntity): Promise<CandidateEntity> {
+  async findById(id: number, user: UserEntity): Promise<CandidateEntity> {
     const candidate = await this.candidateRepo.findOne({ where: { id } as any });
     if (!candidate) throw new NotFoundException(`Candidate ${id} not found`);
     this.checkAccess(candidate, user);
@@ -112,7 +112,7 @@ export class CandidatesService {
     return this.candidateRepo.save(candidate) as unknown as Promise<CandidateEntity>;
   }
 
-  async update(id: string, dto: UpdateCandidateDto, user: UserEntity): Promise<CandidateEntity> {
+  async update(id: number, dto: UpdateCandidateDto, user: UserEntity): Promise<CandidateEntity> {
     const candidate = await this.findById(id, user);
     Object.assign(candidate, dto);
     if (dto.is_deleted && !candidate.deleted_at) {
@@ -122,12 +122,12 @@ export class CandidatesService {
     return this.candidateRepo.save(candidate) as unknown as Promise<CandidateEntity>;
   }
 
-  async softDelete(id: string, user: UserEntity): Promise<void> {
+  async softDelete(id: number, user: UserEntity): Promise<void> {
     await this.update(id, { is_deleted: true } as any, user);
   }
 
   // ─── Notes ──────────────────────────────────────────────────────────────
-  async getNotes(candidateId: string, user: UserEntity) {
+  async getNotes(candidateId: number, user: UserEntity) {
     await this.findById(candidateId, user);
     return this.noteRepo.find({
       where: { candidate_id: candidateId },
@@ -144,21 +144,21 @@ export class CandidatesService {
     return this.noteRepo.save(note);
   }
 
-  async updateNote(noteId: string, dto: UpdateCandidateNoteDto, user: UserEntity) {
+  async updateNote(noteId: number, dto: UpdateCandidateNoteDto, user: UserEntity) {
     const note = await this.noteRepo.findOne({ where: { id: noteId } });
     if (!note) throw new NotFoundException(`Note ${noteId} not found`);
     Object.assign(note, dto);
     return this.noteRepo.save(note);
   }
 
-  async deleteNote(noteId: string, user: UserEntity) {
+  async deleteNote(noteId: number, user: UserEntity) {
     const note = await this.noteRepo.findOne({ where: { id: noteId } });
     if (!note) throw new NotFoundException(`Note ${noteId} not found`);
     await this.noteRepo.remove(note);
   }
 
   // ─── Tags ──────────────────────────────────────────────────────────────
-  async getTags(candidateId: string, user: UserEntity) {
+  async getTags(candidateId: number, user: UserEntity) {
     await this.findById(candidateId, user);
     return this.tagRepo.find({ where: { candidate_id: candidateId } });
   }
@@ -169,14 +169,14 @@ export class CandidatesService {
     return this.tagRepo.save(tag);
   }
 
-  async deleteTag(tagId: string, user: UserEntity) {
+  async deleteTag(tagId: number, user: UserEntity) {
     const tag = await this.tagRepo.findOne({ where: { id: tagId } });
     if (!tag) throw new NotFoundException(`Tag ${tagId} not found`);
     await this.tagRepo.remove(tag);
   }
 
   // ─── Timeline ───────────────────────────────────────────────────────────
-  async getTimeline(candidateId: string, user: UserEntity) {
+  async getTimeline(candidateId: number, user: UserEntity) {
     await this.findById(candidateId, user);
     return this.timelineRepo.find({
       where: { candidate_id: candidateId },
@@ -190,7 +190,7 @@ export class CandidatesService {
   }
 
   // ─── Documents ──────────────────────────────────────────────────────────
-  async getDocuments(candidateId: string, user: UserEntity) {
+  async getDocuments(candidateId: number, user: UserEntity) {
     await this.findById(candidateId, user);
     return this.documentRepo.find({
       where: { candidate_id: candidateId },
@@ -215,7 +215,7 @@ export class CandidatesService {
     return this.batchRepo.find({ where, order: { created_date: 'DESC' } });
   }
 
-  async getBatch(id: string) {
+  async getBatch(id: number) {
     const batch = await this.batchRepo.findOne({ where: { id } });
     if (!batch) throw new NotFoundException(`Import batch ${id} not found`);
     return batch;
@@ -226,7 +226,7 @@ export class CandidatesService {
     return this.batchRepo.save(batch);
   }
 
-  async updateBatch(id: string, data: Partial<CandidateImportBatchEntity>) {
+  async updateBatch(id: number, data: Partial<CandidateImportBatchEntity>) {
     const batch = await this.getBatch(id);
     Object.assign(batch, data);
     return this.batchRepo.save(batch);
@@ -255,9 +255,13 @@ export class CandidatesService {
     return this.profileRepo.save(profile);
   }
 
-  /** Update by profile id OR user_email — mirrors base44's `.update(profile.id, data)` usage */
+  /** Update by profile id (int) OR user_email — mirrors base44's `.update(profile.id, data)` usage */
   async updateProfileByKey(key: string, dto: Partial<CandidateProfileEntity>) {
-    let existing = await this.profileRepo.findOne({ where: { id: key } });
+    const numericId = parseInt(key, 10);
+    let existing: CandidateProfileEntity | null = null;
+    if (!isNaN(numericId)) {
+      existing = await this.profileRepo.findOne({ where: { id: numericId } });
+    }
     if (!existing) existing = await this.profileRepo.findOne({ where: { user_email: key } });
     if (!existing) throw new NotFoundException(`Candidate profile ${key} not found`);
     Object.assign(existing, dto);
@@ -265,7 +269,7 @@ export class CandidatesService {
   }
 
   // ─── Access ──────────────────────────────────────────────────────────────
-  async getAccess(candidateId: string) {
+  async getAccess(candidateId: number) {
     return this.accessRepo.find({ where: { candidate_id: candidateId } });
   }
 
@@ -282,14 +286,14 @@ export class CandidatesService {
     return this.accessRepo.save(access);
   }
 
-  async updateAccess(id: string, data: Partial<CandidateAccessEntity>) {
+  async updateAccess(id: number, data: Partial<CandidateAccessEntity>) {
     const access = await this.accessRepo.findOne({ where: { id } });
     if (!access) throw new NotFoundException(`Access ${id} not found`);
     Object.assign(access, data);
     return this.accessRepo.save(access);
   }
 
-  async deleteAccess(id: string) {
+  async deleteAccess(id: number) {
     const access = await this.accessRepo.findOne({ where: { id } });
     if (!access) throw new NotFoundException(`Access ${id} not found`);
     await this.accessRepo.remove(access);

@@ -14,7 +14,7 @@ export const CreateUserSchema = z.object({
   full_name: z.string().min(1, { message: 'Full name is required' }),
   phone: z.string().optional(),
   role: z.enum(ROLES).default('candidate'),
-  organization_id: z.string().uuid().nullable().optional(),
+  organization_id: z.number().int().nullable().optional(),
   is_active: z.boolean().default(true),
 });
 export class CreateUserDto extends createZodDto(CreateUserSchema) {}
@@ -24,11 +24,11 @@ export const UpdateUserSchema = z.object({
   full_name: z.string().min(1).optional(),
   phone: z.string().optional(),
   role: z.enum(ROLES).optional(),
-  organization_id: z.string().uuid().nullable().optional(),
+  organization_id: z.number().int().nullable().optional(),
   org_type: z.enum(['staffing_agency', 'organization']).nullable().optional(),
-  team_manager_id: z.string().uuid().nullable().optional(),
-  recruitment_manager_id: z.string().uuid().nullable().optional(),
-  employer_company_id: z.string().uuid().nullable().optional(),
+  team_manager_id: z.number().int().nullable().optional(),
+  recruitment_manager_id: z.number().int().nullable().optional(),
+  employer_company_id: z.number().int().nullable().optional(),
   display_role_name: z.string().optional(),
   is_active: z.boolean().optional(),
 });
@@ -41,7 +41,7 @@ export const QueryUsersSchema = z.object({
   sort: z.string().default('created_date'),
   order: z.enum(['ASC', 'DESC']).default('DESC'),
   role: z.string().optional(),
-  organization_id: z.string().optional(),
+  organization_id: z.coerce.number().int().optional(),
   is_active: z.coerce.boolean().optional(),
   search: z.string().optional(),
 });

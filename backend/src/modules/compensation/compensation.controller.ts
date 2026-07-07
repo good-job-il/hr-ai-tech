@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseUUIDPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CompensationService } from './compensation.service';
 import {
@@ -21,7 +21,7 @@ export class CompensationController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() u: UserEntity) {
+  findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) {
     return this.svc.findById(id, u);
   }
 
@@ -32,14 +32,13 @@ export class CompensationController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateCompensationPlanDto, @CurrentUser() u: UserEntity) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCompensationPlanDto, @CurrentUser() u: UserEntity) {
     return this.svc.update(id, dto, u);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() u: UserEntity) {
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) {
     return this.svc.remove(id, u);
   }
 }
-

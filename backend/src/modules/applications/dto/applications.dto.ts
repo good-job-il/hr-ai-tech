@@ -4,13 +4,13 @@ import { createZodDto } from 'nestjs-zod';
 const statusEnum = z.enum(['new','reviewed','phone_interview','recommended','employer_interview','offer','hired','probation','completed','rejected']);
 
 export const CreateApplicationSchema = z.object({
-  job_id: z.string().uuid(),
-  candidate_id: z.string().uuid().optional().nullable(),
+  job_id: z.number().int(),
+  candidate_id: z.number().int().optional().nullable(),
   job_title: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
-  employer_company_id: z.string().uuid().optional().nullable(),
-  recruiter_id: z.string().uuid().optional().nullable(),
-  team_manager_id: z.string().uuid().optional().nullable(),
+  employer_company_id: z.number().int().optional().nullable(),
+  recruiter_id: z.number().int().optional().nullable(),
+  team_manager_id: z.number().int().optional().nullable(),
   candidate_name: z.string().min(1),
   candidate_email: z.string().email(),
   candidate_phone: z.string().optional().nullable(),
@@ -23,7 +23,7 @@ export const CreateApplicationSchema = z.object({
   source: z.enum(['app','linkedin','facebook','jobsite','pool_assignment','email_intake','other']).optional(),
   status: statusEnum.optional().default('new'),
   notes: z.string().optional().nullable(),
-  assigned_to: z.string().uuid().optional().nullable(),
+  assigned_to: z.number().int().optional().nullable(),
 });
 export class CreateApplicationDto extends createZodDto(CreateApplicationSchema) {}
 
@@ -41,14 +41,14 @@ export const QueryApplicationsSchema = z.object({
   limit: z.coerce.number().min(1).max(500).default(20),
   sort: z.string().default('created_date'),
   order: z.enum(['ASC', 'DESC']).default('DESC'),
-  job_id: z.string().uuid().optional(),
-  candidate_id: z.string().uuid().optional(),
+  job_id: z.coerce.number().int().optional(),
+  candidate_id: z.coerce.number().int().optional(),
   candidate_email: z.string().email().optional(),
   status: statusEnum.optional(),
-  recruiter_id: z.string().uuid().optional(),
-  employer_company_id: z.string().uuid().optional(),
-  organization_id: z.string().uuid().optional(),
-  assigned_to: z.string().uuid().optional(),
+  recruiter_id: z.coerce.number().int().optional(),
+  employer_company_id: z.coerce.number().int().optional(),
+  organization_id: z.coerce.number().int().optional(),
+  assigned_to: z.coerce.number().int().optional(),
   is_deleted: z.coerce.boolean().optional().default(false),
   search: z.string().optional(),
 });

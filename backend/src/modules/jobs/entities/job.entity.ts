@@ -8,8 +8,8 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Index(['is_deleted'])
 @Index(['domain_id'])
 export class JobEntity extends BaseEntity {
-  @Column({ name: 'organization_id', type: 'varchar', length: 36, nullable: true })
-  organization_id: string | null;
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
 
   @Column({ name: 'domain_id', type: 'int', nullable: true })
   domain_id: number | null;
@@ -53,18 +53,18 @@ export class JobEntity extends BaseEntity {
   @Column({ type: 'longtext', nullable: true })
   description: string | null;
 
-  @Column({ name: 'employer_company_id', type: 'varchar', length: 36, nullable: true })
-  employer_company_id: string | null;
+  @Column({ name: 'employer_company_id', type: 'int', nullable: true })
+  employer_company_id: number | null;
 
   /** @deprecated use organization_id */
-  @Column({ name: 'agency_company_id', type: 'varchar', length: 36, nullable: true })
-  agency_company_id: string | null;
+  @Column({ name: 'agency_company_id', type: 'int', nullable: true })
+  agency_company_id: number | null;
 
-  @Column({ name: 'created_by_user_id', type: 'varchar', length: 36, nullable: true })
-  created_by_user_id: string | null;
+  @Column({ name: 'created_by_user_id', type: 'int', nullable: true })
+  created_by_user_id: number | null;
 
-  @Column({ name: 'recruiter_id', type: 'varchar', length: 36, nullable: true })
-  recruiter_id: string | null;
+  @Column({ name: 'recruiter_id', type: 'int', nullable: true })
+  recruiter_id: number | null;
 
   /** @deprecated use employer_company_id */
   @Column({ name: 'employer_id', type: 'varchar', length: 255, nullable: true })
@@ -136,7 +136,7 @@ export class JobEntity extends BaseEntity {
   @Column({ name: 'deleted_at', type: 'datetime', nullable: true })
   deleted_at: Date | null;
 
-  @Column({ name: 'deleted_by', type: 'varchar', length: 36, nullable: true })
-  deleted_by: string | null;
+  @Column({ name: 'deleted_by', type: 'int', nullable: true })
+  deleted_by: number | null;
 }
 

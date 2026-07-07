@@ -32,8 +32,12 @@ export class AuditLogEntity extends BaseEntity {
   @Column({ name: 'entity_type', type: 'enum', enum: AUDIT_ENTITY_TYPES })
   entity_type: string;
 
-  @Column({ name: 'entity_id', type: 'varchar', length: 36 })
-  entity_id: string;
+  /**
+   * Polymorphic entity ID — stores the integer PK of the referenced entity.
+   * All entities now use INT auto-increment PKs.
+   */
+  @Column({ name: 'entity_id', type: 'int' })
+  entity_id: number;
 
   @Column({ name: 'entity_label', type: 'varchar', length: 255, nullable: true })
   entity_label: string | null;

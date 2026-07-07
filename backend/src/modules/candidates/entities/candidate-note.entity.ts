@@ -5,11 +5,11 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Index(['candidate_id'])
 @Index(['organization_id'])
 export class CandidateNoteEntity extends BaseEntity {
-  @Column({ name: 'organization_id', type: 'varchar', length: 36, nullable: true })
-  organization_id: string | null;
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
 
-  @Column({ name: 'candidate_id', type: 'varchar', length: 36 })
-  candidate_id: string;
+  @Column({ name: 'candidate_id', type: 'int' })
+  candidate_id: number;
 
   @Column({ name: 'candidate_email', type: 'varchar', length: 255, nullable: true })
   candidate_email: string | null;
@@ -35,10 +35,10 @@ export class CandidateNoteEntity extends BaseEntity {
   @Column({ name: 'note_type', type: 'varchar', length: 50, nullable: true })
   note_type: string | null;
 
-  @Column({ name: 'related_application_id', type: 'varchar', length: 36, nullable: true })
-  related_application_id: string | null;
+  @Column({ name: 'related_application_id', type: 'int', nullable: true })
+  related_application_id: number | null;
 
-  @Column({ name: 'related_interview_id', type: 'varchar', length: 36, nullable: true })
-  related_interview_id: string | null;
+  @Column({ name: 'related_interview_id', type: 'int', nullable: true })
+  related_interview_id: number | null;
 }
 

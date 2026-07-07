@@ -35,7 +35,7 @@ export class NotificationsService {
     return this.repo.save(n) as unknown as Promise<NotificationEntity>;
   }
 
-  async markRead(id: string, user: UserEntity): Promise<NotificationEntity> {
+  async markRead(id: number, user: UserEntity): Promise<NotificationEntity> {
     const n = await this.repo.findOne({ where: { id } as any });
     if (!n) throw new NotFoundException(`Notification ${id} not found`);
     this.assertOwner(n, user);
@@ -47,7 +47,7 @@ export class NotificationsService {
     await this.repo.update({ recipient_email: recipientEmail, is_read: false } as any, { is_read: true });
   }
 
-  async remove(id: string, user: UserEntity): Promise<void> {
+  async remove(id: number, user: UserEntity): Promise<void> {
     const n = await this.repo.findOne({ where: { id } as any });
     if (!n) throw new NotFoundException(`Notification ${id} not found`);
     this.assertOwner(n, user);

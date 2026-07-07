@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseUUIDPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PermissionsService } from './permissions.service';
 import {
@@ -27,8 +27,8 @@ export class PermissionMatrixController {
 
   @Get() findAll(@Query() q: QueryPermissionMatricesDto, @CurrentUser() u: UserEntity) { return this.svc.findMatrices(q, u); }
   @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreatePermissionMatrixDto, @CurrentUser() u: UserEntity) { return this.svc.createMatrix(dto, u); }
-  @Patch(':id') update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdatePermissionMatrixDto, @CurrentUser() u: UserEntity) { return this.svc.updateMatrix(id, dto, u); }
-  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() u: UserEntity) { return this.svc.removeMatrix(id, u); }
+  @Patch(':id') update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePermissionMatrixDto, @CurrentUser() u: UserEntity) { return this.svc.updateMatrix(id, dto, u); }
+  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.removeMatrix(id, u); }
 }
 
 @ApiTags('Role Templates')
@@ -39,8 +39,8 @@ export class RoleTemplateController {
 
   @Get() findAll(@Query() q: QueryRoleTemplatesDto, @CurrentUser() u: UserEntity) { return this.svc.findRoleTemplates(q, u); }
   @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateRoleTemplateDto, @CurrentUser() u: UserEntity) { return this.svc.createRoleTemplate(dto, u); }
-  @Patch(':id') update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateRoleTemplateDto, @CurrentUser() u: UserEntity) { return this.svc.updateRoleTemplate(id, dto, u); }
-  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() u: UserEntity) { return this.svc.removeRoleTemplate(id, u); }
+  @Patch(':id') update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoleTemplateDto, @CurrentUser() u: UserEntity) { return this.svc.updateRoleTemplate(id, dto, u); }
+  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.removeRoleTemplate(id, u); }
 }
 
 @ApiTags('Role Aliases')
@@ -60,8 +60,8 @@ export class UserPositionAccessController {
 
   @Get() findAll(@Query('company_email') companyEmail: string) { return this.svc.findUserPositionAccess(companyEmail); }
   @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateUserPositionAccessDto) { return this.svc.createUserPositionAccess(dto); }
-  @Patch(':id') update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateUserPositionAccessDto) { return this.svc.updateUserPositionAccess(id, dto); }
-  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseUUIDPipe) id: string) { return this.svc.removeUserPositionAccess(id); }
+  @Patch(':id') update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserPositionAccessDto) { return this.svc.updateUserPositionAccess(id, dto); }
+  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number) { return this.svc.removeUserPositionAccess(id); }
 }
 
 @ApiTags('Positions')
@@ -72,7 +72,6 @@ export class PositionController {
 
   @Get() findAll(@Query() q: QueryPositionsDto) { return this.svc.findPositions(q); }
   @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreatePositionDto) { return this.svc.createPosition(dto); }
-  @Patch(':id') update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdatePositionDto) { return this.svc.updatePosition(id, dto); }
-  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseUUIDPipe) id: string) { return this.svc.removePosition(id); }
+  @Patch(':id') update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePositionDto) { return this.svc.updatePosition(id, dto); }
+  @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number) { return this.svc.removePosition(id); }
 }
-

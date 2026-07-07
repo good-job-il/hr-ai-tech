@@ -6,8 +6,8 @@ import { BaseEntity } from '../../common/entities/base.entity';
 @Index(['recipient_email'])
 @Index(['is_read'])
 export class NotificationEntity extends BaseEntity {
-  @Column({ name: 'organization_id', type: 'varchar', length: 36, nullable: true })
-  organization_id: string | null;
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
 
   @Column({ name: 'recipient_email', type: 'varchar', length: 255 })
   recipient_email: string;

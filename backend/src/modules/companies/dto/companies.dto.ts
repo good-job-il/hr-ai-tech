@@ -13,7 +13,7 @@ export class CreateCompanyDto extends createZodDto(CreateCompanySchema) {}
 export const UpdateCompanySchema = CreateCompanySchema.partial().extend({
   job_count: z.number().int().optional(),
   is_deleted: z.boolean().optional(),
-  deleted_by: z.string().optional().nullable(),
+  deleted_by: z.number().int().optional().nullable(),
 });
 export class UpdateCompanyDto extends createZodDto(UpdateCompanySchema) {}
 export const QueryCompaniesSchema = z.object({
@@ -29,7 +29,7 @@ export class QueryCompaniesDto extends createZodDto(QueryCompaniesSchema) {}
 
 // ─── Company Review ───────────────────────────────────────────────────────
 export const CreateCompanyReviewSchema = z.object({
-  company_id: z.string().uuid(),
+  company_id: z.number().int(),
   company_name: z.string().optional().nullable(),
   reviewer_email: z.string().email(),
   reviewer_name: z.string().optional().nullable(),

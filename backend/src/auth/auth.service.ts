@@ -96,12 +96,12 @@ export class AuthService {
   }
 
   // ─── Logout ────────────────────────────────────────────────────────────
-  async logout(userId: string): Promise<void> {
+  async logout(userId: number): Promise<void> {
     await this.userRepository.update(userId, { refresh_token_hash: null });
   }
 
   // ─── Get current user (me) ─────────────────────────────────────────────
-  async getMe(userId: string): Promise<UserEntity> {
+  async getMe(userId: number): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
       where: { id: userId, is_active: true },
     });
@@ -114,7 +114,7 @@ export class AuthService {
   }
 
   // ─── Update me ─────────────────────────────────────────────────────────
-  async updateMe(userId: string, updates: Partial<UserEntity>): Promise<UserEntity> {
+  async updateMe(userId: number, updates: Partial<UserEntity>): Promise<UserEntity> {
     const allowedFields: (keyof UserEntity)[] = [
       'full_name',
       'phone',
@@ -250,7 +250,7 @@ export class AuthService {
     return { access_token, refresh_token };
   }
 
-  private async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
+  private async saveRefreshToken(userId: number, refreshToken: string): Promise<void> {
     const hash = await bcrypt.hash(refreshToken, this.SALT_ROUNDS);
     await this.userRepository.update(userId, { refresh_token_hash: hash });
   }

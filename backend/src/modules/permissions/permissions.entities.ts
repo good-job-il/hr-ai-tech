@@ -18,8 +18,8 @@ export interface PermissionSet {
 @Index(['organization_id'])
 @Index(['role_key'])
 export class PermissionMatrixEntity extends BaseEntity {
-  @Column({ name: 'organization_id', type: 'varchar', length: 36, nullable: true })
-  organization_id: string | null;
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
 
   @Column({ name: 'org_type', type: 'enum', enum: ['staffing_agency', 'organization'], nullable: true })
   org_type: string | null;
@@ -38,8 +38,8 @@ export class PermissionMatrixEntity extends BaseEntity {
 @Index(['organization_id'])
 @Index(['system_role_key'])
 export class RoleTemplateEntity extends BaseEntity {
-  @Column({ name: 'organization_id', type: 'varchar', length: 36, nullable: true })
-  organization_id: string | null;
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
 
   @Column({ name: 'org_type', type: 'enum', enum: ['staffing_agency', 'organization'] })
   org_type: string;
@@ -62,8 +62,8 @@ export class RoleTemplateEntity extends BaseEntity {
   @Column({ name: 'is_system_required', type: 'boolean', default: true })
   is_system_required: boolean;
 
-  @Column({ name: 'permissions_template_id', type: 'varchar', length: 36, nullable: true })
-  permissions_template_id: string | null;
+  @Column({ name: 'permissions_template_id', type: 'int', nullable: true })
+  permissions_template_id: number | null;
 
   @Column({ name: 'is_active', type: 'boolean', default: true })
   is_active: boolean;
@@ -95,7 +95,7 @@ export class UserPositionAccessEntity extends BaseEntity {
   user_type: string;
 
   @Column({ name: 'position_ids', type: 'json', nullable: true })
-  position_ids: string[] | null;
+  position_ids: number[] | null;
 
   @Column({ name: 'can_review_applications', type: 'boolean', default: true })
   can_review_applications: boolean;
@@ -137,4 +137,3 @@ export class PositionEntity extends BaseEntity {
   @Column({ name: 'is_active', type: 'boolean', default: true })
   is_active: boolean;
 }
-

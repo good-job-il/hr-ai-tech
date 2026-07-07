@@ -29,16 +29,16 @@ export class CompanyEntity extends BaseEntity {
   @Column({ name: 'deleted_at', type: 'datetime', nullable: true })
   deleted_at: Date | null;
 
-  @Column({ name: 'deleted_by', type: 'varchar', length: 36, nullable: true })
-  deleted_by: string | null;
+  @Column({ name: 'deleted_by', type: 'int', nullable: true })
+  deleted_by: number | null;
 }
 
 @Entity('company_reviews')
 @Index(['company_id'])
 @Index(['reviewer_email'])
 export class CompanyReviewEntity extends BaseEntity {
-  @Column({ name: 'company_id', type: 'varchar', length: 36 })
-  company_id: string;
+  @Column({ name: 'company_id', type: 'int' })
+  company_id: number;
 
   @Column({ name: 'company_name', type: 'varchar', length: 255, nullable: true })
   company_name: string | null;

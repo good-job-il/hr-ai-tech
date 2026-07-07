@@ -29,7 +29,7 @@ export const RegisterSchema = z.object({
       'internal_recruiter',
     ])
     .default('candidate'),
-  organization_id: z.string().uuid().optional(),
+  organization_id: z.number().int().optional(),
 });
 export class RegisterDto extends createZodDto(RegisterSchema) {}
 

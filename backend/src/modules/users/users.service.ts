@@ -62,7 +62,7 @@ export class UsersService {
     );
   }
 
-  async findById(id: string, requestingUser: UserEntity): Promise<UserEntity> {
+  async findById(id: number, requestingUser: UserEntity): Promise<UserEntity> {
     const user = await this.repo.findOne({ where: { id } });
 
     if (!user) throw new NotFoundException(`User ${id} not found`);
@@ -80,7 +80,7 @@ export class UsersService {
   }
 
   async update(
-    id: string,
+    id: number,
     dto: UpdateUserDto,
     requestingUser: UserEntity,
   ): Promise<UserEntity> {
@@ -129,7 +129,7 @@ export class UsersService {
     return this.sanitize(saved);
   }
 
-  async remove(id: string, requestingUser: UserEntity): Promise<void> {
+  async remove(id: number, requestingUser: UserEntity): Promise<void> {
     if (
       requestingUser.role !== UserRole.ADMIN
     ) {

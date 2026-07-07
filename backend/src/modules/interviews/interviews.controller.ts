@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseUUIDPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { InterviewsService } from './interviews.service';
 import { CreateInterviewDto, UpdateInterviewDto, QueryInterviewsDto } from './dto/interviews.dto';
@@ -17,9 +17,9 @@ export class InterviewsController {
   constructor(private readonly svc: InterviewsService) {}
 
   @Get() findAll(@Query() q: QueryInterviewsDto, @CurrentUser() u: UserEntity) { return this.svc.findAll(q, u); }
-  @Get(':id') findOne(@Param('id', ParseUUIDPipe) id: string) { return this.svc.findById(id); }
+  @Get(':id') findOne(@Param('id', ParseIntPipe) id: number) { return this.svc.findById(id); }
   @Post() @Roles(...INTERVIEW_WRITE_ROLES) @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateInterviewDto, @CurrentUser() u: UserEntity) { return this.svc.create(dto, u); }
-  @Patch(':id') @Roles(...INTERVIEW_WRITE_ROLES) update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateInterviewDto) { return this.svc.update(id, dto); }
-  @Delete(':id') @Roles(...INTERVIEW_WRITE_ROLES) @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseUUIDPipe) id: string) { return this.svc.remove(id); }
+  @Patch(':id') @Roles(...INTERVIEW_WRITE_ROLES) update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateInterviewDto) { return this.svc.update(id, dto); }
+  @Delete(':id') @Roles(...INTERVIEW_WRITE_ROLES) @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number) { return this.svc.remove(id); }
 }
 

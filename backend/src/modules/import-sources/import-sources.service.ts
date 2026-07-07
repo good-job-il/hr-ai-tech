@@ -22,7 +22,7 @@ export class ImportSourcesService {
     return buildPaginatedResponse(data, total, { page, limit });
   }
 
-  async findById(id: string): Promise<ImportSourceEntity> {
+  async findById(id: number): Promise<ImportSourceEntity> {
     const source = await this.repo.findOne({ where: { id } });
     if (!source) throw new NotFoundException(`Import source ${id} not found`);
     return source;
@@ -33,15 +33,14 @@ export class ImportSourcesService {
     return this.repo.save(source) as unknown as Promise<ImportSourceEntity>;
   }
 
-  async update(id: string, dto: UpdateImportSourceDto): Promise<ImportSourceEntity> {
+  async update(id: number, dto: UpdateImportSourceDto): Promise<ImportSourceEntity> {
     const source = await this.findById(id);
     Object.assign(source, dto);
     return this.repo.save(source);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const source = await this.findById(id);
     await this.repo.remove(source);
   }
 }
-

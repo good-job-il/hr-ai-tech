@@ -9,6 +9,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { OrganizationsService } from './organizations.service';
@@ -38,7 +39,7 @@ export class OrganizationsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get organization by ID' })
   findOne(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: UserEntity,
   ) {
     return this.service.findById(id, user);
@@ -57,7 +58,7 @@ export class OrganizationsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update organization' })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateOrganizationDto,
     @CurrentUser() user: UserEntity,
   ) {
@@ -68,7 +69,7 @@ export class OrganizationsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete organization (admin only)' })
   remove(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: UserEntity,
   ) {
     return this.service.remove(id, user);

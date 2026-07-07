@@ -35,7 +35,7 @@ export class InterviewsService {
     return buildPaginatedResponse(data, total, { page, limit, sort, order });
   }
 
-  async findById(id: string): Promise<InterviewEntity> {
+  async findById(id: number): Promise<InterviewEntity> {
     const item = await this.repo.findOne({ where: { id } as any });
     if (!item) throw new NotFoundException(`Interview ${id} not found`);
     return item;
@@ -46,13 +46,13 @@ export class InterviewsService {
     return this.repo.save(item) as unknown as Promise<InterviewEntity>;
   }
 
-  async update(id: string, dto: UpdateInterviewDto): Promise<InterviewEntity> {
+  async update(id: number, dto: UpdateInterviewDto): Promise<InterviewEntity> {
     const item = await this.findById(id);
     Object.assign(item, dto);
     return this.repo.save(item) as unknown as Promise<InterviewEntity>;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const item = await this.findById(id);
     await this.repo.remove(item);
   }

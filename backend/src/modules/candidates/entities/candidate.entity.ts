@@ -42,8 +42,8 @@ export enum ConversionStatus {
 @Index(['email'])
 @Index(['is_deleted'])
 export class CandidateEntity extends BaseEntity {
-  @Column({ name: 'organization_id', type: 'varchar', length: 36, nullable: true })
-  organization_id: string | null;
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
 
   @Column({ type: 'varchar', length: 255 })
   full_name: string;
@@ -123,21 +123,21 @@ export class CandidateEntity extends BaseEntity {
   @Column({ type: 'enum', enum: CandidateStatus, default: CandidateStatus.NEW })
   status: CandidateStatus;
 
-  @Column({ name: 'recruiter_id', type: 'varchar', length: 36, nullable: true })
-  recruiter_id: string | null;
+  @Column({ name: 'recruiter_id', type: 'int', nullable: true })
+  recruiter_id: number | null;
 
-  @Column({ name: 'team_manager_id', type: 'varchar', length: 36, nullable: true })
-  team_manager_id: string | null;
+  @Column({ name: 'team_manager_id', type: 'int', nullable: true })
+  team_manager_id: number | null;
 
-  @Column({ name: 'recruitment_manager_id', type: 'varchar', length: 36, nullable: true })
-  recruitment_manager_id: string | null;
+  @Column({ name: 'recruitment_manager_id', type: 'int', nullable: true })
+  recruitment_manager_id: number | null;
 
-  @Column({ name: 'employer_company_id', type: 'varchar', length: 36, nullable: true })
-  employer_company_id: string | null;
+  @Column({ name: 'employer_company_id', type: 'int', nullable: true })
+  employer_company_id: number | null;
 
   /** @deprecated use organization_id */
-  @Column({ name: 'agency_company_id', type: 'varchar', length: 36, nullable: true })
-  agency_company_id: string | null;
+  @Column({ name: 'agency_company_id', type: 'int', nullable: true })
+  agency_company_id: number | null;
 
   @Column({ type: 'json', nullable: true })
   skills: string[] | null;
@@ -157,11 +157,11 @@ export class CandidateEntity extends BaseEntity {
   @Column({ name: 'is_duplicate_suspected', type: 'boolean', default: false })
   is_duplicate_suspected: boolean;
 
-  @Column({ name: 'duplicate_of_id', type: 'varchar', length: 36, nullable: true })
-  duplicate_of_id: string | null;
+  @Column({ name: 'duplicate_of_id', type: 'int', nullable: true })
+  duplicate_of_id: number | null;
 
-  @Column({ name: 'import_batch_id', type: 'varchar', length: 36, nullable: true })
-  import_batch_id: string | null;
+  @Column({ name: 'import_batch_id', type: 'int', nullable: true })
+  import_batch_id: number | null;
 
   @Column({ name: 'data_quality_score', type: 'int', default: 0 })
   data_quality_score: number;
@@ -194,7 +194,7 @@ export class CandidateEntity extends BaseEntity {
   @Column({ name: 'deleted_at', type: 'datetime', nullable: true })
   deleted_at: Date | null;
 
-  @Column({ name: 'deleted_by', type: 'varchar', length: 36, nullable: true })
-  deleted_by: string | null;
+  @Column({ name: 'deleted_by', type: 'int', nullable: true })
+  deleted_by: number | null;
 }
 

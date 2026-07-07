@@ -34,15 +34,14 @@ export class UserEntity extends BaseEntity {
 
   @Column({
     name: 'organization_id',
-    type: 'varchar',
-    length: 36,
+    type: 'int',
     nullable: true,
   })
-  organization_id: string | null;
+  organization_id: number | null;
 
   /** DEPRECATED in Base44 — keep for backward compat, maps to organization_id */
-  @Column({ name: 'company_id', type: 'varchar', length: 36, nullable: true })
-  company_id: string | null;
+  @Column({ name: 'company_id', type: 'int', nullable: true })
+  company_id: number | null;
 
   @Column({
     name: 'org_type',
@@ -57,19 +56,17 @@ export class UserEntity extends BaseEntity {
 
   @Column({
     name: 'team_manager_id',
-    type: 'varchar',
-    length: 36,
+    type: 'int',
     nullable: true,
   })
-  team_manager_id: string | null;
+  team_manager_id: number | null;
 
   @Column({
     name: 'recruitment_manager_id',
-    type: 'varchar',
-    length: 36,
+    type: 'int',
     nullable: true,
   })
-  recruitment_manager_id: string | null;
+  recruitment_manager_id: number | null;
 
   /** Custom display name for their role (UI only) */
   @Column({
@@ -83,11 +80,10 @@ export class UserEntity extends BaseEntity {
   /** Employer-specific: which company they represent */
   @Column({
     name: 'employer_company_id',
-    type: 'varchar',
-    length: 36,
+    type: 'int',
     nullable: true,
   })
-  employer_company_id: string | null;
+  employer_company_id: number | null;
 
   @Column({ name: 'is_active', type: 'boolean', default: true })
   is_active: boolean;

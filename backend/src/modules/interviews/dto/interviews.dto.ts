@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 
 export const CreateInterviewSchema = z.object({
-  application_id: z.string().uuid().optional().nullable(),
-  candidate_id: z.string().uuid().optional().nullable(),
-  job_id: z.string().uuid().optional().nullable(),
+  application_id: z.number().int().optional().nullable(),
+  candidate_id: z.number().int().optional().nullable(),
+  job_id: z.number().int().optional().nullable(),
   job_title: z.string().optional().nullable(),
   employer_id: z.string().optional().nullable(),
   recruiter_id: z.string().optional().nullable(),
@@ -37,11 +37,11 @@ export const QueryInterviewsSchema = z.object({
   limit: z.coerce.number().min(1).max(500).default(20),
   sort: z.string().default('date'),
   order: z.enum(['ASC', 'DESC']).default('ASC'),
-  application_id: z.string().uuid().optional(),
-  candidate_id: z.string().uuid().optional(),
+  application_id: z.coerce.number().int().optional(),
+  candidate_id: z.coerce.number().int().optional(),
   recruiter_id: z.string().optional(),
   status: z.enum(['scheduled', 'confirmed', 'completed', 'cancelled', 'no_show', 'rescheduled']).optional(),
-  organization_id: z.string().uuid().optional(),
+  organization_id: z.coerce.number().int().optional(),
 });
 export class QueryInterviewsDto extends createZodDto(QueryInterviewsSchema) {}
 

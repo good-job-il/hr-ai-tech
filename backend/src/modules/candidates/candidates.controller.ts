@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete,
-  Param, Body, Query, ParseUUIDPipe,
+  Param, Body, Query, ParseIntPipe,
   HttpCode, HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
@@ -35,7 +35,7 @@ export class CandidatesController {
   }
 
   @Get('import-batches/:id')
-  getBatch(@Param('id', ParseUUIDPipe) id: string) {
+  getBatch(@Param('id', ParseIntPipe) id: number) {
     return this.svc.getBatch(id);
   }
 
@@ -46,7 +46,7 @@ export class CandidatesController {
   }
 
   @Patch('import-batches/:id')
-  updateBatch(@Param('id', ParseUUIDPipe) id: string, @Body() data: Record<string, any>) {
+  updateBatch(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>) {
     return this.svc.updateBatch(id, data);
   }
 
@@ -95,20 +95,20 @@ export class CandidatesController {
   }
 
   @Patch('access/:id')
-  updateAccess(@Param('id', ParseUUIDPipe) id: string, @Body() data: Record<string, any>) {
+  updateAccess(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>) {
     return this.svc.updateAccess(id, data);
   }
 
   @Delete('access/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteAccess(@Param('id', ParseUUIDPipe) id: string) {
+  deleteAccess(@Param('id', ParseIntPipe) id: number) {
     return this.svc.deleteAccess(id);
   }
 
   // ─── Notes (static prefix routes) ─────────────────────────────────────────
   @Patch('notes/:noteId')
   updateNote(
-    @Param('noteId', ParseUUIDPipe) noteId: string,
+    @Param('noteId', ParseIntPipe) noteId: number,
     @Body() dto: UpdateCandidateNoteDto,
     @CurrentUser() user: UserEntity,
   ) {
@@ -117,14 +117,14 @@ export class CandidatesController {
 
   @Delete('notes/:noteId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteNote(@Param('noteId', ParseUUIDPipe) noteId: string, @CurrentUser() user: UserEntity) {
+  deleteNote(@Param('noteId', ParseIntPipe) noteId: number, @CurrentUser() user: UserEntity) {
     return this.svc.deleteNote(noteId, user);
   }
 
   // ─── Tags (static prefix routes) ──────────────────────────────────────────
   @Delete('tags/:tagId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteTag(@Param('tagId', ParseUUIDPipe) tagId: string, @CurrentUser() user: UserEntity) {
+  deleteTag(@Param('tagId', ParseIntPipe) tagId: number, @CurrentUser() user: UserEntity) {
     return this.svc.deleteTag(tagId, user);
   }
 
@@ -145,7 +145,7 @@ export class CandidatesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get candidate by ID' })
-  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
+  findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.findById(id, user);
   }
 
@@ -153,7 +153,7 @@ export class CandidatesController {
   @Roles(...CANDIDATE_WRITE_ROLES)
   @ApiOperation({ summary: 'Update candidate' })
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCandidateDto,
     @CurrentUser() user: UserEntity,
   ) {
@@ -164,20 +164,20 @@ export class CandidatesController {
   @Roles(...CANDIDATE_WRITE_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft-delete candidate' })
-  remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.softDelete(id, user);
   }
 
   // ─── Notes ───────────────────────────────────────────────────────────────
   @Get(':id/notes')
-  getNotes(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
+  getNotes(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.getNotes(id, user);
   }
 
   @Post(':id/notes')
   @HttpCode(HttpStatus.CREATED)
   createNote(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: CreateCandidateNoteDto,
     @CurrentUser() user: UserEntity,
   ) {
@@ -186,14 +186,14 @@ export class CandidatesController {
 
   // ─── Tags ─────────────────────────────────────────────────────────────────
   @Get(':id/tags')
-  getTags(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
+  getTags(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.getTags(id, user);
   }
 
   @Post(':id/tags')
   @HttpCode(HttpStatus.CREATED)
   createTag(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: CreateCandidateTagDto,
     @CurrentUser() user: UserEntity,
   ) {
@@ -202,26 +202,26 @@ export class CandidatesController {
 
   // ─── Timeline ────────────────────────────────────────────────────────────
   @Get(':id/timeline')
-  getTimeline(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
+  getTimeline(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.getTimeline(id, user);
   }
 
   @Post(':id/timeline')
   @HttpCode(HttpStatus.CREATED)
-  createTimelineEvent(@Param('id', ParseUUIDPipe) id: string, @Body() data: Record<string, any>) {
+  createTimelineEvent(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>) {
     return this.svc.createTimelineEvent({ ...data, candidate_id: id });
   }
 
   // ─── Documents ───────────────────────────────────────────────────────────
   @Get(':id/documents')
-  getDocuments(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: UserEntity) {
+  getDocuments(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.getDocuments(id, user);
   }
 
   @Post(':id/documents')
   @HttpCode(HttpStatus.CREATED)
   createDocument(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: CreateCandidateDocumentDto,
     @CurrentUser() user: UserEntity,
   ) {

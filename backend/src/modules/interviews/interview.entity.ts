@@ -7,17 +7,17 @@ import { BaseEntity } from '../../common/entities/base.entity';
 @Index(['candidate_id'])
 @Index(['recruiter_id'])
 export class InterviewEntity extends BaseEntity {
-  @Column({ name: 'organization_id', type: 'varchar', length: 36, nullable: true })
-  organization_id: string | null;
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
 
-  @Column({ name: 'application_id', type: 'varchar', length: 36, nullable: true })
-  application_id: string | null;
+  @Column({ name: 'application_id', type: 'int', nullable: true })
+  application_id: number | null;
 
-  @Column({ name: 'candidate_id', type: 'varchar', length: 36, nullable: true })
-  candidate_id: string | null;
+  @Column({ name: 'candidate_id', type: 'int', nullable: true })
+  candidate_id: number | null;
 
-  @Column({ name: 'job_id', type: 'varchar', length: 36, nullable: true })
-  job_id: string | null;
+  @Column({ name: 'job_id', type: 'int', nullable: true })
+  job_id: number | null;
 
   @Column({ name: 'job_title', type: 'varchar', length: 255, nullable: true })
   job_title: string | null;
