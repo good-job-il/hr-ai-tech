@@ -332,6 +332,17 @@ const auth = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────
+// Organizations — self-service onboarding helpers (beyond the generic
+// entities.Organization CRUD shim above)
+// ─────────────────────────────────────────────────────────────────────────
+export const organizationsApi = {
+  /** org_admin, no organization yet → create their own staffing agency */
+  async onboardAgency(data) {
+    return httpClient.post('/organizations/onboard-agency', data);
+  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────
 // Functions — maps `functions.invoke(name, params)` → `POST /functions/:name`
 // ─────────────────────────────────────────────────────────────────────────
 const functions = new Proxy(

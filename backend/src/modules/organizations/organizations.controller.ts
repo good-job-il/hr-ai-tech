@@ -17,6 +17,7 @@ import {
   CreateOrganizationDto,
   UpdateOrganizationDto,
   QueryOrganizationsDto,
+  OnboardAgencyDto,
 } from './dto/organizations.dto';
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import { BlockDuringImpersonation } from "@/common/decorators/block-during-impersonation.decorator";
@@ -55,6 +56,17 @@ export class OrganizationsController {
     @CurrentUser() user: UserEntity,
   ) {
     return this.service.create(dto, user);
+  }
+
+  @Post('onboard-agency')
+  @HttpCode(HttpStatus.CREATED)
+  @BlockDuringImpersonation()
+  @ApiOperation({ summary: 'Self-service: org_admin creates their own staffing agency' })
+  onboardAgency(
+    @Body() dto: OnboardAgencyDto,
+    @CurrentUser() user: UserEntity,
+  ) {
+    return this.service.onboardAgency(dto, user);
   }
 
   @Patch(':id')

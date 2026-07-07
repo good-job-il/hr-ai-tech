@@ -8,13 +8,20 @@ import PageNotFound from '@/lib/PageNotFound';
  * staffing_agency roles → /agency/...
  * organization roles → /company/...
  * candidate → /candidate/dashboard
+ * org_admin with no organization yet → /agency/onboarding
  */
-function getRoleHome(role, orgType) {
+function getRoleHome(role, orgType, hasOrganization, intendedOrgType) {
   // Platform operators
   if (role === 'admin') return '/platform/dashboard';
 
   // Candidate
   if (role === 'candidate') return '/candidate/dashboard';
+
+  // org_admin who hasn't created their organization yet — onboard first.
+  // (Only staffing_agency self-onboarding exists today.)
+  if (role === 'org_admin' && !hasOrganization && intendedOrgType !== 'organization') {
+    return '/agency/onboarding';
+  }
 
   // Staffing agency roles
   if (orgType === 'staffing_agency') {
@@ -38,13 +45,13 @@ function getRoleHome(role, orgType) {
 }
 
 export default function RoleFallback() {
-  const { user, isLoadingAuth, orgType } = useAuth();
+  const { user, isLoadingAuth, orgType, organization, intendedOrgType } = useAuth();
 
   if (isLoadingAuth) return null;
 
   if (user) {
     const role = user.role || user.user_type;
-    const home = getRoleHome(role, orgType);
+    const home = getRoleHome(role, orgType, !!organization, intendedOrgType);
     return <Navigate to={home} replace />;
   }
 

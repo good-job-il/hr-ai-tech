@@ -5,14 +5,16 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
-import { OrganizationEntity } from './organization.entity';
+import { OrganizationEntity, OrgStatus, OrgPlan } from './organization.entity';
 import {
   CreateOrganizationDto,
   UpdateOrganizationDto,
   QueryOrganizationsDto,
+  OnboardAgencyDto,
 } from './dto/organizations.dto';
 import { UserEntity } from '../users/user.entity';
 import { UserRole } from '../../common/enums/user-role.enum';
+import { OrgType } from '../../common/enums/org-type.enum';
 import {
   buildPaginatedResponse,
   getSkipTake,
@@ -23,6 +25,8 @@ export class OrganizationsService {
   constructor(
     @InjectRepository(OrganizationEntity)
     private readonly repo: Repository<OrganizationEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
   ) {}
 
   async findAll(query: QueryOrganizationsDto, user: UserEntity) {
@@ -84,6 +88,38 @@ export class OrganizationsService {
 
     const org = this.repo.create(dto as any);
     return (this.repo.save(org) as unknown) as Promise<OrganizationEntity>;
+  }
+
+  // ── Self-service onboarding ─────────────────────────────────────────────
+  // Allows a freshly-registered org_admin who has no organization yet to
+  // create their own staffing agency and be linked to it immediately.
+  // Unlike `create()` (admin-only, any org_type), this is intentionally
+  // narrow: only ORG_ADMIN, only when they don't already belong to an org,
+  // and org_type is always forced to STAFFING_AGENCY.
+  async onboardAgency(dto: OnboardAgencyDto, user: UserEntity): Promise<OrganizationEntity> {
+    if (user.role !== UserRole.ORG_ADMIN) {
+      throw new ForbiddenException('Only an organization admin can create an agency');
+    }
+    if (user.organization_id) {
+      throw new ForbiddenException('You already belong to an organization');
+    }
+
+    const org = this.repo.create({
+      name: dto.name,
+      org_type: OrgType.STAFFING_AGENCY,
+      status: OrgStatus.ACTIVE,
+      plan: OrgPlan.TRIAL,
+      contact_email: dto.contact_email ?? null,
+      logo_url: dto.logo_url ?? null,
+    });
+    const saved = (await this.repo.save(org)) as unknown as OrganizationEntity;
+
+    await this.userRepo.update(user.id, {
+      organization_id: saved.id,
+      org_type: OrgType.STAFFING_AGENCY,
+    });
+
+    return saved;
   }
 
   async update(

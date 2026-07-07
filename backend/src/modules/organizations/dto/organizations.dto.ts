@@ -17,6 +17,14 @@ export class CreateOrganizationDto extends createZodDto(CreateOrganizationSchema
 export const UpdateOrganizationSchema = CreateOrganizationSchema.partial();
 export class UpdateOrganizationDto extends createZodDto(UpdateOrganizationSchema) {}
 
+// ─── Self-service onboarding (org_admin, no organization yet) ─────────────
+export const OnboardAgencySchema = z.object({
+  name: z.string().min(1),
+  contact_email: z.string().email().optional(),
+  logo_url: z.string().url().optional(),
+});
+export class OnboardAgencyDto extends createZodDto(OnboardAgencySchema) {}
+
 // ─── Query ────────────────────────────────────────────────────────────────
 export const QueryOrganizationsSchema = z.object({
   page: z.coerce.number().min(1).default(1),

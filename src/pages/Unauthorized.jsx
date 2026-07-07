@@ -16,12 +16,13 @@ const ROLE_HOME = {
 
 export default function Unauthorized() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, organization } = useAuth();
 
-  console.log(user, "user")
-  const homeRoute = ROLE_HOME[user?.role] || '/';
-
-  console.log(homeRoute, "homeRoute")
+  // org_admin with no organization yet should go onboard, not bounce
+  // between /agency/dashboard and /unauthorized.
+  const homeRoute = (user?.role === 'org_admin' && !organization)
+    ? '/agency/onboarding'
+    : (ROLE_HOME[user?.role] || '/');
 
   const handleGoBack = () => {
     navigate(homeRoute);

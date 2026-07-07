@@ -73,6 +73,7 @@ import MarketplaceExposurePage from './pages/platform/marketplace/MarketplaceExp
 
 // ── Agency Pages (Staffing Agency) ────────────────────────────────────
 import AgencyDashboard from './pages/agency/AgencyDashboard';
+import AgencyOnboarding from './pages/agency/AgencyOnboarding';
 import AgencyClients from './pages/agency/AgencyClients';
 import AgencyClientDetail from './pages/agency/AgencyClientDetail';
 
@@ -178,10 +179,17 @@ const AuthenticatedApp = () => {
         </Route>
       </Route>
 
+      {/* ── STAFFING AGENCY ONBOARDING — org_admin without an org yet ───── */}
+      {/* No requiredOrgTypes here: the whole point is they don't have one. */}
+      <Route element={<ProtectedRoute requiredRoles={['org_admin']} />}>
+        <Route path="/agency/onboarding" element={<AgencyOnboarding />} />
+      </Route>
+
       {/* ── STAFFING AGENCY — Admin / Recruitment Manager / Team Manager ── */}
       <Route element={<ProtectedRoute
         requiredRoles={['org_admin', 'recruitment_manager', 'team_manager']}
         requiredOrgTypes={['staffing_agency']}
+        noOrgRedirect="/agency/onboarding"
       />}>
         <Route element={<StaffingAgencyLayout />}>
           <Route path="/agency/dashboard" element={<AgencyDashboard />} />

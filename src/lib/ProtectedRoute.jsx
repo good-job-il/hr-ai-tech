@@ -10,17 +10,21 @@ const SUPER_ROLES = ['admin'];
  * - requiredRoles: string[]   — user.role must be in list
  * - requiredOrgTypes: string[] — orgType must be in list ('staffing_agency' | 'organization')
  * - superAdminOnly: boolean   — only admin
+ * - noOrgRedirect: string     — if an org_admin has no organization yet
+ *   (blocking the orgType check below), send them here to onboard instead
+ *   of showing "unauthorized" (e.g. '/agency/onboarding').
  * Super roles bypass requiredRoles but NOT requiredOrgTypes (by design).
  */
 export default function ProtectedRoute({
   requiredRoles = [],
   requiredOrgTypes = [],
   superAdminOnly = false,
+  noOrgRedirect = null,
   fallback = null,
   unauthenticatedElement = <Navigate to="/login" replace />,
   unauthorizedElement = <Navigate to="/unauthorized" replace />,
 }) {
-  const { user, isLoadingAuth, authError, orgType } = useAuth();
+  const { user, isLoadingAuth, authError, orgType, organization } = useAuth();
 
   if (isLoadingAuth) {
     return fallback || (
@@ -50,6 +54,11 @@ export default function ProtectedRoute({
   if (requiredOrgTypes.length > 0 && !requiredOrgTypes.includes(orgType)) {
     // Super admin has no org, allow them through org-type gates
     if (!isSuperAdmin) {
+      // An org_admin with no organization row yet isn't "unauthorized" —
+      // they just haven't onboarded. Send them to create their org instead.
+      if (!organization && noOrgRedirect && effectiveRole === 'org_admin') {
+        return <Navigate to={noOrgRedirect} replace />;
+      }
       console.warn('Blocked by orgType:', { user, orgType, requiredOrgTypes });
       return unauthorizedElement;
     }

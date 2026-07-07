@@ -31,6 +31,12 @@ export default function Login() {
         team_manager: '/recruitment/jobs',
         recruitment_manager: '/recruitment/jobs',
         admin: '/admin/dashboard',
+        hr_manager: '/company/dashboard',
+        internal_recruiter: '/company/recruiter/dashboard',
+        // org_admin without an organization yet gets bounced to onboarding
+        // automatically by ProtectedRoute; company-type admins go straight
+        // to their dashboard.
+        org_admin: user.org_type === 'organization' ? '/company/dashboard' : '/agency/dashboard',
       };
       
       window.location.href = redirects[role] || '/';

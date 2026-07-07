@@ -15,6 +15,11 @@ export const AuthProvider = ({ children }) => {
   const [appPublicSettings, setAppPublicSettings] = useState(null); // unused with NestJS backend, kept for API compat
   const [organization, setOrganization] = useState(null);
   const [orgType, setOrgType] = useState(null); // 'staffing_agency' | 'organization' | null (platform)
+  // Raw org_type field stored on the user row itself — reflects the type of
+  // organization they *intend* to belong to (chosen at registration), even
+  // before an actual Organization row exists. Used only to decide which
+  // onboarding flow to send them through; never used for access control.
+  const [intendedOrgType, setIntendedOrgType] = useState(null);
   // True while a platform admin is "inside" a specific organization's
   // workspace via a scoped token (see tokenStorage workspace slot below).
   const [isImpersonating, setIsImpersonating] = useState(false);
@@ -66,9 +71,14 @@ export const AuthProvider = ({ children }) => {
         }
       } else {
         setOrganization(null);
-        // Fallback: use org_type stored directly on the user when no organization is linked
-        setOrgType(currentUser.org_type || null);
+        // No organization row yet (e.g. org_admin who hasn't onboarded).
+        // `orgType` reflects the REAL organization only — access gates
+        // (ProtectedRoute) must never grant org-scoped access based on a
+        // user's mere intent. Use `intendedOrgType` (below) for onboarding
+        // redirect decisions instead.
+        setOrgType(null);
       }
+      setIntendedOrgType(currentUser.org_type || null);
 
       setIsLoadingAuth(false);
       setAuthChecked(true);
@@ -144,6 +154,7 @@ export const AuthProvider = ({ children }) => {
       authChecked,
       organization,
       orgType,         // 'staffing_agency' | 'organization' | null
+      intendedOrgType, // user's declared org_type even without an org row yet
       isSuperAdmin: user?.role === 'admin',
       isAgency: orgType === 'staffing_agency',
       isCompany: orgType === 'organization',

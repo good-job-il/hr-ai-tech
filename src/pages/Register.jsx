@@ -24,13 +24,13 @@ export default function Register() {
 
   const ORG_TYPES = [
     {
-      id: 'regular',
+      id: 'organization',
       label: isRtl ? 'ארגון / חברה רגילה' : 'Regular Organization / Company',
       desc: isRtl ? 'גיוס עצמאי ללא מערכת תגמולים פנימית' : 'Independent hiring without internal compensation system',
       icon: '🏢',
     },
     {
-      id: 'staffing',
+      id: 'staffing_agency',
       label: isRtl ? 'חברת השמה / כוח אדם' : 'Staffing Agency',
       desc: isRtl ? 'כולל מערכת תגמולים, עמלות וניהול היררכי' : 'Includes compensation, commissions and hierarchical management',
       icon: '🎯',
@@ -121,7 +121,11 @@ export default function Register() {
         recruiter: '/recruiter/dashboard',
         team_manager: '/recruitment/jobs',
         recruitment_manager: '/recruitment/jobs',
-        org_admin: '/agency/dashboard',
+        // org_admin never has an organization yet at this point — send
+        // straight to onboarding for the org type they picked. Staffing
+        // agencies self-onboard immediately; company org_admins land on
+        // their dashboard (company creation is handled separately/by admin).
+        org_admin: orgType === 'organization' ? '/company/dashboard' : '/agency/onboarding',
       };
 
       window.location.href = redirects[userType] || '/';
