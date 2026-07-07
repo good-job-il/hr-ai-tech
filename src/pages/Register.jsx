@@ -19,7 +19,7 @@ export default function Register() {
     { id: 'recruiter', label: isRtl ? 'רכז גיוס' : 'Recruiter', requiresOrg: true },
     { id: 'team_manager', label: isRtl ? 'מנהל צוות' : 'Team Manager', requiresOrg: true },
     { id: 'recruitment_manager', label: isRtl ? 'מנהל גיוס' : 'Recruitment Manager', requiresOrg: true },
-    { id: 'admin', label: isRtl ? 'בעל חברה / אדמין' : 'Company Owner / Admin', requiresOrg: true },
+    { id: 'org_admin', label: isRtl ? 'בעל חברה / אדמין' : 'Company Owner / Admin', requiresOrg: true },
   ];
 
   const ORG_TYPES = [
@@ -68,7 +68,7 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (!fullName.trim()) {
       showError(isRtl ? 'יש להזין שם מלא' : 'Please enter your full name');
       return;
@@ -121,7 +121,7 @@ export default function Register() {
         recruiter: '/recruiter/dashboard',
         team_manager: '/recruitment/jobs',
         recruitment_manager: '/recruitment/jobs',
-        admin: '/admin/dashboard',
+        org_admin: '/agency/dashboard',
       };
 
       window.location.href = redirects[userType] || '/';

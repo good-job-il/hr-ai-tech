@@ -12,6 +12,9 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { UserEntity } from '../modules/users/user.entity';
+import { OrganizationEntity } from '../modules/organizations/organization.entity';
+import { UserRole } from '../common/enums/user-role.enum';
+import { AuditService } from '../modules/audit/audit.service';
 import { RegisterDto } from './dto/auth.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
 
@@ -31,8 +34,11 @@ export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(OrganizationEntity)
+    private readonly organizationRepository: Repository<OrganizationEntity>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly auditService: AuditService,
   ) {}
 
   // ─── Validate credentials (used by LocalStrategy) ──────────────────────
@@ -224,6 +230,73 @@ export class AuthService {
       reset_token_hash: null,
       reset_token_expires: null,
       refresh_token_hash: null,
+    });
+  }
+
+  // ─── Admin: enter an organization's workspace (impersonation) ──────────
+  // Only ADMIN may call this (enforced by @Roles(UserRole.ADMIN) on the
+  // controller route). Issues a short-lived, non-refreshable token scoped
+  // to the target organization instead of mutating the admin's real
+  // session — the admin's own long-lived access/refresh tokens are left
+  // completely untouched, so "exiting" is just discarding this token.
+  async enterOrganization(admin: UserEntity, organizationId: number): Promise<{
+    access_token: string;
+    organization: OrganizationEntity;
+  }> {
+    if (admin.role !== UserRole.ADMIN) {
+      throw new UnauthorizedException('Only platform admins can enter an organization workspace');
+    }
+
+    const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    if (!org) {
+      throw new NotFoundException(`Organization ${organizationId} not found`);
+    }
+
+    const payload: JwtPayload = {
+      sub: admin.id,
+      email: admin.email,
+      role: admin.role,
+      organization_id: org.id,
+      impersonating: true,
+    };
+
+    const access_token = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      // Deliberately short — forces re-entry, limits blast radius, and
+      // there is no matching refresh token for this scoped session.
+      expiresIn: this.configService.get<string>('JWT_WORKSPACE_EXPIRES_IN', '2h'),
+    });
+
+    await this.auditService.log({
+      organization_id: String(org.id),
+      actor_user_id: String(admin.id),
+      actor_email: admin.email,
+      actor_role: admin.role,
+      entity_type: 'Organization',
+      entity_id: org.id,
+      entity_label: org.name,
+      action: 'impersonate',
+      metadata: { event: 'enter' },
+    });
+
+    return { access_token, organization: org };
+  }
+
+  // ─── Admin: exit an organization's workspace ───────────────────────────
+  // Stateless by design — the frontend simply discards the workspace token
+  // and reverts to the admin's normal access token. This call only exists
+  // to leave an audit trail.
+  async exitOrganization(admin: UserEntity, organizationId: number | null): Promise<void> {
+    if (!organizationId) return;
+    await this.auditService.log({
+      organization_id: String(organizationId),
+      actor_user_id: String(admin.id),
+      actor_email: admin.email,
+      actor_role: admin.role,
+      entity_type: 'Organization',
+      entity_id: organizationId,
+      action: 'impersonate',
+      metadata: { event: 'exit' },
     });
   }
 

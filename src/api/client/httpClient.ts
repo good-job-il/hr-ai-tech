@@ -21,10 +21,14 @@ export class HttpClient {
   }
 
   private setupInterceptors(): void {
-    // Request interceptor — attach JWT access token from storage
+    // Request interceptor — attach JWT access token from storage.
+    // While an admin is "inside" an organization workspace, the scoped
+    // workspace token takes precedence over the admin's own access token —
+    // this is what makes every subsequent request (list jobs, candidates,
+    // users, ...) transparently scoped to that organization on the backend.
     this.axiosInstance.interceptors.request.use(
       (config) => {
-        const token = tokenStorage.getAccessToken();
+        const token = tokenStorage.getWorkspaceToken() || tokenStorage.getAccessToken();
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -43,6 +47,17 @@ export class HttpClient {
 
         if (error.response?.status === 401 && !originalRequest?._retry && !originalRequest?.url?.includes('/auth/')) {
           originalRequest._retry = true;
+
+          // The scoped workspace token has no matching refresh token — if it
+          // expired, drop it and reload so AuthContext falls back to the
+          // admin's own session (and the user sees the platform view again)
+          // instead of silently retrying with mismatched credentials.
+          if (tokenStorage.hasWorkspaceToken()) {
+            tokenStorage.clearWorkspaceToken();
+            if (typeof window !== 'undefined') window.location.href = '/platform/organizations/staffing';
+            return Promise.reject(error);
+          }
+
           const newToken = await this.refreshAccessToken();
           if (newToken) {
             originalRequest.headers.Authorization = `Bearer ${newToken}`;

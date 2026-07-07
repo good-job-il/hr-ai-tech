@@ -4,13 +4,13 @@ import {
   Get,
   Patch,
   Body,
+  Param,
   UseGuards,
   HttpCode,
   HttpStatus,
-  Request,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import {
   LoginDto,
@@ -22,6 +22,8 @@ import {
 } from './dto/auth.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Roles } from '../common/decorators/roles.decorator';
+import { UserRole } from '../common/enums/user-role.enum';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { UserEntity } from '../modules/users/user.entity';
 
@@ -107,6 +109,31 @@ export class AuthController {
   async resetPassword(@Body() dto: ResetPasswordDto) {
     await this.authService.resetPassword(dto.token, dto.password);
     return { message: 'Password reset successfully' };
+  }
+
+  // ─── Admin: enter organization workspace (impersonation) ────────────────
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('organizations/:id/enter')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '[Admin only] Enter an organization workspace (short-lived scoped token)' })
+  async enterOrganization(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserEntity,
+  ) {
+    return this.authService.enterOrganization(user, id);
+  }
+
+  // ─── Admin: exit organization workspace ──────────────────────────────────
+  @UseGuards(JwtAuthGuard)
+  @Post('organizations/exit')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Exit the current organization workspace (audit only — client just drops the token)' })
+  async exitOrganization(@CurrentUser() user: UserEntity) {
+    await this.authService.exitOrganization(user, user.organization_id);
+    return { message: 'Exited organization workspace' };
   }
 }
 

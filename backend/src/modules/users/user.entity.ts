@@ -131,6 +131,13 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'json', nullable: true })
   testimonials: Record<string, any>[] | null;
 
+  // ─── Transient (non-persisted) impersonation context ───────────────────
+  // Set only in-memory by JwtStrategy when an ADMIN is "acting as" a
+  // specific organization (see /auth/organizations/:id/enter). Never
+  // written to the database — plain runtime fields only.
+  impersonating?: boolean;
+  real_organization_id?: number | null;
+
   @BeforeInsert()
   normalizeEmail() {
     if (this.email) {

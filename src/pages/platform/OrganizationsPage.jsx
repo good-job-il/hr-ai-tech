@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Building2, Search, Plus, CheckCircle, XCircle, Clock, Pencil, Trash2, MoreVertical, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +22,8 @@ export default function OrganizationsPage() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const { enterOrganization } = useAuth();
+  const [enteringOrgId, setEnteringOrgId] = useState(null);
   const activeTab = TABS.find(tab => location.pathname.startsWith(tab.route)) ?? TABS[0];
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -83,6 +86,21 @@ export default function OrganizationsPage() {
     await qc.invalidateQueries(['platform-orgs']);
     setDeleteOrg(null);
     setDeleting(false);
+  };
+
+  // Admin: enter this organization's workspace and see it exactly as its
+  // own users do (org_admin / recruitment_manager / hr_manager view).
+  const handleEnterWorkspace = async (org) => {
+    if (enteringOrgId) return;
+    setEnteringOrgId(org.id);
+    try {
+      await enterOrganization(org.id);
+      navigate(org.org_type === 'staffing_agency' ? '/agency/dashboard' : '/company/dashboard');
+    } catch (e) {
+      console.error('Failed to enter organization workspace:', e);
+    } finally {
+      setEnteringOrgId(null);
+    }
   };
 
   const stats = {
@@ -219,15 +237,14 @@ export default function OrganizationsPage() {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="min-w-[160px]">
-                          {org.org_type === 'staffing_agency' && (
-                            <DropdownMenuItem
-                              onClick={() => navigate(`/company/dashboard?orgId=${org.id}`)}
-                              className="flex items-center gap-2 cursor-pointer focus:bg-gray-100 focus:text-gray-900"
-                            >
-                              <ExternalLink className="w-4 h-4 text-purple-500" />
-                              <span>{t('platform.orgs.btnOpen')}</span>
-                            </DropdownMenuItem>
-                          )}
+                          <DropdownMenuItem
+                            onClick={() => handleEnterWorkspace(org)}
+                            disabled={enteringOrgId === org.id}
+                            className="flex items-center gap-2 cursor-pointer focus:bg-gray-100 focus:text-gray-900"
+                          >
+                            <ExternalLink className="w-4 h-4 text-purple-500" />
+                            <span>{enteringOrgId === org.id ? t('platform.orgs.btnOpening', 'Opening…') : t('platform.orgs.btnOpen')}</span>
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleEdit(org)}
                             className="flex items-center gap-2 cursor-pointer focus:bg-gray-100 focus:text-gray-900"

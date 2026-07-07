@@ -19,6 +19,7 @@ import {
   QueryOrganizationsDto,
 } from './dto/organizations.dto';
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
+import { BlockDuringImpersonation } from "@/common/decorators/block-during-impersonation.decorator";
 import { UserEntity } from '../users/user.entity';
 
 @ApiTags('Organizations')
@@ -47,6 +48,7 @@ export class OrganizationsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @BlockDuringImpersonation()
   @ApiOperation({ summary: 'Create organization (admin only)' })
   create(
     @Body() dto: CreateOrganizationDto,
@@ -67,6 +69,7 @@ export class OrganizationsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @BlockDuringImpersonation()
   @ApiOperation({ summary: 'Delete organization (admin only)' })
   remove(
     @Param('id', ParseIntPipe) id: number,

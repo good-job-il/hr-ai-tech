@@ -15,6 +15,11 @@ export interface UserContext {
   employer_company_id?: number | null;
   email: string;
   org_type?: string | null;
+  /** True when an ADMIN has entered a specific organization's workspace
+   *  (see /auth/organizations/:id/enter). When true, RLS treats them like
+   *  that organization's own ORG_ADMIN instead of an unrestricted platform
+   *  admin — they see exactly what a real org user would see. */
+  impersonating?: boolean;
 }
 
 /** Sentinel value that indicates the query should return no results */
@@ -51,9 +56,17 @@ export function getRlsWhere(
   user: UserContext,
   extraFilters: Record<string, any> = {},
 ): Record<string, any> {
-  const { role, id: userId, organization_id, employer_company_id, email } = user;
+  const { role, id: userId, organization_id, employer_company_id, email, impersonating } = user;
 
-  // ─── Admin — unrestricted ─────────────────────────────────────────────
+  // ─── Admin acting inside an organization's workspace ──────────────────
+  // Scoped exactly like that org's ORG_ADMIN — never the unrestricted
+  // platform view — so admins see the data the same way real org users do.
+  if (role === UserRole.ADMIN && impersonating) {
+    if (!organization_id) return BLOCKED_FILTER;
+    return buildFinal(entityName, { organization_id }, extraFilters);
+  }
+
+  // ─── Admin — unrestricted (platform view, not impersonating) ──────────
   if (role === UserRole.ADMIN) {
     return buildFinal(entityName, {}, extraFilters);
   }

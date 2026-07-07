@@ -10,7 +10,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { NoImpersonationGuard } from '../common/guards/no-impersonation.guard';
 import { UserEntity } from '../modules/users/user.entity';
+import { OrganizationEntity } from '../modules/organizations/organization.entity';
+import { AuditModule } from '../modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -25,7 +28,8 @@ import { UserEntity } from '../modules/users/user.entity';
         },
       }),
     }),
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, OrganizationEntity]),
+    AuditModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -41,6 +45,12 @@ import { UserEntity } from '../modules/users/user.entity';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    // Blocks @BlockDuringImpersonation() routes for admins acting inside
+    // an organization workspace
+    {
+      provide: APP_GUARD,
+      useClass: NoImpersonationGuard,
     },
   ],
   exports: [AuthService, JwtModule],

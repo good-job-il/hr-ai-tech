@@ -25,6 +25,7 @@ export class JobsService {
     const rlsWhere = getRlsWhere('Job', {
       id: user.id, role: user.role, organization_id: user.organization_id,
       employer_company_id: user.employer_company_id, email: user.email,
+      impersonating: user.impersonating,
     });
 
     if (isBlocked(rlsWhere)) return buildPaginatedResponse([], 0, { page, limit });

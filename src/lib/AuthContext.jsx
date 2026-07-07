@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { httpClient } from '@/api/client/httpClient';
 import { tokenStorage } from '@/api/client/tokenStorage';
 
 const AuthContext = createContext();
@@ -14,6 +15,9 @@ export const AuthProvider = ({ children }) => {
   const [appPublicSettings, setAppPublicSettings] = useState(null); // unused with NestJS backend, kept for API compat
   const [organization, setOrganization] = useState(null);
   const [orgType, setOrgType] = useState(null); // 'staffing_agency' | 'organization' | null (platform)
+  // True while a platform admin is "inside" a specific organization's
+  // workspace via a scoped token (see tokenStorage workspace slot below).
+  const [isImpersonating, setIsImpersonating] = useState(false);
 
   useEffect(() => {
     checkAppState();
@@ -36,14 +40,16 @@ export const AuthProvider = ({ children }) => {
       // Now check if the user is authenticated
       setIsLoadingAuth(true);
       const currentUser = await base44.auth.me();
-      
+
       // עדכן last_login
       if (currentUser.user_type) {
         base44.auth.updateMe({ last_login: new Date().toISOString() }).catch(() => {});
       }
-      
+
       setUser(currentUser);
+      console.log(currentUser, "currentUser")
       setIsAuthenticated(true);
+      setIsImpersonating(tokenStorage.hasWorkspaceToken());
 
       // Load organization context synchronously before releasing loading state
       // This prevents ProtectedRoute from evaluating orgType before it's set
@@ -58,6 +64,10 @@ export const AuthProvider = ({ children }) => {
         } catch (_) {
           // org load failed — treat as no org (platform operator or orphaned user)
         }
+      } else {
+        setOrganization(null);
+        // Fallback: use org_type stored directly on the user when no organization is linked
+        setOrgType(currentUser.org_type || null);
       }
 
       setIsLoadingAuth(false);
@@ -76,9 +86,38 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // ── Admin: enter an organization's workspace ────────────────────────────
+  // Exchanges the admin's real session for a short-lived, org-scoped
+  // "workspace" token (kept separately — the admin's own access/refresh
+  // tokens are never touched). All subsequent requests are transparently
+  // scoped to that organization by the backend (see rls.utils.ts +
+  // JwtStrategy `impersonating` handling). Re-runs checkUserAuth() so
+  // `user`/`organization`/`orgType` reflect the entered organization,
+  // exactly as that organization's own users would see it.
+  const enterOrganization = async (organizationId) => {
+    const { access_token, organization: org } = await httpClient.post(
+      `/auth/organizations/${organizationId}/enter`
+    );
+    tokenStorage.setWorkspaceToken(access_token, organizationId);
+    await checkUserAuth();
+    return org;
+  };
+
+  // ── Admin: exit the current organization workspace ──────────────────────
+  const exitOrganization = async () => {
+    try {
+      await httpClient.post('/auth/organizations/exit');
+    } catch (_) {
+      // best-effort — proceed to drop the workspace token regardless
+    }
+    tokenStorage.clearWorkspaceToken();
+    await checkUserAuth();
+  };
+
   const logout = (shouldRedirect = true) => {
     setUser(null);
     setIsAuthenticated(false);
+    tokenStorage.clearWorkspaceToken();
 
     if (shouldRedirect) {
       const from = encodeURIComponent(window.location.pathname + window.location.search);
@@ -95,9 +134,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated, 
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated,
       isLoadingAuth,
       isLoadingPublicSettings,
       authError,
@@ -108,6 +147,10 @@ export const AuthProvider = ({ children }) => {
       isSuperAdmin: user?.role === 'admin',
       isAgency: orgType === 'staffing_agency',
       isCompany: orgType === 'organization',
+      // Admin-acting-inside-an-organization context switch
+      isImpersonating,
+      enterOrganization,
+      exitOrganization,
       logout,
       navigateToLogin,
       checkUserAuth,

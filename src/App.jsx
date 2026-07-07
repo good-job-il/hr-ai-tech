@@ -98,6 +98,9 @@ import EmployerSettingsPage from './pages/employer/EmployerSettingsPage';
 // ── Placeholder ───────────────────────────────────────────────────────
 import PlaceholderPage from './pages/placeholder/PlaceholderPage';
 
+// TODO: Ask Rudik about this component
+// import AdminDashboard from "./pages/admin/AdminDashboard.jsx"
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 

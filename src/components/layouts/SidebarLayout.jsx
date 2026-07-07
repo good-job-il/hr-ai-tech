@@ -21,12 +21,24 @@ const THEME = {
 };
 
 export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
-  const { user, logout, orgType, organization } = useAuth();
+  const { user, logout, orgType, organization, isImpersonating, exitOrganization } = useAuth();
   const { t, i18n } = useTranslation();
   const isRtl = !i18n.language?.startsWith('en');
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState(null);
+  const [exiting, setExiting] = useState(false);
+
+  const handleExitWorkspace = async () => {
+    if (exiting) return;
+    setExiting(true);
+    try {
+      await exitOrganization();
+      window.location.href = '/platform/organizations/staffing';
+    } finally {
+      setExiting(false);
+    }
+  };
 
   const getLabel = (item) => item.labelKey ? t(item.labelKey) : (item.label || '');
 
@@ -157,6 +169,22 @@ export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
       </aside>
 
       <div className={`flex-1 min-w-0 ${isRtl ? 'md:mr-64' : 'md:ml-64'} flex flex-col min-h-screen`}>
+        {isImpersonating && (
+          <div className="bg-amber-400 text-amber-950 text-xs sm:text-sm font-bold px-4 py-2 flex items-center justify-center gap-3 flex-wrap">
+            <span>
+              {isRtl
+                ? `אתה צופה בארגון "${organization?.name || ''}" כאדמין פלטפורמה`
+                : `You are viewing "${organization?.name || 'this organization'}" as a platform admin`}
+            </span>
+            <button
+              onClick={handleExitWorkspace}
+              disabled={exiting}
+              className="underline underline-offset-2 hover:no-underline disabled:opacity-60"
+            >
+              {exiting ? (isRtl ? 'יוצא…' : 'Exiting…') : (isRtl ? 'יציאה מהארגון' : 'Exit organization')}
+            </button>
+          </div>
+        )}
         <DashboardHeader
           user={user}
           roleTitle={roleTitle}
