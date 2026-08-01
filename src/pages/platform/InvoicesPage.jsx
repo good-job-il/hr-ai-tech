@@ -2,7 +2,25 @@ import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
-import { Receipt, Download, Search, CheckCircle, Clock, XCircle, TrendingUp, DollarSign } from 'lucide-react';
+import {
+  CheckCircle,
+  Clock,
+  DollarSign,
+  Download,
+  Receipt,
+  Search,
+  SlidersHorizontal,
+  TrendingUp,
+  XCircle,
+} from 'lucide-react';
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from '@/components/platform/PlatformUI';
 
 const PLAN_PRICES = { trial: 0, starter: 499, pro: 1499, enterprise: 2999 };
 
@@ -66,108 +84,195 @@ export default function InvoicesPage() {
   };
 
   return (
-    <div dir={dir} className="space-y-6 max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-black text-slate-900">{t('platform.invoices.title')}</h1>
-        <p className="text-slate-500 mt-1 font-semibold">{t('platform.invoices.subtitle')}</p>
-      </div>
-
-      {/* KPI */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: t('platform.invoices.stats.totalInvoices'), value: stats.total, color: 'bg-purple-50 text-purple-700', icon: Receipt },
-          { label: t('platform.invoices.stats.paid'), value: stats.paid, color: 'bg-emerald-50 text-emerald-700', icon: CheckCircle },
-          { label: t('platform.invoices.stats.pending'), value: stats.pending, color: 'bg-amber-50 text-amber-700', icon: Clock },
-          { label: t('platform.invoices.stats.revenue'), value: `₪${stats.revenue.toLocaleString()}`, color: 'bg-blue-50 text-blue-700', icon: DollarSign },
-        ].map(s => {
-          const Icon = s.icon;
-          return (
-            <div key={s.label} className={`rounded-2xl p-5 flex items-center gap-4 ${s.color}`}>
-              <Icon className="w-6 h-6 opacity-60" />
+    <PlatformPageShell dir={dir}>
+      <div className="space-y-5">
+        <PlatformPageHeader
+          title={t('platform.invoices.title')}
+          subtitle={t('platform.invoices.subtitle')}
+          icon={Receipt}
+          actions={(
+            <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/85 px-4 py-3 shadow-[0_8px_25px_rgba(66,81,130,0.07)]">
+              <TrendingUp className="h-5 w-5 text-violet-500" />
               <div>
-                <p className="text-2xl font-black">{isLoading ? '...' : s.value}</p>
-                <p className="text-sm font-semibold mt-0.5 opacity-80">{s.label}</p>
+                <p className="text-xs font-bold text-slate-700">{t('platform.invoices.stats.revenue')}</p>
+                <p className="mt-0.5 text-[10px] font-medium text-slate-400">
+                  {t('platform.invoices.stats.paid')}: {stats.paid}
+                </p>
               </div>
             </div>
-          );
-        })}
-      </div>
+          )}
+        />
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center gap-2 flex-1 min-w-48 border border-gray-200 rounded-xl px-3 py-2">
-          <Search className="w-4 h-4 text-gray-400" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder={t('platform.invoices.filters.searchPlaceholder')}
-            className="outline-none text-sm w-full bg-transparent" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <PlatformStatCard
+            icon={Receipt}
+            label={t('platform.invoices.stats.totalInvoices')}
+            value={stats.total}
+            tone="violet"
+            loading={isLoading}
+            meta={t('platform.invoices.filters.invoicesCount')}
+          />
+          <PlatformStatCard
+            icon={CheckCircle}
+            label={t('platform.invoices.stats.paid')}
+            value={stats.paid}
+            tone="emerald"
+            loading={isLoading}
+            meta={t('platform.invoices.status.paid')}
+          />
+          <PlatformStatCard
+            icon={Clock}
+            label={t('platform.invoices.stats.pending')}
+            value={stats.pending}
+            tone="fuchsia"
+            loading={isLoading}
+            meta={t('platform.invoices.status.pending')}
+          />
+          <PlatformStatCard
+            icon={DollarSign}
+            label={t('platform.invoices.stats.revenue')}
+            value={stats.revenue}
+            prefix="₪"
+            tone="blue"
+            loading={isLoading}
+            meta={t('platform.invoices.stats.paid')}
+          />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold outline-none">
-          <option value="all">{t('platform.invoices.filters.allStatuses')}</option>
-          <option value="paid">{t('platform.invoices.status.paid')}</option>
-          <option value="pending">{t('platform.invoices.status.pending')}</option>
-          <option value="overdue">{t('platform.invoices.status.overdue')}</option>
-        </select>
-        <span className="text-sm text-gray-400 font-semibold">{filtered.length} {t('platform.invoices.filters.invoicesCount')}</span>
-      </div>
 
-      {/* Table */}
-      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
-            <tr>
-              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.invoiceNumber')}</th>
-              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.organization')}</th>
-              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.plan')}</th>
-              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.period')}</th>
-              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.amount')}</th>
-              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.status')}</th>
-              <th className={`${dir === 'rtl' ? 'text-right' : 'text-left'} font-black text-gray-600 px-5 py-3`}>{t('platform.invoices.table.download')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              Array(6).fill(0).map((_, i) => (
-                <tr key={i} className="border-b border-gray-50">
-                  {Array(7).fill(0).map((_, j) => (
-                    <td key={j} className="px-5 py-4"><div className="h-4 bg-gray-100 rounded animate-pulse" /></td>
+        <PlatformCard className="p-5">
+          <PlatformWidgetHeader
+            title={t('platform.invoices.filters.allStatuses')}
+            subtitle={`${filtered.length} ${t('platform.invoices.filters.invoicesCount')}`}
+            action={(
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+                <SlidersHorizontal className="h-4 w-4" />
+              </div>
+            )}
+          />
+          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-[minmax(260px,1fr)_220px]">
+            <div className="relative">
+              <Search className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder={t('platform.invoices.filters.searchPlaceholder')}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pe-4 ps-10 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-50"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-50"
+            >
+              <option value="all">{t('platform.invoices.filters.allStatuses')}</option>
+              <option value="paid">{t('platform.invoices.status.paid')}</option>
+              <option value="pending">{t('platform.invoices.status.pending')}</option>
+              <option value="overdue">{t('platform.invoices.status.overdue')}</option>
+            </select>
+          </div>
+        </PlatformCard>
+
+        <PlatformCard className="overflow-hidden">
+          <div className="border-b border-slate-100 p-5">
+            <PlatformWidgetHeader
+              title={t('platform.invoices.title')}
+              subtitle={t('platform.invoices.subtitle')}
+              action={(
+                <span className="rounded-full bg-violet-50 px-3 py-1.5 text-[11px] font-bold text-violet-700">
+                  {filtered.length} {t('platform.invoices.filters.invoicesCount')}
+                </span>
+              )}
+            />
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[980px] text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50/60">
+                  {[
+                    t('platform.invoices.table.invoiceNumber'),
+                    t('platform.invoices.table.organization'),
+                    t('platform.invoices.table.plan'),
+                    t('platform.invoices.table.period'),
+                    t('platform.invoices.table.amount'),
+                    t('platform.invoices.table.status'),
+                    t('platform.invoices.table.download'),
+                  ].map(label => (
+                    <th key={label} className="px-5 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
+                      {label}
+                    </th>
                   ))}
                 </tr>
-              ))
-            ) : filtered.length === 0 ? (
-              <tr><td colSpan={7} className="px-5 py-12 text-center text-gray-400">{t('platform.invoices.noInvoices')}</td></tr>
-            ) : filtered.map(inv => {
-              const st = STATUS[inv.status] || STATUS.pending;
-              const StIcon = st.icon;
-              const statusLabel = t(`platform.invoices.status.${inv.status}`);
-              return (
-                <tr key={inv.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-4 font-mono font-bold text-gray-700">{inv.id}</td>
-                  <td className="px-5 py-4 font-bold text-gray-900">{inv.org_name}</td>
-                  <td className="px-5 py-4">
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-purple-50 text-purple-700">
-                      {inv.plan}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-gray-600">{inv.date}</td>
-                  <td className="px-5 py-4 font-black text-gray-900">₪{inv.amount.toLocaleString()}</td>
-                  <td className="px-5 py-4">
-                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${st.bg} ${st.text}`}>
-                      <StIcon className="w-3 h-3" />
-                      {statusLabel}
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
-                      <Download className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {isLoading ? (
+                  Array(6).fill(0).map((_, i) => (
+                    <tr key={i}>
+                      {Array(7).fill(0).map((_, j) => (
+                        <td key={j} className="px-5 py-4">
+                          <div className="h-5 animate-pulse rounded-lg bg-slate-100" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-5">
+                      <PlatformEmptyState icon={Receipt}>{t('platform.invoices.noInvoices')}</PlatformEmptyState>
+                    </td>
+                  </tr>
+                ) : filtered.map((inv, index) => {
+                  const st = STATUS[inv.status] || STATUS.pending;
+                  const StIcon = st.icon;
+                  const statusLabel = t(`platform.invoices.status.${inv.status}`);
+                  return (
+                    <tr key={inv.id} className="group transition-colors hover:bg-violet-50/35">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${
+                            index % 3 === 0
+                              ? 'from-violet-100 to-fuchsia-50 text-violet-600'
+                              : index % 3 === 1
+                                ? 'from-blue-100 to-cyan-50 text-blue-600'
+                                : 'from-cyan-100 to-emerald-50 text-cyan-600'
+                          }`}>
+                            <Receipt className="h-4 w-4" strokeWidth={1.8} />
+                          </div>
+                          <span className="font-mono text-xs font-extrabold text-slate-700">{inv.id}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <p className="font-extrabold text-slate-800 transition group-hover:text-violet-700">{inv.org_name}</p>
+                        <p className="mt-0.5 text-[10px] font-medium text-slate-400">{String(inv.org_id).slice(0, 8)}</p>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className="inline-flex rounded-full bg-violet-50 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-violet-700">
+                          {inv.plan}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-xs font-semibold text-slate-500">{inv.date}</td>
+                      <td className="px-5 py-4">
+                        <span className="font-black text-slate-900">₪{inv.amount.toLocaleString()}</span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold ${st.bg} ${st.text}`}>
+                          <StIcon className="h-3 w-3" />
+                          {statusLabel}
+                        </div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white text-slate-400 shadow-sm transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-600">
+                          <Download className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </PlatformCard>
       </div>
-    </div>
+    </PlatformPageShell>
   );
 }

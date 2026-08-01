@@ -8,6 +8,14 @@ import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Save, RefreshCw, ShieldCheck, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from '@/components/platform/PlatformUI';
 
 const PERM_KEYS = [
   'view', 'create', 'update', 'delete', 'export',
@@ -131,54 +139,57 @@ export default function PermissionsPage() {
 
   if (!canEdit) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]" dir={isRtl ? 'rtl' : 'ltr'}>
-        <div className="text-center text-gray-500">
-          <Lock className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="font-bold text-lg">{t('permissionsMatrix.accessDenied')}</p>
-          <p className="text-sm mt-1">{t('permissionsMatrix.accessDeniedDesc')}</p>
-        </div>
-      </div>
+      <PlatformPageShell dir={isRtl ? 'rtl' : 'ltr'}>
+        <PlatformCard className="p-5">
+          <PlatformEmptyState icon={Lock} className="min-h-[60vh]">
+            <p className="text-lg font-bold text-slate-600">{t('permissionsMatrix.accessDenied')}</p>
+            <p className="mt-1 text-sm text-slate-400">{t('permissionsMatrix.accessDeniedDesc')}</p>
+          </PlatformEmptyState>
+        </PlatformCard>
+      </PlatformPageShell>
     );
   }
 
   const hasDirty = Object.keys(dirty).some(k => dirty[k]);
   const stickyColClass = isRtl ? 'sticky right-0' : 'sticky left-0';
+  const enabledPermissions = roleKeys.reduce(
+    (total, roleKey) => total + Object.values(matrix[roleKey] || {}).filter(Boolean).length,
+    0,
+  );
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'} className="p-6 max-w-6xl mx-auto">
+    <PlatformPageShell dir={isRtl ? 'rtl' : 'ltr'}>
+      <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-        <div className="flex items-center gap-3">
-          <ShieldCheck className="w-7 h-7 text-purple-600" />
-          <div>
-            <h1 className="text-2xl font-black text-gray-900">{t('permissionsMatrix.title')}</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{t('permissionsMatrix.subtitle')}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
+      <PlatformPageHeader
+        title={t('permissionsMatrix.title')}
+        subtitle={t('permissionsMatrix.subtitle')}
+        icon={ShieldCheck}
+        actions={(
+          <>
           {/* org_type toggle */}
-          <div className="flex rounded-xl border border-gray-200 overflow-hidden text-sm">
+          <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70 p-1 text-sm">
             <button
               onClick={() => setOrgType('staffing_agency')}
-              className={`px-4 py-2 font-semibold transition-all ${orgType === 'staffing_agency' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              className={`rounded-lg px-4 py-2 font-semibold transition-all ${orgType === 'staffing_agency' ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-500'}`}
             >
               {t('permissionsMatrix.staffingAgency')}
             </button>
             <button
               onClick={() => setOrgType('organization')}
-              className={`px-4 py-2 font-semibold transition-all ${orgType === 'organization' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              className={`rounded-lg px-4 py-2 font-semibold transition-all ${orgType === 'organization' ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-500'}`}
             >
               {t('permissionsMatrix.organization')}
             </button>
           </div>
           <button onClick={load} disabled={loading}
-            className="h-9 w-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:border-purple-300 transition-all">
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-violet-200 hover:bg-violet-50">
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <Button
             onClick={handleSaveAll}
             disabled={saving || !hasDirty}
-            className="gap-2 bg-purple-600 hover:bg-purple-700 text-white"
+            className="gap-2"
           >
             <Save className="w-4 h-4" />
             {saving
@@ -187,37 +198,43 @@ export default function PermissionsPage() {
                 ? t('permissionsMatrix.saved')
                 : t('permissionsMatrix.saveChanges')}
           </Button>
-        </div>
+          </>
+        )}
+      />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <PlatformStatCard icon={ShieldCheck} label={t('permissionsMatrix.roleColumn')} value={roleKeys.length} tone="violet" meta={orgType === 'staffing_agency' ? t('permissionsMatrix.staffingAgency') : t('permissionsMatrix.organization')} />
+        <PlatformStatCard icon={Lock} label={t('permissionsMatrix.title')} value={enabledPermissions} tone="blue" meta={t('permissionsMatrix.footer')} />
+        <PlatformStatCard icon={Save} label={t('permissionsMatrix.modified')} value={Object.keys(dirty).filter(key => dirty[key]).length} tone={hasDirty ? 'amber' : 'emerald'} meta={saved ? t('permissionsMatrix.saved') : t('permissionsMatrix.saveChanges')} />
       </div>
 
       {loading ? (
-        <div className="text-center py-16 text-gray-400">{t('permissionsMatrix.loading')}</div>
+        <PlatformCard className="p-16 text-center text-slate-400">{t('permissionsMatrix.loading')}</PlatformCard>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-x-auto shadow-sm">
+        <PlatformCard className="overflow-hidden">
+          <div className="border-b border-slate-100 p-5">
+            <PlatformWidgetHeader title={t('permissionsMatrix.title')} subtitle={t('permissionsMatrix.subtitle')} />
+          </div>
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className={`${isRtl ? 'text-right' : 'text-left'} px-5 py-3 font-black text-gray-700 w-40 ${stickyColClass} bg-gray-50 z-10`}>
+              <tr className="border-b border-slate-100 bg-slate-50/60">
+                <th className={`w-40 px-5 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400 ${stickyColClass} z-10 bg-slate-50`}>
                   {t('permissionsMatrix.roleColumn')}
                 </th>
                 {PERM_KEYS.map(key => (
-                  <th key={key} className="px-3 py-3 font-bold text-gray-600 text-center whitespace-nowrap">
+                  <th key={key} className="whitespace-nowrap px-3 py-3.5 text-center text-[11px] font-extrabold text-slate-400">
                     {t(`permissionsMatrix.perms.${key}`)}
                   </th>
                 ))}
-                {hasDirty && (
-                  <th className="px-3 py-3 text-center font-bold text-gray-600">
-                    {t('permissionsMatrix.save')}
-                  </th>
-                )}
               </tr>
             </thead>
             <tbody>
               {roleKeys.map((roleKey, i) => (
-                <tr key={roleKey} className={`border-b border-gray-50 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'} hover:bg-purple-50/20 transition-colors`}>
+                <tr key={roleKey} className={`border-b border-slate-100 ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/25'} transition-colors hover:bg-violet-50/30`}>
                   <td className={`px-5 py-4 ${stickyColClass} bg-inherit z-10`}>
-                    <div className="font-bold text-gray-900">{roleLabel(roleKey)}</div>
-                    <div className="text-xs text-gray-400 font-mono">{roleKey}</div>
+                    <div className="font-bold text-slate-900">{roleLabel(roleKey)}</div>
+                    <div className="font-mono text-xs text-slate-400">{roleKey}</div>
                     {dirty[roleKey] && (
                       <span className="text-xs text-amber-600 font-semibold">{t('permissionsMatrix.modified')}</span>
                     )}
@@ -227,10 +244,10 @@ export default function PermissionsPage() {
                       <button
                         onClick={() => toggle(roleKey, permKey)}
                         disabled={!canEdit}
-                        className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mx-auto transition-all
+                        className={`mx-auto flex h-7 w-7 items-center justify-center rounded-lg border-2 transition-all
                           ${matrix[roleKey]?.[permKey]
-                            ? 'bg-purple-600 border-purple-600 text-white'
-                            : 'bg-white border-gray-300 hover:border-purple-400'
+                            ? 'gradient-brand border-[#6C4DFF] text-white shadow-[0_4px_10px_rgba(99,72,210,0.28)]'
+                            : 'border-slate-200 bg-white hover:border-[#8B5CF6]'
                           }
                           ${!canEdit ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
                         `}
@@ -243,33 +260,18 @@ export default function PermissionsPage() {
                       </button>
                     </td>
                   ))}
-                  {hasDirty && (
-                    <td className="px-3 py-4 text-center">
-                      {dirty[roleKey] && (
-                        <button
-                          onClick={async () => {
-                            setSaving(true);
-                            await saveRole(roleKey);
-                            await load();
-                            setSaving(false);
-                          }}
-                          className="text-xs px-3 py-1.5 bg-purple-100 text-purple-700 font-bold rounded-lg hover:bg-purple-200 transition-all"
-                        >
-                          {t('permissionsMatrix.save')}
-                        </button>
-                      )}
-                    </td>
-                  )}
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+        </PlatformCard>
       )}
 
-      <p className="text-xs text-gray-400 mt-4 text-center">
+      <p className="text-center text-xs text-slate-400">
         {t('permissionsMatrix.footer')}
       </p>
-    </div>
+      </div>
+    </PlatformPageShell>
   );
 }

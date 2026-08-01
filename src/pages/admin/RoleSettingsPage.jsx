@@ -9,6 +9,14 @@ import { useAuth } from '@/lib/AuthContext';
 import { Input } from '@/components/ui/input';
 import { RefreshCw, Users, Lock, Pencil, Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from '@/components/platform/PlatformUI';
 
 const EDITABLE_ROLES = ['admin', 'org_admin'];
 
@@ -37,17 +45,17 @@ function RoleRow({ record, canEdit, onSave, t }) {
   const levelColor = LEVEL_COLORS[record.hierarchy_level] || LEVEL_COLORS[4];
 
   return (
-    <tr className="border-b border-gray-50 hover:bg-gray-50/40 transition-colors">
+    <tr className="border-b border-slate-100 transition-colors hover:bg-violet-50/30">
       {/* Hierarchy Level */}
       <td className="px-4 py-3 text-center">
-        <span className={`text-xs font-bold px-2 py-1 rounded-full border ${levelColor}`}>
+        <span className={`rounded-full border px-2.5 py-1 text-[10px] font-bold ${levelColor}`}>
           {t(`roleSettings.levels.${record.hierarchy_level}`, { defaultValue: String(record.hierarchy_level) })}
         </span>
       </td>
 
       {/* system_role_key — read only */}
       <td className="px-4 py-3">
-        <span className="font-mono text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-md border border-slate-200">
+        <span className="rounded-lg border border-slate-200 bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600">
           {record.system_role_key}
         </span>
       </td>
@@ -59,25 +67,25 @@ function RoleRow({ record, canEdit, onSave, t }) {
             <Input
               value={value}
               onChange={e => setValue(e.target.value)}
-              className="h-8 text-sm w-48"
+              className="h-9 w-48 rounded-xl border-violet-200 text-sm focus:ring-violet-200"
               autoFocus
               onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel(); }}
             />
             <button onClick={handleSave} disabled={saving}
-              className="p-1.5 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-all">
+              className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 transition hover:bg-emerald-200">
               <Check className="w-3.5 h-3.5" />
             </button>
             <button onClick={handleCancel}
-              className="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all">
+              className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition hover:bg-slate-200">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-2 group">
-            <span className="font-semibold text-gray-900">{record.display_name}</span>
+            <span className="font-semibold text-slate-900">{record.display_name}</span>
             {canEdit && record.is_editable_name && (
               <button onClick={() => setEditing(true)}
-                className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-purple-50 text-purple-500 transition-all">
+                className="flex h-8 w-8 items-center justify-center rounded-xl text-violet-500 opacity-0 transition group-hover:opacity-100 hover:bg-violet-50">
                 <Pencil className="w-3.5 h-3.5" />
               </button>
             )}
@@ -88,24 +96,24 @@ function RoleRow({ record, canEdit, onSave, t }) {
       {/* parent_role_key */}
       <td className="px-4 py-3 text-center">
         {record.parent_role_key ? (
-          <span className="text-xs text-gray-500 font-mono">{record.parent_role_key}</span>
+          <span className="font-mono text-xs text-slate-500">{record.parent_role_key}</span>
         ) : (
-          <span className="text-xs text-gray-300">—</span>
+          <span className="text-xs text-slate-300">—</span>
         )}
       </td>
 
       {/* is_system_required */}
       <td className="px-4 py-3 text-center">
         {record.is_system_required ? (
-          <span className="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-2 py-0.5 rounded-full font-semibold">{t('roleSettings.required')}</span>
+          <span className="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-semibold text-orange-600">{t('roleSettings.required')}</span>
         ) : (
-          <span className="text-xs bg-gray-50 text-gray-400 border border-gray-200 px-2 py-0.5 rounded-full">{t('roleSettings.optional')}</span>
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] text-slate-400">{t('roleSettings.optional')}</span>
         )}
       </td>
 
       {/* is_active */}
       <td className="px-4 py-3 text-center">
-        <span className={`w-2 h-2 rounded-full inline-block ${record.is_active ? 'bg-green-500' : 'bg-gray-300'}`} />
+        <span className={`inline-block h-2.5 w-2.5 rounded-full ${record.is_active ? 'bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.12)]' : 'bg-slate-300'}`} />
       </td>
     </tr>
   );
@@ -155,12 +163,11 @@ export default function RoleSettingsPage() {
       r.system_role_key === record.system_role_key
     );
 
-    let saved;
     if (existing) {
-      saved = await base44.entities.RoleTemplate.update(existing.id, { display_name: newDisplayName });
+      await base44.entities.RoleTemplate.update(existing.id, { display_name: newDisplayName });
     } else {
       // Create org-specific override based on global template
-      saved = await base44.entities.RoleTemplate.create({
+      await base44.entities.RoleTemplate.create({
         organization_id: orgId,
         org_type: record.org_type,
         system_role_key: record.system_role_key,
@@ -199,75 +206,86 @@ export default function RoleSettingsPage() {
 
   if (!canEdit) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]" dir={isRtl ? 'rtl' : 'ltr'}>
-        <div className="text-center text-gray-500">
-          <Lock className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="font-bold text-lg">{t('roleSettings.accessDenied')}</p>
-          <p className="text-sm mt-1">{t('roleSettings.accessDeniedDesc')}</p>
-        </div>
-      </div>
+      <PlatformPageShell dir={isRtl ? 'rtl' : 'ltr'}>
+        <PlatformCard className="p-5">
+          <PlatformEmptyState icon={Lock} className="min-h-[60vh]">
+            <p className="text-lg font-bold text-slate-600">{t('roleSettings.accessDenied')}</p>
+            <p className="mt-1 text-sm text-slate-400">{t('roleSettings.accessDeniedDesc')}</p>
+          </PlatformEmptyState>
+        </PlatformCard>
+      </PlatformPageShell>
     );
   }
 
   const displayRecords = getDisplayRecords();
+  const activeRoles = displayRecords.filter(record => record.is_active).length;
+  const editableRoles = displayRecords.filter(record => record.is_editable_name).length;
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'} className="p-6 max-w-4xl mx-auto">
+    <PlatformPageShell dir={isRtl ? 'rtl' : 'ltr'}>
+      <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-        <div className="flex items-center gap-3">
-          <Users className="w-7 h-7 text-purple-600" />
-          <div>
-            <h1 className="text-2xl font-black text-gray-900">{t('roleSettings.title')}</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{t('roleSettings.subtitle')}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
+      <PlatformPageHeader
+        title={t('roleSettings.title')}
+        subtitle={t('roleSettings.subtitle')}
+        icon={Users}
+        actions={(
+          <>
           {/* org_type toggle */}
-          <div className="flex rounded-xl border border-gray-200 overflow-hidden text-sm">
+          <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70 p-1 text-sm">
             <button
               onClick={() => setOrgType('staffing_agency')}
-              className={`px-4 py-2 font-semibold transition-all ${orgType === 'staffing_agency' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              className={`rounded-lg px-4 py-2 font-semibold transition-all ${orgType === 'staffing_agency' ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-500'}`}
             >
               {t('roleSettings.staffingAgency')}
             </button>
             <button
               onClick={() => setOrgType('organization')}
-              className={`px-4 py-2 font-semibold transition-all ${orgType === 'organization' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              className={`rounded-lg px-4 py-2 font-semibold transition-all ${orgType === 'organization' ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-500'}`}
             >
               {t('roleSettings.organization')}
             </button>
           </div>
           <button onClick={load} disabled={loading}
-            className="h-9 w-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:border-purple-300 transition-all">
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-600">
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           {savedMsg && (
-            <span className="text-sm text-green-600 font-semibold flex items-center gap-1">
-              <Check className="w-4 h-4" /> {savedMsg}
+            <span className="flex items-center gap-1 rounded-xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-600">
+              <Check className="h-4 w-4" /> {savedMsg}
             </span>
           )}
-        </div>
+          </>
+        )}
+      />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <PlatformStatCard icon={Users} label={t('roleSettings.title')} value={displayRecords.length} tone="violet" meta={orgType === 'staffing_agency' ? t('roleSettings.staffingAgency') : t('roleSettings.organization')} />
+        <PlatformStatCard icon={Check} label={t('roleSettings.columns.active')} value={activeRoles} tone="emerald" meta={t('roleSettings.columns.status')} />
+        <PlatformStatCard icon={Pencil} label={t('roleSettings.columns.displayName')} value={editableRoles} tone="blue" meta={t('roleSettings.footer')} />
       </div>
 
       {/* Info banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-5 text-sm text-blue-700"
-        dangerouslySetInnerHTML={{ __html: t('roleSettings.infoBanner') }}
-      />
+      <PlatformCard className="border-blue-100 bg-gradient-to-r from-blue-50/90 to-violet-50/70 px-5 py-4 text-sm leading-6 text-blue-700"
+        dangerouslySetInnerHTML={{ __html: t('roleSettings.infoBanner') }} />
 
       {loading ? (
-        <div className="text-center py-16 text-gray-400">{t('roleSettings.loading')}</div>
+        <PlatformCard className="p-16 text-center text-slate-400">{t('roleSettings.loading')}</PlatformCard>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-          <table className="w-full text-sm">
+        <PlatformCard className="overflow-hidden">
+          <div className="border-b border-slate-100 p-5">
+            <PlatformWidgetHeader title={t('roleSettings.title')} subtitle={t('roleSettings.subtitle')} />
+          </div>
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[820px] text-sm">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="px-4 py-3 font-bold text-gray-600 text-center">{t('roleSettings.columns.level')}</th>
-                <th className={`px-4 py-3 font-bold text-gray-600 ${isRtl ? 'text-right' : 'text-left'}`}>{t('roleSettings.columns.systemRoleKey')}</th>
-                <th className={`px-4 py-3 font-bold text-gray-600 ${isRtl ? 'text-right' : 'text-left'}`}>{t('roleSettings.columns.displayName')}</th>
-                <th className="px-4 py-3 font-bold text-gray-600 text-center">{t('roleSettings.columns.parentRole')}</th>
-                <th className="px-4 py-3 font-bold text-gray-600 text-center">{t('roleSettings.columns.status')}</th>
-                <th className="px-4 py-3 font-bold text-gray-600 text-center">{t('roleSettings.columns.active')}</th>
+              <tr className="border-b border-slate-100 bg-slate-50/60">
+                <th className="px-4 py-3.5 text-center text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">{t('roleSettings.columns.level')}</th>
+                <th className="px-4 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">{t('roleSettings.columns.systemRoleKey')}</th>
+                <th className="px-4 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">{t('roleSettings.columns.displayName')}</th>
+                <th className="px-4 py-3.5 text-center text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">{t('roleSettings.columns.parentRole')}</th>
+                <th className="px-4 py-3.5 text-center text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">{t('roleSettings.columns.status')}</th>
+                <th className="px-4 py-3.5 text-center text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">{t('roleSettings.columns.active')}</th>
               </tr>
             </thead>
             <tbody>
@@ -282,17 +300,21 @@ export default function RoleSettingsPage() {
               ))}
               {displayRecords.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-gray-400">{t('roleSettings.noRoles')}</td>
+                  <td colSpan={6} className="p-5">
+                    <PlatformEmptyState icon={Users}>{t('roleSettings.noRoles')}</PlatformEmptyState>
+                  </td>
                 </tr>
               )}
             </tbody>
           </table>
-        </div>
+          </div>
+        </PlatformCard>
       )}
 
-      <p className="text-xs text-gray-400 mt-4 text-center">
+      <p className="text-center text-xs text-slate-400">
         {t('roleSettings.footer')}
       </p>
-    </div>
+      </div>
+    </PlatformPageShell>
   );
 }

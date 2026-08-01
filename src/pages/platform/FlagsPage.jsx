@@ -2,10 +2,18 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import {
-  Flag, Search, Building2, CheckCircle, XCircle, ChevronDown, ChevronUp,
+  Flag, Search, Building2, ChevronDown, ChevronUp,
   Zap, BarChart3, Users, Shield, Cpu, Globe, Layers, DollarSign, Save,
-  RotateCcw, Info,
+  RotateCcw, Info, SlidersHorizontal,
 } from 'lucide-react';
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from '@/components/platform/PlatformUI';
 
 // ─── Feature catalogue ───────────────────────────────────────────────────────
 
@@ -94,14 +102,15 @@ function loadMatrix() {
 function Toggle({ value, onChange, disabled }) {
   return (
     <button
+      type="button"
       onClick={() => !disabled && onChange(!value)}
       disabled={disabled}
-      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors
+      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-all duration-200
         ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
-        ${value ? 'bg-emerald-500' : 'bg-gray-200'}`}
+        ${value ? 'border-violet-500 bg-gradient-to-r from-violet-600 to-indigo-500 shadow-[0_4px_12px_rgba(109,75,220,0.25)]' : 'border-slate-200 bg-slate-100'}`}
     >
-      <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform
-        ${value ? 'translate-x-4' : 'translate-x-0.5'}`} />
+      <span className={`inline-block h-[18px] w-[18px] transform rounded-full bg-white shadow-sm transition-transform duration-200
+        ${value ? 'translate-x-[20px]' : 'translate-x-0.5'}`} />
     </button>
   );
 }
@@ -146,35 +155,51 @@ function PlanMatrixTab() {
 
   return (
     <div className="space-y-4">
-      {/* Header actions */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500 font-semibold">
-          Define which features are included in each subscription plan. Changes apply to new and renewing organizations.
-        </p>
-        <div className="flex gap-2">
-          <button onClick={handleReset}
-            className="flex items-center gap-1.5 text-xs px-3 py-2 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 font-bold transition-colors">
-            <RotateCcw className="w-3.5 h-3.5" /> Reset defaults
-          </button>
-          <button onClick={handleSave} disabled={!dirty}
-            className={`flex items-center gap-1.5 text-xs px-4 py-2 rounded-xl font-bold transition-colors
-              ${saved ? 'bg-emerald-500 text-white' : dirty ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}>
-            <Save className="w-3.5 h-3.5" />
-            {saved ? 'Saved!' : 'Save changes'}
-          </button>
-        </div>
-      </div>
+      <PlatformCard className="p-5">
+        <PlatformWidgetHeader
+          title="Plan feature matrix"
+          subtitle="Define which features are included in each subscription plan. Changes apply to new and renewing organizations."
+          action={(
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Reset defaults
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={!dirty}
+                className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+                  saved
+                    ? 'bg-emerald-500 text-white shadow-[0_8px_18px_rgba(16,185,129,0.2)]'
+                    : dirty
+                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-[0_8px_18px_rgba(99,72,210,0.22)] hover:-translate-y-0.5'
+                      : 'cursor-not-allowed bg-slate-100 text-slate-400'
+                }`}
+              >
+                <Save className="h-3.5 w-3.5" />
+                {saved ? 'Saved!' : 'Save changes'}
+              </button>
+            </div>
+          )}
+        />
+      </PlatformCard>
 
       {/* Matrix table */}
-      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+      <PlatformCard className="overflow-x-auto">
+        <div className="min-w-[760px]">
         {/* Plan header */}
-        <div className="grid bg-gray-50 border-b border-gray-100" style={{ gridTemplateColumns: '1fr repeat(4, 120px)' }}>
-          <div className="px-5 py-3 font-black text-gray-600 text-sm">Feature</div>
+        <div className="grid border-b border-slate-100 bg-slate-50/70" style={{ gridTemplateColumns: '1fr repeat(4, 120px)' }}>
+          <div className="px-5 py-4 text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">Feature</div>
           {PLANS.map(plan => {
             const c = PLAN_COLORS[plan];
             return (
-              <div key={plan} className="px-3 py-3 text-center">
-                <span className={`text-xs font-black px-2.5 py-1 rounded-full border ${c.bg} ${c.text} ${c.border}`}>
+              <div key={plan} className="px-3 py-4 text-center">
+                <span className={`rounded-full border px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide ${c.bg} ${c.text} ${c.border}`}>
                   {plan.charAt(0).toUpperCase() + plan.slice(1)}
                 </span>
               </div>
@@ -188,23 +213,25 @@ function PlanMatrixTab() {
           const features = FEATURES.filter(f => f.category === cat.id);
           const expanded = expandedCats.has(cat.id);
           return (
-            <div key={cat.id} className="border-b border-gray-50 last:border-0">
+            <div key={cat.id} className="border-b border-slate-100 last:border-0">
               {/* Category header */}
               <button
                 onClick={() => toggleCat(cat.id)}
-                className="w-full grid items-center bg-slate-50/60 hover:bg-slate-100/60 transition-colors"
+                className="grid w-full items-center bg-slate-50/45 transition-colors hover:bg-violet-50/45"
                 style={{ gridTemplateColumns: '1fr repeat(4, 120px)' }}
               >
-                <div className="px-5 py-2.5 flex items-center gap-2">
-                  <CatIcon className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="text-xs font-black text-slate-500 uppercase tracking-wide">{cat.label}</span>
-                  {expanded ? <ChevronUp className="w-3.5 h-3.5 text-slate-400 ml-auto" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-auto" />}
+                <div className="flex items-center gap-2 px-5 py-3">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-50 text-violet-500">
+                    <CatIcon className="h-3.5 w-3.5" />
+                  </div>
+                  <span className="text-xs font-black uppercase tracking-wide text-slate-600">{cat.label}</span>
+                  {expanded ? <ChevronUp className="ml-auto h-3.5 w-3.5 text-slate-400" /> : <ChevronDown className="ml-auto h-3.5 w-3.5 text-slate-400" />}
                 </div>
                 {PLANS.map(plan => {
                   const enabledCount = features.filter(f => matrix[plan]?.[f.id]).length;
                   return (
-                    <div key={plan} className="px-3 py-2.5 text-center">
-                      <span className="text-xs text-slate-400 font-semibold">{enabledCount}/{features.length}</span>
+                    <div key={plan} className="px-3 py-3 text-center">
+                      <span className="rounded-full bg-white px-2 py-1 text-[10px] font-bold text-slate-400 shadow-sm">{enabledCount}/{features.length}</span>
                     </div>
                   );
                 })}
@@ -213,11 +240,11 @@ function PlanMatrixTab() {
               {/* Feature rows */}
               {expanded && features.map(feat => (
                 <div key={feat.id}
-                  className="grid items-center border-t border-gray-50 hover:bg-gray-50/60 transition-colors"
+                  className="grid items-center border-t border-slate-100 transition-colors hover:bg-violet-50/25"
                   style={{ gridTemplateColumns: '1fr repeat(4, 120px)' }}>
-                  <div className="px-5 py-3 pl-9">
-                    <p className="text-sm font-bold text-gray-800">{feat.label}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{feat.description}</p>
+                  <div className="px-5 py-3.5 pl-14">
+                    <p className="text-sm font-bold text-slate-800">{feat.label}</p>
+                    <p className="mt-0.5 text-xs text-slate-400">{feat.description}</p>
                   </div>
                   {PLANS.map(plan => (
                     <div key={plan} className="px-3 py-3 flex justify-center">
@@ -232,10 +259,11 @@ function PlanMatrixTab() {
             </div>
           );
         })}
-      </div>
+        </div>
+      </PlatformCard>
 
-      <p className="text-xs text-slate-400 flex items-center gap-1.5">
-        <Info className="w-3.5 h-3.5" />
+      <p className="flex items-center gap-1.5 px-1 text-xs font-medium text-slate-400">
+        <Info className="h-3.5 w-3.5" />
         Plan matrix is stored locally on this device. Organization-level overrides take precedence.
       </p>
     </div>
@@ -319,34 +347,50 @@ function OrgOverridesTab() {
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center gap-2 flex-1 min-w-48 border border-gray-200 rounded-xl px-3 py-2">
-          <Search className="w-4 h-4 text-gray-400" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search organization..."
-            className="outline-none text-sm w-full bg-transparent" />
+      <PlatformCard className="p-5">
+        <PlatformWidgetHeader
+          title="Organization overrides"
+          subtitle={`${filtered.length} organizations`}
+          action={(
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+              <SlidersHorizontal className="h-4 w-4" />
+            </div>
+          )}
+        />
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-[minmax(260px,1fr)_210px]">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search organization..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pl-10 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-50"
+            />
+          </div>
+          <select
+            value={planFilter}
+            onChange={e => setPlanFilter(e.target.value)}
+            className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-50"
+          >
+            <option value="all">All Plans</option>
+            {PLANS.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
+          </select>
         </div>
-        <select value={planFilter} onChange={e => setPlanFilter(e.target.value)}
-          className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold outline-none">
-          <option value="all">All Plans</option>
-          {PLANS.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
-        </select>
-        <span className="text-sm text-gray-400 font-semibold">{filtered.length} organizations</span>
-      </div>
+      </PlatformCard>
 
       {/* Org list */}
       <div className="space-y-2">
         {isLoading ? (
           Array(4).fill(0).map((_, i) => (
-            <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 animate-pulse">
-              <div className="h-5 bg-gray-100 rounded w-48 mb-2" />
-              <div className="h-4 bg-gray-100 rounded w-32" />
-            </div>
+            <PlatformCard key={i} className="animate-pulse p-5">
+              <div className="mb-2 h-5 w-48 rounded bg-slate-100" />
+              <div className="h-4 w-32 rounded bg-slate-100" />
+            </PlatformCard>
           ))
         ) : filtered.length === 0 ? (
-          <div className="bg-white border border-gray-100 rounded-2xl p-12 text-center text-gray-400">
-            No matching organizations
-          </div>
+          <PlatformCard className="p-5">
+            <PlatformEmptyState icon={Search}>No matching organizations</PlatformEmptyState>
+          </PlatformCard>
         ) : filtered.map(org => {
           const plan = org.plan || 'trial';
           const c = PLAN_COLORS[plan];
@@ -357,43 +401,47 @@ function OrgOverridesTab() {
           const isDirty = localOverrides[org.id] !== undefined;
 
           return (
-            <div key={org.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+            <PlatformCard key={org.id} className="overflow-hidden">
               {/* Org header row */}
               <button
                 onClick={() => setExpandedOrg(isExpanded ? null : org.id)}
-                className="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50/60 transition-colors text-left"
+                className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-violet-50/35"
               >
-                <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
-                  <Building2 className="w-4 h-4 text-purple-600" />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-blue-50 text-violet-600">
+                  <Building2 className="h-5 w-5" strokeWidth={1.8} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-black text-gray-900 truncate">{org.name}</p>
-                  <p className="text-xs text-gray-400">{org.org_type === 'staffing_agency' ? 'Staffing Agency' : 'Internal HR'}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-black text-slate-900">{org.name}</p>
+                  <p className="mt-0.5 text-xs text-slate-400">{org.org_type === 'staffing_agency' ? 'Staffing Agency' : 'Internal HR'}</p>
                 </div>
-                <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${c.bg} ${c.text} ${c.border}`}>
+                <span className={`rounded-full border px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide ${c.bg} ${c.text} ${c.border}`}>
                   {plan.charAt(0).toUpperCase() + plan.slice(1)}
                 </span>
                 {overridesCount > 0 && (
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-600">
+                  <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[10px] font-bold text-orange-600">
                     {overridesCount} override{overridesCount !== 1 ? 's' : ''}
                   </span>
                 )}
-                {isExpanded ? <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />}
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-400">
+                  {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </div>
               </button>
 
               {/* Expanded feature overrides */}
               {isExpanded && (
-                <div className="border-t border-gray-100 px-5 py-4 space-y-5">
+                <div className="space-y-5 border-t border-slate-100 bg-slate-50/30 px-5 py-5">
                   {CATEGORIES.map(cat => {
                     const CatIcon = cat.icon;
                     const catFeatures = FEATURES.filter(f => f.category === cat.id);
                     return (
                       <div key={cat.id}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <CatIcon className="w-3.5 h-3.5 text-slate-400" />
-                          <span className="text-xs font-black text-slate-500 uppercase tracking-wide">{cat.label}</span>
+                        <div className="mb-2 flex items-center gap-2">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-50 text-violet-500">
+                            <CatIcon className="h-3.5 w-3.5" />
+                          </div>
+                          <span className="text-xs font-black uppercase tracking-wide text-slate-500">{cat.label}</span>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                           {catFeatures.map(feat => {
                             const planVal = planDefaults[feat.id] ?? false;
                             const overrideVal = flags[feat.id];
@@ -402,12 +450,12 @@ function OrgOverridesTab() {
 
                             return (
                               <div key={feat.id}
-                                className={`flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 transition-colors
-                                  ${isOverridden ? 'border-orange-200 bg-orange-50/40' : 'border-gray-100 bg-gray-50/40'}`}>
+                                className={`flex items-center justify-between gap-3 rounded-xl border bg-white px-3 py-3 transition-all
+                                  ${isOverridden ? 'border-orange-200 shadow-[0_5px_16px_rgba(251,146,60,0.08)]' : 'border-slate-100 hover:border-violet-100'}`}>
                                 <div className="min-w-0">
-                                  <p className="text-sm font-bold text-gray-800 truncate">{feat.label}</p>
+                                  <p className="truncate text-sm font-bold text-slate-800">{feat.label}</p>
                                   {isOverridden && (
-                                    <p className="text-xs text-orange-500 font-semibold">
+                                    <p className="text-xs font-semibold text-orange-500">
                                       override {planVal ? '(plan: on)' : '(plan: off)'}
                                     </p>
                                   )}
@@ -422,24 +470,38 @@ function OrgOverridesTab() {
                   })}
 
                   {/* Save / reset actions */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-                    <button onClick={() => handleResetOrg(org)} disabled={!isDirty}
-                      className="flex items-center gap-1.5 text-xs px-3 py-2 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                      <RotateCcw className="w-3.5 h-3.5" /> Reset
+                  <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => handleResetOrg(org)}
+                      disabled={!isDirty}
+                      className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 transition hover:border-violet-200 hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      Reset
                     </button>
-                    <button onClick={() => handleSaveOrg(org)} disabled={!isDirty || saving[org.id]}
-                      className={`flex items-center gap-1.5 text-xs px-4 py-2 rounded-xl font-bold transition-colors
-                        ${savedOrgs[org.id] ? 'bg-emerald-500 text-white' : isDirty ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}>
-                      <Save className="w-3.5 h-3.5" />
+                    <button
+                      type="button"
+                      onClick={() => handleSaveOrg(org)}
+                      disabled={!isDirty || saving[org.id]}
+                      className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+                        savedOrgs[org.id]
+                          ? 'bg-emerald-500 text-white'
+                          : isDirty
+                            ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-[0_8px_18px_rgba(99,72,210,0.2)]'
+                            : 'cursor-not-allowed bg-slate-100 text-slate-400'
+                      }`}
+                    >
+                      <Save className="h-3.5 w-3.5" />
                       {saving[org.id] ? 'Saving…' : savedOrgs[org.id] ? 'Saved!' : 'Save overrides'}
                     </button>
-                    <p className="text-xs text-gray-400 ml-2">
-                      Overrides saved to <code className="bg-gray-100 px-1 rounded">Organization.settings.feature_flags</code>
+                    <p className="ml-2 text-xs text-slate-400">
+                      Overrides saved to <code className="rounded bg-slate-100 px-1">Organization.settings.feature_flags</code>
                     </p>
                   </div>
                 </div>
               )}
-            </div>
+            </PlatformCard>
           );
         })}
       </div>
@@ -462,49 +524,65 @@ export default function FlagsPage() {
   }, []);
 
   return (
-    <div dir="ltr" className="space-y-6 max-w-7xl mx-auto">
-      {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-black text-slate-900">Feature Flags</h1>
-        <p className="text-slate-500 mt-1 font-semibold">
-          Control which features are enabled per plan and add per-organization overrides
-        </p>
-      </div>
+    <PlatformPageShell dir="ltr">
+      <div className="space-y-5">
+        <PlatformPageHeader
+          title="Feature Flags"
+          subtitle="Control which features are enabled per plan and add per-organization overrides"
+          icon={Flag}
+          actions={(
+            <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/85 px-4 py-3 shadow-[0_8px_25px_rgba(66,81,130,0.07)]">
+              <Shield className="h-5 w-5 text-violet-500" />
+              <div>
+                <p className="text-xs font-bold text-slate-700">{FEATURES.length} platform features</p>
+                <p className="mt-0.5 text-[10px] font-medium text-slate-400">Across {CATEGORIES.length} categories</p>
+              </div>
+            </div>
+          )}
+        />
 
       {/* Plan stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {PLANS.map(plan => {
-          const c = PLAN_COLORS[plan];
-          return (
-            <div key={plan} className={`rounded-2xl p-5 ${c.bg}`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Flag className={`w-4 h-4 ${c.text} opacity-70`} />
-                <span className={`text-xs font-black uppercase tracking-wide ${c.text} opacity-70`}>{plan}</span>
-              </div>
-              <p className={`text-2xl font-black ${c.text}`}>{stats[plan]}</p>
-              <p className={`text-xs font-semibold mt-0.5 ${c.text} opacity-70`}>
-                of {FEATURES.length} features enabled
-              </p>
-            </div>
-          );
-        })}
-      </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {PLANS.map(plan => (
+            <PlatformStatCard
+              key={plan}
+              icon={Flag}
+              label={plan.charAt(0).toUpperCase() + plan.slice(1)}
+              value={stats[plan]}
+              suffix={`/${FEATURES.length}`}
+              tone={plan === 'trial' ? 'amber' : plan === 'starter' ? 'blue' : plan === 'pro' ? 'violet' : 'emerald'}
+              meta="features enabled"
+            />
+          ))}
+        </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
-        {[
-          { id: 'matrix', label: 'Plan Matrix' },
-          { id: 'overrides', label: 'Org Overrides' },
-        ].map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)}
-            className={`px-4 py-2 text-sm font-black rounded-lg transition-colors
-              ${tab === t.id ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
-            {t.label}
-          </button>
-        ))}
-      </div>
+        <PlatformCard className="inline-flex max-w-full items-center gap-1 overflow-x-auto p-1.5">
+          {[
+            { id: 'matrix', label: 'Plan Matrix', icon: Layers },
+            { id: 'overrides', label: 'Org Overrides', icon: Building2 },
+          ].map(item => {
+            const TabIcon = item.icon;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setTab(item.id)}
+                className={`flex min-w-max items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold transition-all ${
+                  tab === item.id
+                    ? 'gradient-brand text-white shadow-[0_8px_20px_rgba(103,78,218,0.25)]'
+                    : 'text-slate-500 hover:bg-violet-50 hover:text-violet-700'
+                }`}
+              >
+                <TabIcon className="h-4 w-4" />
+                {item.label}
+              </button>
+            );
+          })}
+        </PlatformCard>
 
-      {tab === 'matrix' ? <PlanMatrixTab /> : <OrgOverridesTab />}
-    </div>
+        {tab === 'matrix' ? <PlanMatrixTab /> : <OrgOverridesTab />}
+      </div>
+    </PlatformPageShell>
   );
 }

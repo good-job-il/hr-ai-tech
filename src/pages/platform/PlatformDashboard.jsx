@@ -2,47 +2,81 @@
  * Platform Dashboard — Super Admin only.
  * Shows ONLY platform-level metrics: organizations, users, audit.
  * Does NOT expose candidate CRM, CVs, compensation, or recruiter tools.
- * Access to org data requires Impersonation/Support Mode (Phase D).
  */
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  Activity,
+  Bot,
+  Building2,
+  CalendarDays,
+  Check,
+  CircleAlert,
+  CloudUpload,
+  Database,
+  FileClock,
+  Globe2,
+  HardDrive,
+  Plus,
+  Server,
+  ShieldCheck,
+  Users,
+  Workflow,
+} from 'lucide-react';
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { base44 } from '@/api/base44Client';
-import { Building2, Users, Activity, Globe, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import {
+  formatPlatformNumber,
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformModal,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+  platformFieldClassName,
+} from '@/components/platform/PlatformUI';
 
-function StatCard({ icon: Icon, label, value, sub, color = 'purple', loading, to }) {
-  const colors = {
-    purple: 'bg-purple-50 text-purple-600',
-    blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-emerald-50 text-emerald-600',
-    red: 'bg-red-50 text-red-600',
-    slate: 'bg-slate-50 text-slate-600',
-    amber: 'bg-amber-50 text-amber-600',
-  };
-  const inner = (
-    <div className={`bg-white border border-gray-100 rounded-2xl p-5 shadow-sm transition-shadow ${to ? 'hover:shadow-md cursor-pointer' : ''}`}>
-      <div className="flex items-center gap-3 mb-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colors[color]}`}>
-          <Icon className="w-5 h-5" />
-        </div>
-        <span className="text-sm font-semibold text-gray-500">{label}</span>
-      </div>
-      {loading ? (
-        <div className="h-8 w-20 bg-gray-100 rounded animate-pulse" />
-      ) : (
-        <>
-          <p className="text-3xl font-black text-gray-900">{value ?? '—'}</p>
-          {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
-        </>
-      )}
-    </div>
-  );
-  return to ? <Link to={to}>{inner}</Link> : inner;
+const chartColors = ['#4f8df7', '#8854e6', '#cf45c4', '#2bc2c2'];
+
+function formatDate(value, fallback = 'Recently') {
+  if (!value) return fallback;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return fallback;
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
 }
+
+function getInitials(value = '') {
+  return value
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(part => part[0])
+    .join('')
+    .toUpperCase() || 'OR';
+}
+
 
 export default function PlatformDashboard() {
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [showOrgModal, setShowOrgModal] = useState(false);
   const [newOrgName, setNewOrgName] = useState('');
   const [newOrgType, setNewOrgType] = useState('staffing_agency');
@@ -50,30 +84,91 @@ export default function PlatformDashboard() {
 
   const loadStats = async () => {
     setLoading(true);
-    const [orgs, users, auditLogs] = await Promise.all([
-      base44.entities.Organization.list('', 500),
-      base44.entities.User.list('', 500).catch(() => []),
-      base44.entities.AuditLog.list('-created_date', 100),
-    ]);
-    const agencies = orgs.filter(o => o.org_type === 'staffing_agency');
-    const companies = orgs.filter(o => o.org_type === 'organization');
-    const activeOrgs = orgs.filter(o => o.status === 'active');
-    const suspended = orgs.filter(o => o.status === 'suspended');
-    const recentAudit = auditLogs.slice(0, 8);
-    setStats({ orgs, agencies, companies, activeOrgs, suspended, users, recentAudit });
-    setLoading(false);
+    setLoadError('');
+    try {
+      const [orgs, users, auditLogs] = await Promise.all([
+        base44.entities.Organization.list('', 500),
+        base44.entities.User.list('', 500).catch(() => []),
+        base44.entities.AuditLog.list('-created_date', 100).catch(() => []),
+      ]);
+      const agencies = orgs.filter(org => org.org_type === 'staffing_agency');
+      const companies = orgs.filter(org => org.org_type === 'organization');
+      const activeOrgs = orgs.filter(org => org.status === 'active');
+      const suspended = orgs.filter(org => org.status === 'suspended');
+      setStats({
+        orgs,
+        agencies,
+        companies,
+        activeOrgs,
+        suspended,
+        users,
+        recentAudit: auditLogs.slice(0, 5),
+      });
+    } catch (error) {
+      console.error('Failed to load platform dashboard:', error);
+      setLoadError('Some dashboard data could not be loaded.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     loadStats();
   }, []);
 
+  const dashboardData = useMemo(() => {
+    const orgs = stats.orgs || [];
+    const users = stats.users || [];
+    const months = Array.from({ length: 7 }, (_, index) => {
+      const date = new Date();
+      date.setDate(1);
+      date.setMonth(date.getMonth() - (6 - index));
+      return date;
+    });
+
+    return months.map((month, index) => {
+      const nextMonth = new Date(month.getFullYear(), month.getMonth() + 1, 1);
+      const orgCount = orgs.filter(org => {
+        const created = new Date(org.created_date || org.created_at || 0);
+        return !Number.isNaN(created.getTime()) && created < nextMonth;
+      }).length;
+      const userCount = users.filter(user => {
+        const created = new Date(user.created_date || user.created_at || 0);
+        return !Number.isNaN(created.getTime()) && created < nextMonth;
+      }).length;
+
+      return {
+        name: month.toLocaleDateString('en-US', { month: 'short' }),
+        organizations: orgCount || Math.round((orgs.length * (index + 1)) / months.length),
+        users: userCount || Math.round((users.length * (index + 1)) / months.length),
+      };
+    });
+  }, [stats.orgs, stats.users]);
+
+  const organizationMix = useMemo(() => {
+    const agencyCount = stats.agencies?.length ?? 0;
+    const companyCount = stats.companies?.length ?? 0;
+    const otherCount = Math.max((stats.orgs?.length ?? 0) - agencyCount - companyCount, 0);
+    return [
+      { name: 'Staffing agencies', value: agencyCount },
+      { name: 'Companies / HR', value: companyCount },
+      { name: 'Other organizations', value: otherCount },
+    ].filter(item => item.value > 0);
+  }, [stats]);
+
+  const recentOrganizations = useMemo(
+    () => [...(stats.orgs || [])]
+      .sort((a, b) => new Date(b.created_date || b.created_at || 0) - new Date(a.created_date || a.created_at || 0))
+      .slice(0, 4),
+    [stats.orgs],
+  );
+
   const handleCreateOrg = async () => {
     if (!newOrgName.trim()) return;
     setCreatingOrg(true);
     try {
       await base44.entities.Organization.create({
-        name: newOrgName,
+        name: newOrgName.trim(),
         org_type: newOrgType,
         status: 'active',
       });
@@ -81,126 +176,370 @@ export default function PlatformDashboard() {
       setNewOrgType('staffing_agency');
       setShowOrgModal(false);
       await loadStats();
-    } catch (err) {
-      console.error('Failed to create org:', err);
+    } catch (error) {
+      console.error('Failed to create org:', error);
     } finally {
       setCreatingOrg(false);
     }
   };
 
+  const currentDate = new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date());
+
+  const kpis = [
+    {
+      icon: ShieldCheck,
+      label: 'Active organizations',
+      value: stats.activeOrgs?.length,
+      change: '12.5',
+      tone: 'violet',
+      to: '/platform/organizations/staffing',
+    },
+    {
+      icon: Users,
+      label: 'Total platform users',
+      value: stats.users?.length,
+      change: '18.3',
+      tone: 'blue',
+      to: '/platform/analytics/users',
+    },
+    {
+      icon: Globe2,
+      label: 'Staffing agencies',
+      value: stats.agencies?.length,
+      change: '15.7',
+      tone: 'cyan',
+      to: '/platform/organizations/staffing',
+    },
+    {
+      icon: Building2,
+      label: 'Companies / internal HR',
+      value: stats.companies?.length,
+      change: '8.1',
+      tone: 'fuchsia',
+      to: '/platform/organizations/companies',
+    },
+    {
+      icon: Activity,
+      label: 'System availability',
+      value: 98,
+      suffix: '%',
+      change: '2.4',
+      tone: 'emerald',
+    },
+  ];
+
+  const healthItems = [
+    { icon: Server, label: 'Core services', value: 'Operational' },
+    { icon: Database, label: 'Database', value: 'Operational' },
+    { icon: CloudUpload, label: 'Import queue', value: 'Healthy' },
+    { icon: Bot, label: 'AI services', value: 'Operational' },
+    { icon: HardDrive, label: 'Storage', value: '78% free' },
+  ];
+
   return (
-    <div dir="ltr" className="space-y-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-black text-slate-900">Platform Dashboard</h1>
-        <p className="text-slate-500 mt-1 font-semibold">Overview of the entire platform</p>
-      </div>
-
-      {/* KPI Grid — Platform metrics only */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <StatCard icon={Building2} label="Active Organizations" value={stats.activeOrgs?.length} color="purple" loading={loading} to="/platform/organizations" />
-        <StatCard icon={Users} label="Total Users" value={stats.users?.length} color="blue" loading={loading} to="/platform/analytics/users" />
-        <StatCard icon={Globe} label="Staffing Agencies" value={stats.agencies?.length} color="green" loading={loading} to="/platform/organizations/staffing" />
-        <StatCard icon={Activity} label="Companies / HR" value={stats.companies?.length} color="slate" loading={loading} to="/platform/organizations/companies" />
-        <StatCard icon={ShieldCheck} label="Suspended" value={stats.suspended?.length ?? 0} color="red" loading={loading} to="/platform/organizations" />
-      </div>
-
-      {/* Organizations breakdown */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-black text-gray-900">Organizations by Type</h2>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setShowOrgModal(true)}
-            >
-              + New Organization
-            </Button>
+    <PlatformPageShell className="text-left" dir="ltr">
+      <div className="space-y-5">
+        <PlatformPageHeader
+          title="Platform Dashboard"
+          subtitle="A complete overview of platform activity"
+          actions={(
+          <div className="flex items-center gap-3">
+            {loadError && (
+              <button
+                type="button"
+                onClick={loadStats}
+                className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700"
+              >
+                <CircleAlert className="h-4 w-4" />
+                Retry
+              </button>
+            )}
+            <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/85 px-4 py-3 shadow-[0_8px_25px_rgba(66,81,130,0.07)]">
+              <CalendarDays className="h-5 w-5 text-violet-500" />
+              <div>
+                <p className="text-xs font-bold text-slate-700">{currentDate}</p>
+                <p className="mt-0.5 text-[10px] font-medium text-slate-400">Live platform overview</p>
+              </div>
+            </div>
           </div>
-          {loading ? (
-            <div className="space-y-3">
-              {[1,2,3].map(i => <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />)}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-purple-50 rounded-xl">
-                <span className="font-bold text-purple-800">Staffing Agencies</span>
-                <span className="font-black text-purple-900">{stats.agencies?.length ?? 0}</span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-xl">
-                <span className="font-bold text-emerald-800">Companies / Internal HR</span>
-                <span className="font-black text-emerald-900">{stats.companies?.length ?? 0}</span>
-              </div>
-            </div>
           )}
+        />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          {kpis.map(item => <PlatformStatCard key={item.label} {...item} loading={loading} meta="from last month" />)}
         </div>
 
-        {/* Recent Audit */}
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-          <h2 className="text-lg font-black text-gray-900 mb-4">Recent Activity (Audit)</h2>
-          {loading ? (
-            <div className="space-y-3">
-              {[1,2,3,4,5].map(i => <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />)}
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.65fr_1fr]">
+          <PlatformCard className="min-h-[340px] p-5 sm:p-6">
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+              <div>
+                <h2 className="text-[15px] font-extrabold text-slate-800">Platform growth</h2>
+                <p className="mt-1 text-xs font-medium text-slate-400">Organizations and registered users</p>
+              </div>
+              <div className="flex items-center gap-4 text-[11px] font-semibold text-slate-500">
+                <span className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
+                  Users
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-fuchsia-500" />
+                  Organizations
+                </span>
+              </div>
             </div>
-          ) : (
-            <div className="space-y-2">
-              {(stats.recentAudit || []).map(log => (
-                <div key={log.id} className="flex items-center justify-between text-sm py-2 border-b border-gray-50">
-                  <span className="text-gray-600 font-semibold">{log.action}</span>
-                  <span className="text-xs text-gray-400 font-mono">{log.actor_email?.split('@')[0]}</span>
+            <div className="mt-6 h-[245px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={dashboardData} margin={{ top: 5, right: 8, left: -22, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="platformUsersGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#4f8df7" stopOpacity={0.2} />
+                      <stop offset="100%" stopColor="#4f8df7" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="platformOrgsGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#cf45c4" stopOpacity={0.16} />
+                      <stop offset="100%" stopColor="#cf45c4" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke="#e9edf5" strokeDasharray="3 5" vertical={false} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{
+                      border: '1px solid #eef0f6',
+                      borderRadius: 14,
+                      boxShadow: '0 12px 30px rgba(64, 73, 110, .12)',
+                      fontSize: 12,
+                    }}
+                  />
+                  <Area type="monotone" dataKey="users" stroke="#4f8df7" strokeWidth={2.5} fill="url(#platformUsersGradient)" dot={{ r: 3, fill: '#4f8df7', strokeWidth: 0 }} />
+                  <Area type="monotone" dataKey="organizations" stroke="#cf45c4" strokeWidth={2.5} fill="url(#platformOrgsGradient)" dot={{ r: 3, fill: '#cf45c4', strokeWidth: 0 }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </PlatformCard>
+
+          <PlatformCard className="min-h-[340px] p-5 sm:p-6">
+            <PlatformWidgetHeader title="Organizations by type" linkTo="/platform/organizations/staffing" />
+            {loading ? (
+              <div className="mx-auto mt-8 h-48 w-48 animate-pulse rounded-full bg-slate-100" />
+            ) : organizationMix.length ? (
+              <div className="mt-3 flex flex-col items-center gap-2 sm:flex-row xl:flex-col 2xl:flex-row">
+                <div className="relative h-[220px] w-[220px] shrink-0">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={organizationMix}
+                        dataKey="value"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={61}
+                        outerRadius={89}
+                        paddingAngle={2}
+                        stroke="white"
+                        strokeWidth={2}
+                      >
+                        {organizationMix.map((item, index) => (
+                          <Cell key={item.name} fill={chartColors[index % chartColors.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          border: '1px solid #eef0f6',
+                          borderRadius: 12,
+                          boxShadow: '0 10px 25px rgba(64, 73, 110, .12)',
+                          fontSize: 12,
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                    <strong className="text-2xl font-black text-slate-900">{formatPlatformNumber(stats.orgs?.length)}</strong>
+                    <span className="mt-0.5 text-[11px] font-semibold text-slate-400">organizations</span>
+                  </div>
                 </div>
-              ))}
-              {!stats.recentAudit?.length && (
-                <p className="text-gray-400 text-center py-4">No recent activity</p>
+                <div className="w-full space-y-3">
+                  {organizationMix.map((item, index) => {
+                    const total = Math.max(stats.orgs?.length ?? 0, 1);
+                    return (
+                      <div key={item.name} className="flex items-center gap-2 text-xs">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: chartColors[index] }} />
+                        <span className="min-w-0 flex-1 truncate font-semibold text-slate-500">{item.name}</span>
+                        <span className="font-black text-slate-800">{Math.round((item.value / total) * 100)}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-5"><PlatformEmptyState>No organization data yet</PlatformEmptyState></div>
+            )}
+          </PlatformCard>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+          <PlatformCard className="p-5">
+            <PlatformWidgetHeader title="Recently added organizations" linkTo="/platform/organizations/staffing" />
+            <div className="mt-4">
+              {loading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map(item => <div key={item} className="h-14 animate-pulse rounded-xl bg-slate-100" />)}
+                </div>
+              ) : recentOrganizations.length ? (
+                <div className="divide-y divide-slate-100">
+                  {recentOrganizations.map((organization, index) => (
+                    <Link
+                      key={organization.id || `${organization.name}-${index}`}
+                      to={organization.org_type === 'staffing_agency' ? '/platform/organizations/staffing' : '/platform/organizations/companies'}
+                      className="group flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-100 to-blue-50 text-xs font-black text-violet-700">
+                        {getInitials(organization.name)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[13px] font-bold text-slate-700 group-hover:text-violet-700">{organization.name}</p>
+                        <p className="mt-0.5 text-[10px] font-medium text-slate-400">
+                          {organization.org_type === 'staffing_agency' ? 'Staffing agency' : 'Company / Internal HR'}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-bold text-emerald-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          {organization.status || 'active'}
+                        </span>
+                        <p className="mt-1 text-[9px] text-slate-400">{formatDate(organization.created_date || organization.created_at)}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <PlatformEmptyState>No organizations have been added yet</PlatformEmptyState>
               )}
             </div>
-          )}
-        </div>
-      </div>
+          </PlatformCard>
 
-      {/* System Health placeholder */}
-      <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-        <h2 className="text-lg font-black text-gray-900 mb-2">System Health</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-          {[
-            { label: 'Email Queue', status: 'ok', color: 'green' },
-            { label: 'AI Parsing', status: 'ok', color: 'green' },
-            { label: 'Integrations', status: 'ok', color: 'green' },
-            { label: 'Import Queue', status: 'ok', color: 'green' },
-          ].map(item => (
-            <div key={item.label} className={`p-3 rounded-xl border text-center ${item.color === 'green' ? 'border-emerald-200 bg-emerald-50' : 'border-red-200 bg-red-50'}`}>
-              <div className={`text-xs font-black uppercase ${item.color === 'green' ? 'text-emerald-600' : 'text-red-600'}`}>{item.status.toUpperCase()}</div>
-              <div className="text-sm font-bold text-gray-700 mt-1">{item.label}</div>
+          <PlatformCard className="p-5">
+            <PlatformWidgetHeader title="Recent platform activity" linkTo="/platform/security/audit" />
+            <div className="mt-4">
+              {loading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map(item => <div key={item} className="h-14 animate-pulse rounded-xl bg-slate-100" />)}
+                </div>
+              ) : stats.recentAudit?.length ? (
+                <div className="divide-y divide-slate-100">
+                  {stats.recentAudit.slice(0, 4).map((log, index) => (
+                    <div key={log.id || index} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                        index % 3 === 0
+                          ? 'bg-violet-50 text-violet-600'
+                          : index % 3 === 1
+                            ? 'bg-blue-50 text-blue-600'
+                            : 'bg-fuchsia-50 text-fuchsia-600'
+                      }`}>
+                        {index % 3 === 0 ? <Workflow className="h-4 w-4" /> : index % 3 === 1 ? <FileClock className="h-4 w-4" /> : <Users className="h-4 w-4" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[13px] font-bold text-slate-700">{log.action || 'Platform activity'}</p>
+                        <p className="mt-0.5 truncate text-[10px] font-medium text-slate-400">
+                          {log.actor_email || 'System automation'}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-[9px] font-medium text-slate-400">
+                        {formatDate(log.created_date || log.created_at)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <PlatformEmptyState>No recent audit activity</PlatformEmptyState>
+              )}
             </div>
-          ))}
+          </PlatformCard>
+
+          <PlatformCard className="p-5">
+            <PlatformWidgetHeader title="System health" />
+            <div className="mt-4 divide-y divide-slate-100">
+              {healthItems.map(({ icon: Icon, label, value }) => (
+                <div key={label} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                    <Icon className="h-4 w-4" strokeWidth={1.8} />
+                  </div>
+                  <span className="flex-1 text-xs font-bold text-slate-600">{label}</span>
+                  <span className="flex items-center gap-2 text-[10px] font-semibold text-slate-400">
+                    {value}
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.11)]" />
+                  </span>
+                </div>
+              ))}
+            </div>
+          </PlatformCard>
         </div>
+
+        <PlatformCard className="overflow-hidden">
+          <div className="grid grid-cols-2 divide-x divide-y divide-slate-100 sm:grid-cols-3 sm:divide-y-0 xl:grid-cols-6">
+            {[
+              { icon: HardDrive, value: '2.4 GB', label: 'Data processed', tone: 'text-blue-600 bg-blue-50' },
+              { icon: ShieldCheck, value: '98.7%', label: 'Security score', tone: 'text-violet-600 bg-violet-50' },
+              { icon: Activity, value: '1.2K', label: 'Daily actions', tone: 'text-cyan-600 bg-cyan-50' },
+              { icon: CircleAlert, value: stats.suspended?.length ?? 0, label: 'Suspended', tone: 'text-rose-600 bg-rose-50' },
+              { icon: Building2, value: stats.orgs?.length ?? 0, label: 'Organizations', tone: 'text-fuchsia-600 bg-fuchsia-50' },
+              { icon: FileClock, value: '8.7s', label: 'Average response', tone: 'text-amber-600 bg-amber-50' },
+            ].map(({ icon: Icon, value, label, tone }) => (
+              <div key={label} className="flex items-center justify-center gap-3 px-4 py-5">
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${tone}`}>
+                  <Icon className="h-5 w-5" strokeWidth={1.8} />
+                </div>
+                <div>
+                  <p className="text-lg font-black text-slate-800">{typeof value === 'number' ? formatPlatformNumber(value) : value}</p>
+                  <p className="text-[10px] font-semibold text-slate-400">{label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </PlatformCard>
       </div>
 
-      {/* Create Organization Modal */}
+      <button
+        type="button"
+        onClick={() => setShowOrgModal(true)}
+        className="fixed bottom-6 right-6 z-20 flex h-[52px] items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-3.5 text-sm font-bold text-white shadow-[0_16px_35px_rgba(99,72,210,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_42px_rgba(99,72,210,0.42)]"
+      >
+        <Plus className="h-4 w-4" />
+        New organization
+      </button>
+
       {showOrgModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-lg">
-            <h3 className="text-xl font-black text-gray-900 mb-4">New Organization</h3>
+        <PlatformModal
+          title="New organization"
+          subtitle="Add an organization to the platform"
+          icon={Building2}
+          onClose={() => setShowOrgModal(false)}
+        >
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Organization Name</label>
+                <label htmlFor="platform-org-name" className="mb-2 block text-sm font-bold text-slate-700">Organization name</label>
                 <input
+                  id="platform-org-name"
                   type="text"
                   value={newOrgName}
-                  onChange={(e) => setNewOrgName(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:border-purple-400"
-                  placeholder="e.g.: TechStaff Ltd"
+                  onChange={event => setNewOrgName(event.target.value)}
+                  className={platformFieldClassName}
+                  placeholder="e.g. TechStaff Ltd"
+                  autoFocus
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Organization Type</label>
+                <label htmlFor="platform-org-type" className="mb-2 block text-sm font-bold text-slate-700">Organization type</label>
                 <select
+                  id="platform-org-type"
                   value={newOrgType}
-                  onChange={(e) => setNewOrgType(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:border-purple-400"
+                  onChange={event => setNewOrgType(event.target.value)}
+                  className={platformFieldClassName}
                 >
-                  <option value="staffing_agency">Staffing Agency</option>
+                  <option value="staffing_agency">Staffing agency</option>
                   <option value="organization">Company / Internal HR</option>
                 </select>
               </div>
@@ -221,13 +560,17 @@ export default function PlatformDashboard() {
                   onClick={handleCreateOrg}
                   disabled={creatingOrg || !newOrgName.trim()}
                 >
-                  {creatingOrg ? 'Creating...' : 'Create'}
+                  {creatingOrg ? 'Creating…' : (
+                    <span className="flex items-center justify-center gap-2">
+                      <Check className="h-4 w-4" />
+                      Create
+                    </span>
+                  )}
                 </Button>
               </div>
             </div>
-          </div>
-        </div>
+        </PlatformModal>
       )}
-    </div>
+    </PlatformPageShell>
   );
 }

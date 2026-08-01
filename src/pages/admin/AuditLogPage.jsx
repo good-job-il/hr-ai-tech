@@ -3,17 +3,26 @@
  * Filters: date, user, action, entity
  * CSV export
  */
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import {
   ShieldCheck, Filter, Download, Eye, FileText,
-  Activity, ChevronDown, ChevronUp, XCircle, CheckCircle2, AlertTriangle
+  Activity, ChevronDown, ChevronUp, XCircle, CheckCircle2, AlertTriangle, Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { he, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+  platformFieldClassName,
+} from '@/components/platform/PlatformUI';
 
 const getActionConfig = (t) => ({
   view: { label: t('auditLog.actions.view'), icon: Eye, color: '#64748B' },
@@ -126,109 +135,116 @@ export default function AuditLogPage() {
     setPage(0);
   };
 
+  const uniqueActors = new Set(logs.map(log => log.actor_email).filter(Boolean)).size;
+  const securityEvents = logs.filter(log => ['delete', 'impersonate', 'login'].includes(log.action)).length;
+
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className="p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <PlatformPageShell dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="space-y-5">
 
         {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-2xl font-black text-[#0F172A] flex items-center gap-2">
-              <ShieldCheck className="w-6 h-6 text-[#7C3AED]" />
-              {t('auditLog.title')}
-            </h1>
-            <p className="text-sm text-[#64748B] mt-0.5">{t('auditLog.subtitle')}</p>
-          </div>
-          <div className="flex items-center gap-2">
+        <PlatformPageHeader
+          title={t('auditLog.title')}
+          subtitle={t('auditLog.subtitle')}
+          icon={ShieldCheck}
+          actions={(
             <Button onClick={exportToCSV} variant="outline" className="gap-1.5 text-sm">
-              <Download className="w-4 h-4" /> {t('auditLog.exportCSV')}
+              <Download className="h-4 w-4" />
+              {t('auditLog.exportCSV')}
             </Button>
-          </div>
+          )}
+        />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <PlatformStatCard icon={Activity} label={t('auditLog.recordsInPage')} value={logs.length} tone="violet" loading={isLoading} meta={`${t('auditLog.tableHeaders.date')} ${page + 1}`} />
+          <PlatformStatCard icon={Users} label={t('auditLog.tableHeaders.user')} value={uniqueActors} tone="blue" loading={isLoading} meta={t('auditLog.userEmail')} />
+          <PlatformStatCard icon={ShieldCheck} label={t('auditLog.tableHeaders.action')} value={securityEvents} tone="rose" loading={isLoading} meta={t('auditLog.details')} />
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-2xl border border-[#E4ECFF] p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Filter className="w-4 h-4 text-[#7C3AED]" />
-            <span className="text-sm font-bold text-[#0F172A]">{t('auditLog.filters')}</span>
-          </div>
+        <PlatformCard className="p-5">
+          <PlatformWidgetHeader
+            title={t('auditLog.filters')}
+            subtitle={`${logs.length} ${t('auditLog.recordsInPage')} ${page + 1}`}
+            action={<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 text-violet-600"><Filter className="h-4 w-4" /></div>}
+          />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
             <div>
-              <label className="text-xs font-semibold text-[#64748B] mb-1 block">{t('auditLog.entity')}</label>
+              <label className="mb-2 block text-xs font-semibold text-slate-500">{t('auditLog.entity')}</label>
               <select value={filters.entity_type} onChange={e => updateFilter('entity_type', e.target.value)}
-                className="w-full h-9 px-3 bg-[#F7FBFF] border border-[#E4ECFF] rounded-xl text-sm focus:outline-none focus:border-[#7C3AED]">
+                className={platformFieldClassName}>
                 <option value="">{t('auditLog.allEntities')}</option>
                 {ENTITY_TYPES.map(type => <option key={type} value={type}>{type}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#64748B] mb-1 block">{t('auditLog.action')}</label>
+              <label className="mb-2 block text-xs font-semibold text-slate-500">{t('auditLog.action')}</label>
               <select value={filters.action} onChange={e => updateFilter('action', e.target.value)}
-                className="w-full h-9 px-3 bg-[#F7FBFF] border border-[#E4ECFF] rounded-xl text-sm focus:outline-none focus:border-[#7C3AED]">
+                className={platformFieldClassName}>
                 <option value="">{t('auditLog.allActions')}</option>
                 {ACTIONS.map(action => <option key={action} value={action}>{ACTION_CONFIG[action]?.label || action}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#64748B] mb-1 block">{t('auditLog.userEmail')}</label>
+              <label className="mb-2 block text-xs font-semibold text-slate-500">{t('auditLog.userEmail')}</label>
               <input type="text" value={filters.actor_email} onChange={e => updateFilter('actor_email', e.target.value)}
-                placeholder={t('auditLog.searchPlaceholder')} className="w-full h-9 px-3 bg-[#F7FBFF] border border-[#E4ECFF] rounded-xl text-sm focus:outline-none focus:border-[#7C3AED]" />
+                placeholder={t('auditLog.searchPlaceholder')} className={platformFieldClassName} />
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#64748B] mb-1 block">{t('auditLog.fromDate')}</label>
+              <label className="mb-2 block text-xs font-semibold text-slate-500">{t('auditLog.fromDate')}</label>
               <input type="date" value={filters.date_from} onChange={e => updateFilter('date_from', e.target.value)}
-                className="w-full h-9 px-3 bg-[#F7FBFF] border border-[#E4ECFF] rounded-xl text-sm focus:outline-none focus:border-[#7C3AED]" />
+                className={platformFieldClassName} />
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#64748B] mb-1 block">{t('auditLog.toDate')}</label>
+              <label className="mb-2 block text-xs font-semibold text-slate-500">{t('auditLog.toDate')}</label>
               <input type="date" value={filters.date_to} onChange={e => updateFilter('date_to', e.target.value)}
-                className="w-full h-9 px-3 bg-[#F7FBFF] border border-[#E4ECFF] rounded-xl text-sm focus:outline-none focus:border-[#7C3AED]" />
+                className={platformFieldClassName} />
             </div>
           </div>
-          <div className="flex items-center justify-between mt-3">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
             <div className="flex items-center gap-2">
               <Button size="sm" onClick={clearFilters} variant="outline" className="text-xs gap-1">
                 <XCircle className="w-3.5 h-3.5" /> {t('auditLog.clearFilters')}
               </Button>
-              <span className="text-xs text-[#94A3B8]">{logs.length} {t('auditLog.recordsInPage')} {page + 1}</span>
+              <span className="text-xs text-slate-400">{logs.length} {t('auditLog.recordsInPage')} {page + 1}</span>
             </div>
             <div className="flex items-center gap-1">
               <Button size="sm" variant="outline" className="text-xs" disabled={page === 0} onClick={() => setPage(p => p - 1)}>
                 {isRTL ? '←' : '→'} {t('auditLog.previous')}
               </Button>
-              <span className="text-xs px-2 text-[#64748B] font-bold">{page + 1}</span>
+              <span className="px-2 text-xs font-bold text-slate-500">{page + 1}</span>
               <Button size="sm" variant="outline" className="text-xs" disabled={logs.length < PAGE_SIZE} onClick={() => setPage(p => p + 1)}>
                 {t('auditLog.next')} {isRTL ? '→' : '←'}
               </Button>
             </div>
           </div>
-        </div>
+        </PlatformCard>
 
         {/* Logs List */}
-        <div className="bg-white rounded-2xl border border-[#E4ECFF] overflow-hidden">
+        <PlatformCard className="overflow-hidden">
+          <div className="border-b border-slate-100 p-5">
+            <PlatformWidgetHeader title={t('auditLog.title')} subtitle={t('auditLog.subtitle')} />
+          </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-[#F7FBFF] border-b border-[#E4ECFF]">
+            <table className="w-full min-w-[980px]">
+              <thead className="border-b border-slate-100 bg-slate-50/60">
                 <tr>
-                  <th className={`${isRTL ? 'text-right' : 'text-left'} text-xs font-bold text-[#64748B] p-3`}>{t('auditLog.tableHeaders.date')}</th>
-                  <th className={`${isRTL ? 'text-right' : 'text-left'} text-xs font-bold text-[#64748B] p-3`}>{t('auditLog.tableHeaders.user')}</th>
-                  <th className={`${isRTL ? 'text-right' : 'text-left'} text-xs font-bold text-[#64748B] p-3`}>{t('auditLog.tableHeaders.action')}</th>
-                  <th className={`${isRTL ? 'text-right' : 'text-left'} text-xs font-bold text-[#64748B] p-3`}>{t('auditLog.tableHeaders.entity')}</th>
-                  <th className={`${isRTL ? 'text-right' : 'text-left'} text-xs font-bold text-[#64748B] p-3`}>{t('auditLog.tableHeaders.description')}</th>
-                  <th className={`${isRTL ? 'text-left' : 'text-right'} text-xs font-bold text-[#64748B] p-3`}></th>
+                  {[t('auditLog.tableHeaders.date'), t('auditLog.tableHeaders.user'), t('auditLog.tableHeaders.action'), t('auditLog.tableHeaders.entity'), t('auditLog.tableHeaders.description'), ''].map((label, index) => (
+                    <th key={`${label}-${index}`} className="p-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">{label}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
                     <td colSpan={6} className="text-center py-10">
-                      <div className="w-6 h-6 border-2 border-[#7C3AED] border-t-transparent rounded-full animate-spin mx-auto" />
+                      <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-violet-600 border-t-transparent" />
                     </td>
                   </tr>
                 ) : logs.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-10 text-[#94A3B8] text-sm font-semibold">
-                      {t('auditLog.noRecords')}
+                    <td colSpan={6} className="p-5">
+                      <PlatformEmptyState icon={ShieldCheck}>{t('auditLog.noRecords')}</PlatformEmptyState>
                     </td>
                   </tr>
                 ) : (
@@ -238,57 +254,59 @@ export default function AuditLogPage() {
                     const isExpanded = expandedLog === log.id;
 
                     return (
-                      <tr key={log.id} className="border-b border-[#F0F1F5] last:border-0 hover:bg-[#F7FBFF]">
-                        <td className="p-3 text-sm text-[#374151]">
+                      <Fragment key={log.id}>
+                      <tr className="border-b border-slate-100 transition-colors hover:bg-violet-50/35">
+                        <td className="p-3.5 text-xs font-medium text-slate-500">
                           {log.created_date ? format(new Date(log.created_date), 'dd/MM/yyyy HH:mm', { locale: dateLocale }) : ''}
                         </td>
-                        <td className="p-3 text-sm text-[#374151]">{log.actor_email || '—'}</td>
-                        <td className="p-3">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold"
+                        <td className="p-3.5 text-xs font-semibold text-slate-700">{log.actor_email || '—'}</td>
+                        <td className="p-3.5">
+                          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold"
                             style={{ backgroundColor: `${cfg.color}15`, color: cfg.color }}>
-                            <Icon className="w-3.5 h-3.5" />
+                            <Icon className="h-3.5 w-3.5" />
                             {cfg.label}
                           </span>
                         </td>
-                        <td className="p-3 text-sm text-[#374151]">{log.entity_type}</td>
-                        <td className="p-3 text-sm text-[#374151] truncate max-w-xs">{log.entity_label || '—'}</td>
-                        <td className={`p-3 ${isRTL ? 'text-left' : 'text-right'}`}>
+                        <td className="p-3.5 text-xs font-semibold text-slate-600">{log.entity_type}</td>
+                        <td className="max-w-xs truncate p-3.5 text-xs text-slate-500">{log.entity_label || '—'}</td>
+                        <td className="p-3.5">
                           <button
                             onClick={() => setExpandedLog(isExpanded ? null : log.id)}
-                            className="text-[#7C3AED] hover:underline text-xs font-bold flex items-center gap-1"
+                            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-bold text-violet-600 transition hover:bg-violet-50"
                           >
-                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                            {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                             {t('auditLog.details')}
                           </button>
                         </td>
+                      </tr>
                         {isExpanded && (
                           <tr>
-                            <td colSpan={6} className="bg-[#F7FBFF] p-4 border-t border-[#E4ECFF]">
+                            <td colSpan={6} className="border-b border-slate-100 bg-slate-50/70 p-5">
                               <div className="grid grid-cols-2 gap-3 text-xs">
                                 <div>
-                                  <span className="font-semibold text-[#64748B]">{t('auditLog.entityId')}:</span>
-                                  <span className={`text-[#374151] ${isRTL ? 'mr-2' : 'ml-2'} font-mono`}>{log.entity_id}</span>
+                                  <span className="font-semibold text-slate-500">{t('auditLog.entityId')}:</span>
+                                  <span className={`text-slate-700 ${isRTL ? 'mr-2' : 'ml-2'} font-mono`}>{log.entity_id}</span>
                                 </div>
                                 <div>
-                                  <span className="font-semibold text-[#64748B]">{t('auditLog.actorRole')}:</span>
-                                  <span className={`text-[#374151] ${isRTL ? 'mr-2' : 'ml-2'}`}>{log.actor_role || '—'}</span>
+                                  <span className="font-semibold text-slate-500">{t('auditLog.actorRole')}:</span>
+                                  <span className={`text-slate-700 ${isRTL ? 'mr-2' : 'ml-2'}`}>{log.actor_role || '—'}</span>
                                 </div>
                                 {log.ip_address && (
                                   <div>
-                                    <span className="font-semibold text-[#64748B]">IP:</span>
-                                    <span className={`text-[#374151] ${isRTL ? 'mr-2' : 'ml-2'} font-mono`}>{log.ip_address}</span>
+                                    <span className="font-semibold text-slate-500">IP:</span>
+                                    <span className={`text-slate-700 ${isRTL ? 'mr-2' : 'ml-2'} font-mono`}>{log.ip_address}</span>
                                   </div>
                                 )}
                                 {log.user_agent && (
                                   <div className="col-span-2">
-                                    <span className="font-semibold text-[#64748B]">User-Agent:</span>
-                                    <span className={`text-[#374151] ${isRTL ? 'mr-2' : 'ml-2'} block mt-1 font-mono text-[10px]`}>{log.user_agent}</span>
+                                    <span className="font-semibold text-slate-500">User-Agent:</span>
+                                    <span className={`text-slate-700 ${isRTL ? 'mr-2' : 'ml-2'} mt-1 block font-mono text-[10px]`}>{log.user_agent}</span>
                                   </div>
                                 )}
                                 {log.metadata && (
                                   <div className="col-span-2">
-                                    <span className="font-semibold text-[#64748B]">Metadata:</span>
-                                    <pre className="bg-white rounded-lg p-2 mt-1 text-[10px] text-[#374151] overflow-x-auto border border-[#E4ECFF]">
+                                    <span className="font-semibold text-slate-500">Metadata:</span>
+                                    <pre className="mt-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-3 text-[10px] text-slate-700">
                                       {JSON.stringify(log.metadata, null, 2)}
                                     </pre>
                                   </div>
@@ -297,15 +315,15 @@ export default function AuditLogPage() {
                             </td>
                           </tr>
                         )}
-                      </tr>
+                      </Fragment>
                     );
                   })
                 )}
               </tbody>
             </table>
           </div>
-        </div>
+        </PlatformCard>
       </div>
-    </div>
+    </PlatformPageShell>
   );
 }

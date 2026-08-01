@@ -1,7 +1,25 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Building2, Search, Filter, CheckCircle, XCircle, Clock, ChevronDown } from 'lucide-react';
+import {
+  Building2,
+  CheckCircle,
+  CircleDollarSign,
+  Clock,
+  CreditCard,
+  Crown,
+  Search,
+  SlidersHorizontal,
+  XCircle,
+} from 'lucide-react';
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from '@/components/platform/PlatformUI';
 
 const PLAN_COLORS = {
   trial:      { bg: 'bg-amber-50',   text: 'text-amber-700',   border: 'border-amber-200',   label: 'Trial' },
@@ -52,144 +70,221 @@ export default function SubscriptionsPage() {
   };
 
   return (
-    <div dir="ltr" className="space-y-6 max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-black text-slate-900">Subscription Management</h1>
-        <p className="text-slate-500 mt-1 font-semibold">All organizations and their subscription plans</p>
-      </div>
+    <PlatformPageShell dir="ltr">
+      <div className="space-y-5">
+        <PlatformPageHeader
+          title="Subscription Management"
+          subtitle="All organizations and their subscription plans"
+          icon={CreditCard}
+          actions={(
+            <div className="flex items-center gap-2 rounded-2xl border border-white bg-white/85 px-4 py-3 shadow-[0_8px_25px_rgba(66,81,130,0.07)]">
+              <CircleDollarSign className="h-5 w-5 text-violet-500" />
+              <div>
+                <p className="text-xs font-bold text-slate-700">Monthly recurring revenue</p>
+                <p className="mt-0.5 text-[10px] font-medium text-slate-400">Based on active subscriptions</p>
+              </div>
+            </div>
+          )}
+        />
 
-      {/* KPI */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Total Organizations', value: stats.total, color: 'bg-purple-50 text-purple-700' },
-          { label: 'Active', value: stats.active, color: 'bg-emerald-50 text-emerald-700' },
-          { label: 'Enterprise', value: stats.enterprise, color: 'bg-blue-50 text-blue-700' },
-          { label: 'MRR (₪)', value: `₪${stats.mrr.toLocaleString()}`, color: 'bg-amber-50 text-amber-700' },
-        ].map(s => (
-          <div key={s.label} className={`rounded-2xl p-5 ${s.color}`}>
-            <p className="text-2xl font-black">{isLoading ? '...' : s.value}</p>
-            <p className="text-sm font-semibold mt-1 opacity-80">{s.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center gap-2 flex-1 min-w-48 border border-gray-200 rounded-xl px-3 py-2">
-          <Search className="w-4 h-4 text-gray-400" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search organization..."
-            className="outline-none text-sm w-full bg-transparent"
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <PlatformStatCard
+            icon={Building2}
+            label="Total organizations"
+            value={stats.total}
+            tone="violet"
+            loading={isLoading}
+            meta="Across every plan"
+          />
+          <PlatformStatCard
+            icon={CheckCircle}
+            label="Active subscriptions"
+            value={stats.active}
+            tone="emerald"
+            loading={isLoading}
+            meta="Currently billable"
+          />
+          <PlatformStatCard
+            icon={Crown}
+            label="Enterprise plans"
+            value={stats.enterprise}
+            tone="blue"
+            loading={isLoading}
+            meta="Highest tier"
+          />
+          <PlatformStatCard
+            icon={CircleDollarSign}
+            label="Monthly recurring revenue"
+            value={stats.mrr}
+            prefix="₪"
+            tone="fuchsia"
+            loading={isLoading}
+            meta="Estimated MRR"
           />
         </div>
-        <select value={planFilter} onChange={e => setPlanFilter(e.target.value)}
-          className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold outline-none">
-          <option value="all">All Plans</option>
-          <option value="trial">Trial</option>
-          <option value="starter">Starter</option>
-          <option value="pro">Pro</option>
-          <option value="enterprise">Enterprise</option>
-        </select>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold outline-none">
-          <option value="all">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="suspended">Suspended</option>
-          <option value="inactive">Inactive</option>
-        </select>
-        <span className="text-sm text-gray-400 font-semibold">{filtered.length} organizations</span>
-      </div>
 
-      {/* Table */}
-      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-100">
-            <tr>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Organization</th>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Type</th>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Plan</th>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Status</th>
-              <th className="text-left font-black text-gray-600 px-5 py-3">MRR</th>
-              <th className="text-left font-black text-gray-600 px-5 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              Array(5).fill(0).map((_, i) => (
-                <tr key={i} className="border-b border-gray-50">
-                  {Array(6).fill(0).map((_, j) => (
-                    <td key={j} className="px-5 py-4">
-                      <div className="h-4 bg-gray-100 rounded animate-pulse" />
-                    </td>
+        <PlatformCard className="p-5">
+          <PlatformWidgetHeader
+            title="Subscription filters"
+            subtitle={`${filtered.length} organizations shown`}
+            action={(
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+                <SlidersHorizontal className="h-4 w-4" />
+              </div>
+            )}
+          />
+          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-[minmax(240px,1fr)_190px_190px]">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search organization..."
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pl-10 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-50"
+              />
+            </div>
+            <select
+              value={planFilter}
+              onChange={e => setPlanFilter(e.target.value)}
+              className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-50"
+            >
+              <option value="all">All Plans</option>
+              <option value="trial">Trial</option>
+              <option value="starter">Starter</option>
+              <option value="pro">Pro</option>
+              <option value="enterprise">Enterprise</option>
+            </select>
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-50"
+            >
+              <option value="all">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="suspended">Suspended</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </PlatformCard>
+
+        <PlatformCard className="overflow-hidden">
+          <div className="border-b border-slate-100 p-5">
+            <PlatformWidgetHeader
+              title="Organization subscriptions"
+              subtitle="Manage plans, billing status and monthly value"
+              action={(
+                <span className="rounded-full bg-violet-50 px-3 py-1.5 text-[11px] font-bold text-violet-700">
+                  {filtered.length} total
+                </span>
+              )}
+            />
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[920px] text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50/60">
+                  {['Organization', 'Type', 'Plan', 'Status', 'MRR', 'Actions'].map(label => (
+                    <th key={label} className="px-5 py-3.5 text-left text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
+                      {label}
+                    </th>
                   ))}
                 </tr>
-              ))
-            ) : filtered.length === 0 ? (
-              <tr><td colSpan={6} className="px-5 py-12 text-center text-gray-400">No matching organizations</td></tr>
-            ) : filtered.map(org => {
-              const plan = PLAN_COLORS[org.plan] || PLAN_COLORS.trial;
-              const status = STATUS_COLORS[org.status] || STATUS_COLORS.inactive;
-              const StatusIcon = status.icon;
-              return (
-                <tr key={org.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                        <Building2 className="w-4 h-4 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-gray-900">{org.name}</p>
-                        <p className="text-xs text-gray-400">{org.contact_email || '—'}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4 text-gray-600 font-semibold">
-                    {org.org_type === 'staffing_agency' ? 'Staffing Agency' : 'Internal HR'}
-                  </td>
-                  <td className="px-5 py-4">
-                    <select
-                      defaultValue={org.plan || 'trial'}
-                      onChange={e => handleChangePlan(org, e.target.value)}
-                      className={`text-xs font-bold px-2.5 py-1 rounded-full border outline-none cursor-pointer ${plan.bg} ${plan.text} ${plan.border}`}
-                    >
-                      <option value="trial">Trial</option>
-                      <option value="starter">Starter</option>
-                      <option value="pro">Pro</option>
-                      <option value="enterprise">Enterprise</option>
-                    </select>
-                  </td>
-                  <td className="px-5 py-4">
-                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${status.bg} ${status.text}`}>
-                      <StatusIcon className="w-3 h-3" />
-                      {org.status === 'active' ? 'Active' : org.status === 'suspended' ? 'Suspended' : 'Inactive'}
-                    </div>
-                  </td>
-                  <td className="px-5 py-4 font-bold text-gray-900">
-                    {org.status === 'active' ? `₪${(PLAN_PRICES[org.plan] || 0).toLocaleString()}` : '—'}
-                  </td>
-                  <td className="px-5 py-4">
-                    <div className="flex gap-2">
-                      {org.status === 'active' ? (
-                        <button onClick={() => handleChangeStatus(org, 'suspended')}
-                          className="text-xs px-3 py-1.5 bg-red-50 text-red-600 rounded-lg font-bold hover:bg-red-100 transition-colors">
-                          Suspend
-                        </button>
-                      ) : (
-                        <button onClick={() => handleChangeStatus(org, 'active')}
-                          className="text-xs px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg font-bold hover:bg-emerald-100 transition-colors">
-                          Activate
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {isLoading ? (
+                  Array(5).fill(0).map((_, i) => (
+                    <tr key={i}>
+                      {Array(6).fill(0).map((_, j) => (
+                        <td key={j} className="px-5 py-4">
+                          <div className="h-5 animate-pulse rounded-lg bg-slate-100" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-5">
+                      <PlatformEmptyState icon={Search}>No matching organizations</PlatformEmptyState>
+                    </td>
+                  </tr>
+                ) : filtered.map((org, index) => {
+                  const plan = PLAN_COLORS[org.plan] || PLAN_COLORS.trial;
+                  const status = STATUS_COLORS[org.status] || STATUS_COLORS.inactive;
+                  const StatusIcon = status.icon;
+                  return (
+                    <tr key={org.id} className="group transition-colors hover:bg-violet-50/35">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${
+                            index % 3 === 0
+                              ? 'from-violet-100 to-fuchsia-50 text-violet-600'
+                              : index % 3 === 1
+                                ? 'from-blue-100 to-cyan-50 text-blue-600'
+                                : 'from-cyan-100 to-emerald-50 text-cyan-600'
+                          }`}>
+                            <Building2 className="h-5 w-5" strokeWidth={1.8} />
+                          </div>
+                          <div>
+                            <p className="font-extrabold text-slate-800 transition group-hover:text-violet-700">{org.name}</p>
+                            <p className="mt-0.5 text-[10px] font-medium text-slate-400">{org.contact_email || '—'}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 text-xs font-semibold text-slate-600">
+                        {org.org_type === 'staffing_agency' ? 'Staffing Agency' : 'Internal HR'}
+                      </td>
+                      <td className="px-5 py-4">
+                        <select
+                          defaultValue={org.plan || 'trial'}
+                          onChange={e => handleChangePlan(org, e.target.value)}
+                          className={`cursor-pointer rounded-full border px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide outline-none ${plan.bg} ${plan.text} ${plan.border}`}
+                        >
+                          <option value="trial">Trial</option>
+                          <option value="starter">Starter</option>
+                          <option value="pro">Pro</option>
+                          <option value="enterprise">Enterprise</option>
+                        </select>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold ${status.bg} ${status.text}`}>
+                          <StatusIcon className="h-3 w-3" />
+                          {org.status === 'active' ? 'Active' : org.status === 'suspended' ? 'Suspended' : 'Inactive'}
+                        </div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className="font-extrabold text-slate-800">
+                          {org.status === 'active' ? `₪${(PLAN_PRICES[org.plan] || 0).toLocaleString()}` : '—'}
+                        </span>
+                        {org.status === 'active' && (
+                          <p className="mt-0.5 text-[9px] font-medium text-slate-400">per month</p>
+                        )}
+                      </td>
+                      <td className="px-5 py-4">
+                        {org.status === 'active' ? (
+                          <button
+                            onClick={() => handleChangeStatus(org, 'suspended')}
+                            className="rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-[10px] font-bold text-rose-600 transition hover:border-rose-200 hover:bg-rose-100"
+                          >
+                            Suspend
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleChangeStatus(org, 'active')}
+                            className="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-[10px] font-bold text-emerald-600 transition hover:border-emerald-200 hover:bg-emerald-100"
+                          >
+                            Activate
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </PlatformCard>
       </div>
-    </div>
+    </PlatformPageShell>
   );
 }

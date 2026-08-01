@@ -93,7 +93,7 @@ const CORE_MIGRATIONS: EntityMigration[] = [
   { base44: 'SavedJob', table: 'saved_jobs' },
 
   { base44: 'Application', table: 'applications' },
-  { base44: 'ApplicationTimeline', table: 'application_timelines' },
+  { base44: 'ApplicationTimeline', table: 'application_timelines', transform: transformApplicationTimeline },
   { base44: 'ApplicationPipeline', table: 'application_pipelines' },
 
   { base44: 'Interview', table: 'interviews' },
@@ -142,11 +142,19 @@ async function transformUser(record: any) {
   return {
     ...record,
     email: (record.email || '').toLowerCase().trim(),
+    role: record.role === 'super_admin' ? 'admin' : record.role,
     org_type,
     password_hash: placeholderHash,
     refresh_token_hash: null,
     reset_token_hash: null,
     reset_token_expires: null,
+  };
+}
+
+function transformApplicationTimeline(record: any) {
+  return {
+    ...record,
+    performed_by_role: record.performed_by_role === 'super_admin' ? 'admin' : record.performed_by_role,
   };
 }
 
@@ -365,4 +373,3 @@ main().catch((err) => {
   console.error('\n❌ Migration failed:', err);
   process.exit(1);
 });
-
