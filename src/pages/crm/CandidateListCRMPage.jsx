@@ -1,11 +1,18 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Search, RefreshCw, User, ChevronLeft } from 'lucide-react';
+import { Search, RefreshCw, User, ChevronLeft, UsersRound, UserCheck, Clock3, ShieldAlert } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+} from '@/components/platform/PlatformUI';
+import { getAgencyScopeFilter, isAgencyUser } from '@/domain/agency/access';
 
 const STATUS_COLORS = {
   new: 'bg-blue-100 text-blue-700',
@@ -26,6 +33,7 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
   const { t, i18n } = useTranslation();
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [hasMore, setHasMore] = useState(false);
@@ -43,43 +51,35 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
       setLoading(true);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // VISIBILITY POLICY — CandidateListCRMPage
-    // PERFORMANCE: Paginated loading with 50 records per page
-    // ─────────────────────────────────────────────────────────────────────────
-    const filter = {};
-    if (statusFilter !== 'all') filter.status = statusFilter;
+    setError(null);
+    try {
+      // ───────────────────────────────────────────────────────────────────────
+      // VISIBILITY POLICY — CandidateListCRMPage
+      // PERFORMANCE: Paginated loading with 50 records per page
+      // ───────────────────────────────────────────────────────────────────────
+      const filter = {};
+      if (statusFilter !== 'all') filter.status = statusFilter;
 
-    if (user?.role === 'employer') {
-      filter.employer_id = user.email;
-    } else if (user?.role === 'recruiter') {
-      filter.recruiter_id = user.email;
+      if (isAgencyUser(user)) {
+        Object.assign(filter, getAgencyScopeFilter(user));
+      } else if (user?.role === 'employer') {
+        filter.employer_id = user.email;
+      }
+
+      const data = await base44.entities.Candidate.filter(filter, '-created_date', PAGE_SIZE);
+      setHasMore(data.length === PAGE_SIZE);
+      if (data.length > 0) setLastCandidateId(data[data.length - 1].id);
+      setCandidates(previous => append ? [...previous, ...data] : data);
+    } catch (requestError) {
+      setError({
+        status: requestError?.status || requestError?.response?.status || null,
+        message: requestError?.message || 'Unable to load candidates',
+      });
+      if (!append) setCandidates([]);
+    } finally {
+      setLoading(false);
+      setAppendLoading(false);
     }
-
-    // Performance: Only fetch PAGE_SIZE records
-    const data = await base44.entities.Candidate.filter(filter, '-created_date', PAGE_SIZE);
-    
-    // Check if there are more records
-    setHasMore(data.length === PAGE_SIZE);
-    if (data.length > 0) {
-      setLastCandidateId(data[data.length - 1].id);
-    }
-
-    let result = data;
-
-    // Recruiter with can_view_unassigned: merge in unassigned candidates (limited)
-    if (user?.role === 'recruiter' && user?.can_view_unassigned === true) {
-      const unassigned = await base44.entities.Candidate.filter(
-        { ...(statusFilter !== 'all' ? { status: statusFilter } : {}), recruiter_id: null },
-        '-created_date', 20
-      ).catch(() => []);
-      const ids = new Set(result.map(c => c.id));
-      result = [...result, ...unassigned.filter(c => !ids.has(c.id))];
-    }
-
-    setCandidates(append ? [...candidates, ...result] : result);
-    setLoading(false);
-    setAppendLoading(false);
   };
 
   // Performance: Debounced search
@@ -88,7 +88,7 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
       if (user) loadCandidates();
     }, 300);
     return () => clearTimeout(timer);
-  }, [statusFilter, user?.email, location.key]);
+  }, [statusFilter, user?.id, location.key]);
 
   // Performance: Memoized filtering
   const filtered = React.useMemo(() => {
@@ -102,54 +102,80 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
     );
   }, [candidates, search]);
 
+  const activeCount = useMemo(
+    () => candidates.filter(candidate => !['hired', 'rejected', 'inactive'].includes(candidate.status)).length,
+    [candidates],
+  );
+  const hiredCount = useMemo(
+    () => candidates.filter(candidate => candidate.status === 'hired').length,
+    [candidates],
+  );
+
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className="p-4">
-      <div className="max-w-6xl mx-auto">
+    <PlatformPageShell dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-black text-[#0F172A]">{t('crm.candidatesCrm')}</h1>
-            <p className="text-sm text-[#64748B] mt-1">{t('crm.candidatesCount', { count: filtered.length })}</p>
-          </div>
-          <Button size="sm" variant="outline" onClick={loadCandidates} className="gap-1.5 text-xs">
-            <RefreshCw className="w-3.5 h-3.5" /> {t('crm.refresh')}
-          </Button>
+        <PlatformPageHeader
+          title={t('crm.candidatesCrm')}
+          subtitle={t('crm.candidatesCount', { count: filtered.length })}
+          icon={UsersRound}
+          actions={(
+            <button onClick={loadCandidates} className="flex h-11 items-center gap-2 rounded-xl border border-white bg-white/90 px-4 text-xs font-bold text-slate-600 shadow-[0_7px_20px_rgba(60,74,125,0.08)] transition hover:text-[#6C4DFF]">
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> {t('crm.refresh')}
+            </button>
+          )}
+        />
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <PlatformStatCard icon={UsersRound} label={t('crm.candidatesCrm')} value={candidates.length} tone="violet" loading={loading} meta="Total profiles" />
+          <PlatformStatCard icon={Clock3} label="Active process" value={activeCount} tone="blue" loading={loading} meta="Candidates in progress" />
+          <PlatformStatCard icon={UserCheck} label={t('crm.statusHired')} value={hiredCount} tone="emerald" loading={loading} meta="Successful placements" />
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-[#E4ECFF] p-4 mb-4 flex flex-wrap gap-3 items-center">
+        <PlatformCard className="flex flex-wrap items-center gap-3 p-4">
           <div className="relative flex-1 min-w-[200px]">
             <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]`} />
             <Input value={search} onChange={e => setSearch(e.target.value)}
-              placeholder={t('crm.searchPlaceholder')} className={`${isRTL ? 'pr-9' : 'pl-9'} text-sm`} />
+              placeholder={t('crm.searchPlaceholder')} className={`${isRTL ? 'pr-9' : 'pl-9'} h-11 rounded-xl border-slate-200 bg-slate-50/60 text-sm shadow-none focus-visible:border-[#A78BFA] focus-visible:ring-[#F3EFFF]`} />
           </div>
           <div className="flex gap-1.5 flex-wrap">
             {['all', 'new', 'contacted', 'interview', 'offer', 'hired', 'rejected'].map(s => (
               <button key={s} onClick={() => setStatusFilter(s)}
-                className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all ${statusFilter === s ? (s === 'all' ? 'bg-[#7C3AED] text-white' : `${STATUS_COLORS[s]} border border-current`) : 'bg-[#F0F1F5] text-[#64748B] hover:bg-[#E4ECFF]'}`}>
+                className={`rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${statusFilter === s ? (s === 'all' ? 'gradient-brand text-white shadow-[0_5px_14px_rgba(99,72,210,0.22)]' : `${STATUS_COLORS[s]} border border-current`) : 'bg-slate-50 text-slate-500 hover:bg-[#F3EFFF] hover:text-[#6C4DFF]'}`}>
                 {s === 'all' ? t('crm.filterAll') : t(`crm.status${s.charAt(0).toUpperCase() + s.slice(1)}`)}
               </button>
             ))}
           </div>
-        </div>
+        </PlatformCard>
 
         {/* Table */}
-        <div className="bg-white rounded-2xl border border-[#E4ECFF] overflow-hidden">
+        <PlatformCard className="overflow-x-auto">
           {loading && !appendLoading ? (
             <div className="space-y-0">
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="h-16 border-b border-[#F0F1F5] animate-pulse bg-gray-50/50" />
               ))}
             </div>
+          ) : error ? (
+            <PlatformEmptyState icon={ShieldAlert} className="m-5 min-h-[260px]">
+              <p className="font-bold text-slate-700">
+                {error.status === 403
+                  ? t('common.accessDenied', { defaultValue: 'Access denied' })
+                  : t('common.loadError', { defaultValue: 'Unable to load candidates' })}
+              </p>
+              <button onClick={() => loadCandidates()} className="mt-3 text-sm font-bold text-violet-600 hover:underline">
+                {t('crm.refresh')}
+              </button>
+            </PlatformEmptyState>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16 text-[#94A3B8]">
-              <User className="w-10 h-10 mx-auto mb-3 opacity-40" />
+            <PlatformEmptyState icon={User} className="m-5 min-h-[260px]">
               <p className="font-bold">{t('crm.noCandidates')}</p>
-            </div>
+            </PlatformEmptyState>
           ) : (
             <div>
               {/* Header Row */}
-              <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-[#F7F8FC] border-b border-[#E4ECFF] text-xs font-black text-[#94A3B8] uppercase tracking-wide">
+              <div className="grid min-w-[900px] grid-cols-12 gap-4 border-b border-[#EAF0F8] bg-[#F7FAFF] px-5 py-3 text-xs font-black uppercase tracking-wide text-[#94A3B8]">
                 <div className="col-span-4">{t('crm.columnCandidate')}</div>
                 <div className="col-span-2">{t('crm.columnRole')}</div>
                 <div className="col-span-2">{t('crm.columnDomain')}</div>
@@ -183,9 +209,9 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
               )}
             </div>
           )}
-        </div>
+        </PlatformCard>
       </div>
-    </div>
+    </PlatformPageShell>
   );
 }
 
@@ -195,10 +221,10 @@ const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick, 
 
   return (
     <div onClick={onClick}
-      className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-[#F0F1F5] hover:bg-[#F7F8FC] cursor-pointer transition-colors group items-center">
+      className="group grid min-w-[900px] cursor-pointer grid-cols-12 items-center gap-4 border-b border-slate-100 px-5 py-4 transition-colors last:border-0 hover:bg-[#F8FAFF]">
       {/* Name */}
       <div className="col-span-4 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#2563EB] flex items-center justify-center text-white text-xs font-black flex-shrink-0">
+        <div className="gradient-brand flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[14px] text-xs font-black text-white shadow-[0_5px_14px_rgba(99,72,210,0.18)]">
           {initials}
         </div>
         <div className="min-w-0">

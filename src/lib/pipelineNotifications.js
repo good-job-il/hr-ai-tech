@@ -6,8 +6,16 @@
 import { httpClient } from '@/api/client/httpClient';
 import i18n from '@/i18n';
 
-// Employer is relevant only from client_stage onward
-const EMPLOYER_RELEVANT_STAGES = ['client_stage', 'hired', 'rejected'];
+// Employer is relevant after the agency recommends the candidate.
+const EMPLOYER_RELEVANT_STAGES = [
+  'recommended',
+  'employer_interview',
+  'offer',
+  'hired',
+  'probation',
+  'completed',
+  'rejected',
+];
 
 // Admin gets notified only on exceptional events
 const ADMIN_ALERT_STAGES = ['hired', 'rejected'];
@@ -73,7 +81,7 @@ export async function createStageChangeNotifications({
     company: application.company || null,
   };
 
-  const recipients = collectRecipients({ application, newStage, user });
+  const recipients = await resolveRecipientEmails(collectRecipients({ application, newStage, user }));
 
   const seen = new Set();
   const creates = [];
@@ -84,6 +92,7 @@ export async function createStageChangeNotifications({
 
     creates.push(
       httpClient.post('/notifications', {
+        organization_id: application.organization_id || user?.organization_id || null,
         recipient_email: email,
         type: mapNotificationType(newStage),
         title,
@@ -102,7 +111,7 @@ export async function createStageChangeNotifications({
  */
 export async function createSlaNotification({ application, stageLabel: stage, hoursInStage, user }) {
   const candidateName = application.candidate_name || t('pipeline.notifications.defaultCandidate');
-  const recipients = collectRecipients({ application, newStage: application.status, user });
+  const recipients = await resolveRecipientEmails(collectRecipients({ application, newStage: application.status, user }));
 
   const seen = new Set();
   const creates = [];
@@ -113,6 +122,7 @@ export async function createSlaNotification({ application, stageLabel: stage, ho
 
     creates.push(
       httpClient.post('/notifications', {
+        organization_id: application.organization_id || user?.organization_id || null,
         recipient_email: email,
         type: 'job_closed', // repurpose as system alert
         title: t('pipeline.notifications.sla.title', {
@@ -149,7 +159,10 @@ function collectRecipients({ application, newStage, user }) {
 
   const recruiterEmail = application.assigned_to || application.recruiter_id;
   if (recruiterEmail) {
-    recipients.push({ email: recruiterEmail, role_target: 'recruiter' });
+    recipients.push({
+      ...(String(recruiterEmail).includes('@') ? { email: recruiterEmail } : { userId: recruiterEmail }),
+      role_target: 'recruiter',
+    });
   }
 
   if (user?.role === 'recruitment_manager') {
@@ -174,8 +187,20 @@ function collectRecipients({ application, newStage, user }) {
   return recipients;
 }
 
+async function resolveRecipientEmails(recipients) {
+  return Promise.all(recipients.map(async recipient => {
+    if (recipient.email || !recipient.userId) return recipient;
+    try {
+      const record = await httpClient.get(`/users/${encodeURIComponent(recipient.userId)}`, { cache: false });
+      return { ...recipient, email: record?.email || null };
+    } catch {
+      return { ...recipient, email: null };
+    }
+  }));
+}
+
 function mapNotificationType(stage) {
   if (stage === 'hired') return 'job_match';
-  if (['phone_interview', 'professional_interview'].includes(stage)) return 'interview_scheduled';
+  if (['phone_interview', 'employer_interview'].includes(stage)) return 'interview_scheduled';
   return 'new_application';
 }

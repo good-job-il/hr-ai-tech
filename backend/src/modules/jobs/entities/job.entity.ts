@@ -66,6 +66,12 @@ export class JobEntity extends BaseEntity {
   @Column({ name: 'recruiter_id', type: 'int', nullable: true })
   recruiter_id: number | null;
 
+  @Column({ name: 'team_manager_id', type: 'int', nullable: true })
+  team_manager_id: number | null;
+
+  @Column({ name: 'recruitment_manager_id', type: 'int', nullable: true })
+  recruitment_manager_id: number | null;
+
   /** @deprecated use employer_company_id */
   @Column({ name: 'employer_id', type: 'varchar', length: 255, nullable: true })
   employer_id: string | null;
@@ -139,4 +145,3 @@ export class JobEntity extends BaseEntity {
   @Column({ name: 'deleted_by', type: 'int', nullable: true })
   deleted_by: number | null;
 }
-

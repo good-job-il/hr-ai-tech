@@ -7,7 +7,9 @@ export const CreateInterviewSchema = z.object({
   job_id: z.number().int().optional().nullable(),
   job_title: z.string().optional().nullable(),
   employer_id: z.string().optional().nullable(),
-  recruiter_id: z.string().optional().nullable(),
+  recruiter_id: z.number().int().optional().nullable(),
+  team_manager_id: z.number().int().optional().nullable(),
+  recruitment_manager_id: z.number().int().optional().nullable(),
   candidate_name: z.string().min(1),
   candidate_email: z.string().email().optional().nullable(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
@@ -39,9 +41,9 @@ export const QueryInterviewsSchema = z.object({
   order: z.enum(['ASC', 'DESC']).default('ASC'),
   application_id: z.coerce.number().int().optional(),
   candidate_id: z.coerce.number().int().optional(),
-  recruiter_id: z.string().optional(),
+  recruiter_id: z.coerce.number().int().optional(),
+  team_manager_id: z.coerce.number().int().optional(),
   status: z.enum(['scheduled', 'confirmed', 'completed', 'cancelled', 'no_show', 'rescheduled']).optional(),
   organization_id: z.coerce.number().int().optional(),
 });
 export class QueryInterviewsDto extends createZodDto(QueryInterviewsSchema) {}
-

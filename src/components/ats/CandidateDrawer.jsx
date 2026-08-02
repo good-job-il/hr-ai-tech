@@ -8,8 +8,9 @@ import ActivityTimeline from './ActivityTimeline';
 import MatchExplanationCard from '@/components/ai/MatchExplanationCard';
 import { scoreMatch } from '@/lib/aiMatching';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { APPLICATION_STATUS_VALUES } from '@/domain/agency/contracts';
 
-const STAGE_VALUES = ['new', 'screening', 'phone_interview', 'professional_interview', 'client_stage', 'hired', 'rejected'];
+const STAGE_VALUES = APPLICATION_STATUS_VALUES;
 
 const TAB_IDS = ['details', 'ai', 'timeline', 'notes'];
 
@@ -19,7 +20,7 @@ function matchColor(score) {
   return 'text-red-600 bg-red-50';
 }
 
-export default function CandidateDrawer({ application, open, onClose, onStageChange, job }) {
+export default function CandidateDrawer({ application, open, onClose, onStageChange, job, canChangeStage = true }) {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('details');
   const [note, setNote] = useState('');
@@ -111,6 +112,7 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
             <select
               value={application.status}
               onChange={e => onStageChange(application.id, e.target.value)}
+              disabled={!canChangeStage}
               className="flex-1 h-9 px-3 rounded-xl border border-[#E4ECFF] bg-white text-sm font-bold text-[#0F172A] outline-none"
             >
               {STAGE_VALUES.map(value => (

@@ -12,11 +12,38 @@ Deno.serve(async (req) => {
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (!['admin', 'org_admin', 'recruitment_manager', 'team_manager'].includes(user.role)) {
+      return Response.json({ error: 'Import permission denied' }, { status: 403 });
+    }
+    const organizationId = user.organization_id || user.data?.organization_id;
+    if (!organizationId) {
+      return Response.json({ error: 'Organization context required' }, { status: 403 });
+    }
 
     const { zip_file_url, import_batch_id, employer_id, recruiter_id, source, initial_status } = await req.json();
 
     if (!zip_file_url || !import_batch_id) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const batches = await base44.asServiceRole.entities.CandidateImportBatch.filter(
+      { id: import_batch_id, organization_id: organizationId }, '', 1
+    );
+    if (batches.length === 0) {
+      return Response.json({ error: 'Import batch not found in organization scope' }, { status: 404 });
+    }
+
+    let effectiveRecruiterId = null;
+    if (recruiter_id) {
+      const recruiters = await base44.asServiceRole.entities.User.filter(
+        { id: recruiter_id, organization_id: organizationId }, '', 1
+      );
+      const recruiter = recruiters[0];
+      const visibleToTeamManager = user.role !== 'team_manager' || recruiter?.team_manager_id === user.id;
+      if (!recruiter || recruiter.role !== 'recruiter' || !visibleToTeamManager) {
+        return Response.json({ error: 'Recruiter outside permitted organization/team scope' }, { status: 403 });
+      }
+      effectiveRecruiterId = recruiter.id;
     }
 
     // Fetch ZIP file
@@ -120,6 +147,7 @@ Deno.serve(async (req) => {
           filename,
           data: {
             ...extractedData,
+            organization_id: organizationId,
             field_confidences: fieldConfidences,
             overall_parsing_confidence: overallConfidence,
             original_resume_url: null,
@@ -129,7 +157,9 @@ Deno.serve(async (req) => {
             resume_uploaded_at: new Date().toISOString(),
             upload_source: 'import_zip',
             employer_id: employer_id || user.email,
-            recruiter_id: recruiter_id || user.email,
+            recruiter_id: effectiveRecruiterId,
+            team_manager_id: user.role === 'team_manager' ? user.id : (user.team_manager_id || null),
+            recruitment_manager_id: user.recruitment_manager_id || (user.role === 'recruitment_manager' ? user.id : null),
             source: source || 'import',
             status: initial_status || 'new',
             import_batch_id,

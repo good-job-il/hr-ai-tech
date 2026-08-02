@@ -27,6 +27,20 @@ const ROLE_TO_ORG_TYPE = {
 // Module-level cache: key = `${orgId}:${roleKey}` → permissions object
 const _permCache = new Map();
 
+export function invalidatePermissionMatrixCache({ organizationId, roleKey } = {}) {
+  if (!organizationId && !roleKey) {
+    _permCache.clear();
+    return;
+  }
+  for (const key of _permCache.keys()) {
+    const [cachedOrgId, cachedRoleKey] = key.split(':');
+    if ((!organizationId || cachedOrgId === String(organizationId)) &&
+        (!roleKey || cachedRoleKey === roleKey)) {
+      _permCache.delete(key);
+    }
+  }
+}
+
 export function usePermissionMatrix() {
   const { user } = useAuth();
   const [permissions, setPermissions] = useState(null);
@@ -41,7 +55,7 @@ export function usePermissionMatrix() {
       return;
     }
     loadPermissions(user);
-  }, [user?.id, user?.role]);
+  }, [user?.id, user?.role, user?.organization_id, user?.org_type]);
 
   const loadPermissions = async (user) => {
     if (loadingRef.current) return;
@@ -58,25 +72,30 @@ export function usePermissionMatrix() {
 
     loadingRef.current = true;
     setLoading(true);
-    const orgType = ROLE_TO_ORG_TYPE[roleKey] || 'staffing_agency';
+    const orgType = user.org_type || ROLE_TO_ORG_TYPE[roleKey] || 'staffing_agency';
 
     // Filter by org — avoids loading all 200 records
-    const [orgRecords, templateRecords] = await Promise.all([
-      orgId
-        ? httpClient.get(`/permission-matrices?organization_id=${encodeURIComponent(orgId)}&role_key=${encodeURIComponent(roleKey)}&limit=5`, { cache: false })
-            .then(r => Array.isArray(r) ? r : (r?.data || []))
-        : Promise.resolve([]),
-      httpClient.get(`/permission-matrices?is_template=true&role_key=${encodeURIComponent(roleKey)}&org_type=${encodeURIComponent(orgType)}&limit=3`, { cache: false })
-        .then(r => Array.isArray(r) ? r : (r?.data || [])),
-    ]);
+    try {
+      const [orgRecords, templateRecords] = await Promise.all([
+        orgId
+          ? httpClient.get(`/permission-matrices?organization_id=${encodeURIComponent(orgId)}&role_key=${encodeURIComponent(roleKey)}&limit=5`, { cache: false })
+              .then(r => Array.isArray(r) ? r : (r?.data || []))
+          : Promise.resolve([]),
+        httpClient.get(`/permission-matrices?is_template=true&role_key=${encodeURIComponent(roleKey)}&org_type=${encodeURIComponent(orgType)}&limit=3`, { cache: false })
+          .then(r => Array.isArray(r) ? r : (r?.data || [])),
+      ]);
 
-    const orgOverride = orgRecords.find(r => !r.is_template);
-    const result = orgOverride?.permissions || templateRecords[0]?.permissions || _buildEmptyPermissions();
+      const orgOverride = orgRecords.find(r => !r.is_template);
+      const result = orgOverride?.permissions || templateRecords[0]?.permissions || _buildEmptyPermissions();
 
-    _permCache.set(cacheKey, result);
-    setPermissions(result);
-    setLoading(false);
-    loadingRef.current = false;
+      _permCache.set(cacheKey, result);
+      setPermissions(result);
+    } catch {
+      setPermissions(_buildEmptyPermissions());
+    } finally {
+      setLoading(false);
+      loadingRef.current = false;
+    }
   };
 
   const can = useCallback((permKey) => {
@@ -86,8 +105,7 @@ export function usePermissionMatrix() {
 
   const refresh = useCallback(() => {
     if (user) {
-      const cacheKey = `${user.organization_id || null}:${user.role}`;
-      _permCache.delete(cacheKey);
+      invalidatePermissionMatrixCache({ organizationId: user.organization_id, roleKey: user.role });
       loadPermissions(user);
     }
   }, [user]);

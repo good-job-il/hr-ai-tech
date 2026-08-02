@@ -32,6 +32,7 @@ import { InterviewEntity } from '../modules/interviews/interview.entity';
 import { MessageEntity } from '../modules/messages/message.entity';
 import { NotificationEntity } from '../modules/notifications/notification.entity';
 import { CompanyEntity, CompanyReviewEntity, StaffEntity } from '../modules/companies/company.entity';
+import { AgencyClientEntity } from '../modules/agency-clients/agency-client.entity';
 // Phase 3 — Advanced modules
 import { AuditLogEntity } from '../modules/audit/audit-log.entity';
 import { CompensationPlanEntity } from '../modules/compensation/compensation-plan.entity';
@@ -58,7 +59,7 @@ const ALL_ENTITIES = [
   JobEntity, SavedJobEntity, JobAlertEntity,
   ApplicationEntity, ApplicationTimelineEntity, ApplicationPipelineEntity,
   InterviewEntity, MessageEntity, NotificationEntity,
-  CompanyEntity, CompanyReviewEntity, StaffEntity,
+  CompanyEntity, CompanyReviewEntity, StaffEntity, AgencyClientEntity,
   // Phase 3
   AuditLogEntity, CompensationPlanEntity,
   CommunicationLogEntity, EmployerTimelineEntity,

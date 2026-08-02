@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, DollarSign, Percent, Users, Calculator, Settings } from 'lucide-react';
+import { Plus, Pencil, Trash2, DollarSign, Percent, Calculator, Settings } from 'lucide-react';
 
 // Which compensation fields can this role see?
 // Employer does NOT have access to compensation at all
@@ -25,7 +25,6 @@ const FIELD_LABELS = {
   recruitment_manager: 'מנהל גיוס',
 };
 
-const canEdit = (role) => ['admin', 'recruitment_manager', 'team_manager'].includes(role);
 const canEditGlobally = (role) => role === 'admin';
 
 function CompField({ label, value, type, totalFee }) {
@@ -68,10 +67,9 @@ export default function CompensationPage() {
   const { can } = usePermissionMatrix();
   const role = user?.role;
   const visibleFields = VISIBLE_FIELDS[role] || [];
-  // Use PermissionMatrix for compensation visibility/edit, fallback to role-based
-  const isAdmin = canEditGlobally(role) || can('edit_compensation');
-  const canEditing = canEdit(role) || can('edit_compensation');
-  const canViewComp = can('view_compensation') || visibleFields.length > 0;
+  const isAdmin = canEditGlobally(role);
+  const canEditing = can('edit_compensation');
+  const canViewComp = can('view_compensation');
   const qc = useQueryClient();
 
   const [showModal, setShowModal] = useState(false);

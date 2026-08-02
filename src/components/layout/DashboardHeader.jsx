@@ -1,4 +1,4 @@
-import { Menu, LogOut, Search, Bell } from 'lucide-react';
+import { Menu, LogOut, Search, Bell, ChevronDown, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import EditNameModal from './EditNameModal';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
@@ -8,10 +8,88 @@ export default function DashboardHeader({
   roleTitle,
   onMenuToggle,
   onLogout,
-  showMenuButton = false
+  showMenuButton = false,
+  platformStyle = false,
 }) {
   const { t, i18n } = useTranslation();
   const isRtl = !i18n.language?.startsWith('en');
+
+  if (platformStyle) {
+    const avatarUrl = user?.avatar_url || user?.picture || user?.profile_image;
+    const displayName = user?.full_name?.trim() || user?.email?.split('@')[0] || (isRtl ? 'מנהל מערכת' : 'Platform Admin');
+
+    return (
+      <header className="relative z-30 grid h-[82px] shrink-0 grid-cols-[auto_minmax(280px,470px)_1fr] items-center gap-6 border-b border-[#E9EDF6] bg-white px-5 shadow-[0_2px_12px_rgba(54,74,138,0.035)] max-lg:grid-cols-[auto_1fr] max-md:h-[70px] max-md:px-4" dir="ltr">
+        <div className="flex min-w-max items-center gap-3">
+          {showMenuButton && (
+            <button
+              onClick={onMenuToggle}
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-[#65708B] transition hover:bg-[#F6F4FF] md:hidden"
+              aria-label="Open navigation"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          )}
+
+          <div className="hidden items-center gap-3 sm:flex" dir={isRtl ? 'rtl' : 'ltr'}>
+            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[linear-gradient(135deg,#8B5CF6,#2F80FF)] text-sm font-black text-white shadow-[0_5px_14px_rgba(75,91,170,0.18)]">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" />
+              ) : (
+                displayName[0]?.toUpperCase()
+              )}
+            </div>
+            <div className="max-w-[150px]">
+              <div className="flex items-center gap-1.5">
+                <p className="truncate text-sm font-black text-[#172036]">
+                  {isRtl ? `שלום, ${displayName}` : `Hello, ${displayName}`}
+                </p>
+                <EditNameModal user={user} />
+              </div>
+              <p className="mt-0.5 truncate text-[11px] font-semibold text-[#8F9AB2]">{roleTitle}</p>
+            </div>
+          </div>
+
+          <span className="hidden h-9 w-px bg-[#EDF0F6] sm:block" />
+
+          <button className="relative flex h-11 w-11 items-center justify-center rounded-xl text-[#66708B] transition hover:bg-[#F6F4FF]" aria-label="Notifications">
+            <Bell className="h-5 w-5" strokeWidth={1.8} />
+            <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-white bg-[#7C3AED] px-1 text-[9px] font-black text-white">3</span>
+          </button>
+
+          <span className="hidden h-9 w-px bg-[#EDF0F6] lg:block" />
+
+          <button className="hidden h-11 items-center gap-3 rounded-[14px] border border-[#E6E9F1] bg-white px-4 text-sm font-bold text-[#5E6881] shadow-[0_3px_12px_rgba(54,74,138,0.035)] transition hover:border-[#D9D2FF] hover:bg-[#FAF9FF] lg:flex" dir={isRtl ? 'rtl' : 'ltr'}>
+            <ChevronDown className="h-4 w-4" />
+            <span>{isRtl ? 'פעולות מהירות' : 'Quick actions'}</span>
+            <Zap className="h-4 w-4 text-[#8B5CF6]" />
+          </button>
+        </div>
+
+        <div className="relative hidden w-full lg:block" dir={isRtl ? 'rtl' : 'ltr'}>
+          <Search className={`absolute ${isRtl ? 'right-5' : 'left-5'} top-1/2 h-5 w-5 -translate-y-1/2 text-[#69748E]`} strokeWidth={1.8} />
+          <input
+            type="text"
+            placeholder={isRtl ? 'חיפוש בכל המערכת...' : 'Search across the platform...'}
+            className={`h-11 w-full rounded-[18px] border border-[#E6E9F1] bg-white text-sm text-[#374151] shadow-[0_3px_12px_rgba(54,74,138,0.035)] outline-none transition placeholder:text-[#B0B7C7] focus:border-[#BDB1FF] focus:ring-4 focus:ring-[#F1EEFF] ${isRtl ? 'pr-13 pl-16' : 'pl-13 pr-16'}`}
+          />
+          <kbd className={`absolute ${isRtl ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 rounded-lg bg-[#F6F7FA] px-2 py-1 text-[10px] font-semibold text-[#8F97A9]`}>⌘ K</kbd>
+        </div>
+
+        <div className="ml-auto flex items-center gap-1">
+          <LanguageSwitcher variant="minimal" className="hidden text-[#7A849B] xl:flex" />
+          <button
+            onClick={onLogout}
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-[#A2AABC] transition hover:bg-red-50 hover:text-red-500"
+            title={t('common.logout')}
+            aria-label={t('common.logout')}
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header

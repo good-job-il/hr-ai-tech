@@ -155,7 +155,18 @@
   ],
   "rls": {
     "create": {
-      "data.organization_id": "{{user.data.organization_id}}"
+      "$or": [
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } },
+        { "user_condition": { "role": "org_admin" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "recruitment_manager" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "team_manager" }, "data.organization_id": "{{user.data.organization_id}}", "data.team_manager_id": "{{user.id}}" },
+        { "user_condition": { "role": "recruiter" }, "data.organization_id": "{{user.data.organization_id}}", "data.recruiter_id": "{{user.id}}" },
+        { "user_condition": { "role": "hr_manager" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "internal_recruiter" }, "data.organization_id": "{{user.data.organization_id}}", "data.recruiter_id": "{{user.id}}" },
+        { "user_condition": { "role": "candidate" }, "data.candidate_email": "{{user.email}}" },
+        { "user_condition": { "role": "employer" }, "data.organization_id": "{{user.data.organization_id}}" }
+      ]
     },
     "read": {
       "$or": [
@@ -196,6 +207,11 @@
           "data.recruiter_id": "{{user.id}}"
         },
         {
+          "user_condition": { "role": "recruiter" },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.assigned_to": "{{user.id}}"
+        },
+        {
           "user_condition": {
             "role": "hr_manager"
           },
@@ -207,6 +223,19 @@
           },
           "data.organization_id": "{{user.data.organization_id}}",
           "data.recruiter_id": "{{user.id}}"
+        },
+        {
+          "user_condition": { "role": "internal_recruiter" },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.assigned_to": "{{user.id}}"
+        },
+        {
+          "user_condition": { "role": "candidate" },
+          "data.candidate_email": "{{user.email}}"
+        },
+        {
+          "user_condition": { "role": "employer" },
+          "data.organization_id": "{{user.data.organization_id}}"
         }
       ]
     },
@@ -249,6 +278,11 @@
           "data.recruiter_id": "{{user.id}}"
         },
         {
+          "user_condition": { "role": "recruiter" },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.assigned_to": "{{user.id}}"
+        },
+        {
           "user_condition": {
             "role": "hr_manager"
           },
@@ -260,6 +294,11 @@
           },
           "data.organization_id": "{{user.data.organization_id}}",
           "data.recruiter_id": "{{user.id}}"
+        },
+        {
+          "user_condition": { "role": "internal_recruiter" },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.assigned_to": "{{user.id}}"
         }
       ]
     },
@@ -300,6 +339,11 @@
           },
           "data.organization_id": "{{user.data.organization_id}}",
           "data.recruiter_id": "{{user.id}}"
+        },
+        {
+          "user_condition": { "role": "recruiter" },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.assigned_to": "{{user.id}}"
         }
       ]
     }

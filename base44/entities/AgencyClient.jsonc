@@ -1,0 +1,28 @@
+{
+  "name": "AgencyClient",
+  "type": "object",
+  "description": "Tenant-scoped relationship between a staffing agency and an employer company",
+  "properties": {
+    "organization_id": { "type": "number" },
+    "company_id": { "type": "number" },
+    "status": {
+      "type": "string",
+      "enum": ["prospect", "active", "inactive", "archived"],
+      "default": "active"
+    },
+    "account_manager_id": { "type": "number" },
+    "contact_name": { "type": "string" },
+    "contact_email": { "type": "string", "format": "email" },
+    "contact_phone": { "type": "string" },
+    "address": { "type": "string" },
+    "contract_type": { "type": "string" },
+    "contract_start_date": { "type": "string", "format": "date" },
+    "contract_end_date": { "type": "string", "format": "date" },
+    "placement_fee_percent": { "type": "number" },
+    "payment_terms_days": { "type": "number" },
+    "notes": { "type": "string" },
+    "archived_at": { "type": "string", "format": "date-time" },
+    "archived_by": { "type": "number" }
+  },
+  "required": ["organization_id", "company_id", "status"]
+}

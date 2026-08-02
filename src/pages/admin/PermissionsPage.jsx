@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Save, RefreshCw, ShieldCheck, Lock } from 'lucide-react';
+import { Save, RefreshCw, ShieldCheck, Lock, ShieldAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   PlatformCard,
@@ -16,6 +16,7 @@ import {
   PlatformStatCard,
   PlatformWidgetHeader,
 } from '@/components/platform/PlatformUI';
+import { invalidatePermissionMatrixCache } from '@/hooks/usePermissionMatrix';
 
 const PERM_KEYS = [
   'view', 'create', 'update', 'delete', 'export',
@@ -41,13 +42,15 @@ export default function PermissionsPage() {
 
   const [allRecords, setAllRecords] = useState([]);
   const [matrix, setMatrix] = useState({});   // { role_key: { ...perms } }
-  const [orgType, setOrgType] = useState('staffing_agency');
+  const [orgType, setOrgType] = useState(user?.org_type || 'staffing_agency');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState({});     // { role_key: boolean }
 
   const canEdit = EDITABLE_ROLES.includes(user?.role);
+  const canSwitchOrgType = user?.role === 'admin';
   const orgId = user?.organization_id || null;
 
   const roleKeys = orgType === 'staffing_agency' ? STAFFING_ROLE_KEYS : ORG_ROLE_KEYS;
@@ -60,11 +63,17 @@ export default function PermissionsPage() {
 
   const load = async () => {
     setLoading(true);
-    const all = await base44.entities.PermissionMatrix.list('', 200);
-    setAllRecords(all);
-    buildMatrix(all);
-    setLoading(false);
-    setDirty({});
+    setError(null);
+    try {
+      const all = await base44.entities.PermissionMatrix.list('', 200);
+      setAllRecords(all);
+      buildMatrix(all);
+      setDirty({});
+    } catch (requestError) {
+      setError({ status: requestError?.status || requestError?.response?.status || null });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const buildMatrix = (records) => {
@@ -125,6 +134,8 @@ export default function PermissionsPage() {
       metadata: { role_key: roleKey, before: oldPerms, after: perms },
     });
 
+    invalidatePermissionMatrixCache({ organizationId: orgId, roleKey });
+
     return savedRecord;
   };
 
@@ -168,7 +179,7 @@ export default function PermissionsPage() {
         actions={(
           <>
           {/* org_type toggle */}
-          <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70 p-1 text-sm">
+          {canSwitchOrgType && <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70 p-1 text-sm">
             <button
               onClick={() => setOrgType('staffing_agency')}
               className={`rounded-lg px-4 py-2 font-semibold transition-all ${orgType === 'staffing_agency' ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-500'}`}
@@ -181,7 +192,7 @@ export default function PermissionsPage() {
             >
               {t('permissionsMatrix.organization')}
             </button>
-          </div>
+          </div>}
           <button onClick={load} disabled={loading}
             className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-violet-200 hover:bg-violet-50">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
@@ -210,6 +221,16 @@ export default function PermissionsPage() {
 
       {loading ? (
         <PlatformCard className="p-16 text-center text-slate-400">{t('permissionsMatrix.loading')}</PlatformCard>
+      ) : error ? (
+        <PlatformCard className="p-5">
+          <PlatformEmptyState icon={ShieldAlert} className="min-h-72">
+            <p className="font-bold text-slate-700">
+              {error.status === 403
+                ? t('permissionsMatrix.accessDenied')
+                : t('common.loadError', { defaultValue: 'Unable to load permissions' })}
+            </p>
+          </PlatformEmptyState>
+        </PlatformCard>
       ) : (
         <PlatformCard className="overflow-hidden">
           <div className="border-b border-slate-100 p-5">

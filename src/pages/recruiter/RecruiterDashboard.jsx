@@ -42,10 +42,10 @@ export default function RecruiterDashboard() {
     //  To grant access to unassigned records: set user.can_view_unassigned = true.
     // ─────────────────────────────────────────────────────────────────────────
     const [candidates, applications, interviews, plans] = await Promise.all([
-      base44.entities.Candidate.filter({ recruiter_id: user.email }, '-created_date', 100).catch(() => []),
-      base44.entities.Application.filter({ assigned_to: user.email }, '-created_date', 100).catch(() => []),
-      base44.entities.Interview.filter({ recruiter_id: user.email, status: 'scheduled' }, '-date', 50).catch(() => []),
-      base44.entities.CompensationPlan.list('-created_date', 100).catch(() => []),
+      base44.entities.Candidate.filter({ organization_id: user.organization_id, recruiter_id: user.id }, '-created_date', 100).catch(() => []),
+      base44.entities.Application.filter({ organization_id: user.organization_id, recruiter_id: user.id }, '-created_date', 100).catch(() => []),
+      base44.entities.Interview.filter({ organization_id: user.organization_id, recruiter_id: user.id, status: 'scheduled' }, '-date', 50).catch(() => []),
+      base44.entities.CompensationPlan.filter({ organization_id: user.organization_id, recruiter_id: user.id }, '-created_date', 100).catch(() => []),
     ]);
 
     // Calculate total compensation for this recruiter
@@ -70,7 +70,7 @@ export default function RecruiterDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, [user?.email]);
+  useEffect(() => { load(); }, [user?.id]);
 
   return (
     <div dir="rtl" className="space-y-6">

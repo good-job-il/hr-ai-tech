@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Input } from '@/components/ui/input';
-import { RefreshCw, Users, Lock, Pencil, Check, X } from 'lucide-react';
+import { RefreshCw, Users, Lock, Pencil, Check, X, ShieldAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   PlatformCard,
@@ -124,20 +124,28 @@ export default function RoleSettingsPage() {
   const { t, i18n } = useTranslation();
   const isRtl = !i18n.language?.startsWith('en');
   const [records, setRecords] = useState([]);
-  const [orgType, setOrgType] = useState('staffing_agency');
+  const [orgType, setOrgType] = useState(user?.org_type || 'staffing_agency');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [savedMsg, setSavedMsg] = useState('');
 
   const canEdit = EDITABLE_ROLES.includes(user?.role);
+  const canSwitchOrgType = user?.role === 'admin';
   const orgId = user?.organization_id || null;
 
   useEffect(() => { load(); }, []);
 
   const load = async () => {
     setLoading(true);
-    const all = await base44.entities.RoleTemplate.list('hierarchy_level', 200);
-    setRecords(all);
-    setLoading(false);
+    setError(null);
+    try {
+      const all = await base44.entities.RoleTemplate.list('hierarchy_level', 200);
+      setRecords(all);
+    } catch (requestError) {
+      setError({ status: requestError?.status || requestError?.response?.status || null });
+    } finally {
+      setLoading(false);
+    }
   };
 
   // For a given org_type, show org-specific overrides if exist, else show global templates
@@ -232,7 +240,7 @@ export default function RoleSettingsPage() {
         actions={(
           <>
           {/* org_type toggle */}
-          <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70 p-1 text-sm">
+          {canSwitchOrgType && <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70 p-1 text-sm">
             <button
               onClick={() => setOrgType('staffing_agency')}
               className={`rounded-lg px-4 py-2 font-semibold transition-all ${orgType === 'staffing_agency' ? 'bg-white text-violet-700 shadow-sm' : 'text-slate-500'}`}
@@ -245,7 +253,7 @@ export default function RoleSettingsPage() {
             >
               {t('roleSettings.organization')}
             </button>
-          </div>
+          </div>}
           <button onClick={load} disabled={loading}
             className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-600">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
@@ -271,6 +279,16 @@ export default function RoleSettingsPage() {
 
       {loading ? (
         <PlatformCard className="p-16 text-center text-slate-400">{t('roleSettings.loading')}</PlatformCard>
+      ) : error ? (
+        <PlatformCard className="p-5">
+          <PlatformEmptyState icon={ShieldAlert} className="min-h-72">
+            <p className="font-bold text-slate-700">
+              {error.status === 403
+                ? t('roleSettings.accessDenied')
+                : t('common.loadError', { defaultValue: 'Unable to load role settings' })}
+            </p>
+          </PlatformEmptyState>
+        </PlatformCard>
       ) : (
         <PlatformCard className="overflow-hidden">
           <div className="border-b border-slate-100 p-5">

@@ -192,38 +192,47 @@ const AuthenticatedApp = () => {
         noOrgRedirect="/agency/onboarding"
       />}>
         <Route element={<StaffingAgencyLayout />}>
-          <Route path="/agency/dashboard" element={<AgencyDashboard />} />
-          <Route path="/agency/jobs" element={<ManageJobsPage />} />
-          <Route path="/agency/jobs/open" element={<ManageJobsPage />} />
-          <Route path="/agency/jobs/filled" element={<ManageJobsPage />} />
-          <Route path="/agency/jobs/hold" element={<ManageJobsPage />} />
-          <Route path="/agency/crm" element={<CandidateListCRMPage candidateRoute="/agency/crm/candidate" />} />
-          <Route path="/agency/crm/candidate" element={<CandidateCRMPage />} />
-          <Route path="/agency/pipeline" element={<PipelinePage />} />
-          <Route path="/agency/ai-matching" element={<AIMatchingPage />} />
-          <Route path="/agency/compensation" element={<CompensationPage />} />
-          <Route path="/agency/import" element={<ImportDashboard />} />
-          <Route path="/agency/clients" element={<AgencyClients />} />
-          <Route path="/agency/clients/:id" element={<AgencyClientDetail />} />
-          <Route path="/agency/teams" element={<PlaceholderPage title="צוותים ומשתמשים" />} />
-          <Route path="/agency/reports" element={<PlaceholderPage title="דוחות ותובנות" />} />
-          <Route path="/agency/activity" element={<PlaceholderPage title="יומן פעילות" />} />
-          <Route path="/agency/settings/permissions" element={<PermissionsPage />} />
-          <Route path="/agency/settings/roles" element={<RoleSettingsPage />} />
-          <Route path="/agency/settings/billing" element={<BillingSettings />} />
-          <Route path="/agency/settings/integrations" element={<IntegrationsSettings />} />
-          {/* Team manager sub-routes */}
-          <Route path="/agency/team/dashboard" element={<AgencyDashboard />} />
-          <Route path="/agency/team/jobs" element={<ManageJobsPage />} />
-          <Route path="/agency/team/crm" element={<CandidateListCRMPage candidateRoute="/agency/team/crm/candidate" />} />
-          <Route path="/agency/team/crm/candidate" element={<CandidateCRMPage />} />
-          <Route path="/agency/team/pipeline" element={<PipelinePage />} />
-          <Route path="/agency/team/compensation" element={<CompensationPage />} />
-          <Route path="/agency/team/ai-matching" element={<AIMatchingPage />} />
-          <Route path="/agency/team/import" element={<ImportDashboard />} />
-          <Route path="/agency/team/reports" element={<PlaceholderPage title="דוחות" />} />
-          {/* Legacy redirects */}
-          <Route path="/recruitment/*" element={<Navigate to="/agency/dashboard" replace />} />
+          {/* Organization-wide operational routes. */}
+          <Route element={<ProtectedRoute requiredRoles={['org_admin', 'recruitment_manager']} />}>
+            <Route path="/agency/dashboard" element={<AgencyDashboard />} />
+            <Route path="/agency/jobs" element={<ManageJobsPage />} />
+            <Route path="/agency/jobs/open" element={<ManageJobsPage />} />
+            <Route path="/agency/jobs/filled" element={<ManageJobsPage />} />
+            <Route path="/agency/jobs/hold" element={<ManageJobsPage />} />
+            <Route path="/agency/crm" element={<CandidateListCRMPage candidateRoute="/agency/crm/candidate" />} />
+            <Route path="/agency/crm/candidate" element={<CandidateCRMPage />} />
+            <Route path="/agency/pipeline" element={<PipelinePage />} />
+            <Route path="/agency/ai-matching" element={<AIMatchingPage />} />
+            <Route path="/agency/compensation" element={<CompensationPage />} />
+            <Route path="/agency/import" element={<ImportDashboard />} />
+            <Route path="/agency/clients" element={<AgencyClients />} />
+            <Route path="/agency/clients/:id" element={<AgencyClientDetail />} />
+            <Route path="/agency/teams" element={<PlaceholderPage title="צוותים ומשתמשים" />} />
+            <Route path="/agency/reports" element={<PlaceholderPage title="דוחות ותובנות" />} />
+            <Route path="/agency/activity" element={<PlaceholderPage title="יומן פעילות" />} />
+            <Route path="/recruitment/*" element={<Navigate to="/agency/dashboard" replace />} />
+          </Route>
+
+          {/* Organization configuration is Org Admin only until read-only views exist. */}
+          <Route element={<ProtectedRoute requiredRoles={['org_admin']} />}>
+            <Route path="/agency/settings/permissions" element={<PermissionsPage />} />
+            <Route path="/agency/settings/roles" element={<RoleSettingsPage />} />
+            <Route path="/agency/settings/billing" element={<BillingSettings />} />
+            <Route path="/agency/settings/integrations" element={<IntegrationsSettings />} />
+          </Route>
+
+          {/* Team Manager cannot expand access through a direct organization URL. */}
+          <Route element={<ProtectedRoute requiredRoles={['team_manager']} />}>
+            <Route path="/agency/team/dashboard" element={<AgencyDashboard />} />
+            <Route path="/agency/team/jobs" element={<ManageJobsPage />} />
+            <Route path="/agency/team/crm" element={<CandidateListCRMPage candidateRoute="/agency/team/crm/candidate" />} />
+            <Route path="/agency/team/crm/candidate" element={<CandidateCRMPage />} />
+            <Route path="/agency/team/pipeline" element={<PipelinePage />} />
+            <Route path="/agency/team/compensation" element={<CompensationPage />} />
+            <Route path="/agency/team/ai-matching" element={<AIMatchingPage />} />
+            <Route path="/agency/team/import" element={<ImportDashboard />} />
+            <Route path="/agency/team/reports" element={<PlaceholderPage title="דוחות" />} />
+          </Route>
         </Route>
       </Route>
 

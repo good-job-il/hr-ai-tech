@@ -3,10 +3,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/AuthContext';
-import { base44 } from '@/api/base44Client';
+import { agencyClientService } from '@/api/services/agencyClientService';
+import { toast } from 'sonner';
 import {
   Building2, Plus, Search, Briefcase, Users, ChevronLeft, X,
-  TrendingUp, CheckCircle2, Filter, Globe, Mail,
+  TrendingUp, Mail,
 } from 'lucide-react';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -70,17 +71,17 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
     setError('');
     setSaving(true);
     try {
-      await base44.entities.Company.create({
+      await agencyClientService.create({
         name: form.name.trim(),
         industry: form.industry || undefined,
         contact_email: form.contact_email || undefined,
         website: form.website || undefined,
         initials: getInitials(form.name),
         color: form.color,
-        job_count: 0,
-        is_deleted: false,
+        status: 'active',
       });
       setForm({ name: '', industry: '', contact_email: '', website: '', color: PALETTE[0] });
+      toast.success(t('agencyClients.createModal.success', { defaultValue: 'Client created successfully' }));
       onClose();
       onSuccess?.();
     } catch (err) {
@@ -295,6 +296,7 @@ export default function AgencyClients() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const orgId = user?.organization_id;
+  const canManageClients = ['org_admin', 'recruitment_manager', 'admin'].includes(user?.role);
   const queryClient = useQueryClient();
 
   const [search, setSearch] = useState('');
@@ -306,65 +308,24 @@ export default function AgencyClients() {
 
   // ── Data queries ─────────────────────────────────────────────────────────
 
-  const { data: companies = [], isLoading: companiesLoading } = useQuery({
-    queryKey: ['agency-companies-list'],
-    queryFn: () => base44.entities.Company.filter({ is_deleted: false }, 'name', 300),
-    staleTime: STALE_TIME,
-  });
-
-  const { data: jobs = [], isLoading: jobsLoading } = useQuery({
-    queryKey: ['agency-jobs-for-clients', orgId],
-    queryFn: () => base44.entities.Job.filter({ organization_id: orgId, is_deleted: false }, '', 500),
+  const { data: clients = [], isLoading: clientsLoading, error: clientsError, refetch } = useQuery({
+    queryKey: ['agency-clients-list', orgId],
+    queryFn: () => agencyClientService.list({}, 300),
     enabled: !!orgId,
     staleTime: STALE_TIME,
   });
 
-  const { data: applications = [], isLoading: appsLoading } = useQuery({
-    queryKey: ['agency-apps-for-clients', orgId],
-    queryFn: () => base44.entities.Application.filter({ organization_id: orgId, is_deleted: false }, '', 500),
-    enabled: !!orgId,
-    staleTime: STALE_TIME,
-  });
-
-  const loading = companiesLoading || jobsLoading || appsLoading;
+  const loading = clientsLoading;
 
   // ── Compute clients with stats ────────────────────────────────────────────
 
   const clientsWithStats = useMemo(() => {
-    const jobsByCompany = {};
-    jobs.forEach(job => {
-      const cid = job.employer_company_id;
-      if (cid) {
-        if (!jobsByCompany[cid]) jobsByCompany[cid] = [];
-        jobsByCompany[cid].push(job);
-      }
-    });
-
-    const appsByJob = {};
-    applications.forEach(app => {
-      if (app.job_id) {
-        if (!appsByJob[app.job_id]) appsByJob[app.job_id] = [];
-        appsByJob[app.job_id].push(app);
-      }
-    });
-
-    return companies.map(company => {
-      const companyJobs = jobsByCompany[company.id] || [];
-      const openJobs = companyJobs.filter(j => !j.is_closed).length;
-      const allApps = companyJobs.flatMap(j => appsByJob[j.id] || []);
-      const inProcess = allApps.filter(a =>
-        ['phone_interview', 'recommended', 'employer_interview'].includes(a.status)
-      ).length;
-      const hired = allApps.filter(a => a.status === 'hired').length;
-      const isActive = companyJobs.length > 0;
-
-      return { ...company, openJobs, inProcess, hired, totalJobs: companyJobs.length, isActive };
-    }).sort((a, b) => {
+    return clients.filter(client => client.status !== 'archived').sort((a, b) => {
       // Active clients first, then by name
       if (b.isActive !== a.isActive) return b.isActive - a.isActive;
       return a.name.localeCompare(b.name, 'he');
     });
-  }, [companies, jobs, applications]);
+  }, [clients]);
 
   // ── Filters ───────────────────────────────────────────────────────────────
 
@@ -403,13 +364,13 @@ export default function AgencyClients() {
           <h1 className="text-3xl font-black text-gray-900">{t('agencyClients.title')}</h1>
           <p className="text-gray-500 mt-1 font-semibold">{t('agencyClients.subtitle')}</p>
         </div>
-        <button
+        {canManageClients && <button
           onClick={() => setShowCreate(true)}
           className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           {t('agencyClients.newClient')}
-        </button>
+        </button>}
       </div>
 
       {/* KPI row */}
@@ -476,7 +437,14 @@ export default function AgencyClients() {
       )}
 
       {/* Grid */}
-      {loading ? (
+      {clientsError ? (
+        <div className="rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
+          <p className="font-bold text-red-700">{t('common.loadError', { defaultValue: 'Unable to load clients' })}</p>
+          <button onClick={() => refetch()} className="mt-3 text-sm font-bold text-purple-700 hover:underline">
+            {t('crm.refresh')}
+          </button>
+        </div>
+      ) : loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm animate-pulse">
@@ -501,7 +469,7 @@ export default function AgencyClients() {
               ? t('agencyClients.results.noMatchingClients')
               : t('agencyClients.results.noClients')}
           </p>
-          {!search && !filterIndustry && filterActive === 'all' && (
+          {!search && !filterIndustry && filterActive === 'all' && canManageClients && (
             <>
               <p className="text-gray-400 text-sm mt-1 mb-4">
                 {t('agencyClients.results.addFirstClient')}
@@ -523,13 +491,14 @@ export default function AgencyClients() {
         </div>
       )}
 
-      <CreateClientModal
+      {canManageClients && <CreateClientModal
         isOpen={showCreate}
         onClose={() => setShowCreate(false)}
         onSuccess={() => {
-          queryClient.invalidateQueries({ queryKey: ['agency-companies-list'] });
+          queryClient.invalidateQueries({ queryKey: ['agency-clients-list', orgId] });
+          queryClient.invalidateQueries({ queryKey: ['agency-clients', orgId] });
         }}
-      />
+      />}
     </div>
   );
 }

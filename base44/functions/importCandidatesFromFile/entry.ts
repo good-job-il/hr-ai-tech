@@ -22,8 +22,13 @@ Deno.serve(async (req) => {
     }
 
     // PERMISSION CHECK: Only internal recruitment team can import candidates
-    if (!['admin', 'recruitment_manager', 'team_manager'].includes(user.role)) {
+    if (!['admin', 'org_admin', 'recruitment_manager', 'team_manager'].includes(user.role)) {
       return Response.json({ error: 'Unauthorized: Import access limited to admin/recruitment_manager/team_manager' }, { status: 403 });
+    }
+
+    const organizationId = user.organization_id || user.data?.organization_id;
+    if (!organizationId) {
+      return Response.json({ error: 'Organization context required' }, { status: 403 });
     }
 
     const body = await req.json();
@@ -31,6 +36,13 @@ Deno.serve(async (req) => {
 
     if (!fileUrl || !batchId) {
       return Response.json({ error: 'Missing fileUrl or batchId' }, { status: 400 });
+    }
+
+    const visibleBatches = await base44.entities.CandidateImportBatch.filter(
+      { id: batchId, organization_id: organizationId }, '', 1
+    );
+    if (visibleBatches.length === 0) {
+      return Response.json({ error: 'Import batch not found in organization scope' }, { status: 404 });
     }
 
     // Update batch status to in_progress
@@ -80,7 +92,7 @@ Deno.serve(async (req) => {
         let existingCandidateId = null;
         if (record.email) {
           const byEmail = await base44.asServiceRole.entities.Candidate.filter(
-            { email: record.email.toLowerCase().trim() }, '', 1
+            { organization_id: organizationId, email: record.email.toLowerCase().trim() }, '', 1
           );
           if (byEmail.length > 0) {
             duplicates++;
@@ -97,7 +109,7 @@ Deno.serve(async (req) => {
           const normalizedPhone = record.phone.replace(/\D/g, '');
           if (normalizedPhone.length >= 7) {
             const allWithPhone = await base44.asServiceRole.entities.Candidate.filter(
-              { phone: record.phone }, '', 1
+              { organization_id: organizationId, phone: record.phone }, '', 1
             );
             if (allWithPhone.length > 0) {
               duplicates++;
@@ -128,6 +140,7 @@ Deno.serve(async (req) => {
 
         // ── Create Candidate ─────────────────────────────────────────────────
         const newCandidate = await base44.asServiceRole.entities.Candidate.create({
+          organization_id: organizationId,
           full_name: record.full_name,
           email: record.email ? record.email.toLowerCase().trim() : '',
           phone: record.phone || '',
@@ -147,7 +160,9 @@ Deno.serve(async (req) => {
           source: 'import',
           status: 'new',
           employer_id: record.employer_id || '',
-          recruiter_id: record.recruiter_id || user.email,
+          recruiter_id: null,
+          team_manager_id: user.role === 'team_manager' ? user.id : (user.team_manager_id || null),
+          recruitment_manager_id: user.recruitment_manager_id || (user.role === 'recruitment_manager' ? user.id : null),
           skills,
           languages,
           previous_companies: previousCompanies,
@@ -165,6 +180,7 @@ Deno.serve(async (req) => {
         // ── Create Document record ────────────────────────────────────────────
         if (record.resume_url) {
           await base44.asServiceRole.entities.CandidateDocument.create({
+            organization_id: organizationId,
             candidate_id: newCandidate.id,
             candidate_email: newCandidate.email || '',
             doc_type: 'cv',
@@ -179,6 +195,7 @@ Deno.serve(async (req) => {
 
         // ── Create Timeline event ─────────────────────────────────────────────
         await base44.asServiceRole.entities.CandidateTimeline.create({
+          organization_id: organizationId,
           candidate_id: newCandidate.id,
           candidate_email: newCandidate.email || '',
           event_type: 'imported',

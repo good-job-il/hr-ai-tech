@@ -16,6 +16,7 @@ function CopyInline({ text }) {
 const EMPTY_FORM = {
   title: '',
   company: '',
+  employer_company_id: '',
   category: '',
   location: '',
   type: 'full',
@@ -30,12 +31,29 @@ const EMPTY_FORM = {
   contact_phone: ''
 };
 
-export default function JobFormModal({ job, isOpen, onClose, onSave }) {
+export default function JobFormModal({ job, isOpen, onClose, onSave, preselectedClientId = null }) {
   const { user } = useAuth();
   const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [compensationPlan, setCompensationPlan] = useState(null);
+  const [agencyClients, setAgencyClients] = useState([]);
+  const [clientsLoading, setClientsLoading] = useState(false);
+  const [clientsError, setClientsError] = useState('');
+  const isAgency = user?.org_type === 'staffing_agency';
+
+  useEffect(() => {
+    if (!isOpen || !isAgency) return;
+    setClientsLoading(true);
+    setClientsError('');
+    base44.entities.AgencyClient.filter({ status: 'active' }, 'name', 300)
+      .then(setAgencyClients)
+      .catch((err) => {
+        setAgencyClients([]);
+        setClientsError(err?.message || 'Unable to load agency clients');
+      })
+      .finally(() => setClientsLoading(false));
+  }, [isOpen, isAgency, user?.organization_id]);
 
   useEffect(() => {
     if (job) {
@@ -59,16 +77,24 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
       };
       loadCompensation();
     } else {
-      setForm(EMPTY_FORM);
+      const selectedClient = agencyClients.find(client => String(client.id) === String(preselectedClientId));
+      setForm(selectedClient ? {
+        ...EMPTY_FORM,
+        employer_company_id: selectedClient.company_id,
+        company: selectedClient.name,
+        contact_email: selectedClient.contact_email || '',
+        contact_phone: selectedClient.contact_phone || '',
+      } : EMPTY_FORM);
       setCompensationPlan(null);
     }
     setError('');
-  }, [job, isOpen]);
+  }, [job, isOpen, preselectedClientId, agencyClients]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title) { setError('Job title is required'); return; }
     if (!form.company) { setError('Company name is required'); return; }
+    if (isAgency && !form.employer_company_id) { setError('Please select an agency client'); return; }
     if (!form.category) { setError('Category is required'); return; }
 
     // Build clean payload — convert salary strings to numbers or omit
@@ -79,6 +105,15 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
     ['contact_email', 'contact_phone', 'location', 'description'].forEach(k => {
       if (payload[k] === '') delete payload[k];
     });
+
+    if (!job?.id && user) {
+      payload.organization_id = user.organization_id;
+      payload.created_by_user_id = user.id;
+      if (user.role === 'recruiter' || user.role === 'internal_recruiter') payload.recruiter_id = user.id;
+      if (user.role === 'team_manager') payload.team_manager_id = user.id;
+      if (user.team_manager_id) payload.team_manager_id = user.team_manager_id;
+      if (user.recruitment_manager_id) payload.recruitment_manager_id = user.recruitment_manager_id;
+    }
 
     setLoading(true);
     try {
@@ -153,13 +188,38 @@ export default function JobFormModal({ job, isOpen, onClose, onSave }) {
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">Company Name *</label>
-              <input
-                required
-                placeholder='Google, Apple, Startup X...'
-                value={form.company}
-                onChange={(e) => setForm({ ...form, company: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
-              />
+              {isAgency ? (
+                <select
+                  required
+                  disabled={clientsLoading || !!clientsError}
+                  value={form.employer_company_id}
+                  onChange={(e) => {
+                    const client = agencyClients.find(item => String(item.company_id) === e.target.value);
+                    setForm({
+                      ...form,
+                      employer_company_id: client?.company_id || '',
+                      company: client?.name || '',
+                      contact_email: client?.contact_email || form.contact_email,
+                      contact_phone: client?.contact_phone || form.contact_phone,
+                    });
+                  }}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
+                >
+                  <option value="">{clientsLoading ? 'Loading clients…' : 'Select a client'}</option>
+                  {agencyClients.map(client => <option key={client.id} value={client.company_id}>{client.name}</option>)}
+                </select>
+              ) : (
+                <input
+                  required
+                  placeholder='Google, Apple, Startup X...'
+                  value={form.company}
+                  onChange={(e) => setForm({ ...form, company: e.target.value })}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
+                />
+              )}
+              {isAgency && clientsError && (
+                <p className="mt-1.5 text-xs font-semibold text-red-600">{clientsError}. Close and reopen the form to retry.</p>
+              )}
             </div>
           </div>
 

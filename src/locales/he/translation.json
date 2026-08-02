@@ -496,10 +496,16 @@
     "stages": {
       "new": "חדש",
       "screening": "סינון ראשוני",
+      "reviewed": "נבדק",
       "phone_interview": "ראיון טלפוני",
       "professional_interview": "ראיון מקצועי",
+      "recommended": "הומלץ ללקוח",
       "client_stage": "שלב לקוח",
+      "employer_interview": "ראיון מעסיק",
+      "offer": "הצעה",
       "hired": "התקבל",
+      "probation": "תקופת ניסיון",
+      "completed": "הושלם",
       "rejected": "נדחה"
     },
     "title": "תהליך גיוס",

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import CandidateCard from './CandidateCard';
 import { Users } from 'lucide-react';
 
-export default function StageColumn({ stage, applications, onCandidateClick, isDragging, colWidth }) {
+export default function StageColumn({ stage, applications, onCandidateClick, isDragging, colWidth, canMove = true }) {
   const { t } = useTranslation();
 
   const hasSlaBreaches = applications.some(a => {
@@ -69,7 +69,7 @@ export default function StageColumn({ stage, applications, onCandidateClick, isD
             )}
 
             {applications.map((app, index) => (
-              <Draggable key={app.id} draggableId={app.id} index={index}>
+              <Draggable key={app.id} draggableId={app.id} index={index} isDragDisabled={!canMove}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}

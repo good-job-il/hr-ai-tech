@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { FileText, Upload, Download, Eye, Trash2, File, Plus } from 'lucide-react';
+import { FileText, Upload, Download, Eye, File } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
 
 const DOC_COLORS = {
   cv: '#7C3AED', cover_letter: '#2563EB', portfolio: '#10B981',
@@ -17,6 +18,9 @@ function formatBytes(bytes) {
 
 export default function DocumentsPanel({ documents, candidate, onUpload }) {
   const { t } = useTranslation();
+  const { can } = usePermissionMatrix();
+  const canUpdate = can('update');
+  const canDownload = can('download_cv');
   
   const DOC_TYPE_LABELS = {
     cv: t('candidateCRM.documents.types.cv'),
@@ -53,7 +57,7 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
   return (
     <div>
       {/* Upload */}
-      <div className="flex items-center gap-2 mb-4">
+      {canUpdate && <div className="flex items-center gap-2 mb-4">
         <select value={docType} onChange={e => setDocType(e.target.value)}
           className="text-xs font-semibold border border-[#E4ECFF] rounded-lg px-3 py-2 bg-white text-[#1F2937] flex-1">
           {Object.entries(DOC_TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
@@ -67,7 +71,7 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
         <input ref={fileRef} type="file" className="hidden"
           accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
           onChange={handleFileChange} />
-      </div>
+      </div>}
 
       {/* Entity CV */}
       {hasResumeEntity && (
@@ -78,6 +82,7 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
               <DocRow
                 doc={{ filename: candidate.original_resume_filename || candidate.resume_filename || 'קורות חיים', file_url: candidate.original_resume_url || candidate.resume_url, doc_type: 'cv' }}
                 color={DOC_COLORS.cv}
+                canDownload={canDownload}
               />
             )}
             {candidate.converted_resume_url && (
@@ -85,6 +90,7 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
                 doc={{ filename: candidate.converted_resume_filename || 'קורות חיים DOCX', file_url: candidate.converted_resume_url, doc_type: 'cv' }}
                 color={DOC_COLORS.cv}
                 badge="DOCX"
+                canDownload={canDownload}
               />
             )}
 
@@ -108,7 +114,7 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
           </div>
           <div className="space-y-2">
             {docs.map(doc => (
-              <DocRow key={doc.id} doc={doc} color={DOC_COLORS[doc.doc_type] || '#94A3B8'} />
+              <DocRow key={doc.id} doc={doc} color={DOC_COLORS[doc.doc_type] || '#94A3B8'} canDownload={canDownload} />
             ))}
           </div>
         </div>
@@ -117,7 +123,7 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
   );
 }
 
-function DocRow({ doc, color, badge }) {
+function DocRow({ doc, color, badge, canDownload }) {
   return (
     <div className="flex items-center gap-3 bg-white rounded-xl border border-[#E4ECFF] px-4 py-3 group">
       <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -137,11 +143,11 @@ function DocRow({ doc, color, badge }) {
             <Eye className="w-4 h-4" />
           </button>
         </a>
-        <a href={doc.file_url} download>
+        {canDownload && <a href={doc.file_url} download>
           <button className="p-1.5 rounded-lg hover:bg-[#EEF4FF] text-[#94A3B8] hover:text-[#7C3AED] transition-colors">
             <Download className="w-4 h-4" />
           </button>
-        </a>
+        </a>}
       </div>
     </div>
   );

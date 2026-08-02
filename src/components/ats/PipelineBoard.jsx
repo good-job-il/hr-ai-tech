@@ -4,7 +4,7 @@ import StageColumn from './StageColumn';
 
 const COLUMN_WIDTH = 300;
 
-export default function PipelineBoard({ stages, applications, onCandidateClick, onMove, userRole, isRTL = true }) {
+export default function PipelineBoard({ stages, applications, onCandidateClick, onMove, userRole, isRTL = true, canMove = true }) {
   const [dragging, setDragging] = useState(false);
   const containerRef = useRef(null);
   const scrollInitialized = useRef(false);
@@ -14,7 +14,7 @@ export default function PipelineBoard({ stages, applications, onCandidateClick, 
 
   const onDragEnd = (result) => {
     setDragging(false);
-    if (!result.destination) return;
+    if (!canMove || !result.destination) return;
     const { draggableId, destination } = result;
     if (destination.droppableId !== result.source.droppableId) {
       onMove(draggableId, destination.droppableId);
@@ -65,6 +65,7 @@ export default function PipelineBoard({ stages, applications, onCandidateClick, 
                 onCandidateClick={onCandidateClick}
                 isDragging={dragging}
                 colWidth={COLUMN_WIDTH}
+                canMove={canMove}
               />
             ))}
           </div>

@@ -4,7 +4,7 @@
  */
 import { useState } from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
-import { ChevronDown, X, Building2, ShieldCheck } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, X, Building2, ShieldCheck, Sparkles } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useTranslation } from 'react-i18next';
 import DashboardHeader from '@/components/layout/DashboardHeader';
@@ -20,7 +20,7 @@ const THEME = {
   inactiveText: 'text-[#4B5563]',
 };
 
-export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
+export default function SidebarLayout({ navItems = [], roleTitle = '', platformStyle = false }) {
   const { user, logout, orgType, organization, isImpersonating, exitOrganization } = useAuth();
   const { t, i18n } = useTranslation();
   const isRtl = !i18n.language?.startsWith('en');
@@ -53,6 +53,16 @@ export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
     const active = isActive(item.route);
     const hasChildren = item.children?.length > 0;
     const isExpanded = expandedMenu === item.id;
+    const showChildren = isExpanded || (platformStyle && active);
+    const itemBaseClass = platformStyle
+      ? 'min-h-[46px] rounded-[14px] px-4 py-3 text-[13px] font-bold'
+      : 'rounded-xl px-3 py-2.5 text-sm font-medium';
+    const activeClass = platformStyle
+      ? 'bg-[#F5EDFF] text-[#7C3AED] shadow-[inset_0_0_0_1px_rgba(124,58,237,0.02)]'
+      : `${THEME.activeBg} font-semibold`;
+    const inactiveClass = platformStyle
+      ? 'text-[#59637C] hover:bg-[#F8F5FF] hover:text-[#6C4DFF]'
+      : `${THEME.inactiveText} ${THEME.hoverBg}`;
 
     return (
       <div key={item.id}>
@@ -60,13 +70,13 @@ export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
           <>
             <button
               onClick={() => setExpandedMenu(isExpanded ? null : item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all
+              className={`flex w-full items-center justify-between transition-all ${itemBaseClass}
                 ${active
-                  ? `${THEME.activeBg} font-semibold`
-                  : `${THEME.inactiveText} ${THEME.hoverBg}`}`}
+                  ? activeClass
+                  : inactiveClass}`}
             >
-              <span className="flex items-center gap-3">
-                {item.icon && <item.icon className={`w-[18px] h-[18px] shrink-0 ${active ? THEME.activeText : 'text-[#9CA3AF]'}`} />}
+              <span className="flex items-center gap-3.5">
+                {item.icon && <item.icon className={`h-[19px] w-[19px] shrink-0 ${active ? (platformStyle ? 'text-[#7C3AED]' : THEME.activeText) : platformStyle ? 'text-[#68728A]' : 'text-[#9CA3AF]'}`} strokeWidth={1.8} />}
                 {getLabel(item)}
                 {item.badge && (
                   <span className="text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
@@ -74,19 +84,19 @@ export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
                   </span>
                 )}
               </span>
-              <ChevronDown className={`w-4 h-4 transition-transform text-[#9CA3AF] ${isExpanded ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`h-4 w-4 text-[#A0A8B9] transition-transform ${showChildren ? 'rotate-180' : ''}`} />
             </button>
-            {isExpanded && (
-              <div className={`${isRtl ? 'mr-6 border-r-2 pr-2' : 'ml-6 border-l-2 pl-2'} mt-1 space-y-0.5 ${THEME.childBorder}`}>
+            {showChildren && (
+              <div className={`${isRtl ? 'mr-7 border-r pr-2' : 'ml-7 border-l pl-2'} mt-1 space-y-0.5 ${platformStyle ? 'border-[#E7E1F7]' : THEME.childBorder}`}>
                 {item.children.map((child) => (
                   <Link
                     key={child.id}
                     to={child.route}
                     onClick={() => setMobileOpen(false)}
-                    className={`block px-3 py-2 rounded-lg text-sm transition-all
+                    className={`${platformStyle ? 'rounded-[11px] text-xs font-semibold' : 'rounded-lg text-sm'} block px-3 py-2 transition-all
                       ${isActive(child.route)
-                        ? `${THEME.childActive} font-semibold`
-                        : `text-[#6B7280] hover:text-[#6C4DFF] ${THEME.hoverBg}`}`}
+                        ? platformStyle ? 'bg-[#F7F1FF] text-[#7C3AED]' : `${THEME.childActive} font-semibold`
+                        : platformStyle ? 'text-[#7A8498] hover:bg-[#FAF8FF] hover:text-[#6C4DFF]' : `text-[#6B7280] hover:text-[#6C4DFF] ${THEME.hoverBg}`}`}
                   >
                     {getLabel(child)}
                   </Link>
@@ -98,12 +108,12 @@ export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
           <Link
             to={item.route}
             onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
+            className={`flex items-center gap-3.5 transition-all ${itemBaseClass}
               ${active
-                ? `${THEME.activeBg} font-semibold`
-                : `${THEME.inactiveText} ${THEME.hoverBg}`}`}
+                ? activeClass
+                : inactiveClass}`}
           >
-            {item.icon && <item.icon className={`w-[18px] h-[18px] shrink-0 ${active ? THEME.activeText : 'text-[#9CA3AF]'}`} />}
+            {item.icon && <item.icon className={`h-[19px] w-[19px] shrink-0 ${active ? (platformStyle ? 'text-[#7C3AED]' : THEME.activeText) : platformStyle ? 'text-[#68728A]' : 'text-[#9CA3AF]'}`} strokeWidth={1.8} />}
             <span className="flex-1">{getLabel(item)}</span>
             {item.badge && (
               <span className="text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
@@ -117,31 +127,45 @@ export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
   });
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F8F7FF] flex">
-      <aside className={`fixed inset-y-0 ${isRtl ? 'right-0 border-l' : 'left-0 border-r'} z-40 w-64 flex flex-col transform transition-transform md:translate-x-0 ${THEME.sidebarBg} ${mobileOpen ? 'translate-x-0' : isRtl ? 'translate-x-full md:translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+    <div dir={isRtl ? 'rtl' : 'ltr'} className={`flex min-h-screen ${platformStyle ? 'bg-[#F5F8FF]' : 'bg-[#F8F7FF]'}`}>
+      <aside className={`fixed inset-y-0 ${isRtl ? 'right-0' : 'left-0'} z-40 flex flex-col transform transition-transform md:translate-x-0 ${platformStyle ? 'w-[290px] border-[#E9EDF6] bg-[#FBFCFF]' : `w-64 ${THEME.sidebarBg}`} ${mobileOpen ? 'translate-x-0' : isRtl ? 'translate-x-full md:translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
 
         {/* Logo */}
-        <div className="h-20 border-b border-[#EDE9FE] flex items-center px-5">
-          <Logo />
+        <div className={`flex h-[82px] shrink-0 items-center ${platformStyle ? 'justify-center border-b border-[#EEF1F6] px-7' : 'border-b border-[#EDE9FE] px-5'}`}>
+          <Logo href={platformStyle ? '/platform/dashboard' : undefined} className={platformStyle ? 'max-h-[54px]' : ''} />
         </div>
 
         {/* Nav */}
-        <div className="px-3 py-4 space-y-0.5 overflow-y-auto flex-1">
-          {renderNavItems(navItems)}
-        </div>
+        <div className={platformStyle ? 'm-3 mt-2 flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-[#E9EDF6] bg-white shadow-[0_8px_30px_rgba(60,74,125,0.045)]' : 'flex min-h-0 flex-1 flex-col'}>
+          <nav className={`flex-1 overflow-y-auto ${platformStyle ? 'space-y-1.5 px-3 py-4' : 'space-y-0.5 px-3 py-4'}`}>
+            {renderNavItems(navItems)}
+          </nav>
 
         {/* Organization Context Block */}
-        <div className="px-4 py-3 border-t border-[#EDE9FE] bg-[#F5F3FF]">
+        <div className={platformStyle ? 'border-t border-[#EEF1F6] p-3' : 'border-t border-[#EDE9FE] bg-[#F5F3FF] px-4 py-3'}>
           {orgType === 'platform' ? (
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#EEF4FF] flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-4 h-4 text-[#6C4DFF]" />
+            platformStyle ? (
+              <button className="flex w-full items-center gap-3 rounded-[17px] border border-[#E8E1FA] bg-[linear-gradient(135deg,#FBF9FF,#F4F1FF)] p-3 text-start transition hover:border-[#D9CCFA]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-white text-[#7C3AED] shadow-[0_4px_12px_rgba(105,78,190,0.08)]">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-black text-[#6C4DFF]">{isRtl ? 'מרכז AI למנהלים' : 'AI Center for Managers'}</p>
+                  <p className="mt-0.5 truncate text-[9px] font-semibold text-[#A19AB5]">{isRtl ? 'תובנות חכמות על המערכת' : 'Smart platform insights'}</p>
+                </div>
+                {isRtl ? <ChevronLeft className="h-4 w-4 text-[#7C3AED]" /> : <ChevronRight className="h-4 w-4 text-[#7C3AED]" />}
+              </button>
+            ) : (
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#EEF4FF]">
+                  <ShieldCheck className="h-4 w-4 text-[#6C4DFF]" />
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-[#1F2937]">{t('nav.platform.controlPanel')}</p>
+                  <p className="text-[10px] text-[#9CA3AF]">Super Admin</p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-[#1F2937] truncate">{t('nav.platform.controlPanel')}</p>
-                <p className="text-[10px] text-[#9CA3AF]">Super Admin</p>
-              </div>
-            </div>
+            )
           ) : (
             <div className="flex items-start gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-[#EEF4FF] flex items-center justify-center shrink-0 mt-0.5">
@@ -166,9 +190,10 @@ export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
             </div>
           )}
         </div>
+        </div>
       </aside>
 
-      <div className={`flex-1 min-w-0 ${isRtl ? 'md:mr-64' : 'md:ml-64'} flex flex-col min-h-screen`}>
+      <div className={`flex min-h-screen min-w-0 flex-1 flex-col ${platformStyle ? (isRtl ? 'md:mr-[290px]' : 'md:ml-[290px]') : (isRtl ? 'md:mr-64' : 'md:ml-64')}`}>
         {isImpersonating && (
           <div className="bg-amber-400 text-amber-950 text-xs sm:text-sm font-bold px-4 py-2 flex items-center justify-center gap-3 flex-wrap">
             <span>
@@ -191,6 +216,7 @@ export default function SidebarLayout({ navItems = [], roleTitle = '' }) {
           onMenuToggle={() => setMobileOpen(true)}
           onLogout={handleLogout}
           showMenuButton={true}
+          platformStyle={platformStyle}
         />
         <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto">
           <div className="p-6 min-w-0">

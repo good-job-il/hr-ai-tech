@@ -147,6 +147,8 @@ export class HttpClient {
       }
 
       return data;
+    }).catch((error) => {
+      throw normalizeError(error);
     }).finally(() => {
       this.pendingRequests.delete(cacheKey);
     });

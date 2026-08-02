@@ -9,6 +9,8 @@
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -p ./jsconfig.json",
+    "test:agency-access": "node scripts/verify-agency-access.mjs",
+    "test:agency-clients": "node scripts/verify-agency-clients.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

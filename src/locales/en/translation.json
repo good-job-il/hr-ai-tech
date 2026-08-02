@@ -496,10 +496,16 @@
     "stages": {
       "new": "New",
       "screening": "Initial Screening",
+      "reviewed": "Reviewed",
       "phone_interview": "Phone Interview",
       "professional_interview": "Professional Interview",
+      "recommended": "Recommended to Client",
       "client_stage": "Client Stage",
+      "employer_interview": "Employer Interview",
+      "offer": "Offer",
       "hired": "Hired",
+      "probation": "Probation",
+      "completed": "Completed",
       "rejected": "Rejected"
     },
     "title": "Recruitment Pipeline",

@@ -2,9 +2,13 @@ import { Entity, Column, Index } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 
 @Entity('candidate_import_batches')
+@Index(['organization_id'])
 @Index(['imported_by'])
 @Index(['status'])
 export class CandidateImportBatchEntity extends BaseEntity {
+  @Column({ name: 'organization_id', type: 'int', nullable: true })
+  organization_id: number | null;
+
   @Column({ name: 'batch_name', type: 'varchar', length: 255 })
   batch_name: string;
 
@@ -22,6 +26,12 @@ export class CandidateImportBatchEntity extends BaseEntity {
 
   @Column({ name: 'recruiter_id', type: 'int', nullable: true })
   recruiter_id: number | null;
+
+  @Column({ name: 'team_manager_id', type: 'int', nullable: true })
+  team_manager_id: number | null;
+
+  @Column({ name: 'recruitment_manager_id', type: 'int', nullable: true })
+  recruitment_manager_id: number | null;
 
   @Column({ name: 'total_records', type: 'int', default: 0 })
   total_records: number;
@@ -75,4 +85,3 @@ export class CandidateImportBatchEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   summary: string | null;
 }
-

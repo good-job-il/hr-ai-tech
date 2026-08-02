@@ -25,8 +25,14 @@ export class InterviewEntity extends BaseEntity {
   @Column({ name: 'employer_id', type: 'varchar', length: 255, nullable: true })
   employer_id: string | null;
 
-  @Column({ name: 'recruiter_id', type: 'varchar', length: 255, nullable: true })
-  recruiter_id: string | null;
+  @Column({ name: 'recruiter_id', type: 'int', nullable: true })
+  recruiter_id: number | null;
+
+  @Column({ name: 'team_manager_id', type: 'int', nullable: true })
+  team_manager_id: number | null;
+
+  @Column({ name: 'recruitment_manager_id', type: 'int', nullable: true })
+  recruitment_manager_id: number | null;
 
   @Column({ name: 'candidate_name', type: 'varchar', length: 255 })
   candidate_name: string;
@@ -79,4 +85,3 @@ export class InterviewEntity extends BaseEntity {
   @Column({ name: 'candidate_confirmed', type: 'boolean', default: false })
   candidate_confirmed: boolean;
 }
-

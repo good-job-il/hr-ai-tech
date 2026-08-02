@@ -221,7 +221,7 @@ export function useCandidateCRM(candidateId) {
       candidate_email: candidate?.email || '',
       candidate_name: candidate?.full_name || '',
       organization_id: orgId(),
-      recruiter_id: user.email,
+      recruiter_id: user.id,
       status: 'scheduled',
     });
     setInterviews(prev => [interview, ...prev]);
@@ -260,11 +260,14 @@ export function useCandidateCRM(candidateId) {
   }, [candidateId, candidate, addTimelineEvent, invalidateCache]);
 
   // ── RECRUITER ASSIGNMENT ──────────────────────────────────────────────────
-  const assignRecruiter = useCallback(async (recruiterEmail, recruiterName) => {
-    const updated = await httpClient.patch(`/candidates/${candidateId}`, { recruiter_id: recruiterEmail });
+  const assignRecruiter = useCallback(async (recruiterId, recruiterName, recruiterEmail) => {
+    const updated = await httpClient.patch(`/candidates/${candidateId}`, { recruiter_id: recruiterId });
     setCandidate(updated);
     invalidateCache();
-    await addTimelineEvent('recruiter_assigned', `הוקצה מגייס: ${recruiterName || recruiterEmail}`, { recruiter_email: recruiterEmail });
+    await addTimelineEvent('recruiter_assigned', `הוקצה מגייס: ${recruiterName || recruiterEmail || recruiterId}`, {
+      recruiter_id: recruiterId,
+      recruiter_email: recruiterEmail || null,
+    });
     return updated;
   }, [candidateId, addTimelineEvent, invalidateCache]);
 

@@ -257,6 +257,7 @@ export class AuthService {
       email: admin.email,
       role: admin.role,
       organization_id: org.id,
+      org_type: org.org_type,
       impersonating: true,
     };
 
@@ -339,4 +340,3 @@ export class AuthService {
     return rest;
   }
 }
-

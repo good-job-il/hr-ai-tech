@@ -66,7 +66,7 @@ export default function CandidateLayout() {
 
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'} className="min-h-screen bg-[#F7FBFF] flex">
-      <aside className={`fixed inset-y-0 ${isRtl ? 'right-0 border-l' : 'left-0 border-r'} z-40 w-64 bg-white border-[#E4ECFF] flex flex-col transform transition-transform md:translate-x-0 ${mobileOpen ? 'translate-x-0' : isRtl ? 'translate-x-full md:translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      <aside className={`fixed inset-y-0 ${isRtl ? 'right-0' : 'left-0'} z-40 w-64 bg-white border-[#E4ECFF] flex flex-col transform transition-transform md:translate-x-0 ${mobileOpen ? 'translate-x-0' : isRtl ? 'translate-x-full md:translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="h-20 border-b border-[#E4ECFF] flex items-center px-6">
           <Logo />
         </div>

@@ -19,6 +19,8 @@ import { UserEntity } from '../users/user.entity';
 
 /** Roles allowed to create/modify candidate records (agency & admin staff only) */
 const CANDIDATE_WRITE_ROLES = [...ORG_ROLES, UserRole.ADMIN];
+const IMPORT_WRITE_ROLES = [UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, UserRole.TEAM_MANAGER, UserRole.ADMIN];
+const ACCESS_WRITE_ROLES = [UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, UserRole.ADMIN];
 
 @ApiTags('Candidates')
 @ApiBearerAuth()
@@ -35,19 +37,21 @@ export class CandidatesController {
   }
 
   @Get('import-batches/:id')
-  getBatch(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.getBatch(id);
+  getBatch(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
+    return this.svc.getBatch(id, user);
   }
 
   @Post('import-batches')
+  @Roles(...IMPORT_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
-  createBatch(@Body() data: Record<string, any>) {
-    return this.svc.createBatch(data);
+  createBatch(@Body() data: Record<string, any>, @CurrentUser() user: UserEntity) {
+    return this.svc.createBatch(data, user);
   }
 
   @Patch('import-batches/:id')
-  updateBatch(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>) {
-    return this.svc.updateBatch(id, data);
+  @Roles(...IMPORT_WRITE_ROLES)
+  updateBatch(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>, @CurrentUser() user: UserEntity) {
+    return this.svc.updateBatch(id, data, user);
   }
 
   // ─── Profile ─────────────────────────────────────────────────────────────
@@ -84,29 +88,33 @@ export class CandidatesController {
   // ─── Access ──────────────────────────────────────────────────────────────
   @Get('access')
   @ApiOperation({ summary: 'List candidate access grants (marketplace)' })
-  listAccess(@Query('candidate_id') candidateId?: string) {
-    return this.svc.findAllAccess({ candidate_id: candidateId });
+  listAccess(@CurrentUser() user: UserEntity, @Query('candidate_id') candidateId?: string) {
+    return this.svc.findAllAccess({ candidate_id: candidateId }, user);
   }
 
   @Post('access')
+  @Roles(...ACCESS_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
-  createAccess(@Body() data: Record<string, any>) {
-    return this.svc.createAccess(data);
+  createAccess(@Body() data: Record<string, any>, @CurrentUser() user: UserEntity) {
+    return this.svc.createAccess(data, user);
   }
 
   @Patch('access/:id')
-  updateAccess(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>) {
-    return this.svc.updateAccess(id, data);
+  @Roles(...ACCESS_WRITE_ROLES)
+  updateAccess(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>, @CurrentUser() user: UserEntity) {
+    return this.svc.updateAccess(id, data, user);
   }
 
   @Delete('access/:id')
+  @Roles(...ACCESS_WRITE_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteAccess(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.deleteAccess(id);
+  deleteAccess(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
+    return this.svc.deleteAccess(id, user);
   }
 
   // ─── Notes (static prefix routes) ─────────────────────────────────────────
   @Patch('notes/:noteId')
+  @Roles(...CANDIDATE_WRITE_ROLES)
   updateNote(
     @Param('noteId', ParseIntPipe) noteId: number,
     @Body() dto: UpdateCandidateNoteDto,
@@ -116,6 +124,7 @@ export class CandidatesController {
   }
 
   @Delete('notes/:noteId')
+  @Roles(...CANDIDATE_WRITE_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteNote(@Param('noteId', ParseIntPipe) noteId: number, @CurrentUser() user: UserEntity) {
     return this.svc.deleteNote(noteId, user);
@@ -123,6 +132,7 @@ export class CandidatesController {
 
   // ─── Tags (static prefix routes) ──────────────────────────────────────────
   @Delete('tags/:tagId')
+  @Roles(...CANDIDATE_WRITE_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteTag(@Param('tagId', ParseIntPipe) tagId: number, @CurrentUser() user: UserEntity) {
     return this.svc.deleteTag(tagId, user);
@@ -175,6 +185,7 @@ export class CandidatesController {
   }
 
   @Post(':id/notes')
+  @Roles(...CANDIDATE_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
   createNote(
     @Param('id', ParseIntPipe) id: number,
@@ -191,6 +202,7 @@ export class CandidatesController {
   }
 
   @Post(':id/tags')
+  @Roles(...CANDIDATE_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
   createTag(
     @Param('id', ParseIntPipe) id: number,
@@ -207,9 +219,10 @@ export class CandidatesController {
   }
 
   @Post(':id/timeline')
+  @Roles(...CANDIDATE_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
-  createTimelineEvent(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>) {
-    return this.svc.createTimelineEvent({ ...data, candidate_id: id });
+  createTimelineEvent(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>, @CurrentUser() user: UserEntity) {
+    return this.svc.createTimelineEvent({ ...data, candidate_id: id }, user);
   }
 
   // ─── Documents ───────────────────────────────────────────────────────────
@@ -219,6 +232,7 @@ export class CandidatesController {
   }
 
   @Post(':id/documents')
+  @Roles(...CANDIDATE_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
   createDocument(
     @Param('id', ParseIntPipe) id: number,
@@ -228,4 +242,3 @@ export class CandidatesController {
     return this.svc.createDocument({ ...dto, candidate_id: id, uploaded_by: dto.uploaded_by ?? user.email } as any, user);
   }
 }
-

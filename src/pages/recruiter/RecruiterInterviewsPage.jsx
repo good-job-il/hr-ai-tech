@@ -28,13 +28,13 @@ export default function RecruiterInterviewsPage() {
     if (!user) return;
     setLoading(true);
     const data = await base44.entities.Interview.filter(
-      { recruiter_id: user.email }, '-date', 100
+      { organization_id: user.organization_id, recruiter_id: user.id }, '-date', 100
     ).catch(() => []);
     setInterviews(data);
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, [user?.email]);
+  useEffect(() => { load(); }, [user?.id]);
 
   const today = new Date().toISOString().split('T')[0];
   const filtered = interviews.filter(i => {

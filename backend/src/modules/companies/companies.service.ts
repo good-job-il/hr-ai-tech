@@ -1,10 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { CompanyEntity, CompanyReviewEntity, StaffEntity } from './company.entity';
 import { CreateCompanyDto, UpdateCompanyDto, QueryCompaniesDto, CreateCompanyReviewDto, CreateStaffDto, UpdateStaffDto } from './dto/companies.dto';
 import { UserEntity } from '../users/user.entity';
 import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
+import { UserRole } from '../../common/enums/user-role.enum';
+import { OrgType } from '../../common/enums/org-type.enum';
 
 @Injectable()
 export class CompaniesService {
@@ -42,6 +44,7 @@ export class CompaniesService {
   }
 
   async update(id: number, dto: UpdateCompanyDto, user: UserEntity): Promise<CompanyEntity> {
+    this.assertCanManageCompany(id, user);
     const c = await this.findById(id);
     Object.assign(c, dto);
     if (dto.is_deleted && !c.deleted_at) {
@@ -53,6 +56,16 @@ export class CompaniesService {
 
   async softDelete(id: number, user: UserEntity): Promise<void> {
     await this.update(id, { is_deleted: true } as any, user);
+  }
+
+  private assertCanManageCompany(id: number, user: UserEntity) {
+    if (user.role === UserRole.ADMIN && !user.impersonating) return;
+    if (user.org_type === OrgType.STAFFING_AGENCY) {
+      throw new ForbiddenException('Agency clients must be managed through the agency client API');
+    }
+    if (user.employer_company_id !== id) {
+      throw new ForbiddenException('You can only manage your own employer company');
+    }
   }
 
   // ─── Reviews ──────────────────────────────────────────────────────────────
@@ -97,4 +110,3 @@ export class CompaniesService {
     await this.staffRepo.remove(s);
   }
 }
-

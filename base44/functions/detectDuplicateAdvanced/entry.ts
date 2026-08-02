@@ -16,6 +16,10 @@ Deno.serve(async (req) => {
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const organizationId = user.organization_id || user.data?.organization_id;
+    if (!organizationId) {
+      return Response.json({ error: 'Organization context required' }, { status: 403 });
+    }
 
     const {
       full_name,
@@ -28,7 +32,7 @@ Deno.serve(async (req) => {
 
     // Fetch existing candidates for this employer
     const candidates = await base44.entities.Candidate.filter(
-      { employer_id },
+      { organization_id: organizationId, employer_id },
       '-created_date',
       10000
     );

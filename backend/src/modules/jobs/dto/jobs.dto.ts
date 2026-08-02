@@ -15,6 +15,8 @@ export const CreateJobSchema = z.object({
   description: z.string().optional().nullable(),
   employer_company_id: z.number().int().optional().nullable(),
   recruiter_id: z.number().int().optional().nullable(),
+  team_manager_id: z.number().int().optional().nullable(),
+  recruitment_manager_id: z.number().int().optional().nullable(),
   domain_id: z.number().int().optional().nullable(),
   role_id: z.number().int().optional().nullable(),
   specialization_id: z.number().int().optional().nullable(),
@@ -57,6 +59,7 @@ export const QueryJobsSchema = z.object({
   organization_id: z.coerce.number().int().optional(),
   employer_company_id: z.coerce.number().int().optional(),
   recruiter_id: z.coerce.number().int().optional(),
+  team_manager_id: z.coerce.number().int().optional(),
   domain_id: z.coerce.number().int().optional(),
   type: z.enum(['full', 'part', 'daily', 'remote']).optional(),
   is_closed: z.coerce.boolean().optional(),
@@ -89,4 +92,3 @@ export const CreateJobAlertSchema = z.object({
 export class CreateJobAlertDto extends createZodDto(CreateJobAlertSchema) {}
 export const UpdateJobAlertSchema = CreateJobAlertSchema.partial();
 export class UpdateJobAlertDto extends createZodDto(UpdateJobAlertSchema) {}
-

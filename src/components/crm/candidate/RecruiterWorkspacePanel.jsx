@@ -134,8 +134,8 @@ export default function RecruiterWorkspacePanel({ candidate, documents, tags, on
       <div>
         <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">{t('candidateCRM.workspace.responsibleRecruiter')}</div>
         <RecruiterDropdown
-          currentEmail={candidate?.recruiter_id}
-          onSelect={(email, name) => onAssignRecruiter(email, name)}
+          currentRecruiterId={candidate?.recruiter_id}
+          onSelect={(id, name, email) => onAssignRecruiter(id, name, email)}
         />
       </div>
 

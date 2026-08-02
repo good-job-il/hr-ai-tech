@@ -22,6 +22,7 @@ import { ImportSourcesModule } from './modules/import-sources/import-sources.mod
 import { SalaryModule } from './modules/salary/salary.module';
 import { FunctionsModule } from './modules/functions/functions.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
+import { AgencyClientsModule } from './modules/agency-clients/agency-clients.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
     MessagesModule,
     NotificationsModule,
     CompaniesModule,
+    AgencyClientsModule,
     // Phase 4
     FunctionsModule,
     // Phase 5

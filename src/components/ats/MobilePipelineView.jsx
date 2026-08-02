@@ -7,7 +7,7 @@ import { ArrowRightLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import AIMatchBadge from '@/components/ai/AIMatchBadge';
 
-export default function MobilePipelineView({ stages, applications, onCandidateClick, onMove, isRTL = true }) {
+export default function MobilePipelineView({ stages, applications, onCandidateClick, onMove, isRTL = true, canMove = true }) {
   const { t } = useTranslation();
   const [movingApp, setMovingApp] = useState(null);
   const [movingFromStage, setMovingFromStage] = useState(null);
@@ -67,6 +67,7 @@ export default function MobilePipelineView({ stages, applications, onCandidateCl
               applications={stageApps}
               onCandidateClick={onCandidateClick}
               onMoveRequest={handleMoveRequest}
+              canMove={canMove}
               emptyLabel={t('pipeline.mobile.noCandidates')}
               changeStageLabel={t('pipeline.mobile.changeStage')}
             />
@@ -107,7 +108,7 @@ export default function MobilePipelineView({ stages, applications, onCandidateCl
   );
 }
 
-function CompactStageColumn({ stage, applications, onCandidateClick, onMoveRequest, emptyLabel, changeStageLabel }) {
+function CompactStageColumn({ stage, applications, onCandidateClick, onMoveRequest, emptyLabel, changeStageLabel, canMove }) {
   return (
     <div
       className="flex-shrink-0 flex flex-col"
@@ -154,6 +155,7 @@ function CompactStageColumn({ stage, applications, onCandidateClick, onMoveReque
             onClick={() => onCandidateClick(app)}
             onMoveRequest={onMoveRequest}
             changeStageLabel={changeStageLabel}
+            canMove={canMove}
           />
         ))}
       </div>
@@ -161,7 +163,7 @@ function CompactStageColumn({ stage, applications, onCandidateClick, onMoveReque
   );
 }
 
-function CompactCard({ app, stageColor, stageId, onClick, onMoveRequest, changeStageLabel }) {
+function CompactCard({ app, stageColor, stageId, onClick, onMoveRequest, changeStageLabel, canMove }) {
   return (
     <div className="bg-white rounded-xl border border-[#E4ECFF] p-3 shadow-sm">
       <div className="flex items-start justify-between mb-2" onClick={onClick}>
@@ -180,13 +182,13 @@ function CompactCard({ app, stageColor, stageId, onClick, onMoveRequest, changeS
         {app.match_score != null && <AIMatchBadge score={app.match_score} size="sm" />}
       </div>
 
-      <button
+      {canMove && <button
         onClick={() => onMoveRequest(app, stageId)}
         className="w-full h-7 rounded-lg border border-[#E4ECFF] bg-[#F7FBFF] text-[#7C3AED] font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-[#F3EFFF] transition-all"
       >
         <ArrowRightLeft className="w-3 h-3" />
         {changeStageLabel}
-      </button>
+      </button>}
     </div>
   );
 }

@@ -115,7 +115,8 @@ export class ErrorNormalizer {
         });
 
       case 409:
-        return AppError.conflict('Resource already exists', {
+        return AppError.conflict(data?.message || 'Resource already exists', {
+          details: data?.details || data,
           originalError: error,
           requestId,
         });

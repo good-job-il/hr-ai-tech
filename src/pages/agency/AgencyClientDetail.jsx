@@ -3,10 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
+import { agencyClientService } from '@/api/services/agencyClientService';
+import { toast } from 'sonner';
 import {
-  ArrowRight, Building2, Briefcase, Users, CheckCircle2,
+  ArrowRight, Building2, Briefcase, Users,
   Edit2, Trash2, Mail, Globe, Phone, MapPin, X, Save,
-  TrendingUp, Kanban, Clock, AlertCircle, ChevronLeft,
+  TrendingUp, Kanban, AlertCircle,
   Plus, ExternalLink,
 } from 'lucide-react';
 
@@ -26,11 +28,14 @@ const STALE_TIME = 3 * 60 * 1000;
 
 const APPLICATION_STATUS = {
   new:                { label: 'חדש',           bg: 'bg-blue-50',   text: 'text-blue-700'   },
-  screening:          { label: 'סינון',          bg: 'bg-purple-50', text: 'text-purple-700' },
+  reviewed:           { label: 'נבדק',           bg: 'bg-purple-50', text: 'text-purple-700' },
   phone_interview:    { label: 'ראיון טלפוני',   bg: 'bg-amber-50',  text: 'text-amber-700'  },
   recommended:        { label: 'הומלץ ללקוח',    bg: 'bg-orange-50', text: 'text-orange-700' },
   employer_interview: { label: 'ראיון מעסיק',   bg: 'bg-violet-50', text: 'text-violet-700' },
+  offer:              { label: 'הצעה',           bg: 'bg-sky-50',    text: 'text-sky-700'    },
   hired:              { label: 'גויס',           bg: 'bg-emerald-50',text: 'text-emerald-700'},
+  probation:          { label: 'תקופת ניסיון',   bg: 'bg-teal-50',   text: 'text-teal-700'   },
+  completed:          { label: 'הושלם',          bg: 'bg-green-50',  text: 'text-green-700'  },
   rejected:           { label: 'נדחה',           bg: 'bg-red-50',    text: 'text-red-700'    },
 };
 
@@ -93,7 +98,7 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
     setError('');
     setSaving(true);
     try {
-      await base44.entities.Company.update(company.id, {
+      await agencyClientService.update(company.id, {
         name: form.name.trim(),
         industry: form.industry || undefined,
         contact_email: form.contact_email || undefined,
@@ -103,6 +108,7 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
         color: form.color,
         initials: getInitials(form.name),
       });
+      toast.success('פרטי הלקוח נשמרו');
       onSaved?.();
       onClose();
     } catch (err) {
@@ -194,7 +200,7 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
 
 // ─── Tab: Jobs ────────────────────────────────────────────────────────────────
 
-function JobsTab({ jobs, orgId }) {
+function JobsTab({ jobs, clientId }) {
   const open  = jobs.filter(j => !j.is_closed);
   const closed = jobs.filter(j => j.is_closed);
 
@@ -204,7 +210,7 @@ function JobsTab({ jobs, orgId }) {
         <Briefcase className="w-10 h-10 text-gray-200 mx-auto mb-3" />
         <p className="text-gray-500 font-bold">אין משרות ללקוח זה עדיין</p>
         <Link
-          to="/agency/jobs"
+          to={`/agency/jobs?clientId=${clientId}`}
           className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors"
         >
           <Plus className="w-4 h-4" /> פרסם משרה
@@ -373,20 +379,20 @@ function AboutTab({ company, onEdit }) {
       <div className="bg-white border border-gray-100 rounded-2xl p-6">
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-black text-gray-900 text-base">פרטי לקוח</h3>
-          <button
+          {onEdit && <button
             onClick={onEdit}
             className="flex items-center gap-2 text-sm font-bold text-purple-600 hover:text-purple-800 transition-colors"
           >
             <Edit2 className="w-4 h-4" /> עריכה
-          </button>
+          </button>}
         </div>
 
         {fields.length === 0 ? (
           <div className="text-center py-6 text-gray-400">
             <p className="text-sm font-semibold">לא הוזנו פרטי קשר</p>
-            <button onClick={onEdit} className="mt-2 text-sm text-purple-600 font-bold hover:underline">
+            {onEdit && <button onClick={onEdit} className="mt-2 text-sm text-purple-600 font-bold hover:underline">
               הוסף פרטים
-            </button>
+            </button>}
           </div>
         ) : (
           <div className="space-y-3">
@@ -422,7 +428,7 @@ function AboutTab({ company, onEdit }) {
         <h3 className="font-black text-gray-900 text-base mb-4">פעולות מהירות</h3>
         <div className="grid grid-cols-2 gap-3">
           <Link
-            to="/agency/jobs"
+            to={`/agency/jobs?clientId=${company.id}`}
             className="flex items-center gap-2 p-3 bg-purple-50 text-purple-700 rounded-xl text-sm font-bold hover:bg-purple-100 transition-colors"
           >
             <Briefcase className="w-4 h-4" /> פרסם משרה
@@ -463,46 +469,44 @@ export default function AgencyClientDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const orgId = user?.organization_id;
+  const canManageClients = ['org_admin', 'recruitment_manager', 'admin'].includes(user?.role);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState('about');
   const [showEdit, setShowEdit] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [archiveError, setArchiveError] = useState('');
 
   // ── Data ─────────────────────────────────────────────────────────────────
 
-  const { data: companies = [], isLoading: companyLoading } = useQuery({
-    queryKey: ['company-detail', id],
-    queryFn: () => base44.entities.Company.filter({ is_deleted: false }, '', 300),
-    staleTime: STALE_TIME,
-  });
-
-  const company = useMemo(() => companies.find(c => c.id === id), [companies, id]);
-
-  const { data: jobs = [], isLoading: jobsLoading } = useQuery({
-    queryKey: ['client-jobs', id, orgId],
-    queryFn: () => base44.entities.Job.filter(
-      { employer_company_id: id, organization_id: orgId, is_deleted: false },
-      '-created_date',
-      200
-    ),
+  const { data: company, isLoading: companyLoading, error: companyError, refetch: refetchCompany } = useQuery({
+    queryKey: ['agency-client-detail', id, orgId],
+    queryFn: () => agencyClientService.get(id),
     enabled: !!id && !!orgId,
     staleTime: STALE_TIME,
   });
 
-  const jobIds = useMemo(() => jobs.map(j => j.id), [jobs]);
+  const { data: jobs = [], isLoading: jobsLoading, error: jobsError, refetch: refetchJobs } = useQuery({
+    queryKey: ['client-jobs', id, orgId],
+    queryFn: () => base44.entities.Job.filter(
+      { employer_company_id: company.company_id, organization_id: orgId, is_deleted: false },
+      '-created_date',
+      200
+    ),
+    enabled: !!company?.company_id && !!orgId,
+    staleTime: STALE_TIME,
+  });
 
-  const { data: applications = [], isLoading: appsLoading } = useQuery({
+  const { data: applications = [], isLoading: appsLoading, error: appsError, refetch: refetchApplications } = useQuery({
     queryKey: ['client-applications', id, orgId],
     queryFn: () => base44.entities.Application.filter(
-      { organization_id: orgId, is_deleted: false },
+      { organization_id: orgId, employer_company_id: company.company_id, is_deleted: false },
       '-created_date',
       500
     ),
-    enabled: !!orgId,
+    enabled: !!orgId && !!company?.company_id,
     staleTime: STALE_TIME,
-    select: data => data.filter(a => jobIds.includes(a.job_id)),
   });
 
   const loading = companyLoading || jobsLoading || appsLoading;
@@ -510,19 +514,26 @@ export default function AgencyClientDetail() {
   // ── Stats ─────────────────────────────────────────────────────────────────
 
   const stats = useMemo(() => {
-    const openJobs   = jobs.filter(j => !j.is_closed).length;
-    const inProcess  = applications.filter(a => ['phone_interview', 'recommended', 'employer_interview'].includes(a.status)).length;
-    const hired      = applications.filter(a => a.status === 'hired').length;
-    return { openJobs, inProcess, hired, totalApps: applications.length };
-  }, [jobs, applications]);
+    return {
+      openJobs: company?.openJobs ?? jobs.filter(j => !j.is_closed).length,
+      inProcess: company?.inProcess ?? applications.filter(a => !['hired', 'completed', 'rejected'].includes(a.status)).length,
+      hired: company?.hired ?? applications.filter(a => a.status === 'hired').length,
+      totalApps: company?.totalApplications ?? applications.length,
+    };
+  }, [company, jobs, applications]);
 
   // ── Delete ────────────────────────────────────────────────────────────────
 
-  const { mutate: deleteClient, isLoading: deleting } = useMutation({
-    mutationFn: () => base44.entities.Company.update(id, { is_deleted: true, deleted_at: new Date().toISOString() }),
+  const { mutate: deleteClient, isPending: deleting } = useMutation({
+    mutationFn: () => agencyClientService.archive(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['agency-companies-list'] });
+      toast.success('הלקוח הועבר לארכיון');
+      queryClient.invalidateQueries({ queryKey: ['agency-clients-list', orgId] });
+      queryClient.invalidateQueries({ queryKey: ['agency-clients', orgId] });
       navigate('/agency/clients');
+    },
+    onError: error => {
+      setArchiveError(error?.message || 'לא ניתן להעביר את הלקוח לארכיון כל עוד קיימת פעילות גיוס פתוחה.');
     },
   });
 
@@ -544,6 +555,16 @@ export default function AgencyClientDetail() {
             {[1,2,3].map(i => <div key={i} className="h-20 bg-gray-50 rounded-xl" />)}
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (companyError) {
+    return (
+      <div dir="rtl" className="max-w-5xl mx-auto text-center py-16">
+        <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-3" />
+        <p className="text-gray-600 font-black text-lg">שגיאה בטעינת הלקוח</p>
+        <button onClick={() => refetchCompany()} className="mt-4 text-purple-600 font-bold hover:underline">נסה שוב</button>
       </div>
     );
   }
@@ -585,7 +606,7 @@ export default function AgencyClientDetail() {
                     {company.industry}
                   </span>
                 )}
-                {jobs.some(j => !j.is_closed) && (
+                {company.status === 'active' && (
                   <span className="text-xs font-bold px-2.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full flex items-center gap-1">
                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                     לקוח פעיל
@@ -595,7 +616,7 @@ export default function AgencyClientDetail() {
             </div>
           </div>
 
-          <div className="flex gap-2">
+          {canManageClients && <div className="flex gap-2">
             <button
               onClick={() => setShowEdit(true)}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:border-purple-300 transition-colors"
@@ -608,7 +629,7 @@ export default function AgencyClientDetail() {
             >
               <Trash2 className="w-4 h-4" />
             </button>
-          </div>
+          </div>}
         </div>
 
         {/* KPI strip */}
@@ -626,6 +647,18 @@ export default function AgencyClientDetail() {
           ))}
         </div>
       </div>
+
+      {(jobsError || appsError) && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-700">
+          <span className="font-bold">לא ניתן לטעון את כל המשרות או המועמדים של הלקוח.</span>
+          <button
+            onClick={() => { refetchJobs(); refetchApplications(); }}
+            className="font-black text-purple-700 hover:underline"
+          >
+            נסה שוב
+          </button>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
@@ -660,10 +693,10 @@ export default function AgencyClientDetail() {
         {/* Tab content */}
         <div className="p-6">
           {activeTab === 'about' && (
-            <AboutTab company={company} onEdit={() => setShowEdit(true)} />
+            <AboutTab company={company} onEdit={canManageClients ? () => setShowEdit(true) : null} />
           )}
           {activeTab === 'jobs' && (
-            <JobsTab jobs={jobs} orgId={orgId} />
+            <JobsTab jobs={jobs} clientId={company.id} />
           )}
           {activeTab === 'candidates' && (
             <CandidatesTab applications={applications} jobs={jobs} />
@@ -672,12 +705,16 @@ export default function AgencyClientDetail() {
       </div>
 
       {/* Edit modal */}
-      {company && (
+      {company && canManageClients && (
         <EditClientModal
+          key={`${company.id}-${company.updated_date || ''}`}
           company={company}
           isOpen={showEdit}
           onClose={() => setShowEdit(false)}
-          onSaved={() => queryClient.invalidateQueries({ queryKey: ['company-detail', id] })}
+          onSaved={() => {
+            queryClient.invalidateQueries({ queryKey: ['agency-client-detail', id, orgId] });
+            queryClient.invalidateQueries({ queryKey: ['agency-clients-list', orgId] });
+          }}
         />
       )}
 
@@ -692,8 +729,9 @@ export default function AgencyClientDetail() {
               <h3 className="font-black text-gray-900 text-lg">מחיקת לקוח</h3>
             </div>
             <p className="text-gray-600 text-sm mb-6">
-              האם למחוק את <strong>{company.name}</strong>? פעולה זו אינה ניתנת לביטול.
+              להעביר את <strong>{company.name}</strong> לארכיון? ניתן לבצע זאת רק כאשר אין משרות או מועמדים בתהליך.
             </p>
+            {archiveError && <p className="mb-4 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-700">{archiveError}</p>}
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmDelete(false)}
@@ -702,11 +740,11 @@ export default function AgencyClientDetail() {
                 ביטול
               </button>
               <button
-                onClick={() => deleteClient()}
+                onClick={() => { setArchiveError(''); deleteClient(); }}
                 disabled={deleting}
                 className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 disabled:opacity-50 text-sm"
               >
-                {deleting ? 'מוחק...' : 'מחק'}
+                {deleting ? 'מעביר...' : 'העבר לארכיון'}
               </button>
             </div>
           </div>

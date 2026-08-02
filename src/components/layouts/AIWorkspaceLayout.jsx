@@ -85,7 +85,7 @@ export default function AIWorkspaceLayout() {
   return (
     <div dir="rtl" className="min-h-screen bg-gradient-to-br from-[#F3EFFF] via-[#F7FBFF] to-[#FFFFFF] flex">
       <aside
-        className={`fixed inset-y-0 right-0 z-40 w-72 bg-white/95 backdrop-blur-xl border-l border-[#E4ECFF] flex flex-col transform transition-transform ${
+        className={`fixed inset-y-0 right-0 z-40 w-72 bg-white/95 backdrop-blur-xl border-[#E4ECFF] flex flex-col transform transition-transform ${
           mobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'
         }`}
       >
@@ -109,7 +109,7 @@ export default function AIWorkspaceLayout() {
             <div className="text-2xl font-black text-[#7C3AED]">3</div>
             <div className="text-xs text-[#94A3B8]">עד למסקנות מלאות</div>
           </div>
-          
+
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold text-[#EF4444] hover:bg-red-50 transition-all"

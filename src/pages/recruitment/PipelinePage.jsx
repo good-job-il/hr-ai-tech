@@ -6,8 +6,16 @@ import MobilePipelineView from '@/components/ats/MobilePipelineView';
 import PipelineFilters from '@/components/ats/PipelineFilters';
 import CandidateDrawer from '@/components/ats/CandidateDrawer';
 import { usePipelineData } from '@/hooks/usePipelineData';
-import { SlidersHorizontal, RefreshCw, Kanban, FlaskConical } from 'lucide-react';
+import { SlidersHorizontal, RefreshCw, Kanban, FlaskConical, Sparkles, Users, ShieldAlert } from 'lucide-react';
 import NotificationCenter from '@/components/ats/NotificationCenter';
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+} from '@/components/platform/PlatformUI';
+import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
 
 // Minimum px per stage column to render Kanban without forced horizontal scroll
 const MIN_PX_PER_STAGE = 160;
@@ -15,6 +23,8 @@ const MIN_PX_PER_STAGE = 160;
 export default function PipelinePage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const { can } = usePermissionMatrix();
+  const canUpdate = can('update');
   const boardContainerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(null);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -25,7 +35,7 @@ export default function PipelinePage() {
   const [notifKey, setNotifKey] = useState(0);
   const handleNotificationCreated = useCallback(() => setNotifKey(k => k + 1), []);
 
-  const { stages, applications, loading, moveApplication, refresh, isMockData } = usePipelineData(user, filters, handleNotificationCreated);
+  const { stages, applications, loading, error, moveApplication, refresh, isMockData } = usePipelineData(user, filters, handleNotificationCreated);
 
   // Get current language direction
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'he';
@@ -63,31 +73,26 @@ export default function PipelinePage() {
     ? applications.find(a => a.id === selectedCandidate) || null
     : null;
 
-  return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className="flex flex-col w-full min-w-0 bg-[#F7FBFF]">
-      {/* Header — fixed to viewport width, never grows with Kanban */}
-      <div className="flex-shrink-0 w-full min-w-0 bg-white border-b border-[#E4ECFF] px-4 md:px-8 py-4">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center">
-              <Kanban className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-black text-[#0F172A]">{t('pipeline.page.title')}</h1>
-              <p className="text-sm text-[#64748B] font-semibold">
-                {t('pipeline.page.candidatesCount', { count: applications.length })} • {t('pipeline.page.stagesCount', { count: stages.length })}
-              </p>
-            </div>
-          </div>
+  const activeStages = stages.filter(stage => applications.some(application => application.status === stage.id)).length;
+  const scoredCandidates = applications.filter(application => application.match_score != null).length;
 
-          <div className="flex items-center gap-3">
+  return (
+    <PlatformPageShell dir={isRTL ? 'rtl' : 'ltr'} className="min-w-0">
+      <div className="flex w-full min-w-0 flex-col gap-6">
+      {/* Header — fixed to viewport width, never grows with Kanban */}
+      <PlatformCard className="flex-shrink-0 p-5 md:p-6">
+        <PlatformPageHeader
+          title={t('pipeline.page.title')}
+          subtitle={`${t('pipeline.page.candidatesCount', { count: applications.length })} • ${t('pipeline.page.stagesCount', { count: stages.length })}`}
+          icon={Kanban}
+          actions={<div className="flex flex-wrap items-center gap-3">
             <NotificationCenter key={notifKey} />
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`h-10 px-4 rounded-xl border font-bold text-sm flex items-center gap-2 transition-all ${
                 showFilters
-                  ? 'bg-[#F3EFFF] border-[#C4B5FD] text-[#7C3AED]'
-                  : 'bg-white border-[#E4ECFF] text-[#64748B] hover:border-[#C4B5FD]'
+                  ? 'gradient-brand border-transparent text-white shadow-[0_6px_18px_rgba(99,72,210,0.22)]'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-[#C4B5FD] hover:text-[#6C4DFF]'
               }`}
             >
               <SlidersHorizontal className="w-4 h-4" />
@@ -95,19 +100,25 @@ export default function PipelinePage() {
             </button>
             <button
               onClick={refresh}
-              className="h-10 px-4 rounded-xl border border-[#E4ECFF] bg-white text-[#64748B] font-bold text-sm flex items-center gap-2 hover:border-[#C4B5FD] transition-all"
+              className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600 transition-all hover:border-[#C4B5FD] hover:text-[#6C4DFF]"
             >
               <RefreshCw className="w-4 h-4" />
               {t('pipeline.page.refresh')}
             </button>
-          </div>
-        </div>
+          </div>}
+        />
 
         {showFilters && (
-          <div className="mt-4 pt-4 border-t border-[#E4ECFF]">
+          <div className="mt-5 border-t border-slate-100 pt-5">
             <PipelineFilters filters={filters} onChange={setFilters} />
           </div>
         )}
+      </PlatformCard>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <PlatformStatCard icon={Users} label={t('pipeline.page.candidatesCount', { count: applications.length })} value={applications.length} tone="violet" loading={loading} meta="In the recruitment board" />
+        <PlatformStatCard icon={Kanban} label={t('pipeline.page.stagesCount', { count: stages.length })} value={activeStages} tone="blue" loading={loading} meta="Stages with candidates" />
+        <PlatformStatCard icon={Sparkles} label="AI scored" value={scoredCandidates} tone="fuchsia" loading={loading} meta="Candidates with match score" />
       </div>
 
       {/* Demo Data Banner */}
@@ -119,10 +130,8 @@ export default function PipelinePage() {
       )}
 
       {/* Kanban viewport — only this area scrolls horizontally */}
-      <div
-        className="w-full min-w-0 overflow-hidden p-4 md:p-6"
-        ref={boardContainerRef}
-      >
+      <PlatformCard className="w-full min-w-0 overflow-hidden p-4 md:p-5">
+        <div ref={boardContainerRef} className="w-full min-w-0">
         {loading ? (
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
@@ -130,12 +139,24 @@ export default function PipelinePage() {
               <p className="text-[#64748B] font-bold">{t('pipeline.page.loading')}</p>
             </div>
           </div>
+        ) : error ? (
+          <PlatformEmptyState icon={ShieldAlert} className="min-h-96">
+            <p className="font-bold text-slate-700">
+              {error.status === 403
+                ? t('common.accessDenied', { defaultValue: 'Access denied' })
+                : t('common.loadError', { defaultValue: 'Unable to load the pipeline' })}
+            </p>
+            <button onClick={refresh} className="mt-3 text-sm font-bold text-violet-600 hover:underline">
+              {t('pipeline.page.refresh')}
+            </button>
+          </PlatformEmptyState>
         ) : useMobileView ? (
           <MobilePipelineView
             stages={stages}
             applications={applications}
             onCandidateClick={handleCandidateClick}
             onMove={moveApplication}
+            canMove={canUpdate}
             isRTL={isRTL}
           />
         ) : (
@@ -146,9 +167,11 @@ export default function PipelinePage() {
             onMove={moveApplication}
             userRole={user?.role}
             isRTL={isRTL}
+            canMove={canUpdate}
           />
         )}
-      </div>
+        </div>
+      </PlatformCard>
 
       {/* Candidate Drawer */}
       <CandidateDrawer
@@ -156,9 +179,11 @@ export default function PipelinePage() {
         open={drawerOpen}
         onClose={handleClose}
         onStageChange={(appId, newStage) => {
-          moveApplication(appId, newStage);
+          if (canUpdate) moveApplication(appId, newStage);
         }}
+        canChangeStage={canUpdate}
       />
-    </div>
+      </div>
+    </PlatformPageShell>
   );
 }

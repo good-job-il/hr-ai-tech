@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/AuthContext';
 import CandidateRecommendationsPanel from '@/components/ai/CandidateRecommendationsPanel';
 import JobRecommendationsPanel from '@/components/ai/JobRecommendationsPanel';
 import { Sparkles, Users, Briefcase, Search, SlidersHorizontal, CheckCircle2, AlertTriangle, X } from 'lucide-react';
+import { getAgencyScopeFilter, isAgencyUser } from '@/domain/agency/access';
 
 function Toast({ message, type, onClose }) {
   useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
@@ -49,8 +50,9 @@ export default function AIMatchingPage() {
     // ─────────────────────────────────────────────────────────────────────
     // VISIBILITY POLICY — AIMatchingPage (candidate list)
     //
-    //  recruiter → only candidates assigned to them (recruiter_id === user.email)
-    //              + unassigned only if can_view_unassigned === true
+    //  recruiter → only candidates assigned by recruiter_id === user.id
+    //  team_manager → only records with team_manager_id === user.id
+    //  org_admin / recruitment_manager → current organization
     //  employer  → only candidates where employer_id === user.email
     //  admin / recruitment_manager / team_manager → all candidates
     //
@@ -58,36 +60,31 @@ export default function AIMatchingPage() {
     // scoped to their own pool. It is NOT a global search.
     // ─────────────────────────────────────────────────────────────────────
     const fetchCandidates = async () => {
-      if (user.role === 'recruiter') {
-        const assigned = await base44.entities.Candidate.filter(
-          { recruiter_id: user.email }, '-created_date', 100
+      if (isAgencyUser(user)) {
+        return base44.entities.Candidate.filter(
+          getAgencyScopeFilter(user), '-created_date', 200
         ).catch(() => []);
-        if (user.can_view_unassigned === true) {
-          const unassigned = await base44.entities.Candidate.filter(
-            { recruiter_id: null }, '-created_date', 50
-          ).catch(() => []);
-          const ids = new Set(assigned.map(c => c.id));
-          return [...assigned, ...unassigned.filter(c => !ids.has(c.id))];
-        }
-        return assigned;
       }
       if (user.role === 'employer') {
         return base44.entities.Candidate.filter(
           { employer_id: user.email }, '-created_date', 100
         ).catch(() => []);
       }
-      // admin / recruitment_manager / team_manager — all
-      return base44.entities.Candidate.list('-created_date', 200).catch(() => []);
+      return [];
     };
+
+    const jobFilter = isAgencyUser(user)
+      ? { organization_id: user.organization_id, is_closed: false }
+      : { is_closed: false };
 
     Promise.all([
       fetchCandidates(),
-      base44.entities.Job.filter({ is_closed: false }, '-created_date', 100).catch(() => []),
+      base44.entities.Job.filter(jobFilter, '-created_date', 100).catch(() => []),
     ]).then(([c, j]) => {
       setCandidates(c || []);
       setJobs(j || []);
     }).finally(() => setLoading(false));
-  }, [user?.email, user?.role]);
+  }, [user?.id, user?.role, user?.organization_id]);
 
   const filteredCandidates = candidates.filter(c =>
     !searchQ || (c.full_name || '').toLowerCase().includes(searchQ.toLowerCase()) ||
@@ -235,10 +232,12 @@ export default function AIMatchingPage() {
                       return;
                     }
                     await base44.entities.Application.create({
+                      organization_id: user.organization_id,
                       job_id: job.id,
+                      candidate_id: selectedCandidate.id,
                       job_title: job.title,
                       company: job.company,
-                      employer_id: job.employer_id || '',
+                      employer_company_id: job.employer_company_id || '',
                       candidate_name: selectedCandidate.full_name,
                       candidate_email: selectedCandidate.email || '',
                       candidate_phone: selectedCandidate.phone || '',
@@ -246,7 +245,10 @@ export default function AIMatchingPage() {
                       location: selectedCandidate.location || '',
                       source: 'app',
                       status: 'new',
-                      assigned_to: selectedCandidate.recruiter_id || '',
+                      recruiter_id: selectedCandidate.recruiter_id || user.id,
+                      assigned_to: selectedCandidate.recruiter_id || user.id,
+                      team_manager_id: selectedCandidate.team_manager_id || user.team_manager_id || (user.role === 'team_manager' ? user.id : null),
+                      recruitment_manager_id: selectedCandidate.recruitment_manager_id || user.recruitment_manager_id || null,
                     });
                     showToast(t('aiMatching.page.assignedSuccess', {
                       candidateName: selectedCandidate.full_name,
@@ -272,10 +274,12 @@ export default function AIMatchingPage() {
                onAddToPipeline={async (candidate) => {
                  try {
                    await base44.entities.Application.create({
+                     organization_id: user.organization_id,
                      job_id: selectedJob.id,
+                     candidate_id: candidate.id,
                      job_title: selectedJob.title,
                      company: selectedJob.company,
-                     employer_id: selectedJob.employer_id || '',
+                     employer_company_id: selectedJob.employer_company_id || '',
                      candidate_name: candidate.full_name,
                      candidate_email: candidate.email || '',
                      candidate_phone: candidate.phone || '',
@@ -283,7 +287,10 @@ export default function AIMatchingPage() {
                      location: candidate.location || '',
                      source: 'app',
                      status: 'new',
-                     assigned_to: candidate.recruiter_id || '',
+                     recruiter_id: candidate.recruiter_id || user.id,
+                     assigned_to: candidate.recruiter_id || user.id,
+                     team_manager_id: candidate.team_manager_id || user.team_manager_id || (user.role === 'team_manager' ? user.id : null),
+                     recruitment_manager_id: candidate.recruitment_manager_id || user.recruitment_manager_id || null,
                    });
                    showToast(t('aiMatching.page.addedToPipeline', {
                      candidateName: candidate.full_name,

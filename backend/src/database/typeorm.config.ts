@@ -27,6 +27,7 @@ import { InterviewEntity } from '../modules/interviews/interview.entity';
 import { MessageEntity } from '../modules/messages/message.entity';
 import { NotificationEntity } from '../modules/notifications/notification.entity';
 import { CompanyEntity, CompanyReviewEntity, StaffEntity } from '../modules/companies/company.entity';
+import { AgencyClientEntity } from '../modules/agency-clients/agency-client.entity';
 import { AuditLogEntity } from '../modules/audit/audit-log.entity';
 import { CompensationPlanEntity } from '../modules/compensation/compensation-plan.entity';
 import { CommunicationLogEntity, EmployerTimelineEntity } from '../modules/communication/communication-log.entity';
@@ -82,6 +83,7 @@ export default new DataSource({
     CompanyEntity,
     CompanyReviewEntity,
     StaffEntity,
+    AgencyClientEntity,
     AuditLogEntity,
     CompensationPlanEntity,
     CommunicationLogEntity,
@@ -98,4 +100,3 @@ export default new DataSource({
   migrationsTableName: 'migrations_history',
   logging: false,
 });
-

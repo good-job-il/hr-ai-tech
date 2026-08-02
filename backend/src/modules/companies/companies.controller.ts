@@ -5,11 +5,11 @@ import { CreateCompanyDto, UpdateCompanyDto, QueryCompaniesDto, CreateCompanyRev
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
+import { UserRole } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
 
-/** Company profile is managed by the employer's own staff or agency/admin staff */
-const COMPANY_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN];
+/** Agency users manage the tenant relationship through /agency-clients. */
+const COMPANY_WRITE_ROLES = [UserRole.EMPLOYER, UserRole.ORG_ADMIN, UserRole.HR_MANAGER, UserRole.INTERNAL_RECRUITER, UserRole.ADMIN];
 
 @ApiTags('Companies')
 @ApiBearerAuth()
@@ -19,7 +19,7 @@ export class CompaniesController {
 
   @Get() @Public() findAll(@Query() q: QueryCompaniesDto) { return this.svc.findAll(q); }
   @Get(':id') @Public() findOne(@Param('id', ParseIntPipe) id: number) { return this.svc.findById(id); }
-  @Post() @Roles(...COMPANY_WRITE_ROLES) @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateCompanyDto) { return this.svc.create(dto); }
+  @Post() @Roles(UserRole.ADMIN) @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateCompanyDto) { return this.svc.create(dto); }
   @Patch(':id') @Roles(...COMPANY_WRITE_ROLES) update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCompanyDto, @CurrentUser() u: UserEntity) { return this.svc.update(id, dto, u); }
   @Delete(':id') @Roles(...COMPANY_WRITE_ROLES) @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.softDelete(id, u); }
 
@@ -47,4 +47,3 @@ export class StaffController {
   @Patch(':id') @Roles(...COMPANY_WRITE_ROLES) update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateStaffDto) { return this.svc.updateStaff(id, dto); }
   @Delete(':id') @Roles(...COMPANY_WRITE_ROLES) @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number) { return this.svc.deleteStaff(id); }
 }
-

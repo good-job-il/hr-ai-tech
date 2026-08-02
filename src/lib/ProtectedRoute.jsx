@@ -13,7 +13,8 @@ const SUPER_ROLES = ['admin'];
  * - noOrgRedirect: string     — if an org_admin has no organization yet
  *   (blocking the orgType check below), send them here to onboard instead
  *   of showing "unauthorized" (e.g. '/agency/onboarding').
- * Super roles bypass requiredRoles but NOT requiredOrgTypes (by design).
+ * Super roles bypass role checks only. Tenant routes still require an explicit
+ * scoped organization context; a platform session is never implicit tenancy.
  */
 export default function ProtectedRoute({
   requiredRoles = [],
@@ -34,8 +35,6 @@ export default function ProtectedRoute({
     );
   }
 
-  console.log("ProtectedRoute")
-
   if (authError || !user) return unauthenticatedElement;
 
   const rawRole = user.role || user.user_type;
@@ -50,18 +49,15 @@ export default function ProtectedRoute({
     return unauthorizedElement;
   }
 
-  // OrgType check (never bypassed — even admin must be explicit)
+  // OrgType check is never bypassed. Platform admins need a future explicit
+  // impersonation/scoped session before entering a tenant workspace.
   if (requiredOrgTypes.length > 0 && !requiredOrgTypes.includes(orgType)) {
-    // Super admin has no org, allow them through org-type gates
-    if (!isSuperAdmin) {
-      // An org_admin with no organization row yet isn't "unauthorized" —
-      // they just haven't onboarded. Send them to create their org instead.
-      if (!organization && noOrgRedirect && effectiveRole === 'org_admin') {
-        return <Navigate to={noOrgRedirect} replace />;
-      }
-      console.warn('Blocked by orgType:', { user, orgType, requiredOrgTypes });
-      return unauthorizedElement;
+    // An org_admin with no organization row yet isn't "unauthorized" —
+    // they just haven't onboarded. Send them to create their org instead.
+    if (!organization && noOrgRedirect && effectiveRole === 'org_admin') {
+      return <Navigate to={noOrgRedirect} replace />;
     }
+    return unauthorizedElement;
   }
 
   return <Outlet />;

@@ -75,7 +75,17 @@ export interface Job {
 }
 
 // === APPLICATIONS ===
-export type ApplicationStatus = 'new' | 'reviewed' | 'interview_scheduled' | 'offer_made' | 'hired' | 'rejected';
+export type ApplicationStatus =
+  | 'new'
+  | 'reviewed'
+  | 'phone_interview'
+  | 'recommended'
+  | 'employer_interview'
+  | 'offer'
+  | 'hired'
+  | 'probation'
+  | 'completed'
+  | 'rejected';
 
 export interface Application {
   id: string;

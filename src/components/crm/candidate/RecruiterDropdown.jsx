@@ -3,7 +3,7 @@ import { httpClient } from '@/api/client/httpClient';
 import { ChevronDown, UserCheck, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export default function RecruiterDropdown({ currentEmail, onSelect }) {
+export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [recruiters, setRecruiters] = useState([]);
@@ -42,8 +42,8 @@ export default function RecruiterDropdown({ currentEmail, onSelect }) {
         className="w-full flex items-center justify-between gap-2 text-sm font-semibold text-[#374151] px-4 py-2.5 rounded-xl border border-[#E4ECFF] bg-white hover:border-[#7C3AED] transition-all">
         <div className="flex items-center gap-2">
           <UserCheck className="w-4 h-4 text-[#7C3AED]" />
-          <span className={currentEmail ? 'text-[#7C3AED]' : 'text-[#94A3B8]'}>
-            {currentEmail || t('candidateCRM.recruiterDropdown.selectRecruiter')}
+          <span className={currentRecruiterId ? 'text-[#7C3AED]' : 'text-[#94A3B8]'}>
+            {currentRecruiterId || t('candidateCRM.recruiterDropdown.selectRecruiter')}
           </span>
         </div>
         <ChevronDown className={`w-4 h-4 text-[#94A3B8] transition-transform ${open ? 'rotate-180' : ''}`} />
@@ -71,8 +71,8 @@ export default function RecruiterDropdown({ currentEmail, onSelect }) {
             ) : (
               filtered.map(r => (
                 <button key={r.id}
-                  onClick={() => { onSelect(r.email, r.full_name); setOpen(false); setSearch(''); }}
-                  className={`w-full text-right flex items-center gap-3 px-4 py-2.5 hover:bg-[#EEF4FF] transition-colors ${r.email === currentEmail ? 'bg-[#EEF4FF]' : ''}`}>
+                  onClick={() => { onSelect(r.id, r.full_name, r.email); setOpen(false); setSearch(''); }}
+                  className={`w-full text-right flex items-center gap-3 px-4 py-2.5 hover:bg-[#EEF4FF] transition-colors ${r.id === currentRecruiterId ? 'bg-[#EEF4FF]' : ''}`}>
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#2563EB] flex items-center justify-center text-white text-xs font-black flex-shrink-0">
                     {r.full_name?.slice(0, 1) || '?'}
                   </div>
@@ -80,7 +80,7 @@ export default function RecruiterDropdown({ currentEmail, onSelect }) {
                     <div className="text-xs font-bold text-[#0F172A] truncate">{r.full_name}</div>
                     <div className="text-xs text-[#94A3B8] truncate">{r.email}</div>
                   </div>
-                  {r.email === currentEmail && <div className="w-2 h-2 rounded-full bg-[#7C3AED]" />}
+                  {r.id === currentRecruiterId && <div className="w-2 h-2 rounded-full bg-[#7C3AED]" />}
                 </button>
               ))
             )}

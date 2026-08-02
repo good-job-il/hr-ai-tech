@@ -14,6 +14,7 @@ import WhatsAppPanel from '@/components/crm/candidate/WhatsAppPanel';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { ArrowRight, RefreshCw, AlertCircle, Trash2 } from 'lucide-react';
 import { httpClient } from '@/api/client/httpClient';
+import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
 
 export default function CandidateCRMPage() {
   const { t, i18n } = useTranslation();
@@ -32,6 +33,9 @@ export default function CandidateCRMPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { can } = usePermissionMatrix();
+  const canUpdate = can('update');
+  const canDelete = can('delete');
   const [activeTab, setActiveTab] = useState('overview');
 
   // Get candidateId from query param: /crm/candidate?id=xxx
@@ -112,9 +116,9 @@ export default function CandidateCRMPage() {
             </button>
             <LanguageSwitcher variant="badge" />
           </div>
-          <button onClick={handleDelete} disabled={deleting} className="flex items-center gap-1.5 text-sm font-bold text-red-500 hover:text-red-700 transition-colors disabled:opacity-50">
+          {canDelete && <button onClick={handleDelete} disabled={deleting} className="flex items-center gap-1.5 text-sm font-bold text-red-500 hover:text-red-700 transition-colors disabled:opacity-50">
             <Trash2 className="w-4 h-4" /> {deleting ? t('candidateCRM.deleting') : t('candidateCRM.deleteCandidate')}
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -229,7 +233,7 @@ export default function CandidateCRMPage() {
 
           {/* Sidebar — Recruiter Workspace */}
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-[#E4ECFF] p-5">
+            {canUpdate && <div className="bg-white rounded-2xl border border-[#E4ECFF] p-5">
               <h3 className="text-sm font-black text-[#0F172A] mb-4">{t('candidateCRM.recruiterActions')}</h3>
               <RecruiterWorkspacePanel
                 candidate={candidate}
@@ -246,7 +250,7 @@ export default function CandidateCRMPage() {
                 currentUser={user}
                 onReload={reload}
               />
-            </div>
+            </div>}
 
             {/* Quick Stats */}
             <div className="bg-white rounded-2xl border border-[#E4ECFF] p-5">

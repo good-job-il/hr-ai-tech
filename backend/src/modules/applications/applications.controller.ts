@@ -22,7 +22,7 @@ export class ApplicationsController {
   constructor(private readonly svc: ApplicationsService) {}
 
   @Get() findAll(@Query() q: QueryApplicationsDto, @CurrentUser() u: UserEntity) { return this.svc.findAll(q, u); }
-  @Get(':id') findOne(@Param('id', ParseIntPipe) id: number) { return this.svc.findById(id); }
+  @Get(':id') findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.findById(id, u); }
 
   @Post()
   @Roles(...APPLICATION_CREATE_ROLES)
@@ -42,7 +42,7 @@ export class ApplicationsController {
 
   // ─── Timeline ────────────────────────────────────────────────────────────
   @Get(':id/timeline')
-  getTimeline(@Param('id', ParseIntPipe) id: number) { return this.svc.getTimeline(id); }
+  getTimeline(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.getTimeline(id, u); }
 
   // ─── Pipeline ────────────────────────────────────────────────────────────
   @Get('pipeline/:employerId')
@@ -65,4 +65,3 @@ export class ApplicationsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteStage(@Param('id', ParseIntPipe) id: number) { return this.svc.deletePipelineStage(id); }
 }
-

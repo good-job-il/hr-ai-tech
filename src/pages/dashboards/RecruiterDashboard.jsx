@@ -53,19 +53,24 @@ export default function RecruiterDashboard() {
   const { user } = useAuth();
 
   const { data: applications = [] } = useQuery({
-    queryKey: ['recruiter-applications', user?.email],
+    queryKey: ['recruiter-applications', user?.id],
     queryFn: async () => {
-      const allApps = await base44.entities.Application.list('-created_date', 50);
-      return allApps.filter(app => app.assigned_to === user?.email);
+      return base44.entities.Application.filter({
+        organization_id: user?.organization_id,
+        recruiter_id: user?.id,
+      }, '-created_date', 50);
     },
     enabled: !!user,
   });
 
   const { data: interviews = [] } = useQuery({
-    queryKey: ['recruiter-interviews', user?.email],
+    queryKey: ['recruiter-interviews', user?.id],
     queryFn: async () => {
-      const all = await base44.entities.Interview.list('-date', 50);
-      return all.filter(i => i.employer_id === user?.email && i.status === 'scheduled');
+      return base44.entities.Interview.filter({
+        organization_id: user?.organization_id,
+        recruiter_id: user?.id,
+        status: 'scheduled',
+      }, '-date', 50);
     },
     enabled: !!user,
   });

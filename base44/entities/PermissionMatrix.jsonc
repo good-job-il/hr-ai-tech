@@ -115,9 +115,18 @@
             "role": "super_admin"
           }
         },
-        {
-          "data.organization_id": "{{user.data.organization_id}}"
-        },
+        { "data.is_template": true, "data.org_type": "{{user.data.org_type}}", "user_condition": { "role": "org_admin" } },
+        { "data.is_template": true, "data.org_type": "{{user.data.org_type}}", "user_condition": { "role": "recruitment_manager" } },
+        { "data.is_template": true, "data.org_type": "{{user.data.org_type}}", "user_condition": { "role": "team_manager" } },
+        { "data.is_template": true, "data.org_type": "{{user.data.org_type}}", "user_condition": { "role": "recruiter" } },
+        { "data.is_template": true, "data.org_type": "{{user.data.org_type}}", "user_condition": { "role": "hr_manager" } },
+        { "data.is_template": true, "data.org_type": "{{user.data.org_type}}", "user_condition": { "role": "internal_recruiter" } },
+        { "data.organization_id": "{{user.data.organization_id}}", "user_condition": { "role": "org_admin" } },
+        { "data.organization_id": "{{user.data.organization_id}}", "user_condition": { "role": "recruitment_manager" } },
+        { "data.organization_id": "{{user.data.organization_id}}", "user_condition": { "role": "team_manager" } },
+        { "data.organization_id": "{{user.data.organization_id}}", "user_condition": { "role": "recruiter" } },
+        { "data.organization_id": "{{user.data.organization_id}}", "user_condition": { "role": "hr_manager" } },
+        { "data.organization_id": "{{user.data.organization_id}}", "user_condition": { "role": "internal_recruiter" } },
         {
           "user_condition": {
             "role": "admin"

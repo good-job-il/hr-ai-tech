@@ -33,6 +33,7 @@ export const QueryPermissionMatricesSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(500).default(50),
   organization_id: z.coerce.number().int().optional(),
+  org_type: OrgTypeEnum.optional(),
   role_key: z.string().optional(),
   is_template: z.coerce.boolean().optional(),
 });

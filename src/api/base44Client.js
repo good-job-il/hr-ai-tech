@@ -33,6 +33,7 @@ const ENTITY_CONFIG = {
   Message: { base: '/messages' },
   Notification: { base: '/notifications' },
   Company: { base: '/companies' },
+  AgencyClient: { base: '/agency-clients' },
 
   CandidateProfile: { base: '/candidates/profiles' },
   CandidateImportBatch: { base: '/candidates/import-batches' },

@@ -145,10 +145,14 @@ export default function ResumeFileImporter({ onImportComplete }) {
 
       // Create batch record
       const batch = await base44.entities.CandidateImportBatch.create({
+        organization_id: user?.organization_id,
         batch_name: `Resume Import ${files.length} קבצים — ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: he })}`,
         source_file: files.map(f => f.name).join(', '),
         file_type: 'zip', // multi-file
         imported_by: user?.email,
+        recruiter_id: user?.id,
+        team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
+        recruitment_manager_id: user?.recruitment_manager_id,
         status: 'pending',
       });
 
@@ -157,7 +161,7 @@ export default function ResumeFileImporter({ onImportComplete }) {
         files: uploaded,
         batchId: batch.id,
         employer_id: '',
-        recruiter_id: user?.email,
+        recruiter_id: user?.id,
       });
 
       const d = res.data;

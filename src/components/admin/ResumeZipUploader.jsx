@@ -4,8 +4,10 @@ import { Upload, AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import ResumeImportReview from './ResumeImportReview';
 import ImportValidationCheck from './ImportValidationCheck';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function ResumeZipUploader({ onImportComplete }) {
+  const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
   const [zipFile, setZipFile] = useState(null);
   const [parseError, setParseError] = useState(null);
@@ -47,10 +49,14 @@ export default function ResumeZipUploader({ onImportComplete }) {
 
       // 2. Create import batch record
       const importBatch = await base44.entities.CandidateImportBatch.create({
+        organization_id: user?.organization_id,
         batch_name: zipFile.name.replace('.zip', ''),
         source_file: zipUrl,
         file_type: 'zip',
-        imported_by: (await base44.auth.me()).email,
+        imported_by: user?.email,
+        recruiter_id: recruiterId || user?.id,
+        team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
+        recruitment_manager_id: user?.recruitment_manager_id,
         employer_id: employerId || null,
         total_records: 0,
         status: 'in_progress',

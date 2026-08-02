@@ -20,6 +20,9 @@ export class CompanyEntity extends BaseEntity {
   @Column({ name: 'logo_url', type: 'text', nullable: true })
   logo_url: string | null;
 
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  website: string | null;
+
   @Column({ name: 'job_count', type: 'int', default: 0 })
   job_count: number;
 
@@ -96,4 +99,3 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'manager_email', type: 'varchar', length: 255, nullable: true })
   manager_email: string | null;
 }
-

@@ -61,10 +61,14 @@ export default function ImportDashboard() {
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       const batch = await base44.entities.CandidateImportBatch.create({
+        organization_id: user?.organization_id,
         batch_name: `${file.name.replace(/\.[^/.]+$/, '')} — ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: he })}`,
         source_file: file.name,
         file_type: file.name.endsWith('.csv') ? 'csv' : file.name.endsWith('.json') ? 'json' : 'xlsx',
         imported_by: user?.email,
+        recruiter_id: user?.id,
+        team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
+        recruitment_manager_id: user?.recruitment_manager_id,
         status: 'pending',
       });
       const res = await base44.functions.invoke('importCandidatesFromFile', {
@@ -93,10 +97,14 @@ export default function ImportDashboard() {
       const testFile = new File([blob], 'validation_test.csv', { type: 'text/csv' });
       const { file_url } = await base44.integrations.Core.UploadFile({ file: testFile });
       const batch = await base44.entities.CandidateImportBatch.create({
+        organization_id: user?.organization_id,
         batch_name: `Validation Test — ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: he })}`,
         source_file: 'validation_test.csv',
         file_type: 'csv',
         imported_by: user?.email,
+        recruiter_id: user?.id,
+        team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
+        recruitment_manager_id: user?.recruitment_manager_id,
         status: 'pending',
       });
       const res = await base44.functions.invoke('importCandidatesFromFile', {

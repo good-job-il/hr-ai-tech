@@ -25,7 +25,15 @@
     },
     "recruiter_id": {
       "type": "string",
-      "description": "Email of the recruiter who scheduled"
+      "description": "user.id of the recruiter who scheduled"
+    },
+    "team_manager_id": {
+      "type": "string",
+      "description": "user.id of the responsible team manager"
+    },
+    "recruitment_manager_id": {
+      "type": "string",
+      "description": "user.id of the responsible recruitment manager"
     },
     "candidate_name": {
       "type": "string"
@@ -134,7 +142,16 @@
   ],
   "rls": {
     "create": {
-      "data.organization_id": "{{user.data.organization_id}}"
+      "$or": [
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } },
+        { "user_condition": { "role": "org_admin" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "recruitment_manager" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "team_manager" }, "data.organization_id": "{{user.data.organization_id}}", "data.team_manager_id": "{{user.id}}" },
+        { "user_condition": { "role": "recruiter" }, "data.organization_id": "{{user.data.organization_id}}", "data.recruiter_id": "{{user.id}}" },
+        { "user_condition": { "role": "hr_manager" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "internal_recruiter" }, "data.organization_id": "{{user.data.organization_id}}", "data.recruiter_id": "{{user.id}}" }
+      ]
     },
     "read": {
       "$or": [
@@ -186,6 +203,15 @@
           },
           "data.organization_id": "{{user.data.organization_id}}",
           "data.recruiter_id": "{{user.id}}"
+        },
+        {
+          "user_condition": { "role": "candidate" },
+          "data.candidate_email": "{{user.email}}"
+        },
+        {
+          "user_condition": { "role": "employer" },
+          "data.organization_id": "{{user.data.organization_id}}",
+          "data.employer_id": "{{user.email}}"
         }
       ]
     },

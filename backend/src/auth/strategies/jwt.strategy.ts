@@ -6,12 +6,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from "@/modules/users/user.entity";
 import { UserRole } from '@/common/enums/user-role.enum';
+import { OrgType } from '@/common/enums/org-type.enum';
 
 export interface JwtPayload {
   sub: number;
   email: string;
   role: string;
   organization_id: number | null;
+  org_type?: OrgType;
   /**
    * Set only on short-lived "workspace" tokens issued by
    * POST /auth/organizations/:id/enter. Never present on a regular
@@ -58,6 +60,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         user,
         {
           organization_id: payload.organization_id,
+          org_type: payload.org_type ?? user.org_type,
           impersonating: true,
           real_organization_id: user.organization_id,
         },
@@ -68,6 +71,5 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     return user;
   }
 }
-
 
 

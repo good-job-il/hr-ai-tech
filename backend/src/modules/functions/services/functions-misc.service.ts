@@ -19,9 +19,6 @@ import {
   SendCandidateToEmployerDto,
 } from '../dto/functions.dto';
 
-/** Default org used by Base44 for legacy single-tenant records (fallback only) */
-const DEFAULT_ORG_FALLBACK = null;
-
 @Injectable()
 export class FunctionsMiscService {
   constructor(
@@ -47,9 +44,10 @@ export class FunctionsMiscService {
 
   // ─── createApplicationTimeline ──────────────────────────────────────────
   async createApplicationTimeline(dto: CreateApplicationTimelineFnDto, user: UserEntity) {
+    const application = await this.applicationsService.findById(dto.application_id, user);
     const timeline = await this.applicationsService.createTimelineEvent({
       application_id: dto.application_id,
-      organization_id: dto.organization_id ?? user.organization_id ?? DEFAULT_ORG_FALLBACK,
+      organization_id: application.organization_id,
       event_type: dto.event_type as any,
       previous_value: dto.previous_value ?? null,
       new_value: dto.new_value ?? null,
@@ -68,11 +66,11 @@ export class FunctionsMiscService {
       event_type: dto.event_type,
       description: dto.description,
       metadata: dto.metadata,
-      organization_id: dto.organization_id ?? user.organization_id ?? DEFAULT_ORG_FALLBACK,
+      organization_id: user.organization_id,
       performed_by: user.email,
       performed_by_name: user.full_name ?? user.email,
       performed_by_role: user.role,
-    } as any);
+    } as any, user);
     return { success: true, timeline };
   }
 
@@ -198,7 +196,7 @@ ${user.full_name || user.email}`;
       },
       is_visible_to_candidate: false,
       is_visible_to_employer: true,
-    } as any);
+    } as any, user);
 
     this.auditService
       .log({
@@ -252,5 +250,3 @@ ${user.full_name || user.email}`;
     }
   }
 }
-
-

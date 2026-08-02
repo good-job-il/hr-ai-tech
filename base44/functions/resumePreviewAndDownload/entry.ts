@@ -26,8 +26,14 @@ Deno.serve(async (req) => {
     }
 
     // Check permissions
-    const isAdmin = user.role === 'admin';
-    const isOwner = candidate.recruiter_id === user.email || candidate.employer_id === user.email;
+    const organizationId = user.organization_id || user.data?.organization_id;
+    const sameOrganization = Boolean(organizationId && candidate.organization_id === organizationId);
+    const isAdmin = user.role === 'admin' && sameOrganization;
+    const isOrgManager = sameOrganization && ['org_admin', 'recruitment_manager', 'hr_manager'].includes(user.role);
+    const isTeamOwner = sameOrganization && user.role === 'team_manager' && candidate.team_manager_id === user.id;
+    const isRecruiterOwner = sameOrganization && ['recruiter', 'internal_recruiter'].includes(user.role) && candidate.recruiter_id === user.id;
+    const isEmployerOwner = sameOrganization && user.role === 'employer' && candidate.employer_id === user.email;
+    const isOwner = isOrgManager || isTeamOwner || isRecruiterOwner || isEmployerOwner;
 
     if (!isAdmin && !isOwner) {
       return Response.json({ error: 'Access denied' }, { status: 403 });

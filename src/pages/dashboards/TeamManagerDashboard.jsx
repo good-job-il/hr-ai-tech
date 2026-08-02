@@ -10,19 +10,24 @@ export default function TeamManagerDashboard() {
   const { user } = useAuth();
 
   const { data: teamApplications = [] } = useQuery({
-    queryKey: ['team-applications'],
+    queryKey: ['team-applications', user?.id],
     queryFn: async () => {
-      const allApps = await base44.entities.Application.list('-created_date', 50);
-      return allApps.filter(app => app.assigned_to === user?.email || app.assigned_to?.includes(user?.email));
+      return base44.entities.Application.filter({
+        organization_id: user?.organization_id,
+        team_manager_id: user?.id,
+      }, '-created_date', 50);
     },
     enabled: !!user,
   });
 
   const { data: teamInterviews = [] } = useQuery({
-    queryKey: ['team-interviews'],
+    queryKey: ['team-interviews', user?.id],
     queryFn: async () => {
-      const allInterviews = await base44.entities.Interview.list('-date');
-      return allInterviews.filter(i => i.employer_id === user?.email && i.status === 'scheduled');
+      return base44.entities.Interview.filter({
+        organization_id: user?.organization_id,
+        team_manager_id: user?.id,
+        status: 'scheduled',
+      }, '-date');
     },
     enabled: !!user,
   });

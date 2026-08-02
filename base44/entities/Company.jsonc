@@ -18,6 +18,10 @@
       "type": "string",
       "description": "URL of the company logo"
     },
+    "website": {
+      "type": "string",
+      "description": "Public company website"
+    },
     "job_count": {
       "type": "number",
       "default": 0

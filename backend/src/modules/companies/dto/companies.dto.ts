@@ -8,6 +8,7 @@ export const CreateCompanySchema = z.object({
   initials: z.string().max(5).optional().nullable(),
   color: z.string().optional().nullable(),
   logo_url: z.string().optional().nullable(),
+  website: z.string().optional().nullable(),
 });
 export class CreateCompanyDto extends createZodDto(CreateCompanySchema) {}
 export const UpdateCompanySchema = CreateCompanySchema.partial().extend({
@@ -56,4 +57,3 @@ export const CreateStaffSchema = z.object({
 export class CreateStaffDto extends createZodDto(CreateStaffSchema) {}
 export const UpdateStaffSchema = CreateStaffSchema.partial();
 export class UpdateStaffDto extends createZodDto(UpdateStaffSchema) {}
-

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { agencyClientService } from '@/api/services/agencyClientService';
+import { toast } from 'sonner';
 
 export default function CreateClientModal({ isOpen, onClose, onSuccess }) {
   const [clientName, setClientName] = useState('');
@@ -11,12 +12,12 @@ export default function CreateClientModal({ isOpen, onClose, onSuccess }) {
     setError('');
     setCreating(true);
     try {
-      await base44.entities.Organization.create({
+      await agencyClientService.create({
         name: clientName,
-        org_type: 'organization',
         status: 'active',
       });
       setClientName('');
+      toast.success('הלקוח נוצר בהצלחה');
       onClose();
       onSuccess?.();
     } catch (err) {

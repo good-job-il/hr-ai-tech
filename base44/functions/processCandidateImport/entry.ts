@@ -12,13 +12,18 @@
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-const TAASUKA_TOVA_ORG_ID = '6a0d7291e1bc86f20a5aef28';
-
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!['admin', 'org_admin', 'recruitment_manager', 'team_manager'].includes(user.role)) {
+      return Response.json({ error: 'Import processing permission denied' }, { status: 403 });
+    }
+    const organizationId = user.organization_id || user.data?.organization_id;
+    if (!organizationId) {
+      return Response.json({ error: 'Organization context required' }, { status: 403 });
+    }
 
     const body = await req.json();
     const { candidateId, jobId } = body;
@@ -33,13 +38,16 @@ Deno.serve(async (req) => {
     if (!candidate) {
       return Response.json({ error: 'Candidate not found' }, { status: 404 });
     }
+    if (candidate.organization_id !== organizationId) {
+      return Response.json({ error: 'Candidate outside organization scope' }, { status: 403 });
+    }
 
     const results = { candidateId, steps: {} };
 
     // ── 2. Create imported timeline event ─────────────────────────────────────
     try {
       await base44.asServiceRole.entities.CandidateTimeline.create({
-        organization_id: candidate.organization_id || TAASUKA_TOVA_ORG_ID,
+        organization_id: candidate.organization_id,
         candidate_id: candidateId,
         candidate_email: candidate.email || '',
         event_type: 'imported',
@@ -73,7 +81,7 @@ Deno.serve(async (req) => {
 
         if (existingDocs.length === 0) {
           await base44.asServiceRole.entities.CandidateDocument.create({
-            organization_id: candidate.organization_id || TAASUKA_TOVA_ORG_ID,
+            organization_id: candidate.organization_id,
             candidate_id: candidateId,
             candidate_email: candidate.email || '',
             doc_type: 'cv',
@@ -103,7 +111,7 @@ Deno.serve(async (req) => {
       // Check by email
       if (candidate.email) {
         const byEmail = await base44.asServiceRole.entities.Candidate.filter(
-          { email: candidate.email }, '', 5
+          { organization_id: candidate.organization_id, email: candidate.email }, '', 5
         );
         const others = byEmail.filter(c => c.id !== candidateId);
         if (others.length > 0) {
@@ -120,7 +128,7 @@ Deno.serve(async (req) => {
       if (!duplicateFound && candidate.phone) {
         const normalizedPhone = candidate.phone.replace(/\D/g, '');
         const allCandidates = await base44.asServiceRole.entities.Candidate.filter(
-          {}, '-created_date', 500
+          { organization_id: candidate.organization_id }, '-created_date', 500
         );
         const phoneMatch = allCandidates.find(c =>
           c.id !== candidateId && c.phone && c.phone.replace(/\D/g, '') === normalizedPhone
@@ -145,7 +153,7 @@ Deno.serve(async (req) => {
     // ── 5. AI Match scoring against open jobs ─────────────────────────────────
     try {
       const openJobs = await base44.asServiceRole.entities.Job.filter(
-        { is_closed: false }, '-created_date', 50
+        { organization_id: candidate.organization_id, is_closed: false }, '-created_date', 50
       );
 
       if (openJobs.length > 0 && (candidate.role_name || candidate.domain_name || (candidate.skills || []).length > 0)) {
@@ -282,13 +290,14 @@ Deno.serve(async (req) => {
             // ALWAYS check by both candidate_email+job_id before creating
             const existingApps = candidate.email
               ? await base44.asServiceRole.entities.Application.filter(
-                  { job_id: autoJobId, candidate_email: candidate.email }, '', 1
+                  { organization_id: candidate.organization_id, job_id: autoJobId, candidate_email: candidate.email }, '', 1
                 )
               : [];
 
             if (existingApps.length > 0) {
               // Log duplicate skip to timeline
               await base44.asServiceRole.entities.CandidateTimeline.create({
+                organization_id: candidate.organization_id,
                 candidate_id: candidateId,
                 candidate_email: candidate.email || '',
                 event_type: 'application_submitted',
@@ -311,11 +320,12 @@ Deno.serve(async (req) => {
               };
             } else if (targetJob) {
               const newApp = await base44.asServiceRole.entities.Application.create({
-                organization_id: candidate.organization_id || TAASUKA_TOVA_ORG_ID,
+                organization_id: candidate.organization_id,
                 job_id: autoJobId,
+                candidate_id: candidate.id,
                 job_title: targetJob.title,
                 company: targetJob.company,
-                employer_id: targetJob.employer_id || '',
+                employer_company_id: targetJob.employer_company_id || '',
                 candidate_name: candidate.full_name,
                 candidate_email: candidate.email || '',
                 candidate_phone: candidate.phone || '',
@@ -326,10 +336,14 @@ Deno.serve(async (req) => {
                 status: 'new',
                 match_score: bestScore,
                 match_reason: bestMatch?.reason || null,
-                assigned_to: candidate.recruiter_id || user.email,
+                recruiter_id: candidate.recruiter_id || user.id,
+                assigned_to: candidate.recruiter_id || user.id,
+                team_manager_id: candidate.team_manager_id || null,
+                recruitment_manager_id: candidate.recruitment_manager_id || null,
               });
 
               await base44.asServiceRole.entities.CandidateTimeline.create({
+                organization_id: candidate.organization_id,
                 candidate_id: candidateId,
                 candidate_email: candidate.email || '',
                 event_type: 'application_submitted',

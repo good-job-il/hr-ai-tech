@@ -73,8 +73,8 @@ export default function EmployerLayout() {
     <div dir={dir} className="min-h-screen bg-[#F7FBFF] flex">
       <aside className={`fixed inset-y-0 z-40 w-64 bg-white flex flex-col transform transition-transform md:translate-x-0
         ${isEn
-          ? `left-0 border-r border-[#E4ECFF] ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`
-          : `right-0 border-l border-[#E4ECFF] ${mobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}`
+          ? `left-0 border-[#E4ECFF] ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`
+          : `right-0 border-[#E4ECFF] ${mobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}`
         }`}>
         <div className="h-20 border-b border-[#E4ECFF] flex items-center px-6">
           <Logo />

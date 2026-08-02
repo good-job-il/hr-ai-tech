@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, FindManyOptions } from 'typeorm';
 import { CandidateEntity } from './entities/candidate.entity';
@@ -69,9 +65,9 @@ export class CandidatesService {
     if (status) where.status = status;
     if (domain_id) where.domain_id = domain_id;
     if (role_id) where.role_id = role_id;
-    if (recruiter_id) where.recruiter_id = recruiter_id;
-    if (team_manager_id) where.team_manager_id = team_manager_id;
-    if (is_deleted !== undefined) where.is_deleted = is_deleted;
+    if (recruiter_id && !('recruiter_id' in rlsWhere)) where.recruiter_id = recruiter_id;
+    if (team_manager_id && !('team_manager_id' in rlsWhere)) where.team_manager_id = team_manager_id;
+    if (is_deleted !== undefined && !('is_deleted' in rlsWhere)) where.is_deleted = is_deleted;
     if (parsing_status) where.parsing_status = parsing_status;
     if (review_required !== undefined) where.review_required = review_required;
     if (import_batch_id) where.import_batch_id = import_batch_id;
@@ -97,9 +93,14 @@ export class CandidatesService {
   }
 
   async findById(id: number, user: UserEntity): Promise<CandidateEntity> {
-    const candidate = await this.candidateRepo.findOne({ where: { id } as any });
+    const rlsWhere = getRlsWhere('Candidate', {
+      id: user.id, role: user.role, organization_id: user.organization_id,
+      employer_company_id: user.employer_company_id, email: user.email,
+      impersonating: user.impersonating,
+    });
+    if (isBlocked(rlsWhere)) throw new NotFoundException(`Candidate ${id} not found`);
+    const candidate = await this.candidateRepo.findOne({ where: { ...rlsWhere, id } as any });
     if (!candidate) throw new NotFoundException(`Candidate ${id} not found`);
-    this.checkAccess(candidate, user);
     return candidate;
   }
 
@@ -148,6 +149,7 @@ export class CandidatesService {
   async updateNote(noteId: number, dto: UpdateCandidateNoteDto, user: UserEntity) {
     const note = await this.noteRepo.findOne({ where: { id: noteId } });
     if (!note) throw new NotFoundException(`Note ${noteId} not found`);
+    await this.findById(note.candidate_id, user);
     Object.assign(note, dto);
     return this.noteRepo.save(note);
   }
@@ -155,6 +157,7 @@ export class CandidatesService {
   async deleteNote(noteId: number, user: UserEntity) {
     const note = await this.noteRepo.findOne({ where: { id: noteId } });
     if (!note) throw new NotFoundException(`Note ${noteId} not found`);
+    await this.findById(note.candidate_id, user);
     await this.noteRepo.remove(note);
   }
 
@@ -173,6 +176,7 @@ export class CandidatesService {
   async deleteTag(tagId: number, user: UserEntity) {
     const tag = await this.tagRepo.findOne({ where: { id: tagId } });
     if (!tag) throw new NotFoundException(`Tag ${tagId} not found`);
+    await this.findById(tag.candidate_id, user);
     await this.tagRepo.remove(tag);
   }
 
@@ -185,8 +189,15 @@ export class CandidatesService {
     });
   }
 
-  async createTimelineEvent(data: Partial<CandidateTimelineEntity>) {
-    const event = this.timelineRepo.create(data);
+  async createTimelineEvent(data: Partial<CandidateTimelineEntity>, user: UserEntity) {
+    await this.findById(data.candidate_id!, user);
+    const event = this.timelineRepo.create({
+      ...data,
+      organization_id: user.organization_id,
+      performed_by: user.email,
+      performed_by_name: user.full_name,
+      performed_by_role: user.role,
+    });
     return this.timelineRepo.save(event);
   }
 
@@ -200,6 +211,7 @@ export class CandidatesService {
   }
 
   async createDocument(data: Partial<CandidateDocumentEntity>, user: UserEntity) {
+    await this.findById(data.candidate_id!, user);
     const doc = this.documentRepo.create({
       ...data,
       organization_id: user.organization_id,
@@ -209,27 +221,44 @@ export class CandidatesService {
 
   // ─── Import Batches ──────────────────────────────────────────────────────
   async getBatches(user: UserEntity) {
-    const where: Record<string, any> = {};
-    if (user.role !== UserRole.ADMIN) {
-      where.recruiter_id = user.id;
-    }
+    const where = getRlsWhere('CandidateImportBatch', {
+      id: user.id, role: user.role, organization_id: user.organization_id,
+      employer_company_id: user.employer_company_id, email: user.email,
+      impersonating: user.impersonating,
+    });
+    if (isBlocked(where)) return [];
     return this.batchRepo.find({ where, order: { created_date: 'DESC' } });
   }
 
-  async getBatch(id: number) {
-    const batch = await this.batchRepo.findOne({ where: { id } });
+  async getBatch(id: number, user: UserEntity) {
+    const rlsWhere = getRlsWhere('CandidateImportBatch', {
+      id: user.id, role: user.role, organization_id: user.organization_id,
+      employer_company_id: user.employer_company_id, email: user.email,
+      impersonating: user.impersonating,
+    });
+    if (isBlocked(rlsWhere)) throw new NotFoundException(`Import batch ${id} not found`);
+    const batch = await this.batchRepo.findOne({ where: { ...rlsWhere, id } as any });
     if (!batch) throw new NotFoundException(`Import batch ${id} not found`);
     return batch;
   }
 
-  async createBatch(data: Partial<CandidateImportBatchEntity>) {
-    const batch = this.batchRepo.create(data);
+  async createBatch(data: Partial<CandidateImportBatchEntity>, user: UserEntity) {
+    const batch = this.batchRepo.create({
+      ...data,
+      organization_id: user.organization_id,
+      recruiter_id: data.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
+      team_manager_id: data.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
+      recruitment_manager_id: data.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
+      imported_by: user.email,
+    });
     return this.batchRepo.save(batch);
   }
 
-  async updateBatch(id: number, data: Partial<CandidateImportBatchEntity>) {
-    const batch = await this.getBatch(id);
-    Object.assign(batch, data);
+  async updateBatch(id: number, data: Partial<CandidateImportBatchEntity>, user: UserEntity) {
+    const batch = await this.getBatch(id, user);
+    const updates = { ...data };
+    delete updates.organization_id;
+    Object.assign(batch, updates);
     return this.batchRepo.save(batch);
   }
 
@@ -275,47 +304,55 @@ export class CandidatesService {
   }
 
   /** Flat list — mirrors base44.entities.CandidateAccess.list(...) */
-  async findAllAccess(filters: Record<string, any> = {}) {
-    const where: Record<string, any> = {};
-    if (filters.candidate_id) where.candidate_id = filters.candidate_id;
-    if (filters.granted_to_organization_id) where.granted_to_organization_id = filters.granted_to_organization_id;
+  async findAllAccess(filters: Record<string, any> = {}, user: UserEntity) {
+    const isGlobalAdmin = user.role === UserRole.ADMIN && !user.impersonating;
+    if (!isGlobalAdmin && !user.organization_id) return [];
+    const base = filters.candidate_id ? { candidate_id: filters.candidate_id } : {};
+    const where: any = isGlobalAdmin
+      ? base
+      : [
+          { ...base, owner_organization_id: user.organization_id },
+          { ...base, accessor_organization_id: user.organization_id },
+        ];
     return this.accessRepo.find({ where, order: { created_date: 'DESC' } as any });
   }
 
-  async createAccess(data: Partial<CandidateAccessEntity>) {
-    const access = this.accessRepo.create(data);
+  async createAccess(data: Partial<CandidateAccessEntity>, user: UserEntity) {
+    const candidate = await this.findById(data.candidate_id!, user);
+    if (!candidate.organization_id) throw new ForbiddenException('Candidate has no organization scope');
+    const access = this.accessRepo.create({
+      ...data,
+      owner_organization_id: candidate.organization_id,
+      granted_by: user.id,
+      granted_at: new Date(),
+    });
     return this.accessRepo.save(access);
   }
 
-  async updateAccess(id: number, data: Partial<CandidateAccessEntity>) {
+  async updateAccess(id: number, data: Partial<CandidateAccessEntity>, user: UserEntity) {
     const access = await this.accessRepo.findOne({ where: { id } });
     if (!access) throw new NotFoundException(`Access ${id} not found`);
-    Object.assign(access, data);
+    this.assertAccessGrantOwner(access, user);
+    const updates = { ...data };
+    delete updates.owner_organization_id;
+    delete updates.candidate_id;
+    delete updates.granted_by;
+    Object.assign(access, updates);
     return this.accessRepo.save(access);
   }
 
-  async deleteAccess(id: number) {
+  async deleteAccess(id: number, user: UserEntity) {
     const access = await this.accessRepo.findOne({ where: { id } });
     if (!access) throw new NotFoundException(`Access ${id} not found`);
+    this.assertAccessGrantOwner(access, user);
     await this.accessRepo.remove(access);
   }
 
   // ─── Private helpers ─────────────────────────────────────────────────────
-  private checkAccess(candidate: CandidateEntity, user: UserEntity) {
-    if (user.role === UserRole.ADMIN) return;
-    if (candidate.organization_id !== user.organization_id) {
+  private assertAccessGrantOwner(access: CandidateAccessEntity, user: UserEntity) {
+    const isGlobalAdmin = user.role === UserRole.ADMIN && !user.impersonating;
+    if (!isGlobalAdmin && access.owner_organization_id !== user.organization_id) {
       throw new ForbiddenException('Access denied');
-    }
-    if (user.role === UserRole.RECRUITER || user.role === UserRole.INTERNAL_RECRUITER) {
-      if (candidate.recruiter_id && candidate.recruiter_id !== user.id) {
-        throw new ForbiddenException('Access denied to this candidate');
-      }
-    }
-    if (user.role === UserRole.TEAM_MANAGER) {
-      if (candidate.team_manager_id && candidate.team_manager_id !== user.id) {
-        throw new ForbiddenException('Access denied to this candidate');
-      }
     }
   }
 }
-

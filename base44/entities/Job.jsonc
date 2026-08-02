@@ -80,6 +80,14 @@
       "type": "string",
       "description": "user.id \u05e9\u05dc \u05d4\u05de\u05d2\u05d9\u05d9\u05e1 \u05d4\u05e4\u05e0\u05d9\u05de\u05d9 \u05d4\u05de\u05de\u05d5\u05e0\u05d4 \u05e2\u05dc \u05d4\u05de\u05e9\u05e8\u05d4"
     },
+    "team_manager_id": {
+      "type": "string",
+      "description": "user.id of the responsible team manager"
+    },
+    "recruitment_manager_id": {
+      "type": "string",
+      "description": "user.id of the responsible recruitment manager"
+    },
     "employer_id": {
       "type": "string",
       "description": "[DEPRECATED] \u05d0\u05d9\u05de\u05d9\u05d9\u05dc \u05e9\u05dc \u05d4\u05de\u05e2\u05e1\u05d9\u05e7 \u2014 \u05d4\u05e9\u05ea\u05de\u05e9 \u05d1-employer_company_id \u05d1\u05de\u05e7\u05d5\u05dd"
@@ -202,57 +210,50 @@
   ],
   "rls": {
     "create": {
-      "data.organization_id": "{{user.data.organization_id}}"
+      "$or": [
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } },
+        { "user_condition": { "role": "org_admin" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "recruitment_manager" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "team_manager" }, "data.organization_id": "{{user.data.organization_id}}", "data.team_manager_id": "{{user.id}}" },
+        { "user_condition": { "role": "recruiter" }, "data.organization_id": "{{user.data.organization_id}}", "data.recruiter_id": "{{user.id}}" },
+        { "user_condition": { "role": "hr_manager" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "internal_recruiter" }, "data.organization_id": "{{user.data.organization_id}}", "data.recruiter_id": "{{user.id}}" },
+        { "user_condition": { "role": "employer" }, "data.organization_id": "{{user.data.organization_id}}" }
+      ]
     },
     "read": {
       "$or": [
-        {
-          "data.organization_id": "{{user.data.organization_id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        }
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } },
+        { "user_condition": { "role": "org_admin" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "recruitment_manager" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "team_manager" }, "data.organization_id": "{{user.data.organization_id}}", "data.team_manager_id": "{{user.id}}" },
+        { "user_condition": { "role": "recruiter" }, "data.organization_id": "{{user.data.organization_id}}", "data.recruiter_id": "{{user.id}}" },
+        { "user_condition": { "role": "hr_manager" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "internal_recruiter" }, "data.organization_id": "{{user.data.organization_id}}", "data.recruiter_id": "{{user.id}}" },
+        { "user_condition": { "role": "candidate" }, "data.is_closed": false },
+        { "user_condition": { "role": "employer" }, "data.organization_id": "{{user.data.organization_id}}" }
       ]
     },
     "update": {
       "$or": [
-        {
-          "data.organization_id": "{{user.data.organization_id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        }
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } },
+        { "user_condition": { "role": "org_admin" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "recruitment_manager" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "team_manager" }, "data.organization_id": "{{user.data.organization_id}}", "data.team_manager_id": "{{user.id}}" },
+        { "user_condition": { "role": "recruiter" }, "data.organization_id": "{{user.data.organization_id}}", "data.recruiter_id": "{{user.id}}" },
+        { "user_condition": { "role": "hr_manager" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "internal_recruiter" }, "data.organization_id": "{{user.data.organization_id}}", "data.recruiter_id": "{{user.id}}" }
       ]
     },
     "delete": {
       "$or": [
-        {
-          "data.organization_id": "{{user.data.organization_id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        }
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } },
+        { "user_condition": { "role": "org_admin" }, "data.organization_id": "{{user.data.organization_id}}" },
+        { "user_condition": { "role": "recruitment_manager" }, "data.organization_id": "{{user.data.organization_id}}" }
       ]
     }
   }

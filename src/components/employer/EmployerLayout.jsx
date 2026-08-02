@@ -55,8 +55,8 @@ export default function EmployerLayout({ children }) {
     <div className="min-h-screen bg-[#F5FAFF] flex text-[#0F172A]" dir={dir}>
       <aside className={`fixed inset-y-0 z-40 w-[280px] bg-white/82 backdrop-blur-2xl flex flex-col transform transition-transform
         ${isEn
-          ? `left-0 border-r border-[#DDEBFF] shadow-[0_30px_90px_rgba(79,124,255,0.12)] ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`
-          : `right-0 border-l border-[#DDEBFF] shadow-[0_30px_90px_rgba(79,124,255,0.12)] ${mobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}`
+          ? `left-0 border-[#DDEBFF] shadow-[0_30px_90px_rgba(79,124,255,0.12)] ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`
+          : `right-0 border-[#DDEBFF] shadow-[0_30px_90px_rgba(79,124,255,0.12)] ${mobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}`
         }`}>
         <Link to="/" className="h-[96px] px-6 border-b border-[#E4ECFF] flex items-center justify-center">
           <img src={LOGO} alt="HeadHunter HR-Tech" className="h-[58px] w-auto object-contain" />
