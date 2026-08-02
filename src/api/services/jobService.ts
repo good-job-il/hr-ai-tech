@@ -1,61 +1,26 @@
-import { BaseRepository } from '@/api/repositories/baseRepository';
+import { httpClient } from '@/api/client/httpClient';
+import { ResourceService, ResourceQuery } from './resourceService';
 import { Job } from '@/types/entities';
-import { RepositoryOptions } from '@/types/api';
 
-export class JobService extends BaseRepository<Job> {
-  protected endpoint = '/jobs';
+export interface JobQuery extends ResourceQuery {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  order?: 'ASC' | 'DESC';
+  search?: string;
+  organization_id?: number;
+  employer_company_id?: number;
+  recruiter_id?: number;
+  domain_id?: number;
+  is_closed?: boolean;
+  is_deleted?: boolean;
+}
 
-  async searchJobs(
-    query: string,
-    options?: RepositoryOptions
-  ): Promise<any> {
-    return this.list({
-      ...options,
-      filters: { ...options?.filters, search: query }
-    });
-  }
-
-  async getJobsByCompany(
-    companyId: string,
-    options?: RepositoryOptions
-  ): Promise<any> {
-    return this.list({
-      ...options,
-      filters: { ...options?.filters, company_id: companyId }
-    });
-  }
-
-  async getJobsByDomain(
-    domainId: number,
-    options?: RepositoryOptions
-  ): Promise<any> {
-    return this.list({
-      ...options,
-      filters: { ...options?.filters, domain_id: domainId }
-    });
-  }
-
-  async getRecommendedJobs(
-    candidateId: string,
-    options?: RepositoryOptions
-  ): Promise<any> {
-    return this.list({
-      ...options,
-      filters: { ...options?.filters, recommended_for: candidateId }
-    });
-  }
-
-  async closeJob(jobId: string): Promise<Job> {
-    return this.patch(jobId, { is_closed: true });
-  }
-
-  async repostJob(jobId: string): Promise<Job> {
-    return this.patch(jobId, { is_closed: false });
-  }
-
-  async increaseViews(jobId: string): Promise<void> {
-    await this.patch(jobId, { views: (await this.getById(jobId)).views + 1 });
-  }
+export class JobService extends ResourceService<Job, JobQuery> {
+  constructor() { super('/jobs'); }
+  close(id: number | string) { return this.update(id, { is_closed: true }); }
+  reopen(id: number | string) { return this.update(id, { is_closed: false }); }
+  incrementViews(id: number | string) { return httpClient.post<void>(`/jobs/${id}/view`); }
 }
 
 export const jobService = new JobService();

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { candidateImportService } from '@/api/services/candidateImportService';
+import { fileService } from '@/api/services/fileService';
 import { useAuth } from '@/lib/AuthContext';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Upload, AlertTriangle, CheckCircle2, Clock, Users, FileText } from 'lucide-react';
+import { Upload, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import ResumeZipUploader from '@/components/admin/ResumeZipUploader';
 
@@ -17,7 +18,7 @@ const CandidateImport = () => {
   const { data: batches = [], refetch } = useQuery({
     queryKey: ['import-batches'],
     queryFn: async () => {
-      const result = await base44.entities.CandidateImportBatch.list('-created_date', 50);
+      const result = await candidateImportService.list({ sort: 'created_date', order: 'DESC', limit: 50 });
       return result || [];
     },
   });
@@ -47,11 +48,11 @@ const CandidateImport = () => {
 
     try {
       // Upload file
-      const uploadRes = await base44.integrations.Core.UploadFile({ file });
+      const uploadRes = await fileService.upload(file);
       const fileUrl = uploadRes.file_url;
 
       // Create import batch record
-      const batchRes = await base44.entities.CandidateImportBatch.create({
+      const batchRes = await candidateImportService.create({
         organization_id: user?.organization_id,
         batch_name: `${file.name.split('.')[0]} - ${new Date().toLocaleDateString('he-IL')}`,
         source_file: file.name,
@@ -65,7 +66,7 @@ const CandidateImport = () => {
       });
 
       // Invoke import function
-      const importRes = await base44.functions.invoke('importCandidatesFromFile', {
+      const importRes = await candidateImportService.importCandidates({
         fileUrl,
         batchId: batchRes.id,
         fileName: file.name

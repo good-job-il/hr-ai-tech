@@ -9,7 +9,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { candidateAccessService } from '@/api/services/candidateAccessService';
+import { organizationService } from '@/api/services/organizationService';
 import {
   ShoppingCart, Users, Share2, CreditCard, Building2,
   TrendingUp, Clock, CheckCircle, XCircle, ArrowRight,
@@ -61,13 +62,13 @@ function AccessTypeBadge({ type }) {
 export default function MarketplacePage() {
   const { data: accesses = [], isLoading: loadingAccesses } = useQuery({
     queryKey: ['marketplace-accesses'],
-    queryFn: () => base44.entities.CandidateAccess.list('-created_date', 1000),
+    queryFn: () => candidateAccessService.list({ sort: 'created_date', order: 'DESC', limit: 1000 }),
     staleTime: 2 * 60 * 1000,
   });
 
   const { data: orgs = [], isLoading: loadingOrgs } = useQuery({
     queryKey: ['platform-orgs'],
-    queryFn: () => base44.entities.Organization.list('', 500),
+    queryFn: () => organizationService.list({ limit: 500 }),
     staleTime: 5 * 60 * 1000,
   });
 

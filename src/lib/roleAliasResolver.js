@@ -1,4 +1,5 @@
-import { base44 } from '@/api/base44Client';
+import { roleAliasService } from '@/api/services/permissionService';
+import { taxonomyService } from '@/api/services/taxonomyService';
 
 let cachedAliases = null;
 let cachedRoles = null;
@@ -13,7 +14,7 @@ export async function resolveRoleAlias(roleNameOrAlias) {
   // Load aliases if not cached
   if (!cachedAliases) {
     try {
-      cachedAliases = await base44.entities.RoleAlias.list('-created_date', 1000);
+      cachedAliases = await roleAliasService.list({ limit: 1000 });
     } catch {
       return null;
     }
@@ -42,7 +43,7 @@ export async function resolveRoleEntity(roleNameOrAlias) {
   // Load roles if not cached
   if (!cachedRoles) {
     try {
-      cachedRoles = await base44.entities.Role.list('-role_id', 1000);
+      cachedRoles = await taxonomyService.roles();
     } catch {
       return null;
     }

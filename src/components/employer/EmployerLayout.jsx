@@ -5,7 +5,7 @@ import {
   MessageCircle, TrendingUp, ChevronDown, ChevronUp, Download,
   Bell, Sparkles, Home, Settings
 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import { useTranslation } from 'react-i18next';
 
 const LOGO = '/headhunter-logo.png';
@@ -158,7 +158,7 @@ export default function EmployerLayout({ children }) {
           </Link>
 
           <button
-            onClick={() => base44.auth.logout('/')}
+            onClick={() => authService.logout('/')}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-[#64748B] hover:bg-red-50 hover:text-red-500"
           >
             <LogOut className="w-4 h-4" /> {isEn ? 'Sign out' : 'יציאה'}

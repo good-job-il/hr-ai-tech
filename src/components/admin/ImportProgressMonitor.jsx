@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { candidateImportService } from '@/api/services/candidateImportService';
 import { Loader2, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
 
 export default function ImportProgressMonitor({ batchId }) {
@@ -10,7 +10,7 @@ export default function ImportProgressMonitor({ batchId }) {
   useEffect(() => {
     const checkProgress = async () => {
       try {
-        const batch = await base44.entities.CandidateImportBatch.get(batchId);
+        const batch = await candidateImportService.get(batchId);
         if (batch) {
           setProgress({
             status: batch.status,

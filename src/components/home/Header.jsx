@@ -113,7 +113,7 @@ export default function Header() {
         {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0 }}>
           <img
-           src="https://media.base44.com/images/public/6a00f4b05ae5180d66425437/8183f1f0a_Gemini_Generated_Image_6uoodu6uoodu6uoo.png"
+            src="/logo.png"
            alt="HeadHunter HR-Tech"
            style={{ height: 44, width: 'auto', objectFit: 'contain', imageRendering: 'crisp-edges' }}
           />

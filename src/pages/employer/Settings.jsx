@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import EmployerLayout from '@/components/employer/EmployerLayout';
 import StaffFormModal from '@/components/employer/StaffFormModal';
@@ -95,7 +96,7 @@ export default function EmployerSettings() {
     setSuccess('');
 
     try {
-      await base44.auth.updateMe(form);
+      await authService.updateMe(form);
       setSuccess('✓ ההגדרות נשמרו בהצלחה');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {

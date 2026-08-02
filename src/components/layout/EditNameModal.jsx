@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import { Pencil, X, Check } from 'lucide-react';
 
 export default function EditNameModal({ user, onUpdated }) {
@@ -10,7 +10,7 @@ export default function EditNameModal({ user, onUpdated }) {
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
-    await base44.auth.updateMe({ full_name: name.trim() });
+    await authService.updateMe({ full_name: name.trim() });
     setSaving(false);
     setOpen(false);
     if (onUpdated) onUpdated();

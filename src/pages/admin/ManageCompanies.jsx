@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { companyService } from '@/api/services/companyService';
 import { Trash2, Search, Edit2 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 
@@ -12,11 +12,11 @@ export default function AdminManageCompanies() {
 
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['admin-all-companies'],
-    queryFn: () => base44.entities.Company.list('-created_date', 200),
+    queryFn: () => companyService.list({ sort: 'created_date', order: 'DESC', limit: 200 }),
   });
 
   const updateMutation = useMutation({
-    mutationFn: (company) => base44.entities.Company.update(company.id, { name: company.name, industry: company.industry, job_count: company.job_count }),
+    mutationFn: (company) => companyService.update(company.id, { name: company.name, industry: company.industry, job_count: company.job_count }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-all-companies'] });
       setEditingCompany(null);
@@ -24,7 +24,7 @@ export default function AdminManageCompanies() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Company.delete(id),
+    mutationFn: (id) => companyService.remove(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-all-companies'] }),
   });
 

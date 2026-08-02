@@ -4,11 +4,11 @@ import { MapPin, Menu, X, Shield, UserPlus } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import LocationConfirmModal from '@/components/home/LocationConfirmModal';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
-const LOGO_URL =
-  'https://media.base44.com/images/public/6a00f4b05ae5180d66425437/8183f1f0a_Gemini_Generated_Image_6uoodu6uoodu6uoo.png';
+const LOGO_URL = '/logo.png';
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -149,7 +149,7 @@ export default function Navbar() {
                 {t('common.dashboard')}
               </Link>
               <button
-                onClick={() => base44.auth.logout('/')}
+                onClick={() => authService.logout('/')}
                 className="inline-flex h-12 px-7 items-center justify-center rounded-2xl bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white font-bold shadow-[0_16px_35px_rgba(108,77,255,0.28)] hover:scale-[1.02] transition"
               >
                 {t('common.logout')}
@@ -206,7 +206,7 @@ export default function Navbar() {
                 <Link to={dashboardLink()} className="flex-1 text-center py-3 rounded-xl border border-[#C9D8FF] text-[#6C4DFF] font-bold text-sm" onClick={() => setMobileOpen(false)}>
                   {t('common.dashboard')}
                 </Link>
-                <button onClick={() => { base44.auth.logout('/'); setMobileOpen(false); }} className="flex-1 py-3 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#A855F7] text-white font-bold text-sm">
+                <button onClick={() => { authService.logout('/'); setMobileOpen(false); }} className="flex-1 py-3 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#A855F7] text-white font-bold text-sm">
                   {t('common.logout')}
                 </button>
               </>

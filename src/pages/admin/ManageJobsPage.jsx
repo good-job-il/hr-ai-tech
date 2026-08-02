@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { jobService } from '@/api/services/jobService';
+import { compensationPlanService } from '@/api/services/compensationPlanService';
 import { Plus, Search, Briefcase, Building2, MapPin, RefreshCw, Edit2, CheckCircle, XCircle, Mail, Copy, Check, AlertCircle } from 'lucide-react';
 import JobFormModal from '@/components/employer/JobFormModal';
 import {
@@ -60,8 +61,8 @@ export default function ManageJobsPage() {
     setLoadError('');
     try {
       const [all, plans] = await Promise.all([
-        base44.entities.Job.list('-created_date', 200),
-        base44.entities.CompensationPlan.list('', 100),
+        jobService.list({ sort: 'created_date', order: 'DESC', limit: 200 }),
+        compensationPlanService.list({ limit: 100 }),
       ]);
       setJobs(all);
       setCompensationPlans(plans);
@@ -101,7 +102,7 @@ export default function ManageJobsPage() {
   const handleEdit = (job) => { setEditingJob(job); setModalOpen(true); };
   const handleToggleClose = async (job) => {
     try {
-      await base44.entities.Job.update(job.id, { is_closed: !job.is_closed });
+      await jobService.update(job.id, { is_closed: !job.is_closed });
       toast.success(job.is_closed ? 'Job reopened' : 'Job closed');
       await loadJobs();
     } catch (error) {

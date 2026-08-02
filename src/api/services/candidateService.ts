@@ -1,67 +1,22 @@
-import { BaseRepository } from '@/api/repositories/baseRepository';
+import { ResourceService, ResourceQuery } from './resourceService';
 import { Candidate } from '@/types/entities';
-import { RepositoryOptions } from '@/types/api';
 
-export class CandidateService extends BaseRepository<Candidate> {
-  protected endpoint = '/candidates';
+export interface CandidateQuery extends ResourceQuery {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  order?: 'ASC' | 'DESC';
+  search?: string;
+  organization_id?: number;
+  recruiter_id?: number;
+  team_manager_id?: number;
+  status?: string;
+  is_deleted?: boolean;
+}
 
-  async searchCandidates(
-    query: string,
-    options?: RepositoryOptions
-  ): Promise<any> {
-    return this.list({
-      ...options,
-      filters: { ...options?.filters, search: query }
-    });
-  }
-
-  async getCandidatesByDomain(
-    domainId: number,
-    options?: RepositoryOptions
-  ): Promise<any> {
-    return this.list({
-      ...options,
-      filters: { ...options?.filters, domain_id: domainId }
-    });
-  }
-
-  async getCandidatesByRole(
-    roleId: number,
-    options?: RepositoryOptions
-  ): Promise<any> {
-    return this.list({
-      ...options,
-      filters: { ...options?.filters, role_id: roleId }
-    });
-  }
-
-  async uploadResume(
-    candidateId: string,
-    file: File
-  ): Promise<Candidate> {
-    const formData = new FormData();
-    formData.append('resume', file);
-
-    return this.patch(candidateId, { resume_filename: file.name });
-  }
-
-  async updateStatus(
-    candidateId: string,
-    status: string
-  ): Promise<Candidate> {
-    return this.patch(candidateId, { status });
-  }
-
-  async detectDuplicates(
-    candidateId: string
-  ): Promise<any> {
-    return this.httpClient.get(`${this.endpoint}/${candidateId}/duplicates`);
-  }
-
-  private get httpClient() {
-    const { httpClient } = require('@/api/client/httpClient');
-    return httpClient;
-  }
+export class CandidateService extends ResourceService<Candidate, CandidateQuery> {
+  constructor() { super('/candidates'); }
+  updateStatus(id: number | string, status: string) { return this.update(id, { status }); }
 }
 
 export const candidateService = new CandidateService();

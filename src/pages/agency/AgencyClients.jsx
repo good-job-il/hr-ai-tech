@@ -310,7 +310,7 @@ export default function AgencyClients() {
 
   const { data: clients = [], isLoading: clientsLoading, error: clientsError, refetch } = useQuery({
     queryKey: ['agency-clients-list', orgId],
-    queryFn: () => agencyClientService.list({}, 300),
+    queryFn: () => agencyClientService.list({ limit: 300, sort: 'name', order: 'ASC' }),
     enabled: !!orgId,
     staleTime: STALE_TIME,
   });

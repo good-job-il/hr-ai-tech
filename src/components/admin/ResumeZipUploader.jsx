@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import React, { useState } from 'react';
+import { candidateImportService } from '@/api/services/candidateImportService';
+import { fileService } from '@/api/services/fileService';
+import { staffService } from '@/api/services/staffService';
 import { Upload, AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import ResumeImportReview from './ResumeImportReview';
@@ -22,7 +24,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
   const { data: staffMembers = [] } = useQuery({
     queryKey: ['staff-members'],
     queryFn: async () => {
-      const result = await base44.entities.Staff.list('-created_date', 1000);
+      const result = await staffService.list({ sort: 'created_date', order: 'DESC', limit: 1000 });
       return result || [];
     }
   });
@@ -44,11 +46,11 @@ export default function ResumeZipUploader({ onImportComplete }) {
 
     try {
       // 1. Upload ZIP file
-      const uploadResult = await base44.integrations.Core.UploadFile({ file: zipFile });
+      const uploadResult = await fileService.upload(zipFile);
       const zipUrl = uploadResult.file_url;
 
       // 2. Create import batch record
-      const importBatch = await base44.entities.CandidateImportBatch.create({
+      const importBatch = await candidateImportService.create({
         organization_id: user?.organization_id,
         batch_name: zipFile.name.replace('.zip', ''),
         source_file: zipUrl,
@@ -64,7 +66,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
       });
 
       // 3. Parse resume batch
-      const parseResult = await base44.functions.invoke('parseResumeBatch', {
+      const parseResult = await candidateImportService.parseBatch({
         zip_file_url: zipUrl,
         import_batch_id: importBatch.id,
         employer_id: employerId || null,
@@ -109,7 +111,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
         onComplete={async () => {
           // Run validation after candidates created
           try {
-            const validation = await base44.functions.invoke('validateImportBatch', {
+            const validation = await candidateImportService.validateBatch({
               import_batch_id: parseResults.importBatchId
             });
             setValidationResults(validation.data);

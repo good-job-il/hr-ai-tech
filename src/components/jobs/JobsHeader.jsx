@@ -37,7 +37,7 @@ export default function JobsHeader() {
 
         <Link to="/" className="flex items-center flex-shrink-0">
           <img
-            src="https://media.base44.com/images/public/6a00f4b05ae5180d66425437/8183f1f0a_Gemini_Generated_Image_6uoodu6uoodu6uoo.png"
+            src="/logo.png"
             alt="HeadHunter HR-Tech"
             className="h-[58px] w-auto object-contain"
           />

@@ -11,6 +11,9 @@
     "typecheck": "tsc -p ./jsconfig.json",
     "test:agency-access": "node scripts/verify-agency-access.mjs",
     "test:agency-clients": "node scripts/verify-agency-clients.mjs",
+    "audit:legacy-api": "node scripts/audit-legacy-api.mjs",
+    "check:legacy-api": "node scripts/audit-legacy-api.mjs --check",
+    "test:phase-3-boundary": "node scripts/verify-phase-3-boundary.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { taxonomyService } from '@/api/services/taxonomyService';
+import { roleAliasService } from '@/api/services/permissionService';
 import { ChevronDown, ChevronUp, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 
@@ -12,22 +13,22 @@ export default function TaxonomyVerification() {
   // Fetch all data
   const { data: domains = [], isLoading: domainsLoading } = useQuery({
     queryKey: ['domains-verify'],
-    queryFn: () => base44.entities.Domain.list('-domain_id', 1000),
+    queryFn: () => taxonomyService.domains(),
   });
 
   const { data: roles = [], isLoading: rolesLoading } = useQuery({
     queryKey: ['roles-verify'],
-    queryFn: () => base44.entities.Role.list('-role_id', 1000),
+    queryFn: () => taxonomyService.roles(),
   });
 
   const { data: specializations = [], isLoading: specsLoading } = useQuery({
     queryKey: ['specializations-verify'],
-    queryFn: () => base44.entities.Specialization.list('-specialization_id', 1000),
+    queryFn: () => taxonomyService.specializations(),
   });
 
   const { data: aliases = [], isLoading: aliasesLoading } = useQuery({
     queryKey: ['aliases-verify'],
-    queryFn: () => base44.entities.RoleAlias.list('-created_date', 1000),
+    queryFn: () => roleAliasService.list({ limit: 1000 }),
   });
 
   const isLoading = domainsLoading || rolesLoading || specsLoading || aliasesLoading;
@@ -62,7 +63,7 @@ export default function TaxonomyVerification() {
     setLoading(true);
     setLoadResult(null);
     try {
-      const res = await base44.functions.invoke('loadTaxonomy', {});
+      const res = await taxonomyService.reload();
       setLoadResult(res.data);
     } catch (error) {
       setLoadResult({ success: false, error: error.message });

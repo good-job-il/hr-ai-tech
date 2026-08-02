@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { userService } from '@/api/services/userService';
+import { organizationService } from '@/api/services/organizationService';
 import {
   BriefcaseBusiness,
   Pencil,
@@ -259,13 +260,13 @@ export default function UsersManagementPage() {
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['platform-users'],
-    queryFn: () => base44.entities.User.list('-created_date', 500).catch(() => []),
+    queryFn: () => userService.list({ sort: 'created_date', order: 'DESC', limit: 500 }).catch(() => []),
     staleTime: 2 * 60 * 1000,
   });
 
   const { data: orgs = [] } = useQuery({
     queryKey: ['platform-orgs'],
-    queryFn: () => base44.entities.Organization.list('', 500),
+    queryFn: () => organizationService.list({ limit: 500 }),
     staleTime: 5 * 60 * 1000,
   });
 
@@ -273,7 +274,7 @@ export default function UsersManagementPage() {
 
   // ── Mutations ──
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.User.create(data),
+    mutationFn: (data) => userService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['platform-users'] });
       setModalOpen(false);
@@ -283,7 +284,7 @@ export default function UsersManagementPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.User.update(id, data),
+    mutationFn: ({ id, data }) => userService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['platform-users'] });
       setModalOpen(false);
@@ -294,7 +295,7 @@ export default function UsersManagementPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.User.delete(id),
+    mutationFn: (id) => userService.remove(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['platform-users'] });
       setDeleteTarget(null);

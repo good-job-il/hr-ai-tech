@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
-import { httpClient } from '@/api/client/httpClient';
 import { tokenStorage } from '@/api/client/tokenStorage';
+import { authService } from '@/api/services/authService';
+import { organizationService } from '@/api/services/organizationService';
 
 const AuthContext = createContext();
 
@@ -44,15 +44,14 @@ export const AuthProvider = ({ children }) => {
     try {
       // Now check if the user is authenticated
       setIsLoadingAuth(true);
-      const currentUser = await base44.auth.me();
+      const currentUser = await authService.me();
 
       // עדכן last_login
       if (currentUser.user_type) {
-        base44.auth.updateMe({ last_login: new Date().toISOString() }).catch(() => {});
+        authService.updateMe({ last_login: new Date().toISOString() }).catch(() => {});
       }
 
       setUser(currentUser);
-      console.log(currentUser, "currentUser")
       setIsAuthenticated(true);
       setIsImpersonating(tokenStorage.hasWorkspaceToken());
 
@@ -60,10 +59,7 @@ export const AuthProvider = ({ children }) => {
       // This prevents ProtectedRoute from evaluating orgType before it's set
       if (currentUser?.organization_id) {
         try {
-          const results = await base44.entities.Organization.filter(
-            { id: currentUser.organization_id }, '', 1
-          );
-          const org = results?.[0] || null;
+          const org = await organizationService.get(currentUser.organization_id);
           setOrganization(org);
           setOrgType(org?.org_type || null);
         } catch (_) {
@@ -105,9 +101,7 @@ export const AuthProvider = ({ children }) => {
   // `user`/`organization`/`orgType` reflect the entered organization,
   // exactly as that organization's own users would see it.
   const enterOrganization = async (organizationId) => {
-    const { access_token, organization: org } = await httpClient.post(
-      `/auth/organizations/${organizationId}/enter`
-    );
+    const { access_token, organization: org } = await authService.enterOrganization(organizationId);
     tokenStorage.setWorkspaceToken(access_token, organizationId);
     await checkUserAuth();
     return org;
@@ -116,7 +110,7 @@ export const AuthProvider = ({ children }) => {
   // ── Admin: exit the current organization workspace ──────────────────────
   const exitOrganization = async () => {
     try {
-      await httpClient.post('/auth/organizations/exit');
+      await authService.exitOrganization();
     } catch (_) {
       // best-effort — proceed to drop the workspace token regardless
     }
@@ -131,7 +125,7 @@ export const AuthProvider = ({ children }) => {
 
     if (shouldRedirect) {
       const from = encodeURIComponent(window.location.pathname + window.location.search);
-      base44.auth.logout(`/login?from_url=${from}`);
+      authService.logout(`/login?from_url=${from}`);
     } else {
       // Just clear tokens, no navigation
       tokenStorage.clearTokens();

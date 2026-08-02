@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import { X, Calendar } from 'lucide-react';
 
 export default function InterviewModal({ application: app, onClose, onSaved }) {
@@ -19,7 +20,7 @@ export default function InterviewModal({ application: app, onClose, onSaved }) {
       return;
     }
     setLoading(true);
-    const user = await base44.auth.me();
+    const user = await authService.me();
     await base44.entities.Interview.create({
       ...form,
       application_id: app.id,

@@ -4,7 +4,7 @@
  * CSV export
  */
 import { Fragment, useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { auditService } from '@/api/services/auditService';
 import { useQuery } from '@tanstack/react-query';
 import {
   ShieldCheck, Filter, Download, Eye, FileText,
@@ -82,9 +82,13 @@ export default function AuditLogPage() {
       if (filters.entity_type) serverFilter.entity_type = filters.entity_type;
       if (filters.action) serverFilter.action = filters.action;
 
-      const fetched = Object.keys(serverFilter).length > 0
-        ? await base44.entities.AuditLog.filter(serverFilter, '-created_date', PAGE_SIZE, page * PAGE_SIZE)
-        : await base44.entities.AuditLog.list('-created_date', PAGE_SIZE, page * PAGE_SIZE);
+      const fetched = await auditService.list({
+        ...serverFilter,
+        sort: 'created_date',
+        order: 'DESC',
+        limit: PAGE_SIZE,
+        page: page + 1,
+      });
 
       // Client-side filter only for non-indexed fields
       return fetched.filter(log => {

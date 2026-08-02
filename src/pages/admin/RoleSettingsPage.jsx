@@ -4,7 +4,8 @@
  * Accessible by: admin, org_admin
  */
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { roleTemplateService } from '@/api/services/permissionService';
+import { auditService } from '@/api/services/auditService';
 import { useAuth } from '@/lib/AuthContext';
 import { Input } from '@/components/ui/input';
 import { RefreshCw, Users, Lock, Pencil, Check, X, ShieldAlert } from 'lucide-react';
@@ -139,7 +140,7 @@ export default function RoleSettingsPage() {
     setLoading(true);
     setError(null);
     try {
-      const all = await base44.entities.RoleTemplate.list('hierarchy_level', 200);
+      const all = await roleTemplateService.list({ sort: 'hierarchy_level', order: 'ASC', limit: 200 });
       setRecords(all);
     } catch (requestError) {
       setError({ status: requestError?.status || requestError?.response?.status || null });
@@ -172,10 +173,10 @@ export default function RoleSettingsPage() {
     );
 
     if (existing) {
-      await base44.entities.RoleTemplate.update(existing.id, { display_name: newDisplayName });
+      await roleTemplateService.update(existing.id, { display_name: newDisplayName });
     } else {
       // Create org-specific override based on global template
-      await base44.entities.RoleTemplate.create({
+      await roleTemplateService.create({
         organization_id: orgId,
         org_type: record.org_type,
         system_role_key: record.system_role_key,
@@ -189,7 +190,7 @@ export default function RoleSettingsPage() {
     }
 
     // AuditLog
-    await base44.functions.invoke('createAuditLog', {
+    await auditService.create({
       organization_id: orgId,
       actor_user_id: user?.id,
       actor_email: user?.email,

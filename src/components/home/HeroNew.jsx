@@ -169,7 +169,7 @@ export default function HeroNew() {
               animation: 'aiImgFloat 4s ease-in-out infinite',
             }}>
               <img
-                src="https://media.base44.com/images/public/6a00f4b05ae5180d66425437/06f8a09e2_7B9122B3-A8D2-46AE-98A2-BDE88BD3B6AC.png"
+                src="/logo.png"
                 alt="AI Head"
                 style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
               />

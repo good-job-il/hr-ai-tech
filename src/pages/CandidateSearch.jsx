@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import { Search, MapPin, Briefcase, Lock, Sliders } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EmployerLayout from '@/components/employer/EmployerLayout';
@@ -17,7 +18,7 @@ export default function CandidateSearch() {
   const { data: userEmail } = useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
-      const user = await base44.auth.me();
+      const user = await authService.me();
       return user?.email;
     },
   });

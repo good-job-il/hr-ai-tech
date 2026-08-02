@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { organizationService } from '@/api/services/organizationService';
 import { useAuth } from '@/lib/AuthContext';
 import { Building2, Search, Plus, CheckCircle, XCircle, Clock, Pencil, Trash2, MoreVertical, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -53,7 +53,7 @@ export default function OrganizationsPage() {
 
   const { data: orgs = [], isLoading } = useQuery({
     queryKey: ['platform-orgs'],
-    queryFn: () => base44.entities.Organization.list('-created_date', 500),
+    queryFn: () => organizationService.list({ sort: 'created_date', order: 'DESC', limit: 500 }),
     staleTime: 2 * 60 * 1000,
   });
 
@@ -67,7 +67,7 @@ export default function OrganizationsPage() {
   const handleCreate = async () => {
     if (!newOrg.name.trim()) return;
     setCreating(true);
-    await base44.entities.Organization.create({ ...newOrg, org_type: activeTab.orgType, status: 'active', plan: 'trial' });
+    await organizationService.create({ ...newOrg, org_type: activeTab.orgType, status: 'active', plan: 'trial' });
     await qc.invalidateQueries(['platform-orgs']);
     setNewOrg({ name: '', contact_email: '' });
     setShowModal(false);
@@ -83,7 +83,7 @@ export default function OrganizationsPage() {
     setSaving(true);
     const payload = { name: editOrg.name, plan: editOrg.plan, status: editOrg.status };
     if (editOrg.contact_email.trim()) payload.contact_email = editOrg.contact_email.trim();
-    await base44.entities.Organization.update(editOrg.id, payload);
+    await organizationService.update(editOrg.id, payload);
     await qc.invalidateQueries(['platform-orgs']);
     setEditOrg(null);
     setSaving(false);
@@ -92,7 +92,7 @@ export default function OrganizationsPage() {
   const handleDelete = async () => {
     if (!deleteOrg) return;
     setDeleting(true);
-    await base44.entities.Organization.delete(deleteOrg.id);
+    await organizationService.remove(deleteOrg.id);
     await qc.invalidateQueries(['platform-orgs']);
     setDeleteOrg(null);
     setDeleting(false);

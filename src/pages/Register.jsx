@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -96,7 +96,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      await base44.auth.register({
+      await authService.register({
         email,
         password,
         full_name: fullName,
@@ -107,13 +107,13 @@ export default function Register() {
       // Set org_type separately — not part of the core register payload
       if (requiresOrg && orgType) {
         try {
-          await base44.auth.updateMe({ org_type: orgType });
+          await authService.updateMe({ org_type: orgType });
         } catch (updateErr) {
           console.warn('[Register] updateMe(org_type) failed:', updateErr);
         }
       }
 
-      localStorage.setItem('base44_registered_role', userType);
+      localStorage.setItem('registered_role', userType);
 
       const redirects = {
         candidate: '/candidate/dashboard',
@@ -138,16 +138,12 @@ export default function Register() {
     }
   };
 
-  const handleGoogle = () => {
-    base44.auth.loginWithProvider('google', '/');
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12" dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'linear-gradient(135deg, #eaf7fb 0%, #d4edfa 100%)' }}>
       <div className="w-full max-w-md">
         <div ref={cardRef} className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
           <div className="text-center mb-6">
-            <img src="https://media.base44.com/images/public/6a00f4b05ae5180d66425437/e31fa83ee_232B9533-1BE6-4299-80F9-1B99BFDA97E1.png" alt="HeadHunter HR-Tech" className="h-16 w-auto object-contain mx-auto mb-4" />
+            <img src="/logo.png" alt="HeadHunter HR-Tech" className="h-16 w-auto object-contain mx-auto mb-4" />
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
               {isRtl ? 'הצטרף לHeadHunter' : 'Join HeadHunter'}
             </h1>
@@ -296,22 +292,6 @@ export default function Register() {
                </Button>
              </form>
 
-              <div className="relative my-7">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-white px-3 text-xs font-medium text-gray-400">{t('auth.register.or')}</span>
-                </div>
-              </div>
-
-              <Button
-                onClick={handleGoogle}
-                variant="outline"
-                className="w-full h-12 text-sm font-semibold border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg"
-              >
-                🔵 {t('auth.register.continueGoogle')}
-              </Button>
             </>
 
           <p className="text-center text-sm text-gray-600 mt-7">

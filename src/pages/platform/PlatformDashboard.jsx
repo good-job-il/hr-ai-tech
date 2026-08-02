@@ -35,7 +35,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { base44 } from '@/api/base44Client';
+import { organizationService } from '@/api/services/organizationService';
+import { userService } from '@/api/services/userService';
+import { auditService } from '@/api/services/auditService';
 import { Button } from '@/components/ui/Button';
 import {
   formatPlatformNumber,
@@ -87,9 +89,9 @@ export default function PlatformDashboard() {
     setLoadError('');
     try {
       const [orgs, users, auditLogs] = await Promise.all([
-        base44.entities.Organization.list('', 500),
-        base44.entities.User.list('', 500).catch(() => []),
-        base44.entities.AuditLog.list('-created_date', 100).catch(() => []),
+        organizationService.list({ limit: 500 }),
+        userService.list({ limit: 500 }).catch(() => []),
+        auditService.list({ sort: 'created_date', order: 'DESC', limit: 100 }).catch(() => []),
       ]);
       const agencies = orgs.filter(org => org.org_type === 'staffing_agency');
       const companies = orgs.filter(org => org.org_type === 'organization');
@@ -167,7 +169,7 @@ export default function PlatformDashboard() {
     if (!newOrgName.trim()) return;
     setCreatingOrg(true);
     try {
-      await base44.entities.Organization.create({
+      await organizationService.create({
         name: newOrgName.trim(),
         org_type: newOrgType,
         status: 'active',

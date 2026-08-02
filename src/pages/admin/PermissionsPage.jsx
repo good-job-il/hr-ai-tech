@@ -3,7 +3,8 @@
  * Accessible only by: admin, org_admin
  */
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { permissionMatrixService } from '@/api/services/permissionService';
+import { auditService } from '@/api/services/auditService';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Save, RefreshCw, ShieldCheck, Lock, ShieldAlert } from 'lucide-react';
@@ -65,7 +66,7 @@ export default function PermissionsPage() {
     setLoading(true);
     setError(null);
     try {
-      const all = await base44.entities.PermissionMatrix.list('', 200);
+      const all = await permissionMatrixService.list({ limit: 200 });
       setAllRecords(all);
       buildMatrix(all);
       setDirty({});
@@ -110,9 +111,9 @@ export default function PermissionsPage() {
 
     let savedRecord;
     if (existing) {
-      savedRecord = await base44.entities.PermissionMatrix.update(existing.id, { permissions: perms });
+      savedRecord = await permissionMatrixService.update(existing.id, { permissions: perms });
     } else {
-      savedRecord = await base44.entities.PermissionMatrix.create({
+      savedRecord = await permissionMatrixService.create({
         organization_id: orgId,
         org_type: orgType,
         role_key: roleKey,
@@ -122,7 +123,7 @@ export default function PermissionsPage() {
     }
 
     // Audit log
-    await base44.functions.invoke('createAuditLog', {
+    await auditService.create({
       organization_id: orgId,
       actor_user_id: user.id,
       actor_email: user.email,

@@ -1,15 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { importSourceService } from '@/api/services/importSourceService';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { AlertCircle, CheckCircle, Clock, Loader2, TrendingUp, RefreshCw } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, Loader2, RefreshCw } from 'lucide-react';
 
 export default function ImportMonitoring() {
   const [sortBy, setSortBy] = useState('last_sync');
 
   const { data: sources = [], isLoading, refetch } = useQuery({
     queryKey: ['import-sources-monitoring'],
-    queryFn: () => base44.asServiceRole.entities.ImportSource.list('-last_sync', 100),
+    queryFn: () => importSourceService.list({ sort: 'last_sync', order: 'DESC', limit: 100 }),
     refetchInterval: 30000, // Auto-refresh every 30s
   });
 

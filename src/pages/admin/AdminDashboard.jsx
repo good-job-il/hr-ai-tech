@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { analyticsService } from '@/api/services/analyticsService';
 import { Link } from 'react-router-dom';
 import {
-  Users, Building2, Briefcase, Activity, TrendingUp, AlertCircle, FileText,
+  Users, Building2, Briefcase, Activity, AlertCircle, FileText,
   RefreshCw, CheckCircle2, XCircle, Clock, Download, Zap, ArrowUpRight, ArrowDownRight,
   BarChart3, UserPlus, Shield, Database, PieChart
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RePieChart, Pie, Cell } from 'recharts';
 
 // ── Stat Card with % change ──────────────────────────────────────────────────
 function StatCard({ icon: Icon, label, value, change, color = '#7C3AED', loading }) {
@@ -86,7 +86,7 @@ export default function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const res = await base44.functions.invoke('getDashboardStats', {});
+      const res = await analyticsService.dashboard();
       setStats(res.data);
       setLastUpdated(new Date());
     } catch (e) {

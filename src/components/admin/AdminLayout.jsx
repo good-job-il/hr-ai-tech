@@ -5,7 +5,7 @@ import {
   Tag, Bot, Shield, Settings, Bell, Send, Home, LogOut,
   Menu, X, ChevronRight, Search, TrendingUp, FileText, Sparkles
 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import { useAuth } from '@/lib/AuthContext';
 
 const LOGO = '/headhunter-logo.png';
@@ -88,7 +88,7 @@ export default function AdminLayout({ children }) {
           </Link>
 
           <button
-            onClick={() => base44.auth.logout('/')}
+            onClick={() => authService.logout('/')}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-[#64748B] hover:bg-red-50 hover:text-red-500"
           >
             <LogOut className="w-4 h-4" /> יציאה

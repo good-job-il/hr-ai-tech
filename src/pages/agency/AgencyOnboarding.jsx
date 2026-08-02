@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { organizationsApi } from '@/api/base44Client';
+import { organizationService } from '@/api/services/organizationService';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,7 +46,7 @@ export default function AgencyOnboarding() {
 
     setLoading(true);
     try {
-      await organizationsApi.onboardAgency({
+      await organizationService.onboardAgency({
         name: name.trim(),
         contact_email: contactEmail.trim() || undefined,
       });
@@ -133,5 +133,4 @@ export default function AgencyOnboarding() {
     </div>
   );
 }
-
 

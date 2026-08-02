@@ -5,12 +5,13 @@
  */
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { candidateImportService } from '@/api/services/candidateImportService';
+import { fileService } from '@/api/services/fileService';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Upload, CheckCircle2, AlertTriangle, Clock, RefreshCw,
-  Users, FileText, Zap, Eye, Play, ChevronDown, ChevronUp,
+  Users, FileText, Eye, Play, ChevronDown, ChevronUp,
   Download, XCircle, Info, FileScan
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -45,7 +46,7 @@ export default function ImportDashboard() {
 
   const { data: batches = [], refetch } = useQuery({
     queryKey: ['import-batches'],
-    queryFn: () => base44.entities.CandidateImportBatch.list('-created_date', 50),
+    queryFn: () => candidateImportService.list({ sort: 'created_date', order: 'DESC', limit: 50 }),
     refetchInterval: (query) => {
       const data = query.state?.data;
       const hasActive = Array.isArray(data) && data.some(b => b.status === 'in_progress');
@@ -59,8 +60,8 @@ export default function ImportDashboard() {
     setUploading(true);
     setUploadMsg(null);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      const batch = await base44.entities.CandidateImportBatch.create({
+      const { file_url } = await fileService.upload(file);
+      const batch = await candidateImportService.create({
         organization_id: user?.organization_id,
         batch_name: `${file.name.replace(/\.[^/.]+$/, '')} — ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: he })}`,
         source_file: file.name,
@@ -71,7 +72,7 @@ export default function ImportDashboard() {
         recruitment_manager_id: user?.recruitment_manager_id,
         status: 'pending',
       });
-      const res = await base44.functions.invoke('importCandidatesFromFile', {
+      const res = await candidateImportService.importCandidates({
         fileUrl: file_url,
         batchId: batch.id,
         fileName: file.name,
@@ -95,8 +96,8 @@ export default function ImportDashboard() {
     try {
       const blob = new Blob([TEST_CSV], { type: 'text/csv' });
       const testFile = new File([blob], 'validation_test.csv', { type: 'text/csv' });
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: testFile });
-      const batch = await base44.entities.CandidateImportBatch.create({
+      const { file_url } = await fileService.upload(testFile);
+      const batch = await candidateImportService.create({
         organization_id: user?.organization_id,
         batch_name: `Validation Test — ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: he })}`,
         source_file: 'validation_test.csv',
@@ -107,7 +108,7 @@ export default function ImportDashboard() {
         recruitment_manager_id: user?.recruitment_manager_id,
         status: 'pending',
       });
-      const res = await base44.functions.invoke('importCandidatesFromFile', {
+      const res = await candidateImportService.importCandidates({
         fileUrl: file_url,
         batchId: batch.id,
         fileName: 'validation_test.csv',
@@ -138,7 +139,7 @@ export default function ImportDashboard() {
   const retryBatch = async (batch) => {
     if (!batch.source_file) return;
     setUploadMsg({ type: 'success', text: `מנסה שוב batch: ${batch.batch_name}...` });
-    await base44.entities.CandidateImportBatch.update(batch.id, { status: 'pending', retry_count: (batch.retry_count || 0) + 1 });
+    await candidateImportService.update(batch.id, { status: 'pending', retry_count: (batch.retry_count || 0) + 1 });
     refetch();
   };
 

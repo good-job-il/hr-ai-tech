@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,9 +20,9 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await base44.auth.loginViaEmailPassword(email, password);
+      await authService.login(email, password);
       
-      const user = await base44.auth.me();
+      const user = await authService.me();
       const role = user.role || user.user_type || '';
       const redirects = {
         candidate: '/candidate/dashboard',
@@ -47,15 +47,11 @@ export default function Login() {
     }
   };
 
-  const handleGoogle = () => {
-    base44.auth.loginWithProvider('google', '/');
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4" dir={isRtl ? 'rtl' : 'ltr'} style={{ backgroundColor: '#eaf7fb' }}>
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
         <div className="text-center mb-6">
-          <img src="https://media.base44.com/images/public/6a00f4b05ae5180d66425437/e31fa83ee_232B9533-1BE6-4299-80F9-1B99BFDA97E1.png" alt="HeadHunter HR-Tech" className="h-16 w-auto object-contain mx-auto mb-3" />
+          <img src="/logo.png" alt="HeadHunter HR-Tech" className="h-16 w-auto object-contain mx-auto mb-3" />
           <h1 className="text-xl font-bold text-gray-900">{t('auth.login.title')}</h1>
           <p className="text-sm text-gray-500 mt-1">{t('auth.login.subtitle')}</p>
         </div>
@@ -82,15 +78,6 @@ export default function Login() {
             {loading ? t('auth.login.loggingIn') : t('auth.login.loginButton')}
           </Button>
         </form>
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
-          <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-gray-400">{t('auth.login.or')}</span></div>
-        </div>
-
-        <Button onClick={handleGoogle} variant="outline" className="w-full h-11 text-sm font-medium">
-          {t('auth.login.continueGoogle')}
-        </Button>
 
         <p className="text-center text-sm text-gray-500 mt-6">
           {t('auth.login.noAccount')}{' '}

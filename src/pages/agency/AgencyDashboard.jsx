@@ -63,7 +63,7 @@ export default function AgencyDashboard() {
 
   const { data: clients = [], isLoading: clientsLoading, isError: clientsError } = useQuery({
     queryKey: ['agency-clients', orgId],
-    queryFn: () => agencyClientService.list({ status: 'active' }, 100),
+    queryFn: () => agencyClientService.list({ status: 'active', limit: 100 }),
     enabled: !!orgId,
     staleTime: DASHBOARD_STALE_TIME,
     cacheTime: DASHBOARD_CACHE_TIME,

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { organizationService } from '@/api/services/organizationService';
 import {
   Flag, Search, Building2, ChevronDown, ChevronUp,
   Zap, BarChart3, Users, Shield, Cpu, Globe, Layers, DollarSign, Save,
@@ -283,7 +283,7 @@ function OrgOverridesTab() {
 
   const { data: orgs = [], isLoading } = useQuery({
     queryKey: ['platform-orgs'],
-    queryFn: () => base44.entities.Organization.list('-created_date', 500),
+    queryFn: () => organizationService.list({ sort: 'created_date', order: 'DESC', limit: 500 }),
     staleTime: 2 * 60 * 1000,
   });
 
@@ -319,7 +319,7 @@ function OrgOverridesTab() {
     if (!flags) return;
     setSaving(prev => ({ ...prev, [org.id]: true }));
     try {
-      await base44.entities.Organization.update(org.id, {
+      await organizationService.update(org.id, {
         settings: { ...(org.settings || {}), feature_flags: flags },
       });
       qc.invalidateQueries(['platform-orgs']);

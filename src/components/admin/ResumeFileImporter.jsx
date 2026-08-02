@@ -4,11 +4,12 @@
  * Shows per-file progress, conversion status, parsing results.
  */
 import { useState, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
+import { candidateImportService } from '@/api/services/candidateImportService';
+import { fileService } from '@/api/services/fileService';
 import { useAuth } from '@/lib/AuthContext';
 import {
   Upload, FileText, CheckCircle2, XCircle, AlertTriangle,
-  RefreshCw, Loader2, ChevronDown, ChevronUp, FileCheck2
+  Loader2, ChevronDown, ChevronUp, FileCheck2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
@@ -135,7 +136,7 @@ export default function ResumeFileImporter({ onImportComplete }) {
       // Upload all files to storage
       const uploaded = [];
       for (const file of files) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        const { file_url } = await fileService.upload(file);
         uploaded.push({
           file_url,
           filename: file.name,
@@ -144,7 +145,7 @@ export default function ResumeFileImporter({ onImportComplete }) {
       }
 
       // Create batch record
-      const batch = await base44.entities.CandidateImportBatch.create({
+      const batch = await candidateImportService.create({
         organization_id: user?.organization_id,
         batch_name: `Resume Import ${files.length} קבצים — ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: he })}`,
         source_file: files.map(f => f.name).join(', '),
@@ -157,7 +158,7 @@ export default function ResumeFileImporter({ onImportComplete }) {
       });
 
       // Call importResumeFiles backend function
-      const res = await base44.functions.invoke('importResumeFiles', {
+      const res = await candidateImportService.importResumes({
         files: uploaded,
         batchId: batch.id,
         employer_id: '',

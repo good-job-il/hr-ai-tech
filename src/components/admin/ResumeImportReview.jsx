@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { candidateImportService } from '@/api/services/candidateImportService';
 import { AlertCircle, CheckCircle2, Loader2, ArrowRight, Mail, Phone, Briefcase } from 'lucide-react';
 import DuplicateResolveModal from './DuplicateResolveModal';
 
@@ -35,13 +35,13 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
       }
 
       // Create bulk candidates
-      const createResult = await base44.functions.invoke('createBulkCandidates', {
+      const createResult = await candidateImportService.createBulk({
         candidates_data: candidatesToCreate.map(c => c.data),
         import_batch_id: results.importBatchId
       });
 
       // Update import batch final status
-      await base44.entities.CandidateImportBatch.update(results.importBatchId, {
+      await candidateImportService.update(results.importBatchId, {
         successful_imports: createResult.data.created.length,
         failed_imports: createResult.data.failed.length,
         duplicate_found: Object.values(resolvedDuplicates).filter(r => r.action === 'merge').length,

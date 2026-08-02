@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import { useAuth } from '@/lib/AuthContext';
 import { Building2, Mail, Phone, User, Save, Check } from 'lucide-react';
 
@@ -28,7 +28,7 @@ export default function EmployerSettingsPage() {
   const handleSave = async () => {
     setLoading(true);
     try {
-      await base44.auth.updateMe({
+      await authService.updateMe({
         full_name: form.contact_name,
       });
       setSaved(true);

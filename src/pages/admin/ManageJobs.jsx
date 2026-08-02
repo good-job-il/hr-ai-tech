@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { jobService } from '@/api/services/jobService';
 import { ToggleLeft, ToggleRight, Trash2, Search } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 
@@ -18,16 +18,16 @@ export default function AdminManageJobs() {
 
   const { data: jobs = [], isLoading } = useQuery({
     queryKey: ['admin-all-jobs'],
-    queryFn: () => base44.entities.Job.list('-created_date', 200),
+    queryFn: () => jobService.list({ sort: 'created_date', order: 'DESC', limit: 200 }),
   });
 
   const toggleCloseMutation = useMutation({
-    mutationFn: (job) => base44.entities.Job.update(job.id, { is_closed: !job.is_closed }),
+    mutationFn: (job) => jobService.update(job.id, { is_closed: !job.is_closed }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-all-jobs'] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Job.delete(id),
+    mutationFn: (id) => jobService.remove(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-all-jobs'] }),
   });
 

@@ -37,7 +37,7 @@ function HHLogo() {
   return (
     <Link to="/" className="flex items-center select-none" style={{ textDecoration: 'none' }}>
       <img
-        src="https://media.base44.com/images/public/6a00f4b05ae5180d66425437/8183f1f0a_Gemini_Generated_Image_6uoodu6uoodu6uoo.png"
+        src="/logo.png"
         alt="HeadHunter HR-Tech"
         style={{ height: 48, width: 'auto', objectFit: 'contain', imageRendering: 'crisp-edges' }}
       />

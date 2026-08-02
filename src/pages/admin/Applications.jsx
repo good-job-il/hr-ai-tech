@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { applicationService } from '@/api/services/applicationService';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Search, FileText, ExternalLink } from 'lucide-react';
 
@@ -48,7 +48,7 @@ export default function AdminApplications() {
 
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ['admin-all-applications'],
-    queryFn: () => base44.entities.Application.list('-created_date', 500),
+    queryFn: () => applicationService.list({ sort: 'created_date', order: 'DESC', limit: 500 }),
   });
 
   // Unique employers for filter

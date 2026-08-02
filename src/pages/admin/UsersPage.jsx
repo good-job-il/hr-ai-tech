@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { userService } from '@/api/services/userService';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { Pencil, User, Mail } from 'lucide-react';
@@ -25,7 +25,7 @@ export default function AdminUsersPage() {
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['admin-users', companyFilter],
     queryFn: async () => {
-      const allUsers = await base44.entities.User.list();
+      const allUsers = await userService.list({ limit: 500 });
       // Admin sees all, employer sees only their company
       if (companyFilter) {
         return allUsers.filter(u => u.data?.company_id === companyFilter);
@@ -36,7 +36,7 @@ export default function AdminUsersPage() {
 
   const updateName = useMutation({
     mutationFn: async ({ userId, newName }) => {
-      return await base44.entities.User.update(userId, { full_name: newName });
+      return await userService.update(userId, { full_name: newName });
     },
     onSuccess: async () => {
       setEditingUser(null);

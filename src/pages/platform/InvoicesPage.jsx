@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { organizationService } from '@/api/services/organizationService';
 import {
   CheckCircle,
   Clock,
@@ -63,7 +63,7 @@ export default function InvoicesPage() {
 
   const { data: orgs = [], isLoading } = useQuery({
     queryKey: ['platform-orgs'],
-    queryFn: () => base44.entities.Organization.list('-created_date', 500),
+    queryFn: () => organizationService.list({ sort: 'created_date', order: 'DESC', limit: 500 }),
     staleTime: 2 * 60 * 1000,
   });
 

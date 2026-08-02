@@ -1,17 +1,16 @@
 /**
- * base44Client — Base44 SDK compatibility shim (Phase 5 of the NestJS migration).
+ * @deprecated Removal in progress. Do not add entities, methods or new imports.
+ * Temporary Base44 compatibility shim for consumers scheduled in Phases 4–6.
  *
  * Historically the entire frontend (~130 files) called `base44.entities.X.*`,
- * `base44.auth.*`, `base44.functions.invoke(...)` and `base44.integrations.Core.*`
+ * `base44.functions.invoke(...)` and `base44.integrations.Core.*`
  * directly against the Base44 backend-as-a-service SDK.
  *
- * Instead of rewriting every call site, this module re-implements the same
- * `base44` surface on top of the new NestJS REST API (via `httpClient`), so
- * all existing call sites keep working unchanged. See
- * `docs/NESTJS_MIGRATION_PLAN.md` §6 "Compatibility Shim Strategy".
+ * It re-implements the remaining legacy surface on top of NestJS REST. The
+ * CI allowlist prevents this surface from growing; migrated domains must use
+ * explicit services from `src/api/services`.
  */
 import { httpClient } from '@/api/client/httpClient';
-import { tokenStorage } from '@/api/client/tokenStorage';
 
 // ─────────────────────────────────────────────────────────────────────────
 // Entity → REST endpoint configuration
@@ -264,86 +263,6 @@ const entities = new Proxy(
 );
 
 // ─────────────────────────────────────────────────────────────────────────
-// Auth — maps to the NestJS JWT auth endpoints (see backend/src/auth)
-// ─────────────────────────────────────────────────────────────────────────
-const auth = {
-  async me() {
-    return httpClient.get('/auth/me', { cache: false });
-  },
-
-  async loginViaEmailPassword(email, password) {
-    const res = await httpClient.post('/auth/login', { email, password });
-    tokenStorage.setTokens(res.access_token, res.refresh_token);
-    return res.user;
-  },
-
-  async register(data) {
-    const res = await httpClient.post('/auth/register', data);
-    tokenStorage.setTokens(res.access_token, res.refresh_token);
-    return res.user;
-  },
-
-  async updateMe(data) {
-    return httpClient.patch('/auth/me', data);
-  },
-
-  async logout(redirectUrl) {
-    try {
-      await httpClient.post('/auth/logout');
-    } catch (_) {
-      // best-effort — proceed to clear local tokens regardless
-    }
-    tokenStorage.clearTokens();
-    if (typeof window !== 'undefined') {
-      window.location.href = typeof redirectUrl === 'string' ? redirectUrl : '/login';
-    }
-  },
-
-  async resetPasswordRequest(email) {
-    return httpClient.post('/auth/forgot-password', { email });
-  },
-
-  async resetPassword(a, b) {
-    const isObj = a && typeof a === 'object';
-    const token = isObj ? (a.resetToken || a.token) : a;
-    const password = isObj ? (a.newPassword || a.password) : b;
-    return httpClient.post('/auth/reset-password', { token, password });
-  },
-
-  setToken(token) {
-    tokenStorage.setAccessToken(token);
-  },
-
-  redirectToLogin() {
-    if (typeof window !== 'undefined') {
-      window.location.href = '/login';
-    }
-  },
-
-  // Not implemented by the NestJS backend yet (kept as clear, safe no-ops).
-  loginWithProvider() {
-    throw new Error('Social login is not available yet — please use email/password.');
-  },
-  async verifyOtp() {
-    throw new Error('OTP verification is no longer required — registration completes immediately.');
-  },
-  async resendOtp() {
-    throw new Error('OTP verification is no longer required — registration completes immediately.');
-  },
-};
-
-// ─────────────────────────────────────────────────────────────────────────
-// Organizations — self-service onboarding helpers (beyond the generic
-// entities.Organization CRUD shim above)
-// ─────────────────────────────────────────────────────────────────────────
-export const organizationsApi = {
-  /** org_admin, no organization yet → create their own staffing agency */
-  async onboardAgency(data) {
-    return httpClient.post('/organizations/onboard-agency', data);
-  },
-};
-
-// ─────────────────────────────────────────────────────────────────────────
 // Functions — maps `functions.invoke(name, params)` → `POST /functions/:name`
 // ─────────────────────────────────────────────────────────────────────────
 const functions = new Proxy(
@@ -394,7 +313,6 @@ const asServiceRole = {
 
 export const base44 = {
   entities,
-  auth,
   functions,
   integrations,
   asServiceRole,

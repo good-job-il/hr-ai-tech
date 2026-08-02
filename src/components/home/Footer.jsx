@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Linkedin, Facebook, Instagram, Youtube } from 'lucide-react';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
-const LOGO = "https://media.base44.com/images/public/6a00f4b05ae5180d66425437/e31fa83ee_232B9533-1BE6-4299-80F9-1B99BFDA97E1.png";
+const LOGO = '/logo.png';
 
 export default function Footer() {
   const { t, i18n } = useTranslation();

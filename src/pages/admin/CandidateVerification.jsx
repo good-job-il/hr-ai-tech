@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { candidateService } from '@/api/services/candidateService';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { AlertTriangle, CheckCircle2, Users } from 'lucide-react';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
 const CandidateVerification = () => {
@@ -10,7 +10,7 @@ const CandidateVerification = () => {
   const { data: candidates = [], isLoading } = useQuery({
     queryKey: ['all-candidates'],
     queryFn: async () => {
-      const result = await base44.asServiceRole.entities.Candidate.list('-created_date', 1000);
+      const result = await candidateService.list({ sort: 'created_date', order: 'DESC', limit: 1000 });
       return result || [];
     },
   });

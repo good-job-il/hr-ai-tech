@@ -8,7 +8,8 @@
  */
 import React, { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { candidateAccessService } from '@/api/services/candidateAccessService';
+import { organizationService } from '@/api/services/organizationService';
 import {
   Building2, Share2, CreditCard, Users, TrendingUp,
   Eye, EyeOff, Search, RefreshCw, Info, BarChart2, SlidersHorizontal,
@@ -61,13 +62,13 @@ export default function MarketplaceExposurePage() {
 
   const { data: accesses = [], isLoading: loadingAccesses } = useQuery({
     queryKey: ['marketplace-accesses'],
-    queryFn: () => base44.entities.CandidateAccess.list('-created_date', 2000),
+    queryFn: () => candidateAccessService.list({ sort: 'created_date', order: 'DESC', limit: 2000 }),
     staleTime: 2 * 60 * 1000,
   });
 
   const { data: orgs = [], isLoading: loadingOrgs } = useQuery({
     queryKey: ['platform-orgs'],
-    queryFn: () => base44.entities.Organization.list('', 500),
+    queryFn: () => organizationService.list({ limit: 500 }),
     staleTime: 5 * 60 * 1000,
   });
 

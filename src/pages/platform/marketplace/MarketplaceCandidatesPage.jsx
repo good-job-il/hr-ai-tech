@@ -5,7 +5,8 @@
  */
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { candidateAccessService } from '@/api/services/candidateAccessService';
+import { organizationService } from '@/api/services/organizationService';
 import {
   Users, Search, Plus, Share2, CreditCard, CheckCircle,
   XCircle, Clock, Trash2, Filter, RefreshCw,
@@ -166,13 +167,13 @@ export default function MarketplaceCandidatesPage() {
 
   const { data: accesses = [], isLoading } = useQuery({
     queryKey: ['marketplace-accesses'],
-    queryFn: () => base44.entities.CandidateAccess.list('-created_date', 1000),
+    queryFn: () => candidateAccessService.list({ sort: 'created_date', order: 'DESC', limit: 1000 }),
     staleTime: 2 * 60 * 1000,
   });
 
   const { data: orgs = [] } = useQuery({
     queryKey: ['platform-orgs'],
-    queryFn: () => base44.entities.Organization.list('', 500),
+    queryFn: () => organizationService.list({ limit: 500 }),
     staleTime: 5 * 60 * 1000,
   });
 
@@ -207,19 +208,19 @@ export default function MarketplaceCandidatesPage() {
   };
 
   const handleGrant = async (data) => {
-    await base44.entities.CandidateAccess.create(data);
+    await candidateAccessService.create(data);
     qc.invalidateQueries(['marketplace-accesses']);
     setShowGrant(false);
   };
 
   const handleRevoke = async (acc) => {
-    await base44.entities.CandidateAccess.update(acc.id, { is_active: false });
+    await candidateAccessService.update(acc.id, { is_active: false });
     qc.invalidateQueries(['marketplace-accesses']);
   };
 
   const handleDelete = async (acc) => {
     if (!window.confirm('Delete this access grant permanently?')) return;
-    await base44.entities.CandidateAccess.delete(acc.id);
+    await candidateAccessService.remove(acc.id);
     qc.invalidateQueries(['marketplace-accesses']);
   };
 

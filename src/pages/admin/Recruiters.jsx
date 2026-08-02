@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { staffService } from '@/api/services/staffService';
 import AdminLayout from '@/components/admin/AdminLayout';
 import HierarchyStaffSection from '@/components/employer/HierarchyStaffSection';
 import { Users } from 'lucide-react';
@@ -11,21 +11,21 @@ export default function AdminRecruiters() {
   // Load ALL staff across all companies for admin view
   const { data: staff = [], isLoading } = useQuery({
     queryKey: ['admin-all-staff'],
-    queryFn: () => base44.entities.Staff.list('-created_date', 200),
+    queryFn: () => staffService.list({ sort: 'created_date', order: 'DESC', limit: 200 }),
   });
 
   const addMutation = useMutation({
-    mutationFn: (data) => base44.entities.Staff.create(data),
+    mutationFn: (data) => staffService.create(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-all-staff'] }),
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Staff.update(id, data),
+    mutationFn: ({ id, data }) => staffService.update(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-all-staff'] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Staff.delete(id),
+    mutationFn: (id) => staffService.remove(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-all-staff'] }),
   });
 

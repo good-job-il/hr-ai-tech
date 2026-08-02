@@ -1,7 +1,7 @@
 import { ChevronDown, LogOut, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
 import Avatar from './Avatar';
 
 export function UserMenu({ user }) {
@@ -30,7 +30,7 @@ export function UserMenu({ user }) {
             הגדרות
           </Link>
           <button
-            onClick={() => base44.auth.logout('/')}
+            onClick={() => authService.logout('/')}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#EF4444] hover:bg-[#FEF2F2] transition-colors border-t border-[#E4ECFF]"
           >
             <LogOut className="w-4 h-4" />

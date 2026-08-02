@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { organizationService } from '@/api/services/organizationService';
 import {
   Building2,
   CheckCircle,
@@ -43,7 +43,7 @@ export default function SubscriptionsPage() {
 
   const { data: orgs = [], isLoading } = useQuery({
     queryKey: ['platform-orgs'],
-    queryFn: () => base44.entities.Organization.list('-created_date', 500),
+    queryFn: () => organizationService.list({ sort: 'created_date', order: 'DESC', limit: 500 }),
     staleTime: 2 * 60 * 1000,
   });
 
@@ -62,11 +62,11 @@ export default function SubscriptionsPage() {
   };
 
   const handleChangePlan = async (org, newPlan) => {
-    await base44.entities.Organization.update(org.id, { plan: newPlan });
+    await organizationService.update(org.id, { plan: newPlan });
   };
 
   const handleChangeStatus = async (org, newStatus) => {
-    await base44.entities.Organization.update(org.id, { status: newStatus });
+    await organizationService.update(org.id, { status: newStatus });
   };
 
   return (

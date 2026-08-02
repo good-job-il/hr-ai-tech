@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { base44 } from '@/api/base44Client';
+import { importSourceService } from '@/api/services/importSourceService';
+import { jobService } from '@/api/services/jobService';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Plus, RefreshCw, Trash2, Pencil, CheckCircle, XCircle, Clock,
+  Plus, Trash2, Pencil, CheckCircle, XCircle, Clock,
   Play, Globe, ChevronDown, ChevronUp, AlertTriangle, Search, FileText,
-  Loader2, ExternalLink, Layers, Eye
+  Loader2, ExternalLink, Layers
 } from 'lucide-react';
 
 const SOURCE_TYPES = [
@@ -118,9 +119,9 @@ function SourceFormModal({ source, onClose, onSaved }) {
     if (!form.name || !form.url) return;
     setSaving(true);
     if (source?.id) {
-      await base44.entities.ImportSource.update(source.id, form);
+      await importSourceService.update(source.id, form);
     } else {
-      await base44.entities.ImportSource.create({ ...form, last_sync_status: 'pending', jobs_added: 0, jobs_updated: 0, jobs_closed: 0 });
+      await importSourceService.create({ ...form, last_sync_status: 'pending', jobs_added: 0, jobs_updated: 0, jobs_closed: 0 });
     }
     setSaving(false);
     onSaved();
@@ -197,12 +198,12 @@ export default function ImportJobs() {
 
   const { data: sources = [], isLoading } = useQuery({
     queryKey: ['import-sources'],
-    queryFn: () => base44.entities.ImportSource.list('-created_date', 50),
+    queryFn: () => importSourceService.list({ sort: 'created_date', order: 'DESC', limit: 50 }),
     refetchInterval: 15000,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.ImportSource.delete(id),
+    mutationFn: (id) => importSourceService.remove(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['import-sources'] }),
   });
 
@@ -210,7 +211,7 @@ export default function ImportJobs() {
     setScanning(prev => ({ ...prev, [source.id]: true }));
     setScanResults(prev => ({ ...prev, [source.id]: null }));
     try {
-      const res = await base44.functions.invoke('crawlCareerPage', {
+      const res = await importSourceService.crawl({
         url: source.url,
         source_id: source.id,
         company_name: source.company_name || source.name,
@@ -229,7 +230,7 @@ export default function ImportJobs() {
     setQuickScanning(true);
     setQuickResult(null);
     try {
-      const res = await base44.functions.invoke('crawlCareerPage', {
+      const res = await importSourceService.crawl({
         url: quickUrl,
         company_name: quickName || 'חברה',
       });
@@ -256,7 +257,7 @@ export default function ImportJobs() {
   const { data: activeJobsCount = 0 } = useQuery({
     queryKey: ['active-jobs-count'],
     queryFn: async () => {
-      const jobs = await base44.entities.Job.filter({ is_closed: false });
+      const jobs = await jobService.list({ is_closed: false });
       return jobs.length;
     },
   });

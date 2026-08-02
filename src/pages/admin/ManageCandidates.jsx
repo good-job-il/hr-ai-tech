@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { applicationService } from '@/api/services/applicationService';
 import { Search, Trash2, Eye } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 
@@ -24,11 +24,11 @@ export default function AdminManageCandidates() {
 
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ['admin-all-applications'],
-    queryFn: () => base44.entities.Application.list('-created_date', 500),
+    queryFn: () => applicationService.list({ sort: 'created_date', order: 'DESC', limit: 500 }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Application.delete(id),
+    mutationFn: (id) => applicationService.remove(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-all-applications'] }),
   });
 

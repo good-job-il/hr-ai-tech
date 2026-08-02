@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, AlertTriangle, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, AlertCircle, ArrowRight } from 'lucide-react';
 
 export default function ImportValidationCheck({ results, onApprove, onBack }) {
   const checks = results.checks || {};

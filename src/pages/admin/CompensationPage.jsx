@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { compensationPlanService } from '@/api/services/compensationPlanService';
+import { jobService } from '@/api/services/jobService';
 import { useAuth } from '@/lib/AuthContext';
 import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
 import { Button } from '@/components/ui/button';
@@ -81,14 +82,14 @@ export default function CompensationPage() {
 
   const { data: plans = [], isLoading } = useQuery({
     queryKey: ['compensation-plans', orgId],
-    queryFn: () => base44.entities.CompensationPlan.filter({ organization_id: orgId }, '-created_date', 100),
+    queryFn: () => compensationPlanService.list({ organization_id: orgId, sort: 'created_date', order: 'DESC', limit: 100 }),
     enabled: !!orgId,
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: jobs = [] } = useQuery({
     queryKey: ['jobs-for-compensation', orgId],
-    queryFn: () => base44.entities.Job.filter({ organization_id: orgId, is_deleted: false }, '-created_date', 100),
+    queryFn: () => jobService.list({ organization_id: orgId, is_deleted: false, sort: 'created_date', order: 'DESC', limit: 100 }),
     enabled: !!orgId,
     staleTime: 5 * 60 * 1000,
   });
@@ -96,13 +97,13 @@ export default function CompensationPage() {
   const saveMutation = useMutation({
     mutationFn: (data) =>
       editing
-        ? base44.entities.CompensationPlan.update(editing.id, data)
-        : base44.entities.CompensationPlan.create({ ...data, organization_id: orgId, created_by_role: role }),
+        ? compensationPlanService.update(editing.id, data)
+        : compensationPlanService.create({ ...data, organization_id: orgId, created_by_role: role }),
     onSuccess: () => { qc.invalidateQueries(['compensation-plans', orgId]); setShowModal(false); },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.CompensationPlan.delete(id),
+    mutationFn: (id) => compensationPlanService.remove(id),
     onSuccess: () => qc.invalidateQueries(['compensation-plans', orgId]),
   });
 
