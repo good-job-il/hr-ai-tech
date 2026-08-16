@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Eye } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { publicJobService } from '@/api/services/publicJobService';
 import { useQuery } from '@tanstack/react-query';
 
 function JobCard({ job }) {
@@ -65,8 +64,7 @@ export default function RecommendedJobs() {
   const { data: jobs = [] } = useQuery({
     queryKey: ['recommended-jobs', selectedCity],
     queryFn: async () => {
-      const allJobs = await base44.entities.Job.list('-created_date', 100);
-      const openJobs = allJobs.filter(j => !j.is_closed);
+      const openJobs = await publicJobService.list({ is_closed: false, sort: 'created_date', order: 'DESC', limit: 100 });
       
       // Sort by proximity to selected city
       return openJobs.sort((a, b) => {

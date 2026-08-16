@@ -14,6 +14,8 @@ import { NoImpersonationGuard } from '../common/guards/no-impersonation.guard';
 import { UserEntity } from '../modules/users/user.entity';
 import { OrganizationEntity } from '../modules/organizations/organization.entity';
 import { AuditModule } from '../modules/audit/audit.module';
+import { IntegrationsModule } from '../modules/integrations/integrations.module';
+import type { SignOptions } from 'jsonwebtoken';
 
 @Module({
   imports: [
@@ -24,12 +26,13 @@ import { AuditModule } from '../modules/audit/audit.module';
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_SECRET', 'fallback-secret'),
         signOptions: {
-          expiresIn: config.get<string>('JWT_EXPIRES_IN', '15m'),
+          expiresIn: config.get<string>('JWT_EXPIRES_IN', '15m') as SignOptions['expiresIn'],
         },
       }),
     }),
     TypeOrmModule.forFeature([UserEntity, OrganizationEntity]),
     AuditModule,
+    IntegrationsModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -56,4 +59,3 @@ import { AuditModule } from '../modules/audit/audit.module';
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
-

@@ -74,13 +74,20 @@ export const QueryCandidatesSchema = z.object({
 });
 export class QueryCandidatesDto extends createZodDto(QueryCandidatesSchema) {}
 
+export const CreateCandidateImportBatchSchema = z.object({
+  batch_name: z.string().min(1).max(255),
+  source_file: z.string().max(500).optional().nullable(),
+  file_type: z.enum(['csv', 'xlsx', 'json', 'zip']),
+  employer_id: z.number().int().optional().nullable(),
+  recruiter_id: z.number().int().optional().nullable(),
+  team_manager_id: z.number().int().optional().nullable(),
+  recruitment_manager_id: z.number().int().optional().nullable(),
+  total_records: z.number().int().min(0).optional().default(0),
+});
+export class CreateCandidateImportBatchDto extends createZodDto(CreateCandidateImportBatchSchema) {}
+
 // ─── Create Candidate Note ────────────────────────────────────────────────
 export const CreateCandidateNoteSchema = z.object({
-  candidate_id: z.number().int(),
-  candidate_email: z.string().email().optional().nullable(),
-  author_email: z.string().email(),
-  author_name: z.string().optional().nullable(),
-  author_role: z.string().optional().nullable(),
   content: z.string().min(1),
   visibility: z.enum(['private', 'team', 'all', 'internal']).default('team').optional(),
   is_pinned: z.boolean().optional().default(false),
@@ -94,16 +101,13 @@ export class UpdateCandidateNoteDto extends createZodDto(UpdateCandidateNoteSche
 
 // ─── Create Candidate Tag ─────────────────────────────────────────────────
 export const CreateCandidateTagSchema = z.object({
-  candidate_id: z.number().int(),
   tag: z.string().min(1).max(100),
   color: z.string().optional().nullable(),
-  added_by: z.string().optional().nullable(),
 });
 export class CreateCandidateTagDto extends createZodDto(CreateCandidateTagSchema) {}
 
 // ─── Create Candidate Profile ─────────────────────────────────────────────
 export const CreateCandidateProfileSchema = z.object({
-  user_email: z.string().email(),
   full_name: z.string().min(1),
   phone: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
@@ -111,7 +115,7 @@ export const CreateCandidateProfileSchema = z.object({
   summary: z.string().optional().nullable(),
   skills: z.array(z.string()).optional().nullable(),
   experience_years: z.number().optional().nullable(),
-  education: z.array(z.any()).optional().nullable(),
+  education: z.union([z.array(z.any()), z.string()]).optional().nullable(),
   experience: z.array(z.any()).optional().nullable(),
   desired_salary_min: z.number().int().optional().nullable(),
   desired_salary_max: z.number().int().optional().nullable(),
@@ -127,13 +131,19 @@ export class UpdateCandidateProfileDto extends createZodDto(UpdateCandidateProfi
 
 // ─── Create Candidate Document ────────────────────────────────────────────
 export const CreateCandidateDocumentSchema = z.object({
-  candidate_email: z.string().email().optional().nullable(),
   doc_type: z.string().min(1).default('cv'),
   filename: z.string().min(1),
   file_url: z.string().min(1),
   file_size: z.number().optional().nullable(),
-  uploaded_by: z.string().optional().nullable(),
   is_latest_cv: z.boolean().optional().default(false),
 });
 export class CreateCandidateDocumentDto extends createZodDto(CreateCandidateDocumentSchema) {}
 
+export const CreateCandidateTimelineSchema = z.object({
+  event_type: z.string().min(1).max(100),
+  description: z.string().min(1),
+  metadata: z.record(z.any()).optional().nullable(),
+  is_visible_to_candidate: z.boolean().optional().default(false),
+  is_visible_to_employer: z.boolean().optional().default(false),
+});
+export class CreateCandidateTimelineDto extends createZodDto(CreateCandidateTimelineSchema) {}

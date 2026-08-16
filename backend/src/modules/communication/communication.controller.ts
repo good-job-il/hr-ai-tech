@@ -6,6 +6,7 @@ import {
   QueryCommunicationLogsDto,
   CreateEmployerTimelineDto,
   QueryEmployerTimelineDto,
+  PresentCandidateDto,
 } from './dto/communication.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -32,6 +33,13 @@ export class CommunicationController {
   create(@Body() dto: CreateCommunicationLogDto, @CurrentUser() u: UserEntity) {
     return this.svc.create(dto, u);
   }
+
+  @Post('present-candidate')
+  @Roles(...COMMUNICATION_WRITE_ROLES)
+  @HttpCode(HttpStatus.CREATED)
+  presentCandidate(@Body() dto: PresentCandidateDto, @CurrentUser() u: UserEntity) {
+    return this.svc.presentCandidate(dto, u);
+  }
 }
 
 @ApiTags('Employer Timeline')
@@ -41,15 +49,15 @@ export class EmployerTimelineController {
   constructor(private readonly svc: CommunicationService) {}
 
   @Get()
+  @Roles(UserRole.ADMIN)
   findAll(@Query() q: QueryEmployerTimelineDto) {
     return this.svc.getEmployerTimeline(q);
   }
 
   @Post()
-  @Roles(...COMMUNICATION_WRITE_ROLES)
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() dto: CreateEmployerTimelineDto) {
     return this.svc.createEmployerTimelineEvent(dto);
   }
 }
-

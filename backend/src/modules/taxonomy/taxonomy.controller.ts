@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { TaxonomyService } from './taxonomy.service';
 import { Public } from '../../common/decorators/public.decorator';
 
@@ -8,7 +8,7 @@ import { Public } from '../../common/decorators/public.decorator';
 export class TaxonomyController {
   constructor(private readonly service: TaxonomyService) {}
 
-  /** Load entire taxonomy in one request — mirrors base44.functions.invoke('loadTaxonomy') */
+  /** Load the complete taxonomy in one request. */
   @Public()
   @Get()
   @ApiOperation({ summary: 'Load all taxonomy data (domains, roles, specializations, etc.)' })
@@ -74,4 +74,3 @@ export class TaxonomyController {
     return this.service.getExperienceLevels();
   }
 }
-

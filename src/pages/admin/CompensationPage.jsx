@@ -82,7 +82,7 @@ export default function CompensationPage() {
 
   const { data: plans = [], isLoading } = useQuery({
     queryKey: ['compensation-plans', orgId],
-    queryFn: () => compensationPlanService.list({ organization_id: orgId, sort: 'created_date', order: 'DESC', limit: 100 }),
+    queryFn: () => compensationPlanService.list({ sort: 'created_date', order: 'DESC', limit: 100 }),
     enabled: !!orgId,
     staleTime: 5 * 60 * 1000,
   });
@@ -98,7 +98,7 @@ export default function CompensationPage() {
     mutationFn: (data) =>
       editing
         ? compensationPlanService.update(editing.id, data)
-        : compensationPlanService.create({ ...data, organization_id: orgId, created_by_role: role }),
+        : compensationPlanService.create(data),
     onSuccess: () => { qc.invalidateQueries(['compensation-plans', orgId]); setShowModal(false); },
   });
 

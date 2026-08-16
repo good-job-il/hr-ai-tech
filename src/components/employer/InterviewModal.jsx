@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
-import { authService } from '@/api/services/authService';
+import { interviewService } from '@/api/services/interviewService';
+import { applicationService } from '@/api/services/applicationService';
 import { X, Calendar } from 'lucide-react';
 
 export default function InterviewModal({ application: app, onClose, onSaved }) {
@@ -20,26 +20,13 @@ export default function InterviewModal({ application: app, onClose, onSaved }) {
       return;
     }
     setLoading(true);
-    const user = await authService.me();
-    await base44.entities.Interview.create({
+    await interviewService.create({
       ...form,
       application_id: app.id,
-      job_id: app.job_id,
-      job_title: app.job_title,
-      employer_id: user.email,
       candidate_name: app.candidate_name,
-      candidate_email: app.candidate_email,
-      status: 'scheduled',
     });
-    await base44.entities.Application.update(app.id, { status: 'phone_interview' });
-    
-    // Send email to candidate
-    await base44.integrations.Core.SendEmail({
-      to: app.candidate_email,
-      subject: `ראיון מוזמן - ${app.job_title}`,
-      body: `שלום ${app.candidate_name},\n\nמזל טוב! זמנו אתך לראיון עבור תפקיד ${app.job_title} ב${app.company}.\n\nפרטי הראיון:\nתאריך: ${form.date}\nשעה: ${form.time}\nסוג: ${form.type === 'video' ? 'וידאו' : form.type === 'phone' ? 'טלפון' : 'פיזי'}\n${form.location_or_link ? `קישור/כתובת: ${form.location_or_link}\n` : ''}\n${form.notes ? `הערות: ${form.notes}\n` : ''}\nבהצלחה!`
-    });
-    
+    await applicationService.updateStatus(app.id, 'phone_interview');
+
     setLoading(false);
     onSaved();
   };

@@ -4,12 +4,14 @@ import { BaseEntity } from '../../common/entities/base.entity';
 export const AUDIT_ENTITY_TYPES = [
   'Candidate', 'Application', 'Job', 'Company', 'CandidateDocument',
   'CompensationPlan', 'User', 'Organization', 'Interview', 'CommunicationLog',
+  'AgencyTeam', 'AgencyInvitation',
 ] as const;
 
 export const AUDIT_ACTIONS = [
   'view', 'create', 'update', 'delete', 'cv_download', 'cv_view',
   'status_change', 'send_to_employer', 'export', 'compensation_change',
   'login', 'impersonate', 'restore', 'role_display_name_update', 'permission_update',
+  'deactivate', 'resend', 'cancel',
 ] as const;
 
 @Entity('audit_logs')
@@ -54,4 +56,3 @@ export class AuditLogEntity extends BaseEntity {
   @Column({ name: 'user_agent', type: 'text', nullable: true })
   user_agent: string | null;
 }
-

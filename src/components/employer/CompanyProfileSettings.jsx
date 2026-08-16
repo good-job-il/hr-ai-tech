@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { base44 } from '@/api/base44Client';
+import { authService } from '@/api/services/authService';
+import { fileService } from '@/api/services/fileService';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Upload, Video, Image as ImageIcon } from 'lucide-react';
+import { Video, Image as ImageIcon } from 'lucide-react';
 
 export default function CompanyProfileSettings() {
   const { user } = useAuth();
@@ -17,9 +18,11 @@ export default function CompanyProfileSettings() {
 
   const updateCompanyProfileMutation = useMutation({
     mutationFn: async (data) => {
-      return base44.functions.invoke('updateCompanyProfile', {
-        companyEmail: user.email,
-        ...data
+      return authService.updateMe({
+        ...data,
+        benefits: typeof data.benefits === 'string'
+          ? data.benefits.split('\n').map(item => item.trim()).filter(Boolean)
+          : data.benefits,
       });
     },
     onSuccess: () => {
@@ -31,7 +34,7 @@ export default function CompanyProfileSettings() {
     const file = e.target.files[0];
     if (!file) return;
 
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await fileService.upload(file);
     setProfileData(prev => ({
       ...prev,
       gallery_urls: [...prev.gallery_urls, file_url]
@@ -42,7 +45,7 @@ export default function CompanyProfileSettings() {
     const file = e.target.files[0];
     if (!file) return;
 
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await fileService.upload(file);
     setProfileData(prev => ({ ...prev, video_url: file_url }));
   };
 

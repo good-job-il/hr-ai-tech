@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Bookmark } from 'lucide-react';
-import { httpClient } from '@/api/client/httpClient';
+import { savedJobService } from '@/api/services/savedJobService';
 
 export default function SaveJobButton({ job, user }) {
   const [saved, setSaved] = useState(false);
@@ -9,8 +9,7 @@ export default function SaveJobButton({ job, user }) {
 
   useEffect(() => {
     if (!user) return;
-    httpClient.get(`/jobs/saved?user_email=${encodeURIComponent(user.email)}&job_id=${encodeURIComponent(job.id)}`, { cache: false }).then((res) => {
-      const arr = Array.isArray(res) ? res : (res?.data || []);
+    savedJobService.list(job.id).then((arr) => {
       if (arr.length > 0) {
         setSaved(true);
         setSavedId(arr[0].id);
@@ -27,12 +26,11 @@ export default function SaveJobButton({ job, user }) {
     }
     setLoading(true);
     if (saved) {
-      await httpClient.delete(`/jobs/saved/${savedId}`);
+      await savedJobService.remove(savedId);
       setSaved(false);
       setSavedId(null);
     } else {
-      const res = await httpClient.post('/jobs/saved', {
-        user_email: user.email,
+      const res = await savedJobService.save({
         job_id: job.id,
         job_title: job.title,
         company: job.company,

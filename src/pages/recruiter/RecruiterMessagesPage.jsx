@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { communicationService } from '@/api/services/communicationService';
 import { useAuth } from '@/lib/AuthContext';
 import { MessageSquare, RefreshCw } from 'lucide-react';
 
@@ -7,15 +7,15 @@ export default function RecruiterMessagesPage() {
   const { user } = useAuth();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const data = await base44.entities.CommunicationLog.filter(
-      { sender_email: user.email }, '-created_date', 50
-    ).catch(() => []);
-    setLogs(data);
-    setLoading(false);
+    setError('');
+    try { setLogs(await communicationService.list({ limit: 50 })); }
+    catch (requestError) { setLogs([]); setError(requestError?.message || 'Unable to load messages'); }
+    finally { setLoading(false); }
   };
 
   useEffect(() => { load(); }, [user?.email]);
@@ -37,6 +37,7 @@ export default function RecruiterMessagesPage() {
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> רענן
         </button>
       </div>
+      {error && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</div>}
 
       {loading ? (
         <div className="space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-16 bg-white rounded-2xl border border-[#E4ECFF] animate-pulse" />)}</div>

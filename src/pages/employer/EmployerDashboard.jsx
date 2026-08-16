@@ -1,6 +1,9 @@
 import { Users, Briefcase, Clock, TrendingUp, Plus, RefreshCw, Users2, Target } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { jobService } from '@/api/services/jobService';
+import { candidateService } from '@/api/services/candidateService';
+import { interviewService } from '@/api/services/interviewService';
+import { applicationService } from '@/api/services/applicationService';
 import { useAuth } from '@/lib/AuthContext';
 import JobFormModal from '@/components/employer/JobFormModal';
 import { Link } from 'react-router-dom';
@@ -26,23 +29,26 @@ export default function EmployerDashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const [jobs, candidates, interviews, applications] = await Promise.all([
-      base44.entities.Job.filter({ employer_id: user.email }, '', 200).catch(() => []),
-      base44.entities.Candidate.filter({ employer_id: user.email }, '', 200).catch(() => []),
-      base44.entities.Interview.filter({ employer_id: user.email, status: 'scheduled' }, '', 200).catch(() => []),
-      base44.entities.Application.filter({ employer_id: user.email }, '', 200).catch(() => []),
-    ]);
-    setStats({
-      openJobs: jobs.filter(j => !j.is_closed).length,
-      candidates: candidates.length,
-      interviews: interviews.length,
-      applications: applications.length,
-    });
-    setLoading(false);
+    setLoadError('');
+    try {
+      const [jobs, candidates, interviews, applications] = await Promise.all([
+        jobService.list({ limit: 200 }),
+        candidateService.list({ limit: 200 }),
+        interviewService.list({ status: 'scheduled', limit: 200 }),
+        applicationService.list({ limit: 200 }),
+      ]);
+      setStats({ openJobs: jobs.filter(j => !j.is_closed).length, candidates: candidates.length, interviews: interviews.length, applications: applications.length });
+    } catch (error) {
+      setStats(null);
+      setLoadError(error?.message || 'Unable to load employer dashboard');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { load(); }, [user?.email]);
@@ -71,6 +77,7 @@ export default function EmployerDashboard() {
         <StatCard icon={Clock} label="Scheduled Interviews" value={stats?.interviews ?? '—'} color="#059669" loading={loading} />
         <StatCard icon={TrendingUp} label="Applications" value={stats?.applications ?? '—'} color="#EA580C" loading={loading} />
       </div>
+      {loadError && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">{loadError}</div>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link to="/employer/candidates" className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200 p-6 hover:shadow-lg transition-all">

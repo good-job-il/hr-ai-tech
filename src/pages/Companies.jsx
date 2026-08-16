@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { companyService } from '@/api/services/companyService';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight } from 'lucide-react';
 import PublicLayout from '@/components/layouts/PublicLayout';
@@ -8,7 +8,7 @@ import PublicLayout from '@/components/layouts/PublicLayout';
 export default function Companies() {
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['companies-all'],
-    queryFn: () => base44.entities.Company.list('-job_count', 50),
+    queryFn: () => companyService.list({ sort: 'job_count', order: 'DESC', limit: 50 }),
     initialData: [],
   });
 

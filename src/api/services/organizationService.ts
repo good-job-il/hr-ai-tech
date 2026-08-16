@@ -6,15 +6,44 @@ export interface OrganizationRecord {
   name: string;
   org_type: 'staffing_agency' | 'organization';
   status: 'active' | 'suspended' | 'inactive';
-  plan?: string;
+  plan: OrganizationPlan;
   contact_email?: string | null;
+  logo_url?: string | null;
+  settings?: Record<string, unknown> | null;
   created_date?: string;
-  [key: string]: unknown;
+  updated_date?: string;
 }
 
-class OrganizationService extends ResourceService<OrganizationRecord, ResourceQuery> {
+export type OrganizationPlan = 'trial' | 'starter' | 'pro' | 'enterprise';
+
+export interface OrganizationQuery extends ResourceQuery {
+  sort?: 'created_date' | 'updated_date' | 'name' | 'status' | 'plan';
+  org_type?: OrganizationRecord['org_type'];
+  status?: OrganizationRecord['status'];
+  search?: string;
+}
+
+export interface CreateOrganizationInput {
+  name: string;
+  org_type: OrganizationRecord['org_type'];
+  status?: OrganizationRecord['status'];
+  settings?: Record<string, unknown>;
+  plan?: OrganizationPlan;
+  contact_email?: string;
+  logo_url?: string;
+}
+
+export type UpdateOrganizationInput = Partial<CreateOrganizationInput>;
+export type OnboardAgencyInput = Pick<CreateOrganizationInput, 'name' | 'contact_email' | 'logo_url'>;
+
+class OrganizationService extends ResourceService<
+  OrganizationRecord,
+  OrganizationQuery,
+  CreateOrganizationInput,
+  UpdateOrganizationInput
+> {
   constructor() { super('/organizations'); }
-  onboardAgency(payload: { name: string; contact_email?: string }) {
+  onboardAgency(payload: OnboardAgencyInput) {
     return httpClient.post<OrganizationRecord>('/organizations/onboard-agency', payload);
   }
 }

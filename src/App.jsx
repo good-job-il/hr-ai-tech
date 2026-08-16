@@ -76,6 +76,7 @@ import AgencyDashboard from './pages/agency/AgencyDashboard';
 import AgencyOnboarding from './pages/agency/AgencyOnboarding';
 import AgencyClients from './pages/agency/AgencyClients';
 import AgencyClientDetail from './pages/agency/AgencyClientDetail';
+import AgencyTeamsPage from './pages/agency/AgencyTeamsPage';
 
 // ── Company Pages (Company HR) ────────────────────────────────────────
 import CompanyDashboard from './pages/company/CompanyDashboard';
@@ -90,6 +91,8 @@ import CandidateApplications from './pages/candidate/CandidateApplications';
 import CandidateSavedJobs from './pages/candidate/CandidateSavedJobs';
 import CandidateInterviews from './pages/candidate/CandidateInterviews';
 import CandidateMessages from './pages/candidate/CandidateMessages';
+import Notifications from './pages/Notifications';
+import RecommendedJobsAI from './components/home/RecommendedJobsAI';
 
 // ── Employer Pages (legacy) ───────────────────────────────────────────
 import EmployerDashboard from './pages/employer/EmployerDashboard';
@@ -207,7 +210,7 @@ const AuthenticatedApp = () => {
             <Route path="/agency/import" element={<ImportDashboard />} />
             <Route path="/agency/clients" element={<AgencyClients />} />
             <Route path="/agency/clients/:id" element={<AgencyClientDetail />} />
-            <Route path="/agency/teams" element={<PlaceholderPage title="צוותים ומשתמשים" />} />
+            <Route path="/agency/teams" element={<AgencyTeamsPage />} />
             <Route path="/agency/reports" element={<PlaceholderPage title="דוחות ותובנות" />} />
             <Route path="/agency/activity" element={<PlaceholderPage title="יומן פעילות" />} />
             <Route path="/recruitment/*" element={<Navigate to="/agency/dashboard" replace />} />
@@ -305,11 +308,12 @@ const AuthenticatedApp = () => {
           <Route path="/candidate/profile" element={<CandidateProfile />} />
           <Route path="/candidate/jobs" element={<Jobs />} />
           <Route path="/candidate/jobs/all" element={<Jobs />} />
-          <Route path="/candidate/jobs/recommended" element={<PlaceholderPage title="המלצות AI" />} />
+          <Route path="/candidate/jobs/recommended" element={<RecommendedJobsAI />} />
           <Route path="/candidate/jobs/saved" element={<CandidateSavedJobs />} />
           <Route path="/candidate/applications" element={<CandidateApplications />} />
           <Route path="/candidate/interviews" element={<CandidateInterviews />} />
           <Route path="/candidate/messages" element={<CandidateMessages />} />
+          <Route path="/candidate/notifications" element={<Notifications />} />
         </Route>
       </Route>
 

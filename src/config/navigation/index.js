@@ -7,7 +7,7 @@ export * from './companyNav';
 import {
   LayoutDashboard, Users, Briefcase, FileText, MessageSquare, BarChart3,
   Settings, Brain, Zap, TrendingUp, Target, Clock, Award, Sparkles,
-  Eye, Filter, Search, Kanban, ContactRound, PieChart, Activity, DollarSign,
+  Eye, Filter, Search, Kanban, ContactRound, PieChart, Activity, DollarSign, Bell,
 } from 'lucide-react';
 
 // Kept for CandidateLayout (unchanged)
@@ -25,6 +25,7 @@ export const CANDIDATE_NAV = [
   { id: 'candidate-applications', labelKey: 'nav.candidate.applications', route: '/candidate/applications', icon: FileText, badge: 2 },
   { id: 'candidate-interviews', labelKey: 'nav.candidate.interviews', route: '/candidate/interviews', icon: Eye },
   { id: 'candidate-messages', labelKey: 'nav.candidate.messages', route: '/candidate/messages', icon: MessageSquare },
+  { id: 'candidate-notifications', label: 'Notifications', route: '/candidate/notifications', icon: Bell },
 ];
 
 // Kept for EmployerLayout (legacy)

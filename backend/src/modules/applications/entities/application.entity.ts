@@ -5,6 +5,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Index(['organization_id'])
 @Index(['job_id'])
 @Index(['candidate_id'])
+@Index(['candidate_user_id'])
 @Index(['recruiter_id'])
 @Index(['status'])
 @Index(['is_deleted'])
@@ -17,6 +18,9 @@ export class ApplicationEntity extends BaseEntity {
 
   @Column({ name: 'candidate_id', type: 'int', nullable: true })
   candidate_id: number | null;
+
+  @Column({ name: 'candidate_user_id', type: 'int', nullable: true })
+  candidate_user_id: number | null;
 
   @Column({ name: 'job_title', type: 'varchar', length: 255, nullable: true })
   job_title: string | null;
@@ -111,4 +115,3 @@ export class ApplicationEntity extends BaseEntity {
   @Column({ name: 'deleted_by', type: 'int', nullable: true })
   deleted_by: number | null;
 }
-

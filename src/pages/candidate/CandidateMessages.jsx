@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { applicationService } from '@/api/services/applicationService';
+import { messageService } from '@/api/services/messageService';
 import { useAuth } from '@/lib/AuthContext';
 import {
   MessageCircle, Send, RefreshCw, X, Briefcase,
-  ChevronLeft, Inbox, MessagesSquare,
+  Inbox, MessagesSquare,
 } from 'lucide-react';
 
 // ─── Conversation List ─────────────────────────────────────────────────────────
@@ -56,7 +57,7 @@ function ChatWindow({ application, user, onClose }) {
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ['candidate-messages-chat', application?.id],
     queryFn: () =>
-      base44.entities.Message.filter({ application_id: application.id }, 'created_date', 100),
+      messageService.list({ application_id: application.id, limit: 100 }),
     enabled: !!application,
     refetchInterval: 5000,
   });
@@ -64,20 +65,15 @@ function ChatWindow({ application, user, onClose }) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     if (application && messages.length > 0) {
-      messages
-        .filter(m => !m.is_read && m.sender_email !== user?.email)
-        .forEach(m => base44.entities.Message.update(m.id, { is_read: true }));
+      if (messages.some(m => !m.is_read && m.sender_email !== user?.email)) {
+        messageService.markApplicationRead(application.id);
+      }
     }
   }, [messages, application, user?.email]);
 
   const sendMutation = useMutation({
     mutationFn: () =>
-      base44.entities.Message.create({
-        application_id: application.id,
-        sender_email: user.email,
-        sender_role: 'candidate',
-        content: text,
-      }),
+      messageService.send(application.id, text),
     onSuccess: () => {
       setText('');
       queryClient.invalidateQueries({ queryKey: ['candidate-messages-chat', application.id] });
@@ -242,26 +238,17 @@ export default function CandidateMessages() {
   const { data: applications = [], isLoading, refetch } = useQuery({
     queryKey: ['candidate-messages-apps', user?.email],
     queryFn: () =>
-      base44.entities.Application.filter(
-        { candidate_email: user.email },
-        '-created_date',
-        50,
-      ),
+      applicationService.list({ sort: 'created_date', order: 'DESC', limit: 50 }),
     enabled: !!user?.email,
   });
 
   const { data: unreadMessages = [] } = useQuery({
     queryKey: ['candidate-messages-unread', user?.email],
     queryFn: async () => {
-      const results = [];
-      for (const app of applications) {
-        const msgs = await base44.entities.Message.filter({
-          application_id: app.id,
-          is_read: false,
-        }).catch(() => []);
-        results.push(...msgs.filter(m => m.sender_email !== user.email));
-      }
-      return results;
+      const results = await Promise.all(applications.map(app =>
+        messageService.list({ application_id: app.id, is_read: false, limit: 100 })
+      ));
+      return results.flat().filter(message => message.sender_email !== user.email);
     },
     enabled: applications.length > 0,
     refetchInterval: 15000,

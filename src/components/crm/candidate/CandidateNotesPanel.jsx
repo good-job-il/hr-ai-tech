@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { MessageSquare, Pin, Eye, EyeOff, Trash2, Plus, Lock } from 'lucide-react';
+import { MessageSquare, Pin, Eye, Trash2, Plus, Lock } from 'lucide-react';
 import { format } from 'date-fns';
 import { he, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';

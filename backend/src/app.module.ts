@@ -23,12 +23,17 @@ import { SalaryModule } from './modules/salary/salary.module';
 import { FunctionsModule } from './modules/functions/functions.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { AgencyClientsModule } from './modules/agency-clients/agency-clients.module';
+import { AgencyTeamsModule } from './modules/agency-teams/agency-teams.module';
+import { HealthController } from './common/controllers/health.controller';
+import { MonitoringModule } from './common/monitoring/monitoring.module';
 
 @Module({
+  controllers: [HealthController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     ScheduleModule.forRoot(),
+    MonitoringModule,
     DatabaseModule,
     // Phase 1
     AuthModule,
@@ -51,6 +56,7 @@ import { AgencyClientsModule } from './modules/agency-clients/agency-clients.mod
     NotificationsModule,
     CompaniesModule,
     AgencyClientsModule,
+    AgencyTeamsModule,
     // Phase 4
     FunctionsModule,
     // Phase 5

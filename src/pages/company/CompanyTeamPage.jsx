@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { userService } from '@/api/services/userService';
 import { useAuth } from '@/lib/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -322,7 +322,7 @@ export default function CompanyTeamPage() {
 
   const { data: staffList = [], isLoading } = useQuery({
     queryKey: ['company-staff', organization?.id],
-    queryFn: () => base44.entities.Staff.filter({ organization_id: organization?.id }),
+    queryFn: () => userService.list({ organization_id: organization?.id, limit: 500, sort: 'full_name', order: 'ASC' }),
     enabled: !!organization?.id,
   });
 
@@ -367,8 +367,7 @@ export default function CompanyTeamPage() {
   // ── Mutations ─────────────────────────────────────────────────────────────
 
   const createMutation = useMutation({
-    mutationFn: data =>
-      base44.entities.Staff.create({ ...data, organization_id: organization?.id }),
+    mutationFn: data => userService.invite(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-staff'] });
       setShowModal(false);
@@ -379,7 +378,10 @@ export default function CompanyTeamPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Staff.update(id, data),
+    mutationFn: ({ id, data }) => {
+      const { email: _email, ...updates } = data;
+      return userService.update(id, updates);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-staff'] });
       setShowModal(false);
@@ -390,7 +392,7 @@ export default function CompanyTeamPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: id => base44.entities.Staff.delete(id),
+    mutationFn: id => userService.remove(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-staff'] });
       setDeletingMember(null);

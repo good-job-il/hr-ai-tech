@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import type { SignOptions } from 'jsonwebtoken';
 import * as crypto from 'crypto';
 import { UserEntity } from '../modules/users/user.entity';
 import { OrganizationEntity } from '../modules/organizations/organization.entity';
@@ -17,6 +18,7 @@ import { UserRole } from '../common/enums/user-role.enum';
 import { AuditService } from '../modules/audit/audit.service';
 import { RegisterDto } from './dto/auth.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
+import { EmailService } from '../modules/integrations/services/email.service';
 
 export interface AuthTokens {
   access_token: string;
@@ -39,6 +41,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly auditService: AuditService,
+    private readonly emailService: EmailService,
   ) {}
 
   // ─── Validate credentials (used by LocalStrategy) ──────────────────────
@@ -89,7 +92,9 @@ export class AuthService {
       full_name: dto.full_name,
       phone: dto.phone ?? null,
       role: dto.role as any,
-      organization_id: dto.organization_id ?? null,
+      // Public registration never attaches a user to an existing tenant.
+      // Staff membership and tenant identity are assigned by invitation/onboarding flows.
+      organization_id: null,
       is_active: true,
       last_login: new Date(),
     });
@@ -128,6 +133,11 @@ export class AuthService {
       'last_login',
       'org_type',
       'is_active',
+      'company_culture',
+      'benefits',
+      'gallery_urls',
+      'video_url',
+      'testimonials',
     ];
 
     const safeUpdates: Partial<UserEntity> = {};
@@ -192,9 +202,7 @@ export class AuthService {
       reset_token_expires: expiresAt,
     });
 
-    // TODO: Send email via MailService (Phase 3)
-    // await this.mailService.sendPasswordReset(user.email, resetToken);
-    console.log(`[Auth] Password reset token for ${user.email}: ${resetToken}`);
+    await this.emailService.sendPasswordReset({ email: user.email, token: resetToken });
 
     return { message: 'If an account with this email exists, a reset link has been sent.' };
   }
@@ -265,7 +273,7 @@ export class AuthService {
       secret: this.configService.get<string>('JWT_SECRET'),
       // Deliberately short — forces re-entry, limits blast radius, and
       // there is no matching refresh token for this scoped session.
-      expiresIn: this.configService.get<string>('JWT_WORKSPACE_EXPIRES_IN', '2h'),
+      expiresIn: this.configService.get<string>('JWT_WORKSPACE_EXPIRES_IN', '2h') as SignOptions['expiresIn'],
     });
 
     await this.auditService.log({
@@ -313,11 +321,11 @@ export class AuthService {
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('JWT_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m'),
+        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m') as SignOptions['expiresIn'],
       }),
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'),
+        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d') as SignOptions['expiresIn'],
       }),
     ]);
 

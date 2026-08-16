@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { applicationService } from '@/api/services/applicationService';
 import { MessageCircle, CheckCircle2, Clock, AlertCircle, FileText, Award, Eye } from 'lucide-react';
 
 const eventIcons = {
@@ -30,7 +30,7 @@ const eventLabels = {
 export default function ApplicationTimeline({ applicationId }) {
   const { data: timeline = [], isLoading } = useQuery({
     queryKey: ['application-timeline', applicationId],
-    queryFn: () => base44.entities.ApplicationTimeline.filter({ application_id: applicationId }, 'created_date', 100)
+    queryFn: () => applicationService.timeline(applicationId)
   });
 
   if (isLoading) {

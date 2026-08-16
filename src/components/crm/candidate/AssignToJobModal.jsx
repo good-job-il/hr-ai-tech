@@ -6,7 +6,8 @@ import { useState, useEffect } from 'react';
 import { X, Briefcase, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { httpClient } from '@/api/client/httpClient';
+import { jobService } from '@/api/services/jobService';
+import { applicationService } from '@/api/services/applicationService';
 import { useTranslation } from 'react-i18next';
 
 export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }) {
@@ -25,7 +26,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const openJobs = await httpClient.get('/jobs?is_closed=false&sort=created_date&order=DESC&limit=100', { cache: false });
+        const openJobs = await jobService.list({ is_closed: false, sort: 'created_date', order: 'DESC', limit: 100 });
         setJobs(openJobs);
         setFilteredJobs(openJobs);
       } catch (err) {
@@ -61,48 +62,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
     setResult(null);
 
     try {
-      // Check if application already exists
-      const existing = await httpClient.get(
-        `/applications?job_id=${selectedJob.id}&candidate_email=${encodeURIComponent(candidate.email)}&sort=created_date&order=DESC&limit=1`,
-        { cache: false }
-      );
-
-      if (existing.length > 0) {
-        setResult({ success: false, message: t('candidateCRM.assignToJob.alreadyExists') });
-        setAssigning(false);
-        return;
-      }
-
-      // Create Application
-      const application = await httpClient.post('/applications', {
-        job_id: selectedJob.id,
-        job_title: selectedJob.title,
-        company: selectedJob.company,
-        employer_id: selectedJob.employer_id || '',
-        candidate_name: candidate.full_name,
-        candidate_email: candidate.email,
-        candidate_phone: candidate.phone || '',
-        resume_url: candidate.resume_url || '',
-        resume_filename: candidate.resume_filename || '',
-        source: 'pool_assignment',
-        status: 'new',
-      });
-
-      // Create Timeline event
-      await httpClient.post(`/candidates/${candidate.id}/timeline`, {
-        candidate_email: candidate.email,
-        event_type: 'application_submitted',
-        description: `מועמדות נוצרה למשרת ${selectedJob.title} ב-${selectedJob.company} (שיוך ידני מהמאגר הכללי)`,
-        performed_by: 'system',
-        performed_by_name: 'מערכת',
-        performed_by_role: 'system',
-        metadata: {
-          job_id: selectedJob.id,
-          job_title: selectedJob.title,
-          source: 'manual_pool_assignment',
-          application_id: application.id,
-        },
-      });
+      const application = await applicationService.assignCandidate(selectedJob.id, candidate.id);
 
       setResult({ success: true, message: t('candidateCRM.assignToJob.successMessage', { jobTitle: selectedJob.title }) });
       if (onAssignSuccess) onAssignSuccess(application.id);

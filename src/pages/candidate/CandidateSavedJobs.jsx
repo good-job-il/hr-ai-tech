@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { savedJobService } from '@/api/services/savedJobService';
 import { useAuth } from '@/lib/AuthContext';
 import {
   Bookmark, Search, X, Briefcase, Building2,
@@ -98,12 +98,12 @@ export default function CandidateSavedJobs() {
 
   const { data: saved = [], isLoading, refetch } = useQuery({
     queryKey: ['saved-jobs', user?.email],
-    queryFn: () => base44.entities.SavedJob.filter({ user_email: user.email }, '-created_date', 100),
+    queryFn: () => savedJobService.list(),
     enabled: !!user?.email,
   });
 
   const { mutate: removeJob, variables: removingId } = useMutation({
-    mutationFn: (id) => base44.entities.SavedJob.delete(id),
+    mutationFn: (id) => savedJobService.remove(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['saved-jobs', user?.email] });
     },

@@ -31,7 +31,6 @@ export default function StaffInvite() {
       const inviteLink = `${window.location.origin}/register?invite=${inviteToken}&email=${encodeURIComponent(email)}&role=${role}&phone=${encodeURIComponent(phone)}`;
 
       // שמור הזמנה בדטאבייס אם יש כזה
-      // await base44.entities.StaffInvite.create({...})
 
       // בעתיד: שלח אימייל עם הקישור
       console.log('Invite link:', inviteLink);

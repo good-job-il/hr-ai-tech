@@ -26,12 +26,6 @@ export class JobsController {
     return this.svc.findAll(query, user);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get job by ID' })
-  findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
-    return this.svc.findById(id, user);
-  }
-
   @Post()
   @Roles(...JOB_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
@@ -71,44 +65,67 @@ export class JobsController {
   @Get('saved')
   @ApiOperation({ summary: 'Get saved jobs for current user (optionally filtered by job_id)' })
   getSavedJobs(@Query('job_id') jobId: string | undefined, @CurrentUser() user: UserEntity) {
-    return this.svc.getSavedJobs(user.email, jobId);
+    return this.svc.getSavedJobs(user, jobId);
   }
 
   @Post('saved')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Save a job' })
   saveJob(@Body() dto: CreateSavedJobDto, @CurrentUser() user: UserEntity) {
-    return this.svc.saveJob({ ...dto, user_email: user.email });
+    return this.svc.saveJob(dto, user);
   }
 
   @Delete('saved/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Unsave a job' })
   unsaveJob(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
-    return this.svc.unsaveJob(id, user.email);
+    return this.svc.unsaveJob(id, user);
   }
 
   // ─── Job Alerts ───────────────────────────────────────────────────────────
   @Get('alerts')
   getAlerts(@CurrentUser() user: UserEntity) {
-    return this.svc.getAlerts(user.email);
+    return this.svc.getAlerts(user);
   }
 
   @Post('alerts')
   @HttpCode(HttpStatus.CREATED)
   createAlert(@Body() dto: CreateJobAlertDto, @CurrentUser() user: UserEntity) {
-    return this.svc.createAlert({ ...dto, user_email: user.email });
+    return this.svc.createAlert(dto, user);
   }
 
   @Patch('alerts/:id')
-  updateAlert(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateJobAlertDto) {
-    return this.svc.updateAlert(id, dto);
+  updateAlert(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateJobAlertDto, @CurrentUser() user: UserEntity) {
+    return this.svc.updateAlert(id, dto, user);
   }
 
   @Delete('alerts/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteAlert(@Param('id', ParseIntPipe) id: number) {
-    return this.svc.deleteAlert(id);
+  deleteAlert(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
+    return this.svc.deleteAlert(id, user);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get scoped job by ID' })
+  findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
+    return this.svc.findById(id, user);
   }
 }
 
+@ApiTags('Public Jobs')
+@Controller('public/jobs')
+export class PublicJobsController {
+  constructor(private readonly svc: JobsService) {}
+
+  @Get()
+  @Public()
+  findAll(@Query() query: QueryJobsDto) {
+    return this.svc.findAll(query);
+  }
+
+  @Get(':id')
+  @Public()
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.svc.findById(id);
+  }
+}

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { httpClient } from '@/api/client/httpClient';
+import { taxonomyService } from '@/api/services/taxonomyService';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, Search, X } from 'lucide-react';
 
@@ -20,37 +20,37 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
   // Fetch data
   const { data: domains = [] } = useQuery({
     queryKey: ['domains'],
-    queryFn: () => httpClient.get('/taxonomy/domains?limit=1000', { cache: false }),
+    queryFn: () => taxonomyService.domains(),
     enabled,
   });
 
   const { data: roles = [] } = useQuery({
     queryKey: ['roles'],
-    queryFn: () => httpClient.get('/taxonomy/roles?limit=1000', { cache: false }),
+    queryFn: () => taxonomyService.roles(),
     enabled,
   });
 
   const { data: specializations = [] } = useQuery({
     queryKey: ['specializations'],
-    queryFn: () => httpClient.get('/taxonomy/specializations?limit=1000', { cache: false }),
+    queryFn: () => taxonomyService.specializations(),
     enabled,
   });
 
   const { data: employmentTypes = [] } = useQuery({
     queryKey: ['employment-types'],
-    queryFn: () => httpClient.get('/taxonomy/employment-types?limit=1000', { cache: false }),
+    queryFn: () => taxonomyService.employmentTypes(),
     enabled,
   });
 
   const { data: workModes = [] } = useQuery({
     queryKey: ['work-modes'],
-    queryFn: () => httpClient.get('/taxonomy/work-modes?limit=1000', { cache: false }),
+    queryFn: () => taxonomyService.workModes(),
     enabled,
   });
 
   const { data: levels = [] } = useQuery({
     queryKey: ['experience-levels'],
-    queryFn: () => httpClient.get('/taxonomy/experience-levels?limit=1000', { cache: false }),
+    queryFn: () => taxonomyService.experienceLevels(),
     enabled,
   });
 

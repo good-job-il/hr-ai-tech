@@ -27,7 +27,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status = HttpStatus.UNPROCESSABLE_ENTITY;
       message = 'Validation failed';
       code = 'VALIDATION_ERROR';
-      errors = exception.getZodError().errors.map((e) => ({
+      const zodError = exception.getZodError() as unknown as {
+        issues?: Array<{ path: PropertyKey[]; message: string; code: string }>;
+        errors?: Array<{ path: PropertyKey[]; message: string; code: string }>;
+      };
+      errors = (zodError.issues ?? zodError.errors ?? []).map((e) => ({
         field: e.path.join('.'),
         message: e.message,
         code: e.code,
@@ -59,7 +63,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
       body.errors = errors;
     }
 
+    const event = JSON.stringify({
+      event: 'http_error',
+      request_id: request.requestId,
+      method: request.method,
+      path: request.path,
+      status,
+      code,
+    });
+    if (status >= 500) this.logger.error(event);
+    else this.logger.warn(event);
+
     response.status(status).json(body);
   }
 }
-

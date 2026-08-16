@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { httpClient } from '@/api/client/httpClient';
+import { publicWorkflowService } from '@/api/services/publicWorkflowService';
 import { Link } from 'react-router-dom';
 import { Loader2, ArrowLeft } from 'lucide-react';
 
@@ -8,11 +8,8 @@ export default function SimilarJobsList({ jobId, title }) {
   const { data: recommendations = [], isLoading } = useQuery({
     queryKey: ['similar-jobs', jobId],
     queryFn: async () => {
-      const res = await httpClient.post('/functions/getJobRecommendations', {
-        job_id: jobId,
-        limit: 4,
-      });
-      return res?.data?.recommendations || res?.recommendations || [];
+      const res = await publicWorkflowService.similarJobs(Number(jobId), 4);
+      return res.recommendations;
     },
   });
 

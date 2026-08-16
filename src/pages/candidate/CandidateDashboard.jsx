@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { applicationService } from '@/api/services/applicationService';
+import { interviewService } from '@/api/services/interviewService';
+import { savedJobService } from '@/api/services/savedJobService';
+import { publicJobService } from '@/api/services/publicJobService';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import { Zap, Target, BookOpen, Sparkles, Briefcase, RefreshCw } from 'lucide-react';
@@ -29,19 +32,18 @@ export default function CandidateDashboard() {
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const [applications, interviews, savedJobs, jobs] = await Promise.all([
-      base44.entities.Application.filter({ candidate_email: user.email }, '', 1).catch(() => []),
-      base44.entities.Interview.filter({ candidate_email: user.email, status: 'scheduled' }, '', 1).catch(() => []),
-      base44.entities.SavedJob.filter({ user_email: user.email }, '', 1).catch(() => []),
-      base44.entities.Job.filter({ is_closed: false }, '-created_date', 5).catch(() => []),
-    ]);
-    setStats({
-      applications: applications.length,
-      interviews: interviews.length,
-      savedJobs: savedJobs.length,
-    });
-    setRecentJobs(jobs);
-    setLoading(false);
+    try {
+      const [applications, interviews, savedJobs, jobs] = await Promise.all([
+        applicationService.list({ limit: 500 }),
+        interviewService.list({ status: 'scheduled', limit: 500 }),
+        savedJobService.list(),
+        publicJobService.list({ is_closed: false, sort: 'created_date', order: 'DESC', limit: 5 }),
+      ]);
+      setStats({ applications: applications.length, interviews: interviews.length, savedJobs: savedJobs.length });
+      setRecentJobs(jobs);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { load(); }, [user?.email]);

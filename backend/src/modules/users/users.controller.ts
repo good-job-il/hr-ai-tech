@@ -13,11 +13,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto, QueryUsersDto } from './dto/users.dto';
+import { CreateUserDto, InviteOrganizationUserDto, UpdateUserDto, QueryUsersDto } from './dto/users.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserEntity } from './user.entity';
-import { UserRole } from '../../common/enums/user-role.enum';
+import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -26,6 +26,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @Roles(UserRole.ADMIN, ...ORG_ROLES)
   @ApiOperation({ summary: 'List users (scoped by role/org)' })
   findAll(
     @Query() query: QueryUsersDto,
@@ -35,6 +36,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMIN, ...ORG_ROLES)
   @ApiOperation({ summary: 'Get user by ID' })
   findOne(
     @Param('id', ParseIntPipe) id: number,
@@ -54,7 +56,16 @@ export class UsersController {
     return this.usersService.create(dto, user);
   }
 
+  @Post('invite')
+  @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRole.ADMIN, UserRole.ORG_ADMIN)
+  @ApiOperation({ summary: 'Invite a user into the current organization' })
+  invite(@Body() dto: InviteOrganizationUserDto, @CurrentUser() user: UserEntity) {
+    return this.usersService.invite(dto, user);
+  }
+
   @Patch(':id')
+  @Roles(UserRole.ADMIN, UserRole.ORG_ADMIN)
   @ApiOperation({ summary: 'Update user' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -66,7 +77,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.ORG_ADMIN)
   @ApiOperation({ summary: 'Delete a user (admin only)' })
   async remove(
     @Param('id', ParseIntPipe) id: number,
@@ -75,4 +86,3 @@ export class UsersController {
     await this.usersService.remove(id, user);
   }
 }
-

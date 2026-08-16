@@ -1,89 +1,12 @@
 import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 
-// ─── createCompanyNotification ─────────────────────────────────────────────
-export const CreateCompanyNotificationSchema = z.object({
-  targetEmail: z.string().email(),
-  type: z.enum(['new_application', 'interview_scheduled', 'message', 'job_closed', 'job_match', 'interview_reminder', 'candidate_sent']),
-  title: z.string().min(1),
-  content: z.string().optional().default(''),
-  metadata: z.record(z.any()).optional().default({}),
-});
-export class CreateCompanyNotificationDto extends createZodDto(CreateCompanyNotificationSchema) {}
-
-// ─── createApplicationTimeline ──────────────────────────────────────────────
-export const CreateApplicationTimelineFnSchema = z.object({
-  application_id: z.number().int(),
-  event_type: z.enum([
-    'submitted', 'status_changed', 'note_added', 'interview_scheduled',
-    'interview_completed', 'offer_made', 'rejected', 'assigned', 'resume_viewed',
-  ]),
-  previous_value: z.string().optional().nullable(),
-  new_value: z.string().optional().nullable(),
-  description: z.string().min(1),
-  performed_by_role: z.string().optional(),
-  organization_id: z.number().int().optional().nullable(),
-});
-export class CreateApplicationTimelineFnDto extends createZodDto(CreateApplicationTimelineFnSchema) {}
-
-// ─── createCandidateTimeline ─────────────────────────────────────────────────
-export const CreateCandidateTimelineFnSchema = z.object({
-  candidate_id: z.number().int().optional().nullable(),
-  candidate_email: z.string().email(),
-  event_type: z.string().min(1),
-  description: z.string().min(1),
-  metadata: z.record(z.any()).optional().default({}),
-  organization_id: z.number().int().optional().nullable(),
-});
-export class CreateCandidateTimelineFnDto extends createZodDto(CreateCandidateTimelineFnSchema) {}
-
-// ─── deleteCandidate ────────────────────────────────────────────────────────
-export const DeleteCandidateFnSchema = z.object({
-  candidate_id: z.number().int(),
-});
-export class DeleteCandidateFnDto extends createZodDto(DeleteCandidateFnSchema) {}
-
-// ─── updateCompanyProfile ────────────────────────────────────────────────────
-export const UpdateCompanyProfileFnSchema = z.object({
-  companyEmail: z.string().email(),
-  company_culture: z.string().optional().nullable(),
-  benefits: z.array(z.string()).optional().nullable(),
-  gallery_urls: z.array(z.string()).optional().nullable(),
-  video_url: z.string().optional().nullable(),
-  testimonials: z.array(z.record(z.any())).optional().nullable(),
-});
-export class UpdateCompanyProfileFnDto extends createZodDto(UpdateCompanyProfileFnSchema) {}
-
-// ─── sendCandidateToEmployer ─────────────────────────────────────────────────
-export const SendCandidateToEmployerSchema = z.object({
-  candidateId: z.number().int(),
-  to: z.string().email(),
-  cc: z.string().optional().nullable(),
-  subject: z.string().optional().nullable(),
-  recruiterNote: z.string().optional().nullable(),
-  candidateName: z.string().min(1),
-  candidateEmail: z.string().email().optional().nullable(),
-  jobId: z.number().int().optional().nullable(),
-  jobTitle: z.string().optional().nullable(),
-  attachmentUrls: z
-    .array(z.object({ url: z.string(), filename: z.string().optional(), doc_type: z.string().optional() }))
-    .optional()
-    .default([]),
-});
-export class SendCandidateToEmployerDto extends createZodDto(SendCandidateToEmployerSchema) {}
-
 // ─── getJobRecommendations ───────────────────────────────────────────────────
 export const GetJobRecommendationsSchema = z.object({
   job_id: z.number().int(),
   limit: z.coerce.number().int().min(1).max(20).default(5),
 });
 export class GetJobRecommendationsDto extends createZodDto(GetJobRecommendationsSchema) {}
-
-// ─── scoreApplication ────────────────────────────────────────────────────────
-export const ScoreApplicationFnSchema = z.object({
-  application_id: z.number().int(),
-});
-export class ScoreApplicationFnDto extends createZodDto(ScoreApplicationFnSchema) {}
 
 // ─── smartSearch ─────────────────────────────────────────────────────────────
 export const SmartSearchSchema = z.object({
@@ -106,7 +29,6 @@ export class SmartSearchDto extends createZodDto(SmartSearchSchema) {}
 // ─── extractAndTranslateResume ───────────────────────────────────────────────
 export const ExtractResumeFnSchema = z.object({
   file_url: z.string().url(),
-  file_content_base64: z.string().optional().nullable(),
 });
 export class ExtractResumeFnDto extends createZodDto(ExtractResumeFnSchema) {}
 
@@ -120,7 +42,35 @@ export class ImportCandidatesFromFileDto extends createZodDto(ImportCandidatesFr
 
 // ─── createBulkCandidates ────────────────────────────────────────────────────
 export const CreateBulkCandidatesSchema = z.object({
-  candidates_data: z.array(z.record(z.any())).min(1),
+  candidates_data: z.array(z.object({
+    full_name: z.string().min(1),
+    email: z.string().email().optional().nullable(),
+    phone: z.string().optional().nullable(),
+    location: z.string().optional().nullable(),
+    domain_id: z.number().int().optional().nullable(),
+    domain_name: z.string().optional().nullable(),
+    role_id: z.number().int().optional().nullable(),
+    role_name: z.string().optional().nullable(),
+    specialization_id: z.number().int().optional().nullable(),
+    specialization_name: z.string().optional().nullable(),
+    experience_years: z.number().optional().nullable(),
+    desired_salary_min: z.number().int().optional().nullable(),
+    desired_salary_max: z.number().int().optional().nullable(),
+    resume_url: z.string().optional().nullable(),
+    resume_filename: z.string().optional().nullable(),
+    skills: z.array(z.string()).optional().nullable(),
+    languages: z.array(z.string()).optional().nullable(),
+    previous_companies: z.array(z.string()).optional().nullable(),
+    summary: z.string().optional().nullable(),
+    notes: z.string().optional().nullable(),
+    recruiter_id: z.number().int().optional().nullable(),
+    team_manager_id: z.number().int().optional().nullable(),
+    recruitment_manager_id: z.number().int().optional().nullable(),
+    employer_company_id: z.number().int().optional().nullable(),
+    data_quality_score: z.number().int().min(0).max(100).optional(),
+    parsing_confidence: z.number().int().min(0).max(100).optional(),
+    review_required: z.boolean().optional(),
+  })).min(1).max(500),
   import_batch_id: z.number().int().optional().nullable(),
 });
 export class CreateBulkCandidatesDto extends createZodDto(CreateBulkCandidatesSchema) {}

@@ -22,6 +22,7 @@ export default function ImportProgressMonitor({ batchId }) {
             review_required: batch.review_required
           });
         }
+        setError(null);
         setLoading(false);
       } catch (err) {
         setError(err.message);

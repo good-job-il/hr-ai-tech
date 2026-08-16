@@ -62,22 +62,15 @@ export default function ImportDashboard() {
     try {
       const { file_url } = await fileService.upload(file);
       const batch = await candidateImportService.create({
-        organization_id: user?.organization_id,
         batch_name: `${file.name.replace(/\.[^/.]+$/, '')} — ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: he })}`,
         source_file: file.name,
         file_type: file.name.endsWith('.csv') ? 'csv' : file.name.endsWith('.json') ? 'json' : 'xlsx',
-        imported_by: user?.email,
         recruiter_id: user?.id,
         team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
         recruitment_manager_id: user?.recruitment_manager_id,
-        status: 'pending',
       });
-      const res = await candidateImportService.importCandidates({
-        fileUrl: file_url,
-        batchId: batch.id,
-        fileName: file.name,
-      });
-      const d = res.data;
+      const queued = await candidateImportService.queueFileImport(batch.id, file_url, file.name);
+      const d = await candidateImportService.waitForJob(queued.id);
       setUploadMsg({ type: 'success', text: `יובאו ${d.successful} מועמדים • ${d.duplicates} כפילויות • ${d.failed} כשלונות` });
       setFile(null);
       document.getElementById('importFileInput').value = '';
@@ -98,22 +91,15 @@ export default function ImportDashboard() {
       const testFile = new File([blob], 'validation_test.csv', { type: 'text/csv' });
       const { file_url } = await fileService.upload(testFile);
       const batch = await candidateImportService.create({
-        organization_id: user?.organization_id,
         batch_name: `Validation Test — ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: he })}`,
         source_file: 'validation_test.csv',
         file_type: 'csv',
-        imported_by: user?.email,
         recruiter_id: user?.id,
         team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
         recruitment_manager_id: user?.recruitment_manager_id,
-        status: 'pending',
       });
-      const res = await candidateImportService.importCandidates({
-        fileUrl: file_url,
-        batchId: batch.id,
-        fileName: 'validation_test.csv',
-      });
-      const d = res.data;
+      const queued = await candidateImportService.queueFileImport(batch.id, file_url, 'validation_test.csv');
+      const d = await candidateImportService.waitForJob(queued.id);
       setValidationResult({
         success: true,
         batch_id: batch.id,
@@ -139,7 +125,7 @@ export default function ImportDashboard() {
   const retryBatch = async (batch) => {
     if (!batch.source_file) return;
     setUploadMsg({ type: 'success', text: `מנסה שוב batch: ${batch.batch_name}...` });
-    await candidateImportService.update(batch.id, { status: 'pending', retry_count: (batch.retry_count || 0) + 1 });
+    await candidateImportService.retryBatch(batch.id);
     refetch();
   };
 

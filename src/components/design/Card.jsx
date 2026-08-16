@@ -1,7 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-const Card = React.forwardRef(({ className, variant = 'elevated', ...props }, ref) => {
+/** @type {React.ForwardRefExoticComponent<React.HTMLAttributes<HTMLDivElement> & React.RefAttributes<HTMLDivElement> & {variant?: 'elevated'|'glass'|'minimal'|'dark'}>} */
+const Card = React.forwardRef(({ className = '', variant = 'elevated', ...props }, ref) => {
   const variants = {
     elevated: 'bg-white/90 border border-blue-300/50 shadow-card hover:shadow-lg transition-all backdrop-blur-md',
     glass: 'bg-gradient-to-br from-white/95 to-white/85 border border-blue-300/60 shadow-glass backdrop-blur-2xl',

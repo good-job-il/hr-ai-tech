@@ -40,10 +40,10 @@ export class AuditService {
   async create(dto: CreateAuditLogDto, user: UserEntity): Promise<AuditLogEntity> {
     const log = this.repo.create({
       ...dto,
-      organization_id: dto.organization_id ?? user.organization_id,
-      actor_user_id: dto.actor_user_id ?? user.id,
-      actor_email: dto.actor_email ?? user.email,
-      actor_role: dto.actor_role ?? user.role,
+      organization_id: user.organization_id == null ? null : String(user.organization_id),
+      actor_user_id: String(user.id),
+      actor_email: user.email,
+      actor_role: user.role,
     } as any);
     return this.repo.save(log) as unknown as Promise<AuditLogEntity>;
   }
@@ -54,4 +54,3 @@ export class AuditService {
     return this.repo.save(log);
   }
 }
-

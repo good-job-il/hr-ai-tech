@@ -28,6 +28,8 @@ import { RoleTaxonomyEntity } from '../taxonomy/entities/role-taxonomy.entity';
 import { DomainEntity } from '../taxonomy/entities/domain.entity';
 import { RoleAliasEntity } from '../permissions/permissions.entities';
 import { ImportSourceEntity } from '../import-sources/import-source.entity';
+import { UserEntity } from '../users/user.entity';
+import { BackgroundJobEntity } from './entities/background-job.entity';
 
 import { FunctionsMiscService } from './services/functions-misc.service';
 import { MatchingService } from './services/matching.service';
@@ -35,7 +37,9 @@ import { DashboardService } from './services/dashboard.service';
 import { ImportService } from './services/import.service';
 import { ResumeExtractionService } from './services/resume-extraction.service';
 import { JobCrawlerService } from './services/job-crawler.service';
-import { FunctionsController } from './functions.controller';
+import { PublicWorkflowController } from './public-workflow.controller';
+import { DomainOperationsController } from './domain-operations.controller';
+import { BackgroundJobsService } from './services/background-jobs.service';
 
 @Module({
   imports: [
@@ -54,6 +58,8 @@ import { FunctionsController } from './functions.controller';
       DomainEntity,
       RoleAliasEntity,
       ImportSourceEntity,
+      UserEntity,
+      BackgroundJobEntity,
     ]),
     CandidatesModule,
     JobsModule,
@@ -68,7 +74,7 @@ import { FunctionsController } from './functions.controller';
     ImportSourcesModule,
     PermissionsModule,
   ],
-  controllers: [FunctionsController],
+  controllers: [PublicWorkflowController, DomainOperationsController],
   providers: [
     FunctionsMiscService,
     MatchingService,
@@ -76,7 +82,7 @@ import { FunctionsController } from './functions.controller';
     ImportService,
     ResumeExtractionService,
     JobCrawlerService,
+    BackgroundJobsService,
   ],
 })
 export class FunctionsModule {}
-

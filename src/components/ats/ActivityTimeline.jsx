@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserPlus, ArrowRight, Sparkles, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { applicationService } from '@/api/services/applicationService';
 
 function timeAgo(dateStr, t, locale) {
   if (!dateStr) return '';
@@ -34,6 +34,7 @@ export default function ActivityTimeline({ application }) {
   const { t, i18n } = useTranslation();
   const [dbEvents, setDbEvents] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   const locale = i18n.language?.startsWith('en') ? 'en-US' : 'he-IL';
 
@@ -44,19 +45,17 @@ export default function ActivityTimeline({ application }) {
     let cancelled = false;
 
     const fetchEvents = () => {
-      base44.entities.ApplicationTimeline
-        .filter({ application_id: application.id }, '-created_date', 50)
-        .then(rows => { if (!cancelled) setDbEvents(rows || []); })
-        .catch(() => {});
+      applicationService.timeline(application.id)
+        .then(rows => { if (!cancelled) { setDbEvents(rows || []); setLoadError(false); } })
+        .catch(() => { if (!cancelled) setLoadError(true); });
     };
 
     setLoading(true);
     const initialTimer = setTimeout(() => {
       if (cancelled) return;
-      base44.entities.ApplicationTimeline
-        .filter({ application_id: application.id }, '-created_date', 50)
-        .then(rows => { if (!cancelled) { setDbEvents(rows || []); setLoading(false); } })
-        .catch(() => { if (!cancelled) setLoading(false); });
+      applicationService.timeline(application.id)
+        .then(rows => { if (!cancelled) { setDbEvents(rows || []); setLoadError(false); setLoading(false); } })
+        .catch(() => { if (!cancelled) { setLoadError(true); setLoading(false); } });
     }, 600);
 
     const pollInterval = setInterval(fetchEvents, 4000);
@@ -93,7 +92,7 @@ export default function ActivityTimeline({ application }) {
     color: '#2F80FF',
     title: ev.event_type === 'status_changed'
       ? t('pipeline.activityTimeline.stageChange', {
-          from: stageLabel(ev.old_value),
+          from: stageLabel(ev.previous_value),
           to: stageLabel(ev.new_value),
         })
       : (ev.title || ev.event_type),
@@ -115,6 +114,11 @@ export default function ActivityTimeline({ application }) {
 
   return (
     <div className="space-y-1">
+      {loadError && (
+        <div role="status" className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
+          {t('common.refreshFailed', { defaultValue: 'Unable to refresh activity' })}
+        </div>
+      )}
       {allEvents.length === 0 && (
         <div className="text-center py-8 text-[#94A3B8]">
           <Clock className="w-8 h-8 mx-auto mb-2" />

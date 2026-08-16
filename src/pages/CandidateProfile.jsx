@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { candidateProfileService } from '@/api/services/candidateProfileService';
+import { fileService } from '@/api/services/fileService';
 import { useAuth } from '@/lib/AuthContext';
 import Navbar from '@/components/home/Navbar';
 import { Plus, Trash2, Upload, Save } from 'lucide-react';
@@ -13,13 +14,11 @@ export default function CandidateProfilePage() {
   const [skillInput, setSkillInput] = useState('');
   const [saved, setSaved] = useState(false);
 
-  const { data: profiles = [], isLoading } = useQuery({
+  const { data: profile = null, isLoading } = useQuery({
     queryKey: ['my-profile', user?.email],
-    queryFn: () => base44.entities.CandidateProfile.filter({ user_email: user.email }),
+    queryFn: () => candidateProfileService.me(),
     enabled: !!user,
   });
-
-  const profile = profiles[0];
 
   const [form, setForm] = useState(null);
 
@@ -40,8 +39,9 @@ export default function CandidateProfilePage() {
 
   const saveMutation = useMutation({
     mutationFn: async (data) => {
-      if (profile) return base44.entities.CandidateProfile.update(profile.id, data);
-      return base44.entities.CandidateProfile.create(data);
+      const { id: _id, user_email: _userEmail, ...profileData } = data;
+      if (profile) return candidateProfileService.update(profileData);
+      return candidateProfileService.create(profileData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-profile'] });
@@ -53,7 +53,7 @@ export default function CandidateProfilePage() {
   const uploadResume = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await fileService.upload(file);
     setForm(f => ({ ...f, resume_url: file_url }));
   };
 

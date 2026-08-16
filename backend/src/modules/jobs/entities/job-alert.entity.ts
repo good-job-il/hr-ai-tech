@@ -2,9 +2,13 @@ import { Entity, Column, Index } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 
 @Entity('job_alerts')
+@Index(['user_id'])
 @Index(['user_email'])
 @Index(['is_active'])
 export class JobAlertEntity extends BaseEntity {
+  @Column({ name: 'user_id', type: 'int', nullable: true })
+  user_id: number | null;
+
   @Column({ name: 'user_email', type: 'varchar', length: 255 })
   user_email: string;
 
@@ -37,4 +41,3 @@ export class JobAlertEntity extends BaseEntity {
   @Column({ name: 'last_sent', type: 'datetime', nullable: true })
   last_sent: Date | null;
 }
-

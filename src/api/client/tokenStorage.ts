@@ -1,12 +1,10 @@
 /**
  * tokenStorage — JWT access/refresh token persistence for the NestJS backend.
  *
- * Replaces Base44 SDK's internal token handling. Keeps the historical
- * localStorage key names (`base44_access_token`, `token`) for backward
- * compatibility with any code/bookmarks still referencing them.
+ * Application-owned JWT persistence for the NestJS backend.
  */
 
-const ACCESS_TOKEN_KEY = 'base44_access_token';
+const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 // Scoped admin "workspace" token — see AuthContext.enterOrganization().
 // Kept in sessionStorage (not localStorage): it is short-lived, tab-scoped,
@@ -28,7 +26,6 @@ export const tokenStorage = {
   setTokens(accessToken: string, refreshToken?: string | null): void {
     if (typeof window === 'undefined') return;
     localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-    localStorage.setItem('token', accessToken); // legacy alias
     if (refreshToken) {
       localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
     }
@@ -37,13 +34,11 @@ export const tokenStorage = {
   setAccessToken(accessToken: string): void {
     if (typeof window === 'undefined') return;
     localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-    localStorage.setItem('token', accessToken);
   },
 
   clearTokens(): void {
     if (typeof window === 'undefined') return;
     localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem('token');
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     this.clearWorkspaceToken();
   },
@@ -80,4 +75,3 @@ export const tokenStorage = {
     return !!this.getWorkspaceToken();
   },
 };
-

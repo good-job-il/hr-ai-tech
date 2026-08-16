@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar, Clock, Video, Phone, MapPin, CheckCircle, XCircle, Plus, Star } from 'lucide-react';
-import { format } from 'date-fns';
+import { Calendar, Clock, Video, Phone, MapPin, Plus, Star } from 'lucide-react';
 import { he, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 

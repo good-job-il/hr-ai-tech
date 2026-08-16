@@ -18,10 +18,7 @@ export class NotificationsController {
 
   @Get()
   findAll(@Query() q: QueryNotificationsDto, @CurrentUser() u: UserEntity) {
-    // Non-admins may only ever see their own notifications, regardless of query override (IDOR fix)
-    const isAdmin = u.role === UserRole.ADMIN;
-    const recipient_email = isAdmin ? q.recipient_email || u.email : u.email;
-    return this.svc.findAll({ ...q, recipient_email });
+    return this.svc.findAll(q, u);
   }
 
   @Post() @Roles(...NOTIFICATION_CREATE_ROLES) @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateNotificationDto) { return this.svc.create(dto); }
@@ -32,4 +29,3 @@ export class NotificationsController {
 
   @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.remove(id, u); }
 }
-

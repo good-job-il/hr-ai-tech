@@ -4,6 +4,7 @@ import { BaseEntity } from '../../common/entities/base.entity';
 @Entity('notifications')
 @Index(['organization_id'])
 @Index(['recipient_email'])
+@Index(['recipient_user_id'])
 @Index(['is_read'])
 export class NotificationEntity extends BaseEntity {
   @Column({ name: 'organization_id', type: 'int', nullable: true })
@@ -11,6 +12,9 @@ export class NotificationEntity extends BaseEntity {
 
   @Column({ name: 'recipient_email', type: 'varchar', length: 255 })
   recipient_email: string;
+
+  @Column({ name: 'recipient_user_id', type: 'int', nullable: true })
+  recipient_user_id: number | null;
 
   @Column({
     type: 'enum',
@@ -30,4 +34,3 @@ export class NotificationEntity extends BaseEntity {
   @Column({ name: 'is_read', type: 'boolean', default: false })
   is_read: boolean;
 }
-

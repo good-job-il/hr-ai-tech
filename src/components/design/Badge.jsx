@@ -1,7 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-const Badge = React.forwardRef(({ className, variant = 'primary', ...props }, ref) => {
+/** @type {React.ForwardRefExoticComponent<React.HTMLAttributes<HTMLSpanElement> & React.RefAttributes<HTMLSpanElement> & {variant?: 'primary'|'secondary'|'success'|'warning'|'error'|'neutral'|'outline'}>} */
+const Badge = React.forwardRef(({ className = '', variant = 'primary', ...props }, ref) => {
   const variants = {
     primary: 'bg-purple-100 text-purple-700 border border-purple-300/50',
     secondary: 'bg-blue-100 text-blue-700 border border-blue-300/50',

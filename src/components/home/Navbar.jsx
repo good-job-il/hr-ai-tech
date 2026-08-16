@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { MapPin, Menu, X, Shield, UserPlus } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { publicWorkflowService } from '@/api/services/publicWorkflowService';
 import { authService } from '@/api/services/authService';
 import LocationConfirmModal from '@/components/home/LocationConfirmModal';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
@@ -33,8 +33,8 @@ export default function Navbar() {
       }
 
       try {
-        const response = await base44.functions.invoke('getLocationFromIP', {});
-        const detectedCity = response.data?.city || (isRtl ? 'תל אביב' : 'Tel Aviv');
+        const response = await publicWorkflowService.currentLocation();
+        const detectedCity = response.city || (isRtl ? 'תל אביב' : 'Tel Aviv');
         setInitialCity(detectedCity);
         const savedCity = localStorage.getItem('selectedCity');
         if (!savedCity && isHomePage) {

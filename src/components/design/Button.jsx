@@ -1,7 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-const Button = React.forwardRef(({ className, variant = 'primary', size = 'md', ...props }, ref) => {
+/** @type {React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & {variant?: 'primary'|'secondary'|'outline'|'ghost'|'error'|'success', size?: 'xs'|'sm'|'md'|'lg'|'xl'}>} */
+const Button = React.forwardRef(({ className = '', variant = 'primary', size = 'md', ...props }, ref) => {
   const baseStyles = 'inline-flex items-center justify-center font-bold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variants = {

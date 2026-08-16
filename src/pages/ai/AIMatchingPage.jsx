@@ -5,7 +5,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { candidateService } from '@/api/services/candidateService';
+import { jobService } from '@/api/services/jobService';
+import { applicationService } from '@/api/services/applicationService';
 import { useAuth } from '@/lib/AuthContext';
 import CandidateRecommendationsPanel from '@/components/ai/CandidateRecommendationsPanel';
 import JobRecommendationsPanel from '@/components/ai/JobRecommendationsPanel';
@@ -59,19 +61,10 @@ export default function AIMatchingPage() {
     // This is an intentional design decision: AI Matching is a recruiter tool
     // scoped to their own pool. It is NOT a global search.
     // ─────────────────────────────────────────────────────────────────────
-    const fetchCandidates = async () => {
-      if (isAgencyUser(user)) {
-        return base44.entities.Candidate.filter(
-          getAgencyScopeFilter(user), '-created_date', 200
-        ).catch(() => []);
-      }
-      if (user.role === 'employer') {
-        return base44.entities.Candidate.filter(
-          { employer_id: user.email }, '-created_date', 100
-        ).catch(() => []);
-      }
-      return [];
-    };
+    const fetchCandidates = () => candidateService.list({
+      ...(isAgencyUser(user) ? getAgencyScopeFilter(user) : {}),
+      sort: 'created_date', order: 'DESC', limit: isAgencyUser(user) ? 200 : 100,
+    });
 
     const jobFilter = isAgencyUser(user)
       ? { organization_id: user.organization_id, is_closed: false }
@@ -79,10 +72,14 @@ export default function AIMatchingPage() {
 
     Promise.all([
       fetchCandidates(),
-      base44.entities.Job.filter(jobFilter, '-created_date', 100).catch(() => []),
+      jobService.list({ ...jobFilter, sort: 'created_date', order: 'DESC', limit: 100 }),
     ]).then(([c, j]) => {
       setCandidates(c || []);
       setJobs(j || []);
+    }).catch(error => {
+      setCandidates([]);
+      setJobs([]);
+      setToast({ message: error?.message || 'Unable to load matching data', type: 'error' });
     }).finally(() => setLoading(false));
   }, [user?.id, user?.role, user?.organization_id]);
 
@@ -220,36 +217,7 @@ export default function AIMatchingPage() {
                 candidate={selectedCandidate}
                 onAssignToJob={async (job) => {
                   try {
-                    // Check for existing application
-                    const existing = await base44.entities.Application.filter(
-                      { job_id: job.id, candidate_email: selectedCandidate.email }, '', 1
-                    );
-                    if (existing.length > 0) {
-                      showToast(t('aiMatching.page.applicationExists', {
-                        candidateName: selectedCandidate.full_name,
-                        jobTitle: job.title
-                      }), 'info');
-                      return;
-                    }
-                    await base44.entities.Application.create({
-                      organization_id: user.organization_id,
-                      job_id: job.id,
-                      candidate_id: selectedCandidate.id,
-                      job_title: job.title,
-                      company: job.company,
-                      employer_company_id: job.employer_company_id || '',
-                      candidate_name: selectedCandidate.full_name,
-                      candidate_email: selectedCandidate.email || '',
-                      candidate_phone: selectedCandidate.phone || '',
-                      resume_url: selectedCandidate.resume_url || selectedCandidate.converted_resume_url || '',
-                      location: selectedCandidate.location || '',
-                      source: 'app',
-                      status: 'new',
-                      recruiter_id: selectedCandidate.recruiter_id || user.id,
-                      assigned_to: selectedCandidate.recruiter_id || user.id,
-                      team_manager_id: selectedCandidate.team_manager_id || user.team_manager_id || (user.role === 'team_manager' ? user.id : null),
-                      recruitment_manager_id: selectedCandidate.recruitment_manager_id || user.recruitment_manager_id || null,
-                    });
+                    await applicationService.assignCandidate(job.id, selectedCandidate.id);
                     showToast(t('aiMatching.page.assignedSuccess', {
                       candidateName: selectedCandidate.full_name,
                       jobTitle: job.title
@@ -273,25 +241,7 @@ export default function AIMatchingPage() {
                job={selectedJob}
                onAddToPipeline={async (candidate) => {
                  try {
-                   await base44.entities.Application.create({
-                     organization_id: user.organization_id,
-                     job_id: selectedJob.id,
-                     candidate_id: candidate.id,
-                     job_title: selectedJob.title,
-                     company: selectedJob.company,
-                     employer_company_id: selectedJob.employer_company_id || '',
-                     candidate_name: candidate.full_name,
-                     candidate_email: candidate.email || '',
-                     candidate_phone: candidate.phone || '',
-                     resume_url: candidate.resume_url || '',
-                     location: candidate.location || '',
-                     source: 'app',
-                     status: 'new',
-                     recruiter_id: candidate.recruiter_id || user.id,
-                     assigned_to: candidate.recruiter_id || user.id,
-                     team_manager_id: candidate.team_manager_id || user.team_manager_id || (user.role === 'team_manager' ? user.id : null),
-                     recruitment_manager_id: candidate.recruitment_manager_id || user.recruitment_manager_id || null,
-                   });
+                   await applicationService.assignCandidate(selectedJob.id, candidate.id);
                    showToast(t('aiMatching.page.addedToPipeline', {
                      candidateName: candidate.full_name,
                      jobTitle: selectedJob.title

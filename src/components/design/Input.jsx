@@ -1,7 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-const Input = React.forwardRef(({ className, variant = 'default', ...props }, ref) => {
+/** @type {React.ForwardRefExoticComponent<React.InputHTMLAttributes<HTMLInputElement> & React.RefAttributes<HTMLInputElement> & {variant?: 'default'|'filled'|'flush'}>} */
+const Input = React.forwardRef(({ className = '', variant = 'default', ...props }, ref) => {
   const variants = {
     default: 'bg-white/80 border border-blue-300/50 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-300/50 placeholder-gray-500 backdrop-blur-sm',
     filled: 'bg-blue-50/80 border border-blue-300/40 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-300/50 placeholder-gray-500',

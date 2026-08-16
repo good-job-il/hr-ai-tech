@@ -9,29 +9,31 @@ import { UserRole } from '../../common/enums/user-role.enum';
 
 @Injectable()
 export class NotificationsService {
-  constructor(@InjectRepository(NotificationEntity) private readonly repo: Repository<NotificationEntity>) {}
+  constructor(
+    @InjectRepository(NotificationEntity) private readonly repo: Repository<NotificationEntity>,
+    @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>,
+  ) {}
 
   private assertOwner(n: NotificationEntity, user: UserEntity) {
     const isAdmin = user.role === UserRole.ADMIN;
-    if (!isAdmin && n.recipient_email !== user.email) {
+    if (!isAdmin && n.recipient_user_id !== user.id) {
       throw new ForbiddenException('Access denied');
     }
   }
 
-  async findAll(query: QueryNotificationsDto) {
-    const { page, limit, sort, order, recipient_email, is_read, type, organization_id } = query;
-    const where: Record<string, any> = {};
-    if (recipient_email) where.recipient_email = recipient_email;
+  async findAll(query: QueryNotificationsDto, user: UserEntity) {
+    const { page, limit, sort, order, is_read, type } = query;
+    const where: Record<string, any> = { recipient_user_id: user.id };
     if (is_read !== undefined) where.is_read = is_read;
     if (type) where.type = type;
-    if (organization_id) where.organization_id = organization_id;
     const { skip, take } = getSkipTake(page, limit);
     const [data, total] = await this.repo.findAndCount({ where, order: { [sort]: order }, skip, take });
     return buildPaginatedResponse(data, total, { page, limit });
   }
 
   async create(dto: CreateNotificationDto): Promise<NotificationEntity> {
-    const n = this.repo.create(dto as any);
+    const recipient = await this.userRepo.findOne({ where: { email: dto.recipient_email } });
+    const n = this.repo.create({ ...dto, recipient_user_id: recipient?.id ?? null } as any);
     return this.repo.save(n) as unknown as Promise<NotificationEntity>;
   }
 
@@ -44,7 +46,9 @@ export class NotificationsService {
   }
 
   async markAllRead(recipientEmail: string): Promise<void> {
-    await this.repo.update({ recipient_email: recipientEmail, is_read: false } as any, { is_read: true });
+    const recipient = await this.userRepo.findOne({ where: { email: recipientEmail } });
+    if (!recipient) return;
+    await this.repo.update({ recipient_user_id: recipient.id, is_read: false } as any, { is_read: true });
   }
 
   async remove(id: number, user: UserEntity): Promise<void> {
@@ -54,4 +58,3 @@ export class NotificationsService {
     await this.repo.remove(n);
   }
 }
-

@@ -5,8 +5,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Bell, CheckCheck, X, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
-import { useAuth } from '@/lib/AuthContext';
+import { notificationService } from '@/api/services/notificationService';
 
 function timeAgo(dateStr, t) {
   const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
@@ -18,29 +17,26 @@ function timeAgo(dateStr, t) {
 
 export default function NotificationCenter() {
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(null);
 
   const isRTL = !i18n.language?.startsWith('en');
 
   const loadNotifications = useCallback(async () => {
-    if (!user?.email) return;
     setLoading(true);
     try {
-      const data = await base44.entities.Notification.filter(
-        { recipient_email: user.email },
-        '-created_date',
-        30
-      );
+      const data = await notificationService.list({ limit: 30 });
       setNotifications(data || []);
-    } catch {
-      // silently fail
+      setLoadError(null);
+    } catch (error) {
+      setLoadError(t('common.refreshFailed', { defaultValue: 'Unable to refresh notifications' }));
+      console.error('Unable to load notifications', error);
     } finally {
       setLoading(false);
     }
-  }, [user?.email]);
+  }, []);
 
   useEffect(() => {
     loadNotifications();
@@ -51,15 +47,12 @@ export default function NotificationCenter() {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   const markAllRead = async () => {
-    const unread = notifications.filter(n => !n.is_read);
-    await Promise.allSettled(
-      unread.map(n => base44.entities.Notification.update(n.id, { is_read: true }))
-    );
+    await notificationService.markAllRead();
     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
   };
 
   const markOneRead = async (id) => {
-    await base44.entities.Notification.update(id, { is_read: true });
+    await notificationService.markRead(id);
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
   };
 
@@ -113,6 +106,11 @@ export default function NotificationCenter() {
             </div>
 
             <div className="overflow-y-auto flex-1">
+              {loadError && (
+                <div role="status" className="mx-4 mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
+                  {loadError}
+                </div>
+              )}
               {loading && (
                 <div className="flex items-center justify-center py-10">
                   <div className="w-6 h-6 border-2 border-[#E4ECFF] border-t-[#7C3AED] rounded-full animate-spin" />

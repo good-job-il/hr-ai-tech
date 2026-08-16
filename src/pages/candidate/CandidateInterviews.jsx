@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { interviewService } from '@/api/services/interviewService';
 import { useAuth } from '@/lib/AuthContext';
 import {
   Calendar, RefreshCw, Clock, Video, Phone, MapPin,
@@ -262,7 +262,7 @@ export default function CandidateInterviews() {
 
   const { data: interviews = [], isLoading, refetch } = useQuery({
     queryKey: ['candidate-interviews-page', user?.email],
-    queryFn: () => base44.entities.Interview.filter({ candidate_email: user.email }, '-date', 200),
+    queryFn: () => interviewService.list({ sort: 'date', order: 'DESC', limit: 200 }),
     enabled: !!user?.email,
   });
 

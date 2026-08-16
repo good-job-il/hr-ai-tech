@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { candidateService } from '@/api/services/candidateService';
+import { applicationService } from '@/api/services/applicationService';
+import { interviewService } from '@/api/services/interviewService';
+import { compensationPlanService } from '@/api/services/compensationPlanService';
 import { useAuth } from '@/lib/AuthContext';
-import { Users, Briefcase, Calendar, MessageSquare, TrendingUp, RefreshCw, ChevronLeft, Clock, DollarSign } from 'lucide-react';
+import { Users, Briefcase, Calendar, RefreshCw, ChevronLeft, DollarSign } from 'lucide-react';
 
 function StatCard({ icon: Icon, label, value, color, href, loading }) {
   const content = (
@@ -29,6 +32,7 @@ export default function RecruiterDashboard() {
   const [recentApplications, setRecentApplications] = useState([]);
   const [compensation, setCompensation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   const load = async () => {
     if (!user) return;
@@ -41,11 +45,13 @@ export default function RecruiterDashboard() {
     //  No fallback-to-all. Empty result → empty state in the UI.
     //  To grant access to unassigned records: set user.can_view_unassigned = true.
     // ─────────────────────────────────────────────────────────────────────────
+    setLoadError('');
+    try {
     const [candidates, applications, interviews, plans] = await Promise.all([
-      base44.entities.Candidate.filter({ organization_id: user.organization_id, recruiter_id: user.id }, '-created_date', 100).catch(() => []),
-      base44.entities.Application.filter({ organization_id: user.organization_id, recruiter_id: user.id }, '-created_date', 100).catch(() => []),
-      base44.entities.Interview.filter({ organization_id: user.organization_id, recruiter_id: user.id, status: 'scheduled' }, '-date', 50).catch(() => []),
-      base44.entities.CompensationPlan.filter({ organization_id: user.organization_id, recruiter_id: user.id }, '-created_date', 100).catch(() => []),
+      candidateService.list({ organization_id: user.organization_id, recruiter_id: user.id, sort: 'created_date', order: 'DESC', limit: 100 }),
+      applicationService.list({ organization_id: user.organization_id, recruiter_id: user.id, sort: 'created_date', order: 'DESC', limit: 100 }),
+      interviewService.list({ organization_id: user.organization_id, recruiter_id: user.id, status: 'scheduled', sort: 'date', order: 'DESC', limit: 50 }),
+      compensationPlanService.list({ recruiter_id: user.id, limit: 100 }),
     ]);
 
     // Calculate total compensation for this recruiter
@@ -67,7 +73,10 @@ export default function RecruiterDashboard() {
     setCompensation({ total: totalComp, plans: plans.filter(p => p.recruiter_compensation) });
     setRecentCandidates(candidates.slice(0, 5));
     setRecentApplications(applications.slice(0, 5));
-    setLoading(false);
+    } catch (error) {
+      setStats(null); setRecentCandidates([]); setRecentApplications([]); setCompensation(null);
+      setLoadError(error?.message || 'Unable to load recruiter dashboard');
+    } finally { setLoading(false); }
   };
 
   useEffect(() => { load(); }, [user?.id]);
@@ -91,6 +100,7 @@ export default function RecruiterDashboard() {
         <StatCard icon={Calendar} label="ראיונות קרובים" value={stats?.interviews ?? '—'} color="#059669" href="/recruiter/interviews" loading={loading} />
         <StatCard icon={DollarSign} label="התגמול שלי" value={compensation ? `${compensation.total.toLocaleString()} ₪` : '—'} color="#059669" href="/recruitment/compensation" loading={loading} />
       </div>
+      {loadError && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">{loadError}</div>}
 
       {/* Compensation Summary */}
       {compensation && compensation.plans.length > 0 && (

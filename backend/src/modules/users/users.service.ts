@@ -7,8 +7,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, FindManyOptions } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { randomBytes, createHash } from 'crypto';
 import { UserEntity } from './user.entity';
-import { CreateUserDto, UpdateUserDto, QueryUsersDto } from './dto/users.dto';
+import { CreateUserDto, InviteOrganizationUserDto, UpdateUserDto, QueryUsersDto } from './dto/users.dto';
+import { EmailService } from '../integrations/services/email.service';
 import { UserRole } from '../../common/enums/user-role.enum';
 import {
   buildPaginatedResponse,
@@ -20,6 +22,7 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly repo: Repository<UserEntity>,
+    private readonly emailService: EmailService,
   ) {}
 
   async findAll(query: QueryUsersDto, requestingUser: UserEntity) {
@@ -86,16 +89,51 @@ export class UsersService {
   ): Promise<UserEntity> {
     const user = await this.findById(id, requestingUser);
 
-    // Only admins can change roles
+    // Platform admins and organization admins may change roles. Organization
+    // admins remain confined to their own tenant and non-platform roles.
     if (
       dto.role &&
-      requestingUser.role !== UserRole.ADMIN
+      ![UserRole.ADMIN, UserRole.ORG_ADMIN].includes(requestingUser.role)
     ) {
-      throw new ForbiddenException('Only admins can change user roles');
+      throw new ForbiddenException('Only administrators can change user roles');
+    }
+    if (requestingUser.role === UserRole.ORG_ADMIN) {
+      if (user.organization_id !== requestingUser.organization_id) throw new ForbiddenException('Access denied');
+      if (user.id === requestingUser.id || user.role === UserRole.ORG_ADMIN || user.role === UserRole.ADMIN) {
+        throw new ForbiddenException('Organization administrators cannot manage administrator accounts');
+      }
+      if (dto.organization_id !== undefined || dto.org_type !== undefined || dto.employer_company_id !== undefined) {
+        throw new ForbiddenException('Organization ownership cannot be changed');
+      }
+      if (dto.role === UserRole.ADMIN || dto.role === UserRole.ORG_ADMIN) throw new ForbiddenException('Role cannot be assigned');
     }
 
     Object.assign(user, dto);
     const saved = await this.repo.save(user);
+    return this.sanitize(saved);
+  }
+
+  async invite(dto: InviteOrganizationUserDto, requestingUser: UserEntity): Promise<any> {
+    const organizationId = requestingUser.organization_id;
+    if (!organizationId) throw new ForbiddenException('An organization workspace is required');
+    const email = dto.email.toLowerCase().trim();
+    if (await this.repo.findOne({ where: { email } })) throw new ConflictException('A user with this email already exists');
+
+    const token = randomBytes(32).toString('hex');
+    const user = this.repo.create({
+      email,
+      password_hash: await bcrypt.hash(randomBytes(32).toString('hex'), 10),
+      full_name: dto.full_name,
+      phone: dto.phone ?? null,
+      role: dto.role as UserRole,
+      organization_id: organizationId,
+      org_type: requestingUser.org_type,
+      is_active: dto.is_active ?? true,
+      reset_token_hash: createHash('sha256').update(token).digest('hex'),
+      reset_token_expires: new Date(Date.now() + 48 * 60 * 60 * 1000),
+    });
+    const saved = await this.repo.save(user);
+    await this.emailService.sendStaffInvite({ email, fullName: saved.full_name, token });
     return this.sanitize(saved);
   }
 
@@ -131,9 +169,9 @@ export class UsersService {
 
   async remove(id: number, requestingUser: UserEntity): Promise<void> {
     if (
-      requestingUser.role !== UserRole.ADMIN
+      ![UserRole.ADMIN, UserRole.ORG_ADMIN].includes(requestingUser.role)
     ) {
-      throw new ForbiddenException('Only admins can delete users');
+      throw new ForbiddenException('Only administrators can remove users');
     }
 
     if (id === requestingUser.id) {
@@ -142,7 +180,14 @@ export class UsersService {
 
     const user = await this.repo.findOne({ where: { id } });
     if (!user) throw new NotFoundException(`User ${id} not found`);
-
+    if (requestingUser.role === UserRole.ORG_ADMIN) {
+      if (user.organization_id !== requestingUser.organization_id || user.role === UserRole.ORG_ADMIN) {
+        throw new ForbiddenException('Access denied');
+      }
+      user.is_active = false;
+      await this.repo.save(user);
+      return;
+    }
     await this.repo.remove(user);
   }
 

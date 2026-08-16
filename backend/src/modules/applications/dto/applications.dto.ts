@@ -11,6 +11,7 @@ export const CreateApplicationSchema = z.object({
   employer_company_id: z.number().int().optional().nullable(),
   recruiter_id: z.number().int().optional().nullable(),
   team_manager_id: z.number().int().optional().nullable(),
+  recruitment_manager_id: z.number().int().optional().nullable(),
   candidate_name: z.string().min(1),
   candidate_email: z.string().email(),
   candidate_phone: z.string().optional().nullable(),
@@ -27,6 +28,25 @@ export const CreateApplicationSchema = z.object({
 });
 export class CreateApplicationDto extends createZodDto(CreateApplicationSchema) {}
 
+export const SubmitApplicationSchema = CreateApplicationSchema.pick({
+  job_id: true,
+  candidate_name: true,
+  candidate_phone: true,
+  resume_url: true,
+  resume_filename: true,
+  cover_letter: true,
+  desired_salary_min: true,
+  desired_salary_max: true,
+  location: true,
+}).extend({ candidate_name: z.string().min(1).optional() });
+export class SubmitApplicationDto extends createZodDto(SubmitApplicationSchema) {}
+
+export const AssignCandidateSchema = z.object({
+  job_id: z.number().int(),
+  candidate_id: z.number().int(),
+});
+export class AssignCandidateDto extends createZodDto(AssignCandidateSchema) {}
+
 export const UpdateApplicationSchema = CreateApplicationSchema.partial().extend({
   match_score: z.number().optional().nullable(),
   match_reason: z.string().optional().nullable(),
@@ -35,6 +55,9 @@ export const UpdateApplicationSchema = CreateApplicationSchema.partial().extend(
   deleted_by: z.string().optional().nullable(),
 });
 export class UpdateApplicationDto extends createZodDto(UpdateApplicationSchema) {}
+
+export const ChangeApplicationStatusSchema = z.object({ status: statusEnum });
+export class ChangeApplicationStatusDto extends createZodDto(ChangeApplicationStatusSchema) {}
 
 export const QueryApplicationsSchema = z.object({
   page: z.coerce.number().min(1).default(1),
@@ -53,15 +76,3 @@ export const QueryApplicationsSchema = z.object({
   search: z.string().optional(),
 });
 export class QueryApplicationsDto extends createZodDto(QueryApplicationsSchema) {}
-
-// ─── Pipeline ─────────────────────────────────────────────────────────────
-export const CreatePipelineStageSchema = z.object({
-  employer_id: z.string(),
-  name: z.string().min(1),
-  order: z.number().int().optional().default(0),
-  color: z.string().optional().nullable(),
-});
-export class CreatePipelineStageDto extends createZodDto(CreatePipelineStageSchema) {}
-export const UpdatePipelineStageSchema = CreatePipelineStageSchema.partial();
-export class UpdatePipelineStageDto extends createZodDto(UpdatePipelineStageSchema) {}
-

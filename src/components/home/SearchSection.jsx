@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, ChevronDown, Sparkles } from 'lucide-react';
+import { Search, MapPin, ChevronDown } from 'lucide-react';
 
 const QUICK_TAGS = ['Full Stack מפתח', 'Data Analyst', 'DevOps', 'UX/UI Designer', 'מנהל/ת מוצר', 'Frontend מפתח', 'שיווק דיגיטלי'];
 const DOMAINS = ['כל התחומים', 'הנדסה ופיתוח', 'עיצוב', 'שיווק', 'מוצר', 'מכירות', 'כספים', 'משאבי אנוש'];

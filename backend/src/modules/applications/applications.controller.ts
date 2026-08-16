@@ -2,9 +2,9 @@ import {
   Controller, Get, Post, Patch, Delete,
   Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ApplicationsService } from './applications.service';
-import { CreateApplicationDto, UpdateApplicationDto, QueryApplicationsDto, CreatePipelineStageDto, UpdatePipelineStageDto } from './dto/applications.dto';
+import { AssignCandidateDto, ChangeApplicationStatusDto, CreateApplicationDto, SubmitApplicationDto, UpdateApplicationDto, QueryApplicationsDto } from './dto/applications.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
@@ -22,6 +22,14 @@ export class ApplicationsController {
   constructor(private readonly svc: ApplicationsService) {}
 
   @Get() findAll(@Query() q: QueryApplicationsDto, @CurrentUser() u: UserEntity) { return this.svc.findAll(q, u); }
+  @Post('submit')
+  @Roles(UserRole.CANDIDATE)
+  @HttpCode(HttpStatus.CREATED)
+  submit(@Body() dto: SubmitApplicationDto, @CurrentUser() u: UserEntity) { return this.svc.submit(dto, u); }
+  @Post('assign-candidate')
+  @Roles(...APPLICATION_MANAGE_ROLES)
+  @HttpCode(HttpStatus.CREATED)
+  assignCandidate(@Body() dto: AssignCandidateDto, @CurrentUser() u: UserEntity) { return this.svc.assignCandidate(dto, u); }
   @Get(':id') findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.findById(id, u); }
 
   @Post()
@@ -35,6 +43,12 @@ export class ApplicationsController {
     return this.svc.update(id, dto, u);
   }
 
+  @Patch(':id/status')
+  @Roles(...APPLICATION_MANAGE_ROLES)
+  changeStatus(@Param('id', ParseIntPipe) id: number, @Body() dto: ChangeApplicationStatusDto, @CurrentUser() u: UserEntity) {
+    return this.svc.changeStatus(id, dto.status, u);
+  }
+
   @Delete(':id')
   @Roles(...APPLICATION_MANAGE_ROLES)
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -44,24 +58,4 @@ export class ApplicationsController {
   @Get(':id/timeline')
   getTimeline(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.getTimeline(id, u); }
 
-  // ─── Pipeline ────────────────────────────────────────────────────────────
-  @Get('pipeline/:employerId')
-  @ApiOperation({ summary: 'Get pipeline stages for employer' })
-  getPipeline(@Param('employerId') employerId: string) { return this.svc.getPipeline(employerId); }
-
-  @Post('pipeline')
-  @Roles(...APPLICATION_MANAGE_ROLES)
-  @HttpCode(HttpStatus.CREATED)
-  createStage(@Body() dto: CreatePipelineStageDto) { return this.svc.createPipelineStage(dto); }
-
-  @Patch('pipeline/:id')
-  @Roles(...APPLICATION_MANAGE_ROLES)
-  updateStage(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePipelineStageDto) {
-    return this.svc.updatePipelineStage(id, dto);
-  }
-
-  @Delete('pipeline/:id')
-  @Roles(...APPLICATION_MANAGE_ROLES)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  deleteStage(@Param('id', ParseIntPipe) id: number) { return this.svc.deletePipelineStage(id); }
 }

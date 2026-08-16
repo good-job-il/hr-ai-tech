@@ -1,14 +1,32 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { MemoryCacheStore } from './cacheStore';
 import { tokenStorage } from './tokenStorage';
 import { normalizeError } from '@/lib/errors/errorNormalizer';
 import { AppError } from '@/lib/errors/AppError';
+import { ErrorNormalizer } from '@/lib/errors/errorNormalizer';
 import { ApiResponse, RequestConfig } from '@/types/api';
+
+type ApiPayload<T> = ApiResponse<T> | T;
+
+function isEnvelope<T>(payload: ApiPayload<T>): payload is ApiResponse<T> {
+  return Boolean(
+    payload
+    && typeof payload === 'object'
+    && 'data' in payload
+    && 'status' in payload
+    && typeof (payload as ApiResponse<T>).status === 'number'
+    && !('pagination' in payload),
+  );
+}
+
+export function unwrapResponse<T>(payload: ApiPayload<T>): T {
+  return isEnvelope(payload) ? payload.data : payload as T;
+}
 
 export class HttpClient {
   private axiosInstance: AxiosInstance;
   private cache = new MemoryCacheStore();
-  private pendingRequests = new Map<string, Promise<any>>();
+  private pendingRequests = new Map<string, Promise<unknown>>();
   private refreshPromise: Promise<string | null> | null = null;
 
   constructor() {
@@ -96,19 +114,20 @@ export class HttpClient {
     return this.refreshPromise;
   }
 
-  private generateCacheKey(method: string, url: string, params?: any): string {
+  private generateCacheKey(method: string, url: string, params?: unknown): string {
     return `${method}:${url}:${JSON.stringify(params || {})}`;
   }
 
-  private async retryWithBackoff(
-    fn: () => Promise<any>,
+  private async retryWithBackoff<T>(
+    fn: () => Promise<T>,
     retries: number = 3,
     delay: number = 1000
-  ): Promise<any> {
+  ): Promise<T> {
     try {
       return await fn();
-    } catch (error: any) {
-      if (retries <= 0 || !error.retryable) {
+    } catch (error) {
+      const normalized = error instanceof AppError ? error : normalizeError(error);
+      if (retries <= 0 || !ErrorNormalizer.isRetryable(normalized)) {
         throw error;
       }
 
@@ -126,24 +145,24 @@ export class HttpClient {
     // Check cache
     if (config?.cache !== false) {
       const cached = this.cache.get<T>(cacheKey);
-      if (cached) return cached;
+      if (cached !== null) return cached;
     }
 
     // Request deduplication
     if (this.pendingRequests.has(cacheKey)) {
-      return this.pendingRequests.get(cacheKey)!;
+      return this.pendingRequests.get(cacheKey)! as Promise<T>;
     }
 
     const request = this.retryWithBackoff(
-      () => this.axiosInstance.get<ApiResponse<T>>(url, config),
-      config?.retryCount || 3,
-      config?.retryDelay || 1000
+      () => this.axiosInstance.get<ApiPayload<T>>(url, config),
+      config?.retryCount ?? 3,
+      config?.retryDelay ?? 1000
     ).then((response) => {
-      const data = response.data?.data || response.data;
+      const data = unwrapResponse<T>(response.data);
 
       // Cache successful response
       if (config?.cache !== false) {
-        this.cache.set(data, cacheKey, config?.cacheDuration || 300000);
+        this.cache.set(cacheKey, data, config?.cacheDuration ?? 300000);
       }
 
       return data;
@@ -159,12 +178,12 @@ export class HttpClient {
 
   async post<T = any>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig & RequestConfig
   ): Promise<T> {
     try {
-      const response = await this.axiosInstance.post<ApiResponse<T>>(url, data, config);
-      return response.data?.data || response.data;
+      const response = await this.axiosInstance.post<ApiPayload<T>>(url, data, config);
+      return unwrapResponse<T>(response.data);
     } catch (error) {
       throw normalizeError(error);
     }
@@ -172,13 +191,13 @@ export class HttpClient {
 
   async put<T = any>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig & RequestConfig
   ): Promise<T> {
     try {
-      const response = await this.axiosInstance.put<ApiResponse<T>>(url, data, config);
+      const response = await this.axiosInstance.put<ApiPayload<T>>(url, data, config);
       this.cache.clear();
-      return response.data?.data || response.data;
+      return unwrapResponse<T>(response.data);
     } catch (error) {
       throw normalizeError(error);
     }
@@ -186,13 +205,13 @@ export class HttpClient {
 
   async patch<T = any>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig & RequestConfig
   ): Promise<T> {
     try {
-      const response = await this.axiosInstance.patch<ApiResponse<T>>(url, data, config);
+      const response = await this.axiosInstance.patch<ApiPayload<T>>(url, data, config);
       this.cache.clear();
-      return response.data?.data || response.data;
+      return unwrapResponse<T>(response.data);
     } catch (error) {
       throw normalizeError(error);
     }
@@ -203,9 +222,9 @@ export class HttpClient {
     config?: AxiosRequestConfig & RequestConfig
   ): Promise<T> {
     try {
-      const response = await this.axiosInstance.delete<ApiResponse<T>>(url, config);
+      const response = await this.axiosInstance.delete<ApiPayload<T>>(url, config);
       this.cache.clear();
-      return response.data?.data || response.data;
+      return unwrapResponse<T>(response.data);
     } catch (error) {
       throw normalizeError(error);
     }

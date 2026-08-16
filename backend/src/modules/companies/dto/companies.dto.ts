@@ -20,7 +20,7 @@ export class UpdateCompanyDto extends createZodDto(UpdateCompanySchema) {}
 export const QueryCompaniesSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(500).default(20),
-  sort: z.string().default('name'),
+  sort: z.enum(['name', 'created_date', 'job_count']).default('name'),
   order: z.enum(['ASC', 'DESC']).default('ASC'),
   search: z.string().optional(),
   industry: z.string().optional(),
@@ -32,8 +32,6 @@ export class QueryCompaniesDto extends createZodDto(QueryCompaniesSchema) {}
 export const CreateCompanyReviewSchema = z.object({
   company_id: z.number().int(),
   company_name: z.string().optional().nullable(),
-  reviewer_email: z.string().email(),
-  reviewer_name: z.string().optional().nullable(),
   rating_overall: z.number().min(1).max(5),
   rating_salary: z.number().min(1).max(5).optional().nullable(),
   rating_management: z.number().min(1).max(5).optional().nullable(),

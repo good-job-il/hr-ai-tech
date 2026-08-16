@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { httpClient } from '@/api/client/httpClient';
-import { createStageChangeNotifications } from '@/lib/pipelineNotifications';
+import { applicationService } from '@/api/services/applicationService';
 import { APPLICATION_PIPELINE_STAGES } from '@/domain/agency/contracts';
 import {
   filterAgencyRecordsByScope,
@@ -14,10 +13,6 @@ function getDefaultStages(t) {
     ...stage,
     label: t(`pipeline.stages.${stage.id}`),
   }));
-}
-
-function stageLabel(t, id) {
-  return t(`pipeline.stages.${id}`, { defaultValue: id });
 }
 
 export function usePipelineData(user, filters = {}, onNotificationCreated) {
@@ -33,11 +28,8 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
     setLoading(true);
     setError(null);
     try {
-      const query = new URLSearchParams({ sort: 'created_date', order: 'DESC', limit: '500' });
       const scopeFilter = getAgencyScopeFilter(user);
-      Object.entries(scopeFilter || {}).forEach(([key, value]) => query.set(key, value));
-      const raw = await httpClient.get(`/applications?${query.toString()}`, { cache: false });
-      const apps = Array.isArray(raw) ? raw : (raw?.data || []);
+      const apps = await applicationService.list({ ...scopeFilter, sort: 'created_date', order: 'DESC', limit: 500 });
       setIsMockData(false);
       const filtered = applyFilters(apps, filters, user);
       setApplications(filtered);
@@ -77,34 +69,8 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
     if (String(appId).startsWith('demo-')) return;
 
     try {
-      await httpClient.patch(`/applications/${appId}`, {
-        status: newStage,
-        stage_entered_at: new Date().toISOString(),
-      });
-
-      if (application && oldStage && oldStage !== newStage) {
-        httpClient.post('/functions/createApplicationTimeline', {
-          application_id: appId,
-          event_type: 'status_changed',
-          previous_value: oldStage,
-          new_value: newStage,
-          description: t('pipeline.activityTimeline.stageChange', {
-            from: stageLabel(t, oldStage),
-            to: stageLabel(t, newStage),
-          }),
-          performed_by_role: user?.role || 'recruiter',
-        }).catch(() => {});
-
-        createStageChangeNotifications({
-          application,
-          oldStage,
-          newStage,
-          changedBy: user?.full_name || user?.email || t('pipeline.data.defaultRecruiter'),
-          user,
-        }).catch(() => {});
-
-        if (onNotificationCreated) onNotificationCreated();
-      }
+      await applicationService.updateStatus(appId, newStage);
+      if (application && oldStage && oldStage !== newStage && onNotificationCreated) onNotificationCreated();
     } catch (requestError) {
       setApplications(prev =>
         prev.map(a => a.id === appId ? { ...a, status: oldStage || a.status } : a)

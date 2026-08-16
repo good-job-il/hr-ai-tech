@@ -23,20 +23,20 @@ export class JobsService {
     @InjectRepository(CompanyEntity) private readonly companyRepo: Repository<CompanyEntity>,
   ) {}
 
-  async findAll(query: QueryJobsDto, user: UserEntity) {
+  async findAll(query: QueryJobsDto, user?: UserEntity) {
     const { page, limit, sort, order, search, organization_id, employer_company_id,
       recruiter_id, domain_id, type, is_closed, is_deleted } = query;
 
-    const rlsWhere = getRlsWhere('Job', {
+    const rlsWhere = user ? getRlsWhere('Job', {
       id: user.id, role: user.role, organization_id: user.organization_id,
       employer_company_id: user.employer_company_id, email: user.email,
       impersonating: user.impersonating,
-    });
+    }) : { is_closed: false, is_deleted: false };
 
     if (isBlocked(rlsWhere)) return buildPaginatedResponse([], 0, { page, limit });
 
     const where: Record<string, any> = { ...rlsWhere };
-    if (organization_id && user.role === UserRole.ADMIN && !user.impersonating) {
+    if (organization_id && user?.role === UserRole.ADMIN && !user.impersonating) {
       where.organization_id = organization_id;
     }
     if (employer_company_id && !('employer_company_id' in rlsWhere)) where.employer_company_id = employer_company_id;
@@ -62,12 +62,12 @@ export class JobsService {
     return buildPaginatedResponse(data, total, { page, limit, sort, order });
   }
 
-  async findById(id: number, user: UserEntity): Promise<JobEntity> {
-    const rlsWhere = getRlsWhere('Job', {
+  async findById(id: number, user?: UserEntity): Promise<JobEntity> {
+    const rlsWhere = user ? getRlsWhere('Job', {
       id: user.id, role: user.role, organization_id: user.organization_id,
       employer_company_id: user.employer_company_id, email: user.email,
       impersonating: user.impersonating,
-    });
+    }) : { is_closed: false, is_deleted: false };
     if (isBlocked(rlsWhere)) throw new NotFoundException(`Job ${id} not found`);
     const job = await this.jobRepo.findOne({ where: { ...rlsWhere, id } as any });
     if (!job) throw new NotFoundException(`Job ${id} not found`);
@@ -127,7 +127,27 @@ export class JobsService {
    * caller cannot attach a job to another agency's customer or spoof its name.
    */
   private async resolveAgencyClientCompany(companyId: number | null | undefined, user: UserEntity) {
-    if (user.org_type !== OrgType.STAFFING_AGENCY) return null;
+    if (user.role === UserRole.ADMIN && !user.impersonating) {
+      if (!companyId) return null;
+      const company = await this.companyRepo.findOne({ where: { id: companyId, is_deleted: false } });
+      if (!company) throw new NotFoundException(`Company ${companyId} not found`);
+      return company;
+    }
+    if (user.org_type !== OrgType.STAFFING_AGENCY) {
+      if (user.role === UserRole.EMPLOYER || user.employer_company_id) {
+        if (!user.employer_company_id) throw new ForbiddenException('Employer company context required');
+        if (companyId && companyId !== user.employer_company_id) {
+          throw new ForbiddenException('You can only create jobs for your own employer company');
+        }
+        const company = await this.companyRepo.findOne({
+          where: { id: user.employer_company_id, is_deleted: false },
+        });
+        if (!company) throw new NotFoundException(`Company ${user.employer_company_id} not found`);
+        return company;
+      }
+      if (companyId) throw new ForbiddenException('Employer company ownership is required');
+      return null;
+    }
     if (!user.organization_id) throw new ForbiddenException('Organization context required');
     if (!companyId) throw new BadRequestException('An active agency client is required');
 
@@ -148,46 +168,49 @@ export class JobsService {
   }
 
   // ─── Saved Jobs ──────────────────────────────────────────────────────────
-  async getSavedJobs(userEmail: string, jobId?: string) {
-    const where: any = { user_email: userEmail };
+  async getSavedJobs(user: UserEntity, jobId?: string) {
+    const where: any = { user_id: user.id };
     if (jobId) where.job_id = jobId;
     return this.savedJobRepo.find({ where, order: { created_date: 'DESC' } as any });
   }
 
-  async saveJob(dto: CreateSavedJobDto): Promise<SavedJobEntity> {
-    const existing = await this.savedJobRepo.findOne({ where: { user_email: dto.user_email, job_id: dto.job_id } as any });
+  async saveJob(dto: CreateSavedJobDto, user: UserEntity): Promise<SavedJobEntity> {
+    const owned = { ...dto, user_id: user.id, user_email: user.email };
+    const existing = await this.savedJobRepo.findOne({ where: { user_id: user.id, job_id: dto.job_id } as any });
     if (existing) return existing;
-    const saved = this.savedJobRepo.create(dto as any);
+    const saved = this.savedJobRepo.create(owned as any);
     return this.savedJobRepo.save(saved) as unknown as Promise<SavedJobEntity>;
   }
 
-  async unsaveJob(id: number, userEmail: string): Promise<void> {
+  async unsaveJob(id: number, user: UserEntity): Promise<void> {
     const saved = await this.savedJobRepo.findOne({ where: { id } });
     if (!saved) throw new NotFoundException('Saved job not found');
-    if (saved.user_email !== userEmail) throw new ForbiddenException('Access denied');
+    if (saved.user_id !== user.id) throw new ForbiddenException('Access denied');
     await this.savedJobRepo.remove(saved);
   }
 
   // ─── Job Alerts ───────────────────────────────────────────────────────────
-  async getAlerts(userEmail: string) {
-    return this.alertRepo.find({ where: { user_email: userEmail } });
+  async getAlerts(user: UserEntity) {
+    return this.alertRepo.find({ where: { user_id: user.id } });
   }
 
-  async createAlert(dto: CreateJobAlertDto): Promise<JobAlertEntity> {
-    const alert = this.alertRepo.create(dto as any);
+  async createAlert(dto: CreateJobAlertDto, user: UserEntity): Promise<JobAlertEntity> {
+    const alert = this.alertRepo.create({ ...dto, user_id: user.id, user_email: user.email } as any);
     return this.alertRepo.save(alert) as unknown as Promise<JobAlertEntity>;
   }
 
-  async updateAlert(id: number, dto: UpdateJobAlertDto): Promise<JobAlertEntity> {
+  async updateAlert(id: number, dto: UpdateJobAlertDto, user: UserEntity): Promise<JobAlertEntity> {
     const alert = await this.alertRepo.findOne({ where: { id } as any });
     if (!alert) throw new NotFoundException(`Alert ${id} not found`);
+    if (alert.user_id !== user.id) throw new ForbiddenException('Access denied');
     Object.assign(alert, dto);
     return this.alertRepo.save(alert) as unknown as Promise<JobAlertEntity>;
   }
 
-  async deleteAlert(id: number): Promise<void> {
+  async deleteAlert(id: number, user: UserEntity): Promise<void> {
     const alert = await this.alertRepo.findOne({ where: { id } as any });
     if (!alert) throw new NotFoundException(`Alert ${id} not found`);
+    if (alert.user_id !== user.id) throw new ForbiddenException('Access denied');
     await this.alertRepo.remove(alert);
   }
 }

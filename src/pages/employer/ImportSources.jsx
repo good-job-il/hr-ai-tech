@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { importSourceService } from '@/api/services/importSourceService';
+import { jobService } from '@/api/services/jobService';
 import { Plus, Trash2, RefreshCw, FileText, Pencil, CheckCircle, XCircle, Clock, Search, Play, AlertTriangle, ChevronDown, ChevronUp, Loader2, ExternalLink } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import ImportSourceModal from '@/components/employer/ImportSourceModal';
@@ -21,31 +22,16 @@ export default function ImportSources() {
 
   const { data: sources = [], isLoading } = useQuery({
     queryKey: ['import-sources'],
-    queryFn: () => base44.entities.ImportSource.list('-created_date', 50),
+    queryFn: () => importSourceService.list({ limit: 50 }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.ImportSource.delete(id),
+    mutationFn: (id) => importSourceService.remove(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['import-sources'] }),
   });
 
   const syncMutation = useMutation({
-    mutationFn: async (source) => {
-      const name = (source.name || '').toLowerCase();
-      const provider = (source.provider || '').toLowerCase();
-      const url = (source.url || '').toLowerCase();
-      
-      if (url.includes('nvidia') || name.includes('nvidia')) {
-        return base44.functions.invoke('importNvidia', { source_id: source.id });
-      }
-      if (name.includes('נובולוג') || name.includes('novolog') || provider.includes('novolog') || url.includes('novolog') || url.includes('adamtotal')) {
-        return base44.functions.invoke('importNovolog', { source_id: source.id });
-      }
-      if (name.includes('alljobs') || provider.includes('alljobs') || url.includes('alljobs')) {
-        return base44.functions.invoke('importAlljobs', {});
-      }
-      return base44.functions.invoke('importNovolog', { source_id: source.id });
-    },
+    mutationFn: (source) => importSourceService.run(source.id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['import-sources'] }),
     onError: () => queryClient.invalidateQueries({ queryKey: ['import-sources'] }),
   });
@@ -54,12 +40,8 @@ export default function ImportSources() {
     setScanning(prev => ({ ...prev, [source.id]: true }));
     setScanResults(prev => ({ ...prev, [source.id]: null }));
     try {
-      const res = await base44.functions.invoke('crawlCareerPage', {
-        url: source.url,
-        source_id: source.id,
-        company_name: source.company_name || source.name,
-      });
-      setScanResults(prev => ({ ...prev, [source.id]: res.data }));
+      const result = await importSourceService.run(source.id);
+      setScanResults(prev => ({ ...prev, [source.id]: result }));
     } catch (err) {
       setScanResults(prev => ({ ...prev, [source.id]: { success: false, error: err.message } }));
     } finally {
@@ -73,11 +55,8 @@ export default function ImportSources() {
     setQuickScanning(true);
     setQuickResult(null);
     try {
-      const res = await base44.functions.invoke('crawlCareerPage', {
-        url: quickUrl,
-        company_name: quickName || 'חברה',
-      });
-      setQuickResult(res.data);
+      const result = await importSourceService.preview(quickUrl, quickName || 'חברה');
+      setQuickResult(result);
     } catch (err) {
       setQuickResult({ success: false, error: err.message });
     } finally {
@@ -88,7 +67,7 @@ export default function ImportSources() {
   const { data: activeJobsCount = 0 } = useQuery({
     queryKey: ['active-jobs-count'],
     queryFn: async () => {
-      const jobs = await base44.entities.Job.filter({ is_closed: false });
+      const jobs = await jobService.list({ is_closed: false, limit: 500 });
       return jobs.length;
     },
   });
@@ -97,31 +76,7 @@ export default function ImportSources() {
     mutationFn: async () => {
       const activeSources = sources.filter(s => s.is_active);
       const results = await Promise.allSettled(
-        activeSources.map(source => {
-          const name = (source.name || '').toLowerCase();
-          const provider = (source.provider || '').toLowerCase();
-          const url = (source.url || '').toLowerCase();
-          
-          if (url.includes('nvidia') || name.includes('nvidia')) {
-            return base44.functions.invoke('importNvidia', { source_id: source.id });
-          }
-          if (name.includes('נובולוג') || name.includes('novolog') || provider.includes('novolog') || url.includes('novolog') || url.includes('adamtotal')) {
-            return base44.functions.invoke('importNovolog', { source_id: source.id });
-          }
-          if (name.includes('alljobs') || provider.includes('alljobs') || url.includes('alljobs')) {
-            return base44.functions.invoke('importAlljobs', {});
-          }
-          if (name.includes('שפיר') || name.includes('shafir') || provider.includes('shafir') || url.includes('shafir')) {
-            return base44.functions.invoke('importShafir', { source_id: source.id });
-          }
-          if (name.includes('אלביט') || name.includes('elbit') || provider.includes('elbit') || url.includes('elbit')) {
-            return base44.functions.invoke('importElbit', { source_id: source.id });
-          }
-          if (name.includes('jobicy') || provider.includes('jobicy') || url.includes('jobicy')) {
-            return base44.functions.invoke('importJobicy', { source_id: source.id });
-          }
-          return base44.functions.invoke('importNovolog', { source_id: source.id });
-        })
+        activeSources.map(source => importSourceService.run(source.id))
       );
       const errors = results.filter(r => r.status === 'rejected');
       if (errors.length > 0) {

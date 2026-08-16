@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { httpClient } from '@/api/client/httpClient';
+import { userService } from '@/api/services/userService';
 import { ChevronDown, UserCheck, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +14,7 @@ export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
   useEffect(() => {
     if (!open) return;
     setLoading(true);
-    httpClient.get('/users?limit=200', { cache: false })
+    userService.list({ limit: 200, is_active: true })
       .then(users => {
         const RECRUITER_ROLES = ['recruiter', 'team_manager', 'recruitment_manager', 'admin'];
         const filtered = users.filter(u =>

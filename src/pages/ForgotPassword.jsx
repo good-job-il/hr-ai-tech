@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { httpClient } from '@/api/client/httpClient';
+import { authService } from '@/api/services/authService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,7 +18,7 @@ export default function ForgotPassword() {
     e.preventDefault();
     setLoading(true);
     try {
-      await httpClient.post('/auth/forgot-password', { email });
+      await authService.requestPasswordReset(email);
     } catch {}
     setSent(true);
     setLoading(false);

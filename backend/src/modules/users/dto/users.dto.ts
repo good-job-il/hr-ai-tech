@@ -19,6 +19,11 @@ export const CreateUserSchema = z.object({
 });
 export class CreateUserDto extends createZodDto(CreateUserSchema) {}
 
+export const InviteOrganizationUserSchema = CreateUserSchema.omit({ password: true, organization_id: true }).extend({
+  role: z.enum(['recruiter', 'team_manager', 'recruitment_manager', 'hr_manager', 'internal_recruiter']),
+});
+export class InviteOrganizationUserDto extends createZodDto(InviteOrganizationUserSchema) {}
+
 // ─── Update User ──────────────────────────────────────────────────────────
 export const UpdateUserSchema = z.object({
   full_name: z.string().min(1).optional(),
@@ -27,6 +32,7 @@ export const UpdateUserSchema = z.object({
   organization_id: z.number().int().nullable().optional(),
   org_type: z.enum(['staffing_agency', 'organization']).nullable().optional(),
   team_manager_id: z.number().int().nullable().optional(),
+  team_id: z.number().int().nullable().optional(),
   recruitment_manager_id: z.number().int().nullable().optional(),
   employer_company_id: z.number().int().nullable().optional(),
   display_role_name: z.string().optional(),
@@ -38,7 +44,7 @@ export class UpdateUserDto extends createZodDto(UpdateUserSchema) {}
 export const QueryUsersSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(500).default(20),
-  sort: z.string().default('created_date'),
+  sort: z.enum(['created_date', 'updated_date', 'full_name', 'email', 'role']).default('created_date'),
   order: z.enum(['ASC', 'DESC']).default('DESC'),
   role: z.string().optional(),
   organization_id: z.coerce.number().int().optional(),
@@ -46,4 +52,3 @@ export const QueryUsersSchema = z.object({
   search: z.string().optional(),
 });
 export class QueryUsersDto extends createZodDto(QueryUsersSchema) {}
-

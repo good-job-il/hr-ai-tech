@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, FileText, Mail, Phone, ExternalLink, MessageSquare } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { applicationService } from '@/api/services/applicationService';
 
 const STATUS_OPTIONS = [
   { value: 'new', label: 'מועמד חדש' },
@@ -37,7 +37,7 @@ export default function CandidateDetailModal({ application: app, onClose, onStat
    const queryClient = useQueryClient();
 
    const updateMutation = useMutation({
-     mutationFn: ({ id, data }) => base44.entities.Application.update(id, data),
+     mutationFn: ({ id, data }) => applicationService.update(id, data),
      onSuccess: () => queryClient.invalidateQueries({ queryKey: ['employer-applications'] }),
    });
 

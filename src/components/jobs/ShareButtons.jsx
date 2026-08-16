@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Linkedin, MessageCircle, Facebook, Link2, Copy, Check } from 'lucide-react';
+import { Linkedin, MessageCircle, Facebook, Copy, Check } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { toast } from 'sonner';
 

@@ -1,6 +1,6 @@
 # Hire Israel — NestJS Backend
 
-Replaces the Base44 BaaS backend with a proper **NestJS + MySQL + TypeORM** stack.
+The API uses **NestJS + MySQL + TypeORM**.
 
 ## Stack
 
@@ -243,9 +243,7 @@ Update the frontend proxy or `VITE_API_BASE_URL` to point to:
 http://localhost:3001/api
 ```
 
-The frontend's `BaseRepository` (`src/api/repositories/baseRepository.ts`) already sends requests to `/api/*` via axios — it works out of the box once the backend is running.
-
-For Base44 compatibility, update `src/api/base44Client.js` with the shim (Phase 5).
+The frontend domain services send requests to `/api/*`; they work once the backend and development proxy are running.
 
 ---
 
@@ -253,10 +251,5 @@ For Base44 compatibility, update `src/api/base44Client.js` with the shim (Phase 
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| 1 | ✅ Complete | Foundation: Auth, Users, Organizations, Taxonomy |
-| 2 | 🔜 Next | Candidates, Jobs, Applications, Interviews, Messages, Notifications, Companies |
-| 3 | 🔜 | Compensation, Audit, CommunicationLog, Permissions, ImportSources |
-| 4 | 🔜 | AI functions, Import, Cron jobs |
-| 5 | 🔜 | Frontend migration (Base44 shim → direct HTTP) |
-| 6 | 🔜 | Testing, data migration, cutover |
-
+| 1–7 | ✅ Complete | Security boundary, typed API, workflows, background jobs and legacy removal |
+| 8 | 🔜 Next | Final environment QA and release sign-off |

@@ -29,11 +29,10 @@ export class OnboardAgencyDto extends createZodDto(OnboardAgencySchema) {}
 export const QueryOrganizationsSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(500).default(20),
-  sort: z.string().default('created_date'),
+  sort: z.enum(['created_date', 'updated_date', 'name', 'status', 'plan']).default('created_date'),
   order: z.enum(['ASC', 'DESC']).default('DESC'),
   org_type: z.enum(['staffing_agency', 'organization']).optional(),
   status: z.enum(['active', 'suspended', 'inactive']).optional(),
   search: z.string().optional(),
 });
 export class QueryOrganizationsDto extends createZodDto(QueryOrganizationsSchema) {}
-

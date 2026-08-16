@@ -136,6 +136,13 @@ export class OrganizationsService {
       throw new ForbiddenException('Insufficient permissions to update organization');
     }
 
+    if (user.role !== UserRole.ADMIN) {
+      const platformOnlyFields: (keyof UpdateOrganizationDto)[] = ['org_type', 'status', 'plan'];
+      if (platformOnlyFields.some((field) => dto[field] !== undefined)) {
+        throw new ForbiddenException('Only platform admins can change organization type, status or plan');
+      }
+    }
+
     Object.assign(org, dto);
     return this.repo.save(org);
   }
@@ -151,4 +158,3 @@ export class OrganizationsService {
     await this.repo.remove(org);
   }
 }
-

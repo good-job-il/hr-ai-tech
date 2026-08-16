@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { notificationService } from '@/api/services/notificationService';
 import { useAuth } from '@/lib/AuthContext';
-import { Bell, CheckCheck, Trash2, Filter, X } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Bell, CheckCheck, Trash2, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/home/Navbar';
 import { getNotifIcon, getNotifColor, NOTIF_TYPE_LABELS } from '@/components/notifications/notifHelpers';
 
@@ -11,49 +11,45 @@ export default function Notifications() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [filter, setFilter] = useState('all'); // all | unread | read
 
   const fetchNotifications = async () => {
     if (!user?.email) return;
-    const result = await base44.entities.Notification.filter(
-      { recipient_email: user.email },
-      '-created_date',
-      100
-    );
-    setNotifications(result || []);
-    setLoading(false);
+    try {
+      const result = await notificationService.list({ limit: 100 });
+      setNotifications(result || []);
+      setLoadError(null);
+    } catch {
+      setLoadError('Unable to refresh notifications');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchNotifications();
-    const unsub = base44.entities.Notification.subscribe((event) => {
-      if (event.data?.recipient_email === user?.email) {
-        if (event.type === 'create') setNotifications(prev => [event.data, ...prev]);
-        else if (event.type === 'update') setNotifications(prev => prev.map(n => n.id === event.id ? { ...n, ...event.data } : n));
-        else if (event.type === 'delete') setNotifications(prev => prev.filter(n => n.id !== event.id));
-      }
-    });
-    return unsub;
+    const interval = window.setInterval(fetchNotifications, 15000);
+    return () => window.clearInterval(interval);
   }, [user?.email]);
 
   const markAsRead = async (id) => {
-    await base44.entities.Notification.update(id, { is_read: true });
+    await notificationService.markRead(id);
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
   };
 
   const markAllRead = async () => {
-    const unread = notifications.filter(n => !n.is_read);
-    await Promise.all(unread.map(n => base44.entities.Notification.update(n.id, { is_read: true })));
+    await notificationService.markAllRead();
     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
   };
 
   const deleteNotif = async (id) => {
-    await base44.entities.Notification.delete(id);
+    await notificationService.remove(id);
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
   const deleteAll = async () => {
-    await Promise.all(notifications.map(n => base44.entities.Notification.delete(n.id)));
+    await Promise.all(notifications.map(n => notificationService.remove(n.id)));
     setNotifications([]);
   };
 
@@ -76,6 +72,7 @@ export default function Notifications() {
     <div className="min-h-screen bg-background" dir="rtl">
       <Navbar />
       <div className="max-w-3xl mx-auto px-4 py-8">
+        {loadError && <div role="status" className="mb-4 rounded-lg border border-amber-400/30 bg-amber-500/10 p-3 text-sm text-amber-300">{loadError}</div>}
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>

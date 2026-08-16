@@ -10,6 +10,7 @@ import { CandidateProfileEntity } from './entities/candidate-profile.entity';
 import { CandidateAccessEntity } from './entities/candidate-access.entity';
 import { CandidatesService } from './candidates.service';
 import { CandidatesController } from './candidates.controller';
+import { UserEntity } from '../users/user.entity';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CandidatesController } from './candidates.controller';
       CandidateImportBatchEntity,
       CandidateProfileEntity,
       CandidateAccessEntity,
+      UserEntity,
     ]),
   ],
   controllers: [CandidatesController],
@@ -29,4 +31,3 @@ import { CandidatesController } from './candidates.controller';
   exports: [CandidatesService, TypeOrmModule],
 })
 export class CandidatesModule {}
-

@@ -1,0 +1,18 @@
+{
+  "extends": "./jsconfig.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "checkJs": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "strict": true
+  },
+  "include": [
+    "src/api/**/*.ts",
+    "src/types/**/*.ts",
+    "src/lib/errors/**/*.ts",
+    "scripts/type-tests/api-contracts.test-d.ts"
+  ],
+  "exclude": ["node_modules", "dist", "backend"]
+}

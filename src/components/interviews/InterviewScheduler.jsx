@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { interviewService } from '@/api/services/interviewService';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Calendar, Clock, MapPin, Video, Phone, Users as UsersIcon } from 'lucide-react';
+import { Video, Phone, Users as UsersIcon } from 'lucide-react';
 
-export default function InterviewScheduler({ applicationId, jobTitle, candidateName, candidateEmail, jobId }) {
+export default function InterviewScheduler({ applicationId, candidateName }) {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,20 +15,10 @@ export default function InterviewScheduler({ applicationId, jobTitle, candidateN
 
   const scheduleMutation = useMutation({
     mutationFn: async (data) => {
-      const interview = await base44.entities.Interview.create({
+      const interview = await interviewService.create({
         ...data,
         application_id: applicationId,
-        job_id: jobId,
-        job_title: jobTitle,
         candidate_name: candidateName,
-        candidate_email: candidateEmail,
-        status: 'scheduled'
-      });
-
-      await base44.integrations.Core.SendEmail({
-        to: candidateEmail,
-        subject: `📅 הזמנה לראיון - ${jobTitle}`,
-        body: `שלום ${candidateName},\n\nנשמח להזמינך לראיון:\n\nתאריך: ${data.date}\nשעה: ${data.time}\nסוג: ${data.type}\n${data.location_or_link ? `קישור/מקום: ${data.location_or_link}` : ''}\n\nבהצלחה!`
       });
 
       return interview;

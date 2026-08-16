@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
-import { IntegrationsController } from './integrations.controller';
+import { FilesController } from './files.controller';
 import { EmailService } from './services/email.service';
-import { LlmService } from './services/llm.service';
 
 @Module({
-  controllers: [IntegrationsController],
-  providers: [EmailService, LlmService],
-  exports: [EmailService, LlmService],
+  controllers: [FilesController],
+  providers: [EmailService],
+  exports: [EmailService],
 })
 export class IntegrationsModule {}
-

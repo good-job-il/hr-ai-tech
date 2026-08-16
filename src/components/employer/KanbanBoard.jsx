@@ -1,6 +1,5 @@
 import React from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { GripVertical, X } from 'lucide-react';
 import ApplicationCard from './ApplicationCard';
 
 export default function KanbanBoard({ stages, applications, onDragEnd, onDeleteApplication }) {

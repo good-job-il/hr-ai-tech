@@ -7,12 +7,16 @@ import { UserEntity } from '../users/user.entity';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { getRlsWhere, isBlocked } from '../../common/utils/rls.utils';
 import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
+import { EmailService } from '../integrations/services/email.service';
+import { ApplicationsService } from '../applications/applications.service';
 
 @Injectable()
 export class InterviewsService {
   constructor(
     @InjectRepository(InterviewEntity)
     private readonly repo: Repository<InterviewEntity>,
+    private readonly emailService: EmailService,
+    private readonly applicationsService: ApplicationsService,
   ) {}
 
   async findAll(query: QueryInterviewsDto, user: UserEntity) {
@@ -49,14 +53,33 @@ export class InterviewsService {
   }
 
   async create(dto: CreateInterviewDto, user: UserEntity): Promise<InterviewEntity> {
+    const application = dto.application_id
+      ? await this.applicationsService.findById(dto.application_id, user)
+      : null;
     const item = this.repo.create({
       ...dto,
-      organization_id: user.organization_id,
+      organization_id: application?.organization_id ?? user.organization_id,
+      candidate_user_id: application?.candidate_user_id ?? null,
+      candidate_id: application?.candidate_id ?? dto.candidate_id,
+      candidate_email: application?.candidate_email ?? dto.candidate_email,
+      candidate_name: application?.candidate_name ?? dto.candidate_name,
+      job_id: application?.job_id ?? dto.job_id,
+      job_title: application?.job_title ?? dto.job_title,
       recruiter_id: dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
       team_manager_id: dto.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
       recruitment_manager_id: dto.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
     } as any);
-    return this.repo.save(item) as unknown as Promise<InterviewEntity>;
+    const saved = await (this.repo.save(item) as unknown as Promise<InterviewEntity>);
+    await this.emailService.sendInterviewScheduled({
+      candidateEmail: saved.candidate_email,
+      candidateName: saved.candidate_name,
+      jobTitle: saved.job_title,
+      date: saved.date,
+      time: saved.time,
+      type: saved.type,
+      locationOrLink: saved.location_or_link,
+    });
+    return saved;
   }
 
   async update(id: number, dto: UpdateInterviewDto, user: UserEntity): Promise<InterviewEntity> {

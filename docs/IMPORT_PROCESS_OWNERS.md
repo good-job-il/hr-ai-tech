@@ -1,0 +1,20 @@
+# Import and migration process ownership
+
+Baseline date: 13 August 2026.
+
+“Owner” here is the accountable role and repository component. A named person must be recorded in the release ticket before any production migration/import is run.
+
+| Process | Current implementation owner | Accountable role | Target owner | State / exit gate |
+|---|---|---|---|---|
+| One-time legacy data migration | Removed in Phase 7 | Backend migration lead + production data owner | removed tooling | Data reconciliation and credential revocation require production-owner sign-off |
+| Resume upload/extraction | `/integrations/upload`, `extractAndTranslateResume` compatibility route | Backend integrations lead | Resume application service | Typed endpoint, file validation, authorization and failure tests |
+| Candidate file/bulk import | function compatibility controller and Candidate import batches | Backend import lead | NestJS ImportModule | Persistent job, idempotency, row errors, retry tests |
+| Resume batch import/parse/validate | `importResumeFiles`, `parseResumeBatch`, `validateImportBatch` legacy implementations | Backend import lead | NestJS ImportModule worker | Progress/error state and duplicate prevention proven |
+| Career-page crawl | `crawlCareerPage` compatibility route | Backend import lead | ImportSource adapter/job | Allowlisted domains, timeout/retry and audit trail |
+| NVIDIA / Novolog / AllJobs / Shafir / Elbit / Jobicy imports | frontend RPC calls; matching backend routes absent | Product owner + backend import lead | vendor adapters or removed UI actions | Explicit keep/remove decision; adapter contract and monitoring if kept |
+| Import retry/queue processing | legacy function tree only | Backend platform lead | application-owned queue worker | Durable queue, idempotency key and dead-letter policy |
+| Taxonomy reload/migration | seed command + legacy `loadTaxonomy` | Backend data owner | taxonomy seed/admin command | No browser-triggered generic RPC; repeatable seed test |
+| Matching/scoring | compatibility `smartSearch`, recommendations and scoring routes | Backend matching lead | MatchingModule | Typed endpoints, authorization and deterministic contract tests |
+| Audit/application timeline creation | mixed frontend RPC and backend services | Backend domain owners | transaction-owned domain events | No frontend-authored actor/tenant fields; transaction tests |
+
+Production execution is blocked until the accountable role is replaced by a named person in the operational release ticket. This repository intentionally does not invent personal ownership.

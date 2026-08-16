@@ -73,18 +73,20 @@ export class CompaniesService {
     return this.reviewRepo.find({ where: { company_id: companyId } as any, order: { created_date: 'DESC' } as any });
   }
 
-  async createReview(dto: CreateCompanyReviewDto): Promise<CompanyReviewEntity> {
-    const r = this.reviewRepo.create(dto as any);
+  async createReview(dto: CreateCompanyReviewDto, user: UserEntity): Promise<CompanyReviewEntity> {
+    const r = this.reviewRepo.create({ ...dto, reviewer_email: user.email, reviewer_name: user.full_name } as any);
     return this.reviewRepo.save(r) as unknown as Promise<CompanyReviewEntity>;
   }
 
   // ─── Staff ────────────────────────────────────────────────────────────────
-  async getStaff(companyId: number) {
+  async getStaff(companyId: number, user: UserEntity) {
+    this.assertCanManageCompany(companyId, user);
     return this.staffRepo.find({ where: { company_id: companyId } as any });
   }
 
-  /** Flat list — mirrors base44.entities.Staff.list()/.filter(...) */
-  async findAllStaff(filters: Record<string, any> = {}) {
+  /** Flat staff list with optional filters. */
+  async findAllStaff(filters: Record<string, any> = {}, user: UserEntity) {
+    if (user.role !== UserRole.ADMIN || user.impersonating) throw new ForbiddenException('Platform administrator access required');
     const where: Record<string, any> = {};
     // StaffEntity only has company_id; treat organization_id filter as an alias for it.
     if (filters.company_id) where.company_id = filters.company_id;
@@ -92,21 +94,25 @@ export class CompaniesService {
     return this.staffRepo.find({ where, order: { created_date: 'DESC' } as any });
   }
 
-  async createStaff(dto: CreateStaffDto): Promise<StaffEntity> {
+  async createStaff(dto: CreateStaffDto, user: UserEntity): Promise<StaffEntity> {
+    this.assertCanManageCompany(Number(dto.company_id), user);
     const s = this.staffRepo.create(dto as any);
     return this.staffRepo.save(s) as unknown as Promise<StaffEntity>;
   }
 
-  async updateStaff(id: number, dto: UpdateStaffDto): Promise<StaffEntity> {
+  async updateStaff(id: number, dto: UpdateStaffDto, user: UserEntity): Promise<StaffEntity> {
     const s = await this.staffRepo.findOne({ where: { id } as any });
     if (!s) throw new NotFoundException(`Staff ${id} not found`);
+    this.assertCanManageCompany(Number(s.company_id), user);
+    if (dto.company_id && dto.company_id !== s.company_id) this.assertCanManageCompany(Number(dto.company_id), user);
     Object.assign(s, dto);
     return this.staffRepo.save(s) as unknown as Promise<StaffEntity>;
   }
 
-  async deleteStaff(id: number): Promise<void> {
+  async deleteStaff(id: number, user: UserEntity): Promise<void> {
     const s = await this.staffRepo.findOne({ where: { id } as any });
     if (!s) throw new NotFoundException(`Staff ${id} not found`);
+    this.assertCanManageCompany(Number(s.company_id), user);
     await this.staffRepo.remove(s);
   }
 }

@@ -64,7 +64,7 @@ export class CompensationService {
     this.assertAgencyAccess(user);
     const plan = this.repo.create({
       ...dto,
-      organization_id: dto.organization_id ?? user.organization_id,
+      organization_id: user.organization_id,
       created_by_role: user.role,
     } as any);
     return this.repo.save(plan) as unknown as Promise<CompensationPlanEntity>;
@@ -81,4 +81,3 @@ export class CompensationService {
     await this.repo.remove(plan);
   }
 }
-

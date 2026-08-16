@@ -1,11 +1,15 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
+import { Readable } from 'node:stream';
 import { CandidateEntity } from '../../candidates/entities/candidate.entity';
 import { CandidateImportBatchEntity } from '../../candidates/entities/candidate-import-batch.entity';
 import { CandidateDocumentEntity } from '../../candidates/entities/candidate-document.entity';
 import { UserEntity } from '../../users/user.entity';
+import { UserRole } from '../../../common/enums/user-role.enum';
+import { assertOwnedFileUrl } from '../../../common/utils/owned-file-url.util';
+import { CandidatesService } from '../../candidates/candidates.service';
 import { ResumeExtractionService } from './resume-extraction.service';
 import {
   ImportCandidatesFromFileDto,
@@ -24,12 +28,12 @@ export class ImportService {
     @InjectRepository(CandidateImportBatchEntity) private readonly batchRepo: Repository<CandidateImportBatchEntity>,
     @InjectRepository(CandidateDocumentEntity) private readonly documentRepo: Repository<CandidateDocumentEntity>,
     private readonly resumeExtraction: ResumeExtractionService,
+    private readonly candidatesService: CandidatesService,
   ) {}
 
   // ─── importCandidatesFromFile — parses CSV/XLSX spreadsheets ─────────────
   async importCandidatesFromFile(dto: ImportCandidatesFromFileDto, user: UserEntity) {
-    const batch = await this.batchRepo.findOne({ where: { id: dto.batchId } });
-    if (!batch) throw new NotFoundException('Import batch not found');
+    const batch = await this.requireBatch(dto.batchId, user);
 
     batch.status = 'processing';
     batch.processing_started_at = new Date();
@@ -41,11 +45,32 @@ export class ImportService {
     let missingEmail = 0;
 
     try {
-      const res = await fetch(dto.fileUrl);
+      const fileUrl = assertOwnedFileUrl(dto.fileUrl);
+      const res = await fetch(fileUrl, { signal: AbortSignal.timeout(30_000) });
+      if (!res.ok) throw new Error(`Import file returned HTTP ${res.status}`);
+      const declaredSize = Number(res.headers.get('content-length') || 0);
+      if (declaredSize > 100 * 1024 * 1024) throw new Error('Import file exceeds 100MB');
       const buffer = Buffer.from(await res.arrayBuffer());
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows: Record<string, any>[] = XLSX.utils.sheet_to_json(sheet);
+      if (buffer.byteLength > 100 * 1024 * 1024) throw new Error('Import file exceeds 100MB');
+      const workbook = new ExcelJS.Workbook();
+      const contentType = res.headers.get('content-type') || '';
+      const isCsv = contentType.includes('text/csv') || new URL(fileUrl).pathname.toLowerCase().endsWith('.csv');
+      const sheet = isCsv
+        ? await workbook.csv.read(Readable.from(buffer))
+        : ((await workbook.xlsx.load(buffer as unknown as ExcelJS.Buffer)), workbook.worksheets[0]);
+      if (!sheet) throw new Error('Import workbook does not contain a worksheet');
+      const headers = (sheet.getRow(1).values as ExcelJS.CellValue[])
+        .slice(1)
+        .map((value) => this.cellText(value));
+      const rows: Record<string, any>[] = [];
+      sheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return;
+        const record: Record<string, any> = {};
+        headers.forEach((header, index) => {
+          if (header) record[header] = row.getCell(index + 1).value;
+        });
+        rows.push(record);
+      });
 
       for (const row of rows) {
         try {
@@ -55,7 +80,7 @@ export class ImportService {
           if (!email) missingEmail++;
 
           if (email) {
-            const existing = await this.candidateRepo.findOne({ where: { email, is_deleted: false } });
+            const existing = await this.candidateRepo.findOne({ where: { email, organization_id: user.organization_id, is_deleted: false } });
             if (existing) {
               duplicates++;
               continue;
@@ -108,8 +133,14 @@ export class ImportService {
     const created: any[] = [];
     const failed: any[] = [];
 
+    if (dto.import_batch_id) await this.requireBatch(dto.import_batch_id, user);
     for (const data of dto.candidates_data) {
       try {
+        await this.candidatesService.assertOrganizationUsers([
+          data.recruiter_id,
+          data.team_manager_id,
+          data.recruitment_manager_id,
+        ], user);
         const candidate = this.candidateRepo.create({
           ...data,
           organization_id: user.organization_id,
@@ -130,6 +161,8 @@ export class ImportService {
       if (batch) {
         batch.successful_imports += created.length;
         batch.failed_imports += failed.length;
+        batch.status = failed.length ? 'partial' : 'completed';
+        batch.processing_completed_at = new Date();
         await this.batchRepo.save(batch);
       }
     }
@@ -138,9 +171,8 @@ export class ImportService {
   }
 
   // ─── validateImportBatch — readiness checks for a batch ──────────────────
-  async validateImportBatch(dto: ValidateImportBatchDto) {
-    const batch = await this.batchRepo.findOne({ where: { id: dto.import_batch_id } });
-    if (!batch) throw new NotFoundException('Batch not found');
+  async validateImportBatch(dto: ValidateImportBatchDto, user: UserEntity) {
+    await this.requireBatch(dto.import_batch_id, user);
 
     const candidates = await this.candidateRepo.find({ where: { import_batch_id: dto.import_batch_id } });
     const total = candidates.length || 1;
@@ -188,8 +220,20 @@ export class ImportService {
     return { passed: passing === candidates.length, total: candidates.length, success: passing, failed: candidates.length - passing };
   }
 
+  private cellText(value: ExcelJS.CellValue | undefined): string {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'object') {
+      if ('text' in value) return String(value.text);
+      if ('result' in value) return String(value.result ?? '');
+      if ('richText' in value) return value.richText.map((part) => part.text).join('');
+    }
+    return String(value);
+  }
+
   // ─── importResumeFiles — bulk resume upload + extraction ────────────────
   async importResumeFiles(dto: ImportResumeFilesDto, user: UserEntity) {
+    if (dto.batchId) await this.requireBatch(dto.batchId, user);
+    await this.candidatesService.assertOrganizationUsers([dto.recruiter_id], user);
     const results: any[] = [];
     let successful = 0;
     let failed = 0;
@@ -197,7 +241,7 @@ export class ImportService {
 
     for (const file of dto.files) {
       try {
-        const existingDoc = await this.documentRepo.findOne({ where: { file_url: file.file_url } });
+        const existingDoc = await this.documentRepo.findOne({ where: { file_url: file.file_url, organization_id: user.organization_id } });
         if (existingDoc) {
           duplicates++;
           results.push({ filename: file.filename, status: 'duplicate' });
@@ -256,6 +300,7 @@ export class ImportService {
 
   // ─── parseResumeBatch — parse a ZIP of resumes (metadata pass) ───────────
   async parseResumeBatch(dto: ParseResumeBatchDto, user: UserEntity) {
+    await this.candidatesService.assertOrganizationUsers([dto.recruiter_id], user);
     // NOTE: Actual ZIP extraction requires unzip on the server (e.g. `unzipper`
     // or `adm-zip`). This implementation validates the batch shell and
     // prepares it for `importResumeFiles` once individual file URLs are known
@@ -263,7 +308,7 @@ export class ImportService {
     // in ResumeZipUploader.jsx which uploads extracted files individually).
     let batch: CandidateImportBatchEntity | null = null;
     if (dto.import_batch_id) {
-      batch = await this.batchRepo.findOne({ where: { id: dto.import_batch_id } });
+      batch = await this.requireBatch(dto.import_batch_id, user);
     }
     if (!batch) {
       batch = this.batchRepo.create({
@@ -286,7 +331,14 @@ export class ImportService {
       message: 'Batch registered. Upload extracted resume files via importResumeFiles with this batchId.',
     };
   }
+
+  private async requireBatch(id: number | null | undefined, user: UserEntity) {
+    if (!id) throw new NotFoundException('Import batch not found');
+    const batch = await this.batchRepo.findOne({ where: { id } });
+    if (!batch) throw new NotFoundException('Import batch not found');
+    if (user.role !== UserRole.ADMIN && batch.organization_id !== user.organization_id) {
+      throw new ForbiddenException('Import batch belongs to another organization');
+    }
+    return batch;
+  }
 }
-
-
-

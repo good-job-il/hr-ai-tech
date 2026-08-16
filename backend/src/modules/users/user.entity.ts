@@ -39,7 +39,7 @@ export class UserEntity extends BaseEntity {
   })
   organization_id: number | null;
 
-  /** DEPRECATED in Base44 — keep for backward compat, maps to organization_id */
+  /** Deprecated alias retained for persisted-record compatibility. */
   @Column({ name: 'company_id', type: 'int', nullable: true })
   company_id: number | null;
 
@@ -60,6 +60,9 @@ export class UserEntity extends BaseEntity {
     nullable: true,
   })
   team_manager_id: number | null;
+
+  @Column({ name: 'team_id', type: 'int', nullable: true })
+  team_id: number | null;
 
   @Column({
     name: 'recruitment_manager_id',
@@ -152,4 +155,3 @@ export class UserEntity extends BaseEntity {
     }
   }
 }
-

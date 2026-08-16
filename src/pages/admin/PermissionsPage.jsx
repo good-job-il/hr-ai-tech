@@ -124,12 +124,8 @@ export default function PermissionsPage() {
 
     // Audit log
     await auditService.create({
-      organization_id: orgId,
-      actor_user_id: user.id,
-      actor_email: user.email,
-      actor_role: user.role,
       entity_type: 'Organization',
-      entity_id: orgId || 'global',
+      entity_id: orgId || 0,
       entity_label: `Role Permissions: ${roleKey}`,
       action: 'permission_update',
       metadata: { role_key: roleKey, before: oldPerms, after: perms },

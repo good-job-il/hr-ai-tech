@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Zap } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { publicJobService } from '@/api/services/publicJobService';
+import { companyService } from '@/api/services/companyService';
 
 export default function PopularCategories() {
   const [showAll, setShowAll] = useState(false);
@@ -10,14 +11,13 @@ export default function PopularCategories() {
   const { data: jobs = [] } = useQuery({
     queryKey: ['all-jobs-for-popular'],
     queryFn: async () => {
-      const allJobs = await base44.entities.Job.list('-created_date', 1000);
-      return allJobs.filter(j => !j.is_closed);
+      return publicJobService.list({ is_closed: false, sort: 'created_date', order: 'DESC', limit: 500 });
     },
   });
 
   const { data: companies = [] } = useQuery({
     queryKey: ['all-companies-for-popular'],
-    queryFn: () => base44.entities.Company.list('-created_date', 1000),
+    queryFn: () => companyService.list({ sort: 'created_date', order: 'DESC', limit: 500 }),
   });
 
   // Calculate dynamic counts

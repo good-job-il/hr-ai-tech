@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { X, Eye, Copy, Check } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
-import { base44 } from '@/api/base44Client';
+import { jobService } from '@/api/services/jobService';
+import { agencyClientService } from '@/api/services/agencyClientService';
+import { compensationPlanService } from '@/api/services/compensationPlanService';
 
 function CopyInline({ text }) {
   const [copied, setCopied] = useState(false);
@@ -46,7 +48,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
     if (!isOpen || !isAgency) return;
     setClientsLoading(true);
     setClientsError('');
-    base44.entities.AgencyClient.filter({ status: 'active' }, 'name', 300)
+    agencyClientService.list({ status: 'active', limit: 300 })
       .then(setAgencyClients)
       .catch((err) => {
         setAgencyClients([]);
@@ -66,7 +68,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
       // Load compensation plan for this job/company
       const loadCompensation = async () => {
         try {
-          const plans = await base44.entities.CompensationPlan.list('', 100);
+          const plans = await compensationPlanService.list({ limit: 100 });
           // First try to find plan for specific job, then for company
           const jobPlan = plans.find(p => p.job_id === job.id);
           const companyPlan = plans.find(p => p.client_name === job.company && !p.job_id);
@@ -107,8 +109,6 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
     });
 
     if (!job?.id && user) {
-      payload.organization_id = user.organization_id;
-      payload.created_by_user_id = user.id;
       if (user.role === 'recruiter' || user.role === 'internal_recruiter') payload.recruiter_id = user.id;
       if (user.role === 'team_manager') payload.team_manager_id = user.id;
       if (user.team_manager_id) payload.team_manager_id = user.team_manager_id;
@@ -118,13 +118,13 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
     setLoading(true);
     try {
       if (job?.id) {
-        await base44.entities.Job.update(job.id, payload);
+        await jobService.update(job.id, payload);
         // Save warranty_period_days to compensation plan
         if (compensationPlan?.id && compensationPlan.warranty_period_days != null) {
-          await base44.entities.CompensationPlan.update(compensationPlan.id, { warranty_period_days: compensationPlan.warranty_period_days });
+          await compensationPlanService.update(compensationPlan.id, { warranty_period_days: compensationPlan.warranty_period_days });
         }
       } else {
-        await base44.entities.Job.create(payload);
+        await jobService.create(payload);
       }
       onSave();
       onClose();

@@ -36,6 +36,10 @@ export class AgencyClientsService {
     const organizationId = this.requireOrganization(user);
     const qb = this.clientRepo.createQueryBuilder('client')
       .innerJoin(CompanyEntity, 'company', 'company.id = client.company_id')
+      // TypeORM wraps JOIN + skip/take queries in a DISTINCT subquery. Every
+      // ORDER BY expression must therefore be projected by the inner query,
+      // otherwise MySQL looks for a missing `distinctAlias.company_name`.
+      .addSelect('company.name', 'company_name')
       .where('client.organization_id = :organizationId', { organizationId })
       .andWhere('company.is_deleted = false');
 

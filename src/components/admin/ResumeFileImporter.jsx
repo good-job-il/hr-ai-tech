@@ -146,15 +146,12 @@ export default function ResumeFileImporter({ onImportComplete }) {
 
       // Create batch record
       const batch = await candidateImportService.create({
-        organization_id: user?.organization_id,
         batch_name: `Resume Import ${files.length} קבצים — ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: he })}`,
         source_file: files.map(f => f.name).join(', '),
         file_type: 'zip', // multi-file
-        imported_by: user?.email,
         recruiter_id: user?.id,
         team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
         recruitment_manager_id: user?.recruitment_manager_id,
-        status: 'pending',
       });
 
       // Call importResumeFiles backend function
@@ -165,7 +162,7 @@ export default function ResumeFileImporter({ onImportComplete }) {
         recruiter_id: user?.id,
       });
 
-      const d = res.data;
+      const d = res;
 
       // Map results back to file statuses
       const newStatuses = {};

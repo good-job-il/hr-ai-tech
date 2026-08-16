@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { applicationService } from '@/api/services/applicationService';
+import { interviewService } from '@/api/services/interviewService';
 import { useAuth } from '@/lib/AuthContext';
 import {
   Send, Search, X, Briefcase, Calendar, ChevronLeft,
@@ -275,13 +276,13 @@ export default function CandidateApplications() {
 
   const { data: applications = [], isLoading, refetch } = useQuery({
     queryKey: ['candidate-applications', user?.email],
-    queryFn: () => base44.entities.Application.filter({ candidate_email: user.email }, '-created_date', 100),
+    queryFn: () => applicationService.list({ sort: 'created_date', order: 'DESC', limit: 100 }),
     enabled: !!user?.email,
   });
 
   const { data: interviews = [] } = useQuery({
     queryKey: ['candidate-interviews', user?.email],
-    queryFn: () => base44.entities.Interview.filter({ candidate_email: user.email }, '-created_date', 200),
+    queryFn: () => interviewService.list({ sort: 'date', order: 'DESC', limit: 200 }),
     enabled: !!user?.email,
   });
 

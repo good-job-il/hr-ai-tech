@@ -5,9 +5,10 @@
 import { GLASS_STYLES, SHADOWS, RADIUS, TRANSITIONS } from '@/theme/tokens';
 import { cn } from '@/lib/utils';
 
+/** @param {React.HTMLAttributes<HTMLDivElement> & {variant?: 'glass' | 'panel', hoverable?: boolean}} props */
 export function Card({ 
-  children, 
-  className, 
+  children = null,
+  className = '',
   variant = 'glass',
   hoverable = false,
   ...props 
@@ -29,7 +30,8 @@ export function Card({
   );
 }
 
-export function CardHeader({ children, className, ...props }) {
+/** @param {React.HTMLAttributes<HTMLDivElement>} props */
+export function CardHeader({ children = null, className = '', ...props }) {
   return (
     <div className={cn('border-b border-[#E4ECFF] pb-4 mb-4', className)} {...props}>
       {children}
@@ -37,7 +39,8 @@ export function CardHeader({ children, className, ...props }) {
   );
 }
 
-export function CardTitle({ children, className, ...props }) {
+/** @param {React.HTMLAttributes<HTMLHeadingElement>} props */
+export function CardTitle({ children = null, className = '', ...props }) {
   return (
     <h3 
       className={cn('text-xl font-black text-[#0F172A]', className)} 
@@ -48,7 +51,8 @@ export function CardTitle({ children, className, ...props }) {
   );
 }
 
-export function CardContent({ children, className, ...props }) {
+/** @param {React.HTMLAttributes<HTMLDivElement>} props */
+export function CardContent({ children = null, className = '', ...props }) {
   return (
     <div className={cn('', className)} {...props}>
       {children}
@@ -56,7 +60,8 @@ export function CardContent({ children, className, ...props }) {
   );
 }
 
-export function CardFooter({ children, className, ...props }) {
+/** @param {React.HTMLAttributes<HTMLDivElement>} props */
+export function CardFooter({ children = null, className = '', ...props }) {
   return (
     <div className={cn('border-t border-[#E4ECFF] pt-4 mt-4', className)} {...props}>
       {children}

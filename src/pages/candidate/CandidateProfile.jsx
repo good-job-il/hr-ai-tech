@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { candidateProfileService } from '@/api/services/candidateProfileService';
+import { fileService } from '@/api/services/fileService';
 import { useAuth } from '@/lib/AuthContext';
 import {
   User, Briefcase, FileText, Plus, Trash2,
@@ -107,13 +108,12 @@ export default function CandidateProfile() {
   const [skillInput, setSkillInput] = useState('');
   const [saveStatus, setSaveStatus] = useState(null); // null | 'saving' | 'saved' | 'error'
 
-  const { data: profiles = [], isLoading } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ['my-profile', user?.email],
-    queryFn: () => base44.entities.CandidateProfile.filter({ user_email: user.email }),
+    queryFn: () => candidateProfileService.me(),
     enabled: !!user,
   });
 
-  const profile = profiles[0];
   const [form, setForm] = useState(null);
 
   useEffect(() => {
@@ -123,7 +123,6 @@ export default function CandidateProfile() {
       setForm({ ...profile });
     } else if (user) {
       setForm({
-        user_email: user.email,
         full_name: user.full_name || '',
         phone: '', location: '', title: '', summary: '',
         skills: [], experience_years: 0, education: '',
@@ -150,8 +149,12 @@ export default function CandidateProfile() {
         desired_salary_min: toSalary(data.desired_salary_min),
         desired_salary_max: toSalary(data.desired_salary_max),
       };
-      if (profile) return base44.entities.CandidateProfile.update(profile.id, sanitized);
-      return base44.entities.CandidateProfile.create(sanitized);
+      delete sanitized.id;
+      delete sanitized.user_email;
+      delete sanitized.created_date;
+      delete sanitized.updated_date;
+      if (profile) return candidateProfileService.update(sanitized);
+      return candidateProfileService.create(sanitized);
     },
     onMutate: () => setSaveStatus('saving'),
     onSuccess: (savedData) => {
@@ -169,7 +172,7 @@ export default function CandidateProfile() {
   const uploadResume = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const { file_url } = await fileService.upload(file);
     upd('resume_url', file_url);
   };
 

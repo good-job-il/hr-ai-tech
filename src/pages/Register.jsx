@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { authService } from '@/api/services/authService';
+import { agencyTeamsService } from '@/api/services/agencyTeamsService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,9 +17,6 @@ export default function Register() {
   const USER_TYPES = [
     { id: 'candidate', label: isRtl ? 'מועמד (מחפש עבודה)' : 'Candidate (Job Seeker)', requiresOrg: false },
     { id: 'employer', label: isRtl ? 'מעסיק (חברה)' : 'Employer (Company)', requiresOrg: true },
-    { id: 'recruiter', label: isRtl ? 'רכז גיוס' : 'Recruiter', requiresOrg: true },
-    { id: 'team_manager', label: isRtl ? 'מנהל צוות' : 'Team Manager', requiresOrg: true },
-    { id: 'recruitment_manager', label: isRtl ? 'מנהל גיוס' : 'Recruitment Manager', requiresOrg: true },
     { id: 'org_admin', label: isRtl ? 'בעל חברה / אדמין' : 'Company Owner / Admin', requiresOrg: true },
   ];
 
@@ -69,15 +67,15 @@ export default function Register() {
     e.preventDefault();
     setError('');
 
-    if (!fullName.trim()) {
+    if (!isFromInvite && !fullName.trim()) {
       showError(isRtl ? 'יש להזין שם מלא' : 'Please enter your full name');
       return;
     }
-    if (!email.trim()) {
+    if (!isFromInvite && !email.trim()) {
       showError(isRtl ? 'יש להזין כתובת אימייל' : 'Please enter your email');
       return;
     }
-    if (!phone.trim()) {
+    if (!isFromInvite && !phone.trim()) {
       showError(isRtl ? 'יש להזין מספר טלפון' : 'Please enter your phone number');
       return;
     }
@@ -96,6 +94,16 @@ export default function Register() {
 
     setLoading(true);
     try {
+      if (isFromInvite) {
+        const member = await agencyTeamsService.acceptInvitation(inviteToken, password);
+        await authService.login(member.email, password);
+        window.location.href = member.role === 'recruiter'
+          ? '/agency/recruiter/dashboard'
+          : member.role === 'team_manager'
+            ? '/agency/team/dashboard'
+            : '/agency/dashboard';
+        return;
+      }
       await authService.register({
         email,
         password,
@@ -165,7 +173,7 @@ export default function Register() {
 
           <>
              <form onSubmit={handleRegister} className="space-y-4">
-               <div>
+               {!isFromInvite && <div>
                  <Label className="text-sm font-semibold text-gray-700 block mb-2">{t('auth.register.fullName')}</Label>
                  <Input
                    type="text"
@@ -175,8 +183,8 @@ export default function Register() {
                    className="h-11 border-gray-300"
                    placeholder={isRtl ? 'ישראל ישראלי' : 'John Smith'}
                  />
-               </div>
-               <div>
+               </div>}
+               {!isFromInvite && <div>
                  <Label className="text-sm font-semibold text-gray-700 block mb-2">{t('auth.register.email')}</Label>
                  <Input
                    type="email"
@@ -187,8 +195,8 @@ export default function Register() {
                    placeholder="you@example.com"
                    dir="ltr"
                  />
-               </div>
-               <div>
+               </div>}
+               {!isFromInvite && <div>
                  <Label className="text-sm font-semibold text-gray-700 block mb-2">{t('auth.register.phone')}</Label>
                  <Input
                    type="tel"
@@ -199,7 +207,7 @@ export default function Register() {
                    placeholder="05X-XXX-XXXX"
                    dir="ltr"
                  />
-               </div>
+               </div>}
                {!isFromInvite && (
                  <div>
                    <Label className="text-sm font-semibold text-gray-700 block mb-2">
@@ -221,10 +229,10 @@ export default function Register() {
                {isFromInvite && (
                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
                    <p className="font-semibold mb-1">
-                     {isRtl ? `הצטרפות כ${USER_TYPES.find(u => u.id === userType)?.label}` : `Joining as ${USER_TYPES.find(u => u.id === userType)?.label}`}
+                     {isRtl ? 'הצטרפות לארגון באמצעות הזמנה' : 'Joining an organization by invitation'}
                    </p>
                    <p className="text-xs text-blue-700">
-                     {isRtl ? 'הדוא"ל והתפקיד קבועים לפי ההזמנה' : 'Email and role are fixed by the invitation'}
+                     {isRtl ? 'הארגון והתפקיד נקבעו באופן מאובטח בהזמנה' : 'Your organization and role are securely defined by the invitation'}
                    </p>
                  </div>
                )}

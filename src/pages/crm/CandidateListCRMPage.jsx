@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { candidateService } from '@/api/services/candidateService';
 import { useAuth } from '@/lib/AuthContext';
 import { Search, RefreshCw, User, ChevronLeft, UsersRound, UserCheck, Clock3, ShieldAlert } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -62,11 +62,9 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
 
       if (isAgencyUser(user)) {
         Object.assign(filter, getAgencyScopeFilter(user));
-      } else if (user?.role === 'employer') {
-        filter.employer_id = user.email;
       }
 
-      const data = await base44.entities.Candidate.filter(filter, '-created_date', PAGE_SIZE);
+      const data = await candidateService.list({ ...filter, sort: 'created_date', order: 'DESC', limit: PAGE_SIZE });
       setHasMore(data.length === PAGE_SIZE);
       if (data.length > 0) setLastCandidateId(data[data.length - 1].id);
       setCandidates(previous => append ? [...previous, ...data] : data);

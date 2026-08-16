@@ -53,26 +53,20 @@ const CandidateImport = () => {
 
       // Create import batch record
       const batchRes = await candidateImportService.create({
-        organization_id: user?.organization_id,
         batch_name: `${file.name.split('.')[0]} - ${new Date().toLocaleDateString('he-IL')}`,
         source_file: file.name,
         file_type: file.type.includes('spreadsheet') ? 'xlsx' : file.type.includes('zip') ? 'zip' : file.type.includes('json') ? 'json' : 'csv',
-        imported_by: user?.email,
         recruiter_id: user?.id,
         team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
         recruitment_manager_id: user?.recruitment_manager_id,
-        total_records: 0,
-        status: 'pending'
+        total_records: 0
       });
 
       // Invoke import function
-      const importRes = await candidateImportService.importCandidates({
-        fileUrl,
-        batchId: batchRes.id,
-        fileName: file.name
-      });
+      const queued = await candidateImportService.queueFileImport(batchRes.id, fileUrl, file.name);
+      const importResult = await candidateImportService.waitForJob(queued.id);
 
-      setSuccessMessage(`יבוא התחיל! ${importRes.data?.message || ''}`);
+      setSuccessMessage(`הייבוא הושלם. ${importResult.message || ''}`);
       setFile(null);
       refetch();
     } catch (err) {

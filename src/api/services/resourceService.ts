@@ -1,9 +1,16 @@
 import { httpClient } from '@/api/client/httpClient';
+import type { PaginatedResponse } from '@/types/api';
 
 export type QueryValue = string | number | boolean | null | undefined;
-export type ResourceQuery = Record<string, QueryValue>;
 
-export function buildQuery(query: ResourceQuery = {}): string {
+export interface ResourceQuery {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  order?: 'ASC' | 'DESC';
+}
+
+export function buildQuery<Q extends object>(query: Q): string {
   const params = new URLSearchParams();
   Object.entries(query).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') params.set(key, String(value));
@@ -12,29 +19,55 @@ export function buildQuery(query: ResourceQuery = {}): string {
   return value ? `?${value}` : '';
 }
 
-export function asList<T>(response: unknown): T[] {
-  if (Array.isArray(response)) return response as T[];
-  const value = response as { data?: T[]; items?: T[] } | null;
-  return value?.data || value?.items || [];
+export function asList<T>(response: T[] | PaginatedResponse<T>): T[] {
+  return Array.isArray(response) ? response : response.data;
 }
 
-/** Explicitly instantiated REST resource. No endpoint guessing or dynamic proxy. */
-export class ResourceService<T, Q extends ResourceQuery = ResourceQuery> {
-  constructor(protected readonly endpoint: string) {}
+export function asPage<T>(response: T[] | PaginatedResponse<T>): PaginatedResponse<T> {
+  if (!Array.isArray(response)) return response;
+  return {
+    data: response,
+    pagination: {
+      page: 1,
+      limit: response.length,
+      total: response.length,
+      totalPages: response.length ? 1 : 0,
+      hasNextPage: false,
+      hasPrevPage: false,
+    },
+  };
+}
 
-  async list(query: Q = {} as Q): Promise<T[]> {
-    return asList<T>(await httpClient.get(`${this.endpoint}${buildQuery(query)}`, { cache: false }));
+/** Explicit REST resource with separate entity, query, create and update contracts. */
+export class ResourceService<
+  TEntity,
+  TQuery extends ResourceQuery = ResourceQuery,
+  TCreate = never,
+  TUpdate = never,
+> {
+  constructor(protected readonly endpoint: `/${string}`) {}
+
+  async list(query: TQuery = {} as TQuery): Promise<TEntity[]> {
+    return asList(await this.listPage(query));
   }
 
-  get(id: string | number): Promise<T> {
+  async listPage(query: TQuery = {} as TQuery): Promise<PaginatedResponse<TEntity>> {
+    const response = await httpClient.get<TEntity[] | PaginatedResponse<TEntity>>(
+      `${this.endpoint}${buildQuery(query)}`,
+      { cache: false },
+    );
+    return asPage(response);
+  }
+
+  get(id: string | number): Promise<TEntity> {
     return httpClient.get(`${this.endpoint}/${id}`, { cache: false });
   }
 
-  create(payload: Partial<T> | Record<string, unknown>): Promise<T> {
+  create(payload: TCreate): Promise<TEntity> {
     return httpClient.post(this.endpoint, payload);
   }
 
-  update(id: string | number, payload: Partial<T> | Record<string, unknown>): Promise<T> {
+  update(id: string | number, payload: TUpdate): Promise<TEntity> {
     return httpClient.patch(`${this.endpoint}/${id}`, payload);
   }
 

@@ -1,0 +1,7 @@
+{
+  "baselineDate": "2026-08-16",
+  "policy": "Terminal zero baseline. No compatibility imports, calls or entity mappings are permitted.",
+  "importFiles": [],
+  "usageByFile": {},
+  "entityConfig": []
+}

@@ -63,8 +63,19 @@ export default function TaxonomyVerification() {
     setLoading(true);
     setLoadResult(null);
     try {
-      const res = await taxonomyService.reload();
-      setLoadResult(res.data);
+      const snapshot = await taxonomyService.load();
+      setLoadResult({
+        success: true,
+        message: 'Taxonomy loaded from database',
+        stats: {
+          domains: snapshot.domains.length,
+          roles: snapshot.roles.length,
+          specializations: snapshot.specializations.length,
+          employmentTypes: snapshot.employmentTypes.length,
+          workModes: snapshot.workModes.length,
+          experienceLevels: snapshot.experienceLevels.length,
+        },
+      });
     } catch (error) {
       setLoadResult({ success: false, error: error.message });
     } finally {

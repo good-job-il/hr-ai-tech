@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { jobService } from '@/api/services/jobService';
+import { interviewService } from '@/api/services/interviewService';
+import { applicationService } from '@/api/services/applicationService';
 import { useAuth } from '@/lib/AuthContext';
-import { BarChart3, TrendingUp, Users, Briefcase, Clock, CheckCircle } from 'lucide-react';
+import { BarChart3, Users, Briefcase, Clock, CheckCircle } from 'lucide-react';
 
 function StatCard({ icon: IconComp, label, value, color = '#7C3AED', sub }) {
   return (
@@ -22,15 +24,18 @@ export default function EmployerAnalyticsPage() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     if (!user?.email) return;
     const load = async () => {
       setLoading(true);
+      setLoadError('');
+      try {
       const [jobs, applications, interviews] = await Promise.all([
-        base44.entities.Job.filter({ employer_id: user.email }, '', 200).catch(() => []),
-        base44.entities.Application.filter({ employer_id: user.email }, '', 200).catch(() => []),
-        base44.entities.Interview.filter({ employer_id: user.email }, '', 200).catch(() => []),
+        jobService.list({ limit: 200 }),
+        applicationService.list({ limit: 200 }),
+        interviewService.list({ limit: 200 }),
       ]);
       const openJobs = jobs.filter(j => !j.is_closed);
       const closedJobs = jobs.filter(j => j.is_closed);
@@ -39,7 +44,12 @@ export default function EmployerAnalyticsPage() {
       const scheduled = interviews.filter(i => i.status === 'scheduled');
       const completed = interviews.filter(i => i.status === 'completed');
       setData({ openJobs: openJobs.length, closedJobs: closedJobs.length, totalApps: applications.length, hired: hired.length, inProgress: inProgress.length, scheduledInterviews: scheduled.length, completedInterviews: completed.length });
-      setLoading(false);
+      } catch (error) {
+        setData(null);
+        setLoadError(error?.message || 'Unable to load analytics');
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, [user?.email]);
@@ -57,6 +67,7 @@ export default function EmployerAnalyticsPage() {
         <h1 className="text-3xl font-black text-[#0F172A]">אנליטיקה</h1>
         <p className="text-[#64748B] font-semibold mt-1">סיכום פעילות גיוס לחברתך</p>
       </div>
+      {loadError && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">{loadError}</div>}
 
       {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

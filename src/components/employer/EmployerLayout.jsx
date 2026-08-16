@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, Users, Menu, X, LogOut, Search,
   MessageCircle, TrendingUp, ChevronDown, ChevronUp, Download,
-  Bell, Sparkles, Home, Settings
+  Sparkles, Home, Settings
 } from 'lucide-react';
 import { authService } from '@/api/services/authService';
 import { useTranslation } from 'react-i18next';

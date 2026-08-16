@@ -13,7 +13,7 @@ import ApplicationsPanel from '@/components/crm/candidate/ApplicationsPanel';
 import WhatsAppPanel from '@/components/crm/candidate/WhatsAppPanel';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { ArrowRight, RefreshCw, AlertCircle, Trash2 } from 'lucide-react';
-import { httpClient } from '@/api/client/httpClient';
+import { candidateService } from '@/api/services/candidateService';
 import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
 
 export default function CandidateCRMPage() {
@@ -47,7 +47,7 @@ export default function CandidateCRMPage() {
   const handleDelete = async () => {
     if (!window.confirm(t('candidateCRM.deleteConfirm'))) return;
     setDeleting(true);
-    await httpClient.delete(`/candidates/${candidateId}`);
+    await candidateService.remove(candidateId);
     navigate(-1);
   };
 

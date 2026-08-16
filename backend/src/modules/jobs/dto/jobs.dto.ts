@@ -53,7 +53,7 @@ export class UpdateJobDto extends createZodDto(UpdateJobSchema) {}
 export const QueryJobsSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(500).default(20),
-  sort: z.string().default('created_date'),
+  sort: z.enum(['created_date', 'updated_date', 'views', 'title', 'company']).default('created_date'),
   order: z.enum(['ASC', 'DESC']).default('DESC'),
   search: z.string().optional(),
   organization_id: z.coerce.number().int().optional(),
@@ -71,7 +71,6 @@ export class QueryJobsDto extends createZodDto(QueryJobsSchema) {}
 
 // ─── SavedJob ────────────────────────────────────────────────────────────
 export const CreateSavedJobSchema = z.object({
-  user_email: z.string().email(),
   job_id: z.number().int(),
   job_title: z.string().optional().nullable(),
   company: z.string().optional().nullable(),
@@ -80,7 +79,6 @@ export class CreateSavedJobDto extends createZodDto(CreateSavedJobSchema) {}
 
 // ─── JobAlert ────────────────────────────────────────────────────────────
 export const CreateJobAlertSchema = z.object({
-  user_email: z.string().email(),
   keywords: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   category: z.string().optional().nullable(),

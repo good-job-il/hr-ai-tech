@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { publicWorkflowService } from '@/api/services/publicWorkflowService';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import { Zap } from 'lucide-react';
@@ -13,8 +13,8 @@ export default function RecommendedJobsAI() {
     const fetchRecommendations = async () => {
       if (!user?.email) return;
       try {
-        const result = await base44.functions.invoke('getRecommendedJobs', {});
-        setJobs(result.data?.jobs || []);
+        const result = await publicWorkflowService.recommendedJobs();
+        setJobs(result.jobs || []);
       } catch (error) {
         console.error('Error fetching recommendations:', error);
       } finally {

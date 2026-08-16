@@ -7,15 +7,13 @@ import { useState, useMemo } from 'react';
 import { X, Send, Eye, Paperclip, CheckSquare, Square, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { httpClient } from '@/api/client/httpClient';
-import { useAuth } from '@/lib/AuthContext';
+import { candidateCrmService } from '@/api/services/candidateCrmService';
 import { useTranslation } from 'react-i18next';
 
 export default function SendToEmployerModal({ candidate, documents, job, onClose, onSuccess }) {
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'he';
   const isRTL = currentLang === 'he';
-  const { user } = useAuth();
   
   const DOC_TYPE_LABELS = {
     cv: t('candidateCRM.sendToEmployer.docTypes.cv'),
@@ -94,22 +92,8 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
     setSending(true);
     setResult(null);
     try {
-      const res = await httpClient.post('/functions/sendCandidateToEmployer', {
-        candidateId: candidate.id,
-        to: to.trim(),
-        cc: cc.trim(),
-        subject,
-        recruiterNote,
-        candidateName: candidate.full_name,
-        candidateEmail: candidate.email,
-        jobId: job?.id || null,
-        jobTitle: job?.title || subject.replace(t('candidateCRM.sendToEmployer.candidacyPrefix'), '').replace(candidate.full_name, '').trim().replace(/^—\s*/, '').trim(),
-        attachmentUrls: selectedDocsList.map(d => ({
-          url: d.url,
-          filename: d.filename,
-          doc_type: d.doc_type,
-        })),
-      });
+      if (!job?.id) throw new Error(t('candidateCRM.sendToEmployer.selectJob', { defaultValue: 'Select a job first' }));
+      const res = await candidateCrmService.presentCandidate(candidate.id, job.id, recruiterNote);
       setResult({ success: true, message: res?.message || t('candidateCRM.sendToEmployer.sentSuccessfully') });
       if (onSuccess) onSuccess();
     } catch (e) {

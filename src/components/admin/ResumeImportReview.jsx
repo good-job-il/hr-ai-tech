@@ -35,18 +35,10 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
       }
 
       // Create bulk candidates
-      const createResult = await candidateImportService.createBulk({
-        candidates_data: candidatesToCreate.map(c => c.data),
-        import_batch_id: results.importBatchId
-      });
-
-      // Update import batch final status
-      await candidateImportService.update(results.importBatchId, {
-        successful_imports: createResult.data.created.length,
-        failed_imports: createResult.data.failed.length,
-        duplicate_found: Object.values(resolvedDuplicates).filter(r => r.action === 'merge').length,
-        status: 'completed'
-      }).catch(() => {});
+      const createResult = await candidateImportService.createBulk(
+        candidatesToCreate.map(c => c.data),
+        results.importBatchId,
+      );
 
       onComplete?.();
     } catch (err) {

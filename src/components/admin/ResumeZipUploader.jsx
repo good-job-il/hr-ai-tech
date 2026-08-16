@@ -51,18 +51,14 @@ export default function ResumeZipUploader({ onImportComplete }) {
 
       // 2. Create import batch record
       const importBatch = await candidateImportService.create({
-        organization_id: user?.organization_id,
         batch_name: zipFile.name.replace('.zip', ''),
         source_file: zipUrl,
         file_type: 'zip',
-        imported_by: user?.email,
         recruiter_id: recruiterId || user?.id,
         team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
         recruitment_manager_id: user?.recruitment_manager_id,
         employer_id: employerId || null,
-        total_records: 0,
-        status: 'in_progress',
-        processing_started_at: new Date().toISOString()
+        total_records: 0
       });
 
       // 3. Parse resume batch
@@ -77,7 +73,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
 
       // 4. Show review screen
       setParseResults({
-        ...parseResult.data,
+        ...parseResult,
         importBatchId: importBatch.id,
         zipUrl,
         recruiterId,
@@ -111,10 +107,8 @@ export default function ResumeZipUploader({ onImportComplete }) {
         onComplete={async () => {
           // Run validation after candidates created
           try {
-            const validation = await candidateImportService.validateBatch({
-              import_batch_id: parseResults.importBatchId
-            });
-            setValidationResults(validation.data);
+            const validation = await candidateImportService.validateBatch(parseResults.importBatchId);
+            setValidationResults(validation);
           } catch (err) {
             console.error('Validation failed:', err);
             setParseResults(null);

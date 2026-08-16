@@ -4,7 +4,7 @@ import { JobEntity } from './entities/job.entity';
 import { SavedJobEntity } from './entities/saved-job.entity';
 import { JobAlertEntity } from './entities/job-alert.entity';
 import { JobsService } from './jobs.service';
-import { JobsController } from './jobs.controller';
+import { JobsController, PublicJobsController } from './jobs.controller';
 import { AgencyClientEntity } from '../agency-clients/agency-client.entity';
 import { CompanyEntity } from '../companies/company.entity';
 
@@ -16,7 +16,7 @@ import { CompanyEntity } from '../companies/company.entity';
     AgencyClientEntity,
     CompanyEntity,
   ])],
-  controllers: [JobsController],
+  controllers: [JobsController, PublicJobsController],
   providers: [JobsService],
   exports: [JobsService, TypeOrmModule],
 })

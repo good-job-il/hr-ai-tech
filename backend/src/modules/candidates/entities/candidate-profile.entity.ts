@@ -2,8 +2,12 @@ import { Entity, Column, Index } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 
 @Entity('candidate_profiles')
+@Index(['user_id'], { unique: true })
 @Index(['user_email'], { unique: true })
 export class CandidateProfileEntity extends BaseEntity {
+  @Column({ name: 'user_id', type: 'int', nullable: true, unique: true })
+  user_id: number | null;
+
   @Column({ name: 'user_email', type: 'varchar', length: 255, unique: true })
   user_email: string;
 
@@ -57,4 +61,3 @@ export class CandidateProfileEntity extends BaseEntity {
   @Column({ name: 'resume_url', type: 'text', nullable: true })
   resume_url: string | null;
 }
-

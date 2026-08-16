@@ -7,8 +7,7 @@
 import { useState } from 'react';
 import { MessageCircle, Plus, Clock, CheckCircle2, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { httpClient } from '@/api/client/httpClient';
-import { useAuth } from '@/lib/AuthContext';
+import { candidateCrmService } from '@/api/services/candidateCrmService';
 import { useTranslation } from 'react-i18next';
 
 function buildWhatsAppUrl(phone, message) {
@@ -24,7 +23,6 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
   const { t, i18n } = useTranslation();
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'he';
   const isRTL = currentLang === 'he';
-  const { user } = useAuth();
 
   const MESSAGE_TEMPLATES = [
     {
@@ -76,13 +74,10 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
     if (!logSummary.trim()) return;
     setSaving(true);
     try {
-      await httpClient.post('/communication-logs', {
+      await candidateCrmService.logCommunication({
         candidate_id: candidate.id,
-        candidate_email: candidate.email || '',
         channel: 'whatsapp',
         direction: 'outbound',
-        sender_email: user?.email || '',
-        sender_name: user?.full_name || '',
         content: logSummary,
         status: logOutcome,
       });
@@ -93,17 +88,6 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
         failed: t('candidateCRM.whatsapp.outcomes.failed'),
       };
 
-      await httpClient.post(`/candidates/${candidate.id}/timeline`, {
-        candidate_email: candidate.email || '',
-        event_type: 'message_sent',
-        description: `WhatsApp — ${outcomeLabels[logOutcome]}: ${logSummary}`,
-        performed_by: user?.email || '',
-        performed_by_name: user?.full_name || '',
-        performed_by_role: user?.role || 'recruiter',
-        metadata: { channel: 'whatsapp', outcome: logOutcome },
-        is_visible_to_candidate: false,
-        is_visible_to_employer: false,
-      });
       if (onAddCommunication) onAddCommunication();
       setLogSummary('');
       setShowLog(false);

@@ -1,6 +1,9 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { jobService } from '@/api/services/jobService';
+import { candidateService } from '@/api/services/candidateService';
+import { applicationService } from '@/api/services/applicationService';
+import { compensationPlanService } from '@/api/services/compensationPlanService';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import {
@@ -31,7 +34,7 @@ export default function AgencyDashboard() {
   // Performance: Use React Query with caching
   const { data: jobs = [], isLoading: jobsLoading, isError: jobsError } = useQuery({
     queryKey: ['agency-jobs', orgId],
-    queryFn: () => base44.entities.Job.filter({ organization_id: orgId, is_deleted: false }, '-created_date', 50),
+    queryFn: () => jobService.list({ organization_id: orgId, is_deleted: false, sort: 'created_date', order: 'DESC', limit: 50 }),
     enabled: !!orgId,
     staleTime: DASHBOARD_STALE_TIME,
     cacheTime: DASHBOARD_CACHE_TIME,
@@ -39,7 +42,7 @@ export default function AgencyDashboard() {
 
   const { data: candidates = [], isLoading: candidatesLoading, isError: candidatesError } = useQuery({
     queryKey: ['agency-candidates', orgId],
-    queryFn: () => base44.entities.Candidate.filter({ organization_id: orgId, is_deleted: false }, '-created_date', 100),
+    queryFn: () => candidateService.list({ organization_id: orgId, is_deleted: false, sort: 'created_date', order: 'DESC', limit: 100 }),
     enabled: !!orgId,
     staleTime: DASHBOARD_STALE_TIME,
     cacheTime: DASHBOARD_CACHE_TIME,
@@ -47,7 +50,7 @@ export default function AgencyDashboard() {
 
   const { data: applications = [], isLoading: applicationsLoading, isError: applicationsError } = useQuery({
     queryKey: ['agency-applications', orgId],
-    queryFn: () => base44.entities.Application.filter({ organization_id: orgId, is_deleted: false }, '-created_date', 100),
+    queryFn: () => applicationService.list({ organization_id: orgId, is_deleted: false, sort: 'created_date', order: 'DESC', limit: 100 }),
     enabled: !!orgId,
     staleTime: DASHBOARD_STALE_TIME,
     cacheTime: DASHBOARD_CACHE_TIME,
@@ -55,7 +58,7 @@ export default function AgencyDashboard() {
 
   const { data: plans = [], isLoading: plansLoading, isError: plansError } = useQuery({
     queryKey: ['agency-plans', orgId],
-    queryFn: () => base44.entities.CompensationPlan.filter({ organization_id: orgId }, '', 50),
+    queryFn: () => compensationPlanService.list({ limit: 50 }),
     enabled: !!orgId,
     staleTime: DASHBOARD_STALE_TIME,
     cacheTime: DASHBOARD_CACHE_TIME,

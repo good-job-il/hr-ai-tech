@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { httpClient } from '@/api/client/httpClient';
 import { useAuth } from '@/lib/AuthContext';
-import { FileText, Download, Trash2 } from 'lucide-react';
+import { FileText, Download } from 'lucide-react';
 import Navbar from '@/components/home/Navbar';
 
 export default function Resumes() {

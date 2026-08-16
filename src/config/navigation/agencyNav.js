@@ -21,6 +21,7 @@ export const AGENCY_ADMIN_NAV = [
   { id: 'agency-ai-matching', labelKey: 'nav.agency.aiMatching', route: '/agency/ai-matching', icon: Sparkles },
 
   { id: 'agency-clients', labelKey: 'nav.agency.clients', route: '/agency/clients', icon: Building2 },
+  { id: 'agency-teams', labelKey: 'nav.agency.teams', route: '/agency/teams', icon: Users },
 
   {
     id: 'agency-compensation', labelKey: 'nav.agency.compensation', route: '/agency/compensation', icon: DollarSign,

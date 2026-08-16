@@ -33,11 +33,14 @@ import { MessageEntity } from '../modules/messages/message.entity';
 import { NotificationEntity } from '../modules/notifications/notification.entity';
 import { CompanyEntity, CompanyReviewEntity, StaffEntity } from '../modules/companies/company.entity';
 import { AgencyClientEntity } from '../modules/agency-clients/agency-client.entity';
+import { AgencyTeamEntity } from '../modules/agency-teams/agency-team.entity';
+import { AgencyInvitationEntity } from '../modules/agency-teams/agency-invitation.entity';
 // Phase 3 — Advanced modules
 import { AuditLogEntity } from '../modules/audit/audit-log.entity';
 import { CompensationPlanEntity } from '../modules/compensation/compensation-plan.entity';
 import { CommunicationLogEntity, EmployerTimelineEntity } from '../modules/communication/communication-log.entity';
 import { ImportSourceEntity } from '../modules/import-sources/import-source.entity';
+import { BackgroundJobEntity } from '../modules/functions/entities/background-job.entity';
 import { SalaryDataEntity } from '../modules/salary/salary-data.entity';
 import {
   PermissionMatrixEntity,
@@ -60,10 +63,11 @@ const ALL_ENTITIES = [
   ApplicationEntity, ApplicationTimelineEntity, ApplicationPipelineEntity,
   InterviewEntity, MessageEntity, NotificationEntity,
   CompanyEntity, CompanyReviewEntity, StaffEntity, AgencyClientEntity,
+  AgencyTeamEntity, AgencyInvitationEntity,
   // Phase 3
   AuditLogEntity, CompensationPlanEntity,
   CommunicationLogEntity, EmployerTimelineEntity,
-  ImportSourceEntity, SalaryDataEntity,
+  ImportSourceEntity, BackgroundJobEntity, SalaryDataEntity,
   PermissionMatrixEntity, RoleTemplateEntity, RoleAliasEntity,
   UserPositionAccessEntity, PositionEntity,
 ];

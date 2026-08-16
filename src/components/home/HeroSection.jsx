@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { publicJobService } from '@/api/services/publicJobService';
+import { companyService } from '@/api/services/companyService';
 import { Sparkles } from 'lucide-react';
 
 export default function HeroSection() {
@@ -16,21 +17,16 @@ export default function HeroSection() {
   const { data: jobs = [] } = useQuery({
     queryKey: ['hero-jobs-count'],
     queryFn: async () => {
-      const allJobs = await base44.entities.Job.filter({ is_closed: false }, '-created_date', 10000);
-      return allJobs;
+      return publicJobService.list({ is_closed: false, sort: 'created_date', order: 'DESC', limit: 500 });
     },
     staleTime: 1000 * 60 * 5,
   });
   const { data: companies = [] } = useQuery({
     queryKey: ['hero-companies-count'],
-    queryFn: () => base44.entities.Company.list('-created_date', 50),
+    queryFn: () => companyService.list({ sort: 'created_date', order: 'DESC', limit: 50 }),
     staleTime: 1000 * 60 * 5,
   });
-  const { data: users = [] } = useQuery({
-    queryKey: ['hero-users-count'],
-    queryFn: () => base44.entities.User.list('-created_date', 50),
-    staleTime: 1000 * 60 * 5,
-  });
+  const users = [];
 
   const jobCount = jobs.length;
   const companyCount = Math.max(companies.length, 1);

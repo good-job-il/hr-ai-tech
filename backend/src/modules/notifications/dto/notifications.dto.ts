@@ -15,12 +15,9 @@ export class CreateNotificationDto extends createZodDto(CreateNotificationSchema
 export const QueryNotificationsSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(200).default(20),
-  sort: z.string().default('created_date'),
+  sort: z.enum(['created_date']).default('created_date'),
   order: z.enum(['ASC', 'DESC']).default('DESC'),
-  recipient_email: z.string().email().optional(),
   is_read: z.coerce.boolean().optional(),
   type: z.string().optional(),
-  organization_id: z.coerce.number().int().optional(),
 });
 export class QueryNotificationsDto extends createZodDto(QueryNotificationsSchema) {}
-

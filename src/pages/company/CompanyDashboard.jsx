@@ -1,6 +1,9 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { httpClient } from '@/api/client/httpClient';
+import { jobService } from '@/api/services/jobService';
+import { candidateService } from '@/api/services/candidateService';
+import { interviewService } from '@/api/services/interviewService';
+import { applicationService } from '@/api/services/applicationService';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -44,28 +47,28 @@ export default function CompanyDashboard() {
 
   const { data: jobs = [], isLoading: jobsLoading } = useQuery({
     queryKey: ['company-jobs', orgId],
-    queryFn: () => httpClient.get(`/jobs?organization_id=${encodeURIComponent(orgId)}&is_deleted=false&sort=created_date&order=DESC&limit=100`, { cache: false }),
+    queryFn: () => jobService.list({ organization_id: orgId, is_deleted: false, sort: 'created_date', order: 'DESC', limit: 100 }),
     enabled: !!orgId,
     staleTime: STALE,
   });
 
   const { data: candidates = [], isLoading: candidatesLoading } = useQuery({
     queryKey: ['company-candidates', orgId],
-    queryFn: () => httpClient.get(`/candidates?organization_id=${encodeURIComponent(orgId)}&is_deleted=false&sort=created_date&order=DESC&limit=100`, { cache: false }),
+    queryFn: () => candidateService.list({ organization_id: orgId, is_deleted: false, sort: 'created_date', order: 'DESC', limit: 100 }),
     enabled: !!orgId,
     staleTime: STALE,
   });
 
   const { data: interviews = [], isLoading: interviewsLoading } = useQuery({
     queryKey: ['company-interviews', orgId],
-    queryFn: () => httpClient.get(`/interviews?organization_id=${encodeURIComponent(orgId)}&sort=created_date&order=DESC&limit=50`, { cache: false }),
+    queryFn: () => interviewService.list({ organization_id: orgId, sort: 'date', order: 'DESC', limit: 50 }),
     enabled: !!orgId,
     staleTime: STALE,
   });
 
   const { data: applications = [], isLoading: applicationsLoading } = useQuery({
     queryKey: ['company-applications', orgId],
-    queryFn: () => httpClient.get(`/applications?organization_id=${encodeURIComponent(orgId)}&is_deleted=false&sort=created_date&order=DESC&limit=100`, { cache: false }),
+    queryFn: () => applicationService.list({ organization_id: orgId, is_deleted: false, sort: 'created_date', order: 'DESC', limit: 100 }),
     enabled: !!orgId,
     staleTime: STALE,
   });

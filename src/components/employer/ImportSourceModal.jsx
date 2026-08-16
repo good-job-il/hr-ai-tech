@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { importSourceService } from '@/api/services/importSourceService';
 import { X } from 'lucide-react';
 
 export default function ImportSourceModal({ source, onClose, onSaved }) {
@@ -24,9 +24,9 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
     e.preventDefault();
     setLoading(true);
     if (source) {
-      await base44.entities.ImportSource.update(source.id, form);
+      await importSourceService.update(source.id, form);
     } else {
-      await base44.entities.ImportSource.create(form);
+      await importSourceService.create(form);
     }
     setLoading(false);
     onSaved();

@@ -5,6 +5,7 @@ import { BaseEntity } from '../../common/entities/base.entity';
 @Index(['organization_id'])
 @Index(['application_id'])
 @Index(['candidate_id'])
+@Index(['candidate_user_id'])
 @Index(['recruiter_id'])
 export class InterviewEntity extends BaseEntity {
   @Column({ name: 'organization_id', type: 'int', nullable: true })
@@ -15,6 +16,9 @@ export class InterviewEntity extends BaseEntity {
 
   @Column({ name: 'candidate_id', type: 'int', nullable: true })
   candidate_id: number | null;
+
+  @Column({ name: 'candidate_user_id', type: 'int', nullable: true })
+  candidate_user_id: number | null;
 
   @Column({ name: 'job_id', type: 'int', nullable: true })
   job_id: number | null;

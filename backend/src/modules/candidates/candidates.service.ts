@@ -1,6 +1,6 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, FindManyOptions } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { CandidateEntity } from './entities/candidate.entity';
 import { CandidateNoteEntity } from './entities/candidate-note.entity';
 import { CandidateTagEntity } from './entities/candidate-tag.entity';
@@ -46,6 +46,8 @@ export class CandidatesService {
     private readonly profileRepo: Repository<CandidateProfileEntity>,
     @InjectRepository(CandidateAccessEntity)
     private readonly accessRepo: Repository<CandidateAccessEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
   ) {}
 
   // ─── Candidates ──────────────────────────────────────────────────────────
@@ -137,10 +139,15 @@ export class CandidatesService {
     });
   }
 
-  async createNote(dto: CreateCandidateNoteDto, user: UserEntity) {
-    await this.findById(dto.candidate_id, user);
+  async createNote(candidateId: number, dto: CreateCandidateNoteDto, user: UserEntity) {
+    const candidate = await this.findById(candidateId, user);
     const note = this.noteRepo.create({
       ...dto,
+      candidate_id: candidateId,
+      candidate_email: candidate.email,
+      author_email: user.email,
+      author_name: user.full_name,
+      author_role: user.role,
       organization_id: user.organization_id,
     } as any);
     return this.noteRepo.save(note);
@@ -167,9 +174,9 @@ export class CandidatesService {
     return this.tagRepo.find({ where: { candidate_id: candidateId } });
   }
 
-  async createTag(dto: CreateCandidateTagDto, user: UserEntity) {
-    await this.findById(dto.candidate_id, user);
-    const tag = this.tagRepo.create(dto as any);
+  async createTag(candidateId: number, dto: CreateCandidateTagDto, user: UserEntity) {
+    await this.findById(candidateId, user);
+    const tag = this.tagRepo.create({ ...dto, candidate_id: candidateId, added_by: user.email } as any);
     return this.tagRepo.save(tag);
   }
 
@@ -190,10 +197,11 @@ export class CandidatesService {
   }
 
   async createTimelineEvent(data: Partial<CandidateTimelineEntity>, user: UserEntity) {
-    await this.findById(data.candidate_id!, user);
+    const candidate = await this.findById(data.candidate_id!, user);
     const event = this.timelineRepo.create({
       ...data,
       organization_id: user.organization_id,
+      candidate_email: candidate.email,
       performed_by: user.email,
       performed_by_name: user.full_name,
       performed_by_role: user.role,
@@ -211,10 +219,12 @@ export class CandidatesService {
   }
 
   async createDocument(data: Partial<CandidateDocumentEntity>, user: UserEntity) {
-    await this.findById(data.candidate_id!, user);
+    const candidate = await this.findById(data.candidate_id!, user);
     const doc = this.documentRepo.create({
       ...data,
       organization_id: user.organization_id,
+      candidate_email: candidate.email,
+      uploaded_by: user.email,
     } as any);
     return this.documentRepo.save(doc);
   }
@@ -243,6 +253,11 @@ export class CandidatesService {
   }
 
   async createBatch(data: Partial<CandidateImportBatchEntity>, user: UserEntity) {
+    await this.assertOrganizationUsers([
+      data.recruiter_id,
+      data.team_manager_id,
+      data.recruitment_manager_id,
+    ], user);
     const batch = this.batchRepo.create({
       ...data,
       organization_id: user.organization_id,
@@ -250,8 +265,17 @@ export class CandidatesService {
       team_manager_id: data.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
       recruitment_manager_id: data.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
       imported_by: user.email,
+      status: 'pending',
     });
     return this.batchRepo.save(batch);
+  }
+
+  async assertOrganizationUsers(ids: Array<number | null | undefined>, user: UserEntity) {
+    if (user.role === UserRole.ADMIN) return;
+    for (const id of [...new Set(ids.filter((value): value is number => Boolean(value)))]) {
+      const member = await this.userRepo.findOne({ where: { id, organization_id: user.organization_id } });
+      if (!member) throw new ForbiddenException(`User ${id} belongs to another organization`);
+    }
   }
 
   async updateBatch(id: number, data: Partial<CandidateImportBatchEntity>, user: UserEntity) {
@@ -263,30 +287,54 @@ export class CandidatesService {
   }
 
   // ─── Profile ─────────────────────────────────────────────────────────────
-  async getProfile(userEmail: string) {
-    return this.profileRepo.findOne({ where: { user_email: userEmail } });
+  async getProfile(userEmail: string, user: UserEntity) {
+    if (user.role === UserRole.CANDIDATE && userEmail !== user.email) {
+      throw new ForbiddenException('Access denied');
+    }
+    return this.profileRepo.findOne({
+      where: user.role === UserRole.CANDIDATE ? { user_id: user.id } : { user_email: userEmail },
+    });
   }
 
-  /** Flat list with optional filters — mirrors base44.entities.CandidateProfile.filter(...) */
-  async findAllProfiles(filters: { user_email?: string; is_public?: boolean }) {
+  /** Flat candidate-profile list with optional filters. */
+  async findAllProfiles(filters: { user_email?: string; is_public?: boolean }, user: UserEntity) {
     const where: Record<string, any> = {};
-    if (filters.user_email) where.user_email = filters.user_email;
+    if (user.role === UserRole.CANDIDATE) where.user_id = user.id;
+    else if (filters.user_email) where.user_email = filters.user_email;
     if (filters.is_public !== undefined) where.is_public = filters.is_public;
     return this.profileRepo.find({ where, order: { created_date: 'DESC' } as any });
   }
 
-  async upsertProfile(dto: CreateCandidateProfileDto | UpdateCandidateProfileDto) {
-    const existing = await this.profileRepo.findOne({ where: { user_email: (dto as any).user_email } });
+  async upsertProfile(dto: CreateCandidateProfileDto | UpdateCandidateProfileDto, user: UserEntity) {
+    const userEmail = user.email;
+    if (!userEmail) throw new BadRequestException('user_email is required');
+    const existing = await this.profileRepo.findOne({ where: { user_id: user.id } });
     if (existing) {
       Object.assign(existing, dto);
       return this.profileRepo.save(existing);
     }
-    const profile = this.profileRepo.create(dto as any);
+    const profile = this.profileRepo.create({ ...dto, user_id: user.id, user_email: userEmail } as any);
     return this.profileRepo.save(profile);
   }
 
-  /** Update by profile id (int) OR user_email — mirrors base44's `.update(profile.id, data)` usage */
-  async updateProfileByKey(key: string, dto: Partial<CandidateProfileEntity>) {
+  async updateMyProfile(dto: Partial<CandidateProfileEntity>, user: UserEntity) {
+    const existing = await this.profileRepo.findOne({ where: { user_id: user.id } });
+    if (!existing) throw new NotFoundException('Candidate profile not found');
+    delete dto.user_email;
+    delete dto.user_id;
+    Object.assign(existing, dto);
+    return this.profileRepo.save(existing);
+  }
+
+  /** Update by profile id (int) or user_email. */
+  async updateProfileByKey(key: string, dto: Partial<CandidateProfileEntity>, user: UserEntity) {
+    if (user.role === UserRole.CANDIDATE && key !== user.email) {
+      const numericKey = Number(key);
+      const owned = Number.isInteger(numericKey)
+        ? await this.profileRepo.findOne({ where: { id: numericKey, user_id: user.id } })
+        : null;
+      if (!owned) throw new ForbiddenException('Access denied');
+    }
     const numericId = parseInt(key, 10);
     let existing: CandidateProfileEntity | null = null;
     if (!isNaN(numericId)) {
@@ -294,6 +342,8 @@ export class CandidatesService {
     }
     if (!existing) existing = await this.profileRepo.findOne({ where: { user_email: key } });
     if (!existing) throw new NotFoundException(`Candidate profile ${key} not found`);
+    if (user.role === UserRole.CANDIDATE && existing.user_id !== user.id) throw new ForbiddenException('Access denied');
+    delete dto.user_email;
     Object.assign(existing, dto);
     return this.profileRepo.save(existing);
   }
@@ -303,7 +353,7 @@ export class CandidatesService {
     return this.accessRepo.find({ where: { candidate_id: candidateId } });
   }
 
-  /** Flat list — mirrors base44.entities.CandidateAccess.list(...) */
+  /** Flat candidate-access list with optional filters. */
   async findAllAccess(filters: Record<string, any> = {}, user: UserEntity) {
     const isGlobalAdmin = user.role === UserRole.ADMIN && !user.impersonating;
     if (!isGlobalAdmin && !user.organization_id) return [];

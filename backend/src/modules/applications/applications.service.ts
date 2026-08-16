@@ -3,21 +3,26 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { ApplicationEntity } from './entities/application.entity';
 import { ApplicationTimelineEntity } from './entities/application-timeline.entity';
-import { ApplicationPipelineEntity } from './entities/application-pipeline.entity';
-import { CreateApplicationDto, UpdateApplicationDto, QueryApplicationsDto, CreatePipelineStageDto, UpdatePipelineStageDto } from './dto/applications.dto';
+import { AssignCandidateDto, CreateApplicationDto, SubmitApplicationDto, UpdateApplicationDto, QueryApplicationsDto } from './dto/applications.dto';
 import { UserEntity } from '../users/user.entity';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { getRlsWhere, isBlocked } from '../../common/utils/rls.utils';
 import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
 import { JobEntity } from '../jobs/entities/job.entity';
+import { EmailService } from '../integrations/services/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { CandidateEntity } from '../candidates/entities/candidate.entity';
 
 @Injectable()
 export class ApplicationsService {
   constructor(
     @InjectRepository(ApplicationEntity) private readonly appRepo: Repository<ApplicationEntity>,
     @InjectRepository(ApplicationTimelineEntity) private readonly timelineRepo: Repository<ApplicationTimelineEntity>,
-    @InjectRepository(ApplicationPipelineEntity) private readonly pipelineRepo: Repository<ApplicationPipelineEntity>,
     @InjectRepository(JobEntity) private readonly jobRepo: Repository<JobEntity>,
+    @InjectRepository(CandidateEntity) private readonly candidateRepo: Repository<CandidateEntity>,
+    @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>,
+    private readonly emailService: EmailService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async findAll(query: QueryApplicationsDto, user: UserEntity) {
@@ -83,7 +88,7 @@ export class ApplicationsService {
     return app;
   }
 
-  async create(dto: CreateApplicationDto, user: UserEntity): Promise<ApplicationEntity> {
+  async create(dto: CreateApplicationDto, user: UserEntity, candidateUserId: number | null = null): Promise<ApplicationEntity> {
     const jobScope = getRlsWhere('Job', {
       id: user.id, role: user.role, organization_id: user.organization_id,
       employer_company_id: user.employer_company_id, email: user.email,
@@ -101,13 +106,72 @@ export class ApplicationsService {
       job_title: dto.job_title ?? job.title,
       company: dto.company ?? job.company,
       candidate_email: isCandidate ? user.email : dto.candidate_email,
+      candidate_user_id: isCandidate ? user.id : candidateUserId,
       candidate_id: isCandidate ? null : dto.candidate_id,
       recruiter_id: isCandidate ? null : (dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null)),
       assigned_to: isCandidate ? null : dto.assigned_to,
       status: isCandidate ? 'new' : dto.status,
       source: isCandidate ? 'app' : dto.source,
     } as any);
-    return this.appRepo.save(app) as unknown as Promise<ApplicationEntity>;
+    const saved = await (this.appRepo.save(app) as unknown as Promise<ApplicationEntity>);
+    await this.timelineRepo.save(this.timelineRepo.create({
+      application_id: saved.id,
+      organization_id: saved.organization_id,
+      event_type: 'submitted',
+      description: `Candidate applied for ${saved.job_title || job.title}`,
+      performed_by: user.email,
+      performed_by_role: user.role,
+    } as any));
+    await this.emailService.sendApplicationSubmitted({
+      candidateEmail: saved.candidate_email,
+      candidateName: saved.candidate_name,
+      jobTitle: saved.job_title || job.title,
+      employerEmail: job.contact_email || job.employer_id,
+    });
+    return saved;
+  }
+
+  async submit(dto: SubmitApplicationDto, user: UserEntity): Promise<ApplicationEntity> {
+    return this.create({
+      ...dto,
+      candidate_name: dto.candidate_name ?? user.full_name ?? user.email,
+      candidate_email: user.email,
+      source: 'app',
+      status: 'new',
+    }, user);
+  }
+
+  async assignCandidate(dto: AssignCandidateDto, user: UserEntity): Promise<ApplicationEntity> {
+    const candidateScope = getRlsWhere('Candidate', {
+      id: user.id, role: user.role, organization_id: user.organization_id,
+      employer_company_id: user.employer_company_id, email: user.email,
+      impersonating: user.impersonating,
+    });
+    if (isBlocked(candidateScope)) throw new NotFoundException(`Candidate ${dto.candidate_id} not found`);
+    const candidate = await this.candidateRepo.findOne({ where: { ...candidateScope, id: dto.candidate_id } as any });
+    if (!candidate) throw new NotFoundException(`Candidate ${dto.candidate_id} not found`);
+    const existing = await this.appRepo.findOne({
+      where: { job_id: dto.job_id, candidate_id: candidate.id, is_deleted: false } as any,
+    });
+    if (existing) return existing;
+    const candidateUser = candidate.email
+      ? await this.userRepo.findOne({ where: { email: candidate.email } })
+      : null;
+    return this.create({
+      job_id: dto.job_id,
+      candidate_id: candidate.id,
+      candidate_name: candidate.full_name,
+      candidate_email: candidate.email,
+      candidate_phone: candidate.phone,
+      resume_url: candidate.resume_url ?? candidate.converted_resume_url,
+      location: candidate.location,
+      source: 'pool_assignment',
+      status: 'new',
+      recruiter_id: candidate.recruiter_id ?? user.id,
+      assigned_to: candidate.recruiter_id ?? user.id,
+      team_manager_id: candidate.team_manager_id ?? user.team_manager_id,
+      recruitment_manager_id: candidate.recruitment_manager_id ?? user.recruitment_manager_id,
+    }, user, candidateUser?.id ?? null);
   }
 
   async update(id: number, dto: UpdateApplicationDto, user: UserEntity): Promise<ApplicationEntity> {
@@ -131,8 +195,20 @@ export class ApplicationsService {
         performed_by: user.email,
         performed_by_role: user.role,
       } as any));
+      await this.notificationsService.create({
+        recipient_email: app.candidate_email,
+        organization_id: app.organization_id,
+        type: ['phone_interview', 'employer_interview'].includes(dto.status) ? 'interview_scheduled' : 'new_application',
+        title: `Application status updated — ${app.job_title || 'position'}`,
+        content: `Your application status changed from ${prev} to ${dto.status}.`,
+        metadata: { application_id: app.id, previous_status: prev, status: dto.status },
+      } as any);
     }
     return saved;
+  }
+
+  changeStatus(id: number, status: UpdateApplicationDto['status'], user: UserEntity) {
+    return this.update(id, { status } as UpdateApplicationDto, user);
   }
 
   async softDelete(id: number, user: UserEntity): Promise<void> {
@@ -150,26 +226,4 @@ export class ApplicationsService {
     return this.timelineRepo.save(event);
   }
 
-  // ─── Pipeline ────────────────────────────────────────────────────────────
-  async getPipeline(employerId: string) {
-    return this.pipelineRepo.find({ where: { employer_id: employerId }, order: { order: 'ASC' } });
-  }
-
-  async createPipelineStage(dto: CreatePipelineStageDto): Promise<ApplicationPipelineEntity> {
-    const stage = this.pipelineRepo.create(dto as any);
-    return this.pipelineRepo.save(stage) as unknown as Promise<ApplicationPipelineEntity>;
-  }
-
-  async updatePipelineStage(id: number, dto: UpdatePipelineStageDto): Promise<ApplicationPipelineEntity> {
-    const stage = await this.pipelineRepo.findOne({ where: { id } as any });
-    if (!stage) throw new NotFoundException(`Stage ${id} not found`);
-    Object.assign(stage, dto);
-    return this.pipelineRepo.save(stage) as unknown as Promise<ApplicationPipelineEntity>;
-  }
-
-  async deletePipelineStage(id: number): Promise<void> {
-    const stage = await this.pipelineRepo.findOne({ where: { id } as any });
-    if (!stage) throw new NotFoundException(`Stage ${id} not found`);
-    await this.pipelineRepo.remove(stage);
-  }
 }

@@ -1,4 +1,4 @@
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T;
   status: number;
   message?: string;
@@ -18,7 +18,7 @@ export interface PaginationParams {
   page: number;
   limit: number;
   sort?: string;
-  order?: 'asc' | 'desc';
+  order?: 'ASC' | 'DESC';
 }
 
 export interface PaginatedResponse<T> {
@@ -33,10 +33,6 @@ export interface PaginatedResponse<T> {
   };
 }
 
-export interface FilterParams {
-  [key: string]: any;
-}
-
 export interface RequestConfig {
   timeout?: number;
   retryCount?: number;
@@ -44,12 +40,6 @@ export interface RequestConfig {
   cache?: boolean;
   cacheDuration?: number;
   signal?: AbortSignal;
-}
-
-export interface RepositoryOptions extends RequestConfig {
-  filters?: FilterParams;
-  pagination?: PaginationParams;
-  select?: string[];
 }
 
 export interface CacheEntry<T> {

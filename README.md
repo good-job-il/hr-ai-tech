@@ -1,39 +1,50 @@
-**Welcome to your Base44 project** 
+# Hire Israel
 
-**About**
+Hire Israel is a React/Vite frontend backed by the NestJS API in `backend/`.
 
-View and Edit  your app on [Base44.com](http://Base44.com) 
+## Local development
 
-This project contains everything you need to run your app locally.
+Prerequisites: Node.js 20+, npm, Docker and Docker Compose.
 
-**Edit the code in your local development environment**
+```bash
+npm install
+cp .env.example .env.local
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
-
-**Prerequisites:** 
-
-1. Clone the repository using the project's Git URL 
-2. Navigate to the project directory
-3. Install dependencies: `npm install`
-4. Create an `.env.local` file and set the right environment variables
-
-```
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=your_backend_url
-
-e.g.
-VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
-VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
+cd backend
+npm install
+cp .env.example .env
+docker compose up mysql -d
+npm run migration:run
+npm run seed:taxonomy
+npm run start:dev
 ```
 
-Run the app: `npm run dev`
+In another terminal, from the repository root:
 
-**Publish your changes**
+```bash
+npm run dev
+```
 
-Open [Base44.com](http://Base44.com) and click on Publish.
+The frontend is served at `http://localhost:5173`; its `/api` requests are proxied to `VITE_API_PROXY_TARGET` (default `http://localhost:3001`). Swagger is available at `http://localhost:3001/api/docs`.
 
-**Docs & Support**
+## Verification
 
-Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
+```bash
+npm run release:verify
+```
 
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+The Phase 8 environment suite additionally requires a clean MySQL database and a
+built API:
+
+```bash
+cd backend
+npm run migration:run
+npm run seed:taxonomy
+npm run build && npm run start:prod
+
+# From the repository root, while the API is running:
+npm run test:phase-8-api
+```
+
+The release gate rejects high or critical production dependency vulnerabilities.
+Historical migration audits and phase sign-off records are stored in `docs/`.

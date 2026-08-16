@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { httpClient } from '@/api/client/httpClient';
+import { interviewService } from '@/api/services/interviewService';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/Button';
 import {
@@ -170,7 +170,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
-    mutationFn: (updates) => httpClient.patch(`/interviews/${interview.id}`, updates),
+    mutationFn: (updates) => interviewService.update(interview.id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-interviews'] });
       setIsEditing(false);
@@ -496,7 +496,7 @@ export default function CompanyInterviews() {
 
   const { data: interviews = [], isLoading, refetch } = useQuery({
     queryKey: ['company-interviews', orgId],
-    queryFn: () => base44.entities.Interview.filter({ organization_id: orgId }, '-date', 500),
+    queryFn: () => interviewService.list({ organization_id: orgId, sort: 'date', order: 'DESC', limit: 500 }),
     enabled: !!orgId,
     staleTime: 2 * 60 * 1000,
   });

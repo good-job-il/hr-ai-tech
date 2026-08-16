@@ -6,6 +6,9 @@ import { JobEntity } from '../../jobs/entities/job.entity';
 import { ImportSourceEntity } from '../../import-sources/import-source.entity';
 import { UserEntity } from '../../users/user.entity';
 import { CrawlCareerPageDto } from '../dto/functions.dto';
+import { lookup } from 'dns/promises';
+import { isIP } from 'net';
+import { BadRequestException } from '@nestjs/common';
 
 const JOB_KEYWORDS = ['job', 'career', 'position', 'role', 'משרה', 'דרוש', 'דרושים', 'קריירה'];
 
@@ -35,7 +38,8 @@ export class JobCrawlerService {
 
     try {
       log.push(`Fetching ${dto.url}`);
-      const response = await fetch(dto.url, { headers: { 'User-Agent': 'Mozilla/5.0 HireIsraelBot/1.0' } });
+      const response = await this.fetchPublicPage(dto.url);
+      if (!response.ok) throw new Error(`Career page returned HTTP ${response.status}`);
       const html = await response.text();
       const $ = cheerio.load(html);
 
@@ -83,6 +87,8 @@ export class JobCrawlerService {
         if (source) {
           source.last_sync = new Date();
           source.last_sync_status = errors.length ? 'error' : 'success';
+          source.last_error = errors.length ? errors.join('\n') : null;
+          source.retry_count = errors.length ? source.retry_count : 0;
           source.jobs_added += created;
           source.jobs_updated += updated;
           source.logs = [...(source.logs || []), ...log].slice(-50);
@@ -91,6 +97,7 @@ export class JobCrawlerService {
       }
 
       return {
+        success: errors.length === 0,
         summary: `Scanned ${dto.url}: ${created} created, ${updated} already existed`,
         pages_scanned: 1,
         job_links_found: links.size,
@@ -105,6 +112,7 @@ export class JobCrawlerService {
       this.logger.error(`crawlCareerPage failed: ${(err as Error).message}`);
       errors.push((err as Error).message);
       return {
+        success: false,
         summary: `Failed to crawl ${dto.url}`,
         pages_scanned: 0,
         job_links_found: 0,
@@ -117,5 +125,40 @@ export class JobCrawlerService {
       };
     }
   }
-}
 
+  private async fetchPublicPage(input: string, redirects = 0): Promise<Response> {
+    if (redirects > 3) throw new BadRequestException('Too many redirects');
+    const url = new URL(input);
+    if (!['http:', 'https:'].includes(url.protocol)) throw new BadRequestException('Unsupported URL protocol');
+    const addresses = isIP(url.hostname)
+      ? [{ address: url.hostname }]
+      : await lookup(url.hostname, { all: true });
+    if (addresses.some(({ address }) => this.isPrivateAddress(address))) {
+      throw new BadRequestException('Private network URLs are not allowed');
+    }
+    const response = await fetch(url, {
+      redirect: 'manual',
+      headers: { 'User-Agent': 'Mozilla/5.0 HireIsraelBot/1.0' },
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location');
+      if (!location) throw new BadRequestException('Redirect has no location');
+      return this.fetchPublicPage(new URL(location, url).toString(), redirects + 1);
+    }
+    return response;
+  }
+
+  private isPrivateAddress(address: string) {
+    const normalized = address.toLowerCase();
+    if (normalized === '::1' || normalized === '0.0.0.0') return true;
+    if (normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('fe80:')) return true;
+    const parts = normalized.split('.').map(Number);
+    if (parts.length !== 4 || parts.some(Number.isNaN)) return false;
+    return parts[0] === 10
+      || parts[0] === 127
+      || (parts[0] === 169 && parts[1] === 254)
+      || (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31)
+      || (parts[0] === 192 && parts[1] === 168);
+  }
+}

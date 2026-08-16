@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { companyService } from '@/api/services/companyService';
+import { publicJobService } from '@/api/services/publicJobService';
 import { useAuth } from '@/lib/AuthContext';
 import Navbar from '@/components/home/Navbar';
-import CompanyProfileSettings from '@/components/employer/CompanyProfileSettings';
-import { Star, Plus, ArrowRight, Video, Image as ImageIcon } from 'lucide-react';
+import { Star, Plus, ArrowRight } from 'lucide-react';
 import SEOHead from '@/components/SEOHead';
 
 function StarRating({ value, onChange }) {
@@ -27,30 +27,27 @@ export default function CompanyProfile() {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating_overall: 0, rating_salary: 0, rating_management: 0, rating_worklife: 0, title: '', pros: '', cons: '', is_anonymous: false });
 
-  const { data: companies = [] } = useQuery({
+  const { data: company } = useQuery({
     queryKey: ['company', id],
-    queryFn: () => base44.entities.Company.filter({ id }),
+    queryFn: () => companyService.get(Number(id)),
   });
-  const company = companies[0];
 
   const { data: jobs = [] } = useQuery({
     queryKey: ['company-jobs', id],
-    queryFn: () => base44.entities.Job.filter({ company: company?.name, is_closed: false }),
+    queryFn: async () => (await publicJobService.list({ search: company?.name, is_closed: false, limit: 100 }))
+      .filter(job => job.company === company?.name),
     enabled: !!company,
   });
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['company-reviews', id],
-    queryFn: () => base44.entities.CompanyReview.filter({ company_id: id }),
+    queryFn: () => companyService.reviews(Number(id)),
   });
 
   const submitReview = useMutation({
-    mutationFn: (data) => base44.entities.CompanyReview.create({
+    mutationFn: (data) => companyService.createReview(Number(id), {
       ...data,
-      company_id: id,
       company_name: company?.name,
-      reviewer_email: user.email,
-      reviewer_name: data.is_anonymous ? 'אנונימי' : user.full_name,
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-reviews'] });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { companyService } from '@/api/services/companyService';
 import { useQuery } from '@tanstack/react-query';
 
 function CompanyCard({ company }) {
@@ -37,7 +37,7 @@ function CompanyCard({ company }) {
 export default function CompaniesSection() {
   const { data: companies = [] } = useQuery({
     queryKey: ['companies-home'],
-    queryFn: () => base44.entities.Company.list('-job_count', 8),
+    queryFn: () => companyService.list({ sort: 'job_count', order: 'DESC', limit: 8 }),
     initialData: [],
   });
 

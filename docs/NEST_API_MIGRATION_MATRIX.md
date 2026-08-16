@@ -1,46 +1,46 @@
 # NestJS API migration matrix
 
-Дата baseline: 2 августа 2026.
+Baseline date: 13 August 2026.
 
-Этот документ фиксирует границу миграции с legacy compatibility API на явные frontend services.
+This is the Phase 0 route/domain contract. `Missing` in the Tests column is an explicit migration risk, not an assertion that the route is covered elsewhere.
 
-| Domain / routes | Frontend service | NestJS API | Ownership/permission source | Target phase |
-|---|---|---|---|---|
-| Login, Register, Reset, AuthContext | `authService` | `/auth/*` | JWT strategy / RolesGuard | 3 |
-| Agency onboarding | `organizationService` | `/organizations/onboard-agency` | current user + org type | 3 |
-| Platform organizations | `organizationService` | `/organizations` | platform admin / scoped token | 3 |
-| Platform users | `userService` | `/users` | UsersService RLS | 3 |
-| Permission Matrix | `permissionService` | `/permission-matrices` | tenant + role | 3 |
-| Role templates / aliases | `permissionService` | `/role-templates`, `/role-aliases` | tenant/template policy | 3 |
-| Taxonomy | `taxonomyService` | `/taxonomy/*` | public read / admin mutation | 3 |
-| Audit | `auditService` | `/audit-logs` | tenant + actor | 3 |
-| Agency clients | `agencyClientService` | `/agency-clients` | staffing tenant | 2/5 |
-| Jobs | `jobService` | `/jobs` | Job RLS | 2/4/5 |
-| Candidates | `candidateService` | `/candidates` | Candidate RLS | 2/4/5 |
-| Applications | `applicationService` | `/applications` | Application RLS | 2/4/5 |
-| Public/candidate workflow | domain services | explicit domain routes | candidate/public rules | 4 |
-| Employer/agency CRM | domain services | explicit domain routes | tenant/team/own RLS | 5 |
-| Import/AI/legacy functions | import/matching services | domain use-case routes | backend orchestration | 6 |
+| Screen / flow | Frontend service | NestJS endpoint | Request DTO / query contract | Permission source | Tests / gate | Target |
+|---|---|---|---|---|---|---|
+| Login, Register, Reset, `AuthContext` | typed `authService` | `/auth/login`, `/auth/register`, `/auth/me`, `/auth/forgot-password`, `/auth/reset-password`, `/auth/refresh`, `/auth/logout`, workspace enter/exit | exact frontend inputs checked against auth DTOs | JWT strategy; public auth decorators; short-lived scoped workspace token | `test:phase-3-boundary`; browser E2E pending | migrated |
+| Agency onboarding | `organizationService` | `POST /organizations/onboard-agency` | `OnboardAgencyDto` | current user + organization policy | `test:phase-3-boundary`; browser E2E missing | migrated |
+| Platform organizations | typed `organizationService` | CRUD `/organizations` | closed create/update/query contracts | tenant read scope; platform-only type/status/plan mutation enforced in service | `test:phase-3-boundary`; browser E2E pending | migrated |
+| Platform users | `userService` | CRUD `/users` | `CreateUserDto`, `UpdateUserDto`, `QueryUsersDto` | `RolesGuard` for create/delete + UsersService RLS | `test:phase-3-boundary`; cross-tenant test missing | migrated |
+| Permission Matrix, role templates and aliases | `permissionService` | `/permission-matrices`, `/role-templates`, `/role-aliases` | permission DTOs in `permissions.dto.ts` | authenticated tenant rules; role aliases public-read | `test:phase-3-boundary`; mutation permission tests missing | migrated |
+| Taxonomy screens | `taxonomyService` | GET `/taxonomy/*` | explicit `domain_id`; no generic filter | public read policy | `test:phase-3-boundary`; contract tests missing | migrated |
+| Audit views | typed `auditService` | GET/POST `/audit-logs` | closed query/create contract; integer entity ID | tenant and actor always derived in AuditService from JWT | `test:phase-3-boundary`; browser E2E pending | migrated |
+| Agency clients list/detail/form | `agencyClientService`, typed job/application joins | CRUD `/agency-clients` plus scoped `/jobs`, `/applications` | typed query/create/update inputs checked against `Query/Create/UpdateAgencyClientDto` | `CLIENT_READ_ROLES` / `CLIENT_WRITE_ROLES` + staffing tenant | `check:phase-2-api`, `test:phase-5-b2b`, `test:agency-clients`, `test:agency-access` | migrated |
+| Public jobs and candidate job discovery | `publicJobService`, `publicWorkflowService` | GET `/public/jobs`, POST `/jobs/:id/view`, POST `/jobs/search`, GET/POST `/matching/jobs/*` | closed public query and matching inputs | public open/non-deleted scope; candidate recommendations use JWT | `test:phase-4-public-candidate`; browser E2E pending | migrated |
+| Employer/agency job management | typed `jobService` | CRUD `/jobs` | typed query/create/update inputs checked against `Query/Create/UpdateJobDto` | `JOB_WRITE_ROLES`; Job RLS | `check:phase-2-api`; role E2E missing | foundation migrated; consumers 5 |
+| Saved jobs and job alerts | `savedJobService` | `/jobs/saved`, `/jobs/alerts` | identity-free create/update DTOs | canonical JWT `user_id`; email retained only as snapshot | `test:phase-4-public-candidate`; DB migration backfill | migrated |
+| Candidate list/detail/CRM | `candidateService`, `candidateCrmService`, `communicationService` | CRUD `/candidates`, nested notes/tags/timeline/documents, `/communication-logs` | closed inputs; author/sender/tenant/candidate snapshots derived server-side | `CANDIDATE_WRITE_ROLES` + Candidate RLS; communication candidate access check | `test:phase-5-b2b`, `test:agency-access`; browser cross-tenant pending | migrated |
+| Candidate profile | `candidateProfileService` | `/candidates/profiles/me` and scoped profile routes | identity-free `CreateCandidateProfileDto`, `UpdateCandidateProfileDto` | canonical JWT `user_id` | `test:phase-4-public-candidate`; browser E2E pending | migrated |
+| Candidate import batches/access | typed `candidateImportService`, `candidateAccessService` | `/candidates/import-batches`, `/candidate-imports/*`, `/background-jobs/:id`, `/candidates/access` | closed batch/import DTOs; status/tenant/importer server-owned | `IMPORT_WRITE_ROLES`, `ACCESS_WRITE_ROLES` + RLS | `test:phase-6-operations`; worker/browser E2E pending | migrated |
+| Candidate applications | typed `applicationService` | POST `/applications/submit`, GET `/applications`, GET `/applications/:id/timeline` | identity-free `SubmitApplicationDto`; candidate identity/status/source derived server-side | canonical `candidate_user_id` + Application RLS | `test:phase-4-public-candidate`; end-to-end environment pending | migrated |
+| B2B applications, Kanban and AI assignment | typed `applicationService` | CRUD `/applications`, PATCH `/applications/:id/status`, POST `/applications/assign-candidate` | closed status DTO; assignment accepts canonical job/candidate IDs only | manage role sets + Job/Candidate/Application RLS; timeline/notification generated backend-side | `test:phase-5-b2b`; transition E2E pending | migrated |
+| Interviews | typed `interviewService` | CRUD `/interviews` | `QueryInterviewsDto`, `CreateInterviewDto`, `UpdateInterviewDto` | candidate `candidate_user_id`; writers resolve ownership from application | `test:phase-4-public-candidate`; schedule E2E pending | candidate read migrated; writers 5 |
+| Messages | typed `messageService` | `/messages`, `/messages/read-all/:applicationId` | sender-free `CreateMessageDto`, closed query | every operation validates access through Application RLS | `test:phase-4-public-candidate`; cross-user E2E pending | candidate migrated |
+| Notifications | typed `notificationService` | `/notifications`, `/notifications/:id/read`, `/notifications/read-all` | closed recipient-free query | canonical `recipient_user_id`; explicit 15s polling | `test:phase-4-public-candidate`; polling failure E2E pending | candidate migrated |
+| Companies and public reviews | typed `companyService` | `/companies`, nested reviews | typed company query; reviewer identity excluded from browser DTO | public company read; reviewer identity from JWT | `test:phase-4-public-candidate`; write E2E pending | public/candidate migrated |
+| Organization teams | typed `userService` | `/users`, POST `/users/invite` | closed organization member role/input contract; no browser tenant/password ownership | org-scoped reads; platform/admin role separation; 48-hour password setup | `test:phase-5-b2b`; mail/browser E2E pending | migrated |
+| Compensation and communication | typed `compensationPlanService`, `communicationService` | `/compensation-plans`, `/communication-logs`, `/communication-logs/present-candidate` | tenant/sender identity excluded from browser contracts | agency-only compensation scope; candidate RLS before communication | `test:phase-5-b2b`; delivery E2E pending | migrated |
+| Import source admin UI | typed `importSourceService` | CRUD `/import-sources`, POST `/:id/runs`, POST `/preview`, GET `/background-jobs/:id` | source DTOs + idempotency key; persisted result/error/retry state | `ADMIN`; crawler rejects private networks | `test:phase-6-operations`; live crawler E2E pending | migrated |
+| Matching, scoring and resume operations | `publicWorkflowService`, `applicationService` | `/jobs/search`, `/matching/jobs/*`, `/applications/:id/score`, `/resumes/extract` | use-case-specific DTOs; no string RPC | public/candidate/manage-role boundaries + RLS | Phase 4/5/6 gates; AI-provider integration pending | migrated |
+| File upload, AI and transactional email | `fileService`; domain services only | POST `/files`; no generic LLM/email endpoint | multipart upload; owned `/uploads` URLs; backend-owned prompts/templates | authenticated upload; business endpoint authorization | Phase 1/4/5/6 gates; delivery E2E pending | migrated |
 
-## Baseline traffic contract
+## Frozen Phase 0 boundary
 
-- Browser calls only `/api/*` for application data.
-- Development `/api` proxy points to NestJS.
-- Direct Base44 domain traffic is limited to legacy media URLs and must be removed in Phase 1.
-- Any new `base44Client` import is rejected by `npm run check:legacy-api`.
-- Unknown query filters are not allowed in new services; every filter must be declared in the service method type.
+- Browser application data is expected under `/api/*`; development proxy targets NestJS.
+- `npm run check:legacy-api` compares every shim import, every per-file call signature, every `.filter()` conditions expression, and every `ENTITY_CONFIG` entry with the frozen baseline.
+- The pull-request CI also compares the baseline file with the PR base branch. The baseline itself may only shrink.
+- New services must declare supported filters in their method contract. Passing an arbitrary conditions object is forbidden.
+- Run `npm run audit:legacy-api:json` for machine-readable inventory and `npm run audit:legacy-api:report` for a Markdown snapshot.
 
-## Long-running/import ownership
+## Known operational gaps
 
-| Process | Current owner | Final owner |
-|---|---|---|
-| Base44 one-time data migration | migration script | removed after signed-off export |
-| Resume import | compatibility function controller | NestJS ImportModule + persistent job |
-| Career crawling | compatibility function controller | NestJS ImportSource adapter/job |
-| Vendor imports | legacy UI calls, incomplete backend routes | NestJS vendor adapters or hidden feature |
-| Matching/scoring | compatibility function controller | NestJS MatchingModule |
-| Audit/timeline | mixed frontend RPC/backend | backend transaction event |
-
-## Verification
-
-Run `npm run audit:legacy-api` for counts and `npm run check:legacy-api` for the CI boundary.
+- Runtime traffic has not been captured because no started test environment and four role accounts were supplied. The capture contract is in `API_TRAFFIC_BASELINE.md`.
+- Phase 6 background-job migration and live retry/restart/duplicate E2E require a running MySQL/backend environment.

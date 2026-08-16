@@ -140,7 +140,7 @@ export default function RoleSettingsPage() {
     setLoading(true);
     setError(null);
     try {
-      const all = await roleTemplateService.list({ sort: 'hierarchy_level', order: 'ASC', limit: 200 });
+      const all = await roleTemplateService.list({ limit: 200 });
       setRecords(all);
     } catch (requestError) {
       setError({ status: requestError?.status || requestError?.response?.status || null });
@@ -191,12 +191,8 @@ export default function RoleSettingsPage() {
 
     // AuditLog
     await auditService.create({
-      organization_id: orgId,
-      actor_user_id: user?.id,
-      actor_email: user?.email,
-      actor_role: user?.role,
       entity_type: 'Organization',
-      entity_id: orgId || 'global',
+      entity_id: orgId || 0,
       entity_label: `שם תפקיד: ${record.system_role_key}`,
       action: 'role_display_name_update',
       metadata: {

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
+import { publicJobService } from '@/api/services/publicJobService';
+import { publicWorkflowService } from '@/api/services/publicWorkflowService';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   Search, MapPin, Bookmark, Share2, Calendar, Briefcase, Sparkles,
   SlidersHorizontal, LayoutGrid, List, BarChart2, TrendingUp, ChevronDown,
   ChevronUp, RotateCcw, Tag, Brain, ShieldCheck, Zap, Building2,
-  Star, ArrowLeft, Wand2
+  ArrowLeft, Wand2
 } from 'lucide-react';
 import SEOHead from '@/components/SEOHead';
 import Navbar from '@/components/home/Navbar';
@@ -245,15 +246,16 @@ export default function Jobs() {
     queryKey: ['jobs', search, loc, jobTypes],
     queryFn: async () => {
       if (search) {
-        const r = await base44.functions.invoke('smartSearch', {
+        const r = await publicWorkflowService.searchJobs({
           query: search,
-          filters: {},
+          filters: { type: jobTypes, location: loc || undefined },
           type: 'search',
+          limit: 100,
         });
-        return r.data?.jobs || [];
+        return r.jobs || [];
       }
 
-      let all = await base44.entities.Job.filter({ is_closed: false }, '-created_date', 100);
+      let all = await publicJobService.list({ is_closed: false, sort: 'created_date', order: 'DESC', limit: 100 });
 
       if (jobTypes.length) all = all.filter((j) => jobTypes.includes(j.type));
       if (loc) all = all.filter((j) => j.location?.toLowerCase().includes(loc.toLowerCase()));

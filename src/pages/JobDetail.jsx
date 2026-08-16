@@ -4,7 +4,11 @@ import SaveJobButton from '@/components/jobs/SaveJobButton';
 import ShareButtons from '@/components/jobs/ShareButtons';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { publicJobService } from '@/api/services/publicJobService';
+import { applicationService } from '@/api/services/applicationService';
+import { candidateProfileService } from '@/api/services/candidateProfileService';
+import { fileService } from '@/api/services/fileService';
+import { publicWorkflowService } from '@/api/services/publicWorkflowService';
 import { ArrowLeft, MapPin, Briefcase, Eye, Clock, Send, Upload, AlertCircle, RefreshCw } from 'lucide-react';
 import Navbar from '@/components/home/Navbar';
 import SEOHead from '@/components/SEOHead';
@@ -70,8 +74,8 @@ export default function JobDetail() {
     queryKey: ['job', id],
     queryFn: async () => {
       console.info(`[JobDetail] Loading job id=${id}`);
-      const j = await withRetry(() => base44.entities.Job.get(id), 2, 'fetch job');
-      if (j) base44.entities.Job.update(id, { views: (j.views || 0) + 1 }).catch(() => {});
+      const j = await withRetry(() => publicJobService.get(id), 2, 'fetch job');
+      if (j) publicJobService.incrementViews(id).catch(() => {});
       return j || null;
     },
     retry: 1,
@@ -83,8 +87,7 @@ export default function JobDetail() {
     queryKey: ['candidate-profile-resume', user?.email],
     queryFn: async () => {
       if (!user?.email) return null;
-      const profiles = await base44.entities.CandidateProfile.filter({ user_email: user.email });
-      const profile = profiles?.[0];
+      const profile = await candidateProfileService.me();
       if (profile?.resume_url) {
         setProfileResume({ url: profile.resume_url, filename: 'Existing Resume' });
       }
@@ -97,8 +100,8 @@ export default function JobDetail() {
     queryKey: ['similar-jobs', job?.category, id],
     queryFn: async () => {
       if (!job?.category) return [];
-      const allJobs = await base44.entities.Job.list('-created_date', 50);
-      return allJobs.filter(j => j.category === job.category && j.id !== id && !j.is_closed).slice(0, 3);
+      const result = await publicWorkflowService.similarJobs(Number(id), 3);
+      return result.recommendations;
     },
     enabled: !!job?.category,
   });
@@ -114,7 +117,7 @@ export default function JobDetail() {
     setUploading(true);
     setUploadError(null);
     try {
-      const result = await withRetry(() => base44.integrations.Core.UploadFile({ file }), 2, 'upload file');
+      const result = await withRetry(() => fileService.upload(file), 2, 'upload file');
       console.info(`[JobDetail] File uploaded: ${file.name}`);
       return result.file_url;
     } catch (error) {
@@ -142,11 +145,11 @@ export default function JobDetail() {
     try {
       console.info(`[JobDetail] Extracting resume data from ${file.name}`);
       const result = await withRetry(
-        () => base44.functions.invoke('extractAndTranslateResume', { file_url: fileUrl }),
+        () => publicWorkflowService.extractResume(fileUrl),
         1, 'extract resume'
       );
-      if (result.data?.data) {
-        const extracted = result.data.data;
+      if (result.data) {
+        const extracted = result.data;
         setForm(prev => ({
           ...prev,
           candidate_name: extracted.full_name || prev.candidate_name,
@@ -180,18 +183,13 @@ export default function JobDetail() {
        resumeUrl = await handleFileUpload(data.resume_file);
      }
      console.info(`[JobDetail] Submitting application for job ${job.id}`);
-     return withRetry(() => base44.entities.Application.create({
-       ...data,
+     const { candidate_email: _ignoredEmail, resume_file: _ignoredFile, ...candidateData } = data;
+     return withRetry(() => applicationService.submit({
+       ...candidateData,
        resume_url: resumeUrl || null,
-       resume_file: undefined,
        desired_salary_min: data.desired_salary_min !== '' ? Number(data.desired_salary_min) : null,
        desired_salary_max: data.desired_salary_max !== '' ? Number(data.desired_salary_max) : null,
        job_id: job.id,
-       job_title: job.title,
-       company: job.company || null,
-       employer_id: job.employer_id || null,
-       status: 'new',
-       source: 'app',
      }), 2, 'create application');
    },
    onError: (error) => {
@@ -199,37 +197,11 @@ export default function JobDetail() {
      const msg = getErrorMessage(error);
      setApplyError(msg || 'Application submission failed. Please try again.');
    },
-   onSuccess: async (newApp) => {
+   onSuccess: async () => {
      setApplyError(null);
       setSubmitted(true);
       queryClient.invalidateQueries({ queryKey: ['job', id] });
 
-      // Create timeline entry for submission
-      await base44.functions.invoke('createApplicationTimeline', {
-        application_id: newApp.id,
-        event_type: 'submitted',
-        description: `Candidate applied for ${job.title} position`,
-        performed_by_role: 'candidate'
-      }).catch(() => {});
-
-      // Send email to candidate
-      await base44.integrations.Core.SendEmail({
-        to: form.candidate_email,
-        subject: `✓ Application Received - ${job.title}`,
-        body: `Hello ${form.candidate_name},\n\nThank you for submitting your application for the ${job.title} position.\n\nYour application has been successfully received in our system.\n\nOur recruitment team will review it and contact you soon if you're a good fit for the role.\n\nGood luck!\n\n---\nHeadHunter - Job Platform`
-      }).catch(() => {});
-
-      // Send email to employer
-      if (job.employer_id) {
-        await base44.integrations.Core.SendEmail({
-          to: job.employer_id,
-          subject: `📧 New Application - ${job.title}`,
-          body: `New notification!\n\nA new candidate has applied for the ${job.title} position.\n\nCandidate details:\nName: ${form.candidate_name}\nPhone: ${form.candidate_phone}\nEmail: ${form.candidate_email}\nCity: ${form.location}\nSalary expectations: ₪${form.desired_salary_min || '-'} - ₪${form.desired_salary_max || '-'}\n\nPlease review the application in the system.`
-        }).catch(() => {});
-      }
-
-      // Trigger AI match score in background
-      base44.functions.invoke('scoreApplication', { application_id: newApp.id }).catch(() => {});
     },
   });
 

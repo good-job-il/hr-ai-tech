@@ -11,6 +11,8 @@ import {
   CreateCandidateTagDto,
   CreateCandidateProfileDto, UpdateCandidateProfileDto,
   CreateCandidateDocumentDto,
+  CreateCandidateTimelineDto,
+  CreateCandidateImportBatchDto,
 } from './dto/candidates.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -44,45 +46,56 @@ export class CandidatesController {
   @Post('import-batches')
   @Roles(...IMPORT_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
-  createBatch(@Body() data: Record<string, any>, @CurrentUser() user: UserEntity) {
+  createBatch(@Body() data: CreateCandidateImportBatchDto, @CurrentUser() user: UserEntity) {
     return this.svc.createBatch(data, user);
-  }
-
-  @Patch('import-batches/:id')
-  @Roles(...IMPORT_WRITE_ROLES)
-  updateBatch(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>, @CurrentUser() user: UserEntity) {
-    return this.svc.updateBatch(id, data, user);
   }
 
   // ─── Profile ─────────────────────────────────────────────────────────────
   @Get('profiles')
   @ApiOperation({ summary: 'List candidate profiles (filter by user_email / is_public)' })
-  listProfiles(@Query('user_email') userEmail?: string, @Query('is_public') isPublic?: string) {
+  listProfiles(@CurrentUser() user: UserEntity, @Query('user_email') userEmail?: string, @Query('is_public') isPublic?: string) {
     return this.svc.findAllProfiles({
       user_email: userEmail,
       is_public: isPublic !== undefined ? isPublic === 'true' : undefined,
-    });
+    }, user);
+  }
+
+  @Get('profiles/me')
+  @Roles(UserRole.CANDIDATE)
+  @ApiOperation({ summary: 'Get the current candidate profile' })
+  getMyProfile(@CurrentUser() user: UserEntity) {
+    return this.svc.getProfile(user.email, user);
+  }
+
+  @Patch('profiles/me')
+  @Roles(UserRole.CANDIDATE)
+  @ApiOperation({ summary: 'Update the current candidate profile' })
+  updateMyProfile(@Body() dto: UpdateCandidateProfileDto, @CurrentUser() user: UserEntity) {
+    return this.svc.updateMyProfile(dto as any, user);
   }
 
   @Get('profiles/:email')
   @ApiOperation({ summary: 'Get candidate profile by email' })
-  getProfile(@Param('email') email: string) {
-    return this.svc.getProfile(email);
+  getProfile(@Param('email') email: string, @CurrentUser() user: UserEntity) {
+    return this.svc.getProfile(email, user);
   }
 
   @Post('profiles')
+  @Roles(UserRole.CANDIDATE)
   @HttpCode(HttpStatus.CREATED)
-  createProfile(@Body() dto: CreateCandidateProfileDto) {
-    return this.svc.upsertProfile(dto);
+  createProfile(@Body() dto: CreateCandidateProfileDto, @CurrentUser() user: UserEntity) {
+    return this.svc.upsertProfile(dto, user);
   }
 
   @Patch('profiles/:key')
+  @Roles(UserRole.CANDIDATE)
   @ApiOperation({ summary: 'Update candidate profile by id or by email' })
   updateProfile(
     @Param('key') key: string,
     @Body() dto: UpdateCandidateProfileDto,
+    @CurrentUser() user: UserEntity,
   ) {
-    return this.svc.updateProfileByKey(key, dto as any);
+    return this.svc.updateProfileByKey(key, dto as any, user);
   }
 
   // ─── Access ──────────────────────────────────────────────────────────────
@@ -192,7 +205,7 @@ export class CandidatesController {
     @Body() dto: CreateCandidateNoteDto,
     @CurrentUser() user: UserEntity,
   ) {
-    return this.svc.createNote({ ...dto, candidate_id: id }, user);
+    return this.svc.createNote(id, dto, user);
   }
 
   // ─── Tags ─────────────────────────────────────────────────────────────────
@@ -209,7 +222,7 @@ export class CandidatesController {
     @Body() dto: CreateCandidateTagDto,
     @CurrentUser() user: UserEntity,
   ) {
-    return this.svc.createTag({ ...dto, candidate_id: id }, user);
+    return this.svc.createTag(id, dto, user);
   }
 
   // ─── Timeline ────────────────────────────────────────────────────────────
@@ -221,7 +234,7 @@ export class CandidatesController {
   @Post(':id/timeline')
   @Roles(...CANDIDATE_WRITE_ROLES)
   @HttpCode(HttpStatus.CREATED)
-  createTimelineEvent(@Param('id', ParseIntPipe) id: number, @Body() data: Record<string, any>, @CurrentUser() user: UserEntity) {
+  createTimelineEvent(@Param('id', ParseIntPipe) id: number, @Body() data: CreateCandidateTimelineDto, @CurrentUser() user: UserEntity) {
     return this.svc.createTimelineEvent({ ...data, candidate_id: id }, user);
   }
 
@@ -239,6 +252,6 @@ export class CandidatesController {
     @Body() dto: CreateCandidateDocumentDto,
     @CurrentUser() user: UserEntity,
   ) {
-    return this.svc.createDocument({ ...dto, candidate_id: id, uploaded_by: dto.uploaded_by ?? user.email } as any, user);
+    return this.svc.createDocument({ ...dto, candidate_id: id } as any, user);
   }
 }

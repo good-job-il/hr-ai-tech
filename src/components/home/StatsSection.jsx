@@ -1,12 +1,13 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { publicJobService } from '@/api/services/publicJobService';
+import { companyService } from '@/api/services/companyService';
 import { Users, Building, Briefcase, Star } from 'lucide-react';
 
 export default function StatsSection() {
-  const { data: candidates = [] } = useQuery({ queryKey: ['stats-cand'], queryFn: () => base44.entities.Candidate.list() });
-  const { data: companies = [] } = useQuery({ queryKey: ['stats-comp'], queryFn: () => base44.entities.Company.list() });
-  const { data: jobs = [] } = useQuery({ queryKey: ['stats-jobs'], queryFn: () => base44.entities.Job.list() });
+  const candidates = [];
+  const { data: companies = [] } = useQuery({ queryKey: ['stats-comp'], queryFn: () => companyService.list({ limit: 500 }) });
+  const { data: jobs = [] } = useQuery({ queryKey: ['stats-jobs'], queryFn: () => publicJobService.list({ is_closed: false, limit: 500 }) });
 
   const STATS = [
     { icon: Users, color: '#6C4DFF', bg: 'rgba(108,77,255,0.08)', value: `${(candidates.length || 15000).toLocaleString('he-IL')}+`, label: 'מועמדים פעילים' },

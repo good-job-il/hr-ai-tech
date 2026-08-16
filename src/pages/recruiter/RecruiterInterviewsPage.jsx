@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { interviewService } from '@/api/services/interviewService';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import { Calendar, RefreshCw, Clock, Video, Phone, MapPin } from 'lucide-react';
@@ -23,15 +23,17 @@ export default function RecruiterInterviewsPage() {
   const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('upcoming');
+  const [error, setError] = useState('');
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const data = await base44.entities.Interview.filter(
-      { organization_id: user.organization_id, recruiter_id: user.id }, '-date', 100
-    ).catch(() => []);
-    setInterviews(data);
-    setLoading(false);
+    setError('');
+    try {
+      const data = await interviewService.list({ organization_id: user.organization_id, recruiter_id: user.id, sort: 'date', order: 'DESC', limit: 100 });
+      setInterviews(data);
+    } catch (requestError) { setInterviews([]); setError(requestError?.message || 'Unable to load interviews'); }
+    finally { setLoading(false); }
   };
 
   useEffect(() => { load(); }, [user?.id]);
@@ -68,6 +70,7 @@ export default function RecruiterInterviewsPage() {
           </button>
         ))}
       </div>
+      {error && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</div>}
 
       {loading ? (
         <div className="space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-20 bg-white rounded-2xl border border-[#E4ECFF] animate-pulse" />)}</div>

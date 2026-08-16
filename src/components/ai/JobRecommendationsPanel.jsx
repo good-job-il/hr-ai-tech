@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { candidateService } from '@/api/services/candidateService';
 import { rankCandidatesForJob } from '@/lib/aiMatching';
 import AIMatchBadge from './AIMatchBadge';
 import { UserPlus, MapPin, ChevronRight, Loader2, AlertTriangle } from 'lucide-react';
@@ -19,7 +19,7 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
   useEffect(() => {
     if (!job) return;
     setLoading(true);
-    base44.entities.Candidate.list('-created_date', 100)
+    candidateService.list({ sort: 'created_date', order: 'DESC', limit: 100 })
       .then(candidates => {
         const ranked = rankCandidatesForJob(job, candidates || []).slice(0, 10);
         setResults(ranked);
@@ -58,7 +58,10 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
               <div className="flex items-center gap-2">
                 <span className="font-black text-[#0F172A] text-sm">{candidate.full_name}</span>
                 {!explanation.requiredMet && (
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500" title={t('aiMatching.jobPanel.missingRequirements')} />
+                  <AlertTriangle
+                    className="w-3.5 h-3.5 text-amber-500"
+                    aria-label={t('aiMatching.jobPanel.missingRequirements')}
+                  />
                 )}
               </div>
               <div className="text-xs text-[#7C3AED] font-semibold">{candidate.role_name || candidate.domain_name}</div>

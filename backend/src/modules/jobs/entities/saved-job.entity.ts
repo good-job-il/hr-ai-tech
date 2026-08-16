@@ -2,9 +2,13 @@ import { Entity, Column, Index } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 
 @Entity('saved_jobs')
+@Index(['user_id'])
 @Index(['user_email'])
 @Index(['job_id'])
 export class SavedJobEntity extends BaseEntity {
+  @Column({ name: 'user_id', type: 'int', nullable: true })
+  user_id: number | null;
+
   @Column({ name: 'user_email', type: 'varchar', length: 255 })
   user_email: string;
 
@@ -17,4 +21,3 @@ export class SavedJobEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   company: string | null;
 }
-

@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { ExtractResumeFnDto } from '../dto/functions.dto';
+import { assertOwnedFileUrl } from '../../../common/utils/owned-file-url.util';
 
 export interface ExtractedResumeData {
   full_name?: string;
@@ -34,7 +35,7 @@ export class ResumeExtractionService {
   private readonly logger = new Logger(ResumeExtractionService.name);
 
   async extractAndTranslate(dto: ExtractResumeFnDto): Promise<{ success: boolean; data: ExtractedResumeData }> {
-    const resumeHash = this.hashContent(dto.file_content_base64 ?? dto.file_url);
+    const resumeHash = this.hashContent(dto.file_url);
     const text = await this.extractTextFromFile(dto.file_url);
 
     let extracted: Partial<ExtractedResumeData> = {};
@@ -61,9 +62,12 @@ export class ResumeExtractionService {
 
   /** Best-effort file download + text extraction. Falls back to empty string on failure. */
   async extractTextFromFile(fileUrl: string): Promise<string> {
+    const ownedUrl = assertOwnedFileUrl(fileUrl);
     try {
-      const res = await fetch(fileUrl);
+      const res = await fetch(ownedUrl, { signal: AbortSignal.timeout(20_000) });
+      if (!res.ok) throw new Error(`Resume file returned HTTP ${res.status}`);
       const buffer = Buffer.from(await res.arrayBuffer());
+      if (buffer.byteLength > 25 * 1024 * 1024) throw new Error('Resume file exceeds 25MB');
       const contentType = res.headers.get('content-type') || '';
 
       if (contentType.includes('pdf') || fileUrl.toLowerCase().endsWith('.pdf')) {
@@ -135,4 +139,3 @@ export class ResumeExtractionService {
     }
   }
 }
-

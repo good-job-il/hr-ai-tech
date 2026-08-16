@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import { jobService } from '@/api/services/jobService';
+import { salaryService } from '@/api/services/salaryService';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { TrendingUp, Loader2 } from 'lucide-react';
 import Navbar from '@/components/home/Navbar';
@@ -14,7 +15,7 @@ export default function MarketStats() {
 
   const { data: jobs = [] } = useQuery({
     queryKey: ['stats-jobs'],
-    queryFn: () => base44.entities.Job.list('-created_date', 500),
+    queryFn: () => jobService.list({ sort: 'created_date', order: 'DESC', limit: 500 }),
   });
 
   // Jobs by category
@@ -34,27 +35,25 @@ export default function MarketStats() {
 
   const loadAiInsights = async () => {
     setAiLoading(true);
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `ניתוח שוק העבודה בישראל לשנת 2025 עבור קטגוריית "${selectedCategory}".
-תן נתוני שכר ממוצע, טווחים, ביקוש, ומגמות שוק. המידע צריך להיות מבוסס על שוק העבודה הישראלי.`,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          salary_avg: { type: "number" },
-          salary_min: { type: "number" },
-          salary_max: { type: "number" },
-          demand_trend: { type: "string" },
-          top_skills: { type: "array", items: { type: "string" } },
-          insights: { type: "string" },
-          salary_by_experience: {
-            type: "array",
-            items: { type: "object", properties: { level: { type: "string" }, salary: { type: "number" } } }
-          }
-        }
-      }
-    });
-    setAiData(result);
-    setAiLoading(false);
+    try {
+      const rows = await salaryService.list({ category: selectedCategory, limit: 200 });
+      const categoryJobs = jobs.filter(job => job.category === selectedCategory || job.title?.includes(selectedCategory));
+      const skills = categoryJobs.flatMap(job => [...(job.required_skills || []), ...(job.preferred_skills || [])]);
+      const skillCounts = skills.reduce((counts, skill) => ({ ...counts, [skill]: (counts[skill] || 0) + 1 }), {});
+      const average = (values) => values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : 0;
+      setAiData({
+        salary_avg: average(rows.map(row => row.salary_avg).filter(Boolean)),
+        salary_min: rows.length ? Math.min(...rows.map(row => row.salary_min).filter(Boolean)) : 0,
+        salary_max: rows.length ? Math.max(...rows.map(row => row.salary_max).filter(Boolean)) : 0,
+        top_skills: Object.entries(skillCounts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([skill]) => skill),
+        salary_by_experience: rows.slice(0, 8).map(row => ({ level: row.job_title, salary: row.salary_avg || 0 })),
+        insights: rows.length
+          ? `הנתונים מבוססים על ${rows.length} רשומות שכר מאומתות ועל ${categoryJobs.length} משרות פעילות.`
+          : 'אין עדיין מספיק נתוני שכר מאומתים עבור התחום שנבחר.',
+      });
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   return (
@@ -101,7 +100,7 @@ export default function MarketStats() {
 
         {/* AI salary insights */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
-          <h2 className="font-semibold text-gray-900 mb-4">נתוני שכר לפי תחום (מבוסס AI)</h2>
+          <h2 className="font-semibold text-gray-900 mb-4">נתוני שכר לפי תחום</h2>
           <div className="flex gap-2 mb-4 flex-wrap">
             {CATEGORIES.map(c => (
               <button key={c} onClick={() => { setSelectedCategory(c); setAiData(null); }}
@@ -157,7 +156,7 @@ export default function MarketStats() {
                 <div className="bg-blue-50 rounded-xl p-4 text-sm text-gray-700">{aiData.insights}</div>
               )}
 
-              <div className="text-xs text-gray-400">* הנתונים מבוססים על ניתוח AI של שוק העבודה הישראלי</div>
+              <div className="text-xs text-gray-400">* הנתונים מבוססים על רשומות השכר והמשרות במערכת</div>
             </div>
           )}
         </div>

@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu, X } from 'lucide-react';
-import { SPACING, SHADOWS, RADIUS, COLORS } from '@/theme/tokens';
+import { SPACING, SHADOWS, COLORS } from '@/theme/tokens';
 import Logo from '@/components/branding/Logo';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 

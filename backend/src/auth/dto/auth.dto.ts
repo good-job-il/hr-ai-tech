@@ -20,17 +20,10 @@ export const RegisterSchema = z.object({
     .enum([
       'candidate',
       'employer',
-      'recruiter',
-      'team_manager',
-      'recruitment_manager',
       'org_admin',
-      'admin',
-      'hr_manager',
-      'internal_recruiter',
     ])
     .default('candidate'),
-  organization_id: z.number().int().optional(),
-});
+}).strict();
 export class RegisterDto extends createZodDto(RegisterSchema) {}
 
 // ─── Forgot Password ──────────────────────────────────────────────────────
@@ -61,6 +54,10 @@ export const UpdateMeSchema = z.object({
   org_type: z.enum(['organization', 'staffing_agency']).optional().nullable(),
   profile_completed: z.boolean().optional(),
   is_active: z.boolean().optional(),
+  company_culture: z.string().optional().nullable(),
+  benefits: z.array(z.string()).optional().nullable(),
+  gallery_urls: z.array(z.string().url()).optional().nullable(),
+  video_url: z.string().url().optional().nullable(),
+  testimonials: z.array(z.record(z.any())).optional().nullable(),
 });
 export class UpdateMeDto extends createZodDto(UpdateMeSchema) {}
-

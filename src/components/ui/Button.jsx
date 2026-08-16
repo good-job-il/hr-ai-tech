@@ -102,11 +102,12 @@ const sizes = {
   },
 };
 
+/** @param {React.ButtonHTMLAttributes<HTMLButtonElement> & {variant?: keyof typeof buttonVariants, size?: keyof typeof sizes, asChild?: boolean}} props */
 export function Button({
-  children,
+  children = null,
   variant = 'primary',
   size = 'md',
-  className,
+  className = '',
   disabled = false,
   asChild = false,
   ...props

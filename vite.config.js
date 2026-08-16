@@ -6,11 +6,11 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   const serverConfig = {};
-  if (env.VITE_BASE44_APP_BASE_URL) {
-    console.log(`[proxy] /api -> ${env.VITE_BASE44_APP_BASE_URL}`);
+  if (env.VITE_API_PROXY_TARGET) {
+    console.log(`[proxy] /api -> ${env.VITE_API_PROXY_TARGET}`);
     serverConfig.proxy = {
       '/api': {
-        target: env.VITE_BASE44_APP_BASE_URL,
+        target: env.VITE_API_PROXY_TARGET,
         changeOrigin: true,
       },
     };

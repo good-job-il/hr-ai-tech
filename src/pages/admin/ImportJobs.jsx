@@ -211,12 +211,8 @@ export default function ImportJobs() {
     setScanning(prev => ({ ...prev, [source.id]: true }));
     setScanResults(prev => ({ ...prev, [source.id]: null }));
     try {
-      const res = await importSourceService.crawl({
-        url: source.url,
-        source_id: source.id,
-        company_name: source.company_name || source.name,
-      });
-      setScanResults(prev => ({ ...prev, [source.id]: res.data }));
+      const result = await importSourceService.run(source.id);
+      setScanResults(prev => ({ ...prev, [source.id]: result }));
     } catch (err) {
       setScanResults(prev => ({ ...prev, [source.id]: { success: false, error: err.message } }));
     } finally {
@@ -230,11 +226,8 @@ export default function ImportJobs() {
     setQuickScanning(true);
     setQuickResult(null);
     try {
-      const res = await importSourceService.crawl({
-        url: quickUrl,
-        company_name: quickName || 'חברה',
-      });
-      setQuickResult(res.data);
+      const result = await importSourceService.preview(quickUrl, quickName || 'חברה');
+      setQuickResult(result);
     } catch (err) {
       setQuickResult({ success: false, error: err.message });
     } finally {

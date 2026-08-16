@@ -56,7 +56,7 @@ export function getRlsWhere(
   user: UserContext,
   extraFilters: Record<string, any> = {},
 ): Record<string, any> {
-  const { role, id: userId, organization_id, employer_company_id, email, impersonating } = user;
+  const { role, id: userId, organization_id, employer_company_id, impersonating } = user;
 
   // ─── Admin acting inside an organization's workspace ──────────────────
   // Scoped exactly like that org's ORG_ADMIN — never the unrestricted
@@ -113,11 +113,11 @@ export function getRlsWhere(
     case UserRole.CANDIDATE: {
       const candidateFilters: Record<string, Record<string, any>> = {
         Job:             { is_closed: false },
-        Application:     { candidate_email: email },
-        SavedJob:        { user_email: email },
-        CandidateProfile: { user_email: email },
-        Interview:       { candidate_email: email },
-        JobAlert:        { user_email: email },
+        Application:      { candidate_user_id: userId },
+        SavedJob:         { user_id: userId },
+        CandidateProfile: { user_id: userId },
+        Interview:        { candidate_user_id: userId },
+        JobAlert:         { user_id: userId },
       };
       const filter = candidateFilters[entityName];
       return filter ? buildFinal(entityName, filter, extraFilters) : BLOCKED_FILTER;
@@ -176,4 +176,3 @@ function buildFinal(
 export function isBlocked(filter: Record<string, any>): boolean {
   return filter?.id === '__BLOCKED__';
 }
-

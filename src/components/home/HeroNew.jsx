@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, UserPlus, MapPin, Sparkles, GraduationCap, Briefcase, Star, CheckCircle, ArrowLeft } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Search, UserPlus, MapPin, Sparkles, GraduationCap, Briefcase, Star, CheckCircle } from 'lucide-react';
 
 export default function HeroNew() {
   const navigate = useNavigate();

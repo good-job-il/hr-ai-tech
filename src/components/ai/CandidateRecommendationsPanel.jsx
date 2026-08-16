@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { base44 } from '@/api/base44Client';
+import { jobService } from '@/api/services/jobService';
 import { rankJobsForCandidate } from '@/lib/aiMatching';
 import AIMatchBadge from './AIMatchBadge';
 import { Briefcase, MapPin, ChevronRight, Loader2 } from 'lucide-react';
@@ -19,7 +19,7 @@ export default function CandidateRecommendationsPanel({ candidate, onAssignToJob
   useEffect(() => {
     if (!candidate) return;
     setLoading(true);
-    base44.entities.Job.filter({ is_closed: false }, '-created_date', 50)
+    jobService.list({ is_closed: false, sort: 'created_date', order: 'DESC', limit: 50 })
       .then(jobs => {
         const ranked = rankJobsForCandidate(candidate, jobs || []).slice(0, 10);
         setResults(ranked);

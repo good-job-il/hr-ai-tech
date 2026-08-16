@@ -17,7 +17,6 @@ import {
   FileClock,
   Globe2,
   HardDrive,
-  Plus,
   Server,
   ShieldCheck,
   Users,
@@ -504,14 +503,14 @@ export default function PlatformDashboard() {
         </PlatformCard>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setShowOrgModal(true)}
-        className="fixed bottom-6 right-6 z-20 flex h-[52px] items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-3.5 text-sm font-bold text-white shadow-[0_16px_35px_rgba(99,72,210,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_42px_rgba(99,72,210,0.42)]"
-      >
-        <Plus className="h-4 w-4" />
-        New organization
-      </button>
+      {/*<button*/}
+      {/*  type="button"*/}
+      {/*  onClick={() => setShowOrgModal(true)}*/}
+      {/*  className="fixed bottom-6 right-6 z-20 flex h-[52px] items-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-3.5 text-sm font-bold text-white shadow-[0_16px_35px_rgba(99,72,210,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_42px_rgba(99,72,210,0.42)]"*/}
+      {/*>*/}
+      {/*  <Plus className="h-4 w-4" />*/}
+      {/*  New organization*/}
+      {/*</button>*/}
 
       {showOrgModal && (
         <PlatformModal

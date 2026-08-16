@@ -2,8 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
-import { base44 } from '@/api/base44Client';
 import { agencyClientService } from '@/api/services/agencyClientService';
+import { jobService } from '@/api/services/jobService';
+import { applicationService } from '@/api/services/applicationService';
 import { toast } from 'sonner';
 import {
   ArrowRight, Building2, Briefcase, Users,
@@ -489,22 +490,14 @@ export default function AgencyClientDetail() {
 
   const { data: jobs = [], isLoading: jobsLoading, error: jobsError, refetch: refetchJobs } = useQuery({
     queryKey: ['client-jobs', id, orgId],
-    queryFn: () => base44.entities.Job.filter(
-      { employer_company_id: company.company_id, organization_id: orgId, is_deleted: false },
-      '-created_date',
-      200
-    ),
+    queryFn: () => jobService.list({ employer_company_id: company.company_id, organization_id: orgId, is_deleted: false, sort: 'created_date', order: 'DESC', limit: 200 }),
     enabled: !!company?.company_id && !!orgId,
     staleTime: STALE_TIME,
   });
 
   const { data: applications = [], isLoading: appsLoading, error: appsError, refetch: refetchApplications } = useQuery({
     queryKey: ['client-applications', id, orgId],
-    queryFn: () => base44.entities.Application.filter(
-      { organization_id: orgId, employer_company_id: company.company_id, is_deleted: false },
-      '-created_date',
-      500
-    ),
+    queryFn: () => applicationService.list({ organization_id: orgId, employer_company_id: company.company_id, is_deleted: false, sort: 'created_date', order: 'DESC', limit: 500 }),
     enabled: !!orgId && !!company?.company_id,
     staleTime: STALE_TIME,
   });

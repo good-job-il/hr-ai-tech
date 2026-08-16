@@ -18,6 +18,8 @@ import {
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { UserEntity } from '../users/user.entity';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole } from '../../common/enums/user-role.enum';
 
 @ApiTags('Permission Matrix')
 @ApiBearerAuth()
@@ -49,7 +51,7 @@ export class RoleAliasController {
   constructor(private readonly svc: PermissionsService) {}
 
   @Get() @Public() findAll() { return this.svc.findRoleAliases(); }
-  @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateRoleAliasDto) { return this.svc.createRoleAlias(dto); }
+  @Post() @Roles(UserRole.ADMIN) @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateRoleAliasDto) { return this.svc.createRoleAlias(dto); }
 }
 
 @ApiTags('User Position Access')

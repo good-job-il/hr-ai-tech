@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { JobEntity } from '../../jobs/entities/job.entity';
 import { SavedJobEntity } from '../../jobs/entities/saved-job.entity';
 import { ApplicationEntity } from '../../applications/entities/application.entity';
@@ -12,7 +12,6 @@ import { UserEntity } from '../../users/user.entity';
 import { ApplicationsService } from '../../applications/applications.service';
 import {
   GetJobRecommendationsDto,
-  ScoreApplicationFnDto,
   SmartSearchDto,
 } from '../dto/functions.dto';
 
@@ -35,7 +34,7 @@ export class MatchingService {
     if (!job) throw new NotFoundException('Job not found');
 
     const allJobs = await this.jobRepo.find({
-      where: { is_closed: false },
+      where: { is_closed: false, is_deleted: false },
       order: { views: 'DESC' },
       take: 500,
     });
@@ -72,13 +71,13 @@ export class MatchingService {
 
   // ─── getRecommendedJobs — jobs recommended to the current candidate ─────
   async getRecommendedJobs(user: UserEntity) {
-    const profiles = await this.profileRepo.find({ where: { user_email: user.email } });
+    const profiles = await this.profileRepo.find({ where: { user_id: user.id } });
     if (!profiles.length) return { jobs: [] };
     const profile = profiles[0];
 
-    const allJobs = await this.jobRepo.find({ where: { is_closed: false } });
-    const savedJobIds = (await this.savedJobRepo.find({ where: { user_email: user.email } })).map((s) => s.job_id);
-    const appliedJobIds = (await this.appRepo.find({ where: { candidate_email: user.email } })).map((a) => a.job_id);
+    const allJobs = await this.jobRepo.find({ where: { is_closed: false, is_deleted: false } });
+    const savedJobIds = (await this.savedJobRepo.find({ where: { user_id: user.id } })).map((s) => s.job_id);
+    const appliedJobIds = (await this.appRepo.find({ where: { candidate_user_id: user.id } })).map((a) => a.job_id);
 
     const relevantJobs = allJobs
       .filter((j) => !savedJobIds.includes(j.id) && !appliedJobIds.includes(j.id))
@@ -117,9 +116,8 @@ export class MatchingService {
   }
 
   // ─── scoreApplication — heuristic candidate/job match score ─────────────
-  async scoreApplication(dto: ScoreApplicationFnDto) {
-    const app = await this.appRepo.findOne({ where: { id: dto.application_id } });
-    if (!app) throw new NotFoundException('Application not found');
+  async scoreApplication(applicationId: number, user: UserEntity) {
+    const app = await this.applicationsService.findById(applicationId, user);
 
     const job = app.job_id ? await this.jobRepo.findOne({ where: { id: app.job_id } }) : null;
     const profiles = await this.profileRepo.find({ where: { user_email: app.candidate_email } });
@@ -141,11 +139,7 @@ export class MatchingService {
       reason = 'לא נמצא מספיק מידע לחישוב התאמה מדויק — ציון ברירת מחדל';
     }
 
-    await this.applicationsService.update(app.id, { match_score: score, match_reason: reason } as any, {
-      id: 'system',
-      role: 'admin',
-      email: 'system@internal',
-    } as any);
+    await this.applicationsService.update(app.id, { match_score: score, match_reason: reason } as any, user);
 
     return { score, reason };
   }
@@ -156,7 +150,7 @@ export class MatchingService {
     const queryLower = (query || '').toLowerCase().trim();
 
     if (type === 'autocomplete') {
-      const jobs = await this.jobRepo.find({ where: { is_closed: false }, order: { created_date: 'DESC' }, take: 100 });
+      const jobs = await this.jobRepo.find({ where: { is_closed: false, is_deleted: false }, order: { created_date: 'DESC' }, take: 100 });
       const roles = await this.roleRepo.find({ take: 500 });
       const aliases = await this.aliasRepo.find({ take: 500 });
 
@@ -190,7 +184,7 @@ export class MatchingService {
     }
 
     // ─── Main search with relevance scoring ────────────────────────────────
-    let allJobs = await this.jobRepo.find({ where: { is_closed: false }, order: { created_date: 'DESC' }, take: 500 });
+    let allJobs = await this.jobRepo.find({ where: { is_closed: false, is_deleted: false }, order: { created_date: 'DESC' }, take: 500 });
 
     const roles = await this.roleRepo.find({ take: 500 });
     const aliases = await this.aliasRepo.find({ take: 500 });
@@ -262,4 +256,3 @@ export class MatchingService {
     };
   }
 }
-
