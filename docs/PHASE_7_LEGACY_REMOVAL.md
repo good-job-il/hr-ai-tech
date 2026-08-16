@@ -18,7 +18,7 @@ The compatibility platform is physically absent from active source, configuratio
 
 ## Enforced boundary
 
-`npm run test:phase-7-removal` proves that:
+The retired Phase 7 removal gate proved that:
 
 - shim, legacy tree and one-time migration tooling do not exist;
 - runtime frontend/backend source contains no legacy platform references;

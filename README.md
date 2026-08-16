@@ -33,18 +33,15 @@ The frontend is served at `http://localhost:5173`; its `/api` requests are proxi
 npm run release:verify
 ```
 
-The Phase 8 environment suite additionally requires a clean MySQL database and a
-built API:
+Database initialization can be verified with a clean MySQL database:
 
 ```bash
 cd backend
 npm run migration:run
 npm run seed:taxonomy
 npm run build && npm run start:prod
-
-# From the repository root, while the API is running:
-npm run test:phase-8-api
 ```
 
-The release gate rejects high or critical production dependency vulnerabilities.
-Historical migration audits and phase sign-off records are stored in `docs/`.
+The release gate rejects high or critical production dependency vulnerabilities
+and verifies frontend/backend lint, types, tests and builds. Historical migration
+audits and phase sign-off records are stored in `docs/`.

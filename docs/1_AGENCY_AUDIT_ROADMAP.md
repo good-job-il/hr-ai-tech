@@ -168,7 +168,7 @@ Permission Matrix редактируется, но большинство экр
 - pipeline, candidate list и permission settings показывают отдельный denied/error state;
 - добавлены dry-run миграция Base44 ownership и SQL-миграция NestJS полей;
 - детали security contract и порядок миграции: [`AGENCY_PHASE_1_SECURITY.md`](./AGENCY_PHASE_1_SECURITY.md);
-- автоматическая проверка cross-tenant/cross-team/own scope: `npm run test:agency-access`.
+- историческая автоматическая проверка cross-tenant/cross-team/own scope завершена; постоянные проверки запускаются через `npm run release:verify`.
 
 Цель: сначала гарантировать безопасность и правильную область данных.
 
@@ -208,7 +208,7 @@ Permission Matrix редактируется, но большинство экр
 - KPI клиентов рассчитываются tenant-scoped по Job/Application, архивирование запрещено при открытых вакансиях или активных Application;
 - добавлены loading/empty/error/success states для основных client/job операций;
 - технический контракт и порядок миграции: [`AGENCY_PHASE_2_CLIENTS.md`](./AGENCY_PHASE_2_CLIENTS.md);
-- автоматическая проверка связей и archive policy: `npm run test:agency-clients`.
+- историческая автоматическая проверка связей и archive policy завершена; постоянные проверки запускаются через `npm run release:verify`.
 
 Цель: сделать клиента полноценным центром agency workflow.
 

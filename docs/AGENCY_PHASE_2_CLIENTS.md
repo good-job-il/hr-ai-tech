@@ -69,8 +69,7 @@ Organization (staffing agency tenant)
 ## Проверка
 
 ```bash
-npm run test:agency-access
-npm run test:agency-clients
+npm run release:verify
 npm run build
 cd backend && npm run build
 ```

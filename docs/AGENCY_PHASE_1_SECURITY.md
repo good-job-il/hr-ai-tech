@@ -51,7 +51,7 @@ npm run migration:run
 Команда:
 
 ```bash
-npm run test:agency-access
+npm run release:verify
 ```
 
 Проверяются organization, team и own scope, cross-tenant denial, cross-team denial, чужой recruiter record и отсутствие неявного platform-admin доступа.

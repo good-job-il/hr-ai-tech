@@ -1,5 +1,7 @@
 # NestJS API migration matrix
 
+> Historical audit artifact. The one-time `test:phase-*` and `check:phase-*` commands mentioned below were retired with the root `scripts` directory. The maintained verification command is `npm run release:verify`.
+
 Baseline date: 13 August 2026.
 
 This is the Phase 0 route/domain contract. `Missing` in the Tests column is an explicit migration risk, not an assertion that the route is covered elsewhere.

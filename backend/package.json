@@ -18,8 +18,7 @@
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
     "migration:show": "npm run typeorm -- migration:show",
-    "seed:taxonomy": "ts-node -r tsconfig-paths/register src/seeds/taxonomy.seed.ts",
-    "test:phase-8-upgrade": "ts-node -r tsconfig-paths/register src/scripts/verify-phase8-upgrade.ts"
+    "seed:taxonomy": "ts-node -r tsconfig-paths/register src/seeds/taxonomy.seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.1",

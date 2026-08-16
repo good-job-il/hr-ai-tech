@@ -17,7 +17,7 @@ Verified: 13 August 2026.
 Run:
 
 ```bash
-npm run check:phase-1-security
+npm run release:verify
 ```
 
 The same check runs in `.github/workflows/legacy-api-boundary.yml`.
@@ -33,7 +33,7 @@ Required production-owner actions:
 3. Assign a named production data owner and security owner in the release ticket.
 4. Revoke the external API key/token and reset the migration account password in the provider console.
 5. Remove all `BASE44_*` lines from every active local, CI and deployment secret store.
-6. Re-run `npm run check:phase-1-security` and the browser network-blocked E2E suite.
+6. Re-run `npm run release:verify` and the browser smoke suite used by the deployment environment.
 
 Credential revocation is an external action and cannot be inferred from a successful code build.
 

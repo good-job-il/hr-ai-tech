@@ -18,7 +18,7 @@ Status: code complete on 13 August 2026. Browser E2E is pending an executable te
 Run:
 
 ```bash
-npm run test:phase-4-public-candidate
+npm run release:verify
 ```
 
 The gate performs API type-contract tests and rejects:

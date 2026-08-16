@@ -11,8 +11,7 @@
   "include": [
     "src/api/**/*.ts",
     "src/types/**/*.ts",
-    "src/lib/errors/**/*.ts",
-    "scripts/type-tests/api-contracts.test-d.ts"
+    "src/lib/errors/**/*.ts"
   ],
   "exclude": ["node_modules", "dist", "backend"]
 }

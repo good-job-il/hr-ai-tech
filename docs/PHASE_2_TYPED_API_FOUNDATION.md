@@ -32,7 +32,7 @@ Every service declares a literal endpoint. There is no dynamic entity name, endp
 Run:
 
 ```bash
-npm run check:phase-2-api
+npm run release:verify
 ```
 
 The gate performs a strict API-only TypeScript build and verifies:

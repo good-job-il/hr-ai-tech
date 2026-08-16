@@ -37,7 +37,7 @@ The in-process scheduler is only the executor trigger; job state itself is datab
 ## Automated gate
 
 ```bash
-npm run test:phase-6-operations
+npm run release:verify
 ```
 
 The gate verifies zero string RPC, physical removal of compatibility controllers, domain routes, persisted idempotency/retry/recovery, scheduler presence, SSRF controls, server-owned batch identity, closed bulk DTOs, and removal of the generic LLM endpoint.

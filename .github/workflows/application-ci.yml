@@ -1,0 +1,50 @@
+name: Application CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: hire_israel
+          MYSQL_USER: hire_user
+          MYSQL_PASSWORD: hire_pass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u hire_user -phire_pass"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: hire_israel
+      DB_USER: hire_user
+      DB_PASSWORD: hire_pass
+      NODE_ENV: test
+      JWT_SECRET: ci-access-secret-change-me
+      JWT_REFRESH_SECRET: ci-refresh-secret-change-me
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm ci --prefix backend
+      - name: Production dependency audit
+        run: npm run audit:production
+      - name: Frontend lint, types and build
+        run: npm run lint && npm run typecheck && npm run build
+      - name: Backend lint, tests and build
+        run: npm --prefix backend run lint && npm --prefix backend test -- --runInBand && npm --prefix backend run build
+      - name: Fresh database migrations and taxonomy seed
+        run: npm --prefix backend run migration:run && npm --prefix backend run seed:taxonomy

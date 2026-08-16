@@ -20,7 +20,7 @@ OAuth is disabled for Phase 3. The supported authentication policy is email/pass
 
 ## Automated gate
 
-`npm run test:phase-3-boundary` performs the API-only TypeScript contract tests and then verifies:
+The retired Phase 3 verification script performed API-only TypeScript contract tests and verified:
 
 - no Phase 3 UI imports the shim or raw HTTP transport;
 - no Base44 auth/organization surface remains in the shim or token storage;

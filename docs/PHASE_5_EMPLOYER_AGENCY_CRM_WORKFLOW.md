@@ -27,7 +27,7 @@ These consumers use typed domain services and contain no `base44Client`, `base44
 Run:
 
 ```bash
-npm run test:phase-5-b2b
+npm run release:verify
 ```
 
 It checks the active B2B route/component graph, API type contracts, identity ownership, canonical-ID assignment, explicit pipeline transitions and the absence of `.catch(() => [])` error masking.

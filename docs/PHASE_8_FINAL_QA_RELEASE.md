@@ -35,7 +35,7 @@ Release candidate прошёл все доступные автоматизир�
 2. Подтвердить owner-side отзыв Base44 credentials и блокировку Base44 domains на egress/DNS уровне; локальный репозиторий принципиально не может доказать состояние внешнего провайдера и production network policy.
 3. Backend audit оставляет 2 moderate finding в транзитивном `uuid` ExcelJS. Уязвимые v3/v5/v6 buffer overloads приложением не вызываются; high/critical release gate проходит. Обновить после выпуска совместимой версии ExcelJS.
 4. `npm run typecheck:js:strict` сохраняет исторический JS backlog и пока не является release gate; основной `npm run typecheck` проходит typed API и compile проверку всего JSX.
-5. Перед production применить обычный backup/restore drill, migrations и smoke/E2E в целевой инфраструктуре. Workflow `.github/workflows/production-release-signoff.yml` потребует все четыре значения `*_VERIFIED`/`*_REVOKED`/`*_BLOCKED=true` в защищённом environment `production`.
+5. Перед production применить обычный backup/restore drill, migrations и smoke/E2E в целевой инфраструктуре. Внешние подтверждения выполняются владельцем инфраструктуры вручную.
 
 ## Команды воспроизведения
 
@@ -48,10 +48,6 @@ npm --prefix backend run migration:run
 npm --prefix backend run seed:taxonomy
 npm --prefix backend run build
 npm --prefix backend run start:prod
-
-# В другом терминале
-npm run test:phase-8-api
-
-# В protected production environment, только после внешних проверок
-npm run release:attest
 ```
+
+Примечание: одноразовые Phase 0–8 verification scripts были удалены после завершения миграции. Текущий `release:verify` сохраняет постоянные lint/typecheck/unit/build/audit gates.

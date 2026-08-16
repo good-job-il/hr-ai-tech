@@ -44,7 +44,7 @@ MySQL + application-owned file storage
 | 7 | Завершена | Shim, Base44 tree, SDK artifacts, compatibility routes и неиспользуемые legacy-страницы физически удалены; terminal audit закреплён в CI. |
 | 8 | Завершена для автоматизированного QA; browser sign-off заблокирован окружением | Единый release gate, реальные backend lint/Jest, fresh/upgrade migrations, OpenAPI/auth/tenant/workflow/import/file/API E2E, health/request-id monitoring и production dependency audit. Встроенный QA-браузер недоступен в текущем окружении, поэтому ручной визуальный sign-off остаётся обязательным перед production deployment. |
 
-Текущий автоматический остаток Base44: 0 runtime-imports, 0 entity/RPC calls, 0 shim contracts и отсутствующий legacy tree. Полный локальный gate: `npm run release:verify`; environment API suite: `npm run test:phase-8-api`. Отчёты по каждой фазе находятся в `docs/PHASE_*`.
+Текущий остаток Base44: 0 runtime-imports, 0 entity/RPC calls, 0 shim contracts и отсутствующий legacy tree. После завершения миграции одноразовые Phase verification scripts удалены. Постоянный локальный gate `npm run release:verify` проверяет dependency audit, frontend lint/typecheck/build и backend lint/unit tests/build. Отчёты по завершённым фазам сохранены в `docs/PHASE_*` как история миграции.
 
 ## 2. Краткий вывод
 
