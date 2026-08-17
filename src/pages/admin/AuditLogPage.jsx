@@ -14,6 +14,8 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { he, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   PlatformCard,
   PlatformEmptyState,
@@ -38,17 +40,24 @@ const getActionConfig = (t) => ({
   login: { label: t('auditLog.actions.login'), icon: CheckCircle2, color: '#10B981' },
   impersonate: { label: t('auditLog.actions.impersonate'), icon: AlertTriangle, color: '#F97316' },
   restore: { label: t('auditLog.actions.restore'), icon: CheckCircle2, color: '#10B981' },
+  role_display_name_update: { label: 'Role label', icon: Users, color: '#6366F1' },
+  permission_update: { label: 'Permissions', icon: ShieldCheck, color: '#7C3AED' },
+  deactivate: { label: 'Deactivate', icon: XCircle, color: '#EF4444' },
+  resend: { label: 'Resend', icon: Activity, color: '#3B82F6' },
+  cancel: { label: 'Cancel', icon: XCircle, color: '#F97316' },
 });
 
 const ENTITY_TYPES = [
   'Candidate', 'Application', 'Job', 'Company', 'CandidateDocument',
-  'CompensationPlan', 'User', 'Organization', 'Interview', 'CommunicationLog'
+  'CompensationPlan', 'User', 'Organization', 'Interview', 'CommunicationLog',
+  'AgencyTeam', 'AgencyInvitation', 'PermissionMatrix', 'RoleTemplate', 'Billing', 'Integration'
 ];
 
 const ACTIONS = [
   'view', 'create', 'update', 'delete', 'cv_download', 'cv_view',
   'status_change', 'send_to_employer', 'export', 'compensation_change',
-  'login', 'impersonate', 'restore'
+  'login', 'impersonate', 'restore', 'role_display_name_update',
+  'permission_update', 'deactivate', 'resend', 'cancel'
 ];
 
 const PAGE_SIZE = 50;
@@ -58,6 +67,9 @@ export default function AuditLogPage() {
   const isRTL = i18n.language === 'he';
   const dateLocale = i18n.language === 'he' ? he : enUS;
   const ACTION_CONFIG = getActionConfig(t);
+  const { can } = usePermissionMatrix();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [filters, setFilters] = useState({
     entity_type: '',
@@ -75,36 +87,29 @@ export default function AuditLogPage() {
     setPage(0);
   };
 
-  const { data: logs = [], isLoading } = useQuery({
+  const { data: result, isLoading } = useQuery({
     queryKey: ['audit-logs', filters.entity_type, filters.action, filters.actor_email, filters.date_from, filters.date_to, page],
     queryFn: async () => {
       const serverFilter = {};
       if (filters.entity_type) serverFilter.entity_type = filters.entity_type;
       if (filters.action) serverFilter.action = filters.action;
+      if (filters.actor_email) serverFilter.actor_email = filters.actor_email;
+      if (filters.date_from) serverFilter.date_from = `${filters.date_from}T00:00:00.000Z`;
+      if (filters.date_to) serverFilter.date_to = `${filters.date_to}T23:59:59.999Z`;
 
-      const fetched = await auditService.list({
+      return auditService.listPage({
         ...serverFilter,
         sort: 'created_date',
         order: 'DESC',
         limit: PAGE_SIZE,
         page: page + 1,
       });
-
-      // Client-side filter only for non-indexed fields
-      return fetched.filter(log => {
-        if (filters.actor_email && !log.actor_email?.toLowerCase().includes(filters.actor_email.toLowerCase())) return false;
-        if (filters.date_from && new Date(log.created_date) < new Date(filters.date_from)) return false;
-        if (filters.date_to) {
-          const toDate = new Date(filters.date_to);
-          toDate.setHours(23, 59, 59);
-          if (new Date(log.created_date) > toDate) return false;
-        }
-        return true;
-      });
     },
     staleTime: 2 * 60 * 1000,
     keepPreviousData: true,
   });
+  const logs = result?.data || [];
+  const pagination = result?.pagination;
 
   const exportToCSV = () => {
     const headers = [
@@ -141,6 +146,21 @@ export default function AuditLogPage() {
 
   const uniqueActors = new Set(logs.map(log => log.actor_email).filter(Boolean)).size;
   const securityEvents = logs.filter(log => ['delete', 'impersonate', 'login'].includes(log.action)).length;
+  const relatedPath = log => {
+    if (!location.pathname.startsWith('/agency/')) return null;
+    const routes = {
+      Candidate: `/agency/crm/candidate?id=${log.entity_id}`,
+      Application: '/agency/pipeline',
+      Job: '/agency/jobs',
+      User: '/agency/teams',
+      AgencyTeam: '/agency/teams',
+      AgencyInvitation: '/agency/teams',
+      CompensationPlan: '/agency/compensation',
+      Billing: '/agency/settings/billing',
+      Integration: '/agency/settings/integrations',
+    };
+    return routes[log.entity_type] || null;
+  };
 
   return (
     <PlatformPageShell dir={isRTL ? 'rtl' : 'ltr'}>
@@ -152,7 +172,7 @@ export default function AuditLogPage() {
           subtitle={t('auditLog.subtitle')}
           icon={ShieldCheck}
           actions={(
-            <Button onClick={exportToCSV} variant="outline" className="gap-1.5 text-sm">
+            <Button onClick={exportToCSV} variant="outline" className="gap-1.5 text-sm" disabled={!can('export') || logs.length === 0}>
               <Download className="h-4 w-4" />
               {t('auditLog.exportCSV')}
             </Button>
@@ -217,7 +237,7 @@ export default function AuditLogPage() {
                 {isRTL ? '←' : '→'} {t('auditLog.previous')}
               </Button>
               <span className="px-2 text-xs font-bold text-slate-500">{page + 1}</span>
-              <Button size="sm" variant="outline" className="text-xs" disabled={logs.length < PAGE_SIZE} onClick={() => setPage(p => p + 1)}>
+              <Button size="sm" variant="outline" className="text-xs" disabled={!pagination?.hasNextPage} onClick={() => setPage(p => p + 1)}>
                 {t('auditLog.next')} {isRTL ? '→' : '←'}
               </Button>
             </div>
@@ -271,7 +291,7 @@ export default function AuditLogPage() {
                             {cfg.label}
                           </span>
                         </td>
-                        <td className="p-3.5 text-xs font-semibold text-slate-600">{log.entity_type}</td>
+                        <td className="p-3.5 text-xs font-semibold text-slate-600">{relatedPath(log) ? <button onClick={() => navigate(relatedPath(log))} className="font-bold text-violet-600 hover:underline">{log.entity_type} #{log.entity_id}</button> : log.entity_type}</td>
                         <td className="max-w-xs truncate p-3.5 text-xs text-slate-500">{log.entity_label || '—'}</td>
                         <td className="p-3.5">
                           <button
@@ -310,9 +330,7 @@ export default function AuditLogPage() {
                                 {log.metadata && (
                                   <div className="col-span-2">
                                     <span className="font-semibold text-slate-500">Metadata:</span>
-                                    <pre className="mt-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-3 text-[10px] text-slate-700">
-                                      {JSON.stringify(log.metadata, null, 2)}
-                                    </pre>
+                                    {('before' in log.metadata || 'after' in log.metadata) ? <div className="mt-2 grid gap-3 md:grid-cols-2"><MetadataBlock title="Before" value={log.metadata.before} /><MetadataBlock title="After" value={log.metadata.after} /></div> : <MetadataBlock value={log.metadata} />}
                                   </div>
                                 )}
                               </div>
@@ -330,4 +348,8 @@ export default function AuditLogPage() {
       </div>
     </PlatformPageShell>
   );
+}
+
+function MetadataBlock({ title, value }) {
+  return <div>{title && <p className="mb-1 text-[10px] font-black uppercase text-slate-400">{title}</p>}<pre className="overflow-x-auto rounded-xl border border-slate-200 bg-white p-3 text-[10px] text-slate-700">{JSON.stringify(value ?? null, null, 2)}</pre></div>;
 }

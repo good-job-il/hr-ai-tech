@@ -40,6 +40,7 @@ export interface Job {
   specialization_id?: number;
   views: number;
   is_closed: boolean;
+  state: 'draft' | 'open' | 'on_hold' | 'filled' | 'closed';
   is_anonymous: boolean;
   show_company_name?: boolean;
   show_company_info?: boolean;
@@ -59,7 +60,7 @@ export interface Application {
   company?: string;
   employer_id: string;
   candidate_name: string;
-  candidate_email: string;
+  candidate_email?: string | null;
   candidate_phone?: string;
   resume_url?: string;
   resume_filename?: string;

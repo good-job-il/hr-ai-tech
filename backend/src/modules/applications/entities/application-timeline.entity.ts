@@ -14,7 +14,7 @@ export class ApplicationTimelineEntity extends BaseEntity {
   @Column({
     name: 'event_type',
     type: 'enum',
-    enum: ['submitted', 'status_changed', 'note_added', 'interview_scheduled', 'interview_completed', 'offer_made', 'rejected', 'assigned', 'resume_viewed'],
+    enum: ['submitted', 'status_changed', 'note_added', 'message_sent', 'interview_scheduled', 'interview_completed', 'offer_made', 'rejected', 'assigned', 'resume_viewed'],
   })
   event_type: string;
 
@@ -38,4 +38,3 @@ export class ApplicationTimelineEntity extends BaseEntity {
   })
   performed_by_role: string | null;
 }
-

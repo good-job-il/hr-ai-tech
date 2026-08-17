@@ -53,6 +53,18 @@ export class JobsController {
     return this.svc.softDelete(id, user);
   }
 
+  @Post(':id/close')
+  @Roles(...JOB_WRITE_ROLES)
+  close(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
+    return this.svc.changeState(id, 'closed', user);
+  }
+
+  @Post(':id/reopen')
+  @Roles(...JOB_WRITE_ROLES)
+  reopen(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
+    return this.svc.changeState(id, 'open', user);
+  }
+
   @Post(':id/view')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Public()

@@ -11,6 +11,7 @@ import { CandidateAccessEntity } from './entities/candidate-access.entity';
 import { CandidatesService } from './candidates.service';
 import { CandidatesController } from './candidates.controller';
 import { UserEntity } from '../users/user.entity';
+import { ApplicationEntity } from '../applications/entities/application.entity';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UserEntity } from '../users/user.entity';
       CandidateProfileEntity,
       CandidateAccessEntity,
       UserEntity,
+      ApplicationEntity,
     ]),
   ],
   controllers: [CandidatesController],

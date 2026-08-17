@@ -19,6 +19,7 @@ import {
   buildPaginatedResponse,
   getSkipTake,
 } from '../../common/utils/pagination.utils';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class OrganizationsService {
@@ -27,6 +28,7 @@ export class OrganizationsService {
     private readonly repo: Repository<OrganizationEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
+    private readonly audit: AuditService,
   ) {}
 
   async findAll(query: QueryOrganizationsDto, user: UserEntity) {
@@ -143,8 +145,21 @@ export class OrganizationsService {
       }
     }
 
+    const before = { name: org.name, contact_email: org.contact_email, status: org.status, plan: org.plan };
     Object.assign(org, dto);
-    return this.repo.save(org);
+    const saved = await this.repo.save(org);
+    await this.audit.log({
+      organization_id: String(saved.id),
+      actor_user_id: String(user.id),
+      actor_email: user.email,
+      actor_role: user.role,
+      entity_type: 'Organization',
+      entity_id: saved.id,
+      entity_label: saved.name,
+      action: 'update',
+      metadata: { before, after: dto },
+    });
+    return saved;
   }
 
   async remove(id: number, user: UserEntity): Promise<void> {

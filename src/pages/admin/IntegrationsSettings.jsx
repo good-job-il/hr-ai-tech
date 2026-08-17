@@ -1,158 +1,51 @@
-import { useState } from 'react';
-import { Plug, Globe, Mail, Calendar, Database, Key, Shield, CheckCircle } from 'lucide-react';
-import { useAuth } from '@/lib/AuthContext';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AlertCircle, Calendar, CheckCircle2, Globe, Mail, Plug, RefreshCw, Shield, Unplug } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { integrationConnectionService } from '@/api/services/integrationConnectionService';
+import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
+import { Button } from '@/components/ui/button';
+import { PlatformCard, PlatformEmptyState, PlatformPageHeader, PlatformPageShell, PlatformStatCard, PlatformWidgetHeader } from '@/components/platform/PlatformUI';
 
-const INTEGRATIONS = [
-  { 
-    id: 'gmail', 
-    name: 'Gmail', 
-    icon: Mail, 
-    status: 'connected',
-    description: 'קליטת קורות חיים ממיילים, תיוג אוטומטי',
-    scopes: ['gmail.readonly', 'gmail.modify']
-  },
-  { 
-    id: 'google-calendar', 
-    name: 'Google Calendar', 
-    icon: Calendar, 
-    status: 'available',
-    description: 'תיאום ראיונות, תזכורות אוטומטיות'
-  },
-  { 
-    id: 'linkedin', 
-    name: 'LinkedIn', 
-    icon: Globe, 
-    status: 'coming_soon',
-    description: 'יבוא מועמדים, פרסום משרות'
-  },
-  { 
-    id: 'database', 
-    name: 'ייבוא נתונים', 
-    icon: Database, 
-    status: 'available',
-    description: 'ייבוא מאקסל, CSV, מערכות חיצוניות'
-  },
-];
+const ICONS = { gmail: Mail, google_calendar: Calendar, linkedin: Globe };
 
 export default function IntegrationsSettings() {
-  const { user } = useAuth();
-  const [selectedIntegration, setSelectedIntegration] = useState(null);
+  const { i18n } = useTranslation();
+  const isRTL = !i18n.language?.startsWith('en');
+  const { can } = usePermissionMatrix();
+  const qc = useQueryClient();
+  const { data: integrations = [], isLoading, error, refetch, isRefetching } = useQuery({ queryKey: ['integration-connections'], queryFn: integrationConnectionService.list, staleTime: 30_000 });
+  const mutation = useMutation({
+    mutationFn: async ({ action, provider }) => {
+      if (action === 'disconnect') return integrationConnectionService.disconnect(provider);
+      const result = action === 'reconnect' ? await integrationConnectionService.reconnect(provider) : await integrationConnectionService.connect(provider);
+      window.location.assign(result.authorization_url);
+      return result;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['integration-connections'] }),
+  });
+  const text = isRTL ? { title: 'אינטגרציות וחיבורים', subtitle: 'מצב חיבור אמיתי, הרשאות, סנכרון ושגיאות', connected: 'מחוברות', available: 'זמינות', unavailable: 'לא זמינות', connect: 'חבר', disconnect: 'נתק', reconnect: 'חבר מחדש', lastSync: 'סנכרון אחרון', scopes: 'הרשאות', notEnabled: 'האינטגרציה אינה מופעלת בסביבה זו', noConnections: 'אין אינטגרציות מחוברות', error: 'לא ניתן לטעון את מצב האינטגרציות', retry: 'נסה שוב' } : { title: 'Integrations', subtitle: 'Real connection state, scopes, synchronization and errors', connected: 'Connected', available: 'Available', unavailable: 'Unavailable', connect: 'Connect', disconnect: 'Disconnect', reconnect: 'Reconnect', lastSync: 'Last sync', scopes: 'Scopes', notEnabled: 'This integration is not enabled in this environment', noConnections: 'No connected integrations', error: 'Unable to load integrations', retry: 'Try again' };
+  if (error) return <PlatformPageShell dir={isRTL ? 'rtl' : 'ltr'}><PlatformCard className="p-5"><PlatformEmptyState icon={AlertCircle} className="min-h-72"><p role="alert" className="font-bold text-slate-700">{text.error}</p><Button className="mt-4" variant="outline" disabled={isRefetching} onClick={() => refetch()}>{text.retry}</Button></PlatformEmptyState></PlatformCard></PlatformPageShell>;
+  const connected = integrations.filter(item => item.status === 'connected').length;
+  const available = integrations.filter(item => item.feature_available).length;
+  const errors = integrations.filter(item => item.status === 'error').length;
 
-  return (
-    <div dir="rtl" className="p-6 max-w-4xl mx-auto">
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <Plug className="w-6 h-6 text-purple-600" />
-          <h1 className="text-2xl font-black text-gray-900">אינטגרציות וחיבורים</h1>
-        </div>
-        <p className="text-sm text-gray-500">חבר מערכות חיצוניות וכלים אוטומטיים</p>
-      </div>
-
-      <div className="grid gap-4">
-        {/* Active Integrations */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-600" />
-            אינטגרציות פעילות
-          </h2>
-          <div className="space-y-3">
-            {INTEGRATIONS.filter(i => i.status === 'connected').map(integration => (
-              <div key={integration.id} className="flex items-center justify-between p-4 border border-green-200 rounded-lg bg-green-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
-                    <integration.icon className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-gray-900">{integration.name}</div>
-                    <div className="text-xs text-gray-600">{integration.description}</div>
-                    {integration.scopes && (
-                      <div className="text-[10px] text-gray-500 mt-1">
-                        הרשאות: {integration.scopes.join(', ')}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <button className="px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 rounded-lg transition-colors">
-                  נתק
-                </button>
-              </div>
-            ))}
-            {INTEGRATIONS.filter(i => i.status === 'connected').length === 0 && (
-              <div className="text-center py-8 text-gray-400 text-sm">
-                <Plug className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                <p>אין אינטגרציות פעילות כרגע</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Available Integrations */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h2 className="font-bold text-gray-900 mb-4">אינטגרציות זמינות</h2>
-          <div className="grid gap-3">
-            {INTEGRATIONS.filter(i => i.status === 'available').map(integration => (
-              <div key={integration.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-purple-300 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center">
-                    <integration.icon className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-gray-900">{integration.name}</div>
-                    <div className="text-xs text-gray-600">{integration.description}</div>
-                  </div>
-                </div>
-                <button className="px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition-colors">
-                  חבר
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Coming Soon */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5 opacity-60">
-          <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Shield className="w-4 h-4 text-gray-400" />
-            בקרוב
-          </h2>
-          <div className="grid gap-3">
-            {INTEGRATIONS.filter(i => i.status === 'coming_soon').map(integration => (
-              <div key={integration.id} className="flex items-center gap-3 p-4 border border-gray-100 rounded-lg bg-gray-50">
-                <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
-                  <integration.icon className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="flex-1">
-                  <div className="font-bold text-gray-700">{integration.name}</div>
-                  <div className="text-xs text-gray-500">{integration.description}</div>
-                </div>
-                <span className="text-xs font-semibold text-gray-400 px-3 py-1.5 bg-gray-200 rounded-full">
-                  בקרוב
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* API Keys */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Key className="w-4 h-4 text-blue-600" />
-            מפתחות API
-          </h2>
-          <div className="space-y-3">
-            <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-gray-700">Gmail API</span>
-                <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">פעיל</span>
-              </div>
-              <div className="text-xs text-gray-500">משמש לקליטת קורות חיים ממיילים</div>
-            </div>
-            <button className="w-full px-4 py-2 border-2 border-dashed border-gray-300 text-gray-500 text-sm font-semibold rounded-lg hover:border-purple-400 hover:text-purple-600 transition-colors">
-              + הוסף מפתח API חדש
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <PlatformPageShell dir={isRTL ? 'rtl' : 'ltr'}><div className="space-y-6">
+    <PlatformPageHeader title={text.title} subtitle={text.subtitle} icon={Plug} />
+    <div className="grid gap-4 sm:grid-cols-3"><PlatformStatCard icon={CheckCircle2} label={text.connected} value={connected} loading={isLoading} tone="emerald" /><PlatformStatCard icon={Plug} label={text.available} value={available} loading={isLoading} tone="violet" /><PlatformStatCard icon={AlertCircle} label="Errors" value={errors} loading={isLoading} tone="rose" /></div>
+    <PlatformCard className="p-5"><PlatformWidgetHeader title={text.title} subtitle={`${integrations.length}`} />
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">{integrations.map(item => {
+        const Icon = ICONS[item.provider] || Plug;
+        const pending = mutation.isPending && mutation.variables?.provider === item.provider;
+        return <div key={item.provider} className={`rounded-2xl border p-5 ${item.status === 'error' ? 'border-rose-200 bg-rose-50/60' : item.status === 'connected' ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-white'}`}>
+          <div className="flex items-start gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-50 text-violet-600"><Icon className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="flex items-center justify-between gap-2"><h3 className="font-black text-slate-800">{item.name}</h3><Status value={item.status} /></div><p className="mt-1 text-xs font-semibold text-slate-400">{item.external_account_label || item.provider}</p></div></div>
+          <div className="mt-4 space-y-2 text-xs text-slate-500"><p><strong>{text.scopes}:</strong> {(item.scopes.length ? item.scopes : item.required_scopes).join(', ') || '—'}</p><p><strong>{text.lastSync}:</strong> {item.last_sync_at ? new Date(item.last_sync_at).toLocaleString() : '—'} {item.last_sync_status ? `(${item.last_sync_status})` : ''}</p>{item.last_error && <p className="rounded-lg bg-rose-100 p-2 font-bold text-rose-700">{item.last_error}</p>}{!item.feature_available && item.status !== 'connected' && <p className="rounded-lg bg-slate-100 p-2 font-bold text-slate-500">{text.notEnabled}</p>}</div>
+          {can('manage_settings') && <div className="mt-4 flex justify-end gap-2">{item.status === 'connected' ? <Button variant="outline" size="sm" disabled={pending} onClick={() => mutation.mutate({ action: 'disconnect', provider: item.provider })}><Unplug className="h-4 w-4" />{text.disconnect}</Button> : item.feature_available && <Button size="sm" disabled={pending} onClick={() => mutation.mutate({ action: item.status === 'error' ? 'reconnect' : 'connect', provider: item.provider })}>{pending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}{item.status === 'error' ? text.reconnect : text.connect}</Button>}</div>}
+        </div>;
+      })}</div>
+      {!isLoading && connected === 0 && <PlatformEmptyState icon={Shield} className="mt-5">{text.noConnections}</PlatformEmptyState>}
+      {mutation.error && <p className="mt-4 rounded-xl bg-rose-50 p-3 text-sm font-bold text-rose-700">{mutation.error.message}</p>}
+    </PlatformCard>
+  </div></PlatformPageShell>;
 }
+
+function Status({ value }) { const tone = value === 'connected' ? 'bg-emerald-100 text-emerald-700' : value === 'error' ? 'bg-rose-100 text-rose-700' : value === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'; return <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${tone}`}>{value}</span>; }

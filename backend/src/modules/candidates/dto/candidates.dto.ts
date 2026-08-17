@@ -71,6 +71,8 @@ export const QueryCandidatesSchema = z.object({
   parsing_status: parsingStatusEnum.optional(),
   review_required: z.coerce.boolean().optional(),
   import_batch_id: z.coerce.number().int().optional(),
+  active: z.coerce.boolean().optional(),
+  in_pipeline: z.coerce.boolean().optional(),
 });
 export class QueryCandidatesDto extends createZodDto(QueryCandidatesSchema) {}
 

@@ -55,6 +55,12 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
     let oldStage = null;
     let application = null;
 
+    const currentApplication = applications.find(a => a.id === appId);
+    const reopenReason = currentApplication?.status === 'rejected' && newStage !== 'rejected'
+      ? window.prompt(t('pipeline.reopenReason', { defaultValue: 'Reason for reopening this rejected application' }))
+      : null;
+    if (currentApplication?.status === 'rejected' && newStage !== 'rejected' && !reopenReason?.trim()) return;
+
     setApplications(prev => {
       application = prev.find(a => a.id === appId);
       oldStage = application?.status;
@@ -69,7 +75,11 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
     if (String(appId).startsWith('demo-')) return;
 
     try {
-      await applicationService.updateStatus(appId, newStage);
+      if (oldStage === 'rejected') {
+        await applicationService.reopen(appId, newStage, reopenReason.trim());
+      } else {
+        await applicationService.updateStatus(appId, newStage);
+      }
       if (application && oldStage && oldStage !== newStage && onNotificationCreated) onNotificationCreated();
     } catch (requestError) {
       setApplications(prev =>
@@ -80,7 +90,7 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
         message: requestError?.message || 'Unable to update application',
       });
     }
-  }, [user, onNotificationCreated, t]);
+  }, [applications, onNotificationCreated, t]);
 
   return {
     stages,

@@ -11,7 +11,7 @@ import {
   PlatformStatCard,
 } from '@/components/platform/PlatformUI';
 import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 function CopyButton({ text }) {
@@ -38,14 +38,21 @@ function CopyButton({ text }) {
 
 const STATUS_COLORS = {
   open: 'bg-green-100 text-green-700',
+  draft: 'bg-slate-100 text-slate-700',
+  on_hold: 'bg-amber-100 text-amber-700',
+  filled: 'bg-blue-100 text-blue-700',
   closed: 'bg-red-100 text-red-700',
 };
+
+const ROUTE_STATES = { open: 'open', filled: 'filled', hold: 'on_hold' };
 
 export default function ManageJobsPage() {
   const { can } = usePermissionMatrix();
   const canCreate = can('create');
   const canUpdate = can('update');
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const routeState = ROUTE_STATES[location.pathname.split('/').pop()] || null;
   const preselectedClientId = searchParams.get('clientId');
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,13 +62,14 @@ export default function ManageJobsPage() {
   const [editingJob, setEditingJob] = useState(null);
   const [compensationPlans, setCompensationPlans] = useState([]);
   const [loadError, setLoadError] = useState('');
+  const [updatingId, setUpdatingId] = useState(null);
 
   const loadJobs = async () => {
     setLoading(true);
     setLoadError('');
     try {
       const [all, plans] = await Promise.all([
-        jobService.list({ sort: 'created_date', order: 'DESC', limit: 200 }),
+        jobService.list({ state: routeState || undefined, sort: 'created_date', order: 'DESC', limit: 200 }),
         compensationPlanService.list({ limit: 100 }),
       ]);
       setJobs(all);
@@ -79,7 +87,7 @@ export default function ManageJobsPage() {
     return jobPlan || compensationPlans.find(p => p.client_name === job.company && !p.job_id);
   };
 
-  useEffect(() => { loadJobs(); }, []);
+  useEffect(() => { loadJobs(); }, [routeState]);
   useEffect(() => {
     if (preselectedClientId && canCreate) {
       setEditingJob(null);
@@ -88,7 +96,7 @@ export default function ManageJobsPage() {
   }, [preselectedClientId, canCreate]);
 
   const filtered = jobs.filter(j => {
-    if (!showClosed && j.is_closed) return false;
+    if (!routeState && !showClosed && ['filled', 'closed'].includes(j.state || (j.is_closed ? 'closed' : 'open'))) return false;
     if (search) {
       const q = search.toLowerCase();
       return (j.title || '').toLowerCase().includes(q) ||
@@ -101,17 +109,33 @@ export default function ManageJobsPage() {
   const handleNew = () => { setEditingJob(null); setModalOpen(true); };
   const handleEdit = (job) => { setEditingJob(job); setModalOpen(true); };
   const handleToggleClose = async (job) => {
+    setUpdatingId(job.id);
     try {
-      await jobService.update(job.id, { is_closed: !job.is_closed });
-      toast.success(job.is_closed ? 'Job reopened' : 'Job closed');
+      await (job.state === 'closed' ? jobService.reopen(job.id) : jobService.close(job.id));
+      toast.success(job.state === 'closed' ? 'Job reopened' : 'Job closed');
       await loadJobs();
     } catch (error) {
       toast.error(error?.message || 'Unable to update job');
+    } finally {
+      setUpdatingId(null);
     }
   };
 
-  const openCount = jobs.filter(j => !j.is_closed).length;
-  const closedCount = jobs.filter(j => j.is_closed).length;
+  const handleStateChange = async (job, state) => {
+    setUpdatingId(job.id);
+    try {
+      await jobService.update(job.id, { state });
+      toast.success('Job status updated');
+      await loadJobs();
+    } catch (error) {
+      toast.error(error?.message || 'Unable to update job');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const openCount = jobs.filter(j => (j.state || (j.is_closed ? 'closed' : 'open')) === 'open').length;
+  const closedCount = jobs.filter(j => ['filled', 'closed'].includes(j.state || (j.is_closed ? 'closed' : 'open'))).length;
 
   return (
     <PlatformPageShell dir="ltr">
@@ -151,11 +175,11 @@ export default function ManageJobsPage() {
             className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#A78BFA] focus:ring-4 focus:ring-[#F3EFFF]"
           />
         </div>
-        <label className="flex items-center gap-2 text-sm font-semibold text-[#64748B] cursor-pointer">
+        {!routeState && <label className="flex items-center gap-2 text-sm font-semibold text-[#64748B] cursor-pointer">
           <input type="checkbox" checked={showClosed} onChange={e => setShowClosed(e.target.checked)}
             className="h-5 w-5 rounded-md border-slate-300 accent-[#6C4DFF]" />
           Show closed
-        </label>
+        </label>}
       </PlatformCard>
 
       {/* Jobs Table */}
@@ -277,9 +301,20 @@ export default function ManageJobsPage() {
                     })()}
                   </td>
                   <td className="px-5 py-4">
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${job.is_closed ? STATUS_COLORS.closed : STATUS_COLORS.open}`}>
-                      {job.is_closed ? 'Closed' : 'Open'}
-                    </span>
+                    {canUpdate ? (
+                      <select
+                        value={job.state || (job.is_closed ? 'closed' : 'open')}
+                        disabled={updatingId === job.id}
+                        onChange={event => handleStateChange(job, event.target.value)}
+                        className={`rounded-full border-0 px-2.5 py-1 text-xs font-bold outline-none ${STATUS_COLORS[job.state || (job.is_closed ? 'closed' : 'open')]}`}
+                      >
+                        <option value="draft">Draft</option><option value="open">Open</option><option value="on_hold">On hold</option><option value="filled">Filled</option><option value="closed">Closed</option>
+                      </select>
+                    ) : (
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${STATUS_COLORS[job.state || (job.is_closed ? 'closed' : 'open')]}`}>
+                        {(job.state || (job.is_closed ? 'closed' : 'open')).replace('_', ' ')}
+                      </span>
+                    )}
                   </td>
                   <td className="px-5 py-4">
                     {canUpdate && <div className="flex items-center gap-2 justify-end">
@@ -287,14 +322,14 @@ export default function ManageJobsPage() {
                         className="h-8 w-8 rounded-lg border border-[#E4ECFF] flex items-center justify-center text-[#64748B] hover:border-[#7C3AED] hover:text-[#7C3AED] transition-all">
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => handleToggleClose(job)}
+                      <button onClick={() => handleToggleClose(job)} disabled={updatingId === job.id}
                         className={`h-8 w-8 rounded-lg border flex items-center justify-center transition-all ${
-                          job.is_closed
+                          job.state === 'closed'
                             ? 'border-green-200 text-green-600 hover:bg-green-50'
                             : 'border-red-200 text-red-500 hover:bg-red-50'
                         }`}
-                        title={job.is_closed ? 'Reopen' : 'Close job'}>
-                        {job.is_closed ? <CheckCircle className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                        title={job.state === 'closed' ? 'Reopen' : 'Close job'}>
+                        {job.state === 'closed' ? <CheckCircle className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                       </button>
                     </div>}
                   </td>

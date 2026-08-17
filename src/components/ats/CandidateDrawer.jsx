@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   X, User, Phone, Mail, MapPin, Briefcase, Sparkles, Clock,
   MessageSquare, Calendar, Send, AlertTriangle
@@ -9,6 +9,13 @@ import MatchExplanationCard from '@/components/ai/MatchExplanationCard';
 import { scoreMatch } from '@/lib/aiMatching';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { APPLICATION_STATUS_VALUES } from '@/domain/agency/contracts';
+import { applicationService } from '@/api/services/applicationService';
+import { interviewService } from '@/api/services/interviewService';
+import { messageService } from '@/api/services/messageService';
+import { jobService } from '@/api/services/jobService';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const STAGE_VALUES = APPLICATION_STATUS_VALUES;
 
@@ -20,15 +27,34 @@ function matchColor(score) {
   return 'text-red-600 bg-red-50';
 }
 
-export default function CandidateDrawer({ application, open, onClose, onStageChange, job, canChangeStage = true }) {
+export default function CandidateDrawer({ application, open, onClose, onStageChange, onApplicationUpdated, job, canChangeStage = true }) {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('details');
   const [note, setNote] = useState('');
-  const [notes, setNotes] = useState([]);
+  const [savingNote, setSavingNote] = useState(false);
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [interviewOpen, setInterviewOpen] = useState(false);
+  const [interview, setInterview] = useState({ date: '', time: '', type: 'video', location_or_link: '' });
+  const [actionPending, setActionPending] = useState(false);
+  const [actionError, setActionError] = useState('');
+  const [jobDetails, setJobDetails] = useState(null);
   const isMobile = useIsMobile();
 
   const isRTL = !i18n.language?.startsWith('en');
-  const locale = isRTL ? 'he-IL' : 'en-US';
+  useEffect(() => {
+    setNote('');
+    setActionError('');
+  }, [application?.id]);
+
+  useEffect(() => {
+    if (!open || !application?.job_id || job) return;
+    let active = true;
+    jobService.get(application.job_id)
+      .then(value => { if (active) setJobDetails(value); })
+      .catch(() => { if (active) setJobDetails(null); });
+    return () => { active = false; };
+  }, [open, application?.job_id, job?.id]);
 
   const tabs = TAB_IDS.map(id => ({
     id,
@@ -50,7 +76,7 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
       desired_salary_min: application.desired_salary_min,
       desired_salary_max: application.desired_salary_max,
     };
-    const jobObj = job || {
+    const jobObj = job || jobDetails || {
       id: application.job_id,
       title: application.job_title,
       company: application.company,
@@ -59,14 +85,51 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
     };
     const { score, explanation } = scoreMatch(candidate, jobObj);
     return { score, explanation };
-  }, [application?.id, job?.id]);
+  }, [application?.id, job?.id, jobDetails?.id]);
 
   if (!open || !application) return null;
 
-  const addNote = () => {
+  const addNote = async () => {
     if (!note.trim()) return;
-    setNotes(prev => [...prev, { text: note, time: new Date().toLocaleTimeString(locale) }]);
-    setNote('');
+    setSavingNote(true);
+    setActionError('');
+    try {
+      const updated = await applicationService.addNote(application.id, note.trim());
+      setNote('');
+      onApplicationUpdated?.(updated);
+    } catch (error) {
+      setActionError(error?.message || 'Unable to save note');
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!message.trim()) return;
+    setActionPending(true); setActionError('');
+    try {
+      await messageService.send(application.id, message.trim());
+      setMessage(''); setMessageOpen(false);
+    } catch (error) { setActionError(error?.message || 'Unable to send message'); }
+    finally { setActionPending(false); }
+  };
+
+  const scheduleInterview = async () => {
+    if (!interview.date || !interview.time) return;
+    setActionPending(true); setActionError('');
+    try {
+      await interviewService.create({
+        ...interview,
+        application_id: application.id,
+        candidate_id: application.candidate_id,
+        job_id: application.job_id,
+        job_title: application.job_title,
+        candidate_name: application.candidate_name,
+      });
+      setInterview({ date: '', time: '', type: 'video', location_or_link: '' });
+      setInterviewOpen(false);
+    } catch (error) { setActionError(error?.message || 'Unable to schedule interview'); }
+    finally { setActionPending(false); }
   };
 
   return (
@@ -215,9 +278,10 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
                 />
                 <button
                   onClick={addNote}
+                  disabled={savingNote}
                   className="self-end h-10 px-4 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm"
                 >
-                  {t('pipeline.drawer.save')}
+                  {savingNote ? '…' : t('pipeline.drawer.save')}
                 </button>
               </div>
               {application.notes && (
@@ -225,27 +289,47 @@ export default function CandidateDrawer({ application, open, onClose, onStageCha
                   <p className="text-sm font-semibold text-[#0F172A]">{application.notes}</p>
                 </div>
               )}
-              {notes.map((n, i) => (
-                <div key={i} className="p-4 rounded-xl bg-[#F7FBFF] border border-[#E4ECFF]">
-                  <p className="text-sm font-semibold text-[#0F172A]">{n.text}</p>
-                  <p className="text-xs text-[#94A3B8] mt-1">{n.time}</p>
-                </div>
-              ))}
+              {actionError && <p className="text-sm font-bold text-red-600">{actionError}</p>}
             </div>
           )}
         </div>
 
         <div className="p-4 border-t border-[#E4ECFF] flex gap-3">
-          <button className="flex-1 h-11 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center justify-center gap-2">
+          <button onClick={() => setMessageOpen(true)} className="flex-1 h-11 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center justify-center gap-2">
             <Send className="w-4 h-4" />
             {t('pipeline.drawer.sendMessage')}
           </button>
-          <button className="flex-1 h-11 rounded-xl border border-[#E4ECFF] bg-white text-[#64748B] font-bold text-sm flex items-center justify-center gap-2 hover:border-[#C4B5FD]">
+          <button onClick={() => setInterviewOpen(true)} className="flex-1 h-11 rounded-xl border border-[#E4ECFF] bg-white text-[#64748B] font-bold text-sm flex items-center justify-center gap-2 hover:border-[#C4B5FD]">
             <Calendar className="w-4 h-4" />
             {t('pipeline.drawer.scheduleInterview')}
           </button>
         </div>
       </div>
+
+      <Dialog open={messageOpen} onOpenChange={setMessageOpen}>
+        <DialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+          <DialogHeader><DialogTitle>{t('pipeline.drawer.sendMessage')}</DialogTitle></DialogHeader>
+          <textarea value={message} onChange={event => setMessage(event.target.value)} rows={5} className="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-violet-300" />
+          {actionError && <p className="text-sm font-bold text-red-600">{actionError}</p>}
+          <Button onClick={sendMessage} disabled={!message.trim() || actionPending}>{actionPending ? '…' : t('pipeline.drawer.sendMessage')}</Button>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={interviewOpen} onOpenChange={setInterviewOpen}>
+        <DialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+          <DialogHeader><DialogTitle>{t('pipeline.drawer.scheduleInterview')}</DialogTitle></DialogHeader>
+          <div className="grid grid-cols-2 gap-3">
+            <Input type="date" value={interview.date} onChange={event => setInterview(value => ({ ...value, date: event.target.value }))} />
+            <Input type="time" value={interview.time} onChange={event => setInterview(value => ({ ...value, time: event.target.value }))} />
+          </div>
+          <select value={interview.type} onChange={event => setInterview(value => ({ ...value, type: event.target.value }))} className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm">
+            <option value="video">Video</option><option value="phone">Phone</option><option value="in_person">In person</option><option value="technical">Technical</option><option value="final">Final</option>
+          </select>
+          <Input value={interview.location_or_link} onChange={event => setInterview(value => ({ ...value, location_or_link: event.target.value }))} placeholder="Location or meeting link" />
+          {actionError && <p className="text-sm font-bold text-red-600">{actionError}</p>}
+          <Button onClick={scheduleInterview} disabled={!interview.date || !interview.time || actionPending}>{actionPending ? '…' : t('pipeline.drawer.scheduleInterview')}</Button>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

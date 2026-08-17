@@ -5,7 +5,7 @@ import type { PaginatedResponse } from '@/types/api';
 export const AUDIT_ENTITY_TYPES = [
   'Candidate', 'Application', 'Job', 'Company', 'CandidateDocument',
   'CompensationPlan', 'User', 'Organization', 'Interview', 'CommunicationLog',
-  'AgencyTeam', 'AgencyInvitation',
+  'AgencyTeam', 'AgencyInvitation', 'PermissionMatrix', 'RoleTemplate', 'Billing', 'Integration',
 ] as const;
 
 export const AUDIT_ACTIONS = [
@@ -41,6 +41,9 @@ export interface AuditQuery extends ResourceQuery {
   entity_id?: number;
   action?: AuditAction;
   actor_user_id?: number;
+  actor_email?: string;
+  date_from?: string;
+  date_to?: string;
 }
 
 // Actor and tenant identity are deliberately absent: the backend derives them

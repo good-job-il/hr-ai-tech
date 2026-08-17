@@ -16,7 +16,14 @@ export const AGENCY_ADMIN_NAV = [
       { id: 'jobs-hold', labelKey: 'nav.agency.jobsHold', route: '/agency/jobs/hold' },
     ],
   },
-  { id: 'agency-crm', labelKey: 'nav.agency.crm', route: '/agency/crm', icon: ContactRound },
+  {
+    id: 'agency-crm', labelKey: 'nav.agency.crm', route: '/agency/crm', icon: ContactRound,
+    children: [
+      { id: 'agency-crm-all', labelKey: 'nav.recruiter.allCandidates', route: '/agency/crm/all' },
+      { id: 'agency-crm-active', labelKey: 'nav.recruiter.activeCandidates', route: '/agency/crm/active' },
+      { id: 'agency-crm-pipeline', labelKey: 'nav.recruiter.pipelineCandidates', route: '/agency/crm/pipeline' },
+    ],
+  },
   { id: 'agency-pipeline', labelKey: 'nav.agency.pipeline', route: '/agency/pipeline', icon: Kanban },
   { id: 'agency-ai-matching', labelKey: 'nav.agency.aiMatching', route: '/agency/ai-matching', icon: Sparkles },
 
@@ -65,7 +72,14 @@ export const AGENCY_RECRUITER_NAV = [
 export const AGENCY_TEAM_MANAGER_NAV = [
   { id: 'tm-dashboard', labelKey: 'nav.teamManager.dashboard', route: '/agency/team/dashboard', icon: LayoutDashboard },
   { id: 'tm-jobs', labelKey: 'nav.teamManager.jobs', route: '/agency/team/jobs', icon: Briefcase },
-  { id: 'tm-crm', labelKey: 'nav.teamManager.crm', route: '/agency/team/crm', icon: ContactRound },
+  {
+    id: 'tm-crm', labelKey: 'nav.teamManager.crm', route: '/agency/team/crm', icon: ContactRound,
+    children: [
+      { id: 'tm-crm-all', labelKey: 'nav.recruiter.allCandidates', route: '/agency/team/crm/all' },
+      { id: 'tm-crm-active', labelKey: 'nav.recruiter.activeCandidates', route: '/agency/team/crm/active' },
+      { id: 'tm-crm-pipeline', labelKey: 'nav.recruiter.pipelineCandidates', route: '/agency/team/crm/pipeline' },
+    ],
+  },
   { id: 'tm-pipeline', labelKey: 'nav.teamManager.pipeline', route: '/agency/team/pipeline', icon: Kanban },
   { id: 'tm-compensation', labelKey: 'nav.teamManager.compensation', route: '/agency/team/compensation', icon: DollarSign },
   { id: 'tm-ai', labelKey: 'nav.teamManager.aiMatching', route: '/agency/team/ai-matching', icon: Sparkles },

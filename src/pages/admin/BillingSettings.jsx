@@ -1,133 +1,35 @@
-import { CreditCard, DollarSign, Receipt, TrendingUp, Users, Briefcase } from 'lucide-react';
-import { useAuth } from '@/lib/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { AlertCircle, Briefcase, CreditCard, Download, Receipt, Sparkles, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { billingService } from '@/api/services/billingService';
+import { PlatformCard, PlatformEmptyState, PlatformPageHeader, PlatformPageShell, PlatformStatCard, PlatformWidgetHeader } from '@/components/platform/PlatformUI';
 
-function StatCard({ icon: Icon, label, value, color = '#7C3AED' }) {
-  return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 flex items-center gap-4">
-      <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: color + '15' }}>
-        <Icon className="w-6 h-6" style={{ color }} />
-      </div>
-      <div>
-        <div className="text-2xl font-black text-gray-900">{value}</div>
-        <div className="text-sm font-semibold text-gray-600">{label}</div>
-      </div>
-    </div>
-  );
-}
+const PLAN_NAMES = { trial: 'Trial', starter: 'Starter', pro: 'Professional', enterprise: 'Enterprise' };
+const money = (minor, currency) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: currency || 'ILS' }).format((minor || 0) / 100);
 
 export default function BillingSettings() {
-  const { user } = useAuth();
+  const { i18n } = useTranslation();
+  const isRTL = !i18n.language?.startsWith('en');
+  const { data, isLoading, error, refetch, isRefetching } = useQuery({ queryKey: ['billing-overview'], queryFn: billingService.overview, staleTime: 60_000 });
+  const text = isRTL ? { title: 'חיוב ותמחור', subtitle: 'תוכנית, מגבלות, שימוש, חשבוניות וסטטוס תשלום', plan: 'תוכנית נוכחית', jobs: 'משרות פעילות', candidates: 'מועמדים', seats: 'משתמשים', payment: 'סטטוס תשלום', invoices: 'חשבוניות', noInvoices: 'אין חשבוניות מסונכרנות', unavailable: 'ניהול תוכנית ואמצעי תשלום אינו מופעל בסביבה זו', error: 'לא ניתן לטעון נתוני חיוב', retry: 'נסה שוב', unlimited: 'ללא הגבלה', ai: 'AI Matching' } : { title: 'Billing & Plans', subtitle: 'Plan, limits, usage, invoices and payment status', plan: 'Current plan', jobs: 'Active jobs', candidates: 'Candidates', seats: 'Seats', payment: 'Payment status', invoices: 'Invoices', noInvoices: 'No synchronized invoices', unavailable: 'Plan and payment method management is not enabled in this environment', error: 'Unable to load billing data', retry: 'Try again', unlimited: 'Unlimited', ai: 'AI Matching' };
+  if (error) return <PlatformPageShell dir={isRTL ? 'rtl' : 'ltr'}><PlatformCard className="p-5"><PlatformEmptyState icon={AlertCircle} className="min-h-72"><p role="alert" className="font-bold text-slate-700">{text.error}</p><button type="button" disabled={isRefetching} onClick={() => refetch()} className="mt-4 rounded-xl border border-slate-200 bg-white px-4 py-2 font-bold text-violet-700 transition hover:border-violet-200 hover:bg-violet-50 disabled:opacity-60">{text.retry}</button></PlatformEmptyState></PlatformCard></PlatformPageShell>;
 
-  return (
-    <div dir="rtl" className="p-6 max-w-5xl mx-auto">
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <CreditCard className="w-6 h-6 text-purple-600" />
-          <h1 className="text-2xl font-black text-gray-900">חיוב ותמחור</h1>
-        </div>
-        <p className="text-sm text-gray-500">ניהול תוכניות, תשלומים וחשבוניות</p>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <StatCard icon={DollarSign} label="הכנסות חודשיות" value="₪45,280" color="#059669" />
-        <StatCard icon={Receipt} label="חשבוניות פתוחות" value="12" color="#EA580C" />
-        <StatCard icon={TrendingUp} label="צמיחה חודשית" value="+18%" color="#2563EB" />
-      </div>
-
-      {/* Pricing Plans */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-        <h2 className="font-bold text-gray-900 mb-4">תוכניות מחירים פעילות</h2>
-        <div className="grid gap-4">
-          <div className="border border-purple-200 rounded-lg p-5 bg-purple-50">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <div className="font-bold text-gray-900">תוכנית Enterprise</div>
-                  <div className="text-xs text-gray-600">לחברות גדולות עם נפח גיוס גבוה</div>
-                </div>
-              </div>
-              <span className="text-sm font-bold text-purple-700 bg-purple-100 px-3 py-1.5 rounded-full">₪2,999/חודש</span>
-            </div>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span className="flex items-center gap-1">✓ עד 50 משרות פעילות</span>
-              <span className="flex items-center gap-1">✓ AI Matching מתקדם</span>
-              <span className="flex items-center gap-1">✓ תמיכה מלאה</span>
-            </div>
-          </div>
-
-          <div className="border border-blue-200 rounded-lg p-5 bg-blue-50">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <div className="font-bold text-gray-900">תוכנית Professional</div>
-                  <div className="text-xs text-gray-600">לעסקים בינוניים</div>
-                </div>
-              </div>
-              <span className="text-sm font-bold text-blue-700 bg-blue-100 px-3 py-1.5 rounded-full">₪1,499/חודש</span>
-            </div>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span className="flex items-center gap-1">✓ עד 20 משרות פעילות</span>
-              <span className="flex items-center gap-1">✓ AI Matching בסיסי</span>
-              <span className="flex items-center gap-1">✓ תמיכה במייל</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Invoices */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h2 className="font-bold text-gray-900 mb-4">חשבוניות אחרונות</h2>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <Receipt className="w-5 h-5 text-gray-400" />
-              <div>
-                <div className="font-bold text-gray-900">חשבונית #INV-2024-001</div>
-                <div className="text-xs text-gray-500">ינואר 2024 • Enterprise</div>
-              </div>
-            </div>
-            <div className="text-left">
-              <div className="font-bold text-gray-900">₪2,999</div>
-              <div className="text-xs text-green-600 font-semibold">שולם</div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <Receipt className="w-5 h-5 text-gray-400" />
-              <div>
-                <div className="font-bold text-gray-900">חשבונית #INV-2024-002</div>
-                <div className="text-xs text-gray-500">פברואר 2024 • Enterprise</div>
-              </div>
-            </div>
-            <div className="text-left">
-              <div className="font-bold text-gray-900">₪2,999</div>
-              <div className="text-xs text-green-600 font-semibold">שולם</div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between p-4 border border-orange-100 rounded-lg bg-orange-50">
-            <div className="flex items-center gap-3">
-              <Receipt className="w-5 h-5 text-orange-400" />
-              <div>
-                <div className="font-bold text-gray-900">חשבונית #INV-2024-003</div>
-                <div className="text-xs text-gray-500">מרץ 2024 • Enterprise</div>
-              </div>
-            </div>
-            <div className="text-left">
-              <div className="font-bold text-gray-900">₪2,999</div>
-              <div className="text-xs text-orange-600 font-semibold">בהמתנה</div>
-            </div>
-          </div>
-        </div>
-      </div>
+  return <PlatformPageShell dir={isRTL ? 'rtl' : 'ltr'}><div className="space-y-6">
+    <PlatformPageHeader title={text.title} subtitle={text.subtitle} icon={CreditCard} />
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <PlatformCard className="min-h-[132px] p-5"><div className="flex items-start justify-between"><div><p className="text-[13px] font-semibold text-slate-500">{text.plan}</p><p className="mt-2 text-[28px] font-black text-slate-900">{isLoading ? '…' : data ? PLAN_NAMES[data.plan] : '—'}</p></div><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-100 text-violet-600"><CreditCard className="h-6 w-6" /></div></div></PlatformCard>
+      <PlatformStatCard icon={Briefcase} label={text.jobs} value={data?.usage.active_jobs} loading={isLoading} tone="blue" meta={limitText(data?.limits.active_jobs, text)} />
+      <PlatformStatCard icon={Users} label={text.candidates} value={data?.usage.candidates} loading={isLoading} tone="emerald" meta={limitText(data?.limits.candidates, text)} />
+      <PlatformStatCard icon={Users} label={text.seats} value={data?.usage.seats} loading={isLoading} tone="fuchsia" meta={limitText(data?.limits.seats, text)} />
     </div>
-  );
+    {data && <div className="grid gap-5 lg:grid-cols-2">
+      <PlatformCard className="p-5"><PlatformWidgetHeader title={text.plan} subtitle={PLAN_NAMES[data.plan]} /><div className="mt-5 space-y-4"><Usage label={text.jobs} value={data.usage.active_jobs} limit={data.limits.active_jobs} /><Usage label={text.candidates} value={data.usage.candidates} limit={data.limits.candidates} /><Usage label={text.seats} value={data.usage.seats} limit={data.limits.seats} /><div className="flex items-center justify-between rounded-xl bg-violet-50 p-3 text-sm font-bold text-violet-700"><span className="flex items-center gap-2"><Sparkles className="h-4 w-4" />{text.ai}</span><span>{data.limits.ai_matching ? '✓' : '—'}</span></div></div></PlatformCard>
+      <PlatformCard className="p-5"><PlatformWidgetHeader title={text.payment} subtitle={data.subscription.provider || '—'} /><div className="mt-5 space-y-3 text-sm"><StatusRow label="Subscription" value={data.subscription.status} /><StatusRow label={text.payment} value={data.subscription.payment_status} /><StatusRow label="Period end" value={data.subscription.current_period_end ? new Date(data.subscription.current_period_end).toLocaleDateString() : '—'} /></div>{!data.capabilities.plan_changes && <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-bold text-amber-800">{text.unavailable}</div>}</PlatformCard>
+    </div>}
+    <PlatformCard className="overflow-hidden"><div className="p-5"><PlatformWidgetHeader title={text.invoices} subtitle={`${data?.invoices.length || 0}`} /></div>{!data?.invoices.length ? <PlatformEmptyState icon={Receipt} className="m-5">{text.noInvoices}</PlatformEmptyState> : <div className="overflow-x-auto"><table className="w-full min-w-[680px] text-sm"><thead className="bg-slate-50 text-xs text-slate-400"><tr><th className="p-3 text-start">#</th><th>Date</th><th>Amount</th><th>Status</th><th /></tr></thead><tbody>{data.invoices.map(invoice => <tr key={invoice.id} className="border-t border-slate-100"><td className="p-3 font-bold">{invoice.invoice_number || invoice.provider_invoice_id}</td><td className="text-center">{new Date(invoice.issued_at).toLocaleDateString()}</td><td className="text-center font-bold">{money(invoice.amount_minor, invoice.currency)}</td><td className="text-center">{invoice.status}</td><td className="p-3 text-end">{(invoice.invoice_pdf_url || invoice.hosted_invoice_url) && <a href={invoice.invoice_pdf_url || invoice.hosted_invoice_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-bold text-violet-600"><Download className="h-4 w-4" />PDF</a>}</td></tr>)}</tbody></table></div>}</PlatformCard>
+  </div></PlatformPageShell>;
 }
+
+function limitText(limit, text) { return limit == null ? text.unlimited : `Limit: ${limit}`; }
+function Usage({ label, value, limit }) { const percent = limit ? Math.min(100, value / limit * 100) : 0; return <div><div className="mb-1.5 flex justify-between text-xs font-bold text-slate-600"><span>{label}</span><span>{value} / {limit ?? '∞'}</span></div><div className="h-2.5 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-blue-500" style={{ width: limit ? `${percent}%` : '12%' }} /></div></div>; }
+function StatusRow({ label, value }) { return <div className="flex items-center justify-between rounded-xl border border-slate-100 p-3"><span className="font-semibold text-slate-500">{label}</span><span className="font-black text-slate-800">{value}</span></div>; }

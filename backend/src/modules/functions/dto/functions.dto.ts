@@ -37,6 +37,7 @@ export const ImportCandidatesFromFileSchema = z.object({
   fileUrl: z.string().url(),
   batchId: z.number().int().optional().nullable(),
   fileName: z.string().optional(),
+  retryFailedOnly: z.boolean().optional().default(false),
 });
 export class ImportCandidatesFromFileDto extends createZodDto(ImportCandidatesFromFileSchema) {}
 

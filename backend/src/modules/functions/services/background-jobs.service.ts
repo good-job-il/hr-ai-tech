@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, LessThanOrEqual, Repository } from 'typeorm';
@@ -75,8 +75,10 @@ export class BackgroundJobsService {
     });
     const job = recent.find(candidate => Number(candidate.payload.batch_id) === batchId);
     if (!job) throw new NotFoundException(`No import job found for batch ${batchId}`);
+    if (job.status === 'running') throw new ConflictException('Import is already running');
     Object.assign(job, {
       status: 'pending', attempts: 0, error: null, result: null,
+      payload: { ...job.payload, retry_failed_only: true },
       run_after: new Date(), locked_at: null, completed_at: null,
     });
     this.metrics.increment('queue_retries');
@@ -130,6 +132,7 @@ export class BackgroundJobsService {
           fileUrl: String(job.payload.file_url),
           batchId: Number(job.payload.batch_id),
           fileName: job.payload.file_name ? String(job.payload.file_name) : undefined,
+          retryFailedOnly: Boolean(job.payload.retry_failed_only),
         }, user);
       } else {
         const source = await this.sources.findOne({ where: { id: Number(job.payload.source_id) } });

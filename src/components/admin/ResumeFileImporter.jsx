@@ -103,7 +103,7 @@ export default function ResumeFileImporter({ onImportComplete }) {
   const addFiles = (newFiles) => {
     const arr = Array.from(newFiles).filter(f => {
       const ext = getFileExt(f.name);
-      return ['pdf', 'doc', 'docx', 'txt'].includes(ext);
+      return ['pdf', 'doc', 'docx', 'txt'].includes(ext) && f.size <= 25 * 1024 * 1024;
     });
     setFiles(prev => {
       const existingNames = new Set(prev.map(f => f.name));

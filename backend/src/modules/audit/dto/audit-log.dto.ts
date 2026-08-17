@@ -20,5 +20,8 @@ export const QueryAuditLogsSchema = z.object({
   entity_id: z.coerce.number().int().optional(),
   action: z.enum(AUDIT_ACTIONS).optional(),
   actor_user_id: z.coerce.number().int().optional(),
+  actor_email: z.string().max(255).optional(),
+  date_from: z.coerce.date().optional(),
+  date_to: z.coerce.date().optional(),
 });
 export class QueryAuditLogsDto extends createZodDto(QueryAuditLogsSchema) {}

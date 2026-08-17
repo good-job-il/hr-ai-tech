@@ -4,6 +4,8 @@ export interface CompensationPlanRecord {
   id: number;
   organization_id: number;
   job_id: number | null;
+  employer_company_id: number | null;
+  agency_client_id: number | null;
   client_name: string;
   total_fee: number | null;
   warranty_period_days: number;
@@ -15,11 +17,13 @@ export interface CompensationPlanRecord {
 export interface CompensationPlanQuery extends ResourceQuery {
   sort?: 'created_date' | 'updated_date' | 'client_name' | 'total_fee';
   job_id?: number;
+  employer_company_id?: number;
   recruiter_id?: number;
 }
 export interface CompensationPlanInput {
   job_id?: number | null;
-  client_name: string;
+  employer_company_id?: number | null;
+  agency_client_id?: number | null;
   total_fee?: number | null;
   warranty_period_days?: number;
   recruiter_id?: number | null;

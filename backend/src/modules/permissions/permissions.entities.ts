@@ -14,6 +14,8 @@ export interface PermissionSet {
   manage_settings?: boolean;
 }
 
+export type PermissionKey = keyof PermissionSet;
+
 @Entity('permission_matrices')
 @Index(['organization_id'])
 @Index(['role_key'])

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { InterviewEntity } from './interview.entity';
 import { CreateInterviewDto, UpdateInterviewDto, QueryInterviewsDto } from './dto/interviews.dto';
 import { UserEntity } from '../users/user.entity';
@@ -9,6 +9,7 @@ import { getRlsWhere, isBlocked } from '../../common/utils/rls.utils';
 import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
 import { EmailService } from '../integrations/services/email.service';
 import { ApplicationsService } from '../applications/applications.service';
+import { ApplicationTimelineEntity } from '../applications/entities/application-timeline.entity';
 
 @Injectable()
 export class InterviewsService {
@@ -17,6 +18,7 @@ export class InterviewsService {
     private readonly repo: Repository<InterviewEntity>,
     private readonly emailService: EmailService,
     private readonly applicationsService: ApplicationsService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async findAll(query: QueryInterviewsDto, user: UserEntity) {
@@ -69,7 +71,20 @@ export class InterviewsService {
       team_manager_id: dto.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
       recruitment_manager_id: dto.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
     } as any);
-    const saved = await (this.repo.save(item) as unknown as Promise<InterviewEntity>);
+    const saved = await this.dataSource.transaction(async manager => {
+      const stored = await manager.getRepository(InterviewEntity).save(item as unknown as InterviewEntity);
+      if (stored.application_id) {
+        await manager.save(ApplicationTimelineEntity, manager.create(ApplicationTimelineEntity, {
+          application_id: stored.application_id,
+          organization_id: stored.organization_id,
+          event_type: 'interview_scheduled',
+          description: `Interview scheduled for ${stored.date} ${stored.time}`,
+          performed_by: user.email,
+          performed_by_role: user.role,
+        } as any));
+      }
+      return stored;
+    });
     await this.emailService.sendInterviewScheduled({
       candidateEmail: saved.candidate_email,
       candidateName: saved.candidate_name,
@@ -78,7 +93,7 @@ export class InterviewsService {
       time: saved.time,
       type: saved.type,
       locationOrLink: saved.location_or_link,
-    });
+    }).catch(() => undefined);
     return saved;
   }
 

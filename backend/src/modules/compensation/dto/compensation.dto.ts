@@ -5,7 +5,8 @@ const CompTypeEnum = z.enum(['fixed', 'percent']);
 
 export const CreateCompensationPlanSchema = z.object({
   job_id: z.number().int().optional().nullable(),
-  client_name: z.string().min(1),
+  employer_company_id: z.number().int().optional().nullable(),
+  agency_client_id: z.number().int().optional().nullable(),
   total_fee: z.number().optional().nullable(),
   warranty_period_days: z.number().int().default(30),
   recruiter_id: z.number().int().optional().nullable(),
@@ -30,6 +31,7 @@ export const QueryCompensationPlansSchema = z.object({
   sort: z.enum(['created_date', 'updated_date', 'client_name', 'total_fee']).default('created_date'),
   order: z.enum(['ASC', 'DESC']).default('DESC'),
   job_id: z.coerce.number().int().optional(),
+  employer_company_id: z.coerce.number().int().optional(),
   recruiter_id: z.coerce.number().int().optional(),
 });
 export class QueryCompensationPlansDto extends createZodDto(QueryCompensationPlansSchema) {}

@@ -43,6 +43,7 @@ export class ImportService {
     let duplicates = 0;
     let failed = 0;
     let missingEmail = 0;
+    const rowErrors: Array<{ row_number: number; message: string; email?: string | null; full_name?: string | null }> = [];
 
     try {
       const fileUrl = assertOwnedFileUrl(dto.fileUrl);
@@ -62,20 +63,35 @@ export class ImportService {
       const headers = (sheet.getRow(1).values as ExcelJS.CellValue[])
         .slice(1)
         .map((value) => this.cellText(value));
-      const rows: Record<string, any>[] = [];
+      let rows: Record<string, any>[] = [];
       sheet.eachRow((row, rowNumber) => {
         if (rowNumber === 1) return;
         const record: Record<string, any> = {};
         headers.forEach((header, index) => {
           if (header) record[header] = row.getCell(index + 1).value;
         });
+        record.__row_number = rowNumber;
         rows.push(record);
       });
 
+      if (dto.retryFailedOnly) {
+        const failedRows = new Set((batch.error_log || []).map(error => Number(error.row_number)).filter(Number.isFinite));
+        if (failedRows.size) rows = rows.filter(row => failedRows.has(Number(row.__row_number)));
+      }
+
       for (const row of rows) {
         try {
+          const rowNumber = Number(row.__row_number);
           const email = row.email || row.Email || row['אימייל'];
           const fullName = row.full_name || row.name || row['שם מלא'] || 'לא ידוע';
+
+          const importedRow = await this.candidateRepo.findOne({
+            where: { organization_id: user.organization_id, import_batch_id: dto.batchId, import_row_number: rowNumber },
+          });
+          if (importedRow) {
+            duplicates++;
+            continue;
+          }
 
           if (!email) missingEmail++;
 
@@ -96,25 +112,39 @@ export class ImportService {
             experience_years: row.experience_years || null,
             skills: row.skills ? String(row.skills).split(',').map((s: string) => s.trim()) : [],
             source: 'import' as any,
-            recruiter_id: dto ? user.id : null,
+            recruiter_id: batch.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
+            team_manager_id: batch.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
+            recruitment_manager_id: batch.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
             organization_id: user.organization_id,
             import_batch_id: dto.batchId,
+            import_row_number: rowNumber,
             imported_at: new Date(),
             imported_by: user.email,
           } as any);
           await this.candidateRepo.save(candidate);
           successful++;
         } catch (rowErr) {
+          if ((rowErr as any)?.code === 'ER_DUP_ENTRY') {
+            duplicates++;
+            continue;
+          }
           this.logger.warn(`Row import failed: ${(rowErr as Error).message}`);
           failed++;
+          rowErrors.push({
+            row_number: Number(row.__row_number),
+            message: (rowErr as Error).message,
+            email: row.email || row.Email || row['אימייל'] || null,
+            full_name: row.full_name || row.name || row['שם מלא'] || null,
+          });
         }
       }
 
-      batch.total_records = rows.length;
-      batch.successful_imports = successful;
+      if (!dto.retryFailedOnly) batch.total_records = rows.length;
+      batch.successful_imports = dto.retryFailedOnly ? batch.successful_imports + successful : successful;
       batch.failed_imports = failed;
-      batch.duplicate_found = duplicates;
-      batch.missing_email = missingEmail;
+      batch.duplicate_found = dto.retryFailedOnly ? batch.duplicate_found + duplicates : duplicates;
+      batch.missing_email = dto.retryFailedOnly ? batch.missing_email + missingEmail : missingEmail;
+      batch.error_log = rowErrors;
       batch.status = failed > 0 ? 'partial' : 'completed';
       batch.processing_completed_at = new Date();
       await this.batchRepo.save(batch);
@@ -123,6 +153,7 @@ export class ImportService {
     } catch (err) {
       batch.status = 'failed';
       batch.error_log = [{ message: (err as Error).message }];
+      batch.processing_completed_at = new Date();
       await this.batchRepo.save(batch);
       throw err;
     }
@@ -242,7 +273,8 @@ export class ImportService {
     for (const file of dto.files) {
       try {
         const existingDoc = await this.documentRepo.findOne({ where: { file_url: file.file_url, organization_id: user.organization_id } });
-        if (existingDoc) {
+        const existingCandidate = await this.candidateRepo.findOne({ where: { resume_url: file.file_url, organization_id: user.organization_id } });
+        if (existingDoc || existingCandidate) {
           duplicates++;
           results.push({ filename: file.filename, status: 'duplicate' });
           continue;
@@ -274,6 +306,7 @@ export class ImportService {
 
         await this.documentRepo.save(
           this.documentRepo.create({
+            organization_id: user.organization_id,
             candidate_id: saved.id,
             candidate_email: saved.email,
             doc_type: 'resume',

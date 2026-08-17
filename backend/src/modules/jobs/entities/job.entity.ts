@@ -5,6 +5,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Index(['organization_id'])
 @Index(['recruiter_id'])
 @Index(['is_closed'])
+@Index(['state'])
 @Index(['is_deleted'])
 @Index(['domain_id'])
 export class JobEntity extends BaseEntity {
@@ -81,6 +82,9 @@ export class JobEntity extends BaseEntity {
 
   @Column({ name: 'is_closed', type: 'boolean', default: false })
   is_closed: boolean;
+
+  @Column({ type: 'enum', enum: ['draft', 'open', 'on_hold', 'filled', 'closed'], default: 'open' })
+  state: 'draft' | 'open' | 'on_hold' | 'filled' | 'closed';
 
   @Column({ name: 'is_anonymous', type: 'boolean', default: false })
   is_anonymous: boolean;

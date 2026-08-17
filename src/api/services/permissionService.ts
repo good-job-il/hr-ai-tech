@@ -26,6 +26,14 @@ export interface PermissionMatrixRecord {
   permissions: PermissionSet;
 }
 
+export interface EffectivePermissionsResponse {
+  organization_id: number | null;
+  org_type: OrganizationType | null;
+  role_key: string;
+  source: 'organization' | 'template' | 'platform_admin' | 'none';
+  permissions: Required<PermissionSet>;
+}
+
 export interface PermissionMatrixQuery extends ResourceQuery {
   organization_id?: number;
   org_type?: OrganizationType;
@@ -103,6 +111,10 @@ function mutableCollection<TEntity, TQuery extends object, TCreate, TUpdate>(end
 export const permissionMatrixService = mutableCollection<
   PermissionMatrixRecord, PermissionMatrixQuery, CreatePermissionMatrixInput, UpdatePermissionMatrixInput
 >('/permission-matrices');
+
+export const effectivePermissionService = {
+  get: () => httpClient.get<EffectivePermissionsResponse>('/permissions/effective', { cache: false }),
+};
 
 export const roleTemplateService = mutableCollection<
   RoleTemplateRecord, RoleTemplateQuery, CreateRoleTemplateInput, UpdateRoleTemplateInput

@@ -41,6 +41,7 @@ export enum ConversionStatus {
 @Index(['status'])
 @Index(['email'])
 @Index(['is_deleted'])
+@Index(['organization_id', 'import_batch_id', 'import_row_number'], { unique: true })
 export class CandidateEntity extends BaseEntity {
   @Column({ name: 'organization_id', type: 'int', nullable: true })
   organization_id: number | null;
@@ -163,6 +164,9 @@ export class CandidateEntity extends BaseEntity {
   @Column({ name: 'import_batch_id', type: 'int', nullable: true })
   import_batch_id: number | null;
 
+  @Column({ name: 'import_row_number', type: 'int', nullable: true })
+  import_row_number: number | null;
+
   @Column({ name: 'data_quality_score', type: 'int', default: 0 })
   data_quality_score: number;
 
@@ -197,4 +201,3 @@ export class CandidateEntity extends BaseEntity {
   @Column({ name: 'deleted_by', type: 'int', nullable: true })
   deleted_by: number | null;
 }
-

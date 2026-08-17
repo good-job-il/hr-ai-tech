@@ -25,6 +25,24 @@ import {
 import { UserEntity } from '../users/user.entity';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
+import { AuditService } from '../audit/audit.service';
+
+const EMPTY_PERMISSIONS = {
+  view: false,
+  create: false,
+  update: false,
+  delete: false,
+  export: false,
+  download_cv: false,
+  view_compensation: false,
+  edit_compensation: false,
+  manage_users: false,
+  manage_settings: false,
+};
+
+const FULL_PERMISSIONS = Object.fromEntries(
+  Object.keys(EMPTY_PERMISSIONS).map((key) => [key, true]),
+) as typeof EMPTY_PERMISSIONS;
 
 @Injectable()
 export class PermissionsService {
@@ -39,6 +57,7 @@ export class PermissionsService {
     private readonly accessRepo: Repository<UserPositionAccessEntity>,
     @InjectRepository(PositionEntity)
     private readonly positionRepo: Repository<PositionEntity>,
+    private readonly audit: AuditService,
   ) {}
 
   private isPrivileged(user: UserEntity) {
@@ -54,6 +73,57 @@ export class PermissionsService {
       throw new ForbiddenException('Organization context is required');
     }
     return { organizationId: user.organization_id, orgType: user.org_type };
+  }
+
+  async getEffectivePermissions(user: UserEntity) {
+    if (this.isPrivileged(user)) {
+      return {
+        organization_id: null,
+        org_type: null,
+        role_key: user.role,
+        source: 'platform_admin' as const,
+        permissions: { ...FULL_PERMISSIONS },
+      };
+    }
+
+    const { organizationId, orgType } = this.requireOrganizationContext(user);
+    const [override, template] = await Promise.all([
+      this.matrixRepo.findOne({
+        where: { organization_id: organizationId, role_key: user.role, is_template: false },
+        order: { updated_date: 'DESC' },
+      }),
+      this.matrixRepo.findOne({
+        where: { organization_id: IsNull(), org_type: orgType, role_key: user.role, is_template: true },
+        order: { updated_date: 'DESC' },
+      }),
+    ]);
+    const source = override ? 'organization' : template ? 'template' : 'none';
+    return {
+      organization_id: organizationId,
+      org_type: orgType,
+      role_key: user.role,
+      source,
+      permissions: { ...EMPTY_PERMISSIONS, ...(override?.permissions ?? template?.permissions ?? {}) },
+    };
+  }
+
+  private async logSecurityChange(
+    user: UserEntity,
+    entityType: 'PermissionMatrix' | 'RoleTemplate',
+    entityId: number,
+    action: 'permission_update' | 'role_display_name_update',
+    metadata: Record<string, any>,
+  ) {
+    await this.audit.log({
+      organization_id: user.organization_id == null ? null : String(user.organization_id),
+      actor_user_id: String(user.id),
+      actor_email: user.email,
+      actor_role: user.role,
+      entity_type: entityType,
+      entity_id: entityId,
+      action,
+      metadata,
+    });
   }
 
   // ─── Permission Matrix ────────────────────────────────────────────────────
@@ -98,7 +168,13 @@ export class PermissionsService {
       org_type: this.isPrivileged(user) ? dto.org_type : context!.orgType,
       is_template: this.isPrivileged(user) ? dto.is_template : false,
     } as any);
-    return this.matrixRepo.save(matrix) as unknown as Promise<PermissionMatrixEntity>;
+    const saved = await this.matrixRepo.save(matrix) as unknown as PermissionMatrixEntity;
+    await this.logSecurityChange(user, 'PermissionMatrix', saved.id, 'permission_update', {
+      role_key: saved.role_key,
+      before: null,
+      after: saved.permissions,
+    });
+    return saved;
   }
 
   async updateMatrix(id: number, dto: UpdatePermissionMatrixDto, user: UserEntity): Promise<PermissionMatrixEntity> {
@@ -109,11 +185,25 @@ export class PermissionsService {
       if (!this.isOrganizationAdministrator(user) || matrix.organization_id !== organizationId || matrix.is_template) {
         throw new ForbiddenException('Access denied');
       }
+      const before = matrix.permissions;
       matrix.permissions = dto.permissions ?? matrix.permissions;
-      return this.matrixRepo.save(matrix);
+      const saved = await this.matrixRepo.save(matrix);
+      await this.logSecurityChange(user, 'PermissionMatrix', saved.id, 'permission_update', {
+        role_key: saved.role_key,
+        before,
+        after: saved.permissions,
+      });
+      return saved;
     }
+    const before = matrix.permissions;
     Object.assign(matrix, dto);
-    return this.matrixRepo.save(matrix);
+    const saved = await this.matrixRepo.save(matrix);
+    await this.logSecurityChange(user, 'PermissionMatrix', saved.id, 'permission_update', {
+      role_key: saved.role_key,
+      before,
+      after: saved.permissions,
+    });
+    return saved;
   }
 
   async removeMatrix(id: number, user: UserEntity): Promise<void> {
@@ -153,7 +243,13 @@ export class PermissionsService {
       organization_id: this.isPrivileged(user) ? dto.organization_id : context!.organizationId,
       org_type: this.isPrivileged(user) ? dto.org_type : context!.orgType,
     } as any);
-    return this.templateRepo.save(tpl) as unknown as Promise<RoleTemplateEntity>;
+    const saved = await this.templateRepo.save(tpl) as unknown as RoleTemplateEntity;
+    await this.logSecurityChange(user, 'RoleTemplate', saved.id, 'role_display_name_update', {
+      system_role_key: saved.system_role_key,
+      before: null,
+      after: saved.display_name,
+    });
+    return saved;
   }
 
   async updateRoleTemplate(id: number, dto: UpdateRoleTemplateDto, user: UserEntity): Promise<RoleTemplateEntity> {
@@ -164,11 +260,25 @@ export class PermissionsService {
       if (!this.isOrganizationAdministrator(user) || tpl.organization_id !== organizationId) {
         throw new ForbiddenException('Access denied');
       }
+      const before = tpl.display_name;
       if (dto.display_name !== undefined) tpl.display_name = dto.display_name;
-      return this.templateRepo.save(tpl);
+      const saved = await this.templateRepo.save(tpl);
+      await this.logSecurityChange(user, 'RoleTemplate', saved.id, 'role_display_name_update', {
+        system_role_key: saved.system_role_key,
+        before,
+        after: saved.display_name,
+      });
+      return saved;
     }
+    const before = tpl.display_name;
     Object.assign(tpl, dto);
-    return this.templateRepo.save(tpl);
+    const saved = await this.templateRepo.save(tpl);
+    await this.logSecurityChange(user, 'RoleTemplate', saved.id, 'role_display_name_update', {
+      system_role_key: saved.system_role_key,
+      before,
+      after: saved.display_name,
+    });
+    return saved;
   }
 
   async removeRoleTemplate(id: number, user: UserEntity): Promise<void> {

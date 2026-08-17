@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, In, Like, Not } from 'typeorm';
 import { CandidateEntity } from './entities/candidate.entity';
 import { CandidateNoteEntity } from './entities/candidate-note.entity';
 import { CandidateTagEntity } from './entities/candidate-tag.entity';
@@ -20,6 +20,7 @@ import {
   UpdateCandidateProfileDto,
 } from './dto/candidates.dto';
 import { UserEntity } from '../users/user.entity';
+import { ApplicationEntity } from '../applications/entities/application.entity';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { getRlsWhere, isBlocked } from '../../common/utils/rls.utils';
 import {
@@ -48,12 +49,15 @@ export class CandidatesService {
     private readonly accessRepo: Repository<CandidateAccessEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
+    @InjectRepository(ApplicationEntity)
+    private readonly applicationRepo: Repository<ApplicationEntity>,
   ) {}
 
   // ─── Candidates ──────────────────────────────────────────────────────────
   async findAll(query: QueryCandidatesDto, user: UserEntity) {
     const { page, limit, sort, order, search, status, domain_id, role_id,
-      recruiter_id, team_manager_id, is_deleted, parsing_status, review_required, import_batch_id } = query;
+      recruiter_id, team_manager_id, is_deleted, parsing_status, review_required, import_batch_id,
+      active, in_pipeline } = query;
 
     const rlsWhere = getRlsWhere('Candidate', {
       id: user.id, role: user.role, organization_id: user.organization_id,
@@ -73,6 +77,25 @@ export class CandidatesService {
     if (parsing_status) where.parsing_status = parsing_status;
     if (review_required !== undefined) where.review_required = review_required;
     if (import_batch_id) where.import_batch_id = import_batch_id;
+    if (active && status && ['hired', 'rejected', 'inactive'].includes(status)) {
+      return buildPaginatedResponse([], 0, { page, limit });
+    }
+    if (active && !status) where.status = Not(In(['hired', 'rejected', 'inactive']));
+    if (in_pipeline) {
+      const applicationScope = getRlsWhere('Application', {
+        id: user.id, role: user.role, organization_id: user.organization_id,
+        employer_company_id: user.employer_company_id, email: user.email,
+        impersonating: user.impersonating,
+      });
+      if (isBlocked(applicationScope)) return buildPaginatedResponse([], 0, { page, limit });
+      const applications = await this.applicationRepo.find({
+        where: { ...applicationScope, status: Not(In(['completed', 'rejected'])) } as any,
+        select: { candidate_id: true },
+      });
+      const candidateIds = [...new Set(applications.map(item => item.candidate_id).filter((id): id is number => id != null))];
+      if (!candidateIds.length) return buildPaginatedResponse([], 0, { page, limit });
+      where.id = In(candidateIds);
+    }
 
     const { skip, take } = getSkipTake(page, limit);
 
@@ -81,6 +104,8 @@ export class CandidatesService {
       findWhere = [
         { ...where, full_name: Like(`%${search}%`) },
         { ...where, email: Like(`%${search}%`) },
+        { ...where, role_name: Like(`%${search}%`) },
+        { ...where, domain_name: Like(`%${search}%`) },
       ];
     }
 

@@ -4,7 +4,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ApplicationsService } from './applications.service';
-import { AssignCandidateDto, ChangeApplicationStatusDto, CreateApplicationDto, SubmitApplicationDto, UpdateApplicationDto, QueryApplicationsDto } from './dto/applications.dto';
+import { AddApplicationNoteDto, AssignCandidateDto, ChangeApplicationStatusDto, CreateApplicationDto, ReopenApplicationDto, SubmitApplicationDto, UpdateApplicationDto, QueryApplicationsDto } from './dto/applications.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
@@ -46,7 +46,20 @@ export class ApplicationsController {
   @Patch(':id/status')
   @Roles(...APPLICATION_MANAGE_ROLES)
   changeStatus(@Param('id', ParseIntPipe) id: number, @Body() dto: ChangeApplicationStatusDto, @CurrentUser() u: UserEntity) {
-    return this.svc.changeStatus(id, dto.status, u);
+    return this.svc.changeStatus(id, dto.status, dto.reason, u);
+  }
+
+  @Post(':id/reopen')
+  @Roles(...APPLICATION_MANAGE_ROLES)
+  reopen(@Param('id', ParseIntPipe) id: number, @Body() dto: ReopenApplicationDto, @CurrentUser() u: UserEntity) {
+    return this.svc.reopen(id, dto.status, dto.reason, u);
+  }
+
+  @Post(':id/notes')
+  @Roles(...APPLICATION_MANAGE_ROLES)
+  @HttpCode(HttpStatus.CREATED)
+  addNote(@Param('id', ParseIntPipe) id: number, @Body() dto: AddApplicationNoteDto, @CurrentUser() u: UserEntity) {
+    return this.svc.addNote(id, dto.content, u);
   }
 
   @Delete(':id')

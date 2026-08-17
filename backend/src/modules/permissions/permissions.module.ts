@@ -8,7 +8,10 @@ import {
   PositionEntity,
 } from './permissions.entities';
 import { PermissionsService } from './permissions.service';
+import { EffectivePermissionsGuard } from './effective-permissions.guard';
+import { AuditModule } from '../audit/audit.module';
 import {
+  EffectivePermissionsController,
   PermissionMatrixController,
   RoleTemplateController,
   RoleAliasController,
@@ -18,6 +21,7 @@ import {
 
 @Module({
   imports: [
+    AuditModule,
     TypeOrmModule.forFeature([
       PermissionMatrixEntity,
       RoleTemplateEntity,
@@ -27,14 +31,14 @@ import {
     ]),
   ],
   controllers: [
+    EffectivePermissionsController,
     PermissionMatrixController,
     RoleTemplateController,
     RoleAliasController,
     UserPositionAccessController,
     PositionController,
   ],
-  providers: [PermissionsService],
-  exports: [PermissionsService, TypeOrmModule],
+  providers: [PermissionsService, EffectivePermissionsGuard],
+  exports: [PermissionsService, EffectivePermissionsGuard, TypeOrmModule],
 })
 export class PermissionsModule {}
-

@@ -15,12 +15,14 @@ export interface JobQuery extends ResourceQuery {
   domain_id?: number;
   type?: Job['type'];
   is_closed?: boolean;
+  state?: JobState;
   is_deleted?: boolean;
   seniority?: JobSeniority;
   recommended_for?: number;
 }
 
 export type JobSeniority = 'junior' | 'mid' | 'senior' | 'lead' | 'manager' | 'director' | 'any';
+export type JobState = 'draft' | 'open' | 'on_hold' | 'filled' | 'closed';
 
 export interface CreateJobInput {
   title: string;
@@ -41,6 +43,7 @@ export interface CreateJobInput {
   role_id?: number | null;
   specialization_id?: number | null;
   is_closed?: boolean;
+  state?: JobState;
   is_anonymous?: boolean;
   show_company_name?: boolean;
   show_company_info?: boolean;
@@ -68,8 +71,8 @@ export interface UpdateJobInput extends Partial<CreateJobInput> {
 
 export class JobService extends ResourceService<Job, JobQuery, CreateJobInput, UpdateJobInput> {
   constructor() { super('/jobs'); }
-  close(id: number | string) { return this.update(id, { is_closed: true }); }
-  reopen(id: number | string) { return this.update(id, { is_closed: false }); }
+  close(id: number | string) { return httpClient.post<Job>(`/jobs/${id}/close`); }
+  reopen(id: number | string) { return httpClient.post<Job>(`/jobs/${id}/reopen`); }
   incrementViews(id: number | string) { return httpClient.post<void>(`/jobs/${id}/view`); }
 }
 

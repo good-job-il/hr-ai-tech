@@ -4,7 +4,7 @@
  * Includes: batch history, per-batch stats, retry, validation test
  */
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { candidateImportService } from '@/api/services/candidateImportService';
 import { fileService } from '@/api/services/fileService';
 import { useAuth } from '@/lib/AuthContext';
@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 import ResumeFileImporter from '@/components/admin/ResumeFileImporter';
+import { PlatformCard, PlatformPageHeader, PlatformPageShell, PlatformStatCard } from '@/components/platform/PlatformUI';
 
 // ── 3 validation test candidates ─────────────────────────────────────────────
 const TEST_CSV = `full_name,email,phone,role_name,domain_name,location,experience_years,skills,summary,resume_url
@@ -27,14 +28,17 @@ const TEST_CSV = `full_name,email,phone,role_name,domain_name,location,experienc
 
 const STATUS_CONFIG = {
   pending:     { label: 'ממתין',    color: 'bg-gray-100 text-gray-600',   icon: Clock },
+  processing:  { label: 'בתהליך',  color: 'bg-yellow-100 text-yellow-700', icon: RefreshCw },
   in_progress: { label: 'בתהליך',  color: 'bg-yellow-100 text-yellow-700', icon: RefreshCw },
   completed:   { label: 'הושלם',   color: 'bg-green-100 text-green-700',  icon: CheckCircle2 },
+  partial:     { label: 'הושלם חלקית', color: 'bg-orange-100 text-orange-700', icon: AlertTriangle },
   failed:      { label: 'נכשל',    color: 'bg-red-100 text-red-700',      icon: XCircle },
 };
 
 export default function ImportDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState('resume'); // 'resume' | 'csv'
   const [file, setFile] = useState(null);
@@ -43,13 +47,14 @@ export default function ImportDashboard() {
   const [expandedBatch, setExpandedBatch] = useState(null);
   const [runningValidation, setRunningValidation] = useState(false);
   const [validationResult, setValidationResult] = useState(null);
+  const showValidationTools = import.meta.env.DEV && user?.role === 'admin';
 
   const { data: batches = [], refetch } = useQuery({
     queryKey: ['import-batches'],
     queryFn: () => candidateImportService.list({ sort: 'created_date', order: 'DESC', limit: 50 }),
     refetchInterval: (query) => {
       const data = query.state?.data;
-      const hasActive = Array.isArray(data) && data.some(b => b.status === 'in_progress');
+      const hasActive = Array.isArray(data) && data.some(b => ['pending', 'processing', 'in_progress'].includes(b.status));
       return hasActive ? 4000 : false;
     },
   });
@@ -57,13 +62,21 @@ export default function ImportDashboard() {
   // ── File upload & import ──────────────────────────────────────────────────
   const handleUpload = async () => {
     if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+      setUploadMsg({ type: 'error', text: 'CSV files only' });
+      return;
+    }
+    if (file.size > 100 * 1024 * 1024) {
+      setUploadMsg({ type: 'error', text: 'File exceeds the 100MB limit' });
+      return;
+    }
     setUploading(true);
     setUploadMsg(null);
     try {
       const { file_url } = await fileService.upload(file);
       const batch = await candidateImportService.create({
         batch_name: `${file.name.replace(/\.[^/.]+$/, '')} — ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: he })}`,
-        source_file: file.name,
+        source_file: file_url,
         file_type: file.name.endsWith('.csv') ? 'csv' : file.name.endsWith('.json') ? 'json' : 'xlsx',
         recruiter_id: user?.id,
         team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
@@ -125,8 +138,27 @@ export default function ImportDashboard() {
   const retryBatch = async (batch) => {
     if (!batch.source_file) return;
     setUploadMsg({ type: 'success', text: `מנסה שוב batch: ${batch.batch_name}...` });
-    await candidateImportService.retryBatch(batch.id);
-    refetch();
+    try {
+      const queued = await candidateImportService.retryBatch(batch.id);
+      const result = await candidateImportService.waitForJob(queued.id);
+      setUploadMsg({
+        type: 'success',
+        text: `Retry completed: ${result.successful} succeeded • ${result.failed} failed • ${result.duplicates} duplicates`,
+      });
+      await refetch();
+    } catch (error) {
+      setUploadMsg({ type: 'error', text: error?.message || 'Retry failed' });
+    }
+  };
+
+  const downloadErrorReport = (batch) => {
+    const errors = Array.isArray(batch.error_log) ? batch.error_log : [];
+    const escape = value => `"${String(value ?? '').replaceAll('"', '""')}"`;
+    const csv = ['row_number,full_name,email,message', ...errors.map(error => [error.row_number, error.full_name, error.email, error.message].map(escape).join(','))].join('\n');
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    link.href = url; link.download = `import-errors-${batch.id}.csv`; link.click();
+    URL.revokeObjectURL(url);
   };
 
   // ── CSV template download ─────────────────────────────────────────────────
@@ -145,47 +177,33 @@ export default function ImportDashboard() {
   const totalParsingFailed = batches.reduce((s, b) => s + (b.parsing_failures || 0), 0);
 
   return (
-    <div dir="rtl" className="p-4 md:p-6">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <PlatformPageShell dir="rtl">
+      <div className="mx-auto max-w-5xl space-y-6">
 
         {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-2xl font-black text-[#0F172A]">דשבורד ייבואים</h1>
-            <p className="text-sm text-[#64748B] mt-0.5">ייבוא מועמדים → CRM → ATS → AI Matching</p>
-          </div>
-          <Button size="sm" variant="outline" onClick={downloadTemplate} className="gap-1.5 text-xs">
+        <PlatformPageHeader
+          title="דשבורד ייבואים"
+          subtitle="ייבוא מועמדים → CRM → ATS → AI Matching"
+          icon={Upload}
+          actions={<Button size="sm" variant="outline" onClick={downloadTemplate} className="gap-1.5 text-xs">
             <Download className="w-3.5 h-3.5" /> הורד תבנית CSV
-          </Button>
-        </div>
+          </Button>}
+        />
 
         {/* Summary stats */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
           {[
-            { label: 'אצוות', value: batches.length, color: '#7C3AED', icon: FileText },
-            { label: 'יובאו', value: totalImported, color: '#10B981', icon: Users },
-            { label: 'כפילויות', value: totalDuplicates, color: '#F59E0B', icon: Info },
-            { label: 'כשלונות', value: totalFailed, color: '#EF4444', icon: XCircle },
-            { label: 'המרה נכשלה', value: totalConversionFailed, color: '#F97316', icon: RefreshCw },
-            { label: 'Parsing נכשל', value: totalParsingFailed, color: '#8B5CF6', icon: FileScan },
-          ].map(s => {
-            const Icon = s.icon;
-            return (
-              <div key={s.label} className="bg-white rounded-2xl border border-[#E4ECFF] p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${s.color}15` }}>
-                  <Icon className="w-5 h-5" style={{ color: s.color }} />
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-[#0F172A]">{s.value}</div>
-                  <div className="text-xs text-[#94A3B8] font-semibold">{s.label}</div>
-                </div>
-              </div>
-            );
-          })}
+            { label: 'אצוות', value: batches.length, tone: 'violet', icon: FileText },
+            { label: 'יובאו', value: totalImported, tone: 'emerald', icon: Users },
+            { label: 'כפילויות', value: totalDuplicates, tone: 'amber', icon: Info },
+            { label: 'כשלונות', value: totalFailed, tone: 'rose', icon: XCircle },
+            { label: 'המרה נכשלה', value: totalConversionFailed, tone: 'amber', icon: RefreshCw },
+            { label: 'Parsing נכשל', value: totalParsingFailed, tone: 'fuchsia', icon: FileScan },
+          ].map(stat => <PlatformStatCard key={stat.label} {...stat} className="min-h-[118px] p-4" />)}
         </div>
 
         {/* Import Tabs */}
-        <div className="bg-white rounded-2xl border border-[#E4ECFF] overflow-hidden">
+        <PlatformCard className="overflow-hidden">
           {/* Tab header */}
           <div className="flex border-b border-[#E4ECFF]">
             <button
@@ -254,10 +272,11 @@ export default function ImportDashboard() {
               </div>
             )}
           </div>
-        </div>
+        </PlatformCard>
 
         {/* Validation Test */}
-        <div className="bg-white rounded-2xl border border-[#E4ECFF] p-6">
+        {showValidationTools && (
+        <PlatformCard className="p-6">
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="font-black text-[#0F172A]">בדיקת אימות</h2>
@@ -292,10 +311,11 @@ export default function ImportDashboard() {
               )}
             </div>
           )}
-        </div>
+        </PlatformCard>
+        )}
 
         {/* Batch History */}
-        <div className="bg-white rounded-2xl border border-[#E4ECFF] p-6">
+        <PlatformCard className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-black text-[#0F172A]">היסטוריית אצוות</h2>
             <Button size="sm" variant="outline" onClick={() => refetch()} className="gap-1.5 text-xs">
@@ -331,7 +351,7 @@ export default function ImportDashboard() {
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${cfg.color}`}>{cfg.label}</span>
-                        {batch.status === 'failed' && (
+                        {(batch.status === 'failed' || (batch.status === 'partial' && batch.failed_imports > 0)) && (
                           <button onClick={e => { e.stopPropagation(); retryBatch(batch); }}
                             className="text-xs font-bold text-[#7C3AED] hover:underline flex items-center gap-1">
                             <RefreshCw className="w-3 h-3" /> retry
@@ -358,14 +378,15 @@ export default function ImportDashboard() {
                             </div>
                           ))}
                         </div>
-                        {batch.error_log && (
+                        {Array.isArray(batch.error_log) && batch.error_log.length > 0 && (
                           <div className="mt-3 p-3 bg-red-50 rounded-xl border border-red-100">
                             <p className="text-xs font-bold text-red-700 mb-1">שגיאות:</p>
-                            <pre className="text-xs text-red-600 whitespace-pre-wrap max-h-32 overflow-y-auto">{batch.error_log}</pre>
+                            <pre className="text-xs text-red-600 whitespace-pre-wrap max-h-32 overflow-y-auto">{JSON.stringify(batch.error_log, null, 2)}</pre>
+                            <button onClick={() => downloadErrorReport(batch)} className="mt-2 flex items-center gap-1 text-xs font-bold text-red-700 hover:underline"><Download className="h-3.5 w-3.5" /> Download error report</button>
                           </div>
                         )}
                         <div className="mt-2 flex gap-2">
-                          <button onClick={() => navigate('/admin/crm')}
+                          <button onClick={() => navigate(`${location.pathname.startsWith('/agency/team/') ? '/agency/team/crm' : '/agency/crm'}?importBatchId=${batch.id}`)}
                             className="text-xs font-bold text-[#7C3AED] hover:underline flex items-center gap-1">
                             <Eye className="w-3.5 h-3.5" /> צפה במועמדים ב-CRM
                           </button>
@@ -377,8 +398,8 @@ export default function ImportDashboard() {
               })}
             </div>
           )}
-        </div>
+        </PlatformCard>
       </div>
-    </div>
+    </PlatformPageShell>
   );
 }

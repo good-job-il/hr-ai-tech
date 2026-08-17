@@ -7,6 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
+import { AlertCircle, Building2 } from 'lucide-react';
+import {
+  PlatformCard,
+  PlatformPageHeader,
+  PlatformPageShell,
+} from '@/components/platform/PlatformUI';
 
 /**
  * AgencyOnboarding
@@ -66,71 +72,73 @@ export default function AgencyOnboarding() {
 
   if (isLoadingAuth) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#F7FBFF]">
-        <div className="w-8 h-8 border-4 border-[#E4ECFF] border-t-[#7C3AED] rounded-full animate-spin" />
+      <div className="fixed inset-0 flex items-center justify-center bg-[#F7FBFF]" role="status" aria-live="polite">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#E4ECFF] border-t-[#7C3AED]" aria-hidden="true" />
+        <span className="sr-only">{isRtl ? 'טוען' : 'Loading'}</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12" dir={isRtl ? 'rtl' : 'ltr'} style={{ background: 'linear-gradient(135deg, #eaf7fb 0%, #d4edfa 100%)' }}>
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
-          <div className="text-center mb-6">
-            <div className="text-4xl mb-3">🎯</div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              {isRtl ? 'הקמת חברת ההשמה שלך' : 'Set up your staffing agency'}
-            </h1>
-            <p className="text-sm text-gray-600">
-              {isRtl
-                ? 'עוד צעד אחד קטן — הקם את הארגון שלך כדי להתחיל לגייס'
-                : 'One last step — create your organization to start recruiting'}
-            </p>
-          </div>
+    <PlatformPageShell
+      dir={isRtl ? 'rtl' : 'ltr'}
+      className="m-0 flex min-h-screen items-center justify-center p-4 sm:p-6"
+    >
+      <div className="w-full max-w-lg space-y-5">
+        <PlatformPageHeader
+          title={isRtl ? 'הקמת חברת ההשמה שלך' : 'Set up your staffing agency'}
+          subtitle={isRtl
+            ? 'עוד צעד אחד קטן — הקם את הארגון שלך כדי להתחיל לגייס'
+            : 'One last step — create your organization to start recruiting'}
+          icon={Building2}
+          className="justify-center text-center sm:flex-col"
+        />
+        <PlatformCard className="p-6 sm:p-8">
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3 mb-6 flex gap-2">
-              <span>⚠️</span>
+            <div className="mb-6 flex gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm font-semibold text-rose-700" role="alert">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
               <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label className="text-sm font-semibold text-gray-700 block mb-2">
+              <Label htmlFor="agency-name" className="mb-2 block text-sm font-semibold text-slate-700">
                 {isRtl ? 'שם חברת ההשמה' : 'Agency name'}
               </Label>
               <Input
+                id="agency-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="h-11 border-gray-300"
+                className="h-11 border-slate-200 focus-visible:ring-violet-200"
                 placeholder={isRtl ? 'לדוגמה: השמה פרו בע"מ' : 'e.g. Acme Staffing Ltd.'}
               />
             </div>
             <div>
-              <Label className="text-sm font-semibold text-gray-700 block mb-2">
+              <Label htmlFor="agency-contact-email" className="mb-2 block text-sm font-semibold text-slate-700">
                 {isRtl ? 'אימייל ליצירת קשר (אופציונלי)' : 'Contact email (optional)'}
               </Label>
               <Input
+                id="agency-contact-email"
                 type="email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
-                className="h-11 border-gray-300"
+                className="h-11 border-slate-200 focus-visible:ring-violet-200"
                 placeholder="agency@example.com"
                 dir="ltr"
               />
             </div>
-            <Button type="submit" disabled={loading} className="w-full bg-red-600 hover:bg-red-700 text-white h-12 font-bold text-base rounded-lg">
+            <Button type="submit" disabled={loading} className="h-12 w-full rounded-xl bg-violet-600 text-base font-bold text-white hover:bg-violet-700">
               {loading
                 ? (isRtl ? 'יוצר ארגון...' : 'Creating organization...')
                 : (isRtl ? 'צור את הארגון שלי' : 'Create my organization')}
             </Button>
           </form>
-        </div>
+        </PlatformCard>
       </div>
-    </div>
+    </PlatformPageShell>
   );
 }
-

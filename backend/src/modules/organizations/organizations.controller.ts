@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { OrganizationsService } from './organizations.service';
@@ -22,6 +23,8 @@ import {
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import { BlockDuringImpersonation } from "@/common/decorators/block-during-impersonation.decorator";
 import { UserEntity } from '../users/user.entity';
+import { RequiresPermission } from '../../common/decorators/requires-permission.decorator';
+import { EffectivePermissionsGuard } from '../permissions/effective-permissions.guard';
 
 @ApiTags('Organizations')
 @ApiBearerAuth()
@@ -70,6 +73,8 @@ export class OrganizationsController {
   }
 
   @Patch(':id')
+  @UseGuards(EffectivePermissionsGuard)
+  @RequiresPermission('manage_settings')
   @ApiOperation({ summary: 'Update organization' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -90,4 +95,3 @@ export class OrganizationsController {
     return this.service.remove(id, user);
   }
 }
-

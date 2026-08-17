@@ -4,7 +4,6 @@
  */
 import React, { useState, useEffect } from 'react';
 import { permissionMatrixService } from '@/api/services/permissionService';
-import { auditService } from '@/api/services/auditService';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Save, RefreshCw, ShieldCheck, Lock, ShieldAlert } from 'lucide-react';
@@ -47,6 +46,7 @@ export default function PermissionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState({});     // { role_key: boolean }
 
@@ -107,8 +107,6 @@ export default function PermissionsPage() {
     const existing = allRecords.find(r =>
       r.organization_id === orgId && r.role_key === roleKey && !r.is_template
     );
-    const oldPerms = existing?.permissions || allRecords.find(r => r.is_template && r.role_key === roleKey)?.permissions || emptyPerms();
-
     let savedRecord;
     if (existing) {
       savedRecord = await permissionMatrixService.update(existing.id, { permissions: perms });
@@ -122,15 +120,6 @@ export default function PermissionsPage() {
       });
     }
 
-    // Audit log
-    await auditService.create({
-      entity_type: 'Organization',
-      entity_id: orgId || 0,
-      entity_label: `Role Permissions: ${roleKey}`,
-      action: 'permission_update',
-      metadata: { role_key: roleKey, before: oldPerms, after: perms },
-    });
-
     invalidatePermissionMatrixCache({ organizationId: orgId, roleKey });
 
     return savedRecord;
@@ -138,11 +127,17 @@ export default function PermissionsPage() {
 
   const handleSaveAll = async () => {
     setSaving(true);
+    setSaveError(false);
     const dirtyRoles = Object.keys(dirty).filter(k => dirty[k]);
-    await Promise.all(dirtyRoles.map(roleKey => saveRole(roleKey)));
-    await load();
-    setSaving(false);
-    setSaved(true);
+    try {
+      await Promise.all(dirtyRoles.map(roleKey => saveRole(roleKey)));
+      await load();
+      setSaved(true);
+    } catch {
+      setSaveError(true);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!canEdit) {
@@ -191,6 +186,7 @@ export default function PermissionsPage() {
             </button>
           </div>}
           <button onClick={load} disabled={loading}
+            aria-label={t('common.retry', { defaultValue: 'Reload permissions' })}
             className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-violet-200 hover:bg-violet-50">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -216,6 +212,12 @@ export default function PermissionsPage() {
         <PlatformStatCard icon={Save} label={t('permissionsMatrix.modified')} value={Object.keys(dirty).filter(key => dirty[key]).length} tone={hasDirty ? 'amber' : 'emerald'} meta={saved ? t('permissionsMatrix.saved') : t('permissionsMatrix.saveChanges')} />
       </div>
 
+      {saveError && (
+        <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm font-bold text-rose-700">
+          {t('common.saveError', { defaultValue: 'Unable to save changes. Please try again.' })}
+        </div>
+      )}
+
       {loading ? (
         <PlatformCard className="p-16 text-center text-slate-400">{t('permissionsMatrix.loading')}</PlatformCard>
       ) : error ? (
@@ -226,6 +228,7 @@ export default function PermissionsPage() {
                 ? t('permissionsMatrix.accessDenied')
                 : t('common.loadError', { defaultValue: 'Unable to load permissions' })}
             </p>
+            {error.status !== 403 && <Button className="mt-4" variant="outline" onClick={load}>{t('common.retry')}</Button>}
           </PlatformEmptyState>
         </PlatformCard>
       ) : (
@@ -260,8 +263,11 @@ export default function PermissionsPage() {
                   {PERM_KEYS.map(permKey => (
                     <td key={permKey} className="px-3 py-4 text-center">
                       <button
+                        type="button"
                         onClick={() => toggle(roleKey, permKey)}
                         disabled={!canEdit}
+                        aria-pressed={Boolean(matrix[roleKey]?.[permKey])}
+                        aria-label={`${roleLabel(roleKey)} — ${t(`permissionsMatrix.perms.${permKey}`)}`}
                         className={`mx-auto flex h-7 w-7 items-center justify-center rounded-lg border-2 transition-all
                           ${matrix[roleKey]?.[permKey]
                             ? 'gradient-brand border-[#6C4DFF] text-white shadow-[0_4px_10px_rgba(99,72,210,0.28)]'

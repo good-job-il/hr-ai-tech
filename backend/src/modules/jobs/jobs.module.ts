@@ -7,9 +7,10 @@ import { JobsService } from './jobs.service';
 import { JobsController, PublicJobsController } from './jobs.controller';
 import { AgencyClientEntity } from '../agency-clients/agency-client.entity';
 import { CompanyEntity } from '../companies/company.entity';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([
+  imports: [AuditModule, TypeOrmModule.forFeature([
     JobEntity,
     SavedJobEntity,
     JobAlertEntity,

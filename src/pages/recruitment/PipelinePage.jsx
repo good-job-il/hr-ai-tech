@@ -181,6 +181,7 @@ export default function PipelinePage() {
         onStageChange={(appId, newStage) => {
           if (canUpdate) moveApplication(appId, newStage);
         }}
+        onApplicationUpdated={refresh}
         canChangeStage={canUpdate}
       />
       </div>

@@ -5,6 +5,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 @Index(['organization_id'])
 @Index(['job_id'])
 @Index(['candidate_id'])
+@Index(['organization_id', 'job_id', 'candidate_id'], { unique: true })
 @Index(['candidate_user_id'])
 @Index(['recruiter_id'])
 @Index(['status'])
@@ -47,8 +48,8 @@ export class ApplicationEntity extends BaseEntity {
   @Column({ name: 'candidate_name', type: 'varchar', length: 255 })
   candidate_name: string;
 
-  @Column({ name: 'candidate_email', type: 'varchar', length: 255 })
-  candidate_email: string;
+  @Column({ name: 'candidate_email', type: 'varchar', length: 255, nullable: true })
+  candidate_email: string | null;
 
   @Column({ name: 'candidate_phone', type: 'varchar', length: 50, nullable: true })
   candidate_phone: string | null;

@@ -32,7 +32,7 @@ export interface CreateApplicationInput {
   team_manager_id?: number | null;
   recruitment_manager_id?: number | null;
   candidate_name: string;
-  candidate_email: string;
+  candidate_email?: string | null;
   candidate_phone?: string | null;
   resume_url?: string | null;
   resume_filename?: string | null;
@@ -62,7 +62,7 @@ export interface UpdateApplicationInput extends Partial<CreateApplicationInput> 
 export interface ApplicationTimelineRecord {
   id: number;
   application_id: number;
-  event_type: 'submitted' | 'status_changed' | 'note_added' | 'interview_scheduled' | 'interview_completed' | 'offer_made' | 'rejected' | 'assigned' | 'resume_viewed';
+  event_type: 'submitted' | 'status_changed' | 'note_added' | 'message_sent' | 'interview_scheduled' | 'interview_completed' | 'offer_made' | 'rejected' | 'assigned' | 'resume_viewed';
   previous_value: string | null;
   new_value: string | null;
   description: string;
@@ -73,10 +73,15 @@ export interface ApplicationTimelineRecord {
 
 export class ApplicationService extends ResourceService<Application, ApplicationQuery, CreateApplicationInput, UpdateApplicationInput> {
   constructor() { super('/applications'); }
-  updateStatus(id: number | string, status: ApplicationStatus) {
-    return httpClient.patch<Application>(`/applications/${id}/status`, { status });
+  updateStatus(id: number | string, status: ApplicationStatus, reason?: string) {
+    return httpClient.patch<Application>(`/applications/${id}/status`, { status, reason });
   }
-  addNote(id: number | string, notes: string) { return this.update(id, { notes }); }
+  reopen(id: number | string, status: Exclude<ApplicationStatus, 'completed' | 'rejected'>, reason: string) {
+    return httpClient.post<Application>(`/applications/${id}/reopen`, { status, reason });
+  }
+  addNote(id: number | string, content: string) {
+    return httpClient.post<Application>(`/applications/${id}/notes`, { content });
+  }
   assign(id: number | string, assigned_to: number) { return this.update(id, { assigned_to }); }
   timeline(id: number | string) {
     return httpClient.get<ApplicationTimelineRecord[]>(`/applications/${id}/timeline`, { cache: false });

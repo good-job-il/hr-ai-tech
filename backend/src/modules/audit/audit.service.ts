@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { AuditLogEntity } from './audit-log.entity';
 import { CreateAuditLogDto, QueryAuditLogsDto } from './dto/audit-log.dto';
 import { UserEntity } from '../users/user.entity';
@@ -15,7 +15,7 @@ export class AuditService {
   ) {}
 
   async findAll(query: QueryAuditLogsDto, user: UserEntity) {
-    const { page, limit, sort, order, entity_type, entity_id, action, actor_user_id } = query;
+    const { page, limit, sort, order, entity_type, entity_id, action, actor_user_id, actor_email, date_from, date_to } = query;
     const where: Record<string, any> = {};
 
     // Only admin sees all logs; others are scoped to their org
@@ -26,6 +26,10 @@ export class AuditService {
     if (entity_id) where.entity_id = entity_id;
     if (action) where.action = action;
     if (actor_user_id) where.actor_user_id = actor_user_id;
+    if (actor_email) where.actor_email = Like(`%${actor_email}%`);
+    if (date_from && date_to) where.created_date = Between(date_from, date_to);
+    else if (date_from) where.created_date = MoreThanOrEqual(date_from);
+    else if (date_to) where.created_date = LessThanOrEqual(date_to);
 
     const { skip, take } = getSkipTake(page, limit);
     const [data, total] = await this.repo.findAndCount({

@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -18,6 +19,8 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserEntity } from './user.entity';
 import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
+import { RequiresPermission } from '../../common/decorators/requires-permission.decorator';
+import { EffectivePermissionsGuard } from '../permissions/effective-permissions.guard';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -59,6 +62,8 @@ export class UsersController {
   @Post('invite')
   @HttpCode(HttpStatus.CREATED)
   @Roles(UserRole.ADMIN, UserRole.ORG_ADMIN)
+  @UseGuards(EffectivePermissionsGuard)
+  @RequiresPermission('manage_users')
   @ApiOperation({ summary: 'Invite a user into the current organization' })
   invite(@Body() dto: InviteOrganizationUserDto, @CurrentUser() user: UserEntity) {
     return this.usersService.invite(dto, user);
@@ -66,6 +71,8 @@ export class UsersController {
 
   @Patch(':id')
   @Roles(UserRole.ADMIN, UserRole.ORG_ADMIN)
+  @UseGuards(EffectivePermissionsGuard)
+  @RequiresPermission('manage_users')
   @ApiOperation({ summary: 'Update user' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -78,6 +85,8 @@ export class UsersController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Roles(UserRole.ADMIN, UserRole.ORG_ADMIN)
+  @UseGuards(EffectivePermissionsGuard)
+  @RequiresPermission('manage_users')
   @ApiOperation({ summary: 'Delete a user (admin only)' })
   async remove(
     @Param('id', ParseIntPipe) id: number,

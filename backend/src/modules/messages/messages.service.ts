@@ -1,17 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { MessageEntity } from './message.entity';
 import { CreateMessageDto, UpdateMessageDto, QueryMessagesDto } from './dto/messages.dto';
 import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
 import { UserEntity } from '../users/user.entity';
 import { ApplicationsService } from '../applications/applications.service';
+import { ApplicationTimelineEntity } from '../applications/entities/application-timeline.entity';
 
 @Injectable()
 export class MessagesService {
   constructor(
     @InjectRepository(MessageEntity) private readonly repo: Repository<MessageEntity>,
     private readonly applications: ApplicationsService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async findAll(query: QueryMessagesDto, user: UserEntity) {
@@ -34,7 +36,7 @@ export class MessagesService {
   }
 
   async create(dto: CreateMessageDto, user: UserEntity): Promise<MessageEntity> {
-    await this.applications.findById(dto.application_id, user);
+    const application = await this.applications.findById(dto.application_id, user);
     // Prevent identity spoofing: sender identity is always derived from the authenticated user,
     // never trusted from the request body.
     const msg = this.repo.create({
@@ -43,7 +45,18 @@ export class MessagesService {
       sender_role: user.role === 'candidate' ? 'candidate' : user.role === 'employer' ? 'employer' : 'recruiter',
       is_read: false,
     } as any);
-    return this.repo.save(msg) as unknown as Promise<MessageEntity>;
+    return this.dataSource.transaction(async manager => {
+      const saved = await manager.getRepository(MessageEntity).save(msg as unknown as MessageEntity);
+      await manager.save(ApplicationTimelineEntity, manager.create(ApplicationTimelineEntity, {
+        application_id: application.id,
+        organization_id: application.organization_id,
+        event_type: 'message_sent',
+        description: 'Message sent in the application conversation',
+        performed_by: user.email,
+        performed_by_role: user.role,
+      } as any));
+      return saved;
+    });
   }
 
   async update(id: number, dto: UpdateMessageDto, user: UserEntity): Promise<MessageEntity> {

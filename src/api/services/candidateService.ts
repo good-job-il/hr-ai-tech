@@ -22,6 +22,8 @@ export interface CandidateQuery extends ResourceQuery {
   parsing_status?: ParsingStatus;
   review_required?: boolean;
   import_batch_id?: number;
+  active?: boolean;
+  in_pipeline?: boolean;
 }
 
 export interface CreateCandidateInput {

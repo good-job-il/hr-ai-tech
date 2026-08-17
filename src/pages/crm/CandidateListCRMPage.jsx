@@ -37,7 +37,7 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [hasMore, setHasMore] = useState(false);
-  const [lastCandidateId, setLastCandidateId] = useState(null);
+  const [page, setPage] = useState(1);
   const [appendLoading, setAppendLoading] = useState(false);
   
   const isRTL = i18n.language === 'he';
@@ -57,17 +57,25 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
       // VISIBILITY POLICY — CandidateListCRMPage
       // PERFORMANCE: Paginated loading with 50 records per page
       // ───────────────────────────────────────────────────────────────────────
-      const filter = {};
+      const filter = { search: search.trim() || undefined };
+      const importBatchId = new URLSearchParams(location.search).get('importBatchId');
+      if (importBatchId) filter.import_batch_id = Number(importBatchId);
       if (statusFilter !== 'all') filter.status = statusFilter;
+      const routeMode = location.pathname.split('/').pop();
+      if (routeMode === 'active') filter.active = true;
+      if (routeMode === 'pipeline') filter.in_pipeline = true;
 
       if (isAgencyUser(user)) {
         Object.assign(filter, getAgencyScopeFilter(user));
       }
 
-      const data = await candidateService.list({ ...filter, sort: 'created_date', order: 'DESC', limit: PAGE_SIZE });
-      setHasMore(data.length === PAGE_SIZE);
-      if (data.length > 0) setLastCandidateId(data[data.length - 1].id);
-      setCandidates(previous => append ? [...previous, ...data] : data);
+      const requestedPage = append ? page + 1 : 1;
+      const response = await candidateService.listPage({ ...filter, page: requestedPage, sort: 'created_date', order: 'DESC', limit: PAGE_SIZE });
+      setHasMore(response.pagination.hasNextPage);
+      setPage(requestedPage);
+      setCandidates(previous => append
+        ? [...new Map([...previous, ...response.data].map(candidate => [candidate.id, candidate])).values()]
+        : response.data);
     } catch (requestError) {
       setError({
         status: requestError?.status || requestError?.response?.status || null,
@@ -86,19 +94,10 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
       if (user) loadCandidates();
     }, 300);
     return () => clearTimeout(timer);
-  }, [statusFilter, user?.id, location.key]);
+  }, [statusFilter, search, user?.id, location.pathname, location.search, location.key]);
 
   // Performance: Memoized filtering
-  const filtered = React.useMemo(() => {
-    if (!search) return candidates;
-    const searchLower = search.toLowerCase();
-    return candidates.filter(c =>
-      c.full_name?.toLowerCase().includes(searchLower) ||
-      c.email?.toLowerCase().includes(searchLower) ||
-      c.role_name?.toLowerCase().includes(searchLower) ||
-      c.domain_name?.toLowerCase().includes(searchLower)
-    );
-  }, [candidates, search]);
+  const filtered = candidates;
 
   const activeCount = useMemo(
     () => candidates.filter(candidate => !['hired', 'rejected', 'inactive'].includes(candidate.status)).length,
@@ -193,7 +192,7 @@ export default function CandidateListCRMPage({ candidateRoute = '/crm/candidate'
               {/* Infinite Scroll Loading */}
               {hasMore && (
                 <div className="p-4 text-center text-gray-400 text-sm">
-                  {loading ? (
+                  {appendLoading ? (
                     <div className="flex items-center justify-center gap-2">
                       <RefreshCw className="w-4 h-4 animate-spin" />
                       {t('crm.loadingMore')}

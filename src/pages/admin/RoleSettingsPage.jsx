@@ -5,7 +5,6 @@
  */
 import React, { useState, useEffect } from 'react';
 import { roleTemplateService } from '@/api/services/permissionService';
-import { auditService } from '@/api/services/auditService';
 import { useAuth } from '@/lib/AuthContext';
 import { Input } from '@/components/ui/input';
 import { RefreshCw, Users, Lock, Pencil, Check, X, ShieldAlert } from 'lucide-react';
@@ -163,8 +162,6 @@ export default function RoleSettingsPage() {
   };
 
   const handleSave = async (record, newDisplayName) => {
-    const oldName = record.display_name;
-
     // Check if org-specific override exists
     const existing = records.find(r =>
       r.organization_id === orgId &&
@@ -188,21 +185,6 @@ export default function RoleSettingsPage() {
         is_active: record.is_active,
       });
     }
-
-    // AuditLog
-    await auditService.create({
-      entity_type: 'Organization',
-      entity_id: orgId || 0,
-      entity_label: `שם תפקיד: ${record.system_role_key}`,
-      action: 'role_display_name_update',
-      metadata: {
-        system_role_key: record.system_role_key,
-        before: oldName,
-        after: newDisplayName,
-        organization_id: orgId,
-        actor_user_id: user?.id,
-      },
-    });
 
     await load();
     setSavedMsg(t('roleSettings.saved', { name: newDisplayName }));

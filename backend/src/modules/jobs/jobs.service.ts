@@ -12,6 +12,7 @@ import { buildPaginatedResponse, getSkipTake } from '../../common/utils/paginati
 import { OrgType } from '../../common/enums/org-type.enum';
 import { AgencyClientEntity } from '../agency-clients/agency-client.entity';
 import { CompanyEntity } from '../companies/company.entity';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class JobsService {
@@ -21,17 +22,18 @@ export class JobsService {
     @InjectRepository(JobAlertEntity) private readonly alertRepo: Repository<JobAlertEntity>,
     @InjectRepository(AgencyClientEntity) private readonly agencyClientRepo: Repository<AgencyClientEntity>,
     @InjectRepository(CompanyEntity) private readonly companyRepo: Repository<CompanyEntity>,
+    private readonly audit: AuditService,
   ) {}
 
   async findAll(query: QueryJobsDto, user?: UserEntity) {
     const { page, limit, sort, order, search, organization_id, employer_company_id,
-      recruiter_id, domain_id, type, is_closed, is_deleted } = query;
+      recruiter_id, domain_id, type, state, is_closed, is_deleted } = query;
 
     const rlsWhere = user ? getRlsWhere('Job', {
       id: user.id, role: user.role, organization_id: user.organization_id,
       employer_company_id: user.employer_company_id, email: user.email,
       impersonating: user.impersonating,
-    }) : { is_closed: false, is_deleted: false };
+    }) : { state: 'open', is_deleted: false };
 
     if (isBlocked(rlsWhere)) return buildPaginatedResponse([], 0, { page, limit });
 
@@ -43,7 +45,8 @@ export class JobsService {
     if (recruiter_id && !('recruiter_id' in rlsWhere)) where.recruiter_id = recruiter_id;
     if (domain_id) where.domain_id = domain_id;
     if (type) where.type = type;
-    if (is_closed !== undefined && !('is_closed' in rlsWhere)) where.is_closed = is_closed;
+    if (state && user) where.state = state;
+    if (is_closed !== undefined && user && !('is_closed' in rlsWhere)) where.is_closed = is_closed;
     if (is_deleted !== undefined && !('is_deleted' in rlsWhere)) where.is_deleted = is_deleted;
 
     const { skip, take } = getSkipTake(page, limit);
@@ -67,7 +70,7 @@ export class JobsService {
       id: user.id, role: user.role, organization_id: user.organization_id,
       employer_company_id: user.employer_company_id, email: user.email,
       impersonating: user.impersonating,
-    }) : { is_closed: false, is_deleted: false };
+    }) : { state: 'open', is_deleted: false };
     if (isBlocked(rlsWhere)) throw new NotFoundException(`Job ${id} not found`);
     const job = await this.jobRepo.findOne({ where: { ...rlsWhere, id } as any });
     if (!job) throw new NotFoundException(`Job ${id} not found`);
@@ -75,6 +78,7 @@ export class JobsService {
   }
 
   async create(dto: CreateJobDto, user: UserEntity): Promise<JobEntity> {
+    this.assertValidJob(dto);
     const clientCompany = await this.resolveAgencyClientCompany(dto.employer_company_id, user);
     const job = this.jobRepo.create({
       ...dto,
@@ -89,6 +93,8 @@ export class JobsService {
       recruiter_id: dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
       team_manager_id: dto.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
       recruitment_manager_id: dto.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
+      state: dto.state ?? (dto.is_closed ? 'closed' : 'open'),
+      is_closed: dto.state ? ['filled', 'closed'].includes(dto.state) : dto.is_closed,
     } as any);
     return this.jobRepo.save(job) as unknown as Promise<JobEntity>;
   }
@@ -100,17 +106,49 @@ export class JobsService {
       user,
     );
     Object.assign(job, dto);
+    if (dto.state) job.is_closed = ['filled', 'closed'].includes(dto.state);
+    else if (dto.is_closed !== undefined) job.state = dto.is_closed ? 'closed' : 'open';
     if (clientCompany) {
       job.employer_company_id = clientCompany.id;
       job.company = clientCompany.name;
       job.company_initials = clientCompany.initials;
       job.company_color = clientCompany.color;
     }
+    this.assertValidJob(job);
     if (dto.is_deleted && !job.deleted_at) {
       job.deleted_at = new Date();
       job.deleted_by = user.id;
     }
     return this.jobRepo.save(job) as unknown as Promise<JobEntity>;
+  }
+
+  async changeState(id: number, state: JobEntity['state'], user: UserEntity) {
+    const job = await this.findById(id, user);
+    const previous = job.state;
+    job.state = state;
+    job.is_closed = ['filled', 'closed'].includes(state);
+    const saved = await this.jobRepo.save(job);
+    await this.audit.log({
+      organization_id: saved.organization_id == null ? null : String(saved.organization_id),
+      actor_user_id: String(user.id),
+      actor_email: user.email,
+      actor_role: user.role,
+      entity_type: 'Job',
+      entity_id: saved.id,
+      entity_label: saved.title,
+      action: 'status_change',
+      metadata: { previous_state: previous, state },
+    });
+    return saved;
+  }
+
+  private assertValidJob(job: Partial<JobEntity | CreateJobDto>) {
+    if (job.salary_min != null && job.salary_max != null && job.salary_min > job.salary_max) {
+      throw new BadRequestException('salary_min cannot be greater than salary_max');
+    }
+    if (job.show_contact_details && !job.contact_email && !job.contact_phone) {
+      throw new BadRequestException('Contact email or phone is required when contact details are visible');
+    }
   }
 
   async softDelete(id: number, user: UserEntity): Promise<void> {

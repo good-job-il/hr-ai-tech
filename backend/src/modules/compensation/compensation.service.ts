@@ -11,12 +11,22 @@ import { UserEntity } from '../users/user.entity';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { OrgType } from '../../common/enums/org-type.enum';
 import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
+import { JobEntity } from '../jobs/entities/job.entity';
+import { AgencyClientEntity } from '../agency-clients/agency-client.entity';
+import { CompanyEntity } from '../companies/company.entity';
+import { UserEntity as OrganizationUserEntity } from '../users/user.entity';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class CompensationService {
   constructor(
     @InjectRepository(CompensationPlanEntity)
     private readonly repo: Repository<CompensationPlanEntity>,
+    @InjectRepository(JobEntity) private readonly jobs: Repository<JobEntity>,
+    @InjectRepository(AgencyClientEntity) private readonly clients: Repository<AgencyClientEntity>,
+    @InjectRepository(CompanyEntity) private readonly companies: Repository<CompanyEntity>,
+    @InjectRepository(OrganizationUserEntity) private readonly users: Repository<OrganizationUserEntity>,
+    private readonly audit: AuditService,
   ) {}
 
   /** Only staffing_agency org_type (or admin) may access compensation plans */
@@ -29,12 +39,15 @@ export class CompensationService {
 
   async findAll(query: QueryCompensationPlansDto, user: UserEntity) {
     this.assertAgencyAccess(user);
-    const { page, limit, sort, order, job_id, recruiter_id } = query;
+    const { page, limit, sort, order, job_id, employer_company_id, recruiter_id } = query;
     const where: Record<string, any> = {};
     if (user.role !== UserRole.ADMIN) {
       where.organization_id = user.organization_id;
+      if (user.role === UserRole.RECRUITER) where.recruiter_id = user.id;
+      if (user.role === UserRole.TEAM_MANAGER) where.team_manager_id = user.id;
     }
     if (job_id) where.job_id = job_id;
+    if (employer_company_id) where.employer_company_id = employer_company_id;
     if (recruiter_id) where.recruiter_id = recruiter_id;
 
     const { skip, take } = getSkipTake(page, limit);
@@ -62,22 +75,69 @@ export class CompensationService {
 
   async create(dto: CreateCompensationPlanDto, user: UserEntity): Promise<CompensationPlanEntity> {
     this.assertAgencyAccess(user);
+    const relations = await this.resolveRelations(dto, user);
     const plan = this.repo.create({
       ...dto,
+      ...relations,
       organization_id: user.organization_id,
       created_by_role: user.role,
     } as any);
-    return this.repo.save(plan) as unknown as Promise<CompensationPlanEntity>;
+    const saved = await this.repo.save(plan) as unknown as CompensationPlanEntity;
+    await this.logChange(saved, user, null);
+    return saved;
   }
 
   async update(id: number, dto: UpdateCompensationPlanDto, user: UserEntity): Promise<CompensationPlanEntity> {
     const plan = await this.findById(id, user);
+    const before = { ...plan };
+    const relations = await this.resolveRelations({ ...plan, ...dto }, user);
     Object.assign(plan, dto);
-    return this.repo.save(plan);
+    Object.assign(plan, relations);
+    const saved = await this.repo.save(plan);
+    await this.logChange(saved, user, before);
+    return saved;
   }
 
   async remove(id: number, user: UserEntity): Promise<void> {
     const plan = await this.findById(id, user);
+    await this.logChange(plan, user, { ...plan }, 'delete');
     await this.repo.remove(plan);
+  }
+
+  private async resolveRelations(dto: Record<string, any>, user: UserEntity) {
+    if (!user.organization_id && user.role !== UserRole.ADMIN) throw new ForbiddenException('Organization context required');
+    const organizationId = user.organization_id;
+    const job = dto.job_id
+      ? await this.jobs.findOne({ where: user.role === UserRole.ADMIN ? { id: dto.job_id } : { id: dto.job_id, organization_id: organizationId } })
+      : null;
+    if (dto.job_id && !job) throw new NotFoundException(`Job ${dto.job_id} not found`);
+    const companyId = dto.employer_company_id ?? job?.employer_company_id;
+    if (!companyId) throw new ForbiddenException('An agency client or job is required');
+    if (job?.employer_company_id !== companyId) throw new ForbiddenException('Job and client do not belong together');
+    const client = await this.clients.findOne({
+      where: { organization_id: organizationId!, company_id: companyId, status: 'active' },
+    });
+    if (!client && user.role !== UserRole.ADMIN) throw new ForbiddenException('The selected company is not an active agency client');
+    const company = await this.companies.findOne({ where: { id: companyId, is_deleted: false } });
+    if (!company) throw new NotFoundException(`Company ${companyId} not found`);
+    const assigneeIds = [dto.recruiter_id, dto.team_manager_id, dto.recruitment_manager_id].filter((id): id is number => id != null);
+    for (const id of assigneeIds) {
+      const member = await this.users.findOne({ where: { id, organization_id: organizationId } });
+      if (!member) throw new ForbiddenException(`User ${id} belongs to another organization`);
+    }
+    return {
+      employer_company_id: companyId,
+      agency_client_id: client?.id ?? dto.agency_client_id ?? null,
+      client_name: company.name,
+    };
+  }
+
+  private async logChange(plan: CompensationPlanEntity, user: UserEntity, before: unknown, action = 'compensation_change') {
+    await this.audit.log({
+      organization_id: plan.organization_id == null ? null : String(plan.organization_id),
+      actor_user_id: String(user.id), actor_email: user.email, actor_role: user.role,
+      entity_type: 'CompensationPlan', entity_id: plan.id, entity_label: plan.client_name,
+      action, metadata: { before, after: action === 'delete' ? null : plan },
+    });
   }
 }

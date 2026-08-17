@@ -16,6 +16,7 @@ import {
   buildPaginatedResponse,
   getSkipTake,
 } from '../../common/utils/pagination.utils';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class UsersService {
@@ -23,7 +24,27 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private readonly repo: Repository<UserEntity>,
     private readonly emailService: EmailService,
+    private readonly audit: AuditService,
   ) {}
+
+  private async logUserAdminChange(
+    actor: UserEntity,
+    target: UserEntity,
+    action: 'create' | 'update' | 'delete' | 'deactivate',
+    metadata: Record<string, any>,
+  ) {
+    await this.audit.log({
+      organization_id: target.organization_id == null ? null : String(target.organization_id),
+      actor_user_id: String(actor.id),
+      actor_email: actor.email,
+      actor_role: actor.role,
+      entity_type: 'User',
+      entity_id: target.id,
+      entity_label: target.email,
+      action,
+      metadata,
+    });
+  }
 
   async findAll(query: QueryUsersDto, requestingUser: UserEntity) {
     const { page, limit, sort, order, role, organization_id, is_active, search } = query;
@@ -108,8 +129,13 @@ export class UsersService {
       if (dto.role === UserRole.ADMIN || dto.role === UserRole.ORG_ADMIN) throw new ForbiddenException('Role cannot be assigned');
     }
 
+    const before = { role: user.role, organization_id: user.organization_id, is_active: user.is_active };
     Object.assign(user, dto);
     const saved = await this.repo.save(user);
+    await this.logUserAdminChange(requestingUser, saved, 'update', {
+      before,
+      after: { role: saved.role, organization_id: saved.organization_id, is_active: saved.is_active },
+    });
     return this.sanitize(saved);
   }
 
@@ -134,6 +160,7 @@ export class UsersService {
     });
     const saved = await this.repo.save(user);
     await this.emailService.sendStaffInvite({ email, fullName: saved.full_name, token });
+    await this.logUserAdminChange(requestingUser, saved, 'create', { role: saved.role });
     return this.sanitize(saved);
   }
 
@@ -186,8 +213,10 @@ export class UsersService {
       }
       user.is_active = false;
       await this.repo.save(user);
+      await this.logUserAdminChange(requestingUser, user, 'deactivate', { is_active: false });
       return;
     }
+    await this.logUserAdminChange(requestingUser, user, 'delete', { role: user.role });
     await this.repo.remove(user);
   }
 

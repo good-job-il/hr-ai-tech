@@ -36,6 +36,8 @@ import { CommunicationLogEntity, EmployerTimelineEntity } from '../modules/commu
 import { ImportSourceEntity } from '../modules/import-sources/import-source.entity';
 import { BackgroundJobEntity } from '../modules/functions/entities/background-job.entity';
 import { SalaryDataEntity } from '../modules/salary/salary-data.entity';
+import { BillingAccountEntity, BillingInvoiceEntity } from '../modules/billing/billing.entities';
+import { IntegrationConnectionEntity } from '../modules/integrations/integration-connection.entity';
 import {
   PermissionMatrixEntity,
   RoleTemplateEntity,
@@ -101,6 +103,9 @@ export default new DataSource({
     RoleAliasEntity,
     UserPositionAccessEntity,
     PositionEntity,
+    BillingAccountEntity,
+    BillingInvoiceEntity,
+    IntegrationConnectionEntity,
   ],
   migrations: ['src/migrations/*.ts'],
   migrationsTableName: 'migrations_history',

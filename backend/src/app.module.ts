@@ -26,6 +26,8 @@ import { AgencyClientsModule } from './modules/agency-clients/agency-clients.mod
 import { AgencyTeamsModule } from './modules/agency-teams/agency-teams.module';
 import { HealthController } from './common/controllers/health.controller';
 import { MonitoringModule } from './common/monitoring/monitoring.module';
+import { ReportsModule } from './modules/reports/reports.module';
+import { BillingModule } from './modules/billing/billing.module';
 
 @Module({
   controllers: [HealthController],
@@ -57,6 +59,8 @@ import { MonitoringModule } from './common/monitoring/monitoring.module';
     CompaniesModule,
     AgencyClientsModule,
     AgencyTeamsModule,
+    ReportsModule,
+    BillingModule,
     // Phase 4
     FunctionsModule,
     // Phase 5

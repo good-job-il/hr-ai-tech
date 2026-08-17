@@ -6,9 +6,10 @@ import { AgencyInvitationEntity } from './agency-invitation.entity';
 import { AgencyTeamEntity } from './agency-team.entity';
 import { AgencyTeamsController } from './agency-teams.controller';
 import { AgencyTeamsService } from './agency-teams.service';
+import { PermissionsModule } from '../permissions/permissions.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, AgencyTeamEntity, AgencyInvitationEntity]), AuditModule],
+  imports: [TypeOrmModule.forFeature([UserEntity, AgencyTeamEntity, AgencyInvitationEntity]), AuditModule, PermissionsModule],
   controllers: [AgencyTeamsController], providers: [AgencyTeamsService], exports: [AgencyTeamsService],
 })
 export class AgencyTeamsModule {}

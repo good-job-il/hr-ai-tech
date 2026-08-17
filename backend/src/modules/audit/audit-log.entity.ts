@@ -5,6 +5,7 @@ export const AUDIT_ENTITY_TYPES = [
   'Candidate', 'Application', 'Job', 'Company', 'CandidateDocument',
   'CompensationPlan', 'User', 'Organization', 'Interview', 'CommunicationLog',
   'AgencyTeam', 'AgencyInvitation',
+  'PermissionMatrix', 'RoleTemplate', 'Billing', 'Integration',
 ] as const;
 
 export const AUDIT_ACTIONS = [

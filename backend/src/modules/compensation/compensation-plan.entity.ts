@@ -4,6 +4,8 @@ import { BaseEntity } from '../../common/entities/base.entity';
 @Entity('compensation_plans')
 @Index(['organization_id'])
 @Index(['job_id'])
+@Index(['employer_company_id'])
+@Index(['agency_client_id'])
 export class CompensationPlanEntity extends BaseEntity {
   @Column({ name: 'organization_id', type: 'int', nullable: true })
   organization_id: number | null;
@@ -11,6 +13,13 @@ export class CompensationPlanEntity extends BaseEntity {
   @Column({ name: 'job_id', type: 'int', nullable: true })
   job_id: number | null;
 
+  @Column({ name: 'employer_company_id', type: 'int', nullable: true })
+  employer_company_id: number | null;
+
+  @Column({ name: 'agency_client_id', type: 'int', nullable: true })
+  agency_client_id: number | null;
+
+  /** Display-only snapshot. Relationships use employer_company_id/agency_client_id. */
   @Column({ name: 'client_name', type: 'varchar', length: 255 })
   client_name: string;
 
@@ -57,4 +66,3 @@ export class CompensationPlanEntity extends BaseEntity {
   @Column({ name: 'created_by_role', type: 'varchar', length: 50, nullable: true })
   created_by_role: string | null;
 }
-

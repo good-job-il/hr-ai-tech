@@ -13,7 +13,7 @@ export const CreateApplicationSchema = z.object({
   team_manager_id: z.number().int().optional().nullable(),
   recruitment_manager_id: z.number().int().optional().nullable(),
   candidate_name: z.string().min(1),
-  candidate_email: z.string().email(),
+  candidate_email: z.string().email().optional().nullable(),
   candidate_phone: z.string().optional().nullable(),
   resume_url: z.string().optional().nullable(),
   resume_filename: z.string().optional().nullable(),
@@ -56,8 +56,20 @@ export const UpdateApplicationSchema = CreateApplicationSchema.partial().extend(
 });
 export class UpdateApplicationDto extends createZodDto(UpdateApplicationSchema) {}
 
-export const ChangeApplicationStatusSchema = z.object({ status: statusEnum });
+export const ChangeApplicationStatusSchema = z.object({
+  status: statusEnum,
+  reason: z.string().min(1).max(1000).optional(),
+});
 export class ChangeApplicationStatusDto extends createZodDto(ChangeApplicationStatusSchema) {}
+
+export const ReopenApplicationSchema = z.object({
+  reason: z.string().trim().min(1).max(1000),
+  status: z.enum(['new','reviewed','phone_interview','recommended','employer_interview','offer','hired','probation']).default('reviewed'),
+});
+export class ReopenApplicationDto extends createZodDto(ReopenApplicationSchema) {}
+
+export const AddApplicationNoteSchema = z.object({ content: z.string().min(1).max(5000) });
+export class AddApplicationNoteDto extends createZodDto(AddApplicationNoteSchema) {}
 
 export const QueryApplicationsSchema = z.object({
   page: z.coerce.number().min(1).default(1),

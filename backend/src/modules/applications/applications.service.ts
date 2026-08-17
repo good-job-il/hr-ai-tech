@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { DataSource, Repository, Like } from 'typeorm';
 import { ApplicationEntity } from './entities/application.entity';
 import { ApplicationTimelineEntity } from './entities/application-timeline.entity';
 import { AssignCandidateDto, CreateApplicationDto, SubmitApplicationDto, UpdateApplicationDto, QueryApplicationsDto } from './dto/applications.dto';
@@ -23,6 +23,7 @@ export class ApplicationsService {
     @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>,
     private readonly emailService: EmailService,
     private readonly notificationsService: NotificationsService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async findAll(query: QueryApplicationsDto, user: UserEntity) {
@@ -98,6 +99,13 @@ export class ApplicationsService {
     const job = await this.jobRepo.findOne({ where: { ...jobScope, id: dto.job_id } as any });
     if (!job?.organization_id) throw new NotFoundException(`Job ${dto.job_id} not found`);
 
+    if (dto.candidate_id != null) {
+      const duplicate = await this.appRepo.findOne({
+        where: { organization_id: job.organization_id, job_id: job.id, candidate_id: dto.candidate_id, is_deleted: false },
+      });
+      if (duplicate) throw new ConflictException('This candidate is already in the pipeline for this job');
+    }
+
     const isCandidate = user.role === UserRole.CANDIDATE;
     const app = this.appRepo.create({
       ...dto,
@@ -113,21 +121,32 @@ export class ApplicationsService {
       status: isCandidate ? 'new' : dto.status,
       source: isCandidate ? 'app' : dto.source,
     } as any);
-    const saved = await (this.appRepo.save(app) as unknown as Promise<ApplicationEntity>);
-    await this.timelineRepo.save(this.timelineRepo.create({
-      application_id: saved.id,
-      organization_id: saved.organization_id,
-      event_type: 'submitted',
-      description: `Candidate applied for ${saved.job_title || job.title}`,
-      performed_by: user.email,
-      performed_by_role: user.role,
-    } as any));
+    let saved: ApplicationEntity;
+    try {
+      saved = await this.dataSource.transaction(async manager => {
+        const stored = await manager.getRepository(ApplicationEntity).save(app as unknown as ApplicationEntity);
+        await manager.save(ApplicationTimelineEntity, manager.create(ApplicationTimelineEntity, {
+          application_id: stored.id,
+          organization_id: stored.organization_id,
+          event_type: 'submitted',
+          description: `Candidate applied for ${stored.job_title || job.title}`,
+          performed_by: user.email,
+          performed_by_role: user.role,
+        } as any));
+        return stored;
+      });
+    } catch (error: any) {
+      if (error?.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException('This candidate is already in the pipeline for this job');
+      }
+      throw error;
+    }
     await this.emailService.sendApplicationSubmitted({
       candidateEmail: saved.candidate_email,
       candidateName: saved.candidate_name,
       jobTitle: saved.job_title || job.title,
       employerEmail: job.contact_email || job.employer_id,
-    });
+    }).catch(() => undefined);
     return saved;
   }
 
@@ -150,10 +169,6 @@ export class ApplicationsService {
     if (isBlocked(candidateScope)) throw new NotFoundException(`Candidate ${dto.candidate_id} not found`);
     const candidate = await this.candidateRepo.findOne({ where: { ...candidateScope, id: dto.candidate_id } as any });
     if (!candidate) throw new NotFoundException(`Candidate ${dto.candidate_id} not found`);
-    const existing = await this.appRepo.findOne({
-      where: { job_id: dto.job_id, candidate_id: candidate.id, is_deleted: false } as any,
-    });
-    if (existing) return existing;
     const candidateUser = candidate.email
       ? await this.userRepo.findOne({ where: { email: candidate.email } })
       : null;
@@ -174,27 +189,35 @@ export class ApplicationsService {
     }, user, candidateUser?.id ?? null);
   }
 
-  async update(id: number, dto: UpdateApplicationDto, user: UserEntity): Promise<ApplicationEntity> {
+  async update(id: number, dto: UpdateApplicationDto, user: UserEntity, reason?: string): Promise<ApplicationEntity> {
     const app = await this.findById(id, user);
     const prev = app.status;
+    if (dto.status && dto.status !== prev) this.assertStatusTransition(prev, dto.status);
     Object.assign(app, dto);
     if (dto.is_deleted && !app.deleted_at) {
       app.deleted_at = new Date();
       app.deleted_by = user.id;
     }
-    const saved = await (this.appRepo.save(app) as unknown as Promise<ApplicationEntity>);
-    // Auto-create timeline on status change
-    if (dto.status && dto.status !== prev) {
-      await this.timelineRepo.save(this.timelineRepo.create({
-        application_id: id,
-        organization_id: app.organization_id,
-        event_type: 'status_changed',
-        previous_value: prev,
-        new_value: dto.status,
-        description: `Status changed from ${prev} to ${dto.status}`,
-        performed_by: user.email,
-        performed_by_role: user.role,
-      } as any));
+    const statusChanged = Boolean(dto.status && dto.status !== prev);
+    const saved = statusChanged
+      ? await this.dataSource.transaction(async manager => {
+        const stored = await manager.save(ApplicationEntity, app as ApplicationEntity);
+          await manager.save(ApplicationTimelineEntity, manager.create(ApplicationTimelineEntity, {
+            application_id: id,
+            organization_id: app.organization_id,
+            event_type: 'status_changed',
+            previous_value: prev,
+            new_value: dto.status,
+            description: reason
+              ? `Status changed from ${prev} to ${dto.status}: ${reason}`
+              : `Status changed from ${prev} to ${dto.status}`,
+            performed_by: user.email,
+            performed_by_role: user.role,
+          } as any));
+          return stored;
+        })
+      : await (this.appRepo.save(app) as unknown as Promise<ApplicationEntity>);
+    if (statusChanged) {
       await this.notificationsService.create({
         recipient_email: app.candidate_email,
         organization_id: app.organization_id,
@@ -202,13 +225,61 @@ export class ApplicationsService {
         title: `Application status updated — ${app.job_title || 'position'}`,
         content: `Your application status changed from ${prev} to ${dto.status}.`,
         metadata: { application_id: app.id, previous_status: prev, status: dto.status },
-      } as any);
+      } as any).catch(() => undefined);
     }
     return saved;
   }
 
-  changeStatus(id: number, status: UpdateApplicationDto['status'], user: UserEntity) {
-    return this.update(id, { status } as UpdateApplicationDto, user);
+  changeStatus(id: number, status: UpdateApplicationDto['status'], reason: string | undefined, user: UserEntity) {
+    return this.update(id, { status } as UpdateApplicationDto, user, reason);
+  }
+
+  async reopen(id: number, status: UpdateApplicationDto['status'], reason: string, user: UserEntity) {
+    if (!reason?.trim()) throw new BadRequestException('A reason is required to reopen a rejected application');
+    const app = await this.findById(id, user);
+    if (app.status !== 'rejected') throw new BadRequestException('Only rejected applications can be reopened');
+    const previous = app.status;
+    app.status = status!;
+    return this.dataSource.transaction(async manager => {
+      const saved = await manager.save(ApplicationEntity, app);
+      await manager.save(ApplicationTimelineEntity, manager.create(ApplicationTimelineEntity, {
+        application_id: app.id,
+        organization_id: app.organization_id,
+        event_type: 'status_changed',
+        previous_value: previous,
+        new_value: status,
+        description: `Rejected application reopened: ${reason.trim()}`,
+        performed_by: user.email,
+        performed_by_role: user.role,
+      } as any));
+      return saved;
+    });
+  }
+
+  private assertStatusTransition(previous: string, next: string) {
+    if (previous === 'completed') throw new BadRequestException('Completed applications cannot be reopened');
+    if (previous === 'rejected' && next !== 'rejected') {
+      throw new BadRequestException('Use the reopen operation for rejected applications');
+    }
+  }
+
+  async addNote(id: number, content: string, user: UserEntity) {
+    const app = await this.findById(id, user);
+    const timestamp = new Date().toISOString();
+    const line = `[${timestamp}] ${user.full_name || user.email}: ${content.trim()}`;
+    return this.dataSource.transaction(async manager => {
+      app.notes = app.notes ? `${app.notes}\n${line}` : line;
+      const saved = await manager.save(ApplicationEntity, app);
+      await manager.save(ApplicationTimelineEntity, manager.create(ApplicationTimelineEntity, {
+        application_id: app.id,
+        organization_id: app.organization_id,
+        event_type: 'note_added',
+        description: content.trim(),
+        performed_by: user.email,
+        performed_by_role: user.role,
+      } as any));
+      return saved;
+    });
   }
 
   async softDelete(id: number, user: UserEntity): Promise<void> {

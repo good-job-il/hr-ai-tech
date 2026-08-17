@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { compensationPlanService } from '@/api/services/compensationPlanService';
 import { jobService } from '@/api/services/jobService';
+import { agencyClientService } from '@/api/services/agencyClientService';
+import { userService } from '@/api/services/userService';
 import { useAuth } from '@/lib/AuthContext';
 import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
 import { Button } from '@/components/ui/button';
@@ -10,11 +12,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus, Pencil, Trash2, DollarSign, Percent, Calculator, Settings } from 'lucide-react';
+import { PlatformCard, PlatformPageHeader, PlatformPageShell } from '@/components/platform/PlatformUI';
 
 // Which compensation fields can this role see?
 // Employer does NOT have access to compensation at all
 const VISIBLE_FIELDS = {
   admin:                ['recruiter', 'team_manager', 'recruitment_manager'],
+  org_admin:            ['recruiter', 'team_manager', 'recruitment_manager'],
   recruitment_manager:  ['recruiter', 'team_manager', 'recruitment_manager'],
   team_manager:         ['recruiter', 'team_manager'],
   recruiter:            ['recruiter'],
@@ -25,8 +29,6 @@ const FIELD_LABELS = {
   team_manager:        'מנהל צוות',
   recruitment_manager: 'מנהל גיוס',
 };
-
-const canEditGlobally = (role) => role === 'admin';
 
 function CompField({ label, value, type, totalFee }) {
   const icon = type === 'percent' ? <Percent className="w-3.5 h-3.5" /> : <DollarSign className="w-3.5 h-3.5" />;
@@ -51,7 +53,12 @@ function CompField({ label, value, type, totalFee }) {
 
 const emptyPlan = {
   client_name: '',
+  employer_company_id: '',
+  agency_client_id: '',
   job_id: '',
+  recruiter_id: '',
+  team_manager_id: '',
+  recruitment_manager_id: '',
   total_fee: '',
   warranty_period_days: 30,
   recruiter_compensation: '',
@@ -65,11 +72,11 @@ const emptyPlan = {
 
 export default function CompensationPage() {
   const { user } = useAuth();
-  const { can } = usePermissionMatrix();
+  const { can, loading: permissionsLoading } = usePermissionMatrix();
   const role = user?.role;
   const visibleFields = VISIBLE_FIELDS[role] || [];
-  const isAdmin = canEditGlobally(role);
   const canEditing = can('edit_compensation');
+  const isAdmin = canEditing;
   const canViewComp = can('view_compensation');
   const qc = useQueryClient();
 
@@ -77,20 +84,34 @@ export default function CompensationPage() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyPlan);
   const [modalType, setModalType] = useState('plan'); // 'plan' or 'template'
+  const [mutationError, setMutationError] = useState('');
 
   const orgId = user?.organization_id;
 
   const { data: plans = [], isLoading } = useQuery({
     queryKey: ['compensation-plans', orgId],
     queryFn: () => compensationPlanService.list({ sort: 'created_date', order: 'DESC', limit: 100 }),
-    enabled: !!orgId,
+    enabled: !!orgId && canViewComp && !permissionsLoading,
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: jobs = [] } = useQuery({
     queryKey: ['jobs-for-compensation', orgId],
     queryFn: () => jobService.list({ organization_id: orgId, is_deleted: false, sort: 'created_date', order: 'DESC', limit: 100 }),
-    enabled: !!orgId,
+    enabled: !!orgId && canViewComp && !permissionsLoading,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: clients = [] } = useQuery({
+    queryKey: ['agency-clients-for-compensation', orgId],
+    queryFn: () => agencyClientService.list({ status: 'active', limit: 200 }),
+    enabled: !!orgId && canViewComp && !permissionsLoading,
+  });
+
+  const { data: members = [] } = useQuery({
+    queryKey: ['organization-members-for-compensation', orgId],
+    queryFn: () => userService.list({ organization_id: orgId, is_active: true, limit: 500 }),
+    enabled: !!orgId && canEditing && !permissionsLoading,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -99,12 +120,15 @@ export default function CompensationPage() {
       editing
         ? compensationPlanService.update(editing.id, data)
         : compensationPlanService.create(data),
-    onSuccess: () => { qc.invalidateQueries(['compensation-plans', orgId]); setShowModal(false); },
+    onMutate: () => setMutationError(''),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['compensation-plans', orgId] }); setShowModal(false); },
+    onError: error => setMutationError(error?.message || 'Unable to save compensation plan'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => compensationPlanService.remove(id),
-    onSuccess: () => qc.invalidateQueries(['compensation-plans', orgId]),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['compensation-plans', orgId] }),
+    onError: error => setMutationError(error?.message || 'Unable to delete compensation plan'),
   });
 
   const openNew = () => { setEditing(null); setForm(emptyPlan); setModalType('plan'); setShowModal(true); };
@@ -112,7 +136,12 @@ export default function CompensationPage() {
   const openTemplate = (existingPlan = null) => { 
     const formData = existingPlan ? {
       client_name: existingPlan.client_name || '',
+      employer_company_id: existingPlan.employer_company_id || '',
+      agency_client_id: existingPlan.agency_client_id || '',
       job_id: existingPlan.job_id || '',
+      recruiter_id: existingPlan.recruiter_id || '',
+      team_manager_id: existingPlan.team_manager_id || '',
+      recruitment_manager_id: existingPlan.recruitment_manager_id || '',
       total_fee: existingPlan.total_fee ?? '',
       warranty_period_days: existingPlan.warranty_period_days ?? 30,
       recruiter_compensation: existingPlan.recruiter_compensation ?? '',
@@ -131,8 +160,12 @@ export default function CompensationPage() {
 
   const handleSave = () => {
     const data = {
-      client_name: form.client_name,
-      job_id: form.job_id || null,
+      employer_company_id: form.employer_company_id ? Number(form.employer_company_id) : null,
+      agency_client_id: form.agency_client_id ? Number(form.agency_client_id) : null,
+      job_id: form.job_id ? Number(form.job_id) : null,
+      recruiter_id: form.recruiter_id ? Number(form.recruiter_id) : null,
+      team_manager_id: form.team_manager_id ? Number(form.team_manager_id) : null,
+      recruitment_manager_id: form.recruitment_manager_id ? Number(form.recruitment_manager_id) : null,
       warranty_period_days: form.warranty_period_days ? Number(form.warranty_period_days) : 30,
       notes: form.notes,
       total_fee: form.total_fee !== '' ? Number(form.total_fee) : null,
@@ -157,7 +190,11 @@ export default function CompensationPage() {
   const totalFee = form.total_fee ? Number(form.total_fee) : 0;
 
   // Block if no compensation permission at all
-  if (!VISIBLE_FIELDS[role] && !canViewComp) {
+  if (permissionsLoading) {
+    return <div className="p-6 text-center text-slate-500" dir="rtl">טוען הרשאות...</div>;
+  }
+
+  if (!canViewComp) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]" dir="rtl">
         <div className="text-center text-gray-500">
@@ -170,13 +207,14 @@ export default function CompensationPage() {
   }
 
   return (
-    <div dir="rtl" className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-black text-gray-900">ניהול תגמולים</h1>
-          <p className="text-sm text-gray-500 mt-1">{canEditing ? 'הגדרת טמפלט תגמול וניהול לפי משרה' : 'תוכניות תגמול'}</p>
-        </div>
-        <div className="flex gap-2">
+    <PlatformPageShell dir="rtl">
+      <div className="mx-auto max-w-5xl">
+      <PlatformPageHeader
+        className="mb-6"
+        title="ניהול תגמולים"
+        subtitle={canEditing ? 'הגדרת טמפלט תגמול וניהול לפי משרה' : 'תוכניות תגמול'}
+        icon={DollarSign}
+        actions={<div className="flex gap-2">
           {canEditing && (
             <Button onClick={() => openTemplate()} className="gap-2 bg-slate-600 hover:bg-slate-700 text-white">
               <Settings className="w-4 h-4" />
@@ -189,8 +227,8 @@ export default function CompensationPage() {
               תוכנית חדשה
             </Button>
           )}
-        </div>
-      </div>
+        </div>}
+      />
 
       {isLoading ? (
         <div className="text-center py-12 text-gray-400">טוען...</div>
@@ -205,10 +243,10 @@ export default function CompensationPage() {
               <div className="space-y-3">
                 {jobs.map(job => {
                   const jobPlan = plans.find(p => p.job_id === job.id);
-                  const defaultPlan = plans.find(p => p.client_name === job.company && !p.job_id);
+                  const defaultPlan = plans.find(p => p.employer_company_id === job.employer_company_id && !p.job_id);
                   const finalPlan = jobPlan || defaultPlan;
                   return (
-                    <div key={job.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                    <PlatformCard key={job.id} className="p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
@@ -244,7 +282,12 @@ export default function CompensationPage() {
                             setEditing(existing);
                             setForm({
                               client_name: existing?.client_name || job.company,
+                              employer_company_id: existing?.employer_company_id || job.employer_company_id,
+                              agency_client_id: existing?.agency_client_id || '',
                               job_id: existing?.job_id || job.id,
+                              recruiter_id: existing?.recruiter_id || '',
+                              team_manager_id: existing?.team_manager_id || '',
+                              recruitment_manager_id: existing?.recruitment_manager_id || '',
                               total_fee: existing?.total_fee ?? '',
                               warranty_period_days: existing?.warranty_period_days ?? 30,
                               recruiter_compensation: existing?.recruiter_compensation ?? '',
@@ -262,7 +305,7 @@ export default function CompensationPage() {
                           </button>
                         )}
                       </div>
-                    </div>
+                    </PlatformCard>
                   );
                 })}
               </div>
@@ -278,7 +321,7 @@ export default function CompensationPage() {
               ) : (
                 <div className="space-y-3">
                   {plans.filter(p => !p.job_id).map(plan => (
-                    <div key={plan.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                    <PlatformCard key={plan.id} className="p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
                           <span className="font-bold text-gray-900">{plan.client_name}</span>
@@ -303,7 +346,7 @@ export default function CompensationPage() {
                           </button>
                         </div>
                       </div>
-                    </div>
+                    </PlatformCard>
                   ))}
                 </div>
               )}
@@ -325,7 +368,13 @@ export default function CompensationPage() {
           <div className="space-y-4 mt-2">
             <div>
               <Label>לקוח / חברה *</Label>
-              <Input value={form.client_name} onChange={e => setForm(f => ({ ...f, client_name: e.target.value }))} placeholder="שם הלקוח" className="mt-1" />
+              <Select value={String(form.employer_company_id || '')} onValueChange={value => {
+                const client = clients.find(item => String(item.company_id) === value);
+                setForm(current => ({ ...current, employer_company_id: value, agency_client_id: client?.id || '', client_name: client?.company?.name || '' }));
+              }}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="בחר לקוח" /></SelectTrigger>
+                <SelectContent>{clients.map(client => <SelectItem key={client.id} value={String(client.company_id)}>{client.company?.name || `#${client.company_id}`}</SelectItem>)}</SelectContent>
+              </Select>
             </div>
             <div>
               <Label>עמלה כוללת מהחברה (₪) *</Label>
@@ -375,9 +424,36 @@ export default function CompensationPage() {
               </div>
             )}
             <div>
-              <Label>ID משרה (אופציונלי)</Label>
-              <Input value={form.job_id} onChange={e => setForm(f => ({ ...f, job_id: e.target.value }))} placeholder="אם ריק — חל על כל משרות הלקוח" className="mt-1" dir="ltr" />
+              <Label>משרה (אופציונלי)</Label>
+              <Select value={String(form.job_id || 'all')} onValueChange={value => {
+                const selected = jobs.find(job => String(job.id) === value);
+                setForm(current => ({ ...current, job_id: value === 'all' ? '' : value, employer_company_id: selected?.employer_company_id || current.employer_company_id }));
+              }}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent><SelectItem value="all">כל משרות הלקוח</SelectItem>{jobs.filter(job => !form.employer_company_id || job.employer_company_id === Number(form.employer_company_id)).map(job => <SelectItem key={job.id} value={String(job.id)}>{job.title}</SelectItem>)}</SelectContent>
+              </Select>
             </div>
+
+            {[
+              { key: 'recruiter_id', label: 'רכז גיוס', roles: ['recruiter'] },
+              { key: 'team_manager_id', label: 'מנהל צוות', roles: ['team_manager'] },
+              { key: 'recruitment_manager_id', label: 'מנהל גיוס', roles: ['recruitment_manager'] },
+            ].map(({ key, label, roles }) => (
+              <div key={key}>
+                <Label>{label} (אופציונלי)</Label>
+                <Select value={String(form[key] || 'all')} onValueChange={value => setForm(current => ({ ...current, [key]: value === 'all' ? '' : value }))}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">ללא שיוך</SelectItem>
+                    {members.filter(member => roles.includes(member.role)).map(member => (
+                      <SelectItem key={member.id} value={String(member.id)}>{member.full_name || member.email}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ))}
+
+            {mutationError && <p className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-700">{mutationError}</p>}
 
             {[
               { key: 'recruiter', label: 'תגמול רכז גיוס' },
@@ -426,7 +502,7 @@ export default function CompensationPage() {
                   {deleteMutation.isPending ? 'מוחק...' : 'מחק'}
                 </Button>
               )}
-              <Button onClick={handleSave} disabled={!form.client_name || saveMutation.isPending} className="flex-1 bg-primary hover:bg-primary/90 text-white">
+              <Button onClick={handleSave} disabled={!form.employer_company_id || saveMutation.isPending} className="flex-1 bg-primary hover:bg-primary/90 text-white">
                 {saveMutation.isPending ? 'שומר...' : 'שמור'}
               </Button>
               <Button variant="outline" onClick={() => setShowModal(false)} className="flex-1">ביטול</Button>
@@ -434,6 +510,7 @@ export default function CompensationPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </PlatformPageShell>
   );
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PermissionsService } from './permissions.service';
 import {
@@ -20,6 +20,20 @@ import { Public } from '../../common/decorators/public.decorator';
 import { UserEntity } from '../users/user.entity';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole } from '../../common/enums/user-role.enum';
+import { RequiresPermission } from '../../common/decorators/requires-permission.decorator';
+import { EffectivePermissionsGuard } from './effective-permissions.guard';
+
+@ApiTags('Effective Permissions')
+@ApiBearerAuth()
+@Controller('permissions')
+export class EffectivePermissionsController {
+  constructor(private readonly svc: PermissionsService) {}
+
+  @Get('effective')
+  effective(@CurrentUser() user: UserEntity) {
+    return this.svc.getEffectivePermissions(user);
+  }
+}
 
 @ApiTags('Permission Matrix')
 @ApiBearerAuth()
@@ -27,9 +41,9 @@ import { UserRole } from '../../common/enums/user-role.enum';
 export class PermissionMatrixController {
   constructor(private readonly svc: PermissionsService) {}
 
-  @Get() findAll(@Query() q: QueryPermissionMatricesDto, @CurrentUser() u: UserEntity) { return this.svc.findMatrices(q, u); }
-  @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreatePermissionMatrixDto, @CurrentUser() u: UserEntity) { return this.svc.createMatrix(dto, u); }
-  @Patch(':id') update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePermissionMatrixDto, @CurrentUser() u: UserEntity) { return this.svc.updateMatrix(id, dto, u); }
+  @Get() @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') findAll(@Query() q: QueryPermissionMatricesDto, @CurrentUser() u: UserEntity) { return this.svc.findMatrices(q, u); }
+  @Post() @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreatePermissionMatrixDto, @CurrentUser() u: UserEntity) { return this.svc.createMatrix(dto, u); }
+  @Patch(':id') @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePermissionMatrixDto, @CurrentUser() u: UserEntity) { return this.svc.updateMatrix(id, dto, u); }
   @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.removeMatrix(id, u); }
 }
 
@@ -39,9 +53,9 @@ export class PermissionMatrixController {
 export class RoleTemplateController {
   constructor(private readonly svc: PermissionsService) {}
 
-  @Get() findAll(@Query() q: QueryRoleTemplatesDto, @CurrentUser() u: UserEntity) { return this.svc.findRoleTemplates(q, u); }
-  @Post() @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateRoleTemplateDto, @CurrentUser() u: UserEntity) { return this.svc.createRoleTemplate(dto, u); }
-  @Patch(':id') update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoleTemplateDto, @CurrentUser() u: UserEntity) { return this.svc.updateRoleTemplate(id, dto, u); }
+  @Get() @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') findAll(@Query() q: QueryRoleTemplatesDto, @CurrentUser() u: UserEntity) { return this.svc.findRoleTemplates(q, u); }
+  @Post() @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateRoleTemplateDto, @CurrentUser() u: UserEntity) { return this.svc.createRoleTemplate(dto, u); }
+  @Patch(':id') @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoleTemplateDto, @CurrentUser() u: UserEntity) { return this.svc.updateRoleTemplate(id, dto, u); }
   @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.removeRoleTemplate(id, u); }
 }
 

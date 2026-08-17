@@ -9,6 +9,7 @@ import Unauthorized from './pages/Unauthorized';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ProtectedRoute from '@/lib/ProtectedRoute';
+import PermissionRoute from '@/lib/PermissionRoute';
 
 // Infrastructure
 import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
@@ -101,6 +102,7 @@ import EmployerSettingsPage from './pages/employer/EmployerSettingsPage';
 
 // ── Placeholder ───────────────────────────────────────────────────────
 import PlaceholderPage from './pages/placeholder/PlaceholderPage';
+import AgencyReportsPage from './pages/agency/AgencyReportsPage';
 
 // TODO: Ask Rudik about this component
 // import AdminDashboard from "./pages/admin/AdminDashboard.jsx"
@@ -203,6 +205,9 @@ const AuthenticatedApp = () => {
             <Route path="/agency/jobs/filled" element={<ManageJobsPage />} />
             <Route path="/agency/jobs/hold" element={<ManageJobsPage />} />
             <Route path="/agency/crm" element={<CandidateListCRMPage candidateRoute="/agency/crm/candidate" />} />
+            <Route path="/agency/crm/all" element={<CandidateListCRMPage candidateRoute="/agency/crm/candidate" />} />
+            <Route path="/agency/crm/active" element={<CandidateListCRMPage candidateRoute="/agency/crm/candidate" />} />
+            <Route path="/agency/crm/pipeline" element={<CandidateListCRMPage candidateRoute="/agency/crm/candidate" />} />
             <Route path="/agency/crm/candidate" element={<CandidateCRMPage />} />
             <Route path="/agency/pipeline" element={<PipelinePage />} />
             <Route path="/agency/ai-matching" element={<AIMatchingPage />} />
@@ -211,17 +216,19 @@ const AuthenticatedApp = () => {
             <Route path="/agency/clients" element={<AgencyClients />} />
             <Route path="/agency/clients/:id" element={<AgencyClientDetail />} />
             <Route path="/agency/teams" element={<AgencyTeamsPage />} />
-            <Route path="/agency/reports" element={<PlaceholderPage title="דוחות ותובנות" />} />
-            <Route path="/agency/activity" element={<PlaceholderPage title="יומן פעילות" />} />
+            <Route path="/agency/reports" element={<AgencyReportsPage />} />
+            <Route path="/agency/activity" element={<AuditLogPage />} />
             <Route path="/recruitment/*" element={<Navigate to="/agency/dashboard" replace />} />
           </Route>
 
           {/* Organization configuration is Org Admin only until read-only views exist. */}
           <Route element={<ProtectedRoute requiredRoles={['org_admin']} />}>
-            <Route path="/agency/settings/permissions" element={<PermissionsPage />} />
-            <Route path="/agency/settings/roles" element={<RoleSettingsPage />} />
-            <Route path="/agency/settings/billing" element={<BillingSettings />} />
-            <Route path="/agency/settings/integrations" element={<IntegrationsSettings />} />
+            <Route element={<PermissionRoute required={['manage_settings']} />}>
+              <Route path="/agency/settings/permissions" element={<PermissionsPage />} />
+              <Route path="/agency/settings/roles" element={<RoleSettingsPage />} />
+              <Route path="/agency/settings/billing" element={<BillingSettings />} />
+              <Route path="/agency/settings/integrations" element={<IntegrationsSettings />} />
+            </Route>
           </Route>
 
           {/* Team Manager cannot expand access through a direct organization URL. */}
@@ -229,12 +236,15 @@ const AuthenticatedApp = () => {
             <Route path="/agency/team/dashboard" element={<AgencyDashboard />} />
             <Route path="/agency/team/jobs" element={<ManageJobsPage />} />
             <Route path="/agency/team/crm" element={<CandidateListCRMPage candidateRoute="/agency/team/crm/candidate" />} />
+            <Route path="/agency/team/crm/all" element={<CandidateListCRMPage candidateRoute="/agency/team/crm/candidate" />} />
+            <Route path="/agency/team/crm/active" element={<CandidateListCRMPage candidateRoute="/agency/team/crm/candidate" />} />
+            <Route path="/agency/team/crm/pipeline" element={<CandidateListCRMPage candidateRoute="/agency/team/crm/candidate" />} />
             <Route path="/agency/team/crm/candidate" element={<CandidateCRMPage />} />
             <Route path="/agency/team/pipeline" element={<PipelinePage />} />
             <Route path="/agency/team/compensation" element={<CompensationPage />} />
             <Route path="/agency/team/ai-matching" element={<AIMatchingPage />} />
             <Route path="/agency/team/import" element={<ImportDashboard />} />
-            <Route path="/agency/team/reports" element={<PlaceholderPage title="דוחות" />} />
+            <Route path="/agency/team/reports" element={<AgencyReportsPage />} />
           </Route>
         </Route>
       </Route>
@@ -249,7 +259,7 @@ const AuthenticatedApp = () => {
           <Route path="/agency/recruiter/candidates" element={<CandidateListCRMPage candidateRoute="/agency/recruiter/crm/candidate" />} />
           <Route path="/agency/recruiter/candidates/all" element={<CandidateListCRMPage candidateRoute="/agency/recruiter/crm/candidate" />} />
           <Route path="/agency/recruiter/candidates/active" element={<CandidateListCRMPage candidateRoute="/agency/recruiter/crm/candidate" />} />
-          <Route path="/agency/recruiter/candidates/pipeline" element={<PipelinePage />} />
+          <Route path="/agency/recruiter/candidates/pipeline" element={<CandidateListCRMPage candidateRoute="/agency/recruiter/crm/candidate" />} />
           <Route path="/agency/recruiter/jobs" element={<Jobs />} />
           <Route path="/agency/recruiter/crm" element={<CandidateListCRMPage candidateRoute="/agency/recruiter/crm/candidate" />} />
           <Route path="/agency/recruiter/crm/candidate" element={<CandidateCRMPage />} />
