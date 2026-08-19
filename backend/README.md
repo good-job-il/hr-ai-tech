@@ -69,16 +69,16 @@ docker-compose --profile dev up adminer -d
 
 See `.env.example` for all variables. Key ones:
 
-| Variable | Description |
-|----------|-------------|
-| `DB_HOST` | MySQL host |
-| `DB_PORT` | MySQL port (default: 3306) |
-| `DB_NAME` | Database name |
-| `JWT_SECRET` | Access token secret (**change in prod!**) |
-| `JWT_REFRESH_SECRET` | Refresh token secret (**change in prod!**) |
-| `JWT_EXPIRES_IN` | Access token expiry (default: 15m) |
-| `JWT_REFRESH_EXPIRES_IN` | Refresh token expiry (default: 7d) |
-| `FRONTEND_URL` | Frontend URL for CORS (default: http://localhost:5173) |
+| Variable                 | Description                                            |
+| ------------------------ | ------------------------------------------------------ |
+| `DB_HOST`                | MySQL host                                             |
+| `DB_PORT`                | MySQL port (default: 3306)                             |
+| `DB_NAME`                | Database name                                          |
+| `JWT_SECRET`             | Access token secret (**change in prod!**)              |
+| `JWT_REFRESH_SECRET`     | Refresh token secret (**change in prod!**)             |
+| `JWT_EXPIRES_IN`         | Access token expiry (default: 15m)                     |
+| `JWT_REFRESH_EXPIRES_IN` | Refresh token expiry (default: 7d)                     |
+| `FRONTEND_URL`           | Frontend URL for CORS (default: http://localhost:5173) |
 
 ---
 
@@ -103,50 +103,55 @@ npm run migration:show
 ## API Endpoints (Phase 1)
 
 ### Auth
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | Login with email + password |
-| POST | `/api/auth/logout` | Logout (revoke refresh token) |
-| POST | `/api/auth/refresh` | Refresh access token |
-| GET | `/api/auth/me` | Get current user |
-| PATCH | `/api/auth/me` | Update current user |
-| POST | `/api/auth/forgot-password` | Request password reset |
-| POST | `/api/auth/reset-password` | Reset password |
+
+| Method | Endpoint                    | Description                   |
+| ------ | --------------------------- | ----------------------------- |
+| POST   | `/api/auth/register`        | Register new user             |
+| POST   | `/api/auth/login`           | Login with email + password   |
+| POST   | `/api/auth/logout`          | Logout (revoke refresh token) |
+| POST   | `/api/auth/refresh`         | Refresh access token          |
+| GET    | `/api/auth/me`              | Get current user              |
+| PATCH  | `/api/auth/me`              | Update current user           |
+| POST   | `/api/auth/forgot-password` | Request password reset        |
+| POST   | `/api/auth/reset-password`  | Reset password                |
 
 ### Users
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/users` | List users (org-scoped) |
-| GET | `/api/users/:id` | Get user by ID |
-| PATCH | `/api/users/:id` | Update user |
+
+| Method | Endpoint         | Description             |
+| ------ | ---------------- | ----------------------- |
+| GET    | `/api/users`     | List users (org-scoped) |
+| GET    | `/api/users/:id` | Get user by ID          |
+| PATCH  | `/api/users/:id` | Update user             |
 
 ### Organizations
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/organizations` | List organizations |
-| GET | `/api/organizations/:id` | Get organization |
-| POST | `/api/organizations` | Create organization (admin) |
-| PATCH | `/api/organizations/:id` | Update organization |
+
+| Method | Endpoint                 | Description                 |
+| ------ | ------------------------ | --------------------------- |
+| GET    | `/api/organizations`     | List organizations          |
+| GET    | `/api/organizations/:id` | Get organization            |
+| POST   | `/api/organizations`     | Create organization (admin) |
+| PATCH  | `/api/organizations/:id` | Update organization         |
 | DELETE | `/api/organizations/:id` | Delete organization (admin) |
 
 ### Taxonomy (all public)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/taxonomy` | Load all taxonomy at once |
-| GET | `/api/taxonomy/domains` | All domains |
-| GET | `/api/taxonomy/domains/:id` | Get domain |
-| GET | `/api/taxonomy/roles?domain_id=1` | Roles (filtered by domain) |
-| GET | `/api/taxonomy/specializations?role_name=X` | Specializations |
-| GET | `/api/taxonomy/work-modes` | Work modes |
-| GET | `/api/taxonomy/employment-types` | Employment types |
-| GET | `/api/taxonomy/experience-levels` | Experience levels |
+
+| Method | Endpoint                                    | Description                |
+| ------ | ------------------------------------------- | -------------------------- |
+| GET    | `/api/taxonomy`                             | Load all taxonomy at once  |
+| GET    | `/api/taxonomy/domains`                     | All domains                |
+| GET    | `/api/taxonomy/domains/:id`                 | Get domain                 |
+| GET    | `/api/taxonomy/roles?domain_id=1`           | Roles (filtered by domain) |
+| GET    | `/api/taxonomy/specializations?role_name=X` | Specializations            |
+| GET    | `/api/taxonomy/work-modes`                  | Work modes                 |
+| GET    | `/api/taxonomy/employment-types`            | Employment types           |
+| GET    | `/api/taxonomy/experience-levels`           | Experience levels          |
 
 ---
 
 ## Auth Flow
 
 ### Login
+
 ```http
 POST /api/auth/login
 { "email": "user@example.com", "password": "secret" }
@@ -162,12 +167,14 @@ Response:
 ```
 
 ### Authenticated Requests
+
 ```http
 GET /api/users
 Authorization: Bearer <access_token>
 ```
 
 ### Refresh
+
 ```http
 POST /api/auth/refresh
 { "refresh_token": "eyJ..." }
@@ -185,6 +192,7 @@ GET /api/candidates?filter[status]=active&filter[organization_id]=abc-123
 ```
 
 Response format:
+
 ```json
 {
   "data": [...],
@@ -239,6 +247,7 @@ src/
 ## Connecting the Frontend
 
 Update the frontend proxy or `VITE_API_BASE_URL` to point to:
+
 ```
 http://localhost:3001/api
 ```
@@ -249,7 +258,7 @@ The frontend domain services send requests to `/api/*`; they work once the backe
 
 ## Phases
 
-| Phase | Status | Description |
-|-------|--------|-------------|
-| 1–7 | ✅ Complete | Security boundary, typed API, workflows, background jobs and legacy removal |
-| 8 | 🔜 Next | Final environment QA and release sign-off |
+| Phase | Status      | Description                                                                 |
+| ----- | ----------- | --------------------------------------------------------------------------- |
+| 1–7   | ✅ Complete | Security boundary, typed API, workflows, background jobs and legacy removal |
+| 8     | 🔜 Next     | Final environment QA and release sign-off                                   |

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common"
 
 @Injectable()
 export class FunctionsMiscService {
@@ -7,6 +7,6 @@ export class FunctionsMiscService {
    * outbound lookup is performed; callers may refine the default in the UI.
    */
   getLocationFromIP(_ip: string | undefined) {
-    return { city: 'תל אביב' };
+    return { city: "תל אביב" }
   }
 }

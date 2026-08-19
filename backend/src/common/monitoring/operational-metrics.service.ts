@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common"
 
 type MetricName =
-  | 'http_4xx'
-  | 'http_5xx'
-  | 'auth_failures'
-  | 'import_failures'
-  | 'imports_enqueued'
-  | 'queue_retries';
+  | "http_4xx"
+  | "http_5xx"
+  | "auth_failures"
+  | "import_failures"
+  | "imports_enqueued"
+  | "queue_retries"
 
 @Injectable()
 export class OperationalMetricsService {
@@ -17,19 +17,19 @@ export class OperationalMetricsService {
     import_failures: 0,
     imports_enqueued: 0,
     queue_retries: 0,
-  };
+  }
 
   recordHttp(path: string, status: number) {
-    if (status >= 500) this.increment('http_5xx');
-    else if (status >= 400) this.increment('http_4xx');
-    if (status >= 400 && path.startsWith('/api/auth/')) this.increment('auth_failures');
+    if (status >= 500) this.increment("http_5xx")
+    else if (status >= 400) this.increment("http_4xx")
+    if (status >= 400 && path.startsWith("/api/auth/")) this.increment("auth_failures")
   }
 
   increment(name: MetricName) {
-    this.counters[name] += 1;
+    this.counters[name] += 1
   }
 
   snapshot() {
-    return { ...this.counters };
+    return { ...this.counters }
   }
 }

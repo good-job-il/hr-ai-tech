@@ -1,8 +1,4 @@
-import {
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm"
 
 /**
  * Base entity with auto-increment integer pk + timestamps.
@@ -10,12 +6,11 @@ import {
  */
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
-  @CreateDateColumn({ name: 'created_date' })
-  created_date: Date;
+  @CreateDateColumn({ name: "created_date" })
+  created_date: Date
 
-  @UpdateDateColumn({ name: 'updated_date' })
-  updated_date: Date;
+  @UpdateDateColumn({ name: "updated_date" })
+  updated_date: Date
 }
-

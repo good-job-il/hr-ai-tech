@@ -1,13 +1,13 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { Injectable, NotFoundException, ForbiddenException } from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
+import { IsNull, Repository } from "typeorm"
 import {
   PermissionMatrixEntity,
   RoleTemplateEntity,
   RoleAliasEntity,
   UserPositionAccessEntity,
   PositionEntity,
-} from './permissions.entities';
+} from "./permissions.entities"
 import {
   CreatePermissionMatrixDto,
   UpdatePermissionMatrixDto,
@@ -21,11 +21,11 @@ import {
   CreatePositionDto,
   UpdatePositionDto,
   QueryPositionsDto,
-} from './dto/permissions.dto';
-import { UserEntity } from '../users/user.entity';
-import { UserRole } from '../../common/enums/user-role.enum';
-import { buildPaginatedResponse, getSkipTake } from '../../common/utils/pagination.utils';
-import { AuditService } from '../audit/audit.service';
+} from "./dto/permissions.dto"
+import { UserEntity } from "../users/user.entity"
+import { UserRole } from "../../common/enums/user-role.enum"
+import { buildPaginatedResponse, getSkipTake } from "../../common/utils/pagination.utils"
+import { AuditService } from "../audit/audit.service"
 
 const EMPTY_PERMISSIONS = {
   view: false,
@@ -38,11 +38,11 @@ const EMPTY_PERMISSIONS = {
   edit_compensation: false,
   manage_users: false,
   manage_settings: false,
-};
+}
 
 const FULL_PERMISSIONS = Object.fromEntries(
   Object.keys(EMPTY_PERMISSIONS).map((key) => [key, true]),
-) as typeof EMPTY_PERMISSIONS;
+) as typeof EMPTY_PERMISSIONS
 
 /**
  * Role invariants are an authorization ceiling, not defaults. An organization
@@ -51,7 +51,7 @@ const FULL_PERMISSIONS = Object.fromEntries(
  */
 const ROLE_PERMISSION_CEILINGS: Partial<Record<UserRole, Partial<typeof EMPTY_PERMISSIONS>>> = {
   [UserRole.RECRUITMENT_MANAGER]: { manage_settings: false },
-};
+}
 
 @Injectable()
 export class PermissionsService {
@@ -70,24 +70,25 @@ export class PermissionsService {
   ) {}
 
   private isPrivileged(user: UserEntity) {
-    return user.role === UserRole.ADMIN && !user.impersonating;
+    return user.role === UserRole.ADMIN && !user.impersonating
   }
 
   private isOrganizationAdministrator(user: UserEntity) {
-    return user.role === UserRole.ORG_ADMIN || (user.role === UserRole.ADMIN && Boolean(user.impersonating));
+    return (
+      user.role === UserRole.ORG_ADMIN ||
+      (user.role === UserRole.ADMIN && Boolean(user.impersonating))
+    )
   }
 
   private getEffectiveRoleKey(user: UserEntity) {
-    return user.role === UserRole.ADMIN && user.impersonating
-      ? UserRole.ORG_ADMIN
-      : user.role;
+    return user.role === UserRole.ADMIN && user.impersonating ? UserRole.ORG_ADMIN : user.role
   }
 
   private requireOrganizationContext(user: UserEntity) {
     if (!user.organization_id || !user.org_type) {
-      throw new ForbiddenException('Organization context is required');
+      throw new ForbiddenException("Organization context is required")
     }
-    return { organizationId: user.organization_id, orgType: user.org_type };
+    return { organizationId: user.organization_id, orgType: user.org_type }
   }
 
   async getEffectivePermissions(user: UserEntity) {
@@ -96,39 +97,47 @@ export class PermissionsService {
         organization_id: null,
         org_type: null,
         role_key: user.role,
-        source: 'platform_admin' as const,
+        source: "platform_admin" as const,
         permissions: { ...FULL_PERMISSIONS },
-      };
+      }
     }
 
-    const { organizationId, orgType } = this.requireOrganizationContext(user);
-    const roleKey = this.getEffectiveRoleKey(user);
+    const { organizationId, orgType } = this.requireOrganizationContext(user)
+    const roleKey = this.getEffectiveRoleKey(user)
     const [override, template] = await Promise.all([
       this.matrixRepo.findOne({
         where: { organization_id: organizationId, role_key: roleKey, is_template: false },
-        order: { updated_date: 'DESC' },
+        order: { updated_date: "DESC" },
       }),
       this.matrixRepo.findOne({
-        where: { organization_id: IsNull(), org_type: orgType, role_key: roleKey, is_template: true },
-        order: { updated_date: 'DESC' },
+        where: {
+          organization_id: IsNull(),
+          org_type: orgType,
+          role_key: roleKey,
+          is_template: true,
+        },
+        order: { updated_date: "DESC" },
       }),
-    ]);
-    const source = override ? 'organization' : template ? 'template' : 'none';
-    const configured = { ...EMPTY_PERMISSIONS, ...(override?.permissions ?? template?.permissions ?? {}) };
+    ])
+    const source = override ? "organization" : template ? "template" : "none"
+    const configured = {
+      ...EMPTY_PERMISSIONS,
+      ...(override?.permissions ?? template?.permissions ?? {}),
+    }
     return {
       organization_id: organizationId,
       org_type: orgType,
       role_key: roleKey,
       source,
       permissions: { ...configured, ...(ROLE_PERMISSION_CEILINGS[roleKey as UserRole] ?? {}) },
-    };
+    }
   }
 
   private async logSecurityChange(
     user: UserEntity,
-    entityType: 'PermissionMatrix' | 'RoleTemplate',
+    entityType: "PermissionMatrix" | "RoleTemplate",
     entityId: number,
-    action: 'permission_update' | 'role_display_name_update',
+    action: "permission_update" | "role_display_name_update",
     metadata: Record<string, any>,
   ) {
     await this.audit.log({
@@ -140,231 +149,257 @@ export class PermissionsService {
       entity_id: entityId,
       action,
       metadata,
-    });
+    })
   }
 
   // ─── Permission Matrix ────────────────────────────────────────────────────
   async findMatrices(query: QueryPermissionMatricesDto, user: UserEntity) {
-    const { page, limit, organization_id, org_type, role_key, is_template } = query;
-    let where: Record<string, any> | Record<string, any>[] = {};
+    const { page, limit, organization_id, org_type, role_key, is_template } = query
+    let where: Record<string, any> | Record<string, any>[] = {}
     if (!this.isPrivileged(user)) {
-      const { organizationId, orgType } = this.requireOrganizationContext(user);
+      const { organizationId, orgType } = this.requireOrganizationContext(user)
       if (is_template === true) {
-        where = { organization_id: IsNull(), org_type: orgType, is_template: true };
+        where = { organization_id: IsNull(), org_type: orgType, is_template: true }
       } else if (is_template === false) {
-        where = { organization_id: organizationId, is_template: false };
+        where = { organization_id: organizationId, is_template: false }
       } else {
         where = [
           { organization_id: organizationId, is_template: false },
           { organization_id: IsNull(), org_type: orgType, is_template: true },
-        ];
+        ]
       }
     } else if (organization_id) {
-      (where as Record<string, any>).organization_id = organization_id;
+      ;(where as Record<string, any>).organization_id = organization_id
     }
-    if (this.isPrivileged(user) && org_type) (where as Record<string, any>).org_type = org_type;
+    if (this.isPrivileged(user) && org_type) (where as Record<string, any>).org_type = org_type
     if (role_key) {
-      if (Array.isArray(where)) where = where.map(item => ({ ...item, role_key }));
-      else where.role_key = role_key;
+      if (Array.isArray(where)) where = where.map((item) => ({ ...item, role_key }))
+      else where.role_key = role_key
     }
-    if (this.isPrivileged(user) && is_template !== undefined) (where as Record<string, any>).is_template = is_template;
+    if (this.isPrivileged(user) && is_template !== undefined)
+      (where as Record<string, any>).is_template = is_template
 
-    const { skip, take } = getSkipTake(page, limit);
-    const [data, total] = await this.matrixRepo.findAndCount({ where, skip, take });
-    return buildPaginatedResponse(data, total, { page, limit });
+    const { skip, take } = getSkipTake(page, limit)
+    const [data, total] = await this.matrixRepo.findAndCount({ where, skip, take })
+    return buildPaginatedResponse(data, total, { page, limit })
   }
 
-  async createMatrix(dto: CreatePermissionMatrixDto, user: UserEntity): Promise<PermissionMatrixEntity> {
+  async createMatrix(
+    dto: CreatePermissionMatrixDto,
+    user: UserEntity,
+  ): Promise<PermissionMatrixEntity> {
     if (!this.isPrivileged(user) && !this.isOrganizationAdministrator(user)) {
-      throw new ForbiddenException('Insufficient permissions to create permission matrix');
+      throw new ForbiddenException("Insufficient permissions to create permission matrix")
     }
-    const context = this.isPrivileged(user) ? null : this.requireOrganizationContext(user);
+    const context = this.isPrivileged(user) ? null : this.requireOrganizationContext(user)
     const matrix = this.matrixRepo.create({
       ...dto,
       organization_id: this.isPrivileged(user) ? dto.organization_id : context!.organizationId,
       org_type: this.isPrivileged(user) ? dto.org_type : context!.orgType,
       is_template: this.isPrivileged(user) ? dto.is_template : false,
-    } as any);
-    const saved = await this.matrixRepo.save(matrix) as unknown as PermissionMatrixEntity;
-    await this.logSecurityChange(user, 'PermissionMatrix', saved.id, 'permission_update', {
+    } as any)
+    const saved = (await this.matrixRepo.save(matrix)) as unknown as PermissionMatrixEntity
+    await this.logSecurityChange(user, "PermissionMatrix", saved.id, "permission_update", {
       role_key: saved.role_key,
       before: null,
       after: saved.permissions,
-    });
-    return saved;
+    })
+    return saved
   }
 
-  async updateMatrix(id: number, dto: UpdatePermissionMatrixDto, user: UserEntity): Promise<PermissionMatrixEntity> {
-    const matrix = await this.matrixRepo.findOne({ where: { id } });
-    if (!matrix) throw new NotFoundException(`Permission matrix ${id} not found`);
+  async updateMatrix(
+    id: number,
+    dto: UpdatePermissionMatrixDto,
+    user: UserEntity,
+  ): Promise<PermissionMatrixEntity> {
+    const matrix = await this.matrixRepo.findOne({ where: { id } })
+    if (!matrix) throw new NotFoundException(`Permission matrix ${id} not found`)
     if (!this.isPrivileged(user)) {
-      const { organizationId } = this.requireOrganizationContext(user);
-      if (!this.isOrganizationAdministrator(user) || matrix.organization_id !== organizationId || matrix.is_template) {
-        throw new ForbiddenException('Access denied');
+      const { organizationId } = this.requireOrganizationContext(user)
+      if (
+        !this.isOrganizationAdministrator(user) ||
+        matrix.organization_id !== organizationId ||
+        matrix.is_template
+      ) {
+        throw new ForbiddenException("Access denied")
       }
-      const before = matrix.permissions;
-      matrix.permissions = dto.permissions ?? matrix.permissions;
-      const saved = await this.matrixRepo.save(matrix);
-      await this.logSecurityChange(user, 'PermissionMatrix', saved.id, 'permission_update', {
+      const before = matrix.permissions
+      matrix.permissions = dto.permissions ?? matrix.permissions
+      const saved = await this.matrixRepo.save(matrix)
+      await this.logSecurityChange(user, "PermissionMatrix", saved.id, "permission_update", {
         role_key: saved.role_key,
         before,
         after: saved.permissions,
-      });
-      return saved;
+      })
+      return saved
     }
-    const before = matrix.permissions;
-    Object.assign(matrix, dto);
-    const saved = await this.matrixRepo.save(matrix);
-    await this.logSecurityChange(user, 'PermissionMatrix', saved.id, 'permission_update', {
+    const before = matrix.permissions
+    Object.assign(matrix, dto)
+    const saved = await this.matrixRepo.save(matrix)
+    await this.logSecurityChange(user, "PermissionMatrix", saved.id, "permission_update", {
       role_key: saved.role_key,
       before,
       after: saved.permissions,
-    });
-    return saved;
+    })
+    return saved
   }
 
   async removeMatrix(id: number, user: UserEntity): Promise<void> {
-    if (!this.isPrivileged(user)) throw new ForbiddenException('Only admins can delete permission matrices');
-    const matrix = await this.matrixRepo.findOne({ where: { id } });
-    if (!matrix) throw new NotFoundException(`Permission matrix ${id} not found`);
-    await this.matrixRepo.remove(matrix);
+    if (!this.isPrivileged(user))
+      throw new ForbiddenException("Only admins can delete permission matrices")
+    const matrix = await this.matrixRepo.findOne({ where: { id } })
+    if (!matrix) throw new NotFoundException(`Permission matrix ${id} not found`)
+    await this.matrixRepo.remove(matrix)
   }
 
   // ─── Role Templates ───────────────────────────────────────────────────────
   async findRoleTemplates(query: QueryRoleTemplatesDto, user: UserEntity) {
-    const { page, limit, organization_id, org_type } = query;
-    let where: Record<string, any> | Record<string, any>[] = {};
+    const { page, limit, organization_id, org_type } = query
+    let where: Record<string, any> | Record<string, any>[] = {}
     if (!this.isPrivileged(user)) {
-      const { organizationId, orgType } = this.requireOrganizationContext(user);
+      const { organizationId, orgType } = this.requireOrganizationContext(user)
       where = [
         { organization_id: organizationId, org_type: orgType },
         { organization_id: IsNull(), org_type: orgType },
-      ];
+      ]
     } else if (organization_id) {
-      where.organization_id = organization_id;
+      where.organization_id = organization_id
     }
-    if (this.isPrivileged(user) && org_type) (where as Record<string, any>).org_type = org_type;
+    if (this.isPrivileged(user) && org_type) (where as Record<string, any>).org_type = org_type
 
-    const { skip, take } = getSkipTake(page, limit);
-    const [data, total] = await this.templateRepo.findAndCount({ where, skip, take });
-    return buildPaginatedResponse(data, total, { page, limit });
+    const { skip, take } = getSkipTake(page, limit)
+    const [data, total] = await this.templateRepo.findAndCount({ where, skip, take })
+    return buildPaginatedResponse(data, total, { page, limit })
   }
 
-  async createRoleTemplate(dto: CreateRoleTemplateDto, user: UserEntity): Promise<RoleTemplateEntity> {
+  async createRoleTemplate(
+    dto: CreateRoleTemplateDto,
+    user: UserEntity,
+  ): Promise<RoleTemplateEntity> {
     if (!this.isPrivileged(user) && !this.isOrganizationAdministrator(user)) {
-      throw new ForbiddenException('Insufficient permissions to create role template');
+      throw new ForbiddenException("Insufficient permissions to create role template")
     }
-    const context = this.isPrivileged(user) ? null : this.requireOrganizationContext(user);
+    const context = this.isPrivileged(user) ? null : this.requireOrganizationContext(user)
     const tpl = this.templateRepo.create({
       ...dto,
       organization_id: this.isPrivileged(user) ? dto.organization_id : context!.organizationId,
       org_type: this.isPrivileged(user) ? dto.org_type : context!.orgType,
-    } as any);
-    const saved = await this.templateRepo.save(tpl) as unknown as RoleTemplateEntity;
-    await this.logSecurityChange(user, 'RoleTemplate', saved.id, 'role_display_name_update', {
+    } as any)
+    const saved = (await this.templateRepo.save(tpl)) as unknown as RoleTemplateEntity
+    await this.logSecurityChange(user, "RoleTemplate", saved.id, "role_display_name_update", {
       system_role_key: saved.system_role_key,
       before: null,
       after: saved.display_name,
-    });
-    return saved;
+    })
+    return saved
   }
 
-  async updateRoleTemplate(id: number, dto: UpdateRoleTemplateDto, user: UserEntity): Promise<RoleTemplateEntity> {
-    const tpl = await this.templateRepo.findOne({ where: { id } });
-    if (!tpl) throw new NotFoundException(`Role template ${id} not found`);
+  async updateRoleTemplate(
+    id: number,
+    dto: UpdateRoleTemplateDto,
+    user: UserEntity,
+  ): Promise<RoleTemplateEntity> {
+    const tpl = await this.templateRepo.findOne({ where: { id } })
+    if (!tpl) throw new NotFoundException(`Role template ${id} not found`)
     if (!this.isPrivileged(user)) {
-      const { organizationId } = this.requireOrganizationContext(user);
+      const { organizationId } = this.requireOrganizationContext(user)
       if (!this.isOrganizationAdministrator(user) || tpl.organization_id !== organizationId) {
-        throw new ForbiddenException('Access denied');
+        throw new ForbiddenException("Access denied")
       }
-      const before = tpl.display_name;
-      if (dto.display_name !== undefined) tpl.display_name = dto.display_name;
-      const saved = await this.templateRepo.save(tpl);
-      await this.logSecurityChange(user, 'RoleTemplate', saved.id, 'role_display_name_update', {
+      const before = tpl.display_name
+      if (dto.display_name !== undefined) tpl.display_name = dto.display_name
+      const saved = await this.templateRepo.save(tpl)
+      await this.logSecurityChange(user, "RoleTemplate", saved.id, "role_display_name_update", {
         system_role_key: saved.system_role_key,
         before,
         after: saved.display_name,
-      });
-      return saved;
+      })
+      return saved
     }
-    const before = tpl.display_name;
-    Object.assign(tpl, dto);
-    const saved = await this.templateRepo.save(tpl);
-    await this.logSecurityChange(user, 'RoleTemplate', saved.id, 'role_display_name_update', {
+    const before = tpl.display_name
+    Object.assign(tpl, dto)
+    const saved = await this.templateRepo.save(tpl)
+    await this.logSecurityChange(user, "RoleTemplate", saved.id, "role_display_name_update", {
       system_role_key: saved.system_role_key,
       before,
       after: saved.display_name,
-    });
-    return saved;
+    })
+    return saved
   }
 
   async removeRoleTemplate(id: number, user: UserEntity): Promise<void> {
-    if (!this.isPrivileged(user)) throw new ForbiddenException('Only admins can delete role templates');
-    const tpl = await this.templateRepo.findOne({ where: { id } });
-    if (!tpl) throw new NotFoundException(`Role template ${id} not found`);
-    await this.templateRepo.remove(tpl);
+    if (!this.isPrivileged(user))
+      throw new ForbiddenException("Only admins can delete role templates")
+    const tpl = await this.templateRepo.findOne({ where: { id } })
+    if (!tpl) throw new NotFoundException(`Role template ${id} not found`)
+    await this.templateRepo.remove(tpl)
   }
 
   // ─── Role Aliases ─────────────────────────────────────────────────────────
   async findRoleAliases() {
-    return this.aliasRepo.find();
+    return this.aliasRepo.find()
   }
 
   async createRoleAlias(dto: CreateRoleAliasDto): Promise<RoleAliasEntity> {
-    const alias = this.aliasRepo.create(dto as any);
-    return this.aliasRepo.save(alias) as unknown as Promise<RoleAliasEntity>;
+    const alias = this.aliasRepo.create(dto as any)
+    return this.aliasRepo.save(alias) as unknown as Promise<RoleAliasEntity>
   }
 
   // ─── User Position Access ─────────────────────────────────────────────────
   async findUserPositionAccess(companyEmail: string) {
-    return this.accessRepo.find({ where: { company_email: companyEmail } });
+    return this.accessRepo.find({ where: { company_email: companyEmail } })
   }
 
-  async createUserPositionAccess(dto: CreateUserPositionAccessDto): Promise<UserPositionAccessEntity> {
-    const access = this.accessRepo.create(dto as any);
-    return this.accessRepo.save(access) as unknown as Promise<UserPositionAccessEntity>;
+  async createUserPositionAccess(
+    dto: CreateUserPositionAccessDto,
+  ): Promise<UserPositionAccessEntity> {
+    const access = this.accessRepo.create(dto as any)
+    return this.accessRepo.save(access) as unknown as Promise<UserPositionAccessEntity>
   }
 
-  async updateUserPositionAccess(id: number, dto: UpdateUserPositionAccessDto): Promise<UserPositionAccessEntity> {
-    const access = await this.accessRepo.findOne({ where: { id } });
-    if (!access) throw new NotFoundException(`User position access ${id} not found`);
-    Object.assign(access, dto);
-    return this.accessRepo.save(access);
+  async updateUserPositionAccess(
+    id: number,
+    dto: UpdateUserPositionAccessDto,
+  ): Promise<UserPositionAccessEntity> {
+    const access = await this.accessRepo.findOne({ where: { id } })
+    if (!access) throw new NotFoundException(`User position access ${id} not found`)
+    Object.assign(access, dto)
+    return this.accessRepo.save(access)
   }
 
   async removeUserPositionAccess(id: number): Promise<void> {
-    const access = await this.accessRepo.findOne({ where: { id } });
-    if (!access) throw new NotFoundException(`User position access ${id} not found`);
-    await this.accessRepo.remove(access);
+    const access = await this.accessRepo.findOne({ where: { id } })
+    if (!access) throw new NotFoundException(`User position access ${id} not found`)
+    await this.accessRepo.remove(access)
   }
 
   // ─── Positions ────────────────────────────────────────────────────────────
   async findPositions(query: QueryPositionsDto) {
-    const { page, limit, company_email, is_active } = query;
-    const where: Record<string, any> = {};
-    if (company_email) where.company_email = company_email;
-    if (is_active !== undefined) where.is_active = is_active;
+    const { page, limit, company_email, is_active } = query
+    const where: Record<string, any> = {}
+    if (company_email) where.company_email = company_email
+    if (is_active !== undefined) where.is_active = is_active
 
-    const { skip, take } = getSkipTake(page, limit);
-    const [data, total] = await this.positionRepo.findAndCount({ where, skip, take });
-    return buildPaginatedResponse(data, total, { page, limit });
+    const { skip, take } = getSkipTake(page, limit)
+    const [data, total] = await this.positionRepo.findAndCount({ where, skip, take })
+    return buildPaginatedResponse(data, total, { page, limit })
   }
 
   async createPosition(dto: CreatePositionDto): Promise<PositionEntity> {
-    const position = this.positionRepo.create(dto as any);
-    return this.positionRepo.save(position) as unknown as Promise<PositionEntity>;
+    const position = this.positionRepo.create(dto as any)
+    return this.positionRepo.save(position) as unknown as Promise<PositionEntity>
   }
 
   async updatePosition(id: number, dto: UpdatePositionDto): Promise<PositionEntity> {
-    const position = await this.positionRepo.findOne({ where: { id } });
-    if (!position) throw new NotFoundException(`Position ${id} not found`);
-    Object.assign(position, dto);
-    return this.positionRepo.save(position);
+    const position = await this.positionRepo.findOne({ where: { id } })
+    if (!position) throw new NotFoundException(`Position ${id} not found`)
+    Object.assign(position, dto)
+    return this.positionRepo.save(position)
   }
 
   async removePosition(id: number): Promise<void> {
-    const position = await this.positionRepo.findOne({ where: { id } });
-    if (!position) throw new NotFoundException(`Position ${id} not found`);
-    await this.positionRepo.remove(position);
+    const position = await this.positionRepo.findOne({ where: { id } })
+    if (!position) throw new NotFoundException(`Position ${id} not found`)
+    await this.positionRepo.remove(position)
   }
 }

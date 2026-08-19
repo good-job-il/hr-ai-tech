@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm"
 
 export class BackgroundJobs1752500000000 implements MigrationInterface {
-  name = 'BackgroundJobs1752500000000';
+  name = "BackgroundJobs1752500000000"
 
   async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -28,10 +28,10 @@ export class BackgroundJobs1752500000000 implements MigrationInterface {
         KEY IDX_background_jobs_organization (organization_id),
         CONSTRAINT FK_background_jobs_user FOREIGN KEY (requested_by) REFERENCES users(id) ON DELETE RESTRICT
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `);
+    `)
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('DROP TABLE background_jobs');
+    await queryRunner.query("DROP TABLE background_jobs")
   }
 }

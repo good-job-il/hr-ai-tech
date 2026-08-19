@@ -1,9 +1,9 @@
-import { forwardRef, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuditLogEntity } from './audit-log.entity';
-import { AuditService } from './audit.service';
-import { AuditController } from './audit.controller';
-import { PermissionsModule } from '../permissions/permissions.module';
+import { forwardRef, Module } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { AuditLogEntity } from "./audit-log.entity"
+import { AuditService } from "./audit.service"
+import { AuditController } from "./audit.controller"
+import { PermissionsModule } from "../permissions/permissions.module"
 
 @Module({
   imports: [forwardRef(() => PermissionsModule), TypeOrmModule.forFeature([AuditLogEntity])],
@@ -12,4 +12,3 @@ import { PermissionsModule } from '../permissions/permissions.module';
   exports: [AuditService, TypeOrmModule],
 })
 export class AuditModule {}
-

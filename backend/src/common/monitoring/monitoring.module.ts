@@ -1,5 +1,5 @@
-import { Global, Module } from '@nestjs/common';
-import { OperationalMetricsService } from './operational-metrics.service';
+import { Global, Module } from "@nestjs/common"
+import { OperationalMetricsService } from "./operational-metrics.service"
 
 @Global()
 @Module({

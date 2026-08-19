@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm"
 
 export class Phase41751300000000 implements MigrationInterface {
-  name = 'Phase41751300000000';
+  name = "Phase41751300000000"
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Employer company-profile fields on `users` (used by updateCompanyProfile)
@@ -12,7 +12,7 @@ export class Phase41751300000000 implements MigrationInterface {
         ADD COLUMN \`gallery_urls\` JSON NULL,
         ADD COLUMN \`video_url\` TEXT NULL,
         ADD COLUMN \`testimonials\` JSON NULL;
-    `);
+    `)
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -23,7 +23,6 @@ export class Phase41751300000000 implements MigrationInterface {
         DROP COLUMN \`gallery_urls\`,
         DROP COLUMN \`video_url\`,
         DROP COLUMN \`testimonials\`;
-    `);
+    `)
   }
 }
-

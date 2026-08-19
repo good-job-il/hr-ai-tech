@@ -1,6 +1,6 @@
-import { SetMetadata } from '@nestjs/common';
+import { SetMetadata } from "@nestjs/common"
 
-export const BLOCK_DURING_IMPERSONATION_KEY = 'blockDuringImpersonation';
+export const BLOCK_DURING_IMPERSONATION_KEY = "blockDuringImpersonation"
 
 /**
  * Marks a route as platform-only: an ADMIN who is currently "inside" an
@@ -11,5 +11,4 @@ export const BLOCK_DURING_IMPERSONATION_KEY = 'blockDuringImpersonation';
  *
  * Pair with NoImpersonationGuard.
  */
-export const BlockDuringImpersonation = () => SetMetadata(BLOCK_DURING_IMPERSONATION_KEY, true);
-
+export const BlockDuringImpersonation = () => SetMetadata(BLOCK_DURING_IMPERSONATION_KEY, true)

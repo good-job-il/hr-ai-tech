@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ImportSourceEntity } from './import-source.entity';
-import { ImportSourcesService } from './import-sources.service';
-import { ImportSourcesController } from './import-sources.controller';
+import { Module } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { ImportSourceEntity } from "./import-source.entity"
+import { ImportSourcesService } from "./import-sources.service"
+import { ImportSourcesController } from "./import-sources.controller"
 
 @Module({
   imports: [TypeOrmModule.forFeature([ImportSourceEntity])],
@@ -11,4 +11,3 @@ import { ImportSourcesController } from './import-sources.controller';
   exports: [ImportSourcesService, TypeOrmModule],
 })
 export class ImportSourcesModule {}
-

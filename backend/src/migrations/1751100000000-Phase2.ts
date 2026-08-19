@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm"
 
 export class Phase21751100000000 implements MigrationInterface {
-  name = 'Phase21751100000000';
+  name = "Phase21751100000000"
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // ─── candidates ───────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_cand_email\`      (\`email\`),
         INDEX \`IDX_cand_deleted\`    (\`is_deleted\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── candidate_notes ──────────────────────────────────────────────────
     await queryRunner.query(`
@@ -93,7 +93,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_note_cand\` (\`candidate_id\`),
         INDEX \`IDX_note_org\`  (\`organization_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── candidate_tags ───────────────────────────────────────────────────
     await queryRunner.query(`
@@ -108,7 +108,7 @@ export class Phase21751100000000 implements MigrationInterface {
         PRIMARY KEY (\`id\`),
         INDEX \`IDX_tag_cand\` (\`candidate_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── candidate_documents ──────────────────────────────────────────────
     await queryRunner.query(`
@@ -142,7 +142,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_doc_cand\` (\`candidate_id\`),
         INDEX \`IDX_doc_org\`  (\`organization_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── candidate_timelines ──────────────────────────────────────────────
     await queryRunner.query(`
@@ -165,7 +165,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_ctl_cand\` (\`candidate_id\`),
         INDEX \`IDX_ctl_org\`  (\`organization_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── candidate_import_batches ─────────────────────────────────────────
     await queryRunner.query(`
@@ -197,7 +197,7 @@ export class Phase21751100000000 implements MigrationInterface {
         \`summary\`                  TEXT         NULL,
         PRIMARY KEY (\`id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── candidate_profiles ───────────────────────────────────────────────
     await queryRunner.query(`
@@ -225,7 +225,7 @@ export class Phase21751100000000 implements MigrationInterface {
         PRIMARY KEY (\`id\`),
         UNIQUE INDEX \`IDX_profile_email\` (\`user_email\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── candidate_access ─────────────────────────────────────────────────
     await queryRunner.query(`
@@ -244,7 +244,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_access_cand\` (\`candidate_id\`),
         INDEX \`IDX_access_owner\` (\`owner_organization_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── jobs ─────────────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -300,7 +300,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_job_deleted\`  (\`is_deleted\`),
         INDEX \`IDX_job_domain\`   (\`domain_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── saved_jobs ───────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -316,7 +316,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_sj_email\` (\`user_email\`),
         INDEX \`IDX_sj_job\`   (\`job_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── job_alerts ───────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -337,7 +337,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_alert_email\`  (\`user_email\`),
         INDEX \`IDX_alert_active\` (\`is_active\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── applications ─────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -383,7 +383,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_app_status\`    (\`status\`),
         INDEX \`IDX_app_deleted\`   (\`is_deleted\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── application_timelines ────────────────────────────────────────────
     await queryRunner.query(`
@@ -403,7 +403,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_atl_app\` (\`application_id\`),
         INDEX \`IDX_atl_org\` (\`organization_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── application_pipelines ────────────────────────────────────────────
     await queryRunner.query(`
@@ -418,7 +418,7 @@ export class Phase21751100000000 implements MigrationInterface {
         PRIMARY KEY (\`id\`),
         INDEX \`IDX_pipeline_employer\` (\`employer_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── interviews ───────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -456,7 +456,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_ivw_cand\`  (\`candidate_id\`),
         INDEX \`IDX_ivw_recr\`  (\`recruiter_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── messages ─────────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -473,7 +473,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_msg_app\`    (\`application_id\`),
         INDEX \`IDX_msg_sender\` (\`sender_email\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── notifications ────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -493,7 +493,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_notif_email\` (\`recipient_email\`),
         INDEX \`IDX_notif_read\`  (\`is_read\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── companies ────────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -514,7 +514,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_company_name\`    (\`name\`),
         INDEX \`IDX_company_deleted\` (\`is_deleted\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── company_reviews ──────────────────────────────────────────────────
     await queryRunner.query(`
@@ -538,7 +538,7 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_review_company\`  (\`company_id\`),
         INDEX \`IDX_review_reviewer\` (\`reviewer_email\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── staff ────────────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -556,22 +556,34 @@ export class Phase21751100000000 implements MigrationInterface {
         INDEX \`IDX_staff_company\` (\`company_id\`),
         INDEX \`IDX_staff_email\`   (\`email\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const tables = [
-      'staff', 'company_reviews', 'companies',
-      'notifications', 'messages', 'interviews',
-      'application_pipelines', 'application_timelines', 'applications',
-      'job_alerts', 'saved_jobs', 'jobs',
-      'candidate_access', 'candidate_profiles', 'candidate_import_batches',
-      'candidate_timelines', 'candidate_documents', 'candidate_tags',
-      'candidate_notes', 'candidates',
-    ];
+      "staff",
+      "company_reviews",
+      "companies",
+      "notifications",
+      "messages",
+      "interviews",
+      "application_pipelines",
+      "application_timelines",
+      "applications",
+      "job_alerts",
+      "saved_jobs",
+      "jobs",
+      "candidate_access",
+      "candidate_profiles",
+      "candidate_import_batches",
+      "candidate_timelines",
+      "candidate_documents",
+      "candidate_tags",
+      "candidate_notes",
+      "candidates",
+    ]
     for (const t of tables) {
-      await queryRunner.query(`DROP TABLE IF EXISTS \`${t}\``);
+      await queryRunner.query(`DROP TABLE IF EXISTS \`${t}\``)
     }
   }
 }
-

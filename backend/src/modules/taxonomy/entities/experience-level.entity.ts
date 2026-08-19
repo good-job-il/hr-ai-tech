@@ -1,11 +1,10 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from "typeorm"
 
-@Entity('experience_levels')
+@Entity("experience_levels")
 export class ExperienceLevelEntity {
-  @PrimaryColumn({ name: 'level_id', type: 'int' })
-  level_id: number;
+  @PrimaryColumn({ name: "level_id", type: "int" })
+  level_id: number
 
-  @Column({ type: 'varchar', length: 100 })
-  name: string;
+  @Column({ type: "varchar", length: 100 })
+  name: string
 }
-

@@ -1,56 +1,73 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { CompensationService } from './compensation.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Query,
+  ParseIntPipe,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from "@nestjs/common"
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger"
+import { CompensationService } from "./compensation.service"
 import {
   CreateCompensationPlanDto,
   UpdateCompensationPlanDto,
   QueryCompensationPlansDto,
-} from './dto/compensation.dto';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { UserEntity } from '../users/user.entity';
-import { EffectivePermissionsGuard } from '../permissions/effective-permissions.guard';
-import { RequiresPermission } from '../../common/decorators/requires-permission.decorator';
+} from "./dto/compensation.dto"
+import { CurrentUser } from "../../common/decorators/current-user.decorator"
+import { UserEntity } from "../users/user.entity"
+import { EffectivePermissionsGuard } from "../permissions/effective-permissions.guard"
+import { RequiresPermission } from "../../common/decorators/requires-permission.decorator"
 
-@ApiTags('Compensation Plans')
+@ApiTags("Compensation Plans")
 @ApiBearerAuth()
-@Controller('compensation-plans')
+@Controller("compensation-plans")
 export class CompensationController {
   constructor(private readonly svc: CompensationService) {}
 
   @Get()
   @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission('view_compensation')
+  @RequiresPermission("view_compensation")
   findAll(@Query() q: QueryCompensationPlansDto, @CurrentUser() u: UserEntity) {
-    return this.svc.findAll(q, u);
+    return this.svc.findAll(q, u)
   }
 
-  @Get(':id')
+  @Get(":id")
   @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission('view_compensation')
-  findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) {
-    return this.svc.findById(id, u);
+  @RequiresPermission("view_compensation")
+  findOne(@Param("id", ParseIntPipe) id: number, @CurrentUser() u: UserEntity) {
+    return this.svc.findById(id, u)
   }
 
   @Post()
   @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission('edit_compensation')
+  @RequiresPermission("edit_compensation")
   @HttpCode(HttpStatus.CREATED)
   create(@Body() dto: CreateCompensationPlanDto, @CurrentUser() u: UserEntity) {
-    return this.svc.create(dto, u);
+    return this.svc.create(dto, u)
   }
 
-  @Patch(':id')
+  @Patch(":id")
   @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission('edit_compensation')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCompensationPlanDto, @CurrentUser() u: UserEntity) {
-    return this.svc.update(id, dto, u);
+  @RequiresPermission("edit_compensation")
+  update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() dto: UpdateCompensationPlanDto,
+    @CurrentUser() u: UserEntity,
+  ) {
+    return this.svc.update(id, dto, u)
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission('edit_compensation')
+  @RequiresPermission("edit_compensation")
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) {
-    return this.svc.remove(id, u);
+  remove(@Param("id", ParseIntPipe) id: number, @CurrentUser() u: UserEntity) {
+    return this.svc.remove(id, u)
   }
 }

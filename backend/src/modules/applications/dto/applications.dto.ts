@@ -1,7 +1,18 @@
-import { z } from 'zod';
-import { createZodDto } from 'nestjs-zod';
+import { z } from "zod"
+import { createZodDto } from "nestjs-zod"
 
-const statusEnum = z.enum(['new','reviewed','phone_interview','recommended','employer_interview','offer','hired','probation','completed','rejected']);
+const statusEnum = z.enum([
+  "new",
+  "reviewed",
+  "phone_interview",
+  "recommended",
+  "employer_interview",
+  "offer",
+  "hired",
+  "probation",
+  "completed",
+  "rejected",
+])
 
 export const CreateApplicationSchema = z.object({
   job_id: z.number().int(),
@@ -21,11 +32,13 @@ export const CreateApplicationSchema = z.object({
   desired_salary_min: z.number().int().optional().nullable(),
   desired_salary_max: z.number().int().optional().nullable(),
   location: z.string().optional().nullable(),
-  source: z.enum(['app','linkedin','facebook','jobsite','pool_assignment','email_intake','other']).optional(),
-  status: statusEnum.optional().default('new'),
+  source: z
+    .enum(["app", "linkedin", "facebook", "jobsite", "pool_assignment", "email_intake", "other"])
+    .optional(),
+  status: statusEnum.optional().default("new"),
   notes: z.string().optional().nullable(),
   assigned_to: z.number().int().optional().nullable(),
-});
+})
 export class CreateApplicationDto extends createZodDto(CreateApplicationSchema) {}
 
 export const SubmitApplicationSchema = CreateApplicationSchema.pick({
@@ -38,13 +51,13 @@ export const SubmitApplicationSchema = CreateApplicationSchema.pick({
   desired_salary_min: true,
   desired_salary_max: true,
   location: true,
-}).extend({ candidate_name: z.string().min(1).optional() });
+}).extend({ candidate_name: z.string().min(1).optional() })
 export class SubmitApplicationDto extends createZodDto(SubmitApplicationSchema) {}
 
 export const AssignCandidateSchema = z.object({
   job_id: z.number().int(),
   candidate_id: z.number().int(),
-});
+})
 export class AssignCandidateDto extends createZodDto(AssignCandidateSchema) {}
 
 export const UpdateApplicationSchema = CreateApplicationSchema.partial().extend({
@@ -53,29 +66,40 @@ export const UpdateApplicationSchema = CreateApplicationSchema.partial().extend(
   internal_history: z.string().optional().nullable(),
   is_deleted: z.boolean().optional(),
   deleted_by: z.string().optional().nullable(),
-});
+})
 export class UpdateApplicationDto extends createZodDto(UpdateApplicationSchema) {}
 
 export const ChangeApplicationStatusSchema = z.object({
   status: statusEnum,
   reason: z.string().min(1).max(1000).optional(),
-});
+})
 export class ChangeApplicationStatusDto extends createZodDto(ChangeApplicationStatusSchema) {}
 
 export const ReopenApplicationSchema = z.object({
   reason: z.string().trim().min(1).max(1000),
-  status: z.enum(['new','reviewed','phone_interview','recommended','employer_interview','offer','hired','probation']).default('reviewed'),
-});
+  status: z
+    .enum([
+      "new",
+      "reviewed",
+      "phone_interview",
+      "recommended",
+      "employer_interview",
+      "offer",
+      "hired",
+      "probation",
+    ])
+    .default("reviewed"),
+})
 export class ReopenApplicationDto extends createZodDto(ReopenApplicationSchema) {}
 
-export const AddApplicationNoteSchema = z.object({ content: z.string().min(1).max(5000) });
+export const AddApplicationNoteSchema = z.object({ content: z.string().min(1).max(5000) })
 export class AddApplicationNoteDto extends createZodDto(AddApplicationNoteSchema) {}
 
 export const QueryApplicationsSchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(500).default(20),
-  sort: z.string().default('created_date'),
-  order: z.enum(['ASC', 'DESC']).default('DESC'),
+  sort: z.string().default("created_date"),
+  order: z.enum(["ASC", "DESC"]).default("DESC"),
   job_id: z.coerce.number().int().optional(),
   candidate_id: z.coerce.number().int().optional(),
   candidate_email: z.string().email().optional(),
@@ -86,5 +110,5 @@ export const QueryApplicationsSchema = z.object({
   assigned_to: z.coerce.number().int().optional(),
   is_deleted: z.coerce.boolean().optional().default(false),
   search: z.string().optional(),
-});
+})
 export class QueryApplicationsDto extends createZodDto(QueryApplicationsSchema) {}

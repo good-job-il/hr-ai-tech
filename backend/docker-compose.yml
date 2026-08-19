@@ -10,13 +10,13 @@ services:
       MYSQL_USER: hire_user
       MYSQL_PASSWORD: hire_pass
     ports:
-      - '${MYSQL_EXPOSE_PORT:-3306}:3306'
+      - "${MYSQL_EXPOSE_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'hire_user', '-phire_pass']
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "hire_user", "-phire_pass"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,15 +39,15 @@ services:
       DB_NAME: hire_israel
       DB_USER: hire_user
       DB_PASSWORD: hire_pass
-      DB_SYNCHRONIZE: 'false'
-      DB_LOGGING: 'false'
+      DB_SYNCHRONIZE: "false"
+      DB_LOGGING: "false"
       JWT_SECRET: ${JWT_SECRET:-local-dev-secret-change-in-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-dev-refresh-secret}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
     ports:
-      - '3001:3001'
+      - "3001:3001"
     volumes:
       - ./uploads:/app/uploads
     profiles:
@@ -61,7 +61,7 @@ services:
     depends_on:
       - mysql
     ports:
-      - '8080:8080'
+      - "8080:8080"
     profiles:
       - dev
 

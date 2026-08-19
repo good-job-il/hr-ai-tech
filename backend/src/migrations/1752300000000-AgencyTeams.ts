@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm"
 
 export class AgencyTeams1752300000000 implements MigrationInterface {
-  name = 'AgencyTeams1752300000000';
+  name = "AgencyTeams1752300000000"
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -19,9 +19,9 @@ export class AgencyTeams1752300000000 implements MigrationInterface {
         INDEX IDX_agency_team_org (organization_id),
         INDEX IDX_agency_team_manager (manager_id)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `);
-    await queryRunner.query(`ALTER TABLE users ADD COLUMN team_id INT NULL AFTER team_manager_id`);
-    await queryRunner.query(`CREATE INDEX IDX_users_team_id ON users (team_id)`);
+    `)
+    await queryRunner.query(`ALTER TABLE users ADD COLUMN team_id INT NULL AFTER team_manager_id`)
+    await queryRunner.query(`CREATE INDEX IDX_users_team_id ON users (team_id)`)
     await queryRunner.query(`
       CREATE TABLE agency_invitations (
         id INT NOT NULL AUTO_INCREMENT,
@@ -43,17 +43,25 @@ export class AgencyTeams1752300000000 implements MigrationInterface {
         INDEX IDX_agency_invitation_org_status (organization_id, status),
         INDEX IDX_agency_invitation_email (email)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `);
-    await queryRunner.query(`ALTER TABLE audit_logs MODIFY COLUMN entity_type ENUM('Candidate','Application','Job','Company','CandidateDocument','CompensationPlan','User','Organization','Interview','CommunicationLog','AgencyTeam','AgencyInvitation') NOT NULL`);
-    await queryRunner.query(`ALTER TABLE audit_logs MODIFY COLUMN action ENUM('view','create','update','delete','cv_download','cv_view','status_change','send_to_employer','export','compensation_change','login','impersonate','restore','role_display_name_update','permission_update','deactivate','resend','cancel') NOT NULL`);
+    `)
+    await queryRunner.query(
+      `ALTER TABLE audit_logs MODIFY COLUMN entity_type ENUM('Candidate','Application','Job','Company','CandidateDocument','CompensationPlan','User','Organization','Interview','CommunicationLog','AgencyTeam','AgencyInvitation') NOT NULL`,
+    )
+    await queryRunner.query(
+      `ALTER TABLE audit_logs MODIFY COLUMN action ENUM('view','create','update','delete','cv_download','cv_view','status_change','send_to_employer','export','compensation_change','login','impersonate','restore','role_display_name_update','permission_update','deactivate','resend','cancel') NOT NULL`,
+    )
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE audit_logs MODIFY COLUMN action ENUM('view','create','update','delete','cv_download','cv_view','status_change','send_to_employer','export','compensation_change','login','impersonate','restore','role_display_name_update','permission_update') NOT NULL`);
-    await queryRunner.query(`ALTER TABLE audit_logs MODIFY COLUMN entity_type ENUM('Candidate','Application','Job','Company','CandidateDocument','CompensationPlan','User','Organization','Interview','CommunicationLog') NOT NULL`);
-    await queryRunner.query(`DROP TABLE agency_invitations`);
-    await queryRunner.query(`DROP INDEX IDX_users_team_id ON users`);
-    await queryRunner.query(`ALTER TABLE users DROP COLUMN team_id`);
-    await queryRunner.query(`DROP TABLE agency_teams`);
+    await queryRunner.query(
+      `ALTER TABLE audit_logs MODIFY COLUMN action ENUM('view','create','update','delete','cv_download','cv_view','status_change','send_to_employer','export','compensation_change','login','impersonate','restore','role_display_name_update','permission_update') NOT NULL`,
+    )
+    await queryRunner.query(
+      `ALTER TABLE audit_logs MODIFY COLUMN entity_type ENUM('Candidate','Application','Job','Company','CandidateDocument','CompensationPlan','User','Organization','Interview','CommunicationLog') NOT NULL`,
+    )
+    await queryRunner.query(`DROP TABLE agency_invitations`)
+    await queryRunner.query(`DROP INDEX IDX_users_team_id ON users`)
+    await queryRunner.query(`ALTER TABLE users DROP COLUMN team_id`)
+    await queryRunner.query(`DROP TABLE agency_teams`)
   }
 }

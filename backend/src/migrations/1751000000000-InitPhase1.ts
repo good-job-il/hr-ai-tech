@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm"
 
 export class InitPhase11751000000000 implements MigrationInterface {
-  name = 'InitPhase11751000000000';
+  name = "InitPhase11751000000000"
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // ─── organizations ───────────────────────────────────────────────────
@@ -21,7 +21,7 @@ export class InitPhase11751000000000 implements MigrationInterface {
         INDEX \`IDX_org_type\`   (\`org_type\`),
         INDEX \`IDX_org_status\` (\`status\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── users ───────────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -55,7 +55,7 @@ export class InitPhase11751000000000 implements MigrationInterface {
         INDEX \`IDX_user_org\`   (\`organization_id\`),
         INDEX \`IDX_user_role\`  (\`role\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── domains ─────────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -64,7 +64,7 @@ export class InitPhase11751000000000 implements MigrationInterface {
         \`name\`      VARCHAR(255) NOT NULL,
         PRIMARY KEY (\`domain_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── taxonomy_roles ───────────────────────────────────────────────────
     await queryRunner.query(`
@@ -76,7 +76,7 @@ export class InitPhase11751000000000 implements MigrationInterface {
         PRIMARY KEY (\`role_id\`),
         INDEX \`IDX_taxrole_domain\` (\`domain_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── specializations ──────────────────────────────────────────────────
     await queryRunner.query(`
@@ -87,7 +87,7 @@ export class InitPhase11751000000000 implements MigrationInterface {
         PRIMARY KEY (\`specialization_id\`),
         INDEX \`IDX_spec_role_name\` (\`role_name\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── work_modes ────────────────────────────────────────────────────────
     await queryRunner.query(`
@@ -96,7 +96,7 @@ export class InitPhase11751000000000 implements MigrationInterface {
         \`name\`    VARCHAR(100) NOT NULL,
         PRIMARY KEY (\`mode_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── employment_types ──────────────────────────────────────────────────
     await queryRunner.query(`
@@ -105,7 +105,7 @@ export class InitPhase11751000000000 implements MigrationInterface {
         \`name\`    VARCHAR(100) NOT NULL,
         PRIMARY KEY (\`type_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
 
     // ─── experience_levels ─────────────────────────────────────────────────
     await queryRunner.query(`
@@ -114,18 +114,17 @@ export class InitPhase11751000000000 implements MigrationInterface {
         \`name\`     VARCHAR(100) NOT NULL,
         PRIMARY KEY (\`level_id\`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
+    `)
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP TABLE IF EXISTS \`experience_levels\``);
-    await queryRunner.query(`DROP TABLE IF EXISTS \`employment_types\``);
-    await queryRunner.query(`DROP TABLE IF EXISTS \`work_modes\``);
-    await queryRunner.query(`DROP TABLE IF EXISTS \`specializations\``);
-    await queryRunner.query(`DROP TABLE IF EXISTS \`taxonomy_roles\``);
-    await queryRunner.query(`DROP TABLE IF EXISTS \`domains\``);
-    await queryRunner.query(`DROP TABLE IF EXISTS \`users\``);
-    await queryRunner.query(`DROP TABLE IF EXISTS \`organizations\``);
+    await queryRunner.query(`DROP TABLE IF EXISTS \`experience_levels\``)
+    await queryRunner.query(`DROP TABLE IF EXISTS \`employment_types\``)
+    await queryRunner.query(`DROP TABLE IF EXISTS \`work_modes\``)
+    await queryRunner.query(`DROP TABLE IF EXISTS \`specializations\``)
+    await queryRunner.query(`DROP TABLE IF EXISTS \`taxonomy_roles\``)
+    await queryRunner.query(`DROP TABLE IF EXISTS \`domains\``)
+    await queryRunner.query(`DROP TABLE IF EXISTS \`users\``)
+    await queryRunner.query(`DROP TABLE IF EXISTS \`organizations\``)
   }
 }
-
