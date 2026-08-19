@@ -174,8 +174,7 @@ export class JobsService {
       created_by_user_id: user.id,
       recruiter_id: dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
       team_id: assignmentTeamId,
-      team_manager_id:
-        user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id,
+      team_manager_id: user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id,
       recruitment_manager_id:
         dto.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
       state: dto.state ?? (dto.is_closed ? "closed" : "open"),
@@ -201,8 +200,8 @@ export class JobsService {
       job.team_id = assignmentTeamId
 
       if (user.role === UserRole.TEAM_MANAGER) {
-job.team_manager_id = user.id
-}
+        job.team_manager_id = user.id
+      }
     }
 
     if (dto.state) {
@@ -308,18 +307,18 @@ job.team_manager_id = user.id
       }
 
       if (assignee.team_id) {
-teamIds.add(assignee.team_id)
-}
+        teamIds.add(assignee.team_id)
+      }
     }
 
     if (teamIds.size > 1) {
-throw new BadRequestException("All assignees must belong to the same team")
-}
+      throw new BadRequestException("All assignees must belong to the same team")
+    }
 
     if (user.role === UserRole.TEAM_MANAGER) {
       if (!user.team_id) {
-throw new ForbiddenException("Active team membership required")
-}
+        throw new ForbiddenException("Active team membership required")
+      }
 
       return user.team_id
     }

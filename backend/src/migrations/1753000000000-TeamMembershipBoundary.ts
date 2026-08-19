@@ -22,7 +22,7 @@ export class TeamMembershipBoundary1753000000000 implements MigrationInterface {
 
       const indexName = `IDX_${tableName}_team_id`
 
-      if (!table?.indices.some(index => index.name === indexName)) {
+      if (!table?.indices.some((index) => index.name === indexName)) {
         await queryRunner.query(`CREATE INDEX \`${indexName}\` ON \`${tableName}\` (\`team_id\`)`)
       }
 
@@ -46,7 +46,7 @@ export class TeamMembershipBoundary1753000000000 implements MigrationInterface {
 
       const indexName = `IDX_${tableName}_team_id`
 
-      if (table?.indices.some(index => index.name === indexName)) {
+      if (table?.indices.some((index) => index.name === indexName)) {
         await queryRunner.query(`DROP INDEX \`${indexName}\` ON \`${tableName}\``)
       }
 

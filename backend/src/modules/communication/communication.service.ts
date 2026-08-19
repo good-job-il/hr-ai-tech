@@ -33,10 +33,12 @@ export class CommunicationService {
   async findAll(query: QueryCommunicationLogsDto, user: UserEntity) {
     const { page, limit, sort, order, candidate_id, channel } = query
 
-    if ([UserRole.TEAM_MANAGER, UserRole.RECRUITER, UserRole.INTERNAL_RECRUITER].includes(user.role)) {
+    if (
+      [UserRole.TEAM_MANAGER, UserRole.RECRUITER, UserRole.INTERNAL_RECRUITER].includes(user.role)
+    ) {
       if (!candidate_id) {
-return buildPaginatedResponse([], 0, { page, limit })
-}
+        return buildPaginatedResponse([], 0, { page, limit })
+      }
 
       await this.candidatesService.findById(candidate_id, user)
     }

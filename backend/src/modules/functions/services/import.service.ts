@@ -263,12 +263,11 @@ export class ImportService {
           ...data,
           organization_id: user.organization_id,
           team_id:
-            importBatch?.team_id
-            ?? (user.role === UserRole.TEAM_MANAGER ? user.team_id : null)
-            ?? assignees.find(member => member.team_id)?.team_id
-            ?? null,
-          team_manager_id:
-            user.role === UserRole.TEAM_MANAGER ? user.id : data.team_manager_id,
+            importBatch?.team_id ??
+            (user.role === UserRole.TEAM_MANAGER ? user.team_id : null) ??
+            assignees.find((member) => member.team_id)?.team_id ??
+            null,
+          team_manager_id: user.role === UserRole.TEAM_MANAGER ? user.id : data.team_manager_id,
           import_batch_id: dto.import_batch_id ?? null,
           imported_at: new Date(),
           imported_by: user.email,
@@ -521,7 +520,7 @@ export class ImportService {
         team_id:
           user.role === UserRole.TEAM_MANAGER
             ? user.team_id
-            : assignees.find(member => member.team_id)?.team_id ?? null,
+            : (assignees.find((member) => member.team_id)?.team_id ?? null),
         batch_name: `ZIP Import ${new Date().toISOString()}`,
         source_file: dto.zip_file_url,
         file_type: "zip",

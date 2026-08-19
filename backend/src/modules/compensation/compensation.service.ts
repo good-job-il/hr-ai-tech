@@ -61,8 +61,8 @@ export class CompensationService {
 
       if (user.role === UserRole.TEAM_MANAGER) {
         if (!user.team_id) {
-return buildPaginatedResponse([], 0, { page, limit })
-}
+          return buildPaginatedResponse([], 0, { page, limit })
+        }
 
         where.team_id = user.team_id
       }
@@ -217,7 +217,10 @@ return buildPaginatedResponse([], 0, { page, limit })
         throw new ForbiddenException(`User ${id} belongs to another organization`)
       }
 
-      if (user.role === UserRole.TEAM_MANAGER && (!user.team_id || member.team_id !== user.team_id)) {
+      if (
+        user.role === UserRole.TEAM_MANAGER &&
+        (!user.team_id || member.team_id !== user.team_id)
+      ) {
         throw new ForbiddenException(`User ${id} belongs to another team`)
       }
 
@@ -225,16 +228,16 @@ return buildPaginatedResponse([], 0, { page, limit })
     }
 
     const teamIds = new Set(
-      [job?.team_id, ...assignees.map(member => member.team_id)].filter(
+      [job?.team_id, ...assignees.map((member) => member.team_id)].filter(
         (id): id is number => id != null,
       ),
     )
 
     if (teamIds.size > 1) {
-throw new ForbiddenException("Job and assignees must belong to one team")
-}
+      throw new ForbiddenException("Job and assignees must belong to one team")
+    }
 
-    const teamId = user.role === UserRole.TEAM_MANAGER ? user.team_id : [...teamIds][0] ?? null
+    const teamId = user.role === UserRole.TEAM_MANAGER ? user.team_id : ([...teamIds][0] ?? null)
 
     if (user.role === UserRole.TEAM_MANAGER && job?.team_id !== user.team_id) {
       throw new ForbiddenException("Job belongs to another team")
@@ -246,7 +249,7 @@ throw new ForbiddenException("Job and assignees must belong to one team")
       client_name: company.name,
       team_id: teamId,
       team_manager_id:
-        user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id ?? null,
+        user.role === UserRole.TEAM_MANAGER ? user.id : (dto.team_manager_id ?? null),
     }
   }
 

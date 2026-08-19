@@ -143,8 +143,8 @@ export class AgencyClientsService {
 
     if (user.role === UserRole.TEAM_MANAGER) {
       if (!teamId) {
-throw new NotFoundException(`Agency client ${id} not found`)
-}
+        throw new NotFoundException(`Agency client ${id} not found`)
+      }
 
       const [teamJob, teamApplication] = await Promise.all([
         this.jobRepo.findOne({
@@ -412,9 +412,7 @@ throw new NotFoundException(`Agency client ${id} not found`)
       applicationQuery.andWhere("application.team_id = :teamId", { teamId })
     }
 
-    const appRows = await applicationQuery
-      .groupBy("application.employer_company_id")
-      .getRawMany()
+    const appRows = await applicationQuery.groupBy("application.employer_company_id").getRawMany()
 
     const appStats = new Map(appRows.map((row) => [Number(row.company_id), row]))
 

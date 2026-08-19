@@ -86,8 +86,8 @@ export class AgencyTeamsService {
 
     if (actor.role === UserRole.TEAM_MANAGER) {
       if (!actor.team_id) {
-throw new ForbiddenException("Active team membership required")
-}
+        throw new ForbiddenException("Active team membership required")
+      }
 
       const [members, team] = await Promise.all([
         this.users.find({
@@ -105,16 +105,21 @@ throw new ForbiddenException("Active team membership required")
       ])
 
       if (!team) {
-throw new ForbiddenException("Active managed team required")
-}
+        throw new ForbiddenException("Active managed team required")
+      }
 
       return {
         members: members
-          .filter(member => member.team_id === actor.team_id)
-          .filter(member => [UserRole.TEAM_MANAGER, UserRole.RECRUITER].includes(member.role))
+          .filter((member) => member.team_id === actor.team_id)
+          .filter((member) => [UserRole.TEAM_MANAGER, UserRole.RECRUITER].includes(member.role))
           .map(
-            ({ password_hash, refresh_token_hash, reset_token_hash, reset_token_expires, ...member }) =>
-              member,
+            ({
+              password_hash,
+              refresh_token_hash,
+              reset_token_hash,
+              reset_token_expires,
+              ...member
+            }) => member,
           ),
         teams: [team],
         invitations: [],

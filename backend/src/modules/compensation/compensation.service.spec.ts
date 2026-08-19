@@ -113,7 +113,11 @@ describe("CompensationService OA-2 canonical relations", () => {
     const plans = repo()
 
     const service = new CompensationService(
-      plans as any, repo() as any, repo() as any, repo() as any, repo() as any,
+      plans as any,
+      repo() as any,
+      repo() as any,
+      repo() as any,
+      repo() as any,
       { log: jest.fn() } as any,
     )
 
@@ -126,14 +130,22 @@ describe("CompensationService OA-2 canonical relations", () => {
       team_id: 4,
     } as any
 
-    await service.findAll({
-      page: 1, limit: 100, sort: "created_date", order: "DESC",
-      recruiter_id: 999,
-    } as any, lead)
+    await service.findAll(
+      {
+        page: 1,
+        limit: 100,
+        sort: "created_date",
+        order: "DESC",
+        recruiter_id: 999,
+      } as any,
+      lead,
+    )
 
-    expect(plans.findAndCount).toHaveBeenCalledWith(expect.objectContaining({
-      where: expect.objectContaining({ organization_id: 22, team_id: 4 }),
-    }))
+    expect(plans.findAndCount).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ organization_id: 22, team_id: 4 }),
+      }),
+    )
 
     plans.findOne.mockResolvedValue({ id: 9, organization_id: 22, team_id: 5 })
     await expect(service.findById(9, lead)).rejects.toBeInstanceOf(NotFoundException)

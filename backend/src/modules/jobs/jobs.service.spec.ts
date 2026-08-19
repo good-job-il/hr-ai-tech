@@ -130,17 +130,19 @@ describe("JobsService OA-2 state filters", () => {
       {} as any,
     )
 
-    await expect(service.create(
-      { title: "Engineer", employer_company_id: 9, recruiter_id: 31 } as any,
-      {
-        id: 41,
-        email: "lead@test",
-        role: UserRole.TEAM_MANAGER,
-        organization_id: 12,
-        org_type: "staffing_agency",
-        team_id: 4,
-      } as any,
-    )).rejects.toBeInstanceOf(ForbiddenException)
+    await expect(
+      service.create(
+        { title: "Engineer", employer_company_id: 9, recruiter_id: 31 } as any,
+        {
+          id: 41,
+          email: "lead@test",
+          role: UserRole.TEAM_MANAGER,
+          organization_id: 12,
+          org_type: "staffing_agency",
+          team_id: 4,
+        } as any,
+      ),
+    ).rejects.toBeInstanceOf(ForbiddenException)
     expect(jobs.save).not.toHaveBeenCalled()
   })
 
@@ -148,27 +150,38 @@ describe("JobsService OA-2 state filters", () => {
     const jobs = { findAndCount: jest.fn().mockResolvedValue([[], 0]) }
 
     const service = new JobsService(
-      jobs as any, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any,
+      jobs as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
     )
 
-    await service.findAll({
-      page: 1,
-      limit: 20,
-      sort: "created_date",
-      order: "DESC",
-      organization_id: 999,
-      recruiter_id: 777,
-      is_deleted: false,
-    } as any, {
-      id: 41,
-      email: "lead@test",
-      role: UserRole.TEAM_MANAGER,
-      organization_id: 12,
-      team_id: 4,
-    } as any)
+    await service.findAll(
+      {
+        page: 1,
+        limit: 20,
+        sort: "created_date",
+        order: "DESC",
+        organization_id: 999,
+        recruiter_id: 777,
+        is_deleted: false,
+      } as any,
+      {
+        id: 41,
+        email: "lead@test",
+        role: UserRole.TEAM_MANAGER,
+        organization_id: 12,
+        team_id: 4,
+      } as any,
+    )
 
-    expect(jobs.findAndCount).toHaveBeenCalledWith(expect.objectContaining({
-      where: expect.objectContaining({ organization_id: 12, team_id: 4 }),
-    }))
+    expect(jobs.findAndCount).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ organization_id: 12, team_id: 4 }),
+      }),
+    )
   })
 })

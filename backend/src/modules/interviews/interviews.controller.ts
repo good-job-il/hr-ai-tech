@@ -38,10 +38,11 @@ export class InterviewsController {
   @Get(":id") findOne(@Param("id", ParseIntPipe) id: number, @CurrentUser() u: UserEntity) {
     return this.svc.findById(id, u)
   }
-  @Post() @Roles(...INTERVIEW_WRITE_ROLES) @RequiresPermission("create") @HttpCode(HttpStatus.CREATED) create(
-    @Body() dto: CreateInterviewDto,
-    @CurrentUser() u: UserEntity,
-  ) {
+  @Post()
+  @Roles(...INTERVIEW_WRITE_ROLES)
+  @RequiresPermission("create")
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() dto: CreateInterviewDto, @CurrentUser() u: UserEntity) {
     return this.svc.create(dto, u)
   }
   @Patch(":id") @Roles(...INTERVIEW_WRITE_ROLES) @RequiresPermission("update") update(
@@ -51,10 +52,11 @@ export class InterviewsController {
   ) {
     return this.svc.update(id, dto, u)
   }
-  @Delete(":id") @Roles(...INTERVIEW_WRITE_ROLES) @RequiresPermission("delete") @HttpCode(HttpStatus.NO_CONTENT) remove(
-    @Param("id", ParseIntPipe) id: number,
-    @CurrentUser() u: UserEntity,
-  ) {
+  @Delete(":id")
+  @Roles(...INTERVIEW_WRITE_ROLES)
+  @RequiresPermission("delete")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param("id", ParseIntPipe) id: number, @CurrentUser() u: UserEntity) {
     return this.svc.remove(id, u)
   }
 }

@@ -105,8 +105,8 @@ export class InterviewsService {
 
     if (user.role === UserRole.TEAM_MANAGER) {
       if (!user.team_id) {
-throw new NotFoundException("Active team membership required")
-}
+        throw new NotFoundException("Active team membership required")
+      }
 
       if (dto.recruiter_id) {
         const recruiter = await this.users.findOne({
@@ -120,8 +120,8 @@ throw new NotFoundException("Active team membership required")
         })
 
         if (!recruiter) {
-throw new NotFoundException(`Recruiter ${dto.recruiter_id} not found`)
-}
+          throw new NotFoundException(`Recruiter ${dto.recruiter_id} not found`)
+        }
       }
     }
 
@@ -135,13 +135,13 @@ throw new NotFoundException(`Recruiter ${dto.recruiter_id} not found`)
       job_id: application?.job_id ?? dto.job_id,
       job_title: application?.job_title ?? dto.job_title,
       recruiter_id:
-        application?.recruiter_id
-        ?? dto.recruiter_id
-        ?? (user.role === UserRole.RECRUITER ? user.id : null),
+        application?.recruiter_id ??
+        dto.recruiter_id ??
+        (user.role === UserRole.RECRUITER ? user.id : null),
       team_id: application?.team_id ?? (user.role === UserRole.TEAM_MANAGER ? user.team_id : null),
       team_manager_id:
-        application?.team_manager_id
-        ?? (user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id),
+        application?.team_manager_id ??
+        (user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id),
       recruitment_manager_id:
         dto.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
     } as any)
@@ -201,8 +201,8 @@ throw new NotFoundException(`Recruiter ${dto.recruiter_id} not found`)
         })
 
         if (!recruiter) {
-throw new NotFoundException(`Recruiter ${updates.recruiter_id} not found`)
-}
+          throw new NotFoundException(`Recruiter ${updates.recruiter_id} not found`)
+        }
       }
 
       updates.team_id = user.team_id

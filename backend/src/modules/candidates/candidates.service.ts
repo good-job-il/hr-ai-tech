@@ -224,8 +224,7 @@ export class CandidatesService {
       organization_id: user.organization_id,
       team_id: assignmentTeamId,
       recruiter_id: dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
-      team_manager_id:
-        user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id,
+      team_manager_id: user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id,
     } as any)
 
     return this.candidateRepo.save(candidate) as unknown as Promise<CandidateEntity>
@@ -242,8 +241,8 @@ export class CandidatesService {
       candidate.team_id = assignmentTeamId
 
       if (user.role === UserRole.TEAM_MANAGER) {
-candidate.team_manager_id = user.id
-}
+        candidate.team_manager_id = user.id
+      }
     }
 
     if (dto.is_deleted && !candidate.deleted_at) {
@@ -301,18 +300,18 @@ candidate.team_manager_id = user.id
       }
 
       if (assignee.team_id) {
-teamIds.add(assignee.team_id)
-}
+        teamIds.add(assignee.team_id)
+      }
     }
 
     if (teamIds.size > 1) {
-throw new BadRequestException("All assignees must belong to the same team")
-}
+      throw new BadRequestException("All assignees must belong to the same team")
+    }
 
     if (user.role === UserRole.TEAM_MANAGER) {
       if (!user.team_id) {
-throw new ForbiddenException("Active team membership required")
-}
+        throw new ForbiddenException("Active team membership required")
+      }
 
       return user.team_id
     }
@@ -503,10 +502,9 @@ throw new ForbiddenException("Active team membership required")
       team_id:
         user.role === UserRole.TEAM_MANAGER
           ? user.team_id
-          : assignees.find(member => member.team_id)?.team_id ?? null,
+          : (assignees.find((member) => member.team_id)?.team_id ?? null),
       recruiter_id: data.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
-      team_manager_id:
-        user.role === UserRole.TEAM_MANAGER ? user.id : data.team_manager_id,
+      team_manager_id: user.role === UserRole.TEAM_MANAGER ? user.id : data.team_manager_id,
       recruitment_manager_id:
         data.recruitment_manager_id ??
         (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
@@ -533,7 +531,10 @@ throw new ForbiddenException("Active team membership required")
         throw new ForbiddenException(`User ${id} belongs to another organization`)
       }
 
-      if (user.role === UserRole.TEAM_MANAGER && (!user.team_id || member.team_id !== user.team_id)) {
+      if (
+        user.role === UserRole.TEAM_MANAGER &&
+        (!user.team_id || member.team_id !== user.team_id)
+      ) {
         throw new ForbiddenException(`User ${id} belongs to another team`)
       }
 
@@ -564,13 +565,15 @@ throw new ForbiddenException("Active team membership required")
       throw new ForbiddenException("Access denied")
     }
 
-    if ([
-      UserRole.ORG_ADMIN,
-      UserRole.RECRUITMENT_MANAGER,
-      UserRole.TEAM_MANAGER,
-      UserRole.RECRUITER,
-      UserRole.INTERNAL_RECRUITER,
-    ].includes(user.role)) {
+    if (
+      [
+        UserRole.ORG_ADMIN,
+        UserRole.RECRUITMENT_MANAGER,
+        UserRole.TEAM_MANAGER,
+        UserRole.RECRUITER,
+        UserRole.INTERNAL_RECRUITER,
+      ].includes(user.role)
+    ) {
       const scope = getRlsWhere("Candidate", {
         id: user.id,
         role: user.role,
@@ -586,8 +589,8 @@ throw new ForbiddenException("Active team membership required")
         : await this.candidateRepo.findOne({ where: { ...scope, email: userEmail } as any })
 
       if (!candidate) {
-throw new NotFoundException("Candidate profile not found")
-}
+        throw new NotFoundException("Candidate profile not found")
+      }
     }
 
     return this.profileRepo.findOne({
@@ -605,13 +608,15 @@ throw new NotFoundException("Candidate profile not found")
       where.user_email = filters.user_email
     }
 
-    if ([
-      UserRole.ORG_ADMIN,
-      UserRole.RECRUITMENT_MANAGER,
-      UserRole.TEAM_MANAGER,
-      UserRole.RECRUITER,
-      UserRole.INTERNAL_RECRUITER,
-    ].includes(user.role)) {
+    if (
+      [
+        UserRole.ORG_ADMIN,
+        UserRole.RECRUITMENT_MANAGER,
+        UserRole.TEAM_MANAGER,
+        UserRole.RECRUITER,
+        UserRole.INTERNAL_RECRUITER,
+      ].includes(user.role)
+    ) {
       const scope = getRlsWhere("Candidate", {
         id: user.id,
         role: user.role,
@@ -623,19 +628,21 @@ throw new NotFoundException("Candidate profile not found")
       })
 
       if (isBlocked(scope)) {
-return []
-}
+        return []
+      }
 
       const candidates = await this.candidateRepo.find({
-        where: filters.user_email ? { ...scope, email: filters.user_email } as any : scope,
+        where: filters.user_email ? ({ ...scope, email: filters.user_email } as any) : scope,
         select: { email: true },
       })
 
-      const emails = candidates.map(candidate => candidate.email).filter((email): email is string => Boolean(email))
+      const emails = candidates
+        .map((candidate) => candidate.email)
+        .filter((email): email is string => Boolean(email))
 
       if (!emails.length) {
-return []
-}
+        return []
+      }
 
       where.user_email = In(emails)
     }
@@ -741,7 +748,9 @@ return []
       return []
     }
 
-    if ([UserRole.TEAM_MANAGER, UserRole.RECRUITER, UserRole.INTERNAL_RECRUITER].includes(user.role)) {
+    if (
+      [UserRole.TEAM_MANAGER, UserRole.RECRUITER, UserRole.INTERNAL_RECRUITER].includes(user.role)
+    ) {
       let candidateIds: number[]
 
       if (filters.candidate_id) {
@@ -760,17 +769,17 @@ return []
         })
 
         if (isBlocked(scope)) {
-return []
-}
+          return []
+        }
 
         const candidates = await this.candidateRepo.find({ where: scope, select: { id: true } })
 
-        candidateIds = candidates.map(candidate => candidate.id)
+        candidateIds = candidates.map((candidate) => candidate.id)
       }
 
       if (!candidateIds.length) {
-return []
-}
+        return []
+      }
 
       return this.accessRepo.find({
         where: { candidate_id: In(candidateIds), owner_organization_id: user.organization_id },

@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Query,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-} from "@nestjs/common"
+import { Controller, Get, Post, Body, Query, HttpCode, HttpStatus, UseGuards } from "@nestjs/common"
 import { ApiTags, ApiBearerAuth } from "@nestjs/swagger"
 import { CommunicationService } from "./communication.service"
 import {

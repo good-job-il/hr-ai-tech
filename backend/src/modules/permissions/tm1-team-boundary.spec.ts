@@ -55,13 +55,7 @@ describe("TM-1 nested team boundary", () => {
   })
 
   it("requires a scoped application before a Team Manager creates an interview", async () => {
-    const service = new InterviewsService(
-      {} as any,
-      {} as any,
-      {} as any,
-      {} as any,
-      {} as any,
-    )
+    const service = new InterviewsService({} as any, {} as any, {} as any, {} as any, {} as any)
 
     await expect(
       service.create({ candidate_id: 8 } as any, teamManager as any),

@@ -232,7 +232,9 @@ export class ApplicationsService {
       team_id: assignmentTeamId ?? job.team_id,
       team_manager_id: isCandidate
         ? job.team_manager_id
-        : (user.role === UserRole.TEAM_MANAGER ? user.id : (dto.team_manager_id ?? job.team_manager_id)),
+        : user.role === UserRole.TEAM_MANAGER
+          ? user.id
+          : (dto.team_manager_id ?? job.team_manager_id),
       recruiter_id: isCandidate
         ? null
         : (dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null)),
@@ -371,8 +373,8 @@ export class ApplicationsService {
       app.team_id = assignmentTeamId
 
       if (user.role === UserRole.TEAM_MANAGER) {
-app.team_manager_id = user.id
-}
+        app.team_manager_id = user.id
+      }
     }
 
     if (dto.is_deleted && !app.deleted_at) {
@@ -572,18 +574,18 @@ app.team_manager_id = user.id
       }
 
       if (assignee.team_id) {
-teamIds.add(assignee.team_id)
-}
+        teamIds.add(assignee.team_id)
+      }
     }
 
     if (teamIds.size > 1) {
-throw new BadRequestException("All assignees must belong to the same team")
-}
+      throw new BadRequestException("All assignees must belong to the same team")
+    }
 
     if (user.role === UserRole.TEAM_MANAGER) {
       if (!user.team_id) {
-throw new BadRequestException("Active team membership required")
-}
+        throw new BadRequestException("Active team membership required")
+      }
 
       return user.team_id
     }
