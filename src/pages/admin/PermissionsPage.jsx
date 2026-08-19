@@ -16,7 +16,7 @@ import {
   PlatformStatCard,
   PlatformWidgetHeader,
 } from '@/components/platform/PlatformUI';
-import { invalidatePermissionMatrixCache } from '@/hooks/usePermissionMatrix';
+import { invalidatePermissionMatrixCache, usePermissionMatrix } from '@/hooks/usePermissionMatrix';
 
 const PERM_KEYS = [
   'view', 'create', 'update', 'delete', 'export',
@@ -37,6 +37,7 @@ const emptyPerms = () => ({
 
 export default function PermissionsPage() {
   const { user } = useAuth();
+  const { can } = usePermissionMatrix();
   const { t, i18n } = useTranslation();
   const isRtl = !i18n.language?.startsWith('en');
 
@@ -50,7 +51,7 @@ export default function PermissionsPage() {
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState({});     // { role_key: boolean }
 
-  const canEdit = EDITABLE_ROLES.includes(user?.role);
+  const canEdit = EDITABLE_ROLES.includes(user?.role) && can('manage_settings');
   const canSwitchOrgType = user?.role === 'admin';
   const orgId = user?.organization_id || null;
 
@@ -140,19 +141,6 @@ export default function PermissionsPage() {
     }
   };
 
-  if (!canEdit) {
-    return (
-      <PlatformPageShell dir={isRtl ? 'rtl' : 'ltr'}>
-        <PlatformCard className="p-5">
-          <PlatformEmptyState icon={Lock} className="min-h-[60vh]">
-            <p className="text-lg font-bold text-slate-600">{t('permissionsMatrix.accessDenied')}</p>
-            <p className="mt-1 text-sm text-slate-400">{t('permissionsMatrix.accessDeniedDesc')}</p>
-          </PlatformEmptyState>
-        </PlatformCard>
-      </PlatformPageShell>
-    );
-  }
-
   const hasDirty = Object.keys(dirty).some(k => dirty[k]);
   const stickyColClass = isRtl ? 'sticky right-0' : 'sticky left-0';
   const enabledPermissions = roleKeys.reduce(
@@ -190,7 +178,7 @@ export default function PermissionsPage() {
             className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-violet-200 hover:bg-violet-50">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <Button
+          {canEdit && <Button
             onClick={handleSaveAll}
             disabled={saving || !hasDirty}
             className="gap-2"
@@ -201,7 +189,7 @@ export default function PermissionsPage() {
               : saved
                 ? t('permissionsMatrix.saved')
                 : t('permissionsMatrix.saveChanges')}
-          </Button>
+          </Button>}
           </>
         )}
       />

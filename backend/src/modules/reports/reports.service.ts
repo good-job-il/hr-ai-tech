@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, In, Repository } from 'typeorm';
 import { UserRole } from '../../common/enums/user-role.enum';
@@ -8,9 +8,11 @@ import { CompensationPlanEntity } from '../compensation/compensation-plan.entity
 import { AgencyTeamEntity } from '../agency-teams/agency-team.entity';
 import { UserEntity } from '../users/user.entity';
 import { ManagementReportQueryDto } from './dto/reports.dto';
-
-const PIPELINE = ['new', 'reviewed', 'phone_interview', 'recommended', 'employer_interview', 'offer', 'hired', 'probation', 'completed', 'rejected'];
-const PLACED = new Set(['hired', 'probation', 'completed']);
+import {
+  APPLICATION_PIPELINE_STATUSES,
+  PLACEMENT_APPLICATION_STATUSES,
+} from '../../common/utils/recruitment-kpis';
+import { PermissionsService } from '../permissions/permissions.service';
 
 @Injectable()
 export class ReportsService {
@@ -20,14 +22,15 @@ export class ReportsService {
     @InjectRepository(CompensationPlanEntity) private readonly compensation: Repository<CompensationPlanEntity>,
     @InjectRepository(AgencyTeamEntity) private readonly teams: Repository<AgencyTeamEntity>,
     @InjectRepository(UserEntity) private readonly users: Repository<UserEntity>,
+    private readonly permissions: PermissionsService,
   ) {}
 
-  async getManagementReport(query: ManagementReportQueryDto, user: UserEntity) {
+  async getScopedApplications(query: ManagementReportQueryDto, user: UserEntity) {
     if (!user.organization_id) throw new ForbiddenException('Organization context required');
     const organizationId = user.organization_id;
     const from = query.date_from ? new Date(`${query.date_from}T00:00:00.000Z`) : new Date(Date.now() - 90 * 86400000);
     const to = query.date_to ? new Date(`${query.date_to}T23:59:59.999Z`) : new Date();
-    if (from > to) throw new ForbiddenException('date_from must be before date_to');
+    if (from > to) throw new BadRequestException('date_from must be before date_to');
 
     let teamManagerId: number | undefined;
     if (user.role === UserRole.TEAM_MANAGER) {
@@ -36,7 +39,7 @@ export class ReportsService {
       const team = await this.teams.findOne({ where: { id: query.team_id, organization_id: organizationId, is_active: true } });
       if (!team) throw new NotFoundException(`Team ${query.team_id} not found`);
       teamManagerId = team.manager_id ?? undefined;
-      if (!teamManagerId) return this.emptyReport(from, to);
+      if (!teamManagerId) return { applications: [], from, to };
     }
 
     const where: Record<string, any> = {
@@ -49,19 +52,28 @@ export class ReportsService {
     if (query.recruiter_id) where.recruiter_id = query.recruiter_id;
     if (teamManagerId) where.team_manager_id = teamManagerId;
 
-    const apps = await this.applications.find({ where, order: { created_date: 'ASC' } });
+    const applications = await this.applications.find({ where, order: { created_date: 'ASC' } });
+    return { applications, from, to };
+  }
+
+  async getManagementReport(query: ManagementReportQueryDto, user: UserEntity) {
+    if (!user.organization_id) throw new ForbiddenException('Organization context required');
+    const organizationId = user.organization_id;
+    const { applications: apps, from, to } = await this.getScopedApplications(query, user);
+    const effective = await this.permissions.getEffectivePermissions(user);
+    const canViewCompensation = effective.permissions.view_compensation;
     const appIds = apps.map(item => item.id);
     const [events, members, teams, plans] = await Promise.all([
       appIds.length ? this.timelines.find({ where: { application_id: In(appIds) }, order: { created_date: 'ASC' } }) : [],
       this.users.find({ where: { organization_id: organizationId } }),
       this.teams.find({ where: { organization_id: organizationId, is_active: true } }),
-      this.compensation.find({ where: { organization_id: organizationId } }),
+      canViewCompensation ? this.compensation.find({ where: { organization_id: organizationId } }) : [],
     ]);
 
     const userNames = new Map(members.map(member => [member.id, member.full_name || member.email]));
     const teamNames = new Map(teams.map(team => [team.manager_id, team.name]));
-    const funnel = PIPELINE.map(status => ({ status, count: apps.filter(app => app.status === status).length }));
-    const placements = apps.filter(app => PLACED.has(app.status));
+    const funnel = APPLICATION_PIPELINE_STATUSES.map(status => ({ status, count: apps.filter(app => app.status === status).length }));
+    const placements = apps.filter(app => PLACEMENT_APPLICATION_STATUSES.has(app.status));
     const transitionEvents = events.filter(event => event.event_type === 'status_changed');
     const hiredAt = new Map<number, Date>();
     transitionEvents.filter(event => event.new_value === 'hired').forEach(event => {
@@ -81,7 +93,7 @@ export class ReportsService {
     source.forEach(row => {
       const scoped = apps.filter(app => (app.source || 'unknown') === row.source);
       row.applications = scoped.length;
-      row.placements = scoped.filter(app => PLACED.has(app.status)).length;
+      row.placements = scoped.filter(app => PLACEMENT_APPLICATION_STATUSES.has(app.status)).length;
       row.conversion_rate = this.rate(row.placements, row.applications);
     });
 
@@ -128,11 +140,11 @@ export class ReportsService {
         placements: placements.length,
         placement_rate: this.rate(placements.length, apps.length),
         average_time_to_hire_days: this.average(hireDurations),
-        placement_revenue: Math.round(placementRevenue * 100) / 100,
-        allocated_compensation: Math.round(allocatedCompensation * 100) / 100,
+        placement_revenue: canViewCompensation ? Math.round(placementRevenue * 100) / 100 : null,
+        allocated_compensation: canViewCompensation ? Math.round(allocatedCompensation * 100) / 100 : null,
       },
       funnel,
-      time_in_stage: PIPELINE.map(status => ({ status, average_days: this.average(stageDurations.get(status) || []) })),
+      time_in_stage: APPLICATION_PIPELINE_STATUSES.map(status => ({ status, average_days: this.average(stageDurations.get(status) || []) })),
       source_effectiveness: source.sort((a, b) => b.applications - a.applications),
       recruiter_performance: recruiter,
       team_performance: team,
@@ -147,16 +159,6 @@ export class ReportsService {
     };
   }
 
-  private emptyReport(from: Date, to: Date) {
-    return {
-      generated_at: new Date().toISOString(), filters: { date_from: from.toISOString(), date_to: to.toISOString() },
-      summary: { applications: 0, placements: 0, placement_rate: 0, average_time_to_hire_days: 0, placement_revenue: 0, allocated_compensation: 0 },
-      funnel: PIPELINE.map(status => ({ status, count: 0 })), time_in_stage: PIPELINE.map(status => ({ status, average_days: 0 })),
-      source_effectiveness: [], recruiter_performance: [], team_performance: [], client_conversion: [], job_conversion: [],
-      dimensions: { recruiters: [], teams: [], clients: [], jobs: [] },
-    };
-  }
-
   private group<T, K extends string | number>(items: T[], key: (item: T) => K | null, factory: (value: K) => any) {
     const values = [...new Set(items.map(key).filter((value): value is K => value != null))];
     return values.map(factory);
@@ -165,7 +167,7 @@ export class ReportsService {
   private performance(apps: ApplicationEntity[], key: (app: ApplicationEntity) => number | null, name: (id: number) => string, idKey: string, nameKey: string) {
     return this.group(apps, key, id => {
       const scoped = apps.filter(app => key(app) === id);
-      const placements = scoped.filter(app => PLACED.has(app.status)).length;
+      const placements = scoped.filter(app => PLACEMENT_APPLICATION_STATUSES.has(app.status)).length;
       return { [idKey]: id, [nameKey]: name(id), applications: scoped.length, placements, conversion_rate: this.rate(placements, scoped.length) };
     }).sort((a, b) => b.placements - a.placements || b.applications - a.applications);
   }

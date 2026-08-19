@@ -8,6 +8,7 @@ import { ApplicationEntity } from '../applications/entities/application.entity';
 import { UserEntity } from '../users/user.entity';
 import { CreateAgencyClientDto, QueryAgencyClientsDto, UpdateAgencyClientDto } from './dto/agency-clients.dto';
 import { OrgType } from '../../common/enums/org-type.enum';
+import { UserRole } from '../../common/enums/user-role.enum';
 
 const ACTIVE_APPLICATION_STATUSES = [
   'new', 'reviewed', 'phone_interview', 'recommended',
@@ -21,6 +22,7 @@ export class AgencyClientsService {
     @InjectRepository(CompanyEntity) private readonly companyRepo: Repository<CompanyEntity>,
     @InjectRepository(JobEntity) private readonly jobRepo: Repository<JobEntity>,
     @InjectRepository(ApplicationEntity) private readonly applicationRepo: Repository<ApplicationEntity>,
+    @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -71,6 +73,7 @@ export class AgencyClientsService {
 
   async create(dto: CreateAgencyClientDto, user: UserEntity) {
     const organizationId = this.requireOrganization(user);
+    await this.assertAccountManager(dto.account_manager_id, organizationId);
     const createdId = await this.dataSource.transaction(async manager => {
       let company: CompanyEntity | null = null;
       if (dto.company_id) {
@@ -117,6 +120,7 @@ export class AgencyClientsService {
 
   async update(id: number, dto: UpdateAgencyClientDto, user: UserEntity) {
     const organizationId = this.requireOrganization(user);
+    await this.assertAccountManager(dto.account_manager_id, organizationId);
     const client = await this.clientRepo.findOne({ where: { id, organization_id: organizationId } });
     if (!client) throw new NotFoundException(`Agency client ${id} not found`);
     if (client.status === 'archived') throw new ConflictException('Archived client cannot be edited');
@@ -194,7 +198,7 @@ export class AgencyClientsService {
       .select('application.employer_company_id', 'company_id')
       .addSelect('COUNT(*)', 'total_applications')
       .addSelect("SUM(CASE WHEN application.status IN ('new','reviewed','phone_interview','recommended','employer_interview','offer','probation') THEN 1 ELSE 0 END)", 'in_process')
-      .addSelect("SUM(CASE WHEN application.status = 'hired' THEN 1 ELSE 0 END)", 'hired')
+      .addSelect("SUM(CASE WHEN application.status IN ('hired','completed') THEN 1 ELSE 0 END)", 'hired')
       .where('application.organization_id = :organizationId', { organizationId })
       .andWhere('application.employer_company_id IN (:...companyIds)', { companyIds })
       .andWhere('application.is_deleted = false')
@@ -227,5 +231,18 @@ export class AgencyClientsService {
 
   private initials(name: string) {
     return name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  private async assertAccountManager(accountManagerId: number | null | undefined, organizationId: number) {
+    if (accountManagerId == null) return;
+    const manager = await this.userRepo.findOne({
+      where: {
+        id: accountManagerId,
+        organization_id: organizationId,
+        role: In([UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER]),
+        is_active: true,
+      },
+    });
+    if (!manager) throw new ForbiddenException('Invalid account_manager_id assignment');
   }
 }

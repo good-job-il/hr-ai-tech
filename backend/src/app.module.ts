@@ -28,6 +28,7 @@ import { HealthController } from './common/controllers/health.controller';
 import { MonitoringModule } from './common/monitoring/monitoring.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { BillingModule } from './modules/billing/billing.module';
+import { RecruitmentManagementModule } from './modules/recruitment-management/recruitment-management.module';
 
 @Module({
   controllers: [HealthController],
@@ -61,6 +62,7 @@ import { BillingModule } from './modules/billing/billing.module';
     AgencyTeamsModule,
     ReportsModule,
     BillingModule,
+    RecruitmentManagementModule,
     // Phase 4
     FunctionsModule,
     // Phase 5

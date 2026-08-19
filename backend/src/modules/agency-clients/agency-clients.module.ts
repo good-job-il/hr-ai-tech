@@ -6,9 +6,11 @@ import { JobEntity } from '../jobs/entities/job.entity';
 import { ApplicationEntity } from '../applications/entities/application.entity';
 import { AgencyClientsController } from './agency-clients.controller';
 import { AgencyClientsService } from './agency-clients.service';
+import { PermissionsModule } from '../permissions/permissions.module';
+import { UserEntity } from '../users/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AgencyClientEntity, CompanyEntity, JobEntity, ApplicationEntity])],
+  imports: [PermissionsModule, TypeOrmModule.forFeature([AgencyClientEntity, CompanyEntity, JobEntity, ApplicationEntity, UserEntity])],
   controllers: [AgencyClientsController],
   providers: [AgencyClientsService],
   exports: [AgencyClientsService],

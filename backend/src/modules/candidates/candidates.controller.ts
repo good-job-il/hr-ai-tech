@@ -2,6 +2,7 @@ import {
   Controller, Get, Post, Patch, Delete,
   Param, Body, Query, ParseIntPipe,
   HttpCode, HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { CandidatesService } from './candidates.service';
@@ -18,6 +19,8 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
+import { AgencyActionPolicyGuard } from '../permissions/agency-action-policy.guard';
+import { RequiresPermission } from '../../common/decorators/requires-permission.decorator';
 
 /** Roles allowed to create/modify candidate records (agency & admin staff only) */
 const CANDIDATE_WRITE_ROLES = [...ORG_ROLES, UserRole.ADMIN];
@@ -27,6 +30,7 @@ const ACCESS_WRITE_ROLES = [UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, Us
 @ApiTags('Candidates')
 @ApiBearerAuth()
 @Controller('candidates')
+@UseGuards(AgencyActionPolicyGuard)
 export class CandidatesController {
   constructor(private readonly svc: CandidatesService) {}
 
@@ -45,6 +49,7 @@ export class CandidatesController {
 
   @Post('import-batches')
   @Roles(...IMPORT_WRITE_ROLES)
+  @RequiresPermission('create')
   @HttpCode(HttpStatus.CREATED)
   createBatch(@Body() data: CreateCandidateImportBatchDto, @CurrentUser() user: UserEntity) {
     return this.svc.createBatch(data, user);
@@ -160,6 +165,7 @@ export class CandidatesController {
 
   @Post()
   @Roles(...CANDIDATE_WRITE_ROLES)
+  @RequiresPermission('create')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create candidate' })
   create(@Body() dto: CreateCandidateDto, @CurrentUser() user: UserEntity) {
@@ -174,6 +180,7 @@ export class CandidatesController {
 
   @Patch(':id')
   @Roles(...CANDIDATE_WRITE_ROLES)
+  @RequiresPermission('update')
   @ApiOperation({ summary: 'Update candidate' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -185,6 +192,7 @@ export class CandidatesController {
 
   @Delete(':id')
   @Roles(...CANDIDATE_WRITE_ROLES)
+  @RequiresPermission('delete')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft-delete candidate' })
   remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {

@@ -25,8 +25,8 @@ export interface ManagementReport {
     placements: number;
     placement_rate: number;
     average_time_to_hire_days: number;
-    placement_revenue: number;
-    allocated_compensation: number;
+    placement_revenue: number | null;
+    allocated_compensation: number | null;
   };
   funnel: Array<{ status: string; count: number }>;
   time_in_stage: Array<{ status: string; average_days: number }>;

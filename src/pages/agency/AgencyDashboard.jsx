@@ -6,6 +6,7 @@ import { applicationService } from '@/api/services/applicationService';
 import { compensationPlanService } from '@/api/services/compensationPlanService';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Briefcase, Users, DollarSign, TrendingUp, Kanban,
   Sparkles, Activity, CheckCircle2, AlertCircle, Building2,
@@ -20,6 +21,10 @@ import {
   PlatformStatCard,
   PlatformWidgetHeader,
 } from '@/components/platform/PlatformUI';
+import {
+  ACTIVE_RECRUITMENT_APPLICATION_STATUSES,
+  PLACEMENT_APPLICATION_STATUSES,
+} from '@/domain/agency/contracts';
 
 // Performance: Query optimization with React Query caching
 const DASHBOARD_STALE_TIME = 5 * 60 * 1000; // 5 minutes
@@ -27,6 +32,8 @@ const DASHBOARD_CACHE_TIME = 10 * 60 * 1000; // 10 minutes
 
 export default function AgencyDashboard() {
   const { user, organization } = useAuth();
+  const { t, i18n } = useTranslation();
+  const isRtl = !i18n.language?.startsWith('en');
   const [showClientModal, setShowClientModal] = useState(false);
   const orgId = user?.organization_id;
   const canManageClients = ['org_admin', 'recruitment_manager', 'admin'].includes(user?.role);
@@ -81,8 +88,8 @@ export default function AgencyDashboard() {
     
     const openJobs = jobs.filter(j => !j.is_closed);
     const closedJobs = jobs.filter(j => j.is_closed);
-    const inProcess = applications.filter(a => ['phone_interview','recommended','employer_interview'].includes(a.status));
-    const hired = applications.filter(a => a.status === 'hired');
+    const inProcess = applications.filter(a => ACTIVE_RECRUITMENT_APPLICATION_STATUSES.includes(a.status));
+    const hired = applications.filter(a => PLACEMENT_APPLICATION_STATUSES.includes(a.status));
     const newCandidates = candidates.filter(c => c.status === 'new');
 
     return {
@@ -102,7 +109,7 @@ export default function AgencyDashboard() {
     return jobs.filter(j => !j.is_closed).slice(0, 5);
   }, [jobs]);
 
-  const orgName = organization?.name || user?.organization_name || 'חברת ההשמה';
+  const orgName = organization?.name || user?.organization_name || t('agencyDashboard.defaultOrganization');
 
   // Performance: Reload stats after creating client with cache invalidation
   const queryClient = useQueryClient();
@@ -116,31 +123,31 @@ export default function AgencyDashboard() {
   }, [orgId, queryClient]);
 
   return (
-    <PlatformPageShell dir="rtl">
+    <PlatformPageShell dir={isRtl ? 'rtl' : 'ltr'}>
       <div className="space-y-7">
 
       {/* Header */}
       <PlatformPageHeader
         title={orgName}
-        subtitle="דשבורד ניהול — חברת השמה"
+        subtitle={t('agencyDashboard.subtitle')}
         icon={Sparkles}
         actions={(
         <div className="flex flex-wrap gap-2">
           <Link to="/agency/jobs/open"
             className="gradient-brand flex h-11 items-center gap-2 rounded-xl px-5 text-sm font-bold text-white shadow-[0_8px_22px_rgba(93,82,216,0.24)] transition hover:-translate-y-0.5 hover:shadow-lg">
             <Briefcase className="w-4 h-4" />
-            הוסף משרה
+            {t('agencyDashboard.actions.addJob')}
           </Link>
           <Link to="/agency/crm"
             className="flex h-11 items-center gap-2 rounded-xl border border-white bg-white/90 px-4 text-sm font-bold text-slate-600 shadow-[0_7px_20px_rgba(60,74,125,0.08)] transition hover:text-[#6C4DFF]">
             <Users className="w-4 h-4" />
-            הוסף מועמד
+            {t('agencyDashboard.actions.addCandidate')}
           </Link>
           {canManageClients && <button
             onClick={() => setShowClientModal(true)}
             className="flex h-11 items-center gap-2 rounded-xl border border-white bg-white/90 px-4 text-sm font-bold text-slate-600 shadow-[0_7px_20px_rgba(60,74,125,0.08)] transition hover:text-[#6C4DFF]">
             <Building2 className="w-4 h-4" />
-            הוסף לקוח
+            {t('agencyDashboard.actions.addClient')}
           </button>}
         </div>
         )}
@@ -148,26 +155,26 @@ export default function AgencyDashboard() {
 
       {dashboardError && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-700">
-          <span className="font-bold">לא ניתן לטעון את כל נתוני הדשבורד. הנתונים המוצגים עשויים להיות חלקיים.</span>
+          <span className="font-bold">{t('agencyDashboard.error.message')}</span>
           <button
             onClick={() => queryClient.invalidateQueries()}
             className="font-black text-purple-700 hover:underline"
           >
-            נסה שוב
+            {t('common.retry')}
           </button>
         </div>
       )}
 
       {/* KPI Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <PlatformStatCard icon={Briefcase} label="משרות פתוחות" value={stats.openJobs} tone="violet" loading={loading} to="/agency/jobs/open" meta="פעילות כעת" />
-        <PlatformStatCard icon={Users} label="סה״כ מועמדים" value={stats.totalCandidates} tone="blue" loading={loading} to="/agency/crm" meta="במאגר המועמדים" />
-        <PlatformStatCard icon={Kanban} label="בתהליך גיוס" value={stats.inProcess} tone="amber" loading={loading} to="/agency/pipeline" meta="בשלבים פעילים" />
-        <PlatformStatCard icon={CheckCircle2} label="גויסו" value={stats.hired} tone="emerald" loading={loading} meta="השמות שהושלמו" />
-        <PlatformStatCard icon={AlertCircle} label="מועמדים חדשים" value={stats.newCandidates} tone="slate" loading={loading} to="/agency/crm" meta="ממתינים לטיפול" />
-        <PlatformStatCard icon={TrendingUp} label="סה״כ הגשות" value={stats.totalApplications} tone="fuchsia" loading={loading} meta="לכל המשרות" />
-        <PlatformStatCard icon={Building2} label="לקוחות פעילים" value={stats.activeClients} tone="cyan" loading={loading} meta="חברות מגייסות" />
-        <PlatformStatCard icon={DollarSign} label="תוכניות תגמול" value={stats.activePlans} tone="rose" loading={loading} to="/agency/compensation" meta="תוכניות פעילות" />
+        <PlatformStatCard icon={Briefcase} label={t('agencyDashboard.stats.openJobs.label')} value={stats.openJobs} tone="violet" loading={loading} to="/agency/jobs/open" meta={t('agencyDashboard.stats.openJobs.meta')} />
+        <PlatformStatCard icon={Users} label={t('agencyDashboard.stats.totalCandidates.label')} value={stats.totalCandidates} tone="blue" loading={loading} to="/agency/crm" meta={t('agencyDashboard.stats.totalCandidates.meta')} />
+        <PlatformStatCard icon={Kanban} label={t('agencyDashboard.stats.inProcess.label')} value={stats.inProcess} tone="amber" loading={loading} to="/agency/pipeline" meta={t('agencyDashboard.stats.inProcess.meta')} />
+        <PlatformStatCard icon={CheckCircle2} label={t('agencyDashboard.stats.hired.label')} value={stats.hired} tone="emerald" loading={loading} meta={t('agencyDashboard.stats.hired.meta')} />
+        <PlatformStatCard icon={AlertCircle} label={t('agencyDashboard.stats.newCandidates.label')} value={stats.newCandidates} tone="slate" loading={loading} to="/agency/crm" meta={t('agencyDashboard.stats.newCandidates.meta')} />
+        <PlatformStatCard icon={TrendingUp} label={t('agencyDashboard.stats.totalApplications.label')} value={stats.totalApplications} tone="fuchsia" loading={loading} meta={t('agencyDashboard.stats.totalApplications.meta')} />
+        <PlatformStatCard icon={Building2} label={t('agencyDashboard.stats.activeClients.label')} value={stats.activeClients} tone="cyan" loading={loading} meta={t('agencyDashboard.stats.activeClients.meta')} />
+        <PlatformStatCard icon={DollarSign} label={t('agencyDashboard.stats.compensationPlans.label')} value={stats.activePlans} tone="rose" loading={loading} to="/agency/compensation" meta={t('agencyDashboard.stats.compensationPlans.meta')} />
       </div>
 
       {/* Two columns: recent jobs + quick actions */}
@@ -175,13 +182,13 @@ export default function AgencyDashboard() {
 
         {/* Recent open jobs */}
         <PlatformCard className="p-6">
-          <PlatformWidgetHeader title="משרות פתוחות אחרונות" linkTo="/agency/jobs/open" actionLabel="כל המשרות" className="mb-4" />
+          <PlatformWidgetHeader title={t('agencyDashboard.recentJobs.title')} linkTo="/agency/jobs/open" actionLabel={t('agencyDashboard.recentJobs.viewAll')} className="mb-4" />
           {loading ? (
             <div className="space-y-3">
               {[1,2,3].map(i => <div key={i} className="h-12 bg-gray-50 rounded-xl animate-pulse" />)}
             </div>
           ) : recentJobs.length === 0 ? (
-            <PlatformEmptyState icon={Briefcase}>אין משרות פתוחות</PlatformEmptyState>
+            <PlatformEmptyState icon={Briefcase}>{t('agencyDashboard.recentJobs.empty')}</PlatformEmptyState>
           ) : (
             <div className="space-y-2">
               {recentJobs.map(job => (
@@ -191,7 +198,7 @@ export default function AgencyDashboard() {
                     <p className="text-xs text-gray-400">{job.company}</p>
                   </div>
                   <span className="rounded-full bg-[#F1EAFF] px-2.5 py-1 text-xs font-bold text-[#6C4DFF]">
-                    {job.applications_count || 0} מגישים
+                    {t('agencyDashboard.recentJobs.applicants', { count: job.applications_count || 0 })}
                   </span>
                 </div>
               ))}
@@ -201,15 +208,15 @@ export default function AgencyDashboard() {
 
         {/* Quick actions */}
         <PlatformCard className="p-6">
-          <PlatformWidgetHeader title="פעולות מהירות" subtitle="גישה מהירה לכלי העבודה המרכזיים" className="mb-4" />
+          <PlatformWidgetHeader title={t('agencyDashboard.quickActions.title')} subtitle={t('agencyDashboard.quickActions.subtitle')} className="mb-4" />
           <div className="grid grid-cols-2 gap-3">
             {[
-              { icon: Briefcase,  label: 'פרסם משרה',          to: '/agency/jobs/open',         color: 'text-[#7C3AED]', bg: 'bg-[#F3EFFF]' },
-              { icon: Users,      label: 'הוסף מועמד',          to: '/agency/crm',               color: 'text-blue-600', bg: 'bg-blue-50' },
-              { icon: Kanban,     label: 'צפה ב-Pipeline',      to: '/agency/pipeline',          color: 'text-amber-600', bg: 'bg-amber-50' },
-              { icon: Sparkles,   label: 'AI התאמה',            to: '/agency/ai-matching',       color: 'text-fuchsia-600', bg: 'bg-fuchsia-50' },
-              { icon: DollarSign, label: 'ניהול תגמולים',       to: '/agency/compensation',      color: 'text-emerald-600', bg: 'bg-emerald-50' },
-              { icon: Activity,   label: 'יומן פעילות',         to: '/agency/activity',          color: 'text-slate-600', bg: 'bg-slate-50' },
+              { icon: Briefcase,  label: t('agencyDashboard.quickActions.postJob'),           to: '/agency/jobs/open',    color: 'text-[#7C3AED]', bg: 'bg-[#F3EFFF]' },
+              { icon: Users,      label: t('agencyDashboard.quickActions.addCandidate'),      to: '/agency/crm',          color: 'text-blue-600', bg: 'bg-blue-50' },
+              { icon: Kanban,     label: t('agencyDashboard.quickActions.viewPipeline'),      to: '/agency/pipeline',     color: 'text-amber-600', bg: 'bg-amber-50' },
+              { icon: Sparkles,   label: t('agencyDashboard.quickActions.aiMatching'),        to: '/agency/ai-matching',  color: 'text-fuchsia-600', bg: 'bg-fuchsia-50' },
+              { icon: DollarSign, label: t('agencyDashboard.quickActions.manageCompensation'), to: '/agency/compensation', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+              { icon: Activity,   label: t('agencyDashboard.quickActions.activityLog'),       to: '/agency/activity',     color: 'text-slate-600', bg: 'bg-slate-50' },
             ].map(a => (
               <Link key={a.to} to={a.to}
                 className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-sm font-bold text-slate-700 transition hover:-translate-y-0.5 hover:border-[#DDD6FE] hover:shadow-md">

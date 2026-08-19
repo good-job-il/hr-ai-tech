@@ -41,7 +41,7 @@ export class EffectivePermissionsController {
 export class PermissionMatrixController {
   constructor(private readonly svc: PermissionsService) {}
 
-  @Get() @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') findAll(@Query() q: QueryPermissionMatricesDto, @CurrentUser() u: UserEntity) { return this.svc.findMatrices(q, u); }
+  @Get() @Roles(UserRole.ADMIN, UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER) findAll(@Query() q: QueryPermissionMatricesDto, @CurrentUser() u: UserEntity) { return this.svc.findMatrices(q, u); }
   @Post() @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreatePermissionMatrixDto, @CurrentUser() u: UserEntity) { return this.svc.createMatrix(dto, u); }
   @Patch(':id') @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePermissionMatrixDto, @CurrentUser() u: UserEntity) { return this.svc.updateMatrix(id, dto, u); }
   @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.removeMatrix(id, u); }
@@ -53,7 +53,7 @@ export class PermissionMatrixController {
 export class RoleTemplateController {
   constructor(private readonly svc: PermissionsService) {}
 
-  @Get() @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') findAll(@Query() q: QueryRoleTemplatesDto, @CurrentUser() u: UserEntity) { return this.svc.findRoleTemplates(q, u); }
+  @Get() @Roles(UserRole.ADMIN, UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER) findAll(@Query() q: QueryRoleTemplatesDto, @CurrentUser() u: UserEntity) { return this.svc.findRoleTemplates(q, u); }
   @Post() @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') @HttpCode(HttpStatus.CREATED) create(@Body() dto: CreateRoleTemplateDto, @CurrentUser() u: UserEntity) { return this.svc.createRoleTemplate(dto, u); }
   @Patch(':id') @UseGuards(EffectivePermissionsGuard) @RequiresPermission('manage_settings') update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoleTemplateDto, @CurrentUser() u: UserEntity) { return this.svc.updateRoleTemplate(id, dto, u); }
   @Delete(':id') @HttpCode(HttpStatus.NO_CONTENT) remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() u: UserEntity) { return this.svc.removeRoleTemplate(id, u); }

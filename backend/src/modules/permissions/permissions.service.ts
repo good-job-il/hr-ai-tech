@@ -44,6 +44,15 @@ const FULL_PERMISSIONS = Object.fromEntries(
   Object.keys(EMPTY_PERMISSIONS).map((key) => [key, true]),
 ) as typeof EMPTY_PERMISSIONS;
 
+/**
+ * Role invariants are an authorization ceiling, not defaults. An organization
+ * permission matrix may further restrict a role, but it must never promote an
+ * operational role into an organization administrator.
+ */
+const ROLE_PERMISSION_CEILINGS: Partial<Record<UserRole, Partial<typeof EMPTY_PERMISSIONS>>> = {
+  [UserRole.RECRUITMENT_MANAGER]: { manage_settings: false },
+};
+
 @Injectable()
 export class PermissionsService {
   constructor(
@@ -68,6 +77,12 @@ export class PermissionsService {
     return user.role === UserRole.ORG_ADMIN || (user.role === UserRole.ADMIN && Boolean(user.impersonating));
   }
 
+  private getEffectiveRoleKey(user: UserEntity) {
+    return user.role === UserRole.ADMIN && user.impersonating
+      ? UserRole.ORG_ADMIN
+      : user.role;
+  }
+
   private requireOrganizationContext(user: UserEntity) {
     if (!user.organization_id || !user.org_type) {
       throw new ForbiddenException('Organization context is required');
@@ -87,23 +102,25 @@ export class PermissionsService {
     }
 
     const { organizationId, orgType } = this.requireOrganizationContext(user);
+    const roleKey = this.getEffectiveRoleKey(user);
     const [override, template] = await Promise.all([
       this.matrixRepo.findOne({
-        where: { organization_id: organizationId, role_key: user.role, is_template: false },
+        where: { organization_id: organizationId, role_key: roleKey, is_template: false },
         order: { updated_date: 'DESC' },
       }),
       this.matrixRepo.findOne({
-        where: { organization_id: IsNull(), org_type: orgType, role_key: user.role, is_template: true },
+        where: { organization_id: IsNull(), org_type: orgType, role_key: roleKey, is_template: true },
         order: { updated_date: 'DESC' },
       }),
     ]);
     const source = override ? 'organization' : template ? 'template' : 'none';
+    const configured = { ...EMPTY_PERMISSIONS, ...(override?.permissions ?? template?.permissions ?? {}) };
     return {
       organization_id: organizationId,
       org_type: orgType,
-      role_key: user.role,
+      role_key: roleKey,
       source,
-      permissions: { ...EMPTY_PERMISSIONS, ...(override?.permissions ?? template?.permissions ?? {}) },
+      permissions: { ...configured, ...(ROLE_PERMISSION_CEILINGS[roleKey as UserRole] ?? {}) },
     };
   }
 

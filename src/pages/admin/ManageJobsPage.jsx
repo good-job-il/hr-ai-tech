@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { jobService } from '@/api/services/jobService';
 import { compensationPlanService } from '@/api/services/compensationPlanService';
 import { Plus, Search, Briefcase, Building2, MapPin, RefreshCw, Edit2, CheckCircle, XCircle, Mail, Copy, Check, AlertCircle } from 'lucide-react';
@@ -47,9 +47,10 @@ const STATUS_COLORS = {
 const ROUTE_STATES = { open: 'open', filled: 'filled', hold: 'on_hold' };
 
 export default function ManageJobsPage() {
-  const { can } = usePermissionMatrix();
+  const { can, loading: permissionsLoading } = usePermissionMatrix();
   const canCreate = can('create');
   const canUpdate = can('update');
+  const canViewCompensation = can('view_compensation');
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const routeState = ROUTE_STATES[location.pathname.split('/').pop()] || null;
@@ -64,22 +65,28 @@ export default function ManageJobsPage() {
   const [loadError, setLoadError] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
 
-  const loadJobs = async () => {
+  const loadJobs = useCallback(async () => {
     setLoading(true);
     setLoadError('');
     try {
-      const [all, plans] = await Promise.all([
-        jobService.list({ state: routeState || undefined, sort: 'created_date', order: 'DESC', limit: 200 }),
-        compensationPlanService.list({ limit: 100 }),
-      ]);
+      const all = await jobService.list({ state: routeState || undefined, sort: 'created_date', order: 'DESC', limit: 200 });
       setJobs(all);
-      setCompensationPlans(plans);
+      if (canViewCompensation) {
+        try {
+          const plans = await compensationPlanService.list({ limit: 100 });
+          setCompensationPlans(plans);
+        } catch {
+          setCompensationPlans([]);
+        }
+      } else {
+        setCompensationPlans([]);
+      }
     } catch (error) {
       setLoadError(error?.message || 'Unable to load jobs');
     } finally {
       setLoading(false);
     }
-  };
+  }, [canViewCompensation, routeState]);
 
   const getCompensation = (job) => {
     if (!job) return null;
@@ -87,7 +94,9 @@ export default function ManageJobsPage() {
     return jobPlan || compensationPlans.find(p => p.client_name === job.company && !p.job_id);
   };
 
-  useEffect(() => { loadJobs(); }, [routeState]);
+  useEffect(() => {
+    if (!permissionsLoading) loadJobs();
+  }, [loadJobs, permissionsLoading]);
   useEffect(() => {
     if (preselectedClientId && canCreate) {
       setEditingJob(null);

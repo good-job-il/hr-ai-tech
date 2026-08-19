@@ -12,9 +12,11 @@ import { CandidatesService } from './candidates.service';
 import { CandidatesController } from './candidates.controller';
 import { UserEntity } from '../users/user.entity';
 import { ApplicationEntity } from '../applications/entities/application.entity';
+import { PermissionsModule } from '../permissions/permissions.module';
 
 @Module({
   imports: [
+    PermissionsModule,
     TypeOrmModule.forFeature([
       CandidateEntity,
       CandidateNoteEntity,

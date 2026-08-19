@@ -37,6 +37,13 @@ export class NotificationsService {
     return this.repo.save(n) as unknown as Promise<NotificationEntity>;
   }
 
+  async createUnreadOnce(dto: CreateNotificationDto): Promise<NotificationEntity> {
+    const existing = await this.repo.findOne({
+      where: { recipient_email: dto.recipient_email, title: dto.title, is_read: false },
+    });
+    return existing ?? this.create(dto);
+  }
+
   async markRead(id: number, user: UserEntity): Promise<NotificationEntity> {
     const n = await this.repo.findOne({ where: { id } as any });
     if (!n) throw new NotFoundException(`Notification ${id} not found`);

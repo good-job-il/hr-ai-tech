@@ -9,7 +9,6 @@ import Unauthorized from './pages/Unauthorized';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ProtectedRoute from '@/lib/ProtectedRoute';
-import PermissionRoute from '@/lib/PermissionRoute';
 
 // Infrastructure
 import { ErrorBoundary } from '@/components/errors/ErrorBoundary';
@@ -78,6 +77,7 @@ import AgencyOnboarding from './pages/agency/AgencyOnboarding';
 import AgencyClients from './pages/agency/AgencyClients';
 import AgencyClientDetail from './pages/agency/AgencyClientDetail';
 import AgencyTeamsPage from './pages/agency/AgencyTeamsPage';
+import RecruitmentManagerDashboard from './pages/agency/RecruitmentManagerDashboard';
 
 // ── Company Pages (Company HR) ────────────────────────────────────────
 import CompanyDashboard from './pages/company/CompanyDashboard';
@@ -106,6 +106,13 @@ import AgencyReportsPage from './pages/agency/AgencyReportsPage';
 
 // TODO: Ask Rudik about this component
 // import AdminDashboard from "./pages/admin/AdminDashboard.jsx"
+
+const AgencyDashboardRoute = () => {
+  const { user } = useAuth();
+  return user?.role === 'recruitment_manager'
+    ? <RecruitmentManagerDashboard />
+    : <AgencyDashboard />;
+};
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -199,7 +206,7 @@ const AuthenticatedApp = () => {
         <Route element={<StaffingAgencyLayout />}>
           {/* Organization-wide operational routes. */}
           <Route element={<ProtectedRoute requiredRoles={['org_admin', 'recruitment_manager']} />}>
-            <Route path="/agency/dashboard" element={<AgencyDashboard />} />
+            <Route path="/agency/dashboard" element={<AgencyDashboardRoute />} />
             <Route path="/agency/jobs" element={<ManageJobsPage />} />
             <Route path="/agency/jobs/open" element={<ManageJobsPage />} />
             <Route path="/agency/jobs/filled" element={<ManageJobsPage />} />
@@ -221,14 +228,12 @@ const AuthenticatedApp = () => {
             <Route path="/recruitment/*" element={<Navigate to="/agency/dashboard" replace />} />
           </Route>
 
-          {/* Organization configuration is Org Admin only until read-only views exist. */}
-          <Route element={<ProtectedRoute requiredRoles={['org_admin']} />}>
-            <Route element={<PermissionRoute required={['manage_settings']} />}>
-              <Route path="/agency/settings/permissions" element={<PermissionsPage />} />
-              <Route path="/agency/settings/roles" element={<RoleSettingsPage />} />
-              <Route path="/agency/settings/billing" element={<BillingSettings />} />
-              <Route path="/agency/settings/integrations" element={<IntegrationsSettings />} />
-            </Route>
+          {/* Recruitment Manager can inspect settings, but all controls remain Org Admin-only. */}
+          <Route element={<ProtectedRoute requiredRoles={['org_admin', 'recruitment_manager']} />}>
+            <Route path="/agency/settings/permissions" element={<PermissionsPage />} />
+            <Route path="/agency/settings/roles" element={<RoleSettingsPage />} />
+            <Route path="/agency/settings/billing" element={<BillingSettings />} />
+            <Route path="/agency/settings/integrations" element={<IntegrationsSettings />} />
           </Route>
 
           {/* Team Manager cannot expand access through a direct organization URL. */}

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -21,6 +21,8 @@ import {
   QueueCandidateImportDto,
   QueueImportSourceDto,
 } from './dto/background-jobs.dto';
+import { AgencyActionPolicyGuard } from '../permissions/agency-action-policy.guard';
+import { RequiresPermission } from '../../common/decorators/requires-permission.decorator';
 
 const IMPORT_ROLES = [UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, UserRole.TEAM_MANAGER, UserRole.ADMIN];
 const APPLICATION_MANAGE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN];
@@ -28,6 +30,7 @@ const APPLICATION_MANAGE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMI
 @ApiTags('Domain operations')
 @ApiBearerAuth()
 @Controller()
+@UseGuards(AgencyActionPolicyGuard)
 export class DomainOperationsController {
   constructor(
     private readonly dashboard: DashboardService,
@@ -44,6 +47,7 @@ export class DomainOperationsController {
 
   @Post('applications/:id/score')
   @Roles(...APPLICATION_MANAGE_ROLES)
+  @RequiresPermission('update')
   @HttpCode(HttpStatus.OK)
   scoreApplication(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.matching.scoreApplication(id, user);
@@ -51,6 +55,7 @@ export class DomainOperationsController {
 
   @Post('candidate-imports/batches/:id/run')
   @Roles(...IMPORT_ROLES)
+  @RequiresPermission('create')
   @HttpCode(HttpStatus.ACCEPTED)
   async queueCandidateImport(
     @Param('id', ParseIntPipe) id: number,
@@ -68,12 +73,14 @@ export class DomainOperationsController {
 
   @Post('candidate-imports/resumes')
   @Roles(...IMPORT_ROLES)
+  @RequiresPermission('create')
   importResumes(@Body() dto: ImportResumeFilesDto, @CurrentUser() user: UserEntity) {
     return this.imports.importResumeFiles(dto, user);
   }
 
   @Post('candidate-imports/batches/:id/retry')
   @Roles(...IMPORT_ROLES)
+  @RequiresPermission('create')
   @HttpCode(HttpStatus.ACCEPTED)
   async retryCandidateImport(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     await this.candidates.getBatch(id, user);
@@ -83,12 +90,14 @@ export class DomainOperationsController {
 
   @Post('candidate-imports/resume-batches/parse')
   @Roles(...IMPORT_ROLES)
+  @RequiresPermission('create')
   parseResumeBatch(@Body() dto: ParseResumeBatchDto, @CurrentUser() user: UserEntity) {
     return this.imports.parseResumeBatch(dto, user);
   }
 
   @Post('candidate-imports/bulk')
   @Roles(...IMPORT_ROLES)
+  @RequiresPermission('create')
   createBulkCandidates(@Body() dto: CreateBulkCandidatesDto, @CurrentUser() user: UserEntity) {
     return this.imports.createBulkCandidates(dto, user);
   }

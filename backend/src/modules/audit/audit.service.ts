@@ -41,6 +41,32 @@ export class AuditService {
     return buildPaginatedResponse(data, total, { page, limit });
   }
 
+  async export(query: QueryAuditLogsDto, user: UserEntity) {
+    const result = await this.findAll({ ...query, page: 1, limit: 500 } as QueryAuditLogsDto, user);
+    await this.log({
+      organization_id: user.organization_id == null ? null : String(user.organization_id),
+      actor_user_id: String(user.id),
+      actor_email: user.email,
+      actor_role: user.role,
+      entity_type: 'Organization',
+      entity_id: user.organization_id ?? 0,
+      entity_label: 'Operational activity export',
+      action: 'export',
+      metadata: {
+        filters: {
+          entity_type: query.entity_type,
+          action: query.action,
+          actor_user_id: query.actor_user_id,
+          actor_email: query.actor_email,
+          date_from: query.date_from,
+          date_to: query.date_to,
+        },
+        exported_records: result.data.length,
+      },
+    });
+    return result;
+  }
+
   async create(dto: CreateAuditLogDto, user: UserEntity): Promise<AuditLogEntity> {
     const log = this.repo.create({
       ...dto,

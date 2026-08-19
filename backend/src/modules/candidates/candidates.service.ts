@@ -132,6 +132,7 @@ export class CandidatesService {
   }
 
   async create(dto: CreateCandidateDto, user: UserEntity): Promise<CandidateEntity> {
+    await this.assertAgencyAssignments(dto, user);
     const candidate = this.candidateRepo.create({
       ...dto,
       organization_id: user.organization_id,
@@ -142,6 +143,7 @@ export class CandidatesService {
   }
 
   async update(id: number, dto: UpdateCandidateDto, user: UserEntity): Promise<CandidateEntity> {
+    await this.assertAgencyAssignments(dto, user);
     const candidate = await this.findById(id, user);
     Object.assign(candidate, dto);
     if (dto.is_deleted && !candidate.deleted_at) {
@@ -153,6 +155,22 @@ export class CandidatesService {
 
   async softDelete(id: number, user: UserEntity): Promise<void> {
     await this.update(id, { is_deleted: true } as any, user);
+  }
+
+  private async assertAgencyAssignments(dto: Partial<CreateCandidateDto>, user: UserEntity) {
+    if (user.org_type !== 'staffing_agency') return;
+    if (!user.organization_id) throw new ForbiddenException('Organization context required');
+    const fields: Array<[keyof CreateCandidateDto, UserRole]> = [
+      ['recruiter_id', UserRole.RECRUITER],
+      ['team_manager_id', UserRole.TEAM_MANAGER],
+      ['recruitment_manager_id', UserRole.RECRUITMENT_MANAGER],
+    ];
+    for (const [field, role] of fields) {
+      const id = dto[field];
+      if (id == null) continue;
+      const assignee = await this.userRepo.findOne({ where: { id: Number(id), organization_id: user.organization_id, role, is_active: true } });
+      if (!assignee) throw new ForbiddenException(`Invalid ${String(field)} assignment`);
+    }
   }
 
   // ─── Notes ──────────────────────────────────────────────────────────────

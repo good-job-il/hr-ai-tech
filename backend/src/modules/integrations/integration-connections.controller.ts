@@ -20,6 +20,7 @@ export class IntegrationConnectionsController {
   list(@CurrentUser() user: UserEntity) { return this.integrations.list(user); }
 
   @Post(':provider/connect')
+  @Roles(UserRole.ORG_ADMIN, UserRole.ADMIN)
   @UseGuards(EffectivePermissionsGuard)
   @RequiresPermission('manage_settings')
   connect(@Param('provider') provider: string, @Body() dto: ConnectIntegrationDto, @CurrentUser() user: UserEntity) {
@@ -27,6 +28,7 @@ export class IntegrationConnectionsController {
   }
 
   @Post(':provider/reconnect')
+  @Roles(UserRole.ORG_ADMIN, UserRole.ADMIN)
   @UseGuards(EffectivePermissionsGuard)
   @RequiresPermission('manage_settings')
   reconnect(@Param('provider') provider: string, @Body() dto: ConnectIntegrationDto, @CurrentUser() user: UserEntity) {
@@ -34,6 +36,7 @@ export class IntegrationConnectionsController {
   }
 
   @Delete(':provider')
+  @Roles(UserRole.ORG_ADMIN, UserRole.ADMIN)
   @UseGuards(EffectivePermissionsGuard)
   @RequiresPermission('manage_settings')
   disconnect(@Param('provider') provider: string, @CurrentUser() user: UserEntity) {

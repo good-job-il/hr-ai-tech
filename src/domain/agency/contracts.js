@@ -76,6 +76,11 @@ export const ACTIVE_RECRUITMENT_APPLICATION_STATUSES = Object.freeze([
   'probation',
 ]);
 
+export const PLACEMENT_APPLICATION_STATUSES = Object.freeze([
+  'hired',
+  'completed',
+]);
+
 export function isActiveAgencyClient(client, organizationId) {
   return Boolean(
     client &&

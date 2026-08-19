@@ -12,6 +12,7 @@ import { JobEntity } from '../jobs/entities/job.entity';
 import { EmailService } from '../integrations/services/email.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CandidateEntity } from '../candidates/entities/candidate.entity';
+import { AuditLogEntity } from '../audit/audit-log.entity';
 
 @Injectable()
 export class ApplicationsService {
@@ -90,6 +91,7 @@ export class ApplicationsService {
   }
 
   async create(dto: CreateApplicationDto, user: UserEntity, candidateUserId: number | null = null): Promise<ApplicationEntity> {
+    await this.assertAgencyAssignments(dto, user);
     const jobScope = getRlsWhere('Job', {
       id: user.id, role: user.role, organization_id: user.organization_id,
       employer_company_id: user.employer_company_id, email: user.email,
@@ -172,6 +174,7 @@ export class ApplicationsService {
     const candidateUser = candidate.email
       ? await this.userRepo.findOne({ where: { email: candidate.email } })
       : null;
+    const recruiterId = candidate.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null);
     return this.create({
       job_id: dto.job_id,
       candidate_id: candidate.id,
@@ -182,14 +185,16 @@ export class ApplicationsService {
       location: candidate.location,
       source: 'pool_assignment',
       status: 'new',
-      recruiter_id: candidate.recruiter_id ?? user.id,
-      assigned_to: candidate.recruiter_id ?? user.id,
+      recruiter_id: recruiterId,
+      assigned_to: recruiterId,
       team_manager_id: candidate.team_manager_id ?? user.team_manager_id,
-      recruitment_manager_id: candidate.recruitment_manager_id ?? user.recruitment_manager_id,
+      recruitment_manager_id: candidate.recruitment_manager_id
+        ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : user.recruitment_manager_id),
     }, user, candidateUser?.id ?? null);
   }
 
   async update(id: number, dto: UpdateApplicationDto, user: UserEntity, reason?: string): Promise<ApplicationEntity> {
+    await this.assertAgencyAssignments(dto, user);
     const app = await this.findById(id, user);
     const prev = app.status;
     if (dto.status && dto.status !== prev) this.assertStatusTransition(prev, dto.status);
@@ -214,6 +219,25 @@ export class ApplicationsService {
             performed_by: user.email,
             performed_by_role: user.role,
           } as any));
+          await manager.save(AuditLogEntity, manager.create(AuditLogEntity, {
+            organization_id: app.organization_id == null ? null : String(app.organization_id),
+            actor_user_id: String(user.id),
+            actor_email: user.email,
+            actor_role: user.role,
+            entity_type: 'Application',
+            entity_id: app.id,
+            entity_label: `${app.candidate_name} — ${app.job_title || 'position'}`,
+            action: 'status_change',
+            metadata: {
+              previous_status: prev,
+              status: dto.status,
+              reason: reason || null,
+              recruiter_id: app.recruiter_id,
+              team_manager_id: app.team_manager_id,
+              job_id: app.job_id,
+              candidate_id: app.candidate_id,
+            },
+          }));
           return stored;
         })
       : await (this.appRepo.save(app) as unknown as Promise<ApplicationEntity>);
@@ -252,6 +276,25 @@ export class ApplicationsService {
         performed_by: user.email,
         performed_by_role: user.role,
       } as any));
+      await manager.save(AuditLogEntity, manager.create(AuditLogEntity, {
+        organization_id: app.organization_id == null ? null : String(app.organization_id),
+        actor_user_id: String(user.id),
+        actor_email: user.email,
+        actor_role: user.role,
+        entity_type: 'Application',
+        entity_id: app.id,
+        entity_label: `${app.candidate_name} — ${app.job_title || 'position'}`,
+        action: 'status_change',
+        metadata: {
+          previous_status: previous,
+          status,
+          reason: reason.trim(),
+          recruiter_id: app.recruiter_id,
+          team_manager_id: app.team_manager_id,
+          job_id: app.job_id,
+          candidate_id: app.candidate_id,
+        },
+      }));
       return saved;
     });
   }
@@ -260,6 +303,23 @@ export class ApplicationsService {
     if (previous === 'completed') throw new BadRequestException('Completed applications cannot be reopened');
     if (previous === 'rejected' && next !== 'rejected') {
       throw new BadRequestException('Use the reopen operation for rejected applications');
+    }
+  }
+
+  private async assertAgencyAssignments(dto: Partial<CreateApplicationDto>, user: UserEntity) {
+    if (user.org_type !== 'staffing_agency') return;
+    if (!user.organization_id) throw new BadRequestException('Organization context required');
+    const fields: Array<[keyof CreateApplicationDto, UserRole]> = [
+      ['recruiter_id', UserRole.RECRUITER],
+      ['assigned_to', UserRole.RECRUITER],
+      ['team_manager_id', UserRole.TEAM_MANAGER],
+      ['recruitment_manager_id', UserRole.RECRUITMENT_MANAGER],
+    ];
+    for (const [field, role] of fields) {
+      const id = dto[field];
+      if (id == null) continue;
+      const assignee = await this.userRepo.findOne({ where: { id: Number(id), organization_id: user.organization_id, role, is_active: true } });
+      if (!assignee) throw new BadRequestException(`Invalid ${String(field)} assignment`);
     }
   }
 

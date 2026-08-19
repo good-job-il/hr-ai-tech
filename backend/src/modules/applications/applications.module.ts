@@ -9,12 +9,15 @@ import { IntegrationsModule } from '../integrations/integrations.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { CandidateEntity } from '../candidates/entities/candidate.entity';
 import { UserEntity } from '../users/user.entity';
+import { PermissionsModule } from '../permissions/permissions.module';
+import { AuditLogEntity } from '../audit/audit-log.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ApplicationEntity, ApplicationTimelineEntity, JobEntity, CandidateEntity, UserEntity]),
+    TypeOrmModule.forFeature([ApplicationEntity, ApplicationTimelineEntity, AuditLogEntity, JobEntity, CandidateEntity, UserEntity]),
     IntegrationsModule,
     NotificationsModule,
+    PermissionsModule,
   ],
   controllers: [ApplicationsController],
   providers: [ApplicationsService],

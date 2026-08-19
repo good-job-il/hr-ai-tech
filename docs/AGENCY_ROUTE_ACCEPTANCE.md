@@ -31,8 +31,8 @@
 | `/agency/clients` | Admin/Manager: Org; Team Manager: related | Единый список `AgencyClient`, create/update/archive без создания Organization | Partial: модель конфликтует |
 | `/agency/clients/:id` | В пределах scope | Client details, contacts, связанные jobs/applications/candidates и быстрые действия с preselected client | Partial |
 | `/agency/teams` | Org Admin/Recruitment Manager | Команды, пользователи, приглашения, manager/recruiter assignments | Placeholder |
-| `/agency/reports` | Org или разрешённый scope | Реальные отчёты с периодом, фильтрами и экспортом | Placeholder |
-| `/agency/activity` | Org или разрешённый scope | AuditLog с actor, action, entity, timestamp, filters и pagination | Placeholder |
+| `/agency/reports` | Org или разрешённый scope | Реальные отчёты с периодом, фильтрами и экспортом | Partial: RM-3 API/UI готовы; нужен role E2E |
+| `/agency/activity` | Org или разрешённый scope | AuditLog с actor, action, entity, timestamp, filters и pagination | Partial: RM-3 API/UI готовы; нужен role E2E |
 | `/agency/settings/permissions` | Org Admin edit; Recruitment Manager read | Effective staffing-agency matrix, сохранение и cache invalidation | Partial |
 | `/agency/settings/roles` | Org Admin manage; Recruitment Manager operational read/assign | Роли только текущего org type, безопасные назначения | Partial |
 | `/agency/settings/billing` | Org Admin | Реальные plan/subscription/invoices либо честный unavailable state | Partial: static mock |
@@ -50,7 +50,7 @@
 | `/agency/team/compensation` | Team | Вознаграждения команды по permission | Partial |
 | `/agency/team/ai-matching` | Team | Matching только доступных jobs/candidates | Partial |
 | `/agency/team/import` | Team | Импорт назначается в команду | Partial |
-| `/agency/team/reports` | Team | Командные отчёты | Placeholder |
+| `/agency/team/reports` | Team | Командные отчёты | Partial: team-scoped API/UI готовы; нужен cross-team E2E |
 
 ## Recruiter routes
 

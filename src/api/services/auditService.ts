@@ -67,5 +67,12 @@ export const auditService = {
     );
     return asPage(response);
   },
+  async export(query: AuditQuery = {}): Promise<PaginatedResponse<AuditRecord>> {
+    const response = await httpClient.get<AuditRecord[] | PaginatedResponse<AuditRecord>>(
+      `/audit-logs/export${buildQuery(query)}`,
+      { cache: false },
+    );
+    return asPage(response);
+  },
   create: (payload: CreateAuditInput) => httpClient.post<AuditRecord>('/audit-logs', payload),
 };

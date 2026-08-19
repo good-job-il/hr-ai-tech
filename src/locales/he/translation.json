@@ -1090,6 +1090,54 @@
     "jobClosed": "המשרה {{job}} נסגרה",
     "newMessage": "הודעה חדשה מ{{sender}}"
   },
+  "agencyDashboard": {
+    "defaultOrganization": "חברת ההשמה",
+    "subtitle": "דשבורד ניהול — חברת השמה",
+    "actions": {
+      "addJob": "הוסף משרה",
+      "addCandidate": "הוסף מועמד",
+      "addClient": "הוסף לקוח"
+    },
+    "error": {
+      "message": "לא ניתן לטעון את כל נתוני הדשבורד. הנתונים המוצגים עשויים להיות חלקיים."
+    },
+    "stats": {
+      "openJobs": { "label": "משרות פתוחות", "meta": "פעילות כעת" },
+      "totalCandidates": { "label": "סה״כ מועמדים", "meta": "במאגר המועמדים" },
+      "inProcess": { "label": "בתהליך גיוס", "meta": "בשלבים פעילים" },
+      "hired": { "label": "גויסו", "meta": "השמות שהושלמו" },
+      "newCandidates": { "label": "מועמדים חדשים", "meta": "ממתינים לטיפול" },
+      "totalApplications": { "label": "סה״כ הגשות", "meta": "לכל המשרות" },
+      "activeClients": { "label": "לקוחות פעילים", "meta": "חברות מגייסות" },
+      "compensationPlans": { "label": "תוכניות תגמול", "meta": "תוכניות פעילות" }
+    },
+    "recentJobs": {
+      "title": "משרות פתוחות אחרונות",
+      "viewAll": "כל המשרות",
+      "empty": "אין משרות פתוחות",
+      "applicants_one": "מגיש אחד",
+      "applicants_other": "{{count}} מגישים"
+    },
+    "quickActions": {
+      "title": "פעולות מהירות",
+      "subtitle": "גישה מהירה לכלי העבודה המרכזיים",
+      "postJob": "פרסם משרה",
+      "addCandidate": "הוסף מועמד",
+      "viewPipeline": "צפה ב-Pipeline",
+      "aiMatching": "AI התאמה",
+      "manageCompensation": "ניהול תגמולים",
+      "activityLog": "יומן פעילות"
+    },
+    "clientModal": {
+      "title": "לקוח חדש",
+      "clientName": "שם הלקוח",
+      "placeholder": "לדוגמה: TechCorp Israel",
+      "create": "צור",
+      "creating": "יוצר...",
+      "success": "הלקוח נוצר בהצלחה",
+      "error": "שגיאה בעת יצירת לקוח"
+    }
+  },
   "agencyTeams": {
     "title": "צוותים ומשתמשים",
     "subtitle": "ניהול חברי הארגון, תפקידים, צוותים והזמנות",
@@ -1578,6 +1626,7 @@
     "title": "יומן אודיט",
     "subtitle": "ניטור פעילויות משתמשים ושינויים במערכת",
     "exportCSV": "יצוא CSV",
+    "exportFailed": "לא ניתן לייצא את הפעילות",
     "filters": "פילטרים",
     "entity": "ישות",
     "allEntities": "כל הישויות",
@@ -2038,8 +2087,9 @@
         "read": "נענה",
         "failed": "לא ענה"
       }
-    },
-    "agencyClients": {
+    }
+  },
+  "agencyClients": {
       "title": "לקוחות",
       "subtitle": "חברות שאנחנו מגייסים עבורן",
       "newClient": "לקוח חדש",
@@ -2056,6 +2106,7 @@
         "cancel": "ביטול",
         "creating": "יוצר...",
         "create": "צור לקוח",
+        "success": "הלקוח נוצר בהצלחה",
         "errorCreating": "שגיאה ביצירת לקוח"
       },
       "industries": {
@@ -2088,11 +2139,13 @@
         "inactive": "ללא פעילות"
       },
       "results": {
-        "clients": "לקוחות",
+        "count_one": "לקוח אחד",
+        "count_two": "שני לקוחות",
+        "count_other": "{{count}} לקוחות",
         "noMatchingClients": "לא נמצאו לקוחות התואמים את החיפוש",
         "noClients": "אין לקוחות עדיין",
         "addFirstClient": "הוסף את הלקוח הראשון שלך ופרסם משרה עבורו"
-      }
-    }
+      },
+      "loadError": "לא ניתן לטעון את הלקוחות"
   }
 }

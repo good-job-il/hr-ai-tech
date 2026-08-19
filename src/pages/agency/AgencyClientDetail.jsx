@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
+import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
 import { agencyClientService } from '@/api/services/agencyClientService';
 import { jobService } from '@/api/services/jobService';
 import { applicationService } from '@/api/services/applicationService';
@@ -469,8 +470,10 @@ const TABS = [
 export default function AgencyClientDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const { can } = usePermissionMatrix();
   const orgId = user?.organization_id;
-  const canManageClients = ['org_admin', 'recruitment_manager', 'admin'].includes(user?.role);
+  const canEditClient = ['org_admin', 'recruitment_manager', 'admin'].includes(user?.role) && can('update');
+  const canArchiveClient = ['org_admin', 'recruitment_manager', 'admin'].includes(user?.role) && can('delete');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -609,19 +612,21 @@ export default function AgencyClientDetail() {
             </div>
           </div>
 
-          {canManageClients && <div className="flex gap-2">
+          {(canEditClient || canArchiveClient) && <div className="flex gap-2">
+            {canEditClient &&
             <button
               onClick={() => setShowEdit(true)}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:border-purple-300 transition-colors"
             >
               <Edit2 className="w-4 h-4" /> עריכה
-            </button>
+            </button>}
+            {canArchiveClient &&
             <button
               onClick={() => setConfirmDelete(true)}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-red-100 text-red-600 rounded-xl text-sm font-bold hover:bg-red-50 transition-colors"
             >
               <Trash2 className="w-4 h-4" />
-            </button>
+            </button>}
           </div>}
         </div>
 
@@ -686,7 +691,7 @@ export default function AgencyClientDetail() {
         {/* Tab content */}
         <div className="p-6">
           {activeTab === 'about' && (
-            <AboutTab company={company} onEdit={canManageClients ? () => setShowEdit(true) : null} />
+            <AboutTab company={company} onEdit={canEditClient ? () => setShowEdit(true) : null} />
           )}
           {activeTab === 'jobs' && (
             <JobsTab jobs={jobs} clientId={company.id} />
@@ -698,7 +703,7 @@ export default function AgencyClientDetail() {
       </div>
 
       {/* Edit modal */}
-      {company && canManageClients && (
+      {company && canEditClient && (
         <EditClientModal
           key={`${company.id}-${company.updated_date || ''}`}
           company={company}
@@ -712,7 +717,7 @@ export default function AgencyClientDetail() {
       )}
 
       {/* Delete confirm */}
-      {confirmDelete && (
+      {confirmDelete && canArchiveClient && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl" dir="rtl">
             <div className="flex items-center gap-3 mb-4">

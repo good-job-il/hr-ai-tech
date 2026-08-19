@@ -51,15 +51,37 @@ describe('PermissionsService OA-1 boundary', () => {
     }));
   });
 
-  it('does not grant platform permissions during an impersonation session', async () => {
-    matrixRepo.findOne.mockResolvedValue(null);
+  it('uses org-admin tenant permissions during an impersonation session', async () => {
+    matrixRepo.findOne
+      .mockResolvedValueOnce({ permissions: { view: true, view_compensation: true } })
+      .mockResolvedValueOnce({ permissions: { manage_settings: true } });
 
     const effective = await service.getEffectivePermissions(user({
       role: UserRole.ADMIN,
       impersonating: true,
     }));
 
-    expect(effective.source).toBe('none');
+    expect(effective.source).toBe('organization');
+    expect(effective.role_key).toBe(UserRole.ORG_ADMIN);
+    expect(effective.permissions.view).toBe(true);
+    expect(effective.permissions.view_compensation).toBe(true);
+    expect(effective.permissions.manage_settings).toBe(false);
+    expect(matrixRepo.findOne).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      where: expect.objectContaining({ organization_id: 7, role_key: UserRole.ORG_ADMIN, is_template: false }),
+    }));
+  });
+
+  it('never promotes a recruitment manager into settings administration', async () => {
+    matrixRepo.findOne
+      .mockResolvedValueOnce({ permissions: { view: true, manage_users: true, manage_settings: true } })
+      .mockResolvedValueOnce(null);
+
+    const effective = await service.getEffectivePermissions(user({
+      role: UserRole.RECRUITMENT_MANAGER,
+    }));
+
+    expect(effective.permissions.view).toBe(true);
+    expect(effective.permissions.manage_users).toBe(true);
     expect(effective.permissions.manage_settings).toBe(false);
   });
 

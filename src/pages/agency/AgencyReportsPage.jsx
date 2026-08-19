@@ -84,8 +84,8 @@ export default function AgencyReportsPage() {
               <PlatformStatCard icon={BriefcaseBusiness} label={text.placements} value={report?.summary.placements} loading={isLoading} tone="emerald" />
               <PlatformStatCard icon={PieChart} label={text.rate} value={report?.summary.placement_rate} suffix="%" loading={isLoading} tone="blue" />
               <PlatformStatCard icon={Clock3} label={text.time} value={report?.summary.average_time_to_hire_days} suffix={` ${text.days}`} loading={isLoading} tone="amber" />
-              <PlatformStatCard icon={WalletCards} label={text.revenue} value={report?.summary.placement_revenue} prefix="₪" loading={isLoading} tone="cyan" />
-              <PlatformStatCard icon={WalletCards} label={text.compensation} value={report?.summary.allocated_compensation} prefix="₪" loading={isLoading} tone="fuchsia" />
+              {can('view_compensation') && <PlatformStatCard icon={WalletCards} label={text.revenue} value={report?.summary.placement_revenue} prefix="₪" loading={isLoading} tone="cyan" />}
+              {can('view_compensation') && <PlatformStatCard icon={WalletCards} label={text.compensation} value={report?.summary.allocated_compensation} prefix="₪" loading={isLoading} tone="fuchsia" />}
             </div>
             {!isLoading && report?.summary.applications === 0 ? <PlatformEmptyState icon={PieChart}>{text.noData}</PlatformEmptyState> : (
               <div className="grid gap-5 xl:grid-cols-2">
@@ -96,7 +96,7 @@ export default function AgencyReportsPage() {
                 <PerformanceTable title={text.teams} rows={report?.team_performance || []} nameKey="team_name" text={text} />
                 <PerformanceTable title={text.clients} rows={report?.client_conversion || []} nameKey="client_name" text={text} />
                 <PerformanceTable title={text.jobs} rows={report?.job_conversion || []} nameKey="job_title" text={text} />
-                <PlatformCard className="p-5"><PlatformWidgetHeader title={text.revenue} /><div className="mt-5 text-3xl font-black text-emerald-600">{money(report?.summary.placement_revenue)}</div><div className="mt-2 text-sm font-semibold text-slate-500">{text.compensation}: {money(report?.summary.allocated_compensation)}</div></PlatformCard>
+                {can('view_compensation') && <PlatformCard className="p-5"><PlatformWidgetHeader title={text.revenue} /><div className="mt-5 text-3xl font-black text-emerald-600">{money(report?.summary.placement_revenue)}</div><div className="mt-2 text-sm font-semibold text-slate-500">{text.compensation}: {money(report?.summary.allocated_compensation)}</div></PlatformCard>}
               </div>
             )}
           </>

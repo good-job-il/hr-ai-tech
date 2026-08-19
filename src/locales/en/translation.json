@@ -1090,6 +1090,54 @@
     "jobClosed": "Job {{job}} has been closed",
     "newMessage": "New message from {{sender}}"
   },
+  "agencyDashboard": {
+    "defaultOrganization": "Staffing Agency",
+    "subtitle": "Staffing Agency Management Dashboard",
+    "actions": {
+      "addJob": "Add Job",
+      "addCandidate": "Add Candidate",
+      "addClient": "Add Client"
+    },
+    "error": {
+      "message": "Some dashboard data could not be loaded. The information shown may be incomplete."
+    },
+    "stats": {
+      "openJobs": { "label": "Open Jobs", "meta": "Currently active" },
+      "totalCandidates": { "label": "Total Candidates", "meta": "In the candidate database" },
+      "inProcess": { "label": "In Recruitment", "meta": "In active stages" },
+      "hired": { "label": "Hired", "meta": "Completed placements" },
+      "newCandidates": { "label": "New Candidates", "meta": "Awaiting review" },
+      "totalApplications": { "label": "Total Applications", "meta": "Across all jobs" },
+      "activeClients": { "label": "Active Clients", "meta": "Hiring companies" },
+      "compensationPlans": { "label": "Compensation Plans", "meta": "Active plans" }
+    },
+    "recentJobs": {
+      "title": "Recent Open Jobs",
+      "viewAll": "View All Jobs",
+      "empty": "No open jobs",
+      "applicants_one": "{{count}} applicant",
+      "applicants_other": "{{count}} applicants"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "subtitle": "Quick access to your main tools",
+      "postJob": "Post a Job",
+      "addCandidate": "Add Candidate",
+      "viewPipeline": "View Pipeline",
+      "aiMatching": "AI Matching",
+      "manageCompensation": "Manage Compensation",
+      "activityLog": "Activity Log"
+    },
+    "clientModal": {
+      "title": "New Client",
+      "clientName": "Client Name",
+      "placeholder": "For example: TechCorp Israel",
+      "create": "Create",
+      "creating": "Creating...",
+      "success": "Client created successfully",
+      "error": "Could not create the client"
+    }
+  },
   "agencyTeams": {
     "title": "Teams & Users",
     "subtitle": "Manage organization members, roles, teams and invitations",
@@ -1578,6 +1626,7 @@
     "title": "Audit Log",
     "subtitle": "Monitor user activities and system changes",
     "exportCSV": "Export CSV",
+    "exportFailed": "Unable to export activity",
     "filters": "Filters",
     "entity": "Entity",
     "allEntities": "All Entities",
@@ -2038,8 +2087,9 @@
         "read": "Answered",
         "failed": "No Answer"
       }
-    },
-    "agencyClients": {
+    }
+  },
+  "agencyClients": {
       "title": "Clients",
       "subtitle": "Companies we recruit for",
       "newClient": "New Client",
@@ -2056,7 +2106,8 @@
         "cancel": "Cancel",
         "creating": "Creating...",
         "create": "Create Client",
-        "errorCreating": "Error creating client"
+        "success": "Client created successfully",
+        "errorCreating": "Could not create the client"
       },
       "industries": {
         "hitech": "Hi-Tech",
@@ -2088,11 +2139,12 @@
         "inactive": "Inactive"
       },
       "results": {
-        "clients": "clients",
+        "count_one": "{{count}} client",
+        "count_other": "{{count}} clients",
         "noMatchingClients": "No clients match the search",
         "noClients": "No clients yet",
         "addFirstClient": "Add your first client and publish a job for them"
-      }
-    }
+      },
+      "loadError": "Unable to load clients"
   }
 }

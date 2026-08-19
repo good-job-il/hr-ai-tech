@@ -6,6 +6,7 @@ import { UserEntity } from '../users/user.entity';
 import { JobEntity } from '../jobs/entities/job.entity';
 import { CandidateEntity } from '../candidates/entities/candidate.entity';
 import { BillingAccountEntity, BillingInvoiceEntity } from './billing.entities';
+import { UserRole } from '../../common/enums/user-role.enum';
 
 const PLAN_LIMITS: Record<OrgPlan, { active_jobs: number | null; candidates: number | null; seats: number | null; ai_matching: boolean }> = {
   [OrgPlan.TRIAL]: { active_jobs: 3, candidates: 100, seats: 3, ai_matching: false },
@@ -36,6 +37,8 @@ export class BillingService {
       this.candidates.count({ where: { organization_id: organization.id, is_deleted: false } }),
       this.users.count({ where: { organization_id: organization.id, is_active: true } }),
     ]);
+    const canViewInvoices = [UserRole.ADMIN, UserRole.ORG_ADMIN].includes(user.role);
+    const visibleInvoices = canViewInvoices ? invoices : [];
     return {
       plan: organization.plan,
       limits: PLAN_LIMITS[organization.plan],
@@ -53,11 +56,11 @@ export class BillingService {
         current_period_end: null,
         cancel_at_period_end: false,
       },
-      invoices,
+      invoices: visibleInvoices,
       capabilities: {
         plan_changes: false,
         payment_method_management: false,
-        invoice_download: invoices.some(invoice => Boolean(invoice.invoice_pdf_url || invoice.hosted_invoice_url)),
+        invoice_download: visibleInvoices.some(invoice => Boolean(invoice.invoice_pdf_url || invoice.hosted_invoice_url)),
       },
     };
   }

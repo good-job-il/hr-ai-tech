@@ -22,6 +22,7 @@ export class JobsService {
     @InjectRepository(JobAlertEntity) private readonly alertRepo: Repository<JobAlertEntity>,
     @InjectRepository(AgencyClientEntity) private readonly agencyClientRepo: Repository<AgencyClientEntity>,
     @InjectRepository(CompanyEntity) private readonly companyRepo: Repository<CompanyEntity>,
+    @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>,
     private readonly audit: AuditService,
   ) {}
 
@@ -80,6 +81,7 @@ export class JobsService {
   async create(dto: CreateJobDto, user: UserEntity): Promise<JobEntity> {
     this.assertValidJob(dto);
     const clientCompany = await this.resolveAgencyClientCompany(dto.employer_company_id, user);
+    await this.assertAgencyAssignments(dto, user);
     const job = this.jobRepo.create({
       ...dto,
       ...(clientCompany ? {
@@ -101,6 +103,7 @@ export class JobsService {
 
   async update(id: number, dto: UpdateJobDto, user: UserEntity): Promise<JobEntity> {
     const job = await this.findById(id, user);
+    await this.assertAgencyAssignments(dto, user);
     const clientCompany = await this.resolveAgencyClientCompany(
       dto.employer_company_id ?? job.employer_company_id,
       user,
@@ -148,6 +151,25 @@ export class JobsService {
     }
     if (job.show_contact_details && !job.contact_email && !job.contact_phone) {
       throw new BadRequestException('Contact email or phone is required when contact details are visible');
+    }
+  }
+
+  private async assertAgencyAssignments(dto: Partial<CreateJobDto>, user: UserEntity) {
+    if (user.org_type !== OrgType.STAFFING_AGENCY) return;
+    if (!user.organization_id) throw new ForbiddenException('Organization context required');
+
+    const assignments: Array<[keyof CreateJobDto, UserRole]> = [
+      ['recruiter_id', UserRole.RECRUITER],
+      ['team_manager_id', UserRole.TEAM_MANAGER],
+      ['recruitment_manager_id', UserRole.RECRUITMENT_MANAGER],
+    ];
+    for (const [field, role] of assignments) {
+      const id = dto[field];
+      if (id == null) continue;
+      const assignee = await this.userRepo.findOne({
+        where: { id: Number(id), organization_id: user.organization_id, role, is_active: true },
+      });
+      if (!assignee) throw new ForbiddenException(`Invalid ${String(field)} assignment`);
     }
   }
 

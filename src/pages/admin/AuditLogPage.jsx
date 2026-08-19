@@ -80,6 +80,7 @@ export default function AuditLogPage() {
   });
   const [expandedLog, setExpandedLog] = useState(null);
   const [page, setPage] = useState(0);
+  const [exportError, setExportError] = useState('');
 
   // Reset to page 0 on filter change
   const updateFilter = (key, value) => {
@@ -87,18 +88,21 @@ export default function AuditLogPage() {
     setPage(0);
   };
 
+  const serverFilters = () => {
+    const serverFilter = {};
+    if (filters.entity_type) serverFilter.entity_type = filters.entity_type;
+    if (filters.action) serverFilter.action = filters.action;
+    if (filters.actor_email) serverFilter.actor_email = filters.actor_email;
+    if (filters.date_from) serverFilter.date_from = `${filters.date_from}T00:00:00.000Z`;
+    if (filters.date_to) serverFilter.date_to = `${filters.date_to}T23:59:59.999Z`;
+    return serverFilter;
+  };
+
   const { data: result, isLoading } = useQuery({
     queryKey: ['audit-logs', filters.entity_type, filters.action, filters.actor_email, filters.date_from, filters.date_to, page],
     queryFn: async () => {
-      const serverFilter = {};
-      if (filters.entity_type) serverFilter.entity_type = filters.entity_type;
-      if (filters.action) serverFilter.action = filters.action;
-      if (filters.actor_email) serverFilter.actor_email = filters.actor_email;
-      if (filters.date_from) serverFilter.date_from = `${filters.date_from}T00:00:00.000Z`;
-      if (filters.date_to) serverFilter.date_to = `${filters.date_to}T23:59:59.999Z`;
-
       return auditService.listPage({
-        ...serverFilter,
+        ...serverFilters(),
         sort: 'created_date',
         order: 'DESC',
         limit: PAGE_SIZE,
@@ -111,7 +115,20 @@ export default function AuditLogPage() {
   const logs = result?.data || [];
   const pagination = result?.pagination;
 
-  const exportToCSV = () => {
+  const exportToCSV = async () => {
+    setExportError('');
+    let exportResult;
+    try {
+      exportResult = await auditService.export({
+        ...serverFilters(),
+        sort: 'created_date',
+        order: 'DESC',
+      });
+    } catch (requestError) {
+      setExportError(requestError?.message || t('auditLog.exportFailed'));
+      return;
+    }
+    const exportedLogs = exportResult.data || [];
     const headers = [
       t('auditLog.tableHeaders.date'),
       t('auditLog.tableHeaders.user'),
@@ -121,7 +138,7 @@ export default function AuditLogPage() {
       t('auditLog.tableHeaders.description'),
       'IP'
     ];
-    const rows = logs.map(log => [
+    const rows = exportedLogs.map(log => [
       log.created_date ? format(new Date(log.created_date), 'dd/MM/yyyy HH:mm', { locale: dateLocale }) : '',
       log.actor_email || '',
       log.action,
@@ -130,7 +147,8 @@ export default function AuditLogPage() {
       log.entity_label || '',
       log.ip_address || '',
     ]);
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const escape = value => `"${String(value ?? '').replaceAll('"', '""')}"`;
+    const csv = [headers, ...rows].map(row => row.map(escape).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -150,12 +168,14 @@ export default function AuditLogPage() {
     if (!location.pathname.startsWith('/agency/')) return null;
     const routes = {
       Candidate: `/agency/crm/candidate?id=${log.entity_id}`,
-      Application: '/agency/pipeline',
-      Job: '/agency/jobs',
+      Application: `/agency/pipeline?applicationId=${log.entity_id}`,
+      Job: `/agency/jobs?jobId=${log.entity_id}`,
+      Company: `/agency/clients/${log.entity_id}`,
       User: '/agency/teams',
       AgencyTeam: '/agency/teams',
       AgencyInvitation: '/agency/teams',
       CompensationPlan: '/agency/compensation',
+      Interview: log.metadata?.application_id ? `/agency/pipeline?applicationId=${log.metadata.application_id}` : '/agency/pipeline',
       Billing: '/agency/settings/billing',
       Integration: '/agency/settings/integrations',
     };
@@ -178,6 +198,7 @@ export default function AuditLogPage() {
             </Button>
           )}
         />
+        {exportError && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm font-bold text-rose-700">{exportError}</p>}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <PlatformStatCard icon={Activity} label={t('auditLog.recordsInPage')} value={logs.length} tone="violet" loading={isLoading} meta={`${t('auditLog.tableHeaders.date')} ${page + 1}`} />

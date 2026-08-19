@@ -194,6 +194,8 @@ Recruitment Manager — руководитель рекрутмента на у�
 
 #### Фаза RM-1. Зафиксировать отличие от Org Admin
 
+Формальная action policy: [`AGENCY_RM1_ACTION_POLICY.md`](./AGENCY_RM1_ACTION_POLICY.md).
+
 - формально определить, какие client/job/team/assignment mutations разрешены роли;
 - добавить backend action policy поверх organization-wide RLS;
 - запретить billing, integrations и редактирование Permission Matrix;
@@ -204,6 +206,8 @@ Recruitment Manager — руководитель рекрутмента на у�
 
 #### Фаза RM-2. Завершить управление рекрутментом
 
+Реализация и операционные контракты: [`AGENCY_RM2_RECRUITMENT_MANAGEMENT.md`](./AGENCY_RM2_RECRUITMENT_MANAGEMENT.md).
+
 - создать manager dashboard с funnel, SLA, overdue stages, workload и placements;
 - реализовать назначение job/candidate/Application команде и рекрутеру одной транзакцией;
 - добавить bulk assign/reassign с audit reason;
@@ -213,6 +217,8 @@ Recruitment Manager — руководитель рекрутмента на у�
 Критерий готовности: менеджер распределяет работу и контролирует весь pipeline без административного доступа.
 
 #### Фаза RM-3. Отчётность и контроль качества
+
+Реализация и KPI-контракты: [`AGENCY_RM3_REPORTING_AND_QUALITY_CONTROL.md`](./AGENCY_RM3_REPORTING_AND_QUALITY_CONTROL.md).
 
 - реализовать organizational reports и фильтры по client/job/team/recruiter/date;
 - реализовать operational Activity с переходом к сущности;

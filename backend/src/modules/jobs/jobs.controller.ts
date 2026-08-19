@@ -1,6 +1,7 @@
 import {
   Controller, Get, Post, Patch, Delete,
   Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JobsService } from './jobs.service';
@@ -10,6 +11,8 @@ import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { UserRole, ORG_ROLES } from '../../common/enums/user-role.enum';
 import { UserEntity } from '../users/user.entity';
+import { AgencyActionPolicyGuard } from '../permissions/agency-action-policy.guard';
+import { RequiresPermission } from '../../common/decorators/requires-permission.decorator';
 
 /** Roles allowed to create/modify job postings (employers & agency staff only) */
 const JOB_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN];
@@ -28,6 +31,8 @@ export class JobsController {
 
   @Post()
   @Roles(...JOB_WRITE_ROLES)
+  @UseGuards(AgencyActionPolicyGuard)
+  @RequiresPermission('create')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create job' })
   create(@Body() dto: CreateJobDto, @CurrentUser() user: UserEntity) {
@@ -36,6 +41,8 @@ export class JobsController {
 
   @Patch(':id')
   @Roles(...JOB_WRITE_ROLES)
+  @UseGuards(AgencyActionPolicyGuard)
+  @RequiresPermission('update')
   @ApiOperation({ summary: 'Update job' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -47,6 +54,8 @@ export class JobsController {
 
   @Delete(':id')
   @Roles(...JOB_WRITE_ROLES)
+  @UseGuards(AgencyActionPolicyGuard)
+  @RequiresPermission('delete')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft-delete job' })
   remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
@@ -55,12 +64,16 @@ export class JobsController {
 
   @Post(':id/close')
   @Roles(...JOB_WRITE_ROLES)
+  @UseGuards(AgencyActionPolicyGuard)
+  @RequiresPermission('update')
   close(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.changeState(id, 'closed', user);
   }
 
   @Post(':id/reopen')
   @Roles(...JOB_WRITE_ROLES)
+  @UseGuards(AgencyActionPolicyGuard)
+  @RequiresPermission('update')
   reopen(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.svc.changeState(id, 'open', user);
   }

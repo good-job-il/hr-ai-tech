@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { roleTemplateService } from '@/api/services/permissionService';
 import { useAuth } from '@/lib/AuthContext';
 import { Input } from '@/components/ui/input';
-import { RefreshCw, Users, Lock, Pencil, Check, X, ShieldAlert } from 'lucide-react';
+import { RefreshCw, Users, Pencil, Check, X, ShieldAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   PlatformCard,
@@ -17,6 +17,7 @@ import {
   PlatformStatCard,
   PlatformWidgetHeader,
 } from '@/components/platform/PlatformUI';
+import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
 
 const EDITABLE_ROLES = ['admin', 'org_admin'];
 
@@ -121,6 +122,7 @@ function RoleRow({ record, canEdit, onSave, t }) {
 
 export default function RoleSettingsPage() {
   const { user } = useAuth();
+  const { can } = usePermissionMatrix();
   const { t, i18n } = useTranslation();
   const isRtl = !i18n.language?.startsWith('en');
   const [records, setRecords] = useState([]);
@@ -129,7 +131,7 @@ export default function RoleSettingsPage() {
   const [error, setError] = useState(null);
   const [savedMsg, setSavedMsg] = useState('');
 
-  const canEdit = EDITABLE_ROLES.includes(user?.role);
+  const canEdit = EDITABLE_ROLES.includes(user?.role) && can('manage_settings');
   const canSwitchOrgType = user?.role === 'admin';
   const orgId = user?.organization_id || null;
 
@@ -190,19 +192,6 @@ export default function RoleSettingsPage() {
     setSavedMsg(t('roleSettings.saved', { name: newDisplayName }));
     setTimeout(() => setSavedMsg(''), 2500);
   };
-
-  if (!canEdit) {
-    return (
-      <PlatformPageShell dir={isRtl ? 'rtl' : 'ltr'}>
-        <PlatformCard className="p-5">
-          <PlatformEmptyState icon={Lock} className="min-h-[60vh]">
-            <p className="text-lg font-bold text-slate-600">{t('roleSettings.accessDenied')}</p>
-            <p className="mt-1 text-sm text-slate-400">{t('roleSettings.accessDeniedDesc')}</p>
-          </PlatformEmptyState>
-        </PlatformCard>
-      </PlatformPageShell>
-    );
-  }
 
   const displayRecords = getDisplayRecords();
   const activeRoles = displayRecords.filter(record => record.is_active).length;

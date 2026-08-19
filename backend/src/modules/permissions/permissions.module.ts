@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   PermissionMatrixEntity,
@@ -9,6 +9,7 @@ import {
 } from './permissions.entities';
 import { PermissionsService } from './permissions.service';
 import { EffectivePermissionsGuard } from './effective-permissions.guard';
+import { AgencyActionPolicyGuard } from './agency-action-policy.guard';
 import { AuditModule } from '../audit/audit.module';
 import {
   EffectivePermissionsController,
@@ -21,7 +22,7 @@ import {
 
 @Module({
   imports: [
-    AuditModule,
+    forwardRef(() => AuditModule),
     TypeOrmModule.forFeature([
       PermissionMatrixEntity,
       RoleTemplateEntity,
@@ -38,7 +39,7 @@ import {
     UserPositionAccessController,
     PositionController,
   ],
-  providers: [PermissionsService, EffectivePermissionsGuard],
-  exports: [PermissionsService, EffectivePermissionsGuard, TypeOrmModule],
+  providers: [PermissionsService, EffectivePermissionsGuard, AgencyActionPolicyGuard],
+  exports: [PermissionsService, EffectivePermissionsGuard, AgencyActionPolicyGuard, TypeOrmModule],
 })
 export class PermissionsModule {}

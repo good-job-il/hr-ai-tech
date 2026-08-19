@@ -29,9 +29,13 @@ export class CompensationService {
     private readonly audit: AuditService,
   ) {}
 
+  private isPlatformAdmin(user: UserEntity) {
+    return user.role === UserRole.ADMIN && !user.impersonating;
+  }
+
   /** Only staffing_agency org_type (or admin) may access compensation plans */
   private assertAgencyAccess(user: UserEntity) {
-    if (user.role === UserRole.ADMIN) return;
+    if (this.isPlatformAdmin(user)) return;
     if (user.org_type !== OrgType.STAFFING_AGENCY) {
       throw new ForbiddenException('Compensation plans are only available to staffing agencies');
     }
@@ -41,7 +45,7 @@ export class CompensationService {
     this.assertAgencyAccess(user);
     const { page, limit, sort, order, job_id, employer_company_id, recruiter_id } = query;
     const where: Record<string, any> = {};
-    if (user.role !== UserRole.ADMIN) {
+    if (!this.isPlatformAdmin(user)) {
       where.organization_id = user.organization_id;
       if (user.role === UserRole.RECRUITER) where.recruiter_id = user.id;
       if (user.role === UserRole.TEAM_MANAGER) where.team_manager_id = user.id;
@@ -65,7 +69,7 @@ export class CompensationService {
     const plan = await this.repo.findOne({ where: { id } });
     if (!plan) throw new NotFoundException(`Compensation plan ${id} not found`);
     if (
-      user.role !== UserRole.ADMIN &&
+      !this.isPlatformAdmin(user) &&
       plan.organization_id !== user.organization_id
     ) {
       throw new ForbiddenException('Access denied');
@@ -105,10 +109,11 @@ export class CompensationService {
   }
 
   private async resolveRelations(dto: Record<string, any>, user: UserEntity) {
-    if (!user.organization_id && user.role !== UserRole.ADMIN) throw new ForbiddenException('Organization context required');
+    const isPlatformAdmin = this.isPlatformAdmin(user);
+    if (!user.organization_id && !isPlatformAdmin) throw new ForbiddenException('Organization context required');
     const organizationId = user.organization_id;
     const job = dto.job_id
-      ? await this.jobs.findOne({ where: user.role === UserRole.ADMIN ? { id: dto.job_id } : { id: dto.job_id, organization_id: organizationId } })
+      ? await this.jobs.findOne({ where: isPlatformAdmin ? { id: dto.job_id } : { id: dto.job_id, organization_id: organizationId } })
       : null;
     if (dto.job_id && !job) throw new NotFoundException(`Job ${dto.job_id} not found`);
     const companyId = dto.employer_company_id ?? job?.employer_company_id;
@@ -117,7 +122,7 @@ export class CompensationService {
     const client = await this.clients.findOne({
       where: { organization_id: organizationId!, company_id: companyId, status: 'active' },
     });
-    if (!client && user.role !== UserRole.ADMIN) throw new ForbiddenException('The selected company is not an active agency client');
+    if (!client && !isPlatformAdmin) throw new ForbiddenException('The selected company is not an active agency client');
     const company = await this.companies.findOne({ where: { id: companyId, is_deleted: false } });
     if (!company) throw new NotFoundException(`Company ${companyId} not found`);
     const assigneeIds = [dto.recruiter_id, dto.team_manager_id, dto.recruitment_manager_id].filter((id): id is number => id != null);

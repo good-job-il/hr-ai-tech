@@ -3,10 +3,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/AuthContext';
+import { usePermissionMatrix } from '@/hooks/usePermissionMatrix';
 import { agencyClientService } from '@/api/services/agencyClientService';
 import { toast } from 'sonner';
 import {
-  Building2, Plus, Search, Briefcase, Users, ChevronLeft, X,
+  Building2, Plus, Search, Briefcase, Users, ChevronLeft, ChevronRight, X,
   TrendingUp, Mail,
 } from 'lucide-react';
 
@@ -28,6 +29,20 @@ const STALE_TIME = 3 * 60 * 1000;
 
 function getInitials(name = '') {
   return name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || '??';
+}
+
+function getIndustryKey(value, t) {
+  if (!value || INDUSTRY_KEYS.includes(value)) return value;
+
+  return INDUSTRY_KEYS.find(key => (
+    t(`agencyClients.industries.${key}`, { lng: 'en' }) === value
+    || t(`agencyClients.industries.${key}`, { lng: 'he' }) === value
+  )) || value;
+}
+
+function getIndustryLabel(value, t) {
+  const key = getIndustryKey(value, t);
+  return INDUSTRY_KEYS.includes(key) ? t(`agencyClients.industries.${key}`) : value;
 }
 
 function CompanyAvatar({ company, size = 'md' }) {
@@ -81,7 +96,7 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
         status: 'active',
       });
       setForm({ name: '', industry: '', contact_email: '', website: '', color: PALETTE[0] });
-      toast.success(t('agencyClients.createModal.success', { defaultValue: 'Client created successfully' }));
+      toast.success(t('agencyClients.createModal.success'));
       onClose();
       onSuccess?.();
     } catch (err) {
@@ -95,14 +110,14 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
 
   if (!isOpen) return null;
 
-  const dir = i18n.language === 'he' ? 'rtl' : 'ltr';
+  const dir = i18n.language?.startsWith('he') ? 'rtl' : 'ltr';
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl" dir={dir}>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-black text-gray-900">{t('agencyClients.createModal.title')}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button onClick={onClose} aria-label={t('common.close')} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -136,7 +151,7 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
             >
               <option value="">{t('agencyClients.createModal.selectIndustry')}</option>
               {INDUSTRY_KEYS.map(key => (
-                <option key={key} value={t(`agencyClients.industries.${key}`)}>
+                <option key={key} value={key}>
                   {t(`agencyClients.industries.${key}`)}
                 </option>
               ))}
@@ -217,7 +232,9 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
 // ─── Client Card ─────────────────────────────────────────────────────────────
 
 function ClientCard({ company }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRtl = !i18n.language?.startsWith('en');
+  const DirectionIcon = isRtl ? ChevronLeft : ChevronRight;
   return (
     <Link
       to={`/agency/clients/${company.id}`}
@@ -231,11 +248,11 @@ function ClientCard({ company }) {
           </h3>
           {company.industry && (
             <span className="inline-block mt-1 text-xs font-bold px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-              {company.industry}
+              {getIndustryLabel(company.industry, t)}
             </span>
           )}
         </div>
-        <ChevronLeft className="w-4 h-4 text-gray-300 flex-shrink-0 mt-1 group-hover:text-purple-400 transition-colors" />
+        <DirectionIcon className="w-4 h-4 text-gray-300 flex-shrink-0 mt-1 group-hover:text-purple-400 transition-colors" />
       </div>
 
       {/* Stats row */}
@@ -295,8 +312,9 @@ function StatCard({ icon: Icon, label, value, color, loading }) {
 export default function AgencyClients() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const { can } = usePermissionMatrix();
   const orgId = user?.organization_id;
-  const canManageClients = ['org_admin', 'recruitment_manager', 'admin'].includes(user?.role);
+  const canManageClients = ['org_admin', 'recruitment_manager', 'admin'].includes(user?.role) && can('create');
   const queryClient = useQueryClient();
 
   const [search, setSearch] = useState('');
@@ -304,7 +322,7 @@ export default function AgencyClients() {
   const [filterActive, setFilterActive] = useState('all'); // 'all' | 'active' | 'inactive'
   const [showCreate, setShowCreate] = useState(false);
 
-  const dir = i18n.language === 'he' ? 'rtl' : 'ltr';
+  const dir = i18n.language?.startsWith('he') ? 'rtl' : 'ltr';
 
   // ── Data queries ─────────────────────────────────────────────────────────
 
@@ -323,26 +341,26 @@ export default function AgencyClients() {
     return clients.filter(client => client.status !== 'archived').sort((a, b) => {
       // Active clients first, then by name
       if (b.isActive !== a.isActive) return b.isActive - a.isActive;
-      return a.name.localeCompare(b.name, 'he');
+      return a.name.localeCompare(b.name, i18n.language?.startsWith('he') ? 'he' : 'en');
     });
-  }, [clients]);
+  }, [clients, i18n.language]);
 
   // ── Filters ───────────────────────────────────────────────────────────────
 
   const filtered = useMemo(() => {
     return clientsWithStats.filter(c => {
       if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
-      if (filterIndustry && c.industry !== filterIndustry) return false;
+      if (filterIndustry && getIndustryKey(c.industry, t) !== filterIndustry) return false;
       if (filterActive === 'active' && !c.isActive) return false;
       if (filterActive === 'inactive' && c.isActive) return false;
       return true;
     });
-  }, [clientsWithStats, search, filterIndustry, filterActive]);
+  }, [clientsWithStats, search, filterIndustry, filterActive, t]);
 
   const industries = useMemo(() => {
-    const set = new Set(clientsWithStats.map(c => c.industry).filter(Boolean));
-    return [...set].sort();
-  }, [clientsWithStats]);
+    const set = new Set(clientsWithStats.map(c => getIndustryKey(c.industry, t)).filter(Boolean));
+    return [...set].sort((a, b) => getIndustryLabel(a, t).localeCompare(getIndustryLabel(b, t), i18n.language));
+  }, [clientsWithStats, i18n.language, t]);
 
   // ── Aggregate stats ───────────────────────────────────────────────────────
 
@@ -403,7 +421,7 @@ export default function AgencyClients() {
             className="px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm bg-white"
           >
             <option value="">{t('agencyClients.filters.allIndustries')}</option>
-            {industries.map(i => <option key={i} value={i}>{i}</option>)}
+            {industries.map(i => <option key={i} value={i}>{getIndustryLabel(i, t)}</option>)}
           </select>
         )}
 
@@ -432,16 +450,16 @@ export default function AgencyClients() {
       {/* Results count */}
       {!loading && (
         <p className="text-sm text-gray-400 font-semibold -mt-2">
-          {filtered.length} {t('agencyClients.results.clients')}
+          {t('agencyClients.results.count', { count: filtered.length })}
         </p>
       )}
 
       {/* Grid */}
       {clientsError ? (
         <div className="rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
-          <p className="font-bold text-red-700">{t('common.loadError', { defaultValue: 'Unable to load clients' })}</p>
+          <p className="font-bold text-red-700">{t('agencyClients.loadError')}</p>
           <button onClick={() => refetch()} className="mt-3 text-sm font-bold text-purple-700 hover:underline">
-            {t('crm.refresh')}
+            {t('common.retry')}
           </button>
         </div>
       ) : loading ? (
