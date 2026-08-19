@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PlatformCard, PlatformEmptyState, PlatformPageHeader, PlatformPageShell, PlatformStatCard, PlatformWidgetHeader, platformFieldClassName } from '@/components/platform/PlatformUI';
+import { REASSIGN_INVALIDATION_KEYS } from '@/domain/agency/rmAcceptance';
 
 const STAGES = ['new', 'reviewed', 'phone_interview', 'recommended', 'employer_interview', 'offer', 'hired', 'probation', 'completed', 'rejected'];
 const parseIds = value => [...new Set(value.split(',').map(item => Number(item.trim())).filter(Number.isInteger))];
@@ -19,10 +20,22 @@ export default function RecruitmentManagerDashboard() {
   const { i18n } = useTranslation();
   const isRtl = !i18n.language?.startsWith('en');
   const text = isRtl ? {
-    title: 'ניהול גיוס', subtitle: 'משפך, SLA, עומסים, השמות וחלוקת עבודה', refresh: 'רענן',
-    openJobs: 'משרות פתוחות', applications: 'מועמדויות', active: 'תהליכים פעילים', overdue: 'חריגות SLA', placements: 'השמות', overloaded: 'מגייסים בעומס',
-    funnel: 'משפך גיוס', workload: 'עומס מגייסים', overdueTitle: 'שלבים באיחור', recentPlacements: 'השמות אחרונות',
-    assign: 'הקצאה והעברה מרוכזת', jobs: 'מזהי משרות', candidates: 'מזהי מועמדים', applications: 'מזהי מועמדויות',
+    title: 'ניהול גיוס',
+    subtitle: 'משפך, SLA, עומסים, השמות וחלוקת עבודה',
+    refresh: 'רענן',
+    openJobs: 'משרות פתוחות',
+    applications: 'מועמדויות',
+    active: 'תהליכים פעילים',
+    overdue: 'חריגות SLA',
+    placements: 'השמות',
+    overloaded: 'מגייסים בעומס',
+    funnel: 'משפך גיוס',
+    workload: 'עומס מגייסים',
+    overdueTitle: 'שלבים באיחור',
+    recentPlacements: 'השמות אחרונות',
+    assign: 'הקצאה והעברה מרוכזת',
+    jobs: 'מזהי משרות',
+    candidates: 'מזהי מועמדים',
     comma: 'מזהים מופרדים בפסיקים', team: 'צוות', recruiter: 'מגייס', unassigned: 'ללא הקצאה', reason: 'סיבת ההקצאה / ההעברה', submit: 'הקצה',
     required: 'יש להזין לפחות מזהה אחד וסיבה', success: 'ההקצאה נשמרה בעסקה אחת', loadError: 'לא ניתן לטעון את לוח הניהול', none: 'אין נתונים', hours: 'שעות',
     filters: 'מסנני KPI', client: 'לקוח', job: 'משרה', from: 'מתאריך', to: 'עד תאריך', all: 'הכול',
@@ -30,7 +43,7 @@ export default function RecruitmentManagerDashboard() {
     title: 'Recruitment Management', subtitle: 'Funnel, SLA, workload, placements and work distribution', refresh: 'Refresh',
     openJobs: 'Open jobs', applications: 'Applications', active: 'Active pipeline', overdue: 'SLA overdue', placements: 'Placements', overloaded: 'Overloaded recruiters',
     funnel: 'Recruitment funnel', workload: 'Recruiter workload', overdueTitle: 'Overdue stages', recentPlacements: 'Recent placements',
-    assign: 'Bulk assign / reassign', jobs: 'Job IDs', candidates: 'Candidate IDs', applications: 'Application IDs',
+    assign: 'Bulk assign / reassign', jobs: 'Job IDs', candidates: 'Candidate IDs',
     comma: 'Comma-separated IDs', team: 'Team', recruiter: 'Recruiter', unassigned: 'Unassigned', reason: 'Assignment / reassignment reason', submit: 'Assign',
     required: 'Provide at least one ID and a reason', success: 'Assignment saved in one transaction', loadError: 'Unable to load manager dashboard', none: 'No data', hours: 'hours',
     filters: 'KPI filters', client: 'Client', job: 'Job', from: 'From', to: 'To', all: 'All',
@@ -52,7 +65,7 @@ export default function RecruitmentManagerDashboard() {
     onSuccess: () => {
       setSaved(true); setFormError('');
       setForm(current => ({ ...current, job_ids: '', candidate_ids: '', application_ids: '', reason: '' }));
-      ['recruitment-manager-dashboard', 'agency-jobs', 'agency-candidates', 'agency-applications'].forEach(key => queryClient.invalidateQueries({ queryKey: [key] }));
+      REASSIGN_INVALIDATION_KEYS.forEach(key => queryClient.invalidateQueries({ queryKey: [key] }));
     },
     onError: error => setFormError(error?.message || text.loadError),
   });

@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { ApplicationEntity } from '../applications/entities/application.entity';
 import { AgencyTeamEntity } from '../agency-teams/agency-team.entity';
@@ -82,6 +82,85 @@ describe('RecruitmentManagementService RM-2', () => {
       job_ids: [999], candidate_ids: [], application_ids: [],
       team_id: null, recruiter_id: null, reason: 'Return to queue',
     } as any, actor)).rejects.toBeInstanceOf(NotFoundException);
+    expect(manager.save).not.toHaveBeenCalled();
+  });
+
+  it('reassigns work between teams and recruiters with both audit reasons', async () => {
+    const application = { id: 3, organization_id: 12 };
+    const teams = [
+      { id: 4, organization_id: 12, manager_id: 41, is_active: true },
+      { id: 5, organization_id: 12, manager_id: 42, is_active: true },
+    ];
+    const recruiters = [
+      { id: 31, organization_id: 12, role: UserRole.RECRUITER, team_id: 4, is_active: true, email: 'a@test' },
+      { id: 32, organization_id: 12, role: UserRole.RECRUITER, team_id: 5, is_active: true, email: 'b@test' },
+    ];
+    const savedValues: any[] = [];
+    const manager = {
+      findOne: jest.fn(async (entity, options) => {
+        if (entity === AgencyTeamEntity) return teams.find(team => team.id === options.where.id) || null;
+        if (entity === UserEntity) return recruiters.find(recruiter => recruiter.id === options.where.id) || null;
+        return null;
+      }),
+      find: jest.fn(async entity => entity === ApplicationEntity ? [application] : []),
+      save: jest.fn(async (_entity, value) => {
+        savedValues.push(value);
+        return value;
+      }),
+      create: jest.fn((_entity, value) => value),
+    };
+    const dataSource = { transaction: jest.fn(async callback => callback(manager)) };
+    const users = { findOne: jest.fn(async ({ where }) => recruiters.find(item => item.id === where.id)) };
+    const service = new RecruitmentManagementService(
+      {} as any, {} as any, {} as any, users as any, {} as any,
+      { create: jest.fn().mockResolvedValue({}) } as any, dataSource as any,
+    );
+
+    await service.assign({
+      job_ids: [], candidate_ids: [], application_ids: [3],
+      team_id: 4, recruiter_id: 31, reason: 'Initial allocation',
+    } as any, actor);
+    expect(application).toEqual(expect.objectContaining({ recruiter_id: 31, team_manager_id: 41, assigned_to: 31 }));
+
+    await service.assign({
+      job_ids: [], candidate_ids: [], application_ids: [3],
+      team_id: 5, recruiter_id: 32, reason: 'Capacity balancing',
+    } as any, actor);
+    expect(application).toEqual(expect.objectContaining({ recruiter_id: 32, team_manager_id: 42, assigned_to: 32 }));
+    expect(savedValues).toEqual(expect.arrayContaining([
+      expect.objectContaining({ metadata: expect.objectContaining({ reason: 'Initial allocation', team_id: 4, recruiter_id: 31 }) }),
+      expect.objectContaining({ metadata: expect.objectContaining({ reason: 'Capacity balancing', team_id: 5, recruiter_id: 32 }) }),
+    ]));
+    expect(dataSource.transaction).toHaveBeenCalledTimes(2);
+  });
+
+  it('rejects a recruiter who is not a member of the selected team', async () => {
+    const manager = {
+      findOne: jest.fn(async entity => {
+        if (entity === AgencyTeamEntity) return { id: 4, organization_id: 12, manager_id: 41, is_active: true };
+        if (entity === UserEntity) return {
+          id: 32,
+          organization_id: 12,
+          role: UserRole.RECRUITER,
+          team_id: 5,
+          is_active: true,
+        };
+        return null;
+      }),
+      find: jest.fn(),
+      save: jest.fn(),
+      create: jest.fn((_entity, value) => value),
+    };
+    const service = new RecruitmentManagementService(
+      {} as any, {} as any, {} as any, {} as any, {} as any, {} as any,
+      { transaction: jest.fn(async callback => callback(manager)) } as any,
+    );
+
+    await expect(service.assign({
+      job_ids: [], candidate_ids: [], application_ids: [3],
+      team_id: 4, recruiter_id: 32, reason: 'Invalid cross-team move',
+    } as any, actor)).rejects.toBeInstanceOf(BadRequestException);
+    expect(manager.find).not.toHaveBeenCalled();
     expect(manager.save).not.toHaveBeenCalled();
   });
 });

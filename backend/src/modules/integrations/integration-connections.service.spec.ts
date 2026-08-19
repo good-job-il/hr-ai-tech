@@ -1,4 +1,4 @@
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, ForbiddenException } from '@nestjs/common';
 import { IntegrationConnectionsService } from './integration-connections.service';
 
 describe('IntegrationConnectionsService OA-3 feature flags', () => {
@@ -36,5 +36,17 @@ describe('IntegrationConnectionsService OA-3 feature flags', () => {
     const disconnected = await service.disconnect('gmail', actor);
     expect(disconnected.status).toBe('disconnected');
     expect(disconnected.oauth_state).toBeNull();
+  });
+
+  it('rejects recruitment manager integration mutations before persistence', async () => {
+    const connections = { findOne: jest.fn(), create: jest.fn(), save: jest.fn() };
+    const config = { get: jest.fn().mockReturnValue('true') };
+    const service = new IntegrationConnectionsService(connections as any, config as any, { log: jest.fn() } as any);
+    const manager = { id: 2, organization_id: 21, email: 'rm@test', role: 'recruitment_manager' } as any;
+
+    await expect(service.connect('gmail', {} as any, manager)).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(service.disconnect('gmail', manager)).rejects.toBeInstanceOf(ForbiddenException);
+    expect(connections.findOne).not.toHaveBeenCalled();
+    expect(connections.save).not.toHaveBeenCalled();
   });
 });

@@ -229,6 +229,8 @@ Recruitment Manager — руководитель рекрутмента на у�
 
 #### Фаза RM-4. Финальная приёмка
 
+Контракты и результаты приёмки: [`AGENCY_RM4_FINAL_ACCEPTANCE.md`](./AGENCY_RM4_FINAL_ACCEPTANCE.md).
+
 - E2E назначения между командами и рекрутерами;
 - negative E2E для permissions edit, billing mutation и integrations mutation;
 - нагрузочный тест больших списков;

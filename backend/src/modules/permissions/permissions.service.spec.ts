@@ -85,6 +85,24 @@ describe('PermissionsService OA-1 boundary', () => {
     expect(effective.permissions.manage_settings).toBe(false);
   });
 
+  it('rejects recruitment manager permission matrix mutations', async () => {
+    const manager = user({ role: UserRole.RECRUITMENT_MANAGER });
+    matrixRepo.findOne.mockResolvedValue({
+      id: 46,
+      organization_id: 7,
+      is_template: false,
+      permissions: { view: true },
+    });
+
+    await expect(service.createMatrix({ role_key: UserRole.RECRUITER, permissions: { view: true } } as any, manager))
+      .rejects.toBeInstanceOf(ForbiddenException);
+    await expect(service.updateMatrix(46, { permissions: { view: false } } as any, manager))
+      .rejects.toBeInstanceOf(ForbiddenException);
+    await expect(service.removeMatrix(46, manager)).rejects.toBeInstanceOf(ForbiddenException);
+    expect(matrixRepo.save).not.toHaveBeenCalled();
+    expect(matrixRepo.remove).not.toHaveBeenCalled();
+  });
+
   it('rejects cross-tenant permission matrix updates', async () => {
     matrixRepo.findOne.mockResolvedValue({
       id: 44,

@@ -7,6 +7,7 @@ import { AuditService } from '../audit/audit.service';
 import { UserEntity } from '../users/user.entity';
 import { ConnectIntegrationDto } from './dto/integration.dto';
 import { IntegrationConnectionEntity } from './integration-connection.entity';
+import { UserRole } from '../../common/enums/user-role.enum';
 
 const PROVIDERS = {
   gmail: { name: 'Gmail', scopes: ['gmail.readonly', 'gmail.modify'] },
@@ -45,6 +46,7 @@ export class IntegrationConnectionsService {
   }
 
   async connect(provider: string, dto: ConnectIntegrationDto, user: UserEntity) {
+    this.assertCanManage(user);
     const organizationId = this.organizationId(user);
     const definition = this.definition(provider);
     const connectUrl = this.connectUrl(provider);
@@ -73,6 +75,7 @@ export class IntegrationConnectionsService {
   }
 
   async disconnect(provider: string, user: UserEntity) {
+    this.assertCanManage(user);
     const organizationId = this.organizationId(user);
     const definition = this.definition(provider);
     const connection = await this.connections.findOne({ where: { organization_id: organizationId, provider } });
@@ -106,5 +109,11 @@ export class IntegrationConnectionsService {
   private organizationId(user: UserEntity) {
     if (!user.organization_id) throw new ForbiddenException('Organization context required');
     return user.organization_id;
+  }
+
+  private assertCanManage(user: UserEntity) {
+    if (![UserRole.ADMIN, UserRole.ORG_ADMIN].includes(user.role)) {
+      throw new ForbiddenException('Recruitment managers have read-only integration access');
+    }
   }
 }

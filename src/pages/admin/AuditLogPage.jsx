@@ -25,6 +25,7 @@ import {
   PlatformWidgetHeader,
   platformFieldClassName,
 } from '@/components/platform/PlatformUI';
+import { directionForLanguage } from '@/domain/agency/rmAcceptance';
 
 const getActionConfig = (t) => ({
   view: { label: t('auditLog.actions.view'), icon: Eye, color: '#64748B' },
@@ -64,8 +65,8 @@ const PAGE_SIZE = 50;
 
 export default function AuditLogPage() {
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'he';
-  const dateLocale = i18n.language === 'he' ? he : enUS;
+  const isRTL = directionForLanguage(i18n.language) === 'rtl';
+  const dateLocale = isRTL ? he : enUS;
   const ACTION_CONFIG = getActionConfig(t);
   const { can } = usePermissionMatrix();
   const navigate = useNavigate();
@@ -98,7 +99,7 @@ export default function AuditLogPage() {
     return serverFilter;
   };
 
-  const { data: result, isLoading } = useQuery({
+  const { data: result, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['audit-logs', filters.entity_type, filters.action, filters.actor_email, filters.date_from, filters.date_to, page],
     queryFn: async () => {
       return auditService.listPage({
@@ -266,7 +267,14 @@ export default function AuditLogPage() {
         </PlatformCard>
 
         {/* Logs List */}
-        <PlatformCard className="overflow-hidden">
+        {isError ? (
+          <PlatformCard className="p-5">
+            <PlatformEmptyState icon={AlertTriangle}>
+              <p>{error?.status === 403 ? t('auditLog.accessDenied') : t('auditLog.loadFailed')}</p>
+              <Button className="mt-4" variant="outline" onClick={() => refetch()}>{t('auditLog.tryAgain')}</Button>
+            </PlatformEmptyState>
+          </PlatformCard>
+        ) : <PlatformCard className="overflow-hidden">
           <div className="border-b border-slate-100 p-5">
             <PlatformWidgetHeader title={t('auditLog.title')} subtitle={t('auditLog.subtitle')} />
           </div>
@@ -365,7 +373,7 @@ export default function AuditLogPage() {
               </tbody>
             </table>
           </div>
-        </PlatformCard>
+        </PlatformCard>}
       </div>
     </PlatformPageShell>
   );
