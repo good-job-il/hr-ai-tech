@@ -474,7 +474,9 @@ export default function ImportSources() {
 
                     {source.last_sync_status === "error" && source.last_error && (
                       <div className="flex items-center gap-1 text-xs text-red-500 mt-1">
-                        <AlertTriangle className="w-3 h-3" /> {source.last_error}
+                        <AlertTriangle className="w-3 h-3" />
+
+                        {source.last_error}
                       </div>
                     )}
                   </div>
