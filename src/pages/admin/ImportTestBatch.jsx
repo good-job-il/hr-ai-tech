@@ -1,11 +1,10 @@
-import React, { useState } from "react"
-import AdminLayout from "@/components/admin/AdminLayout"
-import { CheckCircle2, Info } from "lucide-react"
-import ResumeZipUploader from "@/components/admin/ResumeZipUploader"
+import { useState } from "react"
 
 export default function ImportTestBatch() {
   const [testMode, setTestMode] = useState("disabled")
+
   const [testSize, setTestSize] = useState("10")
+
   const [importComplete, setImportComplete] = useState(false)
 
   const testSizes = [

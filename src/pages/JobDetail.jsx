@@ -1,38 +1,33 @@
 import React, { useState } from "react"
 import { useAuth } from "@/lib/AuthContext"
-import SaveJobButton from "@/components/jobs/SaveJobButton"
-import ShareButtons from "@/components/jobs/ShareButtons"
-import { useParams, Link } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { publicJobService } from "@/api/services/publicJobService"
 import { applicationService } from "@/api/services/applicationService"
 import { candidateProfileService } from "@/api/services/candidateProfileService"
 import { fileService } from "@/api/services/fileService"
 import { publicWorkflowService } from "@/api/services/publicWorkflowService"
-import {
-  ArrowLeft,
-  MapPin,
-  Briefcase,
-  Eye,
-  Clock,
-  Send,
-  Upload,
-  AlertCircle,
-  RefreshCw,
-} from "lucide-react"
-import Navbar from "@/components/home/Navbar"
-import SEOHead from "@/components/SEOHead"
-import SimilarJobsList from "@/components/jobs/SimilarJobsList"
+
 import { logError, getErrorMessage } from "@/lib/errorHandler"
 
 // Validation
 const validateForm = (form) => {
   const errors = {}
-  if (!form.candidate_name?.trim()) errors.candidate_name = "Full name is required"
-  if (!form.candidate_email?.trim()) errors.candidate_email = "Email is required"
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.candidate_email))
+
+  if (!form.candidate_name?.trim()) {
+    errors.candidate_name = "Full name is required"
+  }
+
+  if (!form.candidate_email?.trim()) {
+    errors.candidate_email = "Email is required"
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.candidate_email)) {
     errors.candidate_email = "Invalid email address"
-  if (!form.candidate_phone?.trim()) errors.candidate_phone = "Phone is required"
+  }
+
+  if (!form.candidate_phone?.trim()) {
+    errors.candidate_phone = "Phone is required"
+  }
+
   if (
     form.desired_salary_min &&
     form.desired_salary_max &&
@@ -40,6 +35,7 @@ const validateForm = (form) => {
   ) {
     errors.desired_salary_max = "Maximum salary must be higher than minimum"
   }
+
   return errors
 }
 
@@ -49,7 +45,10 @@ const withRetry = async (fn, retries = 2, label = "") => {
     try {
       return await fn()
     } catch (err) {
-      if (i === retries) throw err
+      if (i === retries) {
+        throw err
+      }
+
       console.warn(`[RETRY ${i + 1}/${retries}] ${label}`, err?.message)
       await new Promise((r) => setTimeout(r, 1000 * (i + 1)))
     }
@@ -60,9 +59,13 @@ const typeLabels = { full: "Full-time", part: "Part-time", daily: "Daily", remot
 
 export default function JobDetail() {
   const { id } = useParams()
+
   const { user } = useAuth()
+
   const queryClient = useQueryClient()
+
   const [showApply, setShowApply] = useState(false)
+
   const [form, setForm] = useState({
     candidate_name: "",
     candidate_email: "",
@@ -75,14 +78,23 @@ export default function JobDetail() {
     resume_filename: "",
     resume_file: null,
   })
+
   const [uploading, setUploading] = useState(false)
+
   const [submitted, setSubmitted] = useState(false)
+
   const [extracting, setExtracting] = useState(false)
+
   const [scrollPosition, setScrollPosition] = useState(0)
+
   const [formErrors, setFormErrors] = useState({})
+
   const [applyError, setApplyError] = useState(null)
+
   const [uploadError, setUploadError] = useState(null)
+
   const [profileResume, setProfileResume] = useState(null) // {url, filename}
+
   const [useProfileResume, setUseProfileResume] = useState(false)
 
   const {
@@ -94,8 +106,13 @@ export default function JobDetail() {
     queryKey: ["job", id],
     queryFn: async () => {
       console.info(`[JobDetail] Loading job id=${id}`)
+
       const j = await withRetry(() => publicJobService.get(id), 2, "fetch job")
-      if (j) publicJobService.incrementViews(id).catch(() => {})
+
+      if (j) {
+        publicJobService.incrementViews(id).catch(() => {})
+      }
+
       return j || null
     },
     retry: 1,
@@ -106,11 +123,16 @@ export default function JobDetail() {
   useQuery({
     queryKey: ["candidate-profile-resume", user?.email],
     queryFn: async () => {
-      if (!user?.email) return null
+      if (!user?.email) {
+        return null
+      }
+
       const profile = await candidateProfileService.me()
+
       if (profile?.resume_url) {
         setProfileResume({ url: profile.resume_url, filename: "Existing Resume" })
       }
+
       return profile || null
     },
     enabled: !!user?.email,
@@ -119,8 +141,12 @@ export default function JobDetail() {
   const { data: similarJobs = [] } = useQuery({
     queryKey: ["similar-jobs", job?.category, id],
     queryFn: async () => {
-      if (!job?.category) return []
+      if (!job?.category) {
+        return []
+      }
+
       const result = await publicWorkflowService.similarJobs(Number(id), 3)
+
       return result.recommendations
     },
     enabled: !!job?.category,
@@ -128,23 +154,32 @@ export default function JobDetail() {
 
   React.useEffect(() => {
     const handleScroll = () => setScrollPosition(window.scrollY)
+
     window.addEventListener("scroll", handleScroll)
+
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const handleFileUpload = async (file) => {
-    if (!file) return null
+    if (!file) {
+      return null
+    }
+
     setUploading(true)
     setUploadError(null)
+
     try {
       const result = await withRetry(() => fileService.upload(file), 2, "upload file")
+
       console.info(`[JobDetail] File uploaded: ${file.name}`)
+
       return result.file_url
     } catch (error) {
       logError(error, "JobDetail.handleFileUpload")
       setUploadError(
         "File upload failed. Please check that the file is valid (PDF/Word up to 10MB) and try again.",
       )
+
       return null
     } finally {
       setUploading(false)
@@ -152,27 +187,40 @@ export default function JobDetail() {
   }
 
   const handleResumeUpload = async (file) => {
-    if (!file) return
-    const MAX_SIZE = 10 * 1024 * 1024
-    if (file.size > MAX_SIZE) {
-      setUploadError("File is too large. Maximum size is 10MB.")
+    if (!file) {
       return
     }
+
+    const MAX_SIZE = 10 * 1024 * 1024
+
+    if (file.size > MAX_SIZE) {
+      setUploadError("File is too large. Maximum size is 10MB.")
+
+      return
+    }
+
     setUploadError(null)
 
     const fileUrl = await handleFileUpload(file)
-    if (!fileUrl) return
+
+    if (!fileUrl) {
+      return
+    }
 
     setExtracting(true)
+
     try {
       console.info(`[JobDetail] Extracting resume data from ${file.name}`)
+
       const result = await withRetry(
         () => publicWorkflowService.extractResume(fileUrl),
         1,
         "extract resume",
       )
+
       if (result.data) {
         const extracted = result.data
+
         setForm((prev) => ({
           ...prev,
           candidate_name: extracted.full_name || prev.candidate_name,
@@ -212,11 +260,15 @@ export default function JobDetail() {
   const applyMutation = useMutation({
     mutationFn: async (data) => {
       let resumeUrl = data.resume_url
+
       if (data.resume_file) {
         resumeUrl = await handleFileUpload(data.resume_file)
       }
+
       console.info(`[JobDetail] Submitting application for job ${job.id}`)
+
       const { candidate_email: _ignoredEmail, resume_file: _ignoredFile, ...candidateData } = data
+
       return withRetry(
         () =>
           applicationService.submit({
@@ -234,7 +286,9 @@ export default function JobDetail() {
     },
     onError: (error) => {
       logError(error, "JobDetail.applyMutation")
+
       const msg = getErrorMessage(error)
+
       setApplyError(msg || "Application submission failed. Please try again.")
     },
     onSuccess: async () => {
@@ -247,16 +301,20 @@ export default function JobDetail() {
   const handleApply = (e) => {
     e.preventDefault()
     setApplyError(null)
+
     const errors = validateForm(form)
+
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors)
+
       return
     }
+
     setFormErrors({})
     applyMutation.mutate(form)
   }
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <div
         className="min-h-screen"
@@ -272,8 +330,9 @@ export default function JobDetail() {
         </div>
       </div>
     )
+  }
 
-  if (jobLoadError || !job)
+  if (jobLoadError || !job) {
     return (
       <div
         className="min-h-screen"
@@ -317,10 +376,12 @@ export default function JobDetail() {
         </div>
       </div>
     )
+  }
 
   const seoTitle = job
     ? `${job.title} at ${job.company}${job.location ? ` | ${job.location}` : ""} | HeadHunter`
     : "Job"
+
   const seoDesc = job
     ? `Job Opening: ${job.title} at ${job.company}${job.location ? ` in ${job.location}` : ""}. ${job.salary_min && job.salary_max ? `Salary ₪${job.salary_min.toLocaleString()}–₪${job.salary_max.toLocaleString()}.` : ""} ${job.type ? `${typeLabels[job.type]}.` : ""} Apply now on HeadHunter.`
     : ""
@@ -393,6 +454,7 @@ export default function JobDetail() {
     0,
     Math.floor((Date.now() - new Date(job.created_date || Date.now())) / 86400000),
   )
+
   const isNew = daysAgo <= 3
 
   return (

@@ -2,20 +2,12 @@
  * PermissionsPage — Organization Permission Matrix Editor
  * Accessible only by: admin, org_admin
  */
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { permissionMatrixService } from "@/api/services/permissionService"
 import { useAuth } from "@/lib/AuthContext"
-import { Button } from "@/components/ui/button"
-import { Save, RefreshCw, ShieldCheck, Lock, ShieldAlert } from "lucide-react"
+import { Save, ShieldCheck, Lock, ShieldAlert } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-} from "@/components/platform/PlatformUI"
+
 import { invalidatePermissionMatrixCache, usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 
 const PERM_KEYS = [
@@ -32,6 +24,7 @@ const PERM_KEYS = [
 ]
 
 const STAFFING_ROLE_KEYS = ["org_admin", "recruitment_manager", "team_manager", "recruiter"]
+
 const ORG_ROLE_KEYS = ["org_admin", "hr_manager", "internal_recruiter"]
 
 const EDITABLE_ROLES = ["admin", "org_admin"]
@@ -51,25 +44,39 @@ const emptyPerms = () => ({
 
 export default function PermissionsPage() {
   const { user } = useAuth()
+
   const { can } = usePermissionMatrix()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const [allRecords, setAllRecords] = useState([])
+
   const [matrix, setMatrix] = useState({}) // { role_key: { ...perms } }
+
   const [orgType, setOrgType] = useState(user?.org_type || "staffing_agency")
+
   const [loading, setLoading] = useState(true)
+
   const [error, setError] = useState(null)
+
   const [saving, setSaving] = useState(false)
+
   const [saveError, setSaveError] = useState(false)
+
   const [saved, setSaved] = useState(false)
+
   const [dirty, setDirty] = useState({}) // { role_key: boolean }
 
   const canEdit = EDITABLE_ROLES.includes(user?.role) && can("manage_settings")
+
   const canSwitchOrgType = user?.role === "admin"
+
   const orgId = user?.organization_id || null
 
   const roleKeys = orgType === "staffing_agency" ? STAFFING_ROLE_KEYS : ORG_ROLE_KEYS
+
   const roleLabel = (key) =>
     orgType === "staffing_agency"
       ? t(`permissionsMatrix.staffingRoles.${key}`)
@@ -82,8 +89,10 @@ export default function PermissionsPage() {
   const load = async () => {
     setLoading(true)
     setError(null)
+
     try {
       const all = await permissionMatrixService.list({ limit: 200 })
+
       setAllRecords(all)
       buildMatrix(all)
       setDirty({})
@@ -96,19 +105,26 @@ export default function PermissionsPage() {
 
   const buildMatrix = (records) => {
     const built = {}
+
     for (const roleKey of [...STAFFING_ROLE_KEYS, ...ORG_ROLE_KEYS]) {
       // Priority: org override > template
       const override = records.find(
         (r) => r.organization_id === orgId && r.role_key === roleKey && !r.is_template,
       )
+
       const template = records.find((r) => r.is_template && r.role_key === roleKey)
+
       built[roleKey] = { ...(override?.permissions || template?.permissions || emptyPerms()) }
     }
+
     setMatrix(built)
   }
 
   const toggle = (roleKey, permKey) => {
-    if (!canEdit) return
+    if (!canEdit) {
+      return
+    }
+
     setMatrix((prev) => ({
       ...prev,
       [roleKey]: { ...prev[roleKey], [permKey]: !prev[roleKey][permKey] },
@@ -119,10 +135,13 @@ export default function PermissionsPage() {
 
   const saveRole = async (roleKey) => {
     const perms = matrix[roleKey]
+
     const existing = allRecords.find(
       (r) => r.organization_id === orgId && r.role_key === roleKey && !r.is_template,
     )
+
     let savedRecord
+
     if (existing) {
       savedRecord = await permissionMatrixService.update(existing.id, { permissions: perms })
     } else {
@@ -143,7 +162,9 @@ export default function PermissionsPage() {
   const handleSaveAll = async () => {
     setSaving(true)
     setSaveError(false)
+
     const dirtyRoles = Object.keys(dirty).filter((k) => dirty[k])
+
     try {
       await Promise.all(dirtyRoles.map((roleKey) => saveRole(roleKey)))
       await load()
@@ -156,7 +177,9 @@ export default function PermissionsPage() {
   }
 
   const hasDirty = Object.keys(dirty).some((k) => dirty[k])
+
   const stickyColClass = isRtl ? "sticky right-0" : "sticky left-0"
+
   const enabledPermissions = roleKeys.reduce(
     (total, roleKey) => total + Object.values(matrix[roleKey] || {}).filter(Boolean).length,
     0,

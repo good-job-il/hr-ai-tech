@@ -1,6 +1,4 @@
-import React, { useState } from "react"
-import { X, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react"
 
 const CATEGORIES = [
   "פיתוח תוכנה",
@@ -17,6 +15,7 @@ const CATEGORIES = [
 
 export default function JobFilters({ isOpen, onClose, filters, onFilterChange, onSearch }) {
   const [expanded, setExpanded] = useState({})
+
   const [tempFilters, setTempFilters] = useState(filters)
 
   const filterSections = [
@@ -49,9 +48,11 @@ export default function JobFilters({ isOpen, onClose, filters, onFilterChange, o
 
   const handleCheck = (section, value) => {
     const current = tempFilters[section] || []
+
     const updated = current.includes(value)
       ? current.filter((v) => v !== value)
       : [...current, value]
+
     setTempFilters({ ...tempFilters, [section]: updated })
   }
 
@@ -78,7 +79,9 @@ export default function JobFilters({ isOpen, onClose, filters, onFilterChange, o
     onFilterChange({})
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   return (
     <>

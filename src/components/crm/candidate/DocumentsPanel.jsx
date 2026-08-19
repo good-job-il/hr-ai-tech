@@ -1,6 +1,4 @@
 import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { FileText, Upload, Download, Eye, File } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 
@@ -15,16 +13,28 @@ const DOC_COLORS = {
 }
 
 function formatBytes(bytes) {
-  if (!bytes) return ""
-  if (bytes < 1024) return `${bytes}B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`
+  if (!bytes) {
+    return ""
+  }
+
+  if (bytes < 1024) {
+    return `${bytes}B`
+  }
+
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)}KB`
+  }
+
   return `${(bytes / (1024 * 1024)).toFixed(1)}MB`
 }
 
 export default function DocumentsPanel({ documents, candidate, onUpload }) {
   const { t } = useTranslation()
+
   const { can } = usePermissionMatrix()
+
   const canUpdate = can("update")
+
   const canDownload = can("download_cv")
 
   const DOC_TYPE_LABELS = {
@@ -38,12 +48,18 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
   }
 
   const [uploading, setUploading] = useState(false)
+
   const [docType, setDocType] = useState("cv")
+
   const fileRef = useRef()
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0]
-    if (!file) return
+
+    if (!file) {
+      return
+    }
+
     setUploading(true)
     await onUpload(file, docType)
     setUploading(false)
@@ -52,7 +68,11 @@ export default function DocumentsPanel({ documents, candidate, onUpload }) {
 
   const grouped = Object.entries(DOC_TYPE_LABELS).reduce((acc, [type]) => {
     const docs = documents.filter((d) => d.doc_type === type)
-    if (docs.length) acc[type] = docs
+
+    if (docs.length) {
+      acc[type] = docs
+    }
+
     return acc
   }, {})
 

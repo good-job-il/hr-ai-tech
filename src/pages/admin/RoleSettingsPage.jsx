@@ -3,20 +3,12 @@
  * Editable Role Display Names per org_type
  * Accessible by: admin, org_admin
  */
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { roleTemplateService } from "@/api/services/permissionService"
 import { useAuth } from "@/lib/AuthContext"
-import { Input } from "@/components/ui/input"
-import { RefreshCw, Users, Pencil, Check, X, ShieldAlert } from "lucide-react"
+import { Users, Pencil, Check, ShieldAlert } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-} from "@/components/platform/PlatformUI"
+
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 
 const EDITABLE_ROLES = ["admin", "org_admin"]
@@ -30,14 +22,18 @@ const LEVEL_COLORS = {
 
 function RoleRow({ record, canEdit, onSave, t }) {
   const [editing, setEditing] = useState(false)
+
   const [value, setValue] = useState(record.display_name)
+
   const [saving, setSaving] = useState(false)
 
   const handleSave = async () => {
     if (!value.trim() || value === record.display_name) {
       setEditing(false)
+
       return
     }
+
     setSaving(true)
     await onSave(record, value.trim())
     setSaving(false)
@@ -79,8 +75,13 @@ function RoleRow({ record, canEdit, onSave, t }) {
               className="h-9 w-48 rounded-xl border-violet-200 text-sm focus:ring-violet-200"
               autoFocus
               onKeyDown={(e) => {
-                if (e.key === "Enter") handleSave()
-                if (e.key === "Escape") handleCancel()
+                if (e.key === "Enter") {
+                  handleSave()
+                }
+
+                if (e.key === "Escape") {
+                  handleCancel()
+                }
               }}
             />
             <button
@@ -146,17 +147,27 @@ function RoleRow({ record, canEdit, onSave, t }) {
 
 export default function RoleSettingsPage() {
   const { user } = useAuth()
+
   const { can } = usePermissionMatrix()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const [records, setRecords] = useState([])
+
   const [orgType, setOrgType] = useState(user?.org_type || "staffing_agency")
+
   const [loading, setLoading] = useState(true)
+
   const [error, setError] = useState(null)
+
   const [savedMsg, setSavedMsg] = useState("")
 
   const canEdit = EDITABLE_ROLES.includes(user?.role) && can("manage_settings")
+
   const canSwitchOrgType = user?.role === "admin"
+
   const orgId = user?.organization_id || null
 
   useEffect(() => {
@@ -166,8 +177,10 @@ export default function RoleSettingsPage() {
   const load = async () => {
     setLoading(true)
     setError(null)
+
     try {
       const all = await roleTemplateService.list({ limit: 200 })
+
       setRecords(all)
     } catch (requestError) {
       setError({ status: requestError?.status || requestError?.response?.status || null })
@@ -181,13 +194,16 @@ export default function RoleSettingsPage() {
     const orgOverrides = records.filter(
       (r) => r.organization_id === orgId && r.org_type === orgType,
     )
+
     const globalTemplates = records.filter((r) => !r.organization_id && r.org_type === orgType)
 
     // Merge: prefer org override per system_role_key
     const merged = globalTemplates.map((tmpl) => {
       const override = orgOverrides.find((o) => o.system_role_key === tmpl.system_role_key)
+
       return override || tmpl
     })
+
     return merged.sort((a, b) => a.hierarchy_level - b.hierarchy_level)
   }
 
@@ -223,7 +239,9 @@ export default function RoleSettingsPage() {
   }
 
   const displayRecords = getDisplayRecords()
+
   const activeRoles = displayRecords.filter((record) => record.is_active).length
+
   const editableRoles = displayRecords.filter((record) => record.is_editable_name).length
 
   return (

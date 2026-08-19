@@ -1,13 +1,14 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useAuth } from "@/lib/AuthContext"
 import { authService } from "@/api/services/authService"
 import { fileService } from "@/api/services/fileService"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Video, Image as ImageIcon } from "lucide-react"
 
 export default function CompanyProfileSettings() {
   const { user } = useAuth()
+
   const queryClient = useQueryClient()
+
   const [profileData, setProfileData] = useState({
     company_culture: "",
     benefits: "",
@@ -36,9 +37,13 @@ export default function CompanyProfileSettings() {
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0]
-    if (!file) return
+
+    if (!file) {
+      return
+    }
 
     const { file_url } = await fileService.upload(file)
+
     setProfileData((prev) => ({
       ...prev,
       gallery_urls: [...prev.gallery_urls, file_url],
@@ -47,9 +52,13 @@ export default function CompanyProfileSettings() {
 
   const handleVideoUpload = async (e) => {
     const file = e.target.files[0]
-    if (!file) return
+
+    if (!file) {
+      return
+    }
 
     const { file_url } = await fileService.upload(file)
+
     setProfileData((prev) => ({ ...prev, video_url: file_url }))
   }
 

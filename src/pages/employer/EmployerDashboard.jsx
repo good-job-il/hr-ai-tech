@@ -1,12 +1,10 @@
-import { Users, Briefcase, Clock, TrendingUp, Plus, RefreshCw, Users2, Target } from "lucide-react"
+import { Users, Briefcase, Clock, TrendingUp } from "lucide-react"
 import { useState, useEffect } from "react"
 import { jobService } from "@/api/services/jobService"
 import { candidateService } from "@/api/services/candidateService"
 import { interviewService } from "@/api/services/interviewService"
 import { applicationService } from "@/api/services/applicationService"
 import { useAuth } from "@/lib/AuthContext"
-import JobFormModal from "@/components/employer/JobFormModal"
-import { Link } from "react-router-dom"
 
 function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
   return (
@@ -33,15 +31,23 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
 
 export default function EmployerDashboard() {
   const { user } = useAuth()
+
   const [modalOpen, setModalOpen] = useState(false)
+
   const [stats, setStats] = useState(null)
+
   const [loading, setLoading] = useState(true)
+
   const [loadError, setLoadError] = useState("")
 
   const load = async () => {
-    if (!user) return
+    if (!user) {
+      return
+    }
+
     setLoading(true)
     setLoadError("")
+
     try {
       const [jobs, candidates, interviews, applications] = await Promise.all([
         jobService.list({ limit: 200 }),
@@ -49,6 +55,7 @@ export default function EmployerDashboard() {
         interviewService.list({ status: "scheduled", limit: 200 }),
         applicationService.list({ limit: 200 }),
       ])
+
       setStats({
         openJobs: jobs.filter((j) => !j.is_closed).length,
         candidates: candidates.length,

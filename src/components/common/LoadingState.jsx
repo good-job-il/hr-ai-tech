@@ -1,5 +1,3 @@
-import { Card, CardContent } from "@/components/ui/Card"
-
 export function LoadingState({ message = "טוען..." }) {
   return (
     <Card>

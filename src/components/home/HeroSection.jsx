@@ -1,17 +1,20 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/lib/AuthContext"
 import { useTranslation } from "react-i18next"
 import { useQuery } from "@tanstack/react-query"
 import { publicJobService } from "@/api/services/publicJobService"
 import { companyService } from "@/api/services/companyService"
-import { Sparkles } from "lucide-react"
 
 export default function HeroSection() {
   const [phone, setPhone] = useState("")
+
   const navigate = useNavigate()
+
   const { user } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const { data: jobs = [] } = useQuery({
@@ -26,19 +29,26 @@ export default function HeroSection() {
     },
     staleTime: 1000 * 60 * 5,
   })
+
   const { data: companies = [] } = useQuery({
     queryKey: ["hero-companies-count"],
     queryFn: () => companyService.list({ sort: "created_date", order: "DESC", limit: 50 }),
     staleTime: 1000 * 60 * 5,
   })
+
   const users = []
 
   const jobCount = jobs.length
+
   const companyCount = Math.max(companies.length, 1)
+
   const userCount = Math.max(users.length, 1)
 
   const handleSubmit = () => {
-    if (!phone.trim()) return
+    if (!phone.trim()) {
+      return
+    }
+
     navigate(`/register?phone=${encodeURIComponent(phone)}`)
   }
 

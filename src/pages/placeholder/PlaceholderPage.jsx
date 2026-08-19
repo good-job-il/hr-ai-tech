@@ -1,5 +1,4 @@
 import { useLocation } from "react-router-dom"
-import { Construction } from "lucide-react"
 
 /**
  * Generic placeholder for pages under construction.
@@ -7,6 +6,7 @@ import { Construction } from "lucide-react"
  */
 export default function PlaceholderPage({ title, description }) {
   const location = useLocation()
+
   const pageName =
     title ||
     location.pathname

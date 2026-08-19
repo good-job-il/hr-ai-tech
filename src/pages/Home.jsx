@@ -1,12 +1,8 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import SEOHead from "@/components/SEOHead"
 import { useAuth } from "@/lib/AuthContext"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
-import Navbar from "@/components/home/Navbar"
 import {
-  Search,
   UserPlus,
   Bell,
   Bot,
@@ -22,8 +18,6 @@ import {
   FileText,
   MessageSquare,
   Target,
-  Sparkles,
-  ChevronDown,
   Users,
 } from "lucide-react"
 
@@ -47,6 +41,7 @@ function HHLogo() {
 
 function CandidateCard() {
   const { i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   return (
@@ -387,11 +382,14 @@ function AIOrb() {
 
 function HeroSection() {
   const { user, isAuthenticated } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const dashboardLink = () => {
     const role = user?.role || user?.user_type || ""
+
     const map = {
       recruiter: "/agency/recruiter/dashboard",
       team_manager: "/agency/dashboard",
@@ -402,6 +400,7 @@ function HeroSection() {
       candidate: "/candidate/dashboard",
       admin: "/platform/dashboard",
     }
+
     return map[role] || "/"
   }
 
@@ -509,6 +508,7 @@ function HeroSection() {
 
 function WhySection() {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const items = [
@@ -602,8 +602,11 @@ function WhySection() {
 
 function SearchSection() {
   const navigate = useNavigate()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const [q, setQ] = useState("")
 
   const doSearch = () => {
@@ -700,6 +703,7 @@ function SearchSection() {
 
 function AICenter() {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const cards = [
@@ -768,6 +772,7 @@ function AICenter() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {cards.map((card) => {
               const Icon = card.icon
+
               return (
                 <div key={card.title} className={`${glassCard} p-7`}>
                   <Icon className="w-9 h-9 text-[#6C4DFF] mb-6" />
@@ -785,6 +790,7 @@ function AICenter() {
 
 function StatsSection() {
   const { i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const stats = [
@@ -802,6 +808,7 @@ function StatsSection() {
         >
           {stats.map((s) => {
             const Icon = s.icon
+
             return (
               <div key={s.label} className="p-9 text-center">
                 <Icon className="w-10 h-10 text-[#6C4DFF] mx-auto mb-4" />
@@ -818,6 +825,7 @@ function StatsSection() {
 
 function HowItWorks() {
   const { i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const steps = [
@@ -869,6 +877,7 @@ function HowItWorks() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {steps.map((step, index) => {
             const Icon = step.icon
+
             return (
               <div key={step.title} className={`${glassCard} p-8 text-center relative`}>
                 <div className="absolute top-5 right-5 w-9 h-9 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] text-white flex items-center justify-center font-black">
@@ -888,6 +897,7 @@ function HowItWorks() {
 
 function CTASection() {
   const { i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   return (
@@ -920,6 +930,7 @@ function CTASection() {
 
 function HomeFooter() {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const columns = isRtl
@@ -980,6 +991,7 @@ function HomeFooter() {
 
 export default function Home() {
   const { i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   return (

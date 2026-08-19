@@ -1,8 +1,6 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { jobService } from "@/api/services/jobService"
-import { ToggleLeft, ToggleRight, Trash2, Search } from "lucide-react"
-import AdminLayout from "@/components/admin/AdminLayout"
 
 const SOURCE_LABELS = {
   novolog_import: "נובולוג",
@@ -13,7 +11,9 @@ const SOURCE_LABELS = {
 
 export default function AdminManageJobs() {
   const queryClient = useQueryClient()
+
   const [search, setSearch] = useState("")
+
   const [filterSource, setFilterSource] = useState("all")
 
   const { data: jobs = [], isLoading } = useQuery({
@@ -35,11 +35,14 @@ export default function AdminManageJobs() {
 
   const filtered = jobs.filter((j) => {
     const matchSearch = !search || j.title?.includes(search) || j.company?.includes(search)
+
     const matchSource = filterSource === "all" || j.employer_id === filterSource
+
     return matchSearch && matchSource
   })
 
   const activeCount = filtered.filter((j) => !j.is_closed).length
+
   const closedCount = filtered.filter((j) => j.is_closed).length
 
   return (

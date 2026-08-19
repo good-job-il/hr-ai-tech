@@ -3,14 +3,11 @@
  * Shows ONLY platform-level metrics: organizations, users, audit.
  * Does NOT expose candidate CRM, CVs, compensation, or recruiter tools.
  */
-import React, { useEffect, useMemo, useState } from "react"
-import { Link } from "react-router-dom"
+import { useEffect, useMemo, useState } from "react"
 import {
   Activity,
   Bot,
   Building2,
-  CalendarDays,
-  Check,
   CircleAlert,
   CloudUpload,
   Database,
@@ -20,42 +17,26 @@ import {
   Server,
   ShieldCheck,
   Users,
-  Workflow,
 } from "lucide-react"
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts"
+
 import { organizationService } from "@/api/services/organizationService"
 import { userService } from "@/api/services/userService"
 import { auditService } from "@/api/services/auditService"
-import { Button } from "@/components/ui/Button"
-import {
-  formatPlatformNumber,
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformModal,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-  platformFieldClassName,
-} from "@/components/platform/PlatformUI"
+import { formatPlatformNumber, platformFieldClassName } from "@/components/platform/PlatformUI"
 
 const chartColors = ["#4f8df7", "#8854e6", "#cf45c4", "#2bc2c2"]
 
 function formatDate(value, fallback = "Recently") {
-  if (!value) return fallback
+  if (!value) {
+    return fallback
+  }
+
   const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return fallback
+
+  if (Number.isNaN(date.getTime())) {
+    return fallback
+  }
+
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "short",
@@ -77,26 +58,38 @@ function getInitials(value = "") {
 
 export default function PlatformDashboard() {
   const [stats, setStats] = useState({})
+
   const [loading, setLoading] = useState(true)
+
   const [loadError, setLoadError] = useState("")
+
   const [showOrgModal, setShowOrgModal] = useState(false)
+
   const [newOrgName, setNewOrgName] = useState("")
+
   const [newOrgType, setNewOrgType] = useState("staffing_agency")
+
   const [creatingOrg, setCreatingOrg] = useState(false)
 
   const loadStats = async () => {
     setLoading(true)
     setLoadError("")
+
     try {
       const [orgs, users, auditLogs] = await Promise.all([
         organizationService.list({ limit: 500 }),
         userService.list({ limit: 500 }).catch(() => []),
         auditService.list({ sort: "created_date", order: "DESC", limit: 100 }).catch(() => []),
       ])
+
       const agencies = orgs.filter((org) => org.org_type === "staffing_agency")
+
       const companies = orgs.filter((org) => org.org_type === "organization")
+
       const activeOrgs = orgs.filter((org) => org.status === "active")
+
       const suspended = orgs.filter((org) => org.status === "suspended")
+
       setStats({
         orgs,
         agencies,
@@ -120,22 +113,30 @@ export default function PlatformDashboard() {
 
   const dashboardData = useMemo(() => {
     const orgs = stats.orgs || []
+
     const users = stats.users || []
+
     const months = Array.from({ length: 7 }, (_, index) => {
       const date = new Date()
+
       date.setDate(1)
       date.setMonth(date.getMonth() - (6 - index))
+
       return date
     })
 
     return months.map((month, index) => {
       const nextMonth = new Date(month.getFullYear(), month.getMonth() + 1, 1)
+
       const orgCount = orgs.filter((org) => {
         const created = new Date(org.created_date || org.created_at || 0)
+
         return !Number.isNaN(created.getTime()) && created < nextMonth
       }).length
+
       const userCount = users.filter((user) => {
         const created = new Date(user.created_date || user.created_at || 0)
+
         return !Number.isNaN(created.getTime()) && created < nextMonth
       }).length
 
@@ -149,8 +150,11 @@ export default function PlatformDashboard() {
 
   const organizationMix = useMemo(() => {
     const agencyCount = stats.agencies?.length ?? 0
+
     const companyCount = stats.companies?.length ?? 0
+
     const otherCount = Math.max((stats.orgs?.length ?? 0) - agencyCount - companyCount, 0)
+
     return [
       { name: "Staffing agencies", value: agencyCount },
       { name: "Companies / HR", value: companyCount },
@@ -171,8 +175,12 @@ export default function PlatformDashboard() {
   )
 
   const handleCreateOrg = async () => {
-    if (!newOrgName.trim()) return
+    if (!newOrgName.trim()) {
+      return
+    }
+
     setCreatingOrg(true)
+
     try {
       await organizationService.create({
         name: newOrgName.trim(),
@@ -408,6 +416,7 @@ export default function PlatformDashboard() {
                 <div className="w-full space-y-3">
                   {organizationMix.map((item, index) => {
                     const total = Math.max(stats.orgs?.length ?? 0, 1)
+
                     return (
                       <div key={item.name} className="flex items-center gap-2 text-xs">
                         <span

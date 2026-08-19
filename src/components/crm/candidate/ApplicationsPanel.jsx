@@ -1,11 +1,12 @@
-import { Briefcase, Calendar } from "lucide-react"
 import { format } from "date-fns"
 import { he, enUS } from "date-fns/locale"
 import { useTranslation } from "react-i18next"
 
 export default function ApplicationsPanel({ applications }) {
   const { t, i18n } = useTranslation()
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const dateLocale = currentLang === "he" ? he : enUS
 
   const STATUS_CFG = {
@@ -51,7 +52,7 @@ export default function ApplicationsPanel({ applications }) {
     },
   }
 
-  if (!applications?.length)
+  if (!applications?.length) {
     return (
       <div className="text-center py-10 text-[#94A3B8]">
         <Briefcase className="w-8 h-8 mx-auto mb-2 opacity-40" />
@@ -60,6 +61,7 @@ export default function ApplicationsPanel({ applications }) {
         </p>
       </div>
     )
+  }
 
   return (
     <div className="space-y-3">
@@ -68,6 +70,7 @@ export default function ApplicationsPanel({ applications }) {
           label: app.status,
           color: "bg-gray-100 text-gray-600",
         }
+
         return (
           <div
             key={app.id}

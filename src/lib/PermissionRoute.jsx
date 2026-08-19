@@ -1,4 +1,3 @@
-import { Navigate, Outlet } from "react-router-dom"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 
 export default function PermissionRoute({
@@ -23,6 +22,9 @@ export default function PermissionRoute({
     )
   }
 
-  if (!required.every(can)) return unauthorizedElement
+  if (!required.every(can)) {
+    return unauthorizedElement
+  }
+
   return <Outlet />
 }

@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react"
-import { X, Eye, Copy, Check } from "lucide-react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/AuthContext"
 import { jobService } from "@/api/services/jobService"
 import { agencyClientService } from "@/api/services/agencyClientService"
@@ -7,6 +6,7 @@ import { compensationPlanService } from "@/api/services/compensationPlanService"
 
 function CopyInline({ text }) {
   const [copied, setCopied] = useState(false)
+
   return (
     <button
       type="button"
@@ -42,17 +42,28 @@ const EMPTY_FORM = {
 
 export default function JobFormModal({ job, isOpen, onClose, onSave, preselectedClientId = null }) {
   const { user } = useAuth()
+
   const [form, setForm] = useState(EMPTY_FORM)
+
   const [loading, setLoading] = useState(false)
+
   const [error, setError] = useState("")
+
   const [compensationPlan, setCompensationPlan] = useState(null)
+
   const [agencyClients, setAgencyClients] = useState([])
+
   const [clientsLoading, setClientsLoading] = useState(false)
+
   const [clientsError, setClientsError] = useState("")
+
   const isAgency = user?.org_type === "staffing_agency"
 
   useEffect(() => {
-    if (!isOpen || !isAgency) return
+    if (!isOpen || !isAgency) {
+      return
+    }
+
     setClientsLoading(true)
     setClientsError("")
     agencyClientService
@@ -73,23 +84,29 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
         salary_min: job.salary_min ?? "",
         salary_max: job.salary_max ?? "",
       })
+
       // Load compensation plan for this job/company
       const loadCompensation = async () => {
         try {
           const plans = await compensationPlanService.list({ limit: 100 })
+
           // First try to find plan for specific job, then for company
           const jobPlan = plans.find((p) => p.job_id === job.id)
+
           const companyPlan = plans.find((p) => p.client_name === job.company && !p.job_id)
+
           setCompensationPlan(jobPlan || companyPlan || null)
         } catch (err) {
           console.error("Failed to load compensation plan:", err)
         }
       }
+
       loadCompensation()
     } else {
       const selectedClient = agencyClients.find(
         (client) => String(client.id) === String(preselectedClientId),
       )
+
       setForm(
         selectedClient
           ? {
@@ -103,49 +120,73 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
       )
       setCompensationPlan(null)
     }
+
     setError("")
   }, [job, isOpen, preselectedClientId, agencyClients])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     if (!form.title) {
       setError("Job title is required")
+
       return
     }
+
     if (!form.company) {
       setError("Company name is required")
+
       return
     }
+
     if (isAgency && !form.employer_company_id) {
       setError("Please select an agency client")
+
       return
     }
+
     if (!form.category) {
       setError("Category is required")
+
       return
     }
 
     // Build clean payload — convert salary strings to numbers or omit
     const payload = { ...form }
+
     payload.salary_min = form.salary_min !== "" ? Number(form.salary_min) : undefined
     payload.salary_max = form.salary_max !== "" ? Number(form.salary_max) : undefined
     // Remove empty string fields that aren't required
     ;["contact_email", "contact_phone", "location", "description"].forEach((k) => {
-      if (payload[k] === "") delete payload[k]
+      if (payload[k] === "") {
+        delete payload[k]
+      }
     })
 
     if (!job?.id && user) {
-      if (user.role === "recruiter" || user.role === "internal_recruiter")
+      if (user.role === "recruiter" || user.role === "internal_recruiter") {
         payload.recruiter_id = user.id
-      if (user.role === "team_manager") payload.team_manager_id = user.id
-      if (user.team_manager_id) payload.team_manager_id = user.team_manager_id
-      if (user.recruitment_manager_id) payload.recruitment_manager_id = user.recruitment_manager_id
+      }
+
+      if (user.role === "team_manager") {
+        payload.team_manager_id = user.id
+      }
+
+      if (user.team_manager_id) {
+        payload.team_manager_id = user.team_manager_id
+      }
+
+      if (user.recruitment_manager_id) {
+        payload.recruitment_manager_id = user.recruitment_manager_id
+      }
     }
 
     setLoading(true)
+
     try {
       if (job?.id) {
         await jobService.update(job.id, payload)
+
         // Save warranty_period_days to compensation plan
         if (compensationPlan?.id && compensationPlan.warranty_period_days != null) {
           await compensationPlanService.update(compensationPlan.id, {
@@ -155,6 +196,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
       } else {
         await jobService.create(payload)
       }
+
       onSave()
       onClose()
     } catch (err) {
@@ -164,7 +206,9 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
     }
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -238,6 +282,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                     const client = agencyClients.find(
                       (item) => String(item.company_id) === e.target.value,
                     )
+
                     setForm({
                       ...form,
                       employer_company_id: client?.company_id || "",
@@ -451,6 +496,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                     value={compensationPlan.warranty_period_days ?? ""}
                     onChange={(e) => {
                       const days = e.target.value ? Number(e.target.value) : null
+
                       setCompensationPlan((prev) =>
                         prev ? { ...prev, warranty_period_days: days } : null,
                       )
@@ -471,13 +517,23 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
               {/* Compensation breakdown — employer cannot see internal compensation */}
               {(() => {
                 const formatComp = (value, type, total) => {
-                  if (!value) return null
-                  if (type === "fixed") return `${value.toLocaleString()}₪`
-                  if (type === "percent" && total)
+                  if (!value) {
+                    return null
+                  }
+
+                  if (type === "fixed") {
+                    return `${value.toLocaleString()}₪`
+                  }
+
+                  if (type === "percent" && total) {
                     return `${((total * value) / 100).toLocaleString()}₪`
+                  }
+
                   return `${value}%`
                 }
+
                 const canSeeAll = ["recruitment_manager", "admin"].includes(user?.role)
+
                 return (
                   <>
                     {compensationPlan.recruiter_compensation &&

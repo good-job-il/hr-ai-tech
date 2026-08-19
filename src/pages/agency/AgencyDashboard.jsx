@@ -1,11 +1,10 @@
-import React, { useState, useMemo, useCallback } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { jobService } from "@/api/services/jobService"
 import { candidateService } from "@/api/services/candidateService"
 import { applicationService } from "@/api/services/applicationService"
 import { compensationPlanService } from "@/api/services/compensationPlanService"
 import { useAuth } from "@/lib/AuthContext"
-import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import {
   Briefcase,
@@ -19,16 +18,8 @@ import {
   AlertCircle,
   Building2,
 } from "lucide-react"
-import CreateClientModal from "@/components/dialogs/CreateClientModal"
 import { agencyClientService } from "@/api/services/agencyClientService"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-} from "@/components/platform/PlatformUI"
+
 import {
   ACTIVE_RECRUITMENT_APPLICATION_STATUSES,
   PLACEMENT_APPLICATION_STATUSES,
@@ -36,14 +27,20 @@ import {
 
 // Performance: Query optimization with React Query caching
 const DASHBOARD_STALE_TIME = 5 * 60 * 1000 // 5 minutes
+
 const DASHBOARD_CACHE_TIME = 10 * 60 * 1000 // 10 minutes
 
 export default function AgencyDashboard() {
   const { user, organization } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const [showClientModal, setShowClientModal] = useState(false)
+
   const orgId = user?.organization_id
+
   const canManageClients = ["org_admin", "recruitment_manager", "admin"].includes(user?.role)
 
   // Performance: Use React Query with caching
@@ -131,18 +128,25 @@ export default function AgencyDashboard() {
   // Performance: Memoized stats calculation
   const loading =
     jobsLoading || candidatesLoading || applicationsLoading || plansLoading || clientsLoading
+
   const dashboardError =
     jobsError || candidatesError || applicationsError || plansError || clientsError
 
   const stats = useMemo(() => {
-    if (!orgId) return {}
+    if (!orgId) {
+      return {}
+    }
 
     const openJobs = jobs.filter((j) => !j.is_closed)
+
     const closedJobs = jobs.filter((j) => j.is_closed)
+
     const inProcess = applications.filter((a) =>
       ACTIVE_RECRUITMENT_APPLICATION_STATUSES.includes(a.status),
     )
+
     const hired = applications.filter((a) => PLACEMENT_APPLICATION_STATUSES.includes(a.status))
+
     const newCandidates = candidates.filter((c) => c.status === "new")
 
     return {
@@ -167,6 +171,7 @@ export default function AgencyDashboard() {
 
   // Performance: Reload stats after creating client with cache invalidation
   const queryClient = useQueryClient()
+
   const handleClientCreated = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["agency-jobs", orgId] })
     queryClient.invalidateQueries({ queryKey: ["agency-candidates", orgId] })

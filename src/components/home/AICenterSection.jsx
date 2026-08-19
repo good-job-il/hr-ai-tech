@@ -1,5 +1,4 @@
-import React from "react"
-import { FileText, Target, MessageSquare, TrendingUp, Sparkles, ArrowLeft } from "lucide-react"
+import { FileText, Target, MessageSquare, TrendingUp } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 const SERVICES = [
@@ -35,6 +34,7 @@ const SERVICES = [
 
 export default function AICenterSection() {
   const navigate = useNavigate()
+
   return (
     <section
       id="ai-center"
@@ -137,6 +137,7 @@ export default function AICenterSection() {
         >
           {SERVICES.map((s, i) => {
             const Icon = s.icon
+
             return (
               <div
                 key={i}

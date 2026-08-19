@@ -1,18 +1,24 @@
 import { useState, useEffect } from "react"
 import { communicationService } from "@/api/services/communicationService"
 import { useAuth } from "@/lib/AuthContext"
-import { MessageSquare, RefreshCw } from "lucide-react"
 
 export default function RecruiterMessagesPage() {
   const { user } = useAuth()
+
   const [logs, setLogs] = useState([])
+
   const [loading, setLoading] = useState(true)
+
   const [error, setError] = useState("")
 
   const load = async () => {
-    if (!user) return
+    if (!user) {
+      return
+    }
+
     setLoading(true)
     setError("")
+
     try {
       setLogs(await communicationService.list({ limit: 50 }))
     } catch (requestError) {
@@ -35,6 +41,7 @@ export default function RecruiterMessagesPage() {
     in_app: "באפליקציה",
     other: "אחר",
   }
+
   const DIR_COLORS = {
     outbound: "bg-blue-100 text-blue-700",
     inbound: "bg-green-100 text-green-700",

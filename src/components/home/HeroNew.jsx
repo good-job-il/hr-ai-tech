@@ -1,15 +1,5 @@
-import React from "react"
 import { useNavigate } from "react-router-dom"
-import {
-  Search,
-  UserPlus,
-  MapPin,
-  Sparkles,
-  GraduationCap,
-  Briefcase,
-  Star,
-  CheckCircle,
-} from "lucide-react"
+import { GraduationCap, Briefcase } from "lucide-react"
 
 export default function HeroNew() {
   const navigate = useNavigate()
@@ -548,6 +538,7 @@ export default function HeroNew() {
                 },
               ].map((item, i) => {
                 const Icon = item.icon
+
                 return (
                   <div
                     key={i}

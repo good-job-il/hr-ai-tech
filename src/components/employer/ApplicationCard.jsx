@@ -1,6 +1,3 @@
-import React from "react"
-import { Trash2 } from "lucide-react"
-
 export default function ApplicationCard({ app, onDelete }) {
   return (
     <div className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-shadow group">

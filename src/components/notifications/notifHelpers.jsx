@@ -1,19 +1,3 @@
-import React from "react"
-import {
-  Send,
-  Eye,
-  Star,
-  Calendar,
-  UserCheck,
-  XCircle,
-  Briefcase,
-  Bell,
-  AlertTriangle,
-  UserPlus,
-  Building,
-  MessageCircle,
-} from "lucide-react"
-
 export function getNotifIcon(type) {
   const icons = {
     new_application: <Send className="w-4 h-4" />,
@@ -30,6 +14,7 @@ export function getNotifIcon(type) {
     new_employer: <Building className="w-4 h-4" />,
     import_error: <AlertTriangle className="w-4 h-4" />,
   }
+
   return icons[type] || <Bell className="w-4 h-4" />
 }
 
@@ -49,6 +34,7 @@ export function getNotifColor(type) {
     new_employer: "bg-orange-100 text-orange-600",
     import_error: "bg-red-100 text-red-500",
   }
+
   return colors[type] || "bg-gray-100 text-gray-500"
 }
 

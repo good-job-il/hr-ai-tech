@@ -1,4 +1,3 @@
-import { Search, X } from "lucide-react"
 import { useState } from "react"
 
 export function SearchBar({ placeholder = "חיפוש...", onSearch, className }) {

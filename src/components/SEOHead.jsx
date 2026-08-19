@@ -16,26 +16,39 @@ export default function SEOHead({
     // Update meta tags
     const updateMeta = (name, content, isProperty = false) => {
       const attr = isProperty ? "property" : "name"
+
       let meta = document.querySelector(`meta[${attr}="${name}"]`)
+
       if (!meta) {
         meta = document.createElement("meta")
         meta.setAttribute(attr, name)
         document.head.appendChild(meta)
       }
+
       meta.content = content
     }
 
-    if (description) updateMeta("description", description)
-    if (keywords) updateMeta("keywords", keywords)
-    if (image) updateMeta("og:image", image, true)
+    if (description) {
+      updateMeta("description", description)
+    }
+
+    if (keywords) {
+      updateMeta("keywords", keywords)
+    }
+
+    if (image) {
+      updateMeta("og:image", image, true)
+    }
 
     // Canonical
     let link = document.querySelector('link[rel="canonical"]')
+
     if (!link) {
       link = document.createElement("link")
       link.rel = "canonical"
       document.head.appendChild(link)
     }
+
     link.href = canonical || window.location.href
 
     updateMeta("og:title", title || "HeadHunter", true)
@@ -45,13 +58,21 @@ export default function SEOHead({
 
     updateMeta("twitter:title", title || "HeadHunter")
     updateMeta("twitter:description", description || "פלטפורמת דרושים בישראל")
-    if (image) updateMeta("twitter:image", image)
+
+    if (image) {
+      updateMeta("twitter:image", image)
+    }
 
     // JSON-LD Schema
     if (schemaData) {
       const existingScript = document.querySelector("script[data-seo-schema]")
-      if (existingScript) existingScript.remove()
+
+      if (existingScript) {
+        existingScript.remove()
+      }
+
       const script = document.createElement("script")
+
       script.type = "application/ld+json"
       script.setAttribute("data-seo-schema", "true")
       script.textContent = JSON.stringify(schemaData)
@@ -60,7 +81,10 @@ export default function SEOHead({
 
     return () => {
       const script = document.querySelector("script[data-seo-schema]")
-      if (script) script.remove()
+
+      if (script) {
+        script.remove()
+      }
     }
   }, [title, description, image, canonical, keywords, ogType, schemaData])
 

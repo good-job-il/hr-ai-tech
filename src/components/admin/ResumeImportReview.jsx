@@ -1,20 +1,13 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { candidateImportService } from "@/api/services/candidateImportService"
-import {
-  AlertCircle,
-  CheckCircle2,
-  Loader2,
-  ArrowRight,
-  Mail,
-  Phone,
-  Briefcase,
-} from "lucide-react"
-import DuplicateResolveModal from "./DuplicateResolveModal"
 
 export default function ResumeImportReview({ results, onComplete, onBack }) {
   const [importing, setImporting] = useState(false)
+
   const [importError, setImportError] = useState(null)
+
   const [resolvedDuplicates, setResolvedDuplicates] = useState({})
+
   const [selectedDuplicate, setSelectedDuplicate] = useState(null)
 
   const handleResolveDuplicate = (duplicateIndex, action, mergeWithId) => {
@@ -33,12 +26,14 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
       // Filter out duplicates that weren't resolved for creation
       const candidatesToCreate = results.candidates.filter((_, idx) => {
         const resolved = resolvedDuplicates[idx]
+
         return !resolved || resolved.action === "create_anyway"
       })
 
       if (candidatesToCreate.length === 0) {
         setImportError("אין מועמדים ליצירה")
         setImporting(false)
+
         return
       }
 
@@ -59,6 +54,7 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
 
   const totalToCreate = results.candidates.filter((_, idx) => {
     const resolved = resolvedDuplicates[idx]
+
     return !resolved || resolved.action === "create_anyway"
   }).length
 

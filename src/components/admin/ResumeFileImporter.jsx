@@ -7,23 +7,14 @@ import { useState, useRef } from "react"
 import { candidateImportService } from "@/api/services/candidateImportService"
 import { fileService } from "@/api/services/fileService"
 import { useAuth } from "@/lib/AuthContext"
-import {
-  Upload,
-  FileText,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  Loader2,
-  ChevronDown,
-  ChevronUp,
-  FileCheck2,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
+
 import { format } from "date-fns"
 import { he } from "date-fns/locale"
 
 const ACCEPTED_TYPES = ".pdf,.doc,.docx,.txt"
+
 const TYPE_LABELS = { pdf: "PDF", doc: "DOC", docx: "DOCX", txt: "TXT" }
+
 const TYPE_COLORS = {
   pdf: "bg-red-50 text-red-700 border-red-200",
   doc: "bg-blue-50 text-blue-700 border-blue-200",
@@ -41,7 +32,9 @@ function getFileExt(filename) {
 
 function FileRow({ file, status }) {
   const [expanded, setExpanded] = useState(false)
+
   const ext = getFileExt(file.name)
+
   const typeColor = TYPE_COLORS[ext] || "bg-gray-50 text-gray-600 border-gray-200"
 
   return (
@@ -134,20 +127,29 @@ function FileRow({ file, status }) {
 
 export default function ResumeFileImporter({ onImportComplete }) {
   const { user } = useAuth()
+
   const inputRef = useRef(null)
+
   const [files, setFiles] = useState([])
+
   const [fileStatuses, setFileStatuses] = useState({}) // filename → status object | 'uploading'
+
   const [running, setRunning] = useState(false)
+
   const [summary, setSummary] = useState(null)
+
   const [dragging, setDragging] = useState(false)
 
   const addFiles = (newFiles) => {
     const arr = Array.from(newFiles).filter((f) => {
       const ext = getFileExt(f.name)
+
       return ["pdf", "doc", "docx", "txt"].includes(ext) && f.size <= 25 * 1024 * 1024
     })
+
     setFiles((prev) => {
       const existingNames = new Set(prev.map((f) => f.name))
+
       return [...prev, ...arr.filter((f) => !existingNames.has(f.name))]
     })
     setSummary(null)
@@ -164,12 +166,16 @@ export default function ResumeFileImporter({ onImportComplete }) {
   }
 
   const runImport = async () => {
-    if (!files.length || running) return
+    if (!files.length || running) {
+      return
+    }
+
     setRunning(true)
     setSummary(null)
 
     // Mark all as uploading
     const initStatuses = {}
+
     files.forEach((f) => {
       initStatuses[f.name] = "uploading"
     })
@@ -178,8 +184,10 @@ export default function ResumeFileImporter({ onImportComplete }) {
     try {
       // Upload all files to storage
       const uploaded = []
+
       for (const file of files) {
         const { file_url } = await fileService.upload(file)
+
         uploaded.push({
           file_url,
           filename: file.name,
@@ -209,6 +217,7 @@ export default function ResumeFileImporter({ onImportComplete }) {
 
       // Map results back to file statuses
       const newStatuses = {}
+
       ;(d.results || []).forEach((r) => {
         newStatuses[r.filename] = r
       })
@@ -226,7 +235,9 @@ export default function ResumeFileImporter({ onImportComplete }) {
       onImportComplete?.()
     } catch (err) {
       setSummary({ error: err.message })
+
       const errStatuses = {}
+
       files.forEach((f) => {
         errStatuses[f.name] = { errors: [err.message], steps: {} }
       })

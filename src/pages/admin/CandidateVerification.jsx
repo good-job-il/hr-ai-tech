@@ -1,7 +1,5 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { candidateService } from "@/api/services/candidateService"
-import AdminLayout from "@/components/admin/AdminLayout"
-import { AlertTriangle, CheckCircle2 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 
 const CandidateVerification = () => {
@@ -15,6 +13,7 @@ const CandidateVerification = () => {
         order: "DESC",
         limit: 1000,
       })
+
       return result || []
     },
   })

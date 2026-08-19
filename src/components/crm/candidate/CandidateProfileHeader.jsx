@@ -1,19 +1,5 @@
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Briefcase,
-  Star,
-  Calendar,
-  UserCheck,
-  FileText,
-  Edit2,
-  Plus,
-} from "lucide-react"
-import ResumePreviewModal from "./ResumePreviewModal"
-import AssignToJobModal from "./AssignToJobModal"
+
 import { useTranslation } from "react-i18next"
 
 export default function CandidateProfileHeader({
@@ -55,10 +41,14 @@ export default function CandidateProfileHeader({
   }
 
   const [changingStatus, setChangingStatus] = useState(false)
+
   const [showResume, setShowResume] = useState(false)
+
   const [showAssignModal, setShowAssignModal] = useState(false)
 
-  if (!candidate) return null
+  if (!candidate) {
+    return null
+  }
 
   const initials =
     candidate.full_name
@@ -67,6 +57,7 @@ export default function CandidateProfileHeader({
       .join("")
       .slice(0, 2)
       .toUpperCase() || "??"
+
   const score = candidate.data_quality_score || candidate.parsing_confidence || 0
 
   return (
@@ -250,7 +241,10 @@ export default function CandidateProfileHeader({
               onClose={() => setShowAssignModal(false)}
               onAssignSuccess={(appId) => {
                 setShowAssignModal(false)
-                if (onAssignSuccess) onAssignSuccess(appId)
+
+                if (onAssignSuccess) {
+                  onAssignSuccess(appId)
+                }
               }}
             />
           )}

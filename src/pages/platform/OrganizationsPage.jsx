@@ -1,38 +1,11 @@
-import React, { useState } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { organizationService } from "@/api/services/organizationService"
 import { useAuth } from "@/lib/AuthContext"
-import {
-  Building2,
-  Search,
-  Plus,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Pencil,
-  Trash2,
-  MoreVertical,
-  ExternalLink,
-} from "lucide-react"
-import { Button } from "@/components/ui/Button"
+import { Building2, Search, CheckCircle, XCircle, Clock, Pencil, Trash2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformModal,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-  platformFieldClassName,
-} from "@/components/platform/PlatformUI"
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
+import { platformFieldClassName } from "@/components/platform/PlatformUI"
 
 const TABS = [
   {
@@ -51,19 +24,33 @@ const TABS = [
 
 export default function OrganizationsPage() {
   const { t } = useTranslation()
+
   const location = useLocation()
+
   const navigate = useNavigate()
+
   const { enterOrganization } = useAuth()
+
   const [enteringOrgId, setEnteringOrgId] = useState(null)
+
   const activeTab = TABS.find((tab) => location.pathname.startsWith(tab.route)) ?? TABS[0]
+
   const [search, setSearch] = useState("")
+
   const [showModal, setShowModal] = useState(false)
+
   const [newOrg, setNewOrg] = useState({ name: "", contact_email: "" })
+
   const [creating, setCreating] = useState(false)
+
   const [editOrg, setEditOrg] = useState(null)
+
   const [saving, setSaving] = useState(false)
+
   const [deleteOrg, setDeleteOrg] = useState(null)
+
   const [deleting, setDeleting] = useState(false)
+
   const qc = useQueryClient()
 
   const STATUS_CONFIG = {
@@ -100,11 +87,15 @@ export default function OrganizationsPage() {
       !search ||
       o.name?.toLowerCase().includes(search.toLowerCase()) ||
       o.contact_email?.toLowerCase().includes(search.toLowerCase())
+
     return matchSearch
   })
 
   const handleCreate = async () => {
-    if (!newOrg.name.trim()) return
+    if (!newOrg.name.trim()) {
+      return
+    }
+
     setCreating(true)
     await organizationService.create({
       ...newOrg,
@@ -129,10 +120,18 @@ export default function OrganizationsPage() {
   }
 
   const handleSaveEdit = async () => {
-    if (!editOrg.name.trim()) return
+    if (!editOrg.name.trim()) {
+      return
+    }
+
     setSaving(true)
+
     const payload = { name: editOrg.name, plan: editOrg.plan, status: editOrg.status }
-    if (editOrg.contact_email.trim()) payload.contact_email = editOrg.contact_email.trim()
+
+    if (editOrg.contact_email.trim()) {
+      payload.contact_email = editOrg.contact_email.trim()
+    }
+
     await organizationService.update(editOrg.id, payload)
     await qc.invalidateQueries(["platform-orgs"])
     setEditOrg(null)
@@ -140,7 +139,10 @@ export default function OrganizationsPage() {
   }
 
   const handleDelete = async () => {
-    if (!deleteOrg) return
+    if (!deleteOrg) {
+      return
+    }
+
     setDeleting(true)
     await organizationService.remove(deleteOrg.id)
     await qc.invalidateQueries(["platform-orgs"])
@@ -151,8 +153,12 @@ export default function OrganizationsPage() {
   // Admin: enter this organization's workspace and see it exactly as its
   // own users do (org_admin / recruitment_manager / hr_manager view).
   const handleEnterWorkspace = async (org) => {
-    if (enteringOrgId) return
+    if (enteringOrgId) {
+      return
+    }
+
     setEnteringOrgId(org.id)
+
     try {
       await enterOrganization(org.id)
       navigate(org.org_type === "staffing_agency" ? "/agency/dashboard" : "/company/dashboard")
@@ -196,6 +202,7 @@ export default function OrganizationsPage() {
         <PlatformCard className="inline-flex max-w-full items-center gap-1 overflow-x-auto p-1.5">
           {TABS.map((tab) => {
             const active = location.pathname.startsWith(tab.route)
+
             return (
               <Link
                 key={tab.id}
@@ -317,7 +324,9 @@ export default function OrganizationsPage() {
                 ) : (
                   filtered.map((org, index) => {
                     const st = STATUS_CONFIG[org.status] || STATUS_CONFIG.inactive
+
                     const StIcon = st.icon
+
                     return (
                       <tr key={org.id} className="group transition-colors hover:bg-violet-50/35">
                         <td className="px-5 py-4">
@@ -536,7 +545,9 @@ export default function OrganizationsPage() {
               <div className="grid grid-cols-3 gap-2">
                 {["active", "suspended", "inactive"].map((s) => {
                   const cfg = STATUS_CONFIG[s]
+
                   const isSelected = editOrg.status === s
+
                   return (
                     <button
                       key={s}

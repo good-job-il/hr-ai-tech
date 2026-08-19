@@ -1,5 +1,3 @@
-import React from "react"
-
 export default function LoadingSpinner({ text = "טוען...", size = "md" }) {
   const sizeClasses = {
     sm: "w-4 h-4",

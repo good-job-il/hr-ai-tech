@@ -1,10 +1,6 @@
-import React from "react"
-import { useParams, Link } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
 import { httpClient } from "@/api/client/httpClient"
-import { Briefcase } from "lucide-react"
-import Navbar from "@/components/home/Navbar"
-import SEOHead from "@/components/SEOHead"
 
 const CATEGORIES = [
   "פיתוח תוכנה",
@@ -21,6 +17,7 @@ const CATEGORIES = [
   "משפטים",
   "אדמיניסטרציה",
 ]
+
 const CITIES = [
   "תל אביב",
   "ירושלים",
@@ -36,6 +33,7 @@ const CITIES = [
 
 export default function CategoryJobs() {
   const { category } = useParams()
+
   const decodedCategory = decodeURIComponent(category)
 
   const { data: jobs = [], isLoading } = useQuery({
@@ -44,13 +42,17 @@ export default function CategoryJobs() {
       const allJobs = await httpClient.get("/jobs?sort=created_date&order=DESC&limit=500", {
         cache: false,
       })
+
       const arr = Array.isArray(allJobs) ? allJobs : allJobs?.data || []
+
       return arr.filter((j) => !j.is_closed && j.category === decodedCategory)
     },
   })
 
   const seoTitle = `דרושים ${decodedCategory} | משרות ${decodedCategory} בישראל | HeadHunter`
+
   const seoDesc = `${jobs.length} משרות ${decodedCategory} פתוחות בישראל. חפשו עבודה ב${decodedCategory} - HeadHunter פלטפורמת הדרושים המובילה. משרות מלאות, חלקיות ומרחוק.`
+
   const canonical = `https://headhunter.co.il/jobs/category/${encodeURIComponent(decodedCategory)}`
 
   return (

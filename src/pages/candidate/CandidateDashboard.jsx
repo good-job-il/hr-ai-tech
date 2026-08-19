@@ -4,8 +4,7 @@ import { interviewService } from "@/api/services/interviewService"
 import { savedJobService } from "@/api/services/savedJobService"
 import { publicJobService } from "@/api/services/publicJobService"
 import { useAuth } from "@/lib/AuthContext"
-import { Link } from "react-router-dom"
-import { Zap, Target, BookOpen, Sparkles, Briefcase, RefreshCw } from "lucide-react"
+import { Zap, Target, BookOpen } from "lucide-react"
 
 function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
   return (
@@ -32,13 +31,20 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
 
 export default function CandidateDashboard() {
   const { user } = useAuth()
+
   const [stats, setStats] = useState(null)
+
   const [recentJobs, setRecentJobs] = useState([])
+
   const [loading, setLoading] = useState(true)
 
   const load = async () => {
-    if (!user) return
+    if (!user) {
+      return
+    }
+
     setLoading(true)
+
     try {
       const [applications, interviews, savedJobs, jobs] = await Promise.all([
         applicationService.list({ limit: 500 }),
@@ -46,6 +52,7 @@ export default function CandidateDashboard() {
         savedJobService.list(),
         publicJobService.list({ is_closed: false, sort: "created_date", order: "DESC", limit: 5 }),
       ])
+
       setStats({
         applications: applications.length,
         interviews: interviews.length,

@@ -15,7 +15,10 @@ export function isAgencyUser(user) {
 }
 
 export function getAgencyDataScope(user) {
-  if (!isAgencyUser(user)) return null
+  if (!isAgencyUser(user)) {
+    return null
+  }
+
   return AGENCY_ROLE_SCOPES[user.role] || null
 }
 
@@ -24,24 +27,47 @@ export function getAgencyDataScope(user) {
  */
 export function getAgencyScopeFilter(user) {
   const scope = getAgencyDataScope(user)
-  if (!scope) return null
+
+  if (!scope) {
+    return null
+  }
 
   const filter = { organization_id: user.organization_id }
-  if (scope === AGENCY_DATA_SCOPES.TEAM) filter.team_manager_id = user.id
-  if (scope === AGENCY_DATA_SCOPES.OWN) filter.recruiter_id = user.id
+
+  if (scope === AGENCY_DATA_SCOPES.TEAM) {
+    filter.team_manager_id = user.id
+  }
+
+  if (scope === AGENCY_DATA_SCOPES.OWN) {
+    filter.recruiter_id = user.id
+  }
+
   return filter
 }
 
 export function canAccessAgencyRecord(user, record) {
   const scope = getAgencyDataScope(user)
-  if (!scope || !record) return false
-  if (!record.organization_id || record.organization_id !== user.organization_id) return false
 
-  if (scope === AGENCY_DATA_SCOPES.ORGANIZATION) return true
-  if (scope === AGENCY_DATA_SCOPES.TEAM) return record.team_manager_id === user.id
+  if (!scope || !record) {
+    return false
+  }
+
+  if (!record.organization_id || record.organization_id !== user.organization_id) {
+    return false
+  }
+
+  if (scope === AGENCY_DATA_SCOPES.ORGANIZATION) {
+    return true
+  }
+
+  if (scope === AGENCY_DATA_SCOPES.TEAM) {
+    return record.team_manager_id === user.id
+  }
+
   if (scope === AGENCY_DATA_SCOPES.OWN) {
     return record.recruiter_id === user.id || record.assigned_to === user.id
   }
+
   return false
 }
 

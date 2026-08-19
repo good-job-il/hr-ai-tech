@@ -1,39 +1,31 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { importSourceService } from "@/api/services/importSourceService"
 import { jobService } from "@/api/services/jobService"
-import {
-  Plus,
-  Trash2,
-  RefreshCw,
-  FileText,
-  Pencil,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Search,
-  Play,
-  AlertTriangle,
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-  ExternalLink,
-} from "lucide-react"
-import AdminLayout from "@/components/admin/AdminLayout"
-import ImportSourceModal from "@/components/employer/ImportSourceModal"
 
 export default function ImportSources() {
   const queryClient = useQueryClient()
+
   const [showModal, setShowModal] = useState(false)
+
   const [editingSource, setEditingSource] = useState(null)
+
   const [showLogs, setShowLogs] = useState(null)
+
   const [search, setSearch] = useState("")
+
   const [quickUrl, setQuickUrl] = useState("")
+
   const [quickName, setQuickName] = useState("")
+
   const [quickScanning, setQuickScanning] = useState(false)
+
   const [quickResult, setQuickResult] = useState(null)
+
   const [scanResults, setScanResults] = useState({})
+
   const [scanning, setScanning] = useState({})
+
   const [expandedLogs, setExpandedLogs] = useState({})
 
   const { data: sources = [], isLoading } = useQuery({
@@ -55,8 +47,10 @@ export default function ImportSources() {
   const scanSource = async (source) => {
     setScanning((prev) => ({ ...prev, [source.id]: true }))
     setScanResults((prev) => ({ ...prev, [source.id]: null }))
+
     try {
       const result = await importSourceService.run(source.id)
+
       setScanResults((prev) => ({ ...prev, [source.id]: result }))
     } catch (err) {
       setScanResults((prev) => ({ ...prev, [source.id]: { success: false, error: err.message } }))
@@ -67,11 +61,16 @@ export default function ImportSources() {
   }
 
   const quickScan = async () => {
-    if (!quickUrl) return
+    if (!quickUrl) {
+      return
+    }
+
     setQuickScanning(true)
     setQuickResult(null)
+
     try {
       const result = await importSourceService.preview(quickUrl, quickName || "חברה")
+
       setQuickResult(result)
     } catch (err) {
       setQuickResult({ success: false, error: err.message })
@@ -84,6 +83,7 @@ export default function ImportSources() {
     queryKey: ["active-jobs-count"],
     queryFn: async () => {
       const jobs = await jobService.list({ is_closed: false, limit: 500 })
+
       return jobs.length
     },
   })
@@ -91,13 +91,17 @@ export default function ImportSources() {
   const syncAllMutation = useMutation({
     mutationFn: async () => {
       const activeSources = sources.filter((s) => s.is_active)
+
       const results = await Promise.allSettled(
         activeSources.map((source) => importSourceService.run(source.id)),
       )
+
       const errors = results.filter((r) => r.status === "rejected")
+
       if (errors.length > 0) {
         throw new Error(`${errors.length} מקורות נכשלו. בדוק את הלוגים`)
       }
+
       return results
     },
     onSuccess: () => {
@@ -107,17 +111,29 @@ export default function ImportSources() {
   })
 
   const statusIcon = (source) => {
-    if (scanning[source.id]) return <Loader2 className="w-3.5 h-3.5 text-purple-500 animate-spin" />
-    if (source.last_sync_status === "success")
+    if (scanning[source.id]) {
+      return <Loader2 className="w-3.5 h-3.5 text-purple-500 animate-spin" />
+    }
+
+    if (source.last_sync_status === "success") {
       return <CheckCircle className="w-3.5 h-3.5 text-green-500" />
-    if (source.last_sync_status === "error") return <XCircle className="w-3.5 h-3.5 text-red-500" />
+    }
+
+    if (source.last_sync_status === "error") {
+      return <XCircle className="w-3.5 h-3.5 text-red-500" />
+    }
+
     return <Clock className="w-3.5 h-3.5 text-gray-400" />
   }
 
   const ScanResultPanel = ({ result, onClose }) => {
     const [showLog, setShowLog] = useState(false)
+
     const [showErrors, setShowErrors] = useState(false)
-    if (!result) return null
+
+    if (!result) {
+      return null
+    }
 
     return (
       <div className="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm">
@@ -215,7 +231,9 @@ export default function ImportSources() {
   }
 
   const totalActive = sources.filter((s) => s.is_active).length
+
   const totalErrors = sources.filter((s) => s.last_sync_status === "error").length
+
   const totalNew = sources.reduce((sum, s) => sum + (s.jobs_added || 0), 0)
 
   const filteredSources = search

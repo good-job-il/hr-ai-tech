@@ -1,10 +1,9 @@
-import PublicLayout from '@/components/layouts/PublicLayout';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FileText, BookOpen, Calculator, TrendingUp, Download, Sparkles, Video } from 'lucide-react';
+import { FileText, BookOpen, Calculator, TrendingUp } from 'lucide-react';
 
 export default function ResourcesPage() {
   const { i18n } = useTranslation();
+
   const isRtl = !i18n.language?.startsWith('en');
 
   const CATEGORIES = [

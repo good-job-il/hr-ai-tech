@@ -1,15 +1,5 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useSearchParams } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 
 const ROLES = [
   { id: "recruiter", label: "רכז גיוס" },
@@ -19,12 +9,19 @@ const ROLES = [
 
 export default function StaffInvite() {
   const [searchParams] = useSearchParams()
+
   const [email, setEmail] = useState("")
+
   const [fullName, setFullName] = useState("")
+
   const [phone, setPhone] = useState("")
+
   const [role, setRole] = useState("recruiter")
+
   const [error, setError] = useState("")
+
   const [loading, setLoading] = useState(false)
+
   const [success, setSuccess] = useState(false)
 
   const handleSubmit = async (e) => {
@@ -34,6 +31,7 @@ export default function StaffInvite() {
 
     try {
       const inviteToken = Math.random().toString(36).substring(2, 15)
+
       const inviteLink = `${window.location.origin}/register?invite=${inviteToken}&email=${encodeURIComponent(email)}&role=${role}&phone=${encodeURIComponent(phone)}`
 
       // שמור הזמנה בדטאבייס אם יש כזה

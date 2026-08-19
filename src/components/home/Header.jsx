@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { Menu, X, UserPlus } from "lucide-react"
 import { useAuth } from "@/lib/AuthContext"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 
 export default function Header() {
   const { user } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const location = useLocation()
+
   const [open, setOpen] = useState(false)
+
   const [scrolled, setScrolled] = useState(false)
 
   const NAV_LINKS = [
@@ -25,7 +28,9 @@ export default function Header() {
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 12)
+
     window.addEventListener("scroll", fn, { passive: true })
+
     return () => window.removeEventListener("scroll", fn)
   }, [])
 
@@ -176,6 +181,7 @@ export default function Header() {
         <nav className="hidden lg:flex" style={{ alignItems: "center", gap: 4 }}>
           {NAV_LINKS.map((link) => {
             const active = location.pathname === link.href
+
             return (
               <Link
                 key={link.label}

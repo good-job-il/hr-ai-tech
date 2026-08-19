@@ -1,10 +1,8 @@
-import React, { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { httpClient } from "@/api/client/httpClient"
-import { ArrowRight, Bookmark, Send, FileText, Download } from "lucide-react"
-import Navbar from "@/components/home/Navbar"
+import { Bookmark, Send, FileText } from "lucide-react"
 import { useAuth } from "@/lib/AuthContext"
 
 const statusColors = {
@@ -22,7 +20,9 @@ const statusColors = {
 
 export default function MyProfile() {
   const { user } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const statusLabels = {
@@ -37,7 +37,9 @@ export default function MyProfile() {
     completed: t("candidate.applications.status.completed"),
     rejected: t("candidate.applications.status.rejected"),
   }
+
   const [activeTab, setActiveTab] = useState("saved")
+
   const [selectedInterview, setSelectedInterview] = useState(null)
 
   // Saved jobs
@@ -77,14 +79,23 @@ export default function MyProfile() {
   const { data: myResumes = [] } = useQuery({
     queryKey: ["my-resumes", user?.email],
     queryFn: async () => {
-      if (!user) return []
+      if (!user) {
+        return []
+      }
+
       const profiles = await httpClient.get(
         `/candidates/profiles?user_email=${encodeURIComponent(user.email)}`,
         { cache: false },
       )
+
       const arr = Array.isArray(profiles) ? profiles : profiles?.data || []
+
       const profile = arr[0]
-      if (!profile || !profile.resume_url) return []
+
+      if (!profile || !profile.resume_url) {
+        return []
+      }
+
       return [
         {
           id: profile.id,
@@ -124,6 +135,7 @@ export default function MyProfile() {
         <div className="flex gap-2 mb-8 border-b border-gray-200 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon
+
             return (
               <button
                 key={tab.id}

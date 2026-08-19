@@ -1,13 +1,13 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { taxonomyService } from "@/api/services/taxonomyService"
 import { roleAliasService } from "@/api/services/permissionService"
-import { ChevronDown, ChevronUp, CheckCircle, AlertCircle, Loader2 } from "lucide-react"
-import AdminLayout from "@/components/admin/AdminLayout"
 
 export default function TaxonomyVerification() {
   const [expandedDomain, setExpandedDomain] = useState(null)
+
   const [loading, setLoading] = useState(false)
+
   const [loadResult, setLoadResult] = useState(null)
 
   // Fetch all data
@@ -56,14 +56,17 @@ export default function TaxonomyVerification() {
   // Find canonical role for alias
   const getCanonicalRole = (alias) => {
     const record = aliases.find((a) => a.alias.toLowerCase() === alias.toLowerCase())
+
     return record?.canonical_role || null
   }
 
   const handleLoadTaxonomy = async () => {
     setLoading(true)
     setLoadResult(null)
+
     try {
       const snapshot = await taxonomyService.load()
+
       setLoadResult({
         success: true,
         message: "Taxonomy loaded from database",
@@ -86,6 +89,7 @@ export default function TaxonomyVerification() {
   // Check for unmatched aliases
   const unmatchedAliases = aliases.filter((alias) => {
     const roleExists = roles.find((r) => r.name === alias.canonical_role)
+
     return !roleExists
   })
 
@@ -95,6 +99,7 @@ export default function TaxonomyVerification() {
   // Check for specializations without matching role
   const unmatchedSpecializations = specializations.filter((spec) => {
     const roleExists = roles.find((r) => r.name === spec.role_name)
+
     return !roleExists
   })
 
@@ -274,7 +279,9 @@ export default function TaxonomyVerification() {
           <div className="divide-y divide-gray-100">
             {domains.map((domain) => {
               const domainRoles = getRolesForDomain(domain.domain_id)
+
               const isExpanded = expandedDomain === domain.id
+
               return (
                 <div key={domain.id} className="p-4">
                   <button
@@ -301,6 +308,7 @@ export default function TaxonomyVerification() {
                       ) : (
                         domainRoles.map((role) => {
                           const roleSpecs = getSpecsForRole(role.name)
+
                           return (
                             <div key={role.id} className="text-sm">
                               <div className="font-medium text-gray-700">
@@ -352,6 +360,7 @@ export default function TaxonomyVerification() {
           <div className="space-y-3">
             {["Fullstack Developer", "Backend Engineer", "SDR", "QA Engineer"].map((testAlias) => {
               const canonical = getCanonicalRole(testAlias)
+
               return (
                 <div
                   key={testAlias}

@@ -1,7 +1,6 @@
 import * as React from "react"
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import { cva } from "class-variance-authority"
-import { ChevronDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -15,6 +14,7 @@ const NavigationMenu = React.forwardRef(({ className, children, ...props }, ref)
     <NavigationMenuViewport />
   </NavigationMenuPrimitive.Root>
 ))
+
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName
 
 const NavigationMenuList = React.forwardRef(({ className, ...props }, ref) => (
@@ -24,6 +24,7 @@ const NavigationMenuList = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
 
 const NavigationMenuItem = NavigationMenuPrimitive.Item
@@ -45,6 +46,7 @@ const NavigationMenuTrigger = React.forwardRef(({ className, children, ...props 
     />
   </NavigationMenuPrimitive.Trigger>
 ))
+
 NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName
 
 const NavigationMenuContent = React.forwardRef(({ className, ...props }, ref) => (
@@ -57,6 +59,7 @@ const NavigationMenuContent = React.forwardRef(({ className, ...props }, ref) =>
     {...props}
   />
 ))
+
 NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName
 
 const NavigationMenuLink = NavigationMenuPrimitive.Link
@@ -73,6 +76,7 @@ const NavigationMenuViewport = React.forwardRef(({ className, ...props }, ref) =
     />
   </div>
 ))
+
 NavigationMenuViewport.displayName = NavigationMenuPrimitive.Viewport.displayName
 
 const NavigationMenuIndicator = React.forwardRef(({ className, ...props }, ref) => (
@@ -87,6 +91,7 @@ const NavigationMenuIndicator = React.forwardRef(({ className, ...props }, ref) 
     <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
   </NavigationMenuPrimitive.Indicator>
 ))
+
 NavigationMenuIndicator.displayName = NavigationMenuPrimitive.Indicator.displayName
 
 export {

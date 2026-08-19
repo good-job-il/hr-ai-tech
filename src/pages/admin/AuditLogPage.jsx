@@ -3,38 +3,26 @@
  * Filters: date, user, action, entity
  * CSV export
  */
-import { Fragment, useState } from "react"
+import { useState } from "react"
 import { auditService } from "@/api/services/auditService"
 import { useQuery } from "@tanstack/react-query"
 import {
   ShieldCheck,
-  Filter,
   Download,
   Eye,
   FileText,
   Activity,
-  ChevronDown,
-  ChevronUp,
   XCircle,
   CheckCircle2,
   AlertTriangle,
   Users,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { format } from "date-fns"
 import { he, enUS } from "date-fns/locale"
 import { useTranslation } from "react-i18next"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { useLocation, useNavigate } from "react-router-dom"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-  platformFieldClassName,
-} from "@/components/platform/PlatformUI"
+import { platformFieldClassName } from "@/components/platform/PlatformUI"
 import { directionForLanguage } from "@/domain/agency/rmAcceptance"
 
 const getActionConfig = (t) => ({
@@ -110,11 +98,17 @@ const PAGE_SIZE = 50
 
 export default function AuditLogPage() {
   const { t, i18n } = useTranslation()
+
   const isRTL = directionForLanguage(i18n.language) === "rtl"
+
   const dateLocale = isRTL ? he : enUS
+
   const ACTION_CONFIG = getActionConfig(t)
+
   const { can } = usePermissionMatrix()
+
   const navigate = useNavigate()
+
   const location = useLocation()
 
   const [filters, setFilters] = useState({
@@ -124,8 +118,11 @@ export default function AuditLogPage() {
     date_from: "",
     date_to: "",
   })
+
   const [expandedLog, setExpandedLog] = useState(null)
+
   const [page, setPage] = useState(0)
+
   const [exportError, setExportError] = useState("")
 
   // Reset to page 0 on filter change
@@ -136,11 +133,27 @@ export default function AuditLogPage() {
 
   const serverFilters = () => {
     const serverFilter = {}
-    if (filters.entity_type) serverFilter.entity_type = filters.entity_type
-    if (filters.action) serverFilter.action = filters.action
-    if (filters.actor_email) serverFilter.actor_email = filters.actor_email
-    if (filters.date_from) serverFilter.date_from = `${filters.date_from}T00:00:00.000Z`
-    if (filters.date_to) serverFilter.date_to = `${filters.date_to}T23:59:59.999Z`
+
+    if (filters.entity_type) {
+      serverFilter.entity_type = filters.entity_type
+    }
+
+    if (filters.action) {
+      serverFilter.action = filters.action
+    }
+
+    if (filters.actor_email) {
+      serverFilter.actor_email = filters.actor_email
+    }
+
+    if (filters.date_from) {
+      serverFilter.date_from = `${filters.date_from}T00:00:00.000Z`
+    }
+
+    if (filters.date_to) {
+      serverFilter.date_to = `${filters.date_to}T23:59:59.999Z`
+    }
+
     return serverFilter
   }
 
@@ -172,12 +185,16 @@ export default function AuditLogPage() {
     staleTime: 2 * 60 * 1000,
     keepPreviousData: true,
   })
+
   const logs = result?.data || []
+
   const pagination = result?.pagination
 
   const exportToCSV = async () => {
     setExportError("")
+
     let exportResult
+
     try {
       exportResult = await auditService.export({
         ...serverFilters(),
@@ -186,9 +203,12 @@ export default function AuditLogPage() {
       })
     } catch (requestError) {
       setExportError(requestError?.message || t("auditLog.exportFailed"))
+
       return
     }
+
     const exportedLogs = exportResult.data || []
+
     const headers = [
       t("auditLog.tableHeaders.date"),
       t("auditLog.tableHeaders.user"),
@@ -198,6 +218,7 @@ export default function AuditLogPage() {
       t("auditLog.tableHeaders.description"),
       "IP",
     ]
+
     const rows = exportedLogs.map((log) => [
       log.created_date
         ? format(new Date(log.created_date), "dd/MM/yyyy HH:mm", { locale: dateLocale })
@@ -209,11 +230,17 @@ export default function AuditLogPage() {
       log.entity_label || "",
       log.ip_address || "",
     ])
+
     const escape = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`
+
     const csv = [headers, ...rows].map((row) => row.map(escape).join(",")).join("\n")
+
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+
     const url = URL.createObjectURL(blob)
+
     const link = document.createElement("a")
+
     link.href = url
     link.download = `audit_log_${format(new Date(), "yyyy-MM-dd")}.csv`
     link.click()
@@ -225,11 +252,16 @@ export default function AuditLogPage() {
   }
 
   const uniqueActors = new Set(logs.map((log) => log.actor_email).filter(Boolean)).size
+
   const securityEvents = logs.filter((log) =>
     ["delete", "impersonate", "login"].includes(log.action),
   ).length
+
   const relatedPath = (log) => {
-    if (!location.pathname.startsWith("/agency/")) return null
+    if (!location.pathname.startsWith("/agency/")) {
+      return null
+    }
+
     const routes = {
       Candidate: `/agency/crm/candidate?id=${log.entity_id}`,
       Application: `/agency/pipeline?applicationId=${log.entity_id}`,
@@ -245,6 +277,7 @@ export default function AuditLogPage() {
       Billing: "/agency/settings/billing",
       Integration: "/agency/settings/integrations",
     }
+
     return routes[log.entity_type] || null
   }
 
@@ -469,7 +502,9 @@ export default function AuditLogPage() {
                   ) : (
                     logs.map((log) => {
                       const cfg = ACTION_CONFIG[log.action] || ACTION_CONFIG.view
+
                       const Icon = cfg.icon
+
                       const isExpanded = expandedLog === log.id
 
                       return (

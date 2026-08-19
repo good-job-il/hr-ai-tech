@@ -103,7 +103,10 @@ export function isApplicationStatus(value) {
 }
 
 export function normalizeApplicationStatus(value) {
-  if (isApplicationStatus(value)) return value
+  if (isApplicationStatus(value)) {
+    return value
+  }
+
   return LEGACY_APPLICATION_STATUS_MAP[value] || null
 }
 

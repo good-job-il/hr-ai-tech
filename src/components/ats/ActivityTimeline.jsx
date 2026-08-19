@@ -1,20 +1,43 @@
-import React, { useState, useEffect } from "react"
-import { UserPlus, ArrowRight, Sparkles, Clock } from "lucide-react"
+import { useState, useEffect } from "react"
+import { UserPlus, ArrowRight, Sparkles } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { applicationService } from "@/api/services/applicationService"
 
 function timeAgo(dateStr, t, locale) {
-  if (!dateStr) return ""
+  if (!dateStr) {
+    return ""
+  }
+
   const date = new Date(dateStr)
-  if (isNaN(date.getTime())) return ""
+
+  if (isNaN(date.getTime())) {
+    return ""
+  }
+
   const diffMs = Date.now() - date.getTime()
+
   const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1) return t("pipeline.time.now")
-  if (diffMin < 60) return t("pipeline.time.minutesAgo", { count: diffMin })
+
+  if (diffMin < 1) {
+    return t("pipeline.time.now")
+  }
+
+  if (diffMin < 60) {
+    return t("pipeline.time.minutesAgo", { count: diffMin })
+  }
+
   const diffH = Math.floor(diffMin / 60)
-  if (diffH < 24) return t("pipeline.time.hoursAgo", { count: diffH })
+
+  if (diffH < 24) {
+    return t("pipeline.time.hoursAgo", { count: diffH })
+  }
+
   const diffD = Math.floor(diffH / 24)
-  if (diffD < 7) return t("pipeline.time.daysAgo", { count: diffD })
+
+  if (diffD < 7) {
+    return t("pipeline.time.daysAgo", { count: diffD })
+  }
+
   return date.toLocaleDateString(locale, {
     timeZone: "Asia/Jerusalem",
     day: "numeric",
@@ -24,9 +47,16 @@ function timeAgo(dateStr, t, locale) {
 }
 
 function formatTime(dateStr, locale) {
-  if (!dateStr) return ""
+  if (!dateStr) {
+    return ""
+  }
+
   const date = new Date(dateStr)
-  if (isNaN(date.getTime())) return ""
+
+  if (isNaN(date.getTime())) {
+    return ""
+  }
+
   return date.toLocaleTimeString(locale, {
     timeZone: "Asia/Jerusalem",
     hour: "2-digit",
@@ -37,8 +67,11 @@ function formatTime(dateStr, locale) {
 
 export default function ActivityTimeline({ application }) {
   const { t, i18n } = useTranslation()
+
   const [dbEvents, setDbEvents] = useState([])
+
   const [loading, setLoading] = useState(false)
+
   const [loadError, setLoadError] = useState(false)
 
   const locale = i18n.language?.startsWith("en") ? "en-US" : "he-IL"
@@ -46,7 +79,10 @@ export default function ActivityTimeline({ application }) {
   const stageLabel = (id) => t(`pipeline.stages.${id}`, { defaultValue: id || "?" })
 
   useEffect(() => {
-    if (!application?.id) return
+    if (!application?.id) {
+      return
+    }
+
     let cancelled = false
 
     const fetchEvents = () => {
@@ -59,13 +95,19 @@ export default function ActivityTimeline({ application }) {
           }
         })
         .catch(() => {
-          if (!cancelled) setLoadError(true)
+          if (!cancelled) {
+            setLoadError(true)
+          }
         })
     }
 
     setLoading(true)
+
     const initialTimer = setTimeout(() => {
-      if (cancelled) return
+      if (cancelled) {
+        return
+      }
+
       applicationService
         .timeline(application.id)
         .then((rows) => {
@@ -158,6 +200,7 @@ export default function ActivityTimeline({ application }) {
       )}
       {allEvents.map((ev, i) => {
         const Icon = ev.icon
+
         return (
           <div key={i} className="flex gap-4 pb-4">
             <div className="flex flex-col items-center">

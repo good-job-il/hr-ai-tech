@@ -1,35 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import {
-  AlertCircle,
-  Calendar,
-  CheckCircle2,
-  Globe,
-  Mail,
-  Plug,
-  RefreshCw,
-  Shield,
-  Unplug,
-} from "lucide-react"
+import { AlertCircle, Calendar, CheckCircle2, Globe, Mail, Plug, Shield } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { integrationConnectionService } from "@/api/services/integrationConnectionService"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
-import { Button } from "@/components/ui/button"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-} from "@/components/platform/PlatformUI"
 
 const ICONS = { gmail: Mail, google_calendar: Calendar, linkedin: Globe }
 
 export default function IntegrationsSettings() {
   const { i18n } = useTranslation()
+
   const isRTL = !i18n.language?.startsWith("en")
+
   const { can } = usePermissionMatrix()
+
   const qc = useQueryClient()
+
   const {
     data: integrations = [],
     isLoading,
@@ -41,18 +26,25 @@ export default function IntegrationsSettings() {
     queryFn: integrationConnectionService.list,
     staleTime: 30_000,
   })
+
   const mutation = useMutation({
     mutationFn: async ({ action, provider }) => {
-      if (action === "disconnect") return integrationConnectionService.disconnect(provider)
+      if (action === "disconnect") {
+        return integrationConnectionService.disconnect(provider)
+      }
+
       const result =
         action === "reconnect"
           ? await integrationConnectionService.reconnect(provider)
           : await integrationConnectionService.connect(provider)
+
       window.location.assign(result.authorization_url)
+
       return result
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["integration-connections"] }),
   })
+
   const text = isRTL
     ? {
         title: "אינטגרציות וחיבורים",
@@ -86,7 +78,8 @@ export default function IntegrationsSettings() {
         error: "Unable to load integrations",
         retry: "Try again",
       }
-  if (error)
+
+  if (error) {
     return (
       <PlatformPageShell dir={isRTL ? "rtl" : "ltr"}>
         <PlatformCard className="p-5">
@@ -106,8 +99,12 @@ export default function IntegrationsSettings() {
         </PlatformCard>
       </PlatformPageShell>
     )
+  }
+
   const connected = integrations.filter((item) => item.status === "connected").length
+
   const available = integrations.filter((item) => item.feature_available).length
+
   const errors = integrations.filter((item) => item.status === "error").length
 
   return (
@@ -142,7 +139,9 @@ export default function IntegrationsSettings() {
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             {integrations.map((item) => {
               const Icon = ICONS[item.provider] || Plug
+
               const pending = mutation.isPending && mutation.variables?.provider === item.provider
+
               return (
                 <div
                   key={item.provider}
@@ -249,6 +248,7 @@ function Status({ value }) {
         : value === "pending"
           ? "bg-amber-100 text-amber-700"
           : "bg-slate-100 text-slate-500"
+
   return (
     <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${tone}`}>
       {value}

@@ -1,5 +1,4 @@
-import { Link, useNavigate } from "react-router-dom"
-import { Shield, ArrowLeft } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/lib/AuthContext"
 
 const ROLE_HOME = {
@@ -16,6 +15,7 @@ const ROLE_HOME = {
 
 export default function Unauthorized() {
   const navigate = useNavigate()
+
   const { user, organization } = useAuth()
 
   // org_admin with no organization yet should go onboard, not bounce

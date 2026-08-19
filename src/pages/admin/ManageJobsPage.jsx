@@ -1,35 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { jobService } from "@/api/services/jobService"
 import { compensationPlanService } from "@/api/services/compensationPlanService"
-import {
-  Plus,
-  Search,
-  Briefcase,
-  Building2,
-  MapPin,
-  RefreshCw,
-  Edit2,
-  CheckCircle,
-  XCircle,
-  Mail,
-  Copy,
-  Check,
-  AlertCircle,
-} from "lucide-react"
-import JobFormModal from "@/components/employer/JobFormModal"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-} from "@/components/platform/PlatformUI"
+import { Briefcase, CheckCircle, XCircle, AlertCircle } from "lucide-react"
+
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { useLocation, useSearchParams } from "react-router-dom"
 import { toast } from "sonner"
 
 function CopyButton({ text }) {
   const [copied, setCopied] = useState(false)
+
   const handleCopy = (e) => {
     e.stopPropagation()
     navigator.clipboard.writeText(text).then(() => {
@@ -37,6 +17,7 @@ function CopyButton({ text }) {
       setTimeout(() => setCopied(false), 2000)
     })
   }
+
   return (
     <button
       onClick={handleCopy}
@@ -62,26 +43,43 @@ const ROUTE_STATES = { open: "open", filled: "filled", hold: "on_hold" }
 
 export default function ManageJobsPage() {
   const { can, loading: permissionsLoading } = usePermissionMatrix()
+
   const canCreate = can("create")
+
   const canUpdate = can("update")
+
   const canViewCompensation = can("view_compensation")
+
   const [searchParams] = useSearchParams()
+
   const location = useLocation()
+
   const routeState = ROUTE_STATES[location.pathname.split("/").pop()] || null
+
   const preselectedClientId = searchParams.get("clientId")
+
   const [jobs, setJobs] = useState([])
+
   const [loading, setLoading] = useState(true)
+
   const [search, setSearch] = useState("")
+
   const [showClosed, setShowClosed] = useState(false)
+
   const [modalOpen, setModalOpen] = useState(false)
+
   const [editingJob, setEditingJob] = useState(null)
+
   const [compensationPlans, setCompensationPlans] = useState([])
+
   const [loadError, setLoadError] = useState("")
+
   const [updatingId, setUpdatingId] = useState(null)
 
   const loadJobs = useCallback(async () => {
     setLoading(true)
     setLoadError("")
+
     try {
       const all = await jobService.list({
         state: routeState || undefined,
@@ -89,10 +87,13 @@ export default function ManageJobsPage() {
         order: "DESC",
         limit: 200,
       })
+
       setJobs(all)
+
       if (canViewCompensation) {
         try {
           const plans = await compensationPlanService.list({ limit: 100 })
+
           setCompensationPlans(plans)
         } catch {
           setCompensationPlans([])
@@ -108,13 +109,19 @@ export default function ManageJobsPage() {
   }, [canViewCompensation, routeState])
 
   const getCompensation = (job) => {
-    if (!job) return null
+    if (!job) {
+      return null
+    }
+
     const jobPlan = compensationPlans.find((p) => p.job_id === job.id)
+
     return jobPlan || compensationPlans.find((p) => p.client_name === job.company && !p.job_id)
   }
 
   useEffect(() => {
-    if (!permissionsLoading) loadJobs()
+    if (!permissionsLoading) {
+      loadJobs()
+    }
   }, [loadJobs, permissionsLoading])
   useEffect(() => {
     if (preselectedClientId && canCreate) {
@@ -128,16 +135,20 @@ export default function ManageJobsPage() {
       !routeState &&
       !showClosed &&
       ["filled", "closed"].includes(j.state || (j.is_closed ? "closed" : "open"))
-    )
+    ) {
       return false
+    }
+
     if (search) {
       const q = search.toLowerCase()
+
       return (
         (j.title || "").toLowerCase().includes(q) ||
         (j.company || "").toLowerCase().includes(q) ||
         (j.location || "").toLowerCase().includes(q)
       )
     }
+
     return true
   })
 
@@ -145,12 +156,15 @@ export default function ManageJobsPage() {
     setEditingJob(null)
     setModalOpen(true)
   }
+
   const handleEdit = (job) => {
     setEditingJob(job)
     setModalOpen(true)
   }
+
   const handleToggleClose = async (job) => {
     setUpdatingId(job.id)
+
     try {
       await (job.state === "closed" ? jobService.reopen(job.id) : jobService.close(job.id))
       toast.success(job.state === "closed" ? "Job reopened" : "Job closed")
@@ -164,6 +178,7 @@ export default function ManageJobsPage() {
 
   const handleStateChange = async (job, state) => {
     setUpdatingId(job.id)
+
     try {
       await jobService.update(job.id, { state })
       toast.success("Job status updated")
@@ -178,6 +193,7 @@ export default function ManageJobsPage() {
   const openCount = jobs.filter(
     (j) => (j.state || (j.is_closed ? "closed" : "open")) === "open",
   ).length
+
   const closedCount = jobs.filter((j) =>
     ["filled", "closed"].includes(j.state || (j.is_closed ? "closed" : "open")),
   ).length
@@ -387,16 +403,23 @@ export default function ManageJobsPage() {
                       <td className="px-5 py-4">
                         {(() => {
                           const plan = getCompensation(job)
+
                           const formatComp = (value, type, total) => {
-                            if (!value) return "—"
+                            if (!value) {
+                              return "—"
+                            }
+
                             if (type === "fixed") {
                               return `${value.toLocaleString()}₪`
                             } else if (type === "percent" && total) {
                               const fixed = (total * value) / 100
+
                               return `${fixed.toLocaleString()}₪`
                             }
+
                             return `${value}%`
                           }
+
                           return (
                             <span className="text-[#374151] text-xs">
                               {plan?.recruiter_compensation
@@ -413,8 +436,13 @@ export default function ManageJobsPage() {
                       <td className="px-5 py-4">
                         {(() => {
                           const plan = getCompensation(job)
-                          if (!plan) return <span className="text-[#CBD5E1] text-xs">—</span>
+
+                          if (!plan) {
+                            return <span className="text-[#CBD5E1] text-xs">—</span>
+                          }
+
                           const days = plan.warranty_period_days ?? 30
+
                           return <span className="text-[#374151] text-xs">{days} days</span>
                         })()}
                       </td>

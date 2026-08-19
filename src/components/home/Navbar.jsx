@@ -1,60 +1,78 @@
-import React, { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { MapPin, Menu, X, Shield, UserPlus } from "lucide-react"
+import { useState, useEffect } from "react"
+import { useLocation } from "react-router-dom"
 import { useAuth } from "@/lib/AuthContext"
 import { useTranslation } from "react-i18next"
 import { publicWorkflowService } from "@/api/services/publicWorkflowService"
 import { authService } from "@/api/services/authService"
-import LocationConfirmModal from "@/components/home/LocationConfirmModal"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 
 const LOGO_URL = "/logo.png"
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+
   const [selectedCity, setSelectedCity] = useState(null)
+
   const [showLocationModal, setShowLocationModal] = useState(false)
+
   const [initialCity, setInitialCity] = useState(null)
+
   const { user } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const location = useLocation()
+
   const isHomePage = location.pathname === "/"
 
   useEffect(() => {
     const loadLocation = async () => {
       const today = new Date().toISOString().split("T")[0]
+
       const lastCheck = localStorage.getItem("locationCheckDate")
 
       if (lastCheck === today) {
         const savedCity = localStorage.getItem("selectedCity")
+
         setSelectedCity(savedCity || (isRtl ? "תל אביב" : "Tel Aviv"))
+
         return
       }
 
       try {
         const response = await publicWorkflowService.currentLocation()
+
         const detectedCity = response.city || (isRtl ? "תל אביב" : "Tel Aviv")
+
         setInitialCity(detectedCity)
+
         const savedCity = localStorage.getItem("selectedCity")
+
         if (!savedCity && isHomePage) {
           setShowLocationModal(true)
         } else {
           setSelectedCity(savedCity || detectedCity)
         }
+
         localStorage.setItem("locationCheckDate", today)
       } catch {
         const fallback = isRtl ? "תל אביב" : "Tel Aviv"
+
         setInitialCity(fallback)
+
         const savedCity = localStorage.getItem("selectedCity")
+
         if (!savedCity && isHomePage) {
           setShowLocationModal(true)
         } else {
           setSelectedCity(savedCity || fallback)
         }
+
         localStorage.setItem("locationCheckDate", today)
       }
     }
+
     loadLocation()
   }, [isRtl])
 
@@ -70,6 +88,7 @@ export default function Navbar() {
 
   const dashboardLink = () => {
     const role = user?.role || user?.user_type || ""
+
     const map = {
       recruiter: "/agency/recruiter/dashboard",
       team_manager: "/agency/dashboard",
@@ -80,6 +99,7 @@ export default function Navbar() {
       candidate: "/candidate/dashboard",
       admin: "/platform/dashboard",
     }
+
     return map[role] || "/"
   }
 
@@ -113,6 +133,7 @@ export default function Navbar() {
         <nav className="hidden lg:flex items-center gap-7 text-[#172033] font-semibold">
           {navLinks.map((link) => {
             const active = location.pathname === link.to
+
             return (
               <Link
                 key={link.to}

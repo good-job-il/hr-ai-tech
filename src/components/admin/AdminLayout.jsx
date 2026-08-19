@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { useState } from "react"
+import { useLocation } from "react-router-dom"
 import {
   LayoutDashboard,
   Users,
@@ -13,15 +13,8 @@ import {
   Settings,
   Bell,
   Send,
-  Home,
-  LogOut,
-  Menu,
-  X,
-  ChevronRight,
-  Search,
   TrendingUp,
   FileText,
-  Sparkles,
 } from "lucide-react"
 import { authService } from "@/api/services/authService"
 import { useAuth } from "@/lib/AuthContext"
@@ -49,7 +42,9 @@ const NAV = [
 
 export default function AdminLayout({ children }) {
   const location = useLocation()
+
   const [mobileOpen, setMobileOpen] = useState(false)
+
   const { user } = useAuth()
 
   return (
@@ -64,8 +59,12 @@ export default function AdminLayout({ children }) {
 
         <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-1">
           {NAV.map((item, i) => {
-            if (!item) return <div key={i} className="h-px bg-[#E8F0FF] my-4" />
+            if (!item) {
+              return <div key={i} className="h-px bg-[#E8F0FF] my-4" />
+            }
+
             const active = location.pathname === item.path
+
             const Icon = item.icon
 
             return (

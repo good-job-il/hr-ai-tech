@@ -2,7 +2,6 @@
 import * as React from "react"
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva } from "class-variance-authority"
-import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -24,6 +23,7 @@ const SheetOverlay = React.forwardRef(({ className, ...props }, ref) => (
     ref={ref}
   />
 ))
+
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 
 const sheetVariants = cva(
@@ -57,11 +57,13 @@ const SheetContent = React.forwardRef(({ side = "right", className, children, ..
     </SheetPrimitive.Content>
   </SheetPortal>
 ))
+
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({ className, ...props }) => (
   <div className={cn("flex flex-col space-y-2 text-center sm:text-left", className)} {...props} />
 )
+
 SheetHeader.displayName = "SheetHeader"
 
 const SheetFooter = ({ className, ...props }) => (
@@ -70,6 +72,7 @@ const SheetFooter = ({ className, ...props }) => (
     {...props}
   />
 )
+
 SheetFooter.displayName = "SheetFooter"
 
 const SheetTitle = React.forwardRef(({ className, ...props }, ref) => (
@@ -79,6 +82,7 @@ const SheetTitle = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 SheetTitle.displayName = SheetPrimitive.Title.displayName
 
 const SheetDescription = React.forwardRef(({ className, ...props }, ref) => (
@@ -88,6 +92,7 @@ const SheetDescription = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 SheetDescription.displayName = SheetPrimitive.Description.displayName
 
 export {

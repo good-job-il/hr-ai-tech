@@ -1,10 +1,7 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { jobService } from "@/api/services/jobService"
 import { salaryService } from "@/api/services/salaryService"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
-import { TrendingUp, Loader2 } from "lucide-react"
-import Navbar from "@/components/home/Navbar"
 
 const CATEGORIES = [
   "תוכנה",
@@ -20,7 +17,9 @@ const CATEGORIES = [
 
 export default function MarketStats() {
   const [selectedCategory, setSelectedCategory] = useState("תוכנה")
+
   const [aiLoading, setAiLoading] = useState(false)
+
   const [aiData, setAiData] = useState(null)
 
   const { data: jobs = [] } = useQuery({
@@ -36,9 +35,13 @@ export default function MarketStats() {
 
   // Jobs by location
   const locationMap = {}
+
   jobs.forEach((j) => {
-    if (j.location) locationMap[j.location] = (locationMap[j.location] || 0) + 1
+    if (j.location) {
+      locationMap[j.location] = (locationMap[j.location] || 0) + 1
+    }
   })
+
   const locationData = Object.entries(locationMap)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8)
@@ -46,23 +49,29 @@ export default function MarketStats() {
 
   const loadAiInsights = async () => {
     setAiLoading(true)
+
     try {
       const rows = await salaryService.list({ category: selectedCategory, limit: 200 })
+
       const categoryJobs = jobs.filter(
         (job) => job.category === selectedCategory || job.title?.includes(selectedCategory),
       )
+
       const skills = categoryJobs.flatMap((job) => [
         ...(job.required_skills || []),
         ...(job.preferred_skills || []),
       ])
+
       const skillCounts = skills.reduce(
         (counts, skill) => ({ ...counts, [skill]: (counts[skill] || 0) + 1 }),
         {},
       )
+
       const average = (values) =>
         values.length
           ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length)
           : 0
+
       setAiData({
         salary_avg: average(rows.map((row) => row.salary_avg).filter(Boolean)),
         salary_min: rows.length

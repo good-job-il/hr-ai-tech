@@ -1,6 +1,5 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Search, MapPin, ChevronDown } from "lucide-react"
 
 const QUICK_TAGS = [
   "Full Stack מפתח",
@@ -11,6 +10,7 @@ const QUICK_TAGS = [
   "Frontend מפתח",
   "שיווק דיגיטלי",
 ]
+
 const DOMAINS = [
   "כל התחומים",
   "הנדסה ופיתוח",
@@ -21,20 +21,35 @@ const DOMAINS = [
   "כספים",
   "משאבי אנוש",
 ]
+
 const TYPES = ["כל הסוגים", "משרה מלאה", "חלקית", "מרחוק", "יומי"]
 
 export default function SearchSection() {
   const navigate = useNavigate()
+
   const [keyword, setKeyword] = useState("")
+
   const [location, setLocation] = useState("")
+
   const [domain, setDomain] = useState("כל התחומים")
+
   const [type, setType] = useState("כל הסוגים")
 
   const handleSearch = () => {
     const p = new URLSearchParams()
-    if (keyword) p.set("q", keyword)
-    if (location) p.set("location", location)
-    if (domain !== "כל התחומים") p.set("domain", domain)
+
+    if (keyword) {
+      p.set("q", keyword)
+    }
+
+    if (location) {
+      p.set("location", location)
+    }
+
+    if (domain !== "כל התחומים") {
+      p.set("domain", domain)
+    }
+
     navigate(`/jobs?${p.toString()}`)
   }
 

@@ -1,6 +1,4 @@
-import React, { useState, useRef, useEffect } from "react"
-import { DragDropContext } from "@hello-pangea/dnd"
-import StageColumn from "./StageColumn"
+import { useState, useRef, useEffect } from "react"
 
 const COLUMN_WIDTH = 300
 
@@ -14,25 +12,37 @@ export default function PipelineBoard({
   canMove = true,
 }) {
   const [dragging, setDragging] = useState(false)
+
   const containerRef = useRef(null)
+
   const scrollInitialized = useRef(false)
 
   const getAppsForStage = (stageId) => applications.filter((a) => a.status === stageId)
 
   const onDragEnd = (result) => {
     setDragging(false)
-    if (!canMove || !result.destination) return
+
+    if (!canMove || !result.destination) {
+      return
+    }
+
     const { draggableId, destination } = result
+
     if (destination.droppableId !== result.source.droppableId) {
       onMove(draggableId, destination.droppableId)
     }
   }
 
   useEffect(() => {
-    if (!containerRef.current || scrollInitialized.current || applications.length === 0) return
+    if (!containerRef.current || scrollInitialized.current || applications.length === 0) {
+      return
+    }
 
     const timer = setTimeout(() => {
-      if (!containerRef.current) return
+      if (!containerRef.current) {
+        return
+      }
+
       containerRef.current.scrollLeft = isRTL ? 99999 : 0
       scrollInitialized.current = true
     }, 100)

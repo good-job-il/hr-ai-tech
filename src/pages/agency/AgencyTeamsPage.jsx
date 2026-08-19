@@ -4,45 +4,12 @@ import { useTranslation } from "react-i18next"
 import { agencyTeamsService } from "@/api/services/agencyTeamsService"
 import { useAuth } from "@/lib/AuthContext"
 import { useToast } from "@/components/ui/use-toast"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-} from "@/components/platform/PlatformUI"
+
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
-import {
-  Building2,
-  Check,
-  Clock3,
-  Copy,
-  Mail,
-  Plus,
-  RefreshCw,
-  Search,
-  ShieldCheck,
-  UserCog,
-  Users,
-  UserX,
-  XCircle,
-} from "lucide-react"
+import { Building2, Clock3, Mail, ShieldCheck, Users, XCircle } from "lucide-react"
 
 const ROLES = ["org_admin", "recruitment_manager", "team_manager", "recruiter"]
+
 const ROLE_COLORS = {
   org_admin: "bg-purple-50 text-purple-700 border-purple-200",
   recruitment_manager: "bg-blue-50 text-blue-700 border-blue-200",
@@ -51,8 +18,10 @@ const ROLE_COLORS = {
 }
 
 const EMPTY_INVITE = { full_name: "", email: "", phone: "", role: "recruiter", team_id: "none" }
+
 function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
   const [form, setForm] = useState(EMPTY_INVITE)
+
   const submit = (e) => {
     e.preventDefault()
     onSubmit({ ...form, team_id: form.team_id === "none" ? null : Number(form.team_id) }, () => {
@@ -60,6 +29,7 @@ function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
       setOpen(false)
     })
   }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent dir={isRtl ? "rtl" : "ltr"} className="sm:max-w-lg">
@@ -157,6 +127,7 @@ function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
 
 function TeamDialog({ open, setOpen, managers, onSubmit, pending, t, isRtl }) {
   const [form, setForm] = useState({ name: "", description: "", manager_id: "none" })
+
   const submit = (e) => {
     e.preventDefault()
     onSubmit(
@@ -167,6 +138,7 @@ function TeamDialog({ open, setOpen, managers, onSubmit, pending, t, isRtl }) {
       },
     )
   }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent dir={isRtl ? "rtl" : "ltr"}>
@@ -226,8 +198,13 @@ function TeamDialog({ open, setOpen, managers, onSubmit, pending, t, isRtl }) {
 
 function MemberDialog({ member, setMember, teams, onSubmit, pending, t, isRtl }) {
   const [role, setRole] = useState(member?.role || "recruiter")
+
   const [teamId, setTeamId] = useState(member?.team_id ? String(member.team_id) : "none")
-  if (!member) return null
+
+  if (!member) {
+    return null
+  }
+
   return (
     <Dialog open onOpenChange={(open) => !open && setMember(null)}>
       <DialogContent dir={isRtl ? "rtl" : "ltr"}>
@@ -291,32 +268,54 @@ function MemberDialog({ member, setMember, teams, onSubmit, pending, t, isRtl })
 
 export default function AgencyTeamsPage() {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const { user } = useAuth()
+
   const { can } = usePermissionMatrix()
+
   const canManageTeams = can("manage_users")
+
   const canManageMembers = ["org_admin", "admin"].includes(user?.role) && canManageTeams
+
   const canAdmin = canManageMembers
+
   const { toast } = useToast()
+
   const queryClient = useQueryClient()
+
   const [search, setSearch] = useState("")
+
   const [roleFilter, setRoleFilter] = useState("all")
+
   const [inviteOpen, setInviteOpen] = useState(false)
+
   const [teamOpen, setTeamOpen] = useState(false)
+
   const [editingMember, setEditingMember] = useState(null)
+
   const [lastLink, setLastLink] = useState("")
+
   const query = useQuery({ queryKey: ["agency-teams"], queryFn: agencyTeamsService.overview })
+
   const data = query.data || { members: [], teams: [], invitations: [] }
+
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["agency-teams"] })
+
   const fail = (error) =>
     toast({ title: error?.message || t("common.error"), variant: "destructive" })
+
   const invite = useMutation({ mutationFn: agencyTeamsService.invite, onError: fail })
+
   const createTeam = useMutation({ mutationFn: agencyTeamsService.createTeam, onError: fail })
+
   const updateMember = useMutation({
     mutationFn: ({ id, payload }) => agencyTeamsService.updateMember(id, payload),
     onSuccess: invalidate,
     onError: fail,
   })
+
   const resend = useMutation({
     mutationFn: agencyTeamsService.resend,
     onSuccess: (result) => {
@@ -325,12 +324,15 @@ export default function AgencyTeamsPage() {
     },
     onError: fail,
   })
+
   const cancel = useMutation({
     mutationFn: agencyTeamsService.cancel,
     onSuccess: invalidate,
     onError: fail,
   })
+
   const teamById = useMemo(() => Object.fromEntries(data.teams.map((x) => [x.id, x])), [data.teams])
+
   const members = useMemo(
     () =>
       data.members.filter(
@@ -341,13 +343,17 @@ export default function AgencyTeamsPage() {
       ),
     [data.members, roleFilter, search],
   )
+
   const pendingInvites = data.invitations.filter((x) => x.status === "pending")
+
   const showInviteLink = (token) => {
     const link = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`
+
     setLastLink(link)
     navigator.clipboard?.writeText(link)
     toast({ title: t("agencyTeams.invite.copied") })
   }
+
   const submitInvite = (payload, done) =>
     invite.mutate(payload, {
       onSuccess: (result) => {
@@ -356,6 +362,7 @@ export default function AgencyTeamsPage() {
         done()
       },
     })
+
   const submitTeam = (payload, done) =>
     createTeam.mutate(payload, {
       onSuccess: () => {
@@ -364,8 +371,10 @@ export default function AgencyTeamsPage() {
         done()
       },
     })
+
   const toggleMember = (member) =>
     updateMember.mutate({ id: member.id, payload: { is_active: !member.is_active } })
+
   const saveMember = (id, payload) =>
     updateMember.mutate(
       { id, payload },
@@ -377,7 +386,7 @@ export default function AgencyTeamsPage() {
       },
     )
 
-  if (query.isError)
+  if (query.isError) {
     return (
       <PlatformPageShell dir={isRtl ? "rtl" : "ltr"}>
         <PlatformCard className="p-5">
@@ -392,6 +401,8 @@ export default function AgencyTeamsPage() {
         </PlatformCard>
       </PlatformPageShell>
     )
+  }
+
   return (
     <PlatformPageShell dir={isRtl ? "rtl" : "ltr"}>
       <div className="mx-auto max-w-7xl space-y-6">
@@ -564,7 +575,9 @@ export default function AgencyTeamsPage() {
               ) : (
                 data.teams.map((team) => {
                   const manager = data.members.find((m) => m.id === team.manager_id)
+
                   const count = data.members.filter((m) => m.team_id === team.id).length
+
                   return (
                     <PlatformCard key={team.id} className="p-5">
                       <div className="flex justify-between">

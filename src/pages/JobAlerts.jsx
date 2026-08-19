@@ -1,9 +1,7 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { httpClient } from "@/api/client/httpClient"
 import { useAuth } from "@/lib/AuthContext"
-import Navbar from "@/components/home/Navbar"
-import { Bell, Plus, Trash2, BellOff } from "lucide-react"
 
 const CATEGORIES = [
   "",
@@ -17,6 +15,7 @@ const CATEGORIES = [
   "רפואה",
   "חינוך",
 ]
+
 const typeLabels = {
   any: "כל הסוגים",
   full: "משרה מלאה",
@@ -27,8 +26,11 @@ const typeLabels = {
 
 export default function JobAlerts() {
   const { user } = useAuth()
+
   const queryClient = useQueryClient()
+
   const [showForm, setShowForm] = useState(false)
+
   const [form, setForm] = useState({
     keywords: "",
     location: "",

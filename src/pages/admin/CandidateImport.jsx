@@ -1,18 +1,20 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { candidateImportService } from "@/api/services/candidateImportService"
 import { fileService } from "@/api/services/fileService"
 import { useAuth } from "@/lib/AuthContext"
-import AdminLayout from "@/components/admin/AdminLayout"
-import { Upload, AlertTriangle, CheckCircle2, Clock } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
-import ResumeZipUploader from "@/components/admin/ResumeZipUploader"
 
 const CandidateImport = () => {
   const { user } = useAuth()
+
   const [file, setFile] = useState(null)
+
   const [uploading, setUploading] = useState(false)
+
   const [uploadError, setUploadError] = useState("")
+
   const [successMessage, setSuccessMessage] = useState("")
+
   const [selectedBatch, setSelectedBatch] = useState(null)
 
   const { data: batches = [], refetch } = useQuery({
@@ -23,12 +25,14 @@ const CandidateImport = () => {
         order: "DESC",
         limit: 50,
       })
+
       return result || []
     },
   })
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0]
+
     if (selectedFile) {
       const validTypes = [
         "text/csv",
@@ -36,10 +40,13 @@ const CandidateImport = () => {
         "application/json",
         "application/zip",
       ]
+
       if (!validTypes.includes(selectedFile.type)) {
         setUploadError("סוג קובץ לא תומך. בחר CSV, Excel, JSON או ZIP")
+
         return
       }
+
       setFile(selectedFile)
       setUploadError("")
     }
@@ -48,6 +55,7 @@ const CandidateImport = () => {
   const handleUpload = async () => {
     if (!file) {
       setUploadError("בחר קובץ קודם")
+
       return
     }
 
@@ -58,6 +66,7 @@ const CandidateImport = () => {
     try {
       // Upload file
       const uploadRes = await fileService.upload(file)
+
       const fileUrl = uploadRes.file_url
 
       // Create import batch record
@@ -79,6 +88,7 @@ const CandidateImport = () => {
 
       // Invoke import function
       const queued = await candidateImportService.queueFileImport(batchRes.id, fileUrl, file.name)
+
       const importResult = await candidateImportService.waitForJob(queued.id)
 
       setSuccessMessage(`הייבוא הושלם. ${importResult.message || ""}`)

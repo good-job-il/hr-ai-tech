@@ -32,9 +32,11 @@ function buildTitle(candidateName, newStage) {
   if (newStage === "hired") {
     return t("pipeline.notifications.stageChange.hiredTitle", { name: candidateName })
   }
+
   if (newStage === "rejected") {
     return t("pipeline.notifications.stageChange.rejectedTitle", { name: candidateName })
   }
+
   return t("pipeline.notifications.stageChange.movedTitle", {
     name: candidateName,
     stage: stageLabel(newStage),
@@ -61,10 +63,14 @@ export async function createStageChangeNotifications({
   changedBy,
   user,
 }) {
-  if (!application || !newStage || oldStage === newStage) return
+  if (!application || !newStage || oldStage === newStage) {
+    return
+  }
 
   const candidateName = application.candidate_name || t("pipeline.notifications.defaultCandidate")
+
   const title = buildTitle(candidateName, newStage)
+
   const content = buildContent(candidateName, oldStage, newStage, changedBy)
 
   const metadata = {
@@ -86,10 +92,14 @@ export async function createStageChangeNotifications({
   )
 
   const seen = new Set()
+
   const creates = []
 
   for (const { email, role_target } of recipients) {
-    if (!email || seen.has(email)) continue
+    if (!email || seen.has(email)) {
+      continue
+    }
+
     seen.add(email)
 
     creates.push(
@@ -118,15 +128,20 @@ export async function createSlaNotification({
   user,
 }) {
   const candidateName = application.candidate_name || t("pipeline.notifications.defaultCandidate")
+
   const recipients = await resolveRecipientEmails(
     collectRecipients({ application, newStage: application.status, user }),
   )
 
   const seen = new Set()
+
   const creates = []
 
   for (const { email, role_target } of recipients) {
-    if (!email || seen.has(email)) continue
+    if (!email || seen.has(email)) {
+      continue
+    }
+
     seen.add(email)
 
     creates.push(
@@ -167,6 +182,7 @@ function collectRecipients({ application, newStage, user }) {
   const recipients = []
 
   const recruiterEmail = application.assigned_to || application.recruiter_id
+
   if (recruiterEmail) {
     recipients.push({
       ...(String(recruiterEmail).includes("@")
@@ -182,6 +198,7 @@ function collectRecipients({ application, newStage, user }) {
 
   if (EMPLOYER_RELEVANT_STAGES.includes(newStage)) {
     const employerEmail = application.employer_id
+
     if (employerEmail) {
       recipients.push({ email: employerEmail, role_target: "employer" })
     }
@@ -201,11 +218,15 @@ function collectRecipients({ application, newStage, user }) {
 async function resolveRecipientEmails(recipients) {
   return Promise.all(
     recipients.map(async (recipient) => {
-      if (recipient.email || !recipient.userId) return recipient
+      if (recipient.email || !recipient.userId) {
+        return recipient
+      }
+
       try {
         const record = await httpClient.get(`/users/${encodeURIComponent(recipient.userId)}`, {
           cache: false,
         })
+
         return { ...recipient, email: record?.email || null }
       } catch {
         return { ...recipient, email: null }
@@ -215,7 +236,13 @@ async function resolveRecipientEmails(recipients) {
 }
 
 function mapNotificationType(stage) {
-  if (stage === "hired") return "job_match"
-  if (["phone_interview", "employer_interview"].includes(stage)) return "interview_scheduled"
+  if (stage === "hired") {
+    return "job_match"
+  }
+
+  if (["phone_interview", "employer_interview"].includes(stage)) {
+    return "interview_scheduled"
+  }
+
   return "new_application"
 }

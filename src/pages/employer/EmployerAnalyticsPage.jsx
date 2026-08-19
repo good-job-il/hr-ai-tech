@@ -3,7 +3,7 @@ import { jobService } from "@/api/services/jobService"
 import { interviewService } from "@/api/services/interviewService"
 import { applicationService } from "@/api/services/applicationService"
 import { useAuth } from "@/lib/AuthContext"
-import { BarChart3, Users, Briefcase, Clock, CheckCircle } from "lucide-react"
+import { Users, Briefcase, Clock, CheckCircle } from "lucide-react"
 
 function StatCard({ icon: IconComp, label, value, color = "#7C3AED", sub }) {
   return (
@@ -25,31 +25,45 @@ function StatCard({ icon: IconComp, label, value, color = "#7C3AED", sub }) {
 
 export default function EmployerAnalyticsPage() {
   const { user } = useAuth()
+
   const [data, setData] = useState(null)
+
   const [loading, setLoading] = useState(true)
+
   const [loadError, setLoadError] = useState("")
 
   useEffect(() => {
-    if (!user?.email) return
+    if (!user?.email) {
+      return
+    }
+
     const load = async () => {
       setLoading(true)
       setLoadError("")
+
       try {
         const [jobs, applications, interviews] = await Promise.all([
           jobService.list({ limit: 200 }),
           applicationService.list({ limit: 200 }),
           interviewService.list({ limit: 200 }),
         ])
+
         const openJobs = jobs.filter((j) => !j.is_closed)
+
         const closedJobs = jobs.filter((j) => j.is_closed)
+
         const hired = applications.filter((a) => a.status === "hired")
+
         const inProgress = applications.filter((a) =>
           ["phone_interview", "recommended", "employer_interview", "offer", "probation"].includes(
             a.status,
           ),
         )
+
         const scheduled = interviews.filter((i) => i.status === "scheduled")
+
         const completed = interviews.filter((i) => i.status === "completed")
+
         setData({
           openJobs: openJobs.length,
           closedJobs: closedJobs.length,
@@ -66,6 +80,7 @@ export default function EmployerAnalyticsPage() {
         setLoading(false)
       }
     }
+
     load()
   }, [user?.email])
 

@@ -1,9 +1,8 @@
-import React from "react"
-import { CheckCircle2, AlertTriangle, AlertCircle, ArrowRight } from "lucide-react"
-
 export default function ImportValidationCheck({ results, onApprove, onBack }) {
   const checks = results.checks || {}
+
   const readinessScore = results.readiness_score || 0
+
   const isProduction = results.is_production_ready
 
   const CheckItem = ({ label, passed, detail }) => (

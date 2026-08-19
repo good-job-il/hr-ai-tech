@@ -2,7 +2,7 @@
  * Unified Card System
  * Single source of truth for all card styling
  */
-import { GLASS_STYLES, SHADOWS, RADIUS, TRANSITIONS } from "@/theme/tokens"
+import { GLASS_STYLES } from "@/theme/tokens"
 import { cn } from "@/lib/utils"
 
 /** @param {React.HTMLAttributes<HTMLDivElement> & {variant?: 'glass' | 'panel', hoverable?: boolean}} props */

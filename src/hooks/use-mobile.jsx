@@ -11,7 +11,9 @@ export function useIsMobile() {
 
   React.useEffect(() => {
     const onChange = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+
     window.addEventListener("resize", onChange)
+
     return () => window.removeEventListener("resize", onChange)
   }, [])
 

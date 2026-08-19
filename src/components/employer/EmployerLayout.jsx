@@ -1,20 +1,12 @@
-import React, { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { useState } from "react"
+import { useLocation } from "react-router-dom"
 import {
   LayoutDashboard,
   Briefcase,
   Users,
-  Menu,
-  X,
-  LogOut,
-  Search,
   MessageCircle,
   TrendingUp,
-  ChevronDown,
-  ChevronUp,
   Download,
-  Sparkles,
-  Home,
   Settings,
 } from "lucide-react"
 import { authService } from "@/api/services/authService"
@@ -56,11 +48,17 @@ const NAV_ITEMS_EN = [
 
 export default function EmployerLayout({ children }) {
   const location = useLocation()
+
   const [mobileOpen, setMobileOpen] = useState(false)
+
   const [expandedSubmenu, setExpandedSubmenu] = useState(null)
+
   const { i18n } = useTranslation()
+
   const isEn = i18n.language?.startsWith("en")
+
   const navItems = isEn ? NAV_ITEMS_EN : NAV_ITEMS_HE
+
   const dir = isEn ? "ltr" : "rtl"
 
   return (
@@ -83,7 +81,9 @@ export default function EmployerLayout({ children }) {
         <nav className="flex-1 px-4 py-5 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const hasSubmenu = item.submenu?.length > 0
+
             const isSubmenuOpen = expandedSubmenu === item.label
+
             const isActive = item.path
               ? location.pathname === item.path
               : item.submenu?.some((sub) => location.pathname === sub.path)
@@ -117,7 +117,9 @@ export default function EmployerLayout({ children }) {
                     >
                       {item.submenu.map((subitem) => {
                         const subActive = location.pathname === subitem.path
+
                         const SubIcon = subitem.icon
+
                         return (
                           <Link
                             key={subitem.path}
@@ -142,6 +144,7 @@ export default function EmployerLayout({ children }) {
             }
 
             const active = location.pathname === item.path
+
             return (
               <Link
                 key={item.path}

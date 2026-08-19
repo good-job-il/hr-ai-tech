@@ -1,23 +1,13 @@
-import React, { useState, useRef } from "react"
-import { Link } from "react-router-dom"
+import { useState, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { authService } from "@/api/services/authService"
 import { agencyTeamsService } from "@/api/services/agencyTeamsService"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
+
 import { toast } from "@/components/ui/use-toast"
 
 export default function Register() {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const USER_TYPES = [
@@ -54,20 +44,33 @@ export default function Register() {
   ]
 
   const urlParams = new URLSearchParams(window.location.search)
+
   const phoneFromUrl = urlParams.get("phone") || ""
+
   const inviteToken = urlParams.get("invite") || ""
+
   const inviteEmail = urlParams.get("email") || ""
+
   const inviteRole = urlParams.get("role") || ""
 
   const [fullName, setFullName] = useState("")
+
   const [email, setEmail] = useState(inviteEmail)
+
   const [phone, setPhone] = useState(phoneFromUrl)
+
   const [password, setPassword] = useState("")
+
   const [confirmPassword, setConfirmPassword] = useState("")
+
   const [userType, setUserType] = useState(inviteRole || "candidate")
+
   const [orgType, setOrgType] = useState("")
+
   const [error, setError] = useState("")
+
   const [loading, setLoading] = useState(false)
+
   const isFromInvite = !!inviteToken
 
   const cardRef = useRef(null)
@@ -79,6 +82,7 @@ export default function Register() {
   }
 
   const selectedUserType = USER_TYPES.find((u) => u.id === userType)
+
   const requiresOrg = selectedUserType?.requiresOrg
 
   const handleRegister = async (e) => {
@@ -87,35 +91,48 @@ export default function Register() {
 
     if (!isFromInvite && !fullName.trim()) {
       showError(isRtl ? "יש להזין שם מלא" : "Please enter your full name")
+
       return
     }
+
     if (!isFromInvite && !email.trim()) {
       showError(isRtl ? "יש להזין כתובת אימייל" : "Please enter your email")
+
       return
     }
+
     if (!isFromInvite && !phone.trim()) {
       showError(isRtl ? "יש להזין מספר טלפון" : "Please enter your phone number")
+
       return
     }
+
     if (password !== confirmPassword) {
       showError(t("errors.passwordMismatch"))
+
       return
     }
+
     if (password.length < 8) {
       showError(
         isRtl ? "הסיסמה חייבת להיות לפחות 8 תווים" : "Password must be at least 8 characters",
       )
+
       return
     }
+
     if (requiresOrg && !orgType) {
       showError(isRtl ? "יש לבחור סוג ארגון" : "Please select an organization type")
+
       return
     }
 
     setLoading(true)
+
     try {
       if (isFromInvite) {
         const member = await agencyTeamsService.acceptInvitation(inviteToken, password)
+
         await authService.login(member.email, password)
         window.location.href =
           member.role === "recruiter"
@@ -123,8 +140,10 @@ export default function Register() {
             : member.role === "team_manager"
               ? "/agency/team/dashboard"
               : "/agency/dashboard"
+
         return
       }
+
       await authService.register({
         email,
         password,
@@ -160,10 +179,12 @@ export default function Register() {
       window.location.href = redirects[userType] || "/"
     } catch (err) {
       console.error("[Register] register error:", err)
+
       const msg =
         err?.response?.data?.message ||
         err?.message ||
         (isRtl ? "שגיאה בהרשמה" : "Registration error")
+
       showError(msg)
     } finally {
       setLoading(false)

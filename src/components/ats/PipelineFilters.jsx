@@ -1,5 +1,4 @@
-import React, { useState } from "react"
-import { Search, X, ChevronDown, ChevronUp } from "lucide-react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 const SOURCES = ["linkedin", "app", "jobsite", "import", "facebook"]
@@ -17,16 +16,20 @@ const DEFAULT_FILTERS = {
 
 export default function PipelineFilters({ filters, onChange }) {
   const { t, i18n } = useTranslation()
+
   const [showAdvanced, setShowAdvanced] = useState(false)
 
   const isRTL = !i18n.language?.startsWith("en")
 
   const update = (key, value) => onChange({ ...filters, [key]: value })
+
   const reset = () => onChange(DEFAULT_FILTERS)
 
   const hasBasic = filters.role || filters.source || filters.aiMin
+
   const hasAdvanced =
     filters.dateFrom || filters.dateTo || filters.expMin || filters.expMax || filters.recruiter
+
   const hasActive = hasBasic || hasAdvanced
 
   return (

@@ -1,6 +1,4 @@
-import React, { useState } from "react"
-import { Link } from "react-router-dom"
-import { Zap } from "lucide-react"
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { publicJobService } from "@/api/services/publicJobService"
 import { companyService } from "@/api/services/companyService"
@@ -27,8 +25,11 @@ export default function PopularCategories() {
 
   // Calculate dynamic counts
   const dailyCount = jobs.filter((j) => j.type === "daily").length
+
   const remoteCount = jobs.filter((j) => j.type === "remote").length
+
   const partCount = jobs.filter((j) => j.type === "part").length
+
   const companyCount = companies.length
 
   const getCategoryCount = (keyword) => {

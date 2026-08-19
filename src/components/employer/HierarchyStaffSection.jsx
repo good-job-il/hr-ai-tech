@@ -1,7 +1,4 @@
-import React, { useState } from "react"
-import { Edit2, Trash2, Plus, Users, ChevronDown, ChevronUp } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import StaffFormModal from "@/components/employer/StaffFormModal"
+import { useState } from "react"
 
 export default function HierarchyStaffSection({
   staff,
@@ -13,7 +10,9 @@ export default function HierarchyStaffSection({
   loading,
 }) {
   const [showModal, setShowModal] = useState(false)
+
   const [editingStaff, setEditingStaff] = useState(null)
+
   const [expandedManagers, setExpandedManagers] = useState({})
 
   const handleSubmit = (data) => {
@@ -22,6 +21,7 @@ export default function HierarchyStaffSection({
     } else {
       onAdd(data)
     }
+
     setShowModal(false)
     setEditingStaff(null)
   }
@@ -40,8 +40,10 @@ export default function HierarchyStaffSection({
 
   // Get hiring managers (בכירים)
   const hiringManagers = staff.filter((s) => s.role === "hiring_manager")
+
   // Get team managers (מנהלי צוות)
   const teamManagers = staff.filter((s) => s.role === "team_manager")
+
   // Get recruiters (רכזי גיוס)
   const recruiters = staff.filter((s) => s.role === "recruiter")
 

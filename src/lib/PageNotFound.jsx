@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 
 export default function PageNotFound({}) {
   const location = useLocation()
+
   const pageName = location.pathname.substring(1)
 
   const { data: authData, isFetched } = useQuery({
@@ -11,6 +12,7 @@ export default function PageNotFound({}) {
     queryFn: async () => {
       try {
         const user = await httpClient.get("/auth/me", { cache: false })
+
         return { user, isAuthenticated: true }
       } catch (error) {
         return { user: null, isAuthenticated: false }

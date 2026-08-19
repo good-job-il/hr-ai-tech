@@ -1,27 +1,10 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { applicationService } from "@/api/services/applicationService"
 import { interviewService } from "@/api/services/interviewService"
 import { useAuth } from "@/lib/AuthContext"
-import {
-  Send,
-  Search,
-  X,
-  Briefcase,
-  Calendar,
-  ChevronLeft,
-  RefreshCw,
-  Clock,
-  Video,
-  Phone,
-  MapPin,
-  CheckCircle2,
-  Award,
-  FileText,
-} from "lucide-react"
-import ApplicationTimeline from "@/components/applications/ApplicationTimeline"
+import { Send, Calendar, FileText } from "lucide-react"
 
 // ─── Status color config (labels come from i18n) ──────────────────────────────
 
@@ -52,8 +35,11 @@ const ACTIVE_STATUSES = new Set([
 
 function StatusBadge({ status }) {
   const { t } = useTranslation()
+
   const style = STATUS_STYLE[status] || { color: "#64748B", bg: "#F8FAFC", border: "#E2E8F0" }
+
   const label = t(`candidate.applications.status.${status}`, { defaultValue: status })
+
   return (
     <span
       className="text-xs px-2.5 py-1 rounded-lg font-bold whitespace-nowrap"
@@ -65,9 +51,18 @@ function StatusBadge({ status }) {
 }
 
 function InterviewTypeIcon({ type }) {
-  if (type === "video") return <Video className="w-3.5 h-3.5" />
-  if (type === "phone") return <Phone className="w-3.5 h-3.5" />
-  if (type === "in_person") return <MapPin className="w-3.5 h-3.5" />
+  if (type === "video") {
+    return <Video className="w-3.5 h-3.5" />
+  }
+
+  if (type === "phone") {
+    return <Phone className="w-3.5 h-3.5" />
+  }
+
+  if (type === "in_person") {
+    return <MapPin className="w-3.5 h-3.5" />
+  }
+
   return <Calendar className="w-3.5 h-3.5" />
 }
 
@@ -98,7 +93,9 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
 
 function ApplicationCard({ app, interviews, isSelected, onSelect }) {
   const { t } = useTranslation()
+
   const relatedInterviews = interviews.filter((i) => i.application_id === app.id)
+
   const nextInterview = relatedInterviews.find((i) => i.status === "scheduled" || !i.status)
 
   return (
@@ -161,6 +158,7 @@ function ApplicationCard({ app, interviews, isSelected, onSelect }) {
 
 function DetailPanel({ app, interviews, onClose }) {
   const { t } = useTranslation()
+
   const relatedInterviews = interviews.filter((i) => i.application_id === app.id)
 
   function interviewTypeLabel(type) {
@@ -170,7 +168,10 @@ function DetailPanel({ app, interviews, onClose }) {
   }
 
   function interviewStatusLabel(status) {
-    if (!status) return null
+    if (!status) {
+      return null
+    }
+
     return t(`candidate.applications.interviewStatus.${status}`, { defaultValue: status })
   }
 
@@ -320,9 +321,13 @@ function DetailPanel({ app, interviews, onClose }) {
 
 export default function CandidateApplications() {
   const { t } = useTranslation()
+
   const { user } = useAuth()
+
   const [search, setSearch] = useState("")
+
   const [filterTab, setFilterTab] = useState("all")
+
   const [selected, setSelected] = useState(null)
 
   const {
@@ -342,6 +347,7 @@ export default function CandidateApplications() {
   })
 
   const activeCount = applications.filter((a) => ACTIVE_STATUSES.has(a.status)).length
+
   const upcomingInterviews = interviews.filter((i) => i.status === "scheduled" || !i.status).length
 
   const FILTER_TABS = [

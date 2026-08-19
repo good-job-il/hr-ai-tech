@@ -10,7 +10,6 @@ import {
   PieChart,
   Activity,
   Settings,
-  ShieldCheck,
   Building2,
 } from "lucide-react"
 

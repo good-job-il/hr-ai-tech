@@ -1,9 +1,5 @@
-import React from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { staffService } from "@/api/services/staffService"
-import AdminLayout from "@/components/admin/AdminLayout"
-import HierarchyStaffSection from "@/components/employer/HierarchyStaffSection"
-import { Users } from "lucide-react"
 
 export default function AdminRecruiters() {
   const queryClient = useQueryClient()
@@ -85,7 +81,9 @@ export default function AdminRecruiters() {
           <div className="space-y-8">
             {companies.map((companyId) => {
               const companyStaff = staff.filter((s) => s.company_id === companyId)
+
               const hm = companyStaff.find((s) => s.role === "hiring_manager")
+
               return (
                 <div key={companyId}>
                   <div className="flex items-center gap-2 mb-3">

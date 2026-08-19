@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { candidateImportService } from "@/api/services/candidateImportService"
-import { Loader2, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react"
 
 export default function ImportProgressMonitor({ batchId }) {
   const [progress, setProgress] = useState(null)
+
   const [loading, setLoading] = useState(true)
+
   const [error, setError] = useState(null)
 
   useEffect(() => {
     const checkProgress = async () => {
       try {
         const batch = await candidateImportService.get(batchId)
+
         if (batch) {
           setProgress({
             status: batch.status,
@@ -22,6 +24,7 @@ export default function ImportProgressMonitor({ batchId }) {
             review_required: batch.review_required,
           })
         }
+
         setError(null)
         setLoading(false)
       } catch (err) {
@@ -31,7 +34,9 @@ export default function ImportProgressMonitor({ batchId }) {
     }
 
     checkProgress()
+
     const interval = setInterval(checkProgress, 2000)
+
     return () => clearInterval(interval)
   }, [batchId])
 
@@ -52,10 +57,13 @@ export default function ImportProgressMonitor({ batchId }) {
     )
   }
 
-  if (!progress) return null
+  if (!progress) {
+    return null
+  }
 
   const percentProcessed =
     progress.total > 0 ? Math.round((progress.processed / progress.total) * 100) : 0
+
   const percentSuccessful =
     progress.processed > 0 ? Math.round((progress.successful / progress.processed) * 100) : 0
 

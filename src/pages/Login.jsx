@@ -1,29 +1,32 @@
-import React, { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { authService } from "@/api/services/authService"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 
 export default function Login() {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const [email, setEmail] = useState("")
+
   const [password, setPassword] = useState("")
+
   const [error, setError] = useState("")
+
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
     setLoading(true)
+
     try {
       await authService.login(email, password)
 
       const user = await authService.me()
+
       const role = user.role || user.user_type || ""
+
       const redirects = {
         candidate: "/candidate/dashboard",
         employer: "/employer/dashboard",

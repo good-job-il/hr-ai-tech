@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from "react"
-import { Bookmark } from "lucide-react"
+import { useState, useEffect } from "react"
 import { savedJobService } from "@/api/services/savedJobService"
 
 export default function SaveJobButton({ job, user }) {
   const [saved, setSaved] = useState(false)
+
   const [savedId, setSavedId] = useState(null)
+
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!user) return
+    if (!user) {
+      return
+    }
+
     savedJobService
       .list(job.id)
       .then((arr) => {
@@ -23,11 +27,15 @@ export default function SaveJobButton({ job, user }) {
   const toggle = async (e) => {
     e.preventDefault()
     e.stopPropagation()
+
     if (!user) {
       window.location.href = "/login"
+
       return
     }
+
     setLoading(true)
+
     if (saved) {
       await savedJobService.remove(savedId)
       setSaved(false)
@@ -38,9 +46,11 @@ export default function SaveJobButton({ job, user }) {
         job_title: job.title,
         company: job.company,
       })
+
       setSaved(true)
       setSavedId(res.id)
     }
+
     setLoading(false)
   }
 

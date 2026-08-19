@@ -1,10 +1,8 @@
 "use client"
 import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { Controller, FormProvider, useFormContext } from "react-hook-form"
+import { FormProvider, useFormContext } from "react-hook-form"
 
 import { cn } from "@/lib/utils"
-import { Label } from "@/components/ui/label"
 
 const Form = FormProvider
 
@@ -20,7 +18,9 @@ const FormField = ({ ...props }) => {
 
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext)
+
   const itemContext = React.useContext(FormItemContext)
+
   const { getFieldState, formState } = useFormContext()
 
   const fieldState = getFieldState(fieldContext.name, formState)
@@ -52,6 +52,7 @@ const FormItem = React.forwardRef(({ className, ...props }, ref) => {
     </FormItemContext.Provider>
   )
 })
+
 FormItem.displayName = "FormItem"
 
 const FormLabel = React.forwardRef(({ className, ...props }, ref) => {
@@ -66,6 +67,7 @@ const FormLabel = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 FormLabel.displayName = "FormLabel"
 
 const FormControl = React.forwardRef(({ ...props }, ref) => {
@@ -81,6 +83,7 @@ const FormControl = React.forwardRef(({ ...props }, ref) => {
     />
   )
 })
+
 FormControl.displayName = "FormControl"
 
 const FormDescription = React.forwardRef(({ className, ...props }, ref) => {
@@ -95,10 +98,12 @@ const FormDescription = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 FormDescription.displayName = "FormDescription"
 
 const FormMessage = React.forwardRef(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField()
+
   const body = error ? String(error?.message) : children
 
   if (!body) {
@@ -116,6 +121,7 @@ const FormMessage = React.forwardRef(({ className, children, ...props }, ref) =>
     </p>
   )
 })
+
 FormMessage.displayName = "FormMessage"
 
 export {

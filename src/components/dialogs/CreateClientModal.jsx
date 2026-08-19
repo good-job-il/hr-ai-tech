@@ -1,19 +1,27 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { agencyClientService } from "@/api/services/agencyClientService"
 import { toast } from "sonner"
 import { useTranslation } from "react-i18next"
 
 export default function CreateClientModal({ isOpen, onClose, onSuccess }) {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const [clientName, setClientName] = useState("")
+
   const [creating, setCreating] = useState(false)
+
   const [error, setError] = useState("")
 
   const handleCreate = async () => {
-    if (!clientName.trim()) return
+    if (!clientName.trim()) {
+      return
+    }
+
     setError("")
     setCreating(true)
+
     try {
       await agencyClientService.create({
         name: clientName,
@@ -30,7 +38,9 @@ export default function CreateClientModal({ isOpen, onClose, onSuccess }) {
     }
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   return (
     <div

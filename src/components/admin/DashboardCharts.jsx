@@ -1,18 +1,3 @@
-import React from "react"
-import {
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts"
-
 const COLORS = ["#7c3aed", "#06b6d4", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"]
 
 export function ApplicationsChart({ data }) {
@@ -65,12 +50,13 @@ export function SourcesChart({ sourceCount }) {
     { name: "אחר", value: sourceCount.other || 0 },
   ].filter((d) => d.value > 0)
 
-  if (data.length === 0)
+  if (data.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-center h-48">
         <p className="text-gray-400 text-sm">אין נתוני מקורות</p>
       </div>
     )
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">

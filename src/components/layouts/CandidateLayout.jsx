@@ -1,19 +1,22 @@
 import { useState } from "react"
-import { Link, useLocation, useNavigate, Outlet } from "react-router-dom"
-import { ChevronDown, LogOut, Menu, X } from "lucide-react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { CANDIDATE_NAV } from "@/config/navigation"
 import { useAuth } from "@/lib/AuthContext"
-import Logo from "@/components/branding/Logo"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 
 export default function CandidateLayout() {
   const { user, logout } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const location = useLocation()
+
   const navigate = useNavigate()
+
   const [mobileOpen, setMobileOpen] = useState(false)
+
   const [expandedMenu, setExpandedMenu] = useState(null)
 
   const getLabel = (item) => (item.labelKey ? t(item.labelKey) : item.label || "")
@@ -22,12 +25,15 @@ export default function CandidateLayout() {
     await logout()
     navigate("/login")
   }
+
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + "/")
 
   const renderNavItems = (items) =>
     items.map((item) => {
       const active = isActive(item.route)
+
       const hasChildren = item.children?.length > 0
+
       const isExpanded = expandedMenu === item.id
 
       return (

@@ -1,7 +1,5 @@
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Calendar, Clock, Video, Phone, MapPin, Plus, Star } from "lucide-react"
+import { Video, Phone, MapPin, Star } from "lucide-react"
 import { he, enUS } from "date-fns/locale"
 import { useTranslation } from "react-i18next"
 
@@ -29,7 +27,9 @@ const EMPTY_FORM = {
 
 export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
   const { t, i18n } = useTranslation()
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const dateLocale = currentLang === "he" ? he : enUS
 
   const TYPE_LABELS = {
@@ -80,11 +80,16 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
   }
 
   const [showForm, setShowForm] = useState(false)
+
   const [form, setForm] = useState(EMPTY_FORM)
+
   const [saving, setSaving] = useState(false)
 
   const handleSubmit = async () => {
-    if (!form.date || !form.time) return
+    if (!form.date || !form.time) {
+      return
+    }
+
     setSaving(true)
     await onSchedule(form)
     setForm(EMPTY_FORM)
@@ -93,6 +98,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
   }
 
   const upcoming = interviews.filter((i) => ["scheduled", "confirmed"].includes(i.status))
+
   const past = interviews.filter((i) => ["completed", "cancelled", "no_show"].includes(i.status))
 
   return (
@@ -275,10 +281,15 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
 
 function InterviewCard({ interview, onUpdate, typeLabels, stageLabels, statusCfg }) {
   const { t } = useTranslation()
+
   const [showFeedback, setShowFeedback] = useState(false)
+
   const [feedback, setFeedback] = useState(interview.feedback || "")
+
   const [rating, setRating] = useState(interview.rating || 0)
+
   const TypeIcon = TYPE_ICONS[interview.type] || Video
+
   const status = statusCfg[interview.status] || statusCfg.scheduled
 
   const saveFeedback = async () => {

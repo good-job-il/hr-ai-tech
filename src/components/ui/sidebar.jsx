@@ -1,28 +1,27 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
+
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
+
 const SIDEBAR_WIDTH = "16rem"
+
 const SIDEBAR_WIDTH_MOBILE = "18rem"
+
 const SIDEBAR_WIDTH_ICON = "3rem"
+
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 const SidebarContext = React.createContext(null)
 
 function useSidebar() {
   const context = React.useContext(SidebarContext)
+
   if (!context) {
     throw new Error("useSidebar must be used within a SidebarProvider.")
   }
@@ -44,15 +43,19 @@ const SidebarProvider = React.forwardRef(
     ref,
   ) => {
     const isMobile = useIsMobile()
+
     const [openMobile, setOpenMobile] = React.useState(false)
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen)
+
     const open = openProp ?? _open
+
     const setOpen = React.useCallback(
       (value) => {
         const openState = typeof value === "function" ? value(open) : value
+
         if (setOpenProp) {
           setOpenProp(openState)
         } else {
@@ -80,6 +83,7 @@ const SidebarProvider = React.forwardRef(
       }
 
       window.addEventListener("keydown", handleKeyDown)
+
       return () => window.removeEventListener("keydown", handleKeyDown)
     }, [toggleSidebar])
 
@@ -123,6 +127,7 @@ const SidebarProvider = React.forwardRef(
     )
   },
 )
+
 SidebarProvider.displayName = "SidebarProvider"
 
 const Sidebar = React.forwardRef(
@@ -217,6 +222,7 @@ const Sidebar = React.forwardRef(
     )
   },
 )
+
 Sidebar.displayName = "Sidebar"
 
 const SidebarTrigger = React.forwardRef(
@@ -249,6 +255,7 @@ const SidebarTrigger = React.forwardRef(
     )
   },
 )
+
 SidebarTrigger.displayName = "SidebarTrigger"
 
 const SidebarRail = React.forwardRef(({ className, ...props }, ref) => {
@@ -275,6 +282,7 @@ const SidebarRail = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 SidebarRail.displayName = "SidebarRail"
 
 const SidebarInset = React.forwardRef(({ className, ...props }, ref) => {
@@ -290,6 +298,7 @@ const SidebarInset = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 SidebarInset.displayName = "SidebarInset"
 
 const SidebarInput = React.forwardRef(({ className, ...props }, ref) => {
@@ -305,6 +314,7 @@ const SidebarInput = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 SidebarInput.displayName = "SidebarInput"
 
 const SidebarHeader = React.forwardRef(({ className, ...props }, ref) => {
@@ -317,6 +327,7 @@ const SidebarHeader = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 SidebarHeader.displayName = "SidebarHeader"
 
 const SidebarFooter = React.forwardRef(({ className, ...props }, ref) => {
@@ -329,6 +340,7 @@ const SidebarFooter = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 SidebarFooter.displayName = "SidebarFooter"
 
 const SidebarSeparator = React.forwardRef(({ className, ...props }, ref) => {
@@ -341,6 +353,7 @@ const SidebarSeparator = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 SidebarSeparator.displayName = "SidebarSeparator"
 
 const SidebarContent = React.forwardRef(({ className, ...props }, ref) => {
@@ -356,6 +369,7 @@ const SidebarContent = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 SidebarContent.displayName = "SidebarContent"
 
 const SidebarGroup = React.forwardRef(({ className, ...props }, ref) => {
@@ -368,6 +382,7 @@ const SidebarGroup = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 SidebarGroup.displayName = "SidebarGroup"
 
 const SidebarGroupLabel = React.forwardRef(({ className, asChild = false, ...props }, ref) => {
@@ -386,6 +401,7 @@ const SidebarGroupLabel = React.forwardRef(({ className, asChild = false, ...pro
     />
   )
 })
+
 SidebarGroupLabel.displayName = "SidebarGroupLabel"
 
 const SidebarGroupAction = React.forwardRef(({ className, asChild = false, ...props }, ref) => {
@@ -406,6 +422,7 @@ const SidebarGroupAction = React.forwardRef(({ className, asChild = false, ...pr
     />
   )
 })
+
 SidebarGroupAction.displayName = "SidebarGroupAction"
 
 const SidebarGroupContent = React.forwardRef(({ className, ...props }, ref) => (
@@ -416,6 +433,7 @@ const SidebarGroupContent = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 SidebarGroupContent.displayName = "SidebarGroupContent"
 
 const SidebarMenu = React.forwardRef(({ className, ...props }, ref) => (
@@ -426,6 +444,7 @@ const SidebarMenu = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 SidebarMenu.displayName = "SidebarMenu"
 
 const SidebarMenuItem = React.forwardRef(({ className, ...props }, ref) => (
@@ -436,6 +455,7 @@ const SidebarMenuItem = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
@@ -474,6 +494,7 @@ const SidebarMenuButton = React.forwardRef(
     ref,
   ) => {
     const Comp = asChild ? Slot : "button"
+
     const { isMobile, state } = useSidebar()
 
     const button = (
@@ -510,6 +531,7 @@ const SidebarMenuButton = React.forwardRef(
     )
   },
 )
+
 SidebarMenuButton.displayName = "SidebarMenuButton"
 
 const SidebarMenuAction = React.forwardRef(
@@ -537,6 +559,7 @@ const SidebarMenuAction = React.forwardRef(
     )
   },
 )
+
 SidebarMenuAction.displayName = "SidebarMenuAction"
 
 const SidebarMenuBadge = React.forwardRef(({ className, ...props }, ref) => (
@@ -555,6 +578,7 @@ const SidebarMenuBadge = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 SidebarMenuBadge.displayName = "SidebarMenuBadge"
 
 const SidebarMenuSkeleton = React.forwardRef(({ className, showIcon = false, ...props }, ref) => {
@@ -581,6 +605,7 @@ const SidebarMenuSkeleton = React.forwardRef(({ className, showIcon = false, ...
     </div>
   )
 })
+
 SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton"
 
 const SidebarMenuSub = React.forwardRef(({ className, ...props }, ref) => (
@@ -595,9 +620,11 @@ const SidebarMenuSub = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 SidebarMenuSub.displayName = "SidebarMenuSub"
 
 const SidebarMenuSubItem = React.forwardRef(({ ...props }, ref) => <li ref={ref} {...props} />)
+
 SidebarMenuSubItem.displayName = "SidebarMenuSubItem"
 
 const SidebarMenuSubButton = React.forwardRef(
@@ -623,6 +650,7 @@ const SidebarMenuSubButton = React.forwardRef(
     )
   },
 )
+
 SidebarMenuSubButton.displayName = "SidebarMenuSubButton"
 
 export {

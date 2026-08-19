@@ -1,18 +1,24 @@
-import React, { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { taxonomyService } from "@/api/services/taxonomyService"
 import { useQuery } from "@tanstack/react-query"
-import { ChevronDown, Search, X } from "lucide-react"
 
 export default function HierarchicalJobFilters({ onFiltersChange, enabled = true }) {
   const [selectedDomains, setSelectedDomains] = useState([])
+
   const [selectedRoles, setSelectedRoles] = useState([])
+
   const [selectedSpecializations, setSelectedSpecializations] = useState([])
+
   const [selectedEmploymentTypes, setSelectedEmploymentTypes] = useState([])
+
   const [selectedWorkModes, setSelectedWorkModes] = useState([])
+
   const [selectedLevels, setSelectedLevels] = useState([])
 
   const [searchDomain, setSearchDomain] = useState("")
+
   const [searchRole, setSearchRole] = useState("")
+
   const [searchSpec, setSearchSpec] = useState("")
 
   const [expandedSections, setExpandedSections] = useState({})
@@ -56,16 +62,23 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
 
   // Filtered roles based on selected domains
   const filteredRoles = useMemo(() => {
-    if (selectedDomains.length === 0) return roles
+    if (selectedDomains.length === 0) {
+      return roles
+    }
+
     return roles.filter((r) => selectedDomains.includes(r.domain_id))
   }, [roles, selectedDomains])
 
   // Filtered specializations based on selected roles
   const filteredSpecializations = useMemo(() => {
-    if (selectedRoles.length === 0) return specializations
+    if (selectedRoles.length === 0) {
+      return specializations
+    }
+
     const selectedRoleNames = roles
       .filter((r) => selectedRoles.includes(r.role_id))
       .map((r) => r.name)
+
     return specializations.filter((s) => selectedRoleNames.includes(s.role_name))
   }, [specializations, selectedRoles, roles])
 
@@ -103,8 +116,10 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
     itemKey = "id",
   }) => {
     const isExpanded = expandedSections[title] ?? true
+
     const filteredItems = items.filter((item) => {
       const text = item.name || item
+
       return text.toLowerCase().includes(searchValue.toLowerCase())
     })
 
@@ -139,7 +154,9 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
             <div className="space-y-2 max-h-56 overflow-y-auto">
               {filteredItems.map((item) => {
                 const id = item[itemKey] || item.id
+
                 const name = item.name || item
+
                 const isSelected = selected.includes(id)
 
                 return (

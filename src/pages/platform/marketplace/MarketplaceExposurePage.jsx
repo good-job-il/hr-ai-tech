@@ -6,32 +6,11 @@
  * "Exposure" = the org has granted at least one shared/purchased CandidateAccess
  * from their pool to another org.
  */
-import React, { useState, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { candidateAccessService } from "@/api/services/candidateAccessService"
 import { organizationService } from "@/api/services/organizationService"
-import {
-  Building2,
-  Share2,
-  CreditCard,
-  Users,
-  TrendingUp,
-  Eye,
-  EyeOff,
-  Search,
-  RefreshCw,
-  Info,
-  BarChart2,
-  SlidersHorizontal,
-} from "lucide-react"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-} from "@/components/platform/PlatformUI"
+import { Share2, CreditCard, Users, Eye, EyeOff } from "lucide-react"
 
 function OrgTypeTag({ type }) {
   return type === "staffing_agency" ? (
@@ -47,8 +26,11 @@ function OrgTypeTag({ type }) {
 
 function ExposureLevelBar({ shared, purchased, total }) {
   const maxBar = 100
+
   const sharedPct = total ? Math.round((shared / total) * maxBar) : 0
+
   const purchasedPct = total ? Math.round((purchased / total) * maxBar) : 0
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
@@ -79,7 +61,9 @@ function ExposureLevelBar({ shared, purchased, total }) {
 
 export default function MarketplaceExposurePage() {
   const [search, setSearch] = useState("")
+
   const [view, setView] = useState("exposing") // 'exposing' | 'all'
+
   const qc = useQueryClient()
 
   const { data: accesses = [], isLoading: loadingAccesses } = useQuery({
@@ -104,14 +88,18 @@ export default function MarketplaceExposurePage() {
       const exposed = accesses.filter(
         (a) => a.owner_organization_id === org.id && a.access_type !== "owner",
       )
+
       const sharedOut = exposed.filter((a) => a.access_type === "shared").length
+
       const purchasedOut = exposed.filter((a) => a.access_type === "purchased").length
 
       // How many accesses this org RECEIVED from others
       const received = accesses.filter(
         (a) => a.accessor_organization_id === org.id && a.access_type !== "owner",
       )
+
       const sharedIn = received.filter((a) => a.access_type === "shared").length
+
       const purchasedIn = received.filter((a) => a.access_type === "purchased").length
 
       // Unique candidates with active access to this pool
@@ -135,17 +123,23 @@ export default function MarketplaceExposurePage() {
 
   const displayed = useMemo(() => {
     let list = view === "exposing" ? orgStats.filter((o) => o.isExposing) : orgStats
+
     if (search) {
       list = list.filter((o) => o.name?.toLowerCase().includes(search.toLowerCase()))
     }
+
     return list.sort((a, b) => b.totalExposed - a.totalExposed)
   }, [orgStats, view, search])
 
   const platformStats = useMemo(() => {
     const exposingOrgs = orgStats.filter((o) => o.isExposing)
+
     const receivingOrgs = orgStats.filter((o) => o.totalReceived > 0)
+
     const totalShared = accesses.filter((a) => a.access_type === "shared").length
+
     const totalPurchased = accesses.filter((a) => a.access_type === "purchased").length
+
     return {
       exposingOrgs: exposingOrgs.length,
       receivingOrgs: receivingOrgs.length,
@@ -439,6 +433,7 @@ export default function MarketplaceExposurePage() {
               },
             ].map((item) => {
               const pct = item.total ? Math.round((item.value / item.total) * 100) : 0
+
               return (
                 <div key={item.label}>
                   <div className="mb-2 flex items-center justify-between gap-4">

@@ -1,6 +1,4 @@
-import React from "react"
 import { useAuth } from "@/lib/AuthContext"
-import { DollarSign, Percent, Edit2 } from "lucide-react"
 
 const COMPENSATION_CONFIG = {
   recruiter: { percent: 40, label: "רכז גיוס" },
@@ -18,7 +16,9 @@ const VISIBILITY = {
 
 export default function JobCompensationDisplay({ job, baseSalary = 0, onEdit }) {
   const { user } = useAuth()
+
   const userRole = user?.role || "employer"
+
   const visibleRoles = VISIBILITY[userRole] || []
 
   if (!baseSalary || baseSalary <= 0) {
@@ -45,7 +45,9 @@ export default function JobCompensationDisplay({ job, baseSalary = 0, onEdit }) 
       <div className="space-y-2">
         {visibleRoles.map((role) => {
           const config = COMPENSATION_CONFIG[role]
+
           const amount = (baseSalary * 0.8 * config.percent) / 100
+
           return (
             <div
               key={role}

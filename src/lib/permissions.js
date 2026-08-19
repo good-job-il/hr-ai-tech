@@ -122,10 +122,19 @@ export const PERMISSIONS = {
  */
 export const canPerformAction = (userRole, entityName, action) => {
   const userPermissions = PERMISSIONS[userRole]
-  if (!userPermissions) return false
+
+  if (!userPermissions) {
+    return false
+  }
+
   const entityPermissions = userPermissions[entityName]
-  if (!entityPermissions) return false
+
+  if (!entityPermissions) {
+    return false
+  }
+
   const permission = entityPermissions[action]
+
   return (
     permission === true || permission === "own" || permission === "team" || permission === "agency"
   )

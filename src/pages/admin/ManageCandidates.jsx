@@ -1,8 +1,6 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { applicationService } from "@/api/services/applicationService"
-import { Search, Trash2, Eye } from "lucide-react"
-import AdminLayout from "@/components/admin/AdminLayout"
 
 const STATUS_COLORS = {
   new: "bg-blue-100 text-blue-700",
@@ -19,7 +17,9 @@ const STATUS_COLORS = {
 
 export default function AdminManageCandidates() {
   const queryClient = useQueryClient()
+
   const [search, setSearch] = useState("")
+
   const [filterStatus, setFilterStatus] = useState("all")
 
   const { data: applications = [], isLoading } = useQuery({
@@ -41,7 +41,9 @@ export default function AdminManageCandidates() {
       a.candidate_email?.toLowerCase().includes(search.toLowerCase()) ||
       a.company?.toLowerCase().includes(search.toLowerCase()) ||
       a.job_title?.toLowerCase().includes(search.toLowerCase())
+
     const matchStatus = filterStatus === "all" || a.status === filterStatus
+
     return matchSearch && matchStatus
   })
 

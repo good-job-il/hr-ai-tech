@@ -1,10 +1,9 @@
-import PublicLayout from '@/components/layouts/PublicLayout';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { UserPlus, Search, Sparkles, Send, CheckCircle, Briefcase, Building2, Brain } from 'lucide-react';
 
 export default function HowItWorksPage() {
   const { i18n } = useTranslation();
+
   const isRtl = !i18n.language?.startsWith('en');
 
   const CANDIDATE_STEPS = [

@@ -20,6 +20,7 @@ const AlertDialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
     ref={ref}
   />
 ))
+
 AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 
 const AlertDialogContent = React.forwardRef(({ className, ...props }, ref) => (
@@ -35,11 +36,13 @@ const AlertDialogContent = React.forwardRef(({ className, ...props }, ref) => (
     />
   </AlertDialogPortal>
 ))
+
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
 
 const AlertDialogHeader = ({ className, ...props }) => (
   <div className={cn("flex flex-col space-y-2 text-center sm:text-left", className)} {...props} />
 )
+
 AlertDialogHeader.displayName = "AlertDialogHeader"
 
 const AlertDialogFooter = ({ className, ...props }) => (
@@ -48,6 +51,7 @@ const AlertDialogFooter = ({ className, ...props }) => (
     {...props}
   />
 )
+
 AlertDialogFooter.displayName = "AlertDialogFooter"
 
 const AlertDialogTitle = React.forwardRef(({ className, ...props }, ref) => (
@@ -57,6 +61,7 @@ const AlertDialogTitle = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName
 
 const AlertDialogDescription = React.forwardRef(({ className, ...props }, ref) => (
@@ -66,11 +71,13 @@ const AlertDialogDescription = React.forwardRef(({ className, ...props }, ref) =
     {...props}
   />
 ))
+
 AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName
 
 const AlertDialogAction = React.forwardRef(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Action ref={ref} className={cn(buttonVariants(), className)} {...props} />
 ))
+
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName
 
 const AlertDialogCancel = React.forwardRef(({ className, ...props }, ref) => (
@@ -80,6 +87,7 @@ const AlertDialogCancel = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName
 
 export {

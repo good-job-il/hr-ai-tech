@@ -1,31 +1,13 @@
-import React, { useState, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useParams, Link, useNavigate } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useAuth } from "@/lib/AuthContext"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { agencyClientService } from "@/api/services/agencyClientService"
 import { jobService } from "@/api/services/jobService"
 import { applicationService } from "@/api/services/applicationService"
 import { toast } from "sonner"
-import {
-  ArrowRight,
-  Building2,
-  Briefcase,
-  Users,
-  Edit2,
-  Trash2,
-  Mail,
-  Globe,
-  Phone,
-  MapPin,
-  X,
-  Save,
-  TrendingUp,
-  Kanban,
-  AlertCircle,
-  Plus,
-  ExternalLink,
-} from "lucide-react"
+import { Building2, Briefcase, Users, Mail, Globe, Phone, MapPin } from "lucide-react"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -86,8 +68,11 @@ function getInitials(name = "") {
 
 function CompanyAvatar({ company, size = "lg" }) {
   const sz = size === "lg" ? "w-16 h-16 text-xl" : "w-10 h-10 text-sm"
+
   const color = company.color || "#7C3AED"
+
   const initials = company.initials || getInitials(company.name)
+
   if (company.logo_url) {
     return (
       <img
@@ -97,6 +82,7 @@ function CompanyAvatar({ company, size = "lg" }) {
       />
     )
   }
+
   return (
     <div
       className={`${sz} rounded-2xl flex items-center justify-center text-white font-black flex-shrink-0`}
@@ -113,6 +99,7 @@ function StatusBadge({ status }) {
     bg: "bg-gray-50",
     text: "text-gray-700",
   }
+
   return (
     <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${cfg.bg} ${cfg.text}`}>
       {cfg.label}
@@ -121,7 +108,10 @@ function StatusBadge({ status }) {
 }
 
 function formatDate(str) {
-  if (!str) return "—"
+  if (!str) {
+    return "—"
+  }
+
   return new Date(str).toLocaleDateString("he-IL", {
     day: "numeric",
     month: "short",
@@ -141,7 +131,9 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
     address: company.address || "",
     color: company.color || PALETTE[0],
   })
+
   const [saving, setSaving] = useState(false)
+
   const [error, setError] = useState("")
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
@@ -149,10 +141,13 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
   const handleSave = async () => {
     if (!form.name.trim()) {
       setError("שם לקוח הוא שדה חובה")
+
       return
     }
+
     setError("")
     setSaving(true)
+
     try {
       await agencyClientService.update(company.id, {
         name: form.name.trim(),
@@ -174,7 +169,9 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
     }
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -297,6 +294,7 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
 
 function JobsTab({ jobs, clientId }) {
   const open = jobs.filter((j) => !j.is_closed)
+
   const closed = jobs.filter((j) => j.is_closed)
 
   if (jobs.length === 0) {
@@ -380,24 +378,31 @@ function JobsTab({ jobs, clientId }) {
 function CandidatesTab({ applications, jobs }) {
   const jobMap = useMemo(() => {
     const m = {}
+
     jobs.forEach((j) => {
       m[j.id] = j
     })
+
     return m
   }, [jobs])
 
   const [statusFilter, setStatusFilter] = useState("all")
 
   const filtered = useMemo(() => {
-    if (statusFilter === "all") return applications
+    if (statusFilter === "all") {
+      return applications
+    }
+
     return applications.filter((a) => a.status === statusFilter)
   }, [applications, statusFilter])
 
   const statusCounts = useMemo(() => {
     const counts = {}
+
     applications.forEach((a) => {
       counts[a.status] = (counts[a.status] || 0) + 1
     })
+
     return counts
   }, [applications])
 
@@ -428,6 +433,7 @@ function CandidatesTab({ applications, jobs }) {
         </button>
         {activeStatuses.map((s) => {
           const cfg = APPLICATION_STATUS[s]
+
           return (
             <button
               key={s}
@@ -448,6 +454,7 @@ function CandidatesTab({ applications, jobs }) {
       <div className="space-y-2">
         {filtered.map((app) => {
           const job = jobMap[app.job_id]
+
           return (
             <div
               key={app.id}
@@ -594,19 +601,29 @@ const TABS = [
 
 export default function AgencyClientDetail() {
   const { id } = useParams()
+
   const { user } = useAuth()
+
   const { can } = usePermissionMatrix()
+
   const orgId = user?.organization_id
+
   const canEditClient =
     ["org_admin", "recruitment_manager", "admin"].includes(user?.role) && can("update")
+
   const canArchiveClient =
     ["org_admin", "recruitment_manager", "admin"].includes(user?.role) && can("delete")
+
   const navigate = useNavigate()
+
   const queryClient = useQueryClient()
 
   const [activeTab, setActiveTab] = useState("about")
+
   const [showEdit, setShowEdit] = useState(false)
+
   const [confirmDelete, setConfirmDelete] = useState(false)
+
   const [archiveError, setArchiveError] = useState("")
 
   // ── Data ─────────────────────────────────────────────────────────────────

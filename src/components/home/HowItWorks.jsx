@@ -1,4 +1,3 @@
-import React from "react"
 import { UserCheck, Bot, Send, Trophy } from "lucide-react"
 
 const STEPS = [
@@ -83,6 +82,7 @@ export default function HowItWorks() {
         <div style={{ display: "flex", alignItems: "flex-start", gap: 0 }}>
           {STEPS.map((step, i) => {
             const Icon = step.icon
+
             return (
               <React.Fragment key={i}>
                 <div

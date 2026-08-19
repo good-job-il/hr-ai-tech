@@ -1,10 +1,9 @@
-import PublicLayout from '@/components/layouts/PublicLayout';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, FileText, Target, TrendingUp, MessageSquare, Shield } from 'lucide-react';
 
 export default function AICareerPage() {
   const { i18n } = useTranslation();
+
   const isRtl = !i18n.language?.startsWith('en');
 
   const FEATURES = [

@@ -1,40 +1,27 @@
-import React, { useState, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { organizationService } from "@/api/services/organizationService"
-import {
-  CheckCircle,
-  Clock,
-  DollarSign,
-  Download,
-  Receipt,
-  Search,
-  SlidersHorizontal,
-  TrendingUp,
-  XCircle,
-} from "lucide-react"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-} from "@/components/platform/PlatformUI"
+import { CheckCircle, Clock, DollarSign, Receipt, XCircle } from "lucide-react"
 
 const PLAN_PRICES = { trial: 0, starter: 499, pro: 1499, enterprise: 2999 }
 
 // Generate mock invoices from real orgs
 function generateInvoices(orgs, locale = "he-IL") {
   const result = []
+
   let num = 1
+
   const now = new Date()
+
   orgs
     .filter((o) => o.status === "active" && (o.plan || "trial") !== "trial")
     .forEach((org) => {
       for (let i = 0; i < 3; i++) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+
         const isPast = i > 0
+
         result.push({
           id: `INV-${String(num++).padStart(4, "0")}`,
           org_name: org.name,
@@ -47,6 +34,7 @@ function generateInvoices(orgs, locale = "he-IL") {
         })
       }
     })
+
   return result.sort((a, b) => b.date_raw - a.date_raw)
 }
 
@@ -58,9 +46,13 @@ const STATUS = {
 
 export default function InvoicesPage() {
   const { t, i18n } = useTranslation()
+
   const [search, setSearch] = useState("")
+
   const [statusFilter, setStatusFilter] = useState("all")
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const dir = currentLang === "he" ? "rtl" : "ltr"
 
   const { data: orgs = [], isLoading } = useQuery({
@@ -70,6 +62,7 @@ export default function InvoicesPage() {
   })
 
   const locale = currentLang === "he" ? "he-IL" : "en-US"
+
   const invoices = useMemo(() => generateInvoices(orgs, locale), [orgs, locale])
 
   const filtered = invoices.filter((inv) => {
@@ -77,7 +70,9 @@ export default function InvoicesPage() {
       !search ||
       inv.org_name?.toLowerCase().includes(search.toLowerCase()) ||
       inv.id.includes(search)
+
     const matchStatus = statusFilter === "all" || inv.status === statusFilter
+
     return matchSearch && matchStatus
   })
 
@@ -240,8 +235,11 @@ export default function InvoicesPage() {
                 ) : (
                   filtered.map((inv, index) => {
                     const st = STATUS[inv.status] || STATUS.pending
+
                     const StIcon = st.icon
+
                     const statusLabel = t(`platform.invoices.status.${inv.status}`)
+
                     return (
                       <tr key={inv.id} className="group transition-colors hover:bg-violet-50/35">
                         <td className="px-5 py-4">

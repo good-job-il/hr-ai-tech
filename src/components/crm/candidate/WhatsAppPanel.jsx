@@ -5,21 +5,24 @@
  * Recruiter manually logs the conversation outcome.
  */
 import { useState } from "react"
-import { MessageCircle, Plus, Clock, CheckCircle2, Phone } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { candidateCrmService } from "@/api/services/candidateCrmService"
 import { useTranslation } from "react-i18next"
 
 function buildWhatsAppUrl(phone, message) {
   const normalized = (phone || "").replace(/\D/g, "")
+
   const intlPhone = normalized.startsWith("0") ? "972" + normalized.slice(1) : normalized
+
   const encoded = encodeURIComponent(message)
+
   return `https://wa.me/${intlPhone}?text=${encoded}`
 }
 
 export default function WhatsAppPanel({ candidate, communications, onAddCommunication }) {
   const { t, i18n } = useTranslation()
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const isRTL = currentLang === "he"
 
   const MESSAGE_TEMPLATES = [
@@ -46,13 +49,19 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
   ]
 
   const [selectedTemplate, setSelectedTemplate] = useState(null)
+
   const [customMsg, setCustomMsg] = useState("")
+
   const [showLog, setShowLog] = useState(false)
+
   const [logSummary, setLogSummary] = useState("")
+
   const [logOutcome, setLogOutcome] = useState("sent")
+
   const [saving, setSaving] = useState(false)
 
   const phone = candidate?.phone
+
   const name = candidate?.full_name?.split(" ")[0] || t("candidateCRM.whatsapp.defaultName")
 
   const activeMessage = selectedTemplate
@@ -69,8 +78,12 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
   }
 
   const handleLogConversation = async () => {
-    if (!logSummary.trim()) return
+    if (!logSummary.trim()) {
+      return
+    }
+
     setSaving(true)
+
     try {
       await candidateCrmService.logCommunication({
         candidate_id: candidate.id,
@@ -86,7 +99,10 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
         failed: t("candidateCRM.whatsapp.outcomes.failed"),
       }
 
-      if (onAddCommunication) onAddCommunication()
+      if (onAddCommunication) {
+        onAddCommunication()
+      }
+
       setLogSummary("")
       setShowLog(false)
     } catch (e) {
@@ -152,8 +168,11 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
         target="_blank"
         rel="noreferrer"
         onClick={(e) => {
-          if (!phone || !activeMessage) e.preventDefault()
-          else handleOpenWA()
+          if (!phone || !activeMessage) {
+            e.preventDefault()
+          } else {
+            handleOpenWA()
+          }
         }}
         className={`flex items-center justify-center gap-2 w-full h-11 rounded-xl font-bold text-sm transition-all ${
           phone && activeMessage

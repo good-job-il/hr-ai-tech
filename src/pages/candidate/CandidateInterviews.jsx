@@ -1,25 +1,9 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { interviewService } from "@/api/services/interviewService"
 import { useAuth } from "@/lib/AuthContext"
-import {
-  Calendar,
-  RefreshCw,
-  Clock,
-  Video,
-  Phone,
-  MapPin,
-  X,
-  Briefcase,
-  ChevronLeft,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  RotateCcw,
-  UserX,
-} from "lucide-react"
+import { Calendar, CheckCircle2, XCircle, AlertCircle, RotateCcw, UserX } from "lucide-react"
 
 // ─── Status config ─────────────────────────────────────────────────────────────
 
@@ -44,16 +28,28 @@ const STATUS_ICON = {
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 function TypeIcon({ type, className = "w-5 h-5" }) {
-  if (type === "video") return <Video className={className} />
-  if (type === "phone") return <Phone className={className} />
-  if (type === "in_person") return <MapPin className={className} />
+  if (type === "video") {
+    return <Video className={className} />
+  }
+
+  if (type === "phone") {
+    return <Phone className={className} />
+  }
+
+  if (type === "in_person") {
+    return <MapPin className={className} />
+  }
+
   return <Calendar className={className} />
 }
 
 function StatusBadge({ status }) {
   const { t } = useTranslation()
+
   const style = STATUS_STYLE[status] || { color: "#64748B", bg: "#F8FAFC", border: "#E2E8F0" }
+
   const label = t(`candidate.interviews.status.${status}`, { defaultValue: status })
+
   return (
     <span
       className="text-xs px-2.5 py-1 rounded-lg font-bold whitespace-nowrap"
@@ -91,6 +87,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
 
 function InterviewCard({ interview, isSelected, onSelect }) {
   const { t } = useTranslation()
+
   const isUpcoming =
     interview.date >= new Date().toISOString().split("T")[0] &&
     interview.status !== "cancelled" &&
@@ -289,8 +286,11 @@ function DetailPanel({ interview, onClose }) {
 
 export default function CandidateInterviews() {
   const { t } = useTranslation()
+
   const { user } = useAuth()
+
   const [filterTab, setFilterTab] = useState("upcoming")
+
   const [selected, setSelected] = useState(null)
 
   const {
@@ -308,6 +308,7 @@ export default function CandidateInterviews() {
   const upcomingCount = interviews.filter(
     (i) => i.date >= today && i.status !== "cancelled" && i.status !== "completed",
   ).length
+
   const completedCount = interviews.filter((i) => i.status === "completed").length
 
   const FILTER_TABS = [
@@ -317,10 +318,14 @@ export default function CandidateInterviews() {
   ]
 
   const filtered = interviews.filter((i) => {
-    if (filterTab === "upcoming")
+    if (filterTab === "upcoming") {
       return i.date >= today && i.status !== "cancelled" && i.status !== "completed"
-    if (filterTab === "past")
+    }
+
+    if (filterTab === "past") {
       return i.date < today || i.status === "completed" || i.status === "cancelled"
+    }
+
     return true
   })
 

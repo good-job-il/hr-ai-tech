@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { compensationPlanService } from "@/api/services/compensationPlanService"
 import { jobService } from "@/api/services/jobService"
@@ -6,23 +6,8 @@ import { agencyClientService } from "@/api/services/agencyClientService"
 import { userService } from "@/api/services/userService"
 import { useAuth } from "@/lib/AuthContext"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus, Pencil, Trash2, DollarSign, Percent, Calculator, Settings } from "lucide-react"
-import {
-  PlatformCard,
-  PlatformPageHeader,
-  PlatformPageShell,
-} from "@/components/platform/PlatformUI"
+
+import { DollarSign } from "lucide-react"
 
 // Which compensation fields can this role see?
 // Employer does NOT have access to compensation at all
@@ -47,8 +32,10 @@ function CompField({ label, value, type, totalFee }) {
     ) : (
       <DollarSign className="w-3.5 h-3.5" />
     )
+
   const displayValue =
     value != null ? (type === "percent" ? `${value}%` : `${value.toLocaleString()} ₪`) : "—"
+
   const calculatedAmount =
     value != null && totalFee ? (type === "percent" ? (totalFee * value) / 100 : value) : null
 
@@ -89,18 +76,29 @@ const emptyPlan = {
 
 export default function CompensationPage() {
   const { user } = useAuth()
+
   const { can, loading: permissionsLoading } = usePermissionMatrix()
+
   const role = user?.role
+
   const visibleFields = VISIBLE_FIELDS[role] || []
+
   const canEditing = can("edit_compensation")
+
   const isAdmin = canEditing
+
   const canViewComp = can("view_compensation")
+
   const qc = useQueryClient()
 
   const [showModal, setShowModal] = useState(false)
+
   const [editing, setEditing] = useState(null)
+
   const [form, setForm] = useState(emptyPlan)
+
   const [modalType, setModalType] = useState("plan") // 'plan' or 'template'
+
   const [mutationError, setMutationError] = useState("")
 
   const orgId = user?.organization_id
@@ -165,12 +163,14 @@ export default function CompensationPage() {
     setModalType("plan")
     setShowModal(true)
   }
+
   const openEdit = (plan) => {
     setEditing(plan)
     setForm({ ...plan })
     setModalType("plan")
     setShowModal(true)
   }
+
   const openTemplate = (existingPlan = null) => {
     const formData = existingPlan
       ? {
@@ -193,6 +193,7 @@ export default function CompensationPage() {
           notes: existingPlan.notes || "",
         }
       : emptyPlan
+
     setEditing(existingPlan)
     setForm(formData)
     setModalType("template")
@@ -224,14 +225,20 @@ export default function CompensationPage() {
           : null,
       recruitment_manager_compensation_type: form.recruitment_manager_compensation_type,
     }
+
     saveMutation.mutate(data)
   }
 
   // Calculate actual amounts based on percentages
   const calculateAmount = (value, type) => {
-    if (!value || !form.total_fee) return null
+    if (!value || !form.total_fee) {
+      return null
+    }
+
     const num = Number(value)
+
     const total = Number(form.total_fee)
+
     return type === "percent" ? (total * num) / 100 : num
   }
 
@@ -303,10 +310,13 @@ export default function CompensationPage() {
                 <div className="space-y-3">
                   {jobs.map((job) => {
                     const jobPlan = plans.find((p) => p.job_id === job.id)
+
                     const defaultPlan = plans.find(
                       (p) => p.employer_company_id === job.employer_company_id && !p.job_id,
                     )
+
                     const finalPlan = jobPlan || defaultPlan
+
                     return (
                       <PlatformCard key={job.id} className="p-4">
                         <div className="flex items-start justify-between gap-3">
@@ -365,6 +375,7 @@ export default function CompensationPage() {
                               onClick={() => {
                                 // jobPlan has an id (existing), no-id means new plan for this job
                                 const existing = jobPlan || null
+
                                 setEditing(existing)
                                 setForm({
                                   client_name: existing?.client_name || job.company,
@@ -491,6 +502,7 @@ export default function CompensationPage() {
                   value={String(form.employer_company_id || "")}
                   onValueChange={(value) => {
                     const client = clients.find((item) => String(item.company_id) === value)
+
                     setForm((current) => ({
                       ...current,
                       employer_company_id: value,
@@ -542,9 +554,15 @@ export default function CompensationPage() {
                   <div className="space-y-1 text-xs">
                     {["recruiter", "team_manager", "recruitment_manager"].map((key) => {
                       const val = form[`${key}_compensation`]
+
                       const type = form[`${key}_compensation_type`]
-                      if (!val) return null
+
+                      if (!val) {
+                        return null
+                      }
+
                       const amount = calculateAmount(val, type)
+
                       return (
                         <div key={key} className="flex justify-between">
                           <span className="text-gray-600">{FIELD_LABELS[key]}:</span>
@@ -566,6 +584,7 @@ export default function CompensationPage() {
                   value={String(form.job_id || "all")}
                   onValueChange={(value) => {
                     const selected = jobs.find((job) => String(job.id) === value)
+
                     setForm((current) => ({
                       ...current,
                       job_id: value === "all" ? "" : value,

@@ -3,31 +3,22 @@
  * Central hub: search candidates or jobs and see AI match results.
  * Role-filtered: recruiter sees own candidates, manager sees all team, etc.
  */
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { candidateService } from "@/api/services/candidateService"
 import { jobService } from "@/api/services/jobService"
 import { applicationService } from "@/api/services/applicationService"
 import { useAuth } from "@/lib/AuthContext"
-import CandidateRecommendationsPanel from "@/components/ai/CandidateRecommendationsPanel"
-import JobRecommendationsPanel from "@/components/ai/JobRecommendationsPanel"
-import {
-  Sparkles,
-  Users,
-  Briefcase,
-  Search,
-  SlidersHorizontal,
-  CheckCircle2,
-  AlertTriangle,
-  X,
-} from "lucide-react"
+import { Users, Briefcase } from "lucide-react"
 import { getAgencyScopeFilter, isAgencyUser } from "@/domain/agency/access"
 
 function Toast({ message, type, onClose }) {
   useEffect(() => {
     const t = setTimeout(onClose, 4000)
+
     return () => clearTimeout(t)
   }, [onClose])
+
   return (
     <div
       className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl text-sm font-bold transition-all ${type === "success" ? "bg-green-600 text-white" : type === "error" ? "bg-red-600 text-white" : "bg-[#1E293B] text-white"}`}
@@ -47,17 +38,29 @@ function Toast({ message, type, onClose }) {
 
 export default function AIMatchingPage() {
   const { user } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRTL = i18n.language === "he"
+
   const [toast, setToast] = useState(null)
+
   const showToast = (message, type = "success") => setToast({ message, type })
+
   const [mode, setMode] = useState("candidate")
+
   const [candidates, setCandidates] = useState([])
+
   const [jobs, setJobs] = useState([])
+
   const [selectedCandidate, setSelectedCandidate] = useState(null)
+
   const [selectedJob, setSelectedJob] = useState(null)
+
   const [searchQ, setSearchQ] = useState("")
+
   const [minScore, setMinScore] = useState(0)
+
   const [loading, setLoading] = useState(false)
 
   const MODES = [
@@ -66,7 +69,10 @@ export default function AIMatchingPage() {
   ]
 
   useEffect(() => {
-    if (!user) return
+    if (!user) {
+      return
+    }
+
     setLoading(true)
 
     // ─────────────────────────────────────────────────────────────────────
@@ -142,6 +148,7 @@ export default function AIMatchingPage() {
         <div className="flex items-center gap-3 flex-wrap">
           {MODES.map((m) => {
             const Icon = m.icon
+
             return (
               <button
                 key={m.id}

@@ -1,14 +1,15 @@
-import React, { useState } from "react"
-import { X } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react"
 
 export default function LocationConfirmModal({ initialCity, onConfirm, onDismiss }) {
   const [city, setCity] = useState(initialCity)
+
   const [customCity, setCustomCity] = useState("")
+
   const [showCustomInput, setShowCustomInput] = useState(false)
 
   const handleConfirm = () => {
     const finalCity = showCustomInput ? customCity : city
+
     if (finalCity.trim()) {
       onConfirm(finalCity)
     }

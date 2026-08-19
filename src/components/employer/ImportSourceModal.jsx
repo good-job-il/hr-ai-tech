@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { importSourceService } from "@/api/services/importSourceService"
-import { X } from "lucide-react"
 
 export default function ImportSourceModal({ source, onClose, onSaved }) {
   const [form, setForm] = useState({
@@ -9,6 +8,7 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
     interval_hours: source?.interval_hours || 6,
     is_active: source?.is_active ?? true,
   })
+
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -23,11 +23,13 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
+
     if (source) {
       await importSourceService.update(source.id, form)
     } else {
       await importSourceService.create(form)
     }
+
     setLoading(false)
     onSaved()
   }

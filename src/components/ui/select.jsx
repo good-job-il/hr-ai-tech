@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -27,6 +26,7 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ))
+
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
 const SelectScrollUpButton = React.forwardRef(({ className, ...props }, ref) => (
@@ -38,6 +38,7 @@ const SelectScrollUpButton = React.forwardRef(({ className, ...props }, ref) => 
     <ChevronUp className="h-4 w-4" />
   </SelectPrimitive.ScrollUpButton>
 ))
+
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
 
 const SelectScrollDownButton = React.forwardRef(({ className, ...props }, ref) => (
@@ -49,6 +50,7 @@ const SelectScrollDownButton = React.forwardRef(({ className, ...props }, ref) =
     <ChevronDown className="h-4 w-4" />
   </SelectPrimitive.ScrollDownButton>
 ))
+
 SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName
 
 const SelectContent = React.forwardRef(
@@ -80,6 +82,7 @@ const SelectContent = React.forwardRef(
     </SelectPrimitive.Portal>
   ),
 )
+
 SelectContent.displayName = SelectPrimitive.Content.displayName
 
 const SelectLabel = React.forwardRef(({ className, ...props }, ref) => (
@@ -89,6 +92,7 @@ const SelectLabel = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 SelectLabel.displayName = SelectPrimitive.Label.displayName
 
 const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => (
@@ -108,6 +112,7 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
+
 SelectItem.displayName = SelectPrimitive.Item.displayName
 
 const SelectSeparator = React.forwardRef(({ className, ...props }, ref) => (
@@ -117,6 +122,7 @@ const SelectSeparator = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName
 
 export {

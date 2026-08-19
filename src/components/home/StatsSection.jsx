@@ -1,4 +1,3 @@
-import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { publicJobService } from "@/api/services/publicJobService"
 import { companyService } from "@/api/services/companyService"
@@ -6,10 +5,12 @@ import { Users, Building, Briefcase, Star } from "lucide-react"
 
 export default function StatsSection() {
   const candidates = []
+
   const { data: companies = [] } = useQuery({
     queryKey: ["stats-comp"],
     queryFn: () => companyService.list({ limit: 500 }),
   })
+
   const { data: jobs = [] } = useQuery({
     queryKey: ["stats-jobs"],
     queryFn: () => publicJobService.list({ is_closed: false, limit: 500 }),
@@ -52,6 +53,7 @@ export default function StatsSection() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 18 }}>
           {STATS.map((s, i) => {
             const Icon = s.icon
+
             return (
               <div
                 key={i}

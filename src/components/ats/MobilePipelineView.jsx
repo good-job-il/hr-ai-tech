@@ -2,10 +2,8 @@
  * MobilePipelineView — TRUE Kanban for mobile/tablet
  * Fixed width columns, horizontal scroll, no layout jumping
  */
-import React, { useState, useRef, useEffect } from "react"
-import { ArrowRightLeft } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import AIMatchBadge from "@/components/ai/AIMatchBadge"
 
 export default function MobilePipelineView({
   stages,
@@ -16,9 +14,13 @@ export default function MobilePipelineView({
   canMove = true,
 }) {
   const { t } = useTranslation()
+
   const [movingApp, setMovingApp] = useState(null)
+
   const [movingFromStage, setMovingFromStage] = useState(null)
+
   const containerRef = useRef(null)
+
   const scrollInitialized = useRef(false)
 
   const handleMoveRequest = (app, stageId) => {
@@ -33,10 +35,15 @@ export default function MobilePipelineView({
   }
 
   useEffect(() => {
-    if (!containerRef.current || scrollInitialized.current || applications.length === 0) return
+    if (!containerRef.current || scrollInitialized.current || applications.length === 0) {
+      return
+    }
 
     const timer = setTimeout(() => {
-      if (!containerRef.current) return
+      if (!containerRef.current) {
+        return
+      }
+
       containerRef.current.scrollLeft = isRTL ? 99999 : 0
       scrollInitialized.current = true
     }, 100)
@@ -67,6 +74,7 @@ export default function MobilePipelineView({
         <div className="flex flex-nowrap gap-3 items-start w-max min-w-full">
           {stages.map((stage) => {
             const stageApps = applications.filter((a) => a.status === stage.id)
+
             return (
               <CompactStageColumn
                 key={stage.id}

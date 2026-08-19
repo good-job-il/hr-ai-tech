@@ -4,21 +4,7 @@ import { useTranslation } from "react-i18next"
 import { candidateProfileService } from "@/api/services/candidateProfileService"
 import { fileService } from "@/api/services/fileService"
 import { useAuth } from "@/lib/AuthContext"
-import {
-  User,
-  Briefcase,
-  FileText,
-  Plus,
-  Trash2,
-  Upload,
-  Save,
-  CheckCircle2,
-  Eye,
-  EyeOff,
-  Zap,
-  GraduationCap,
-  Tag,
-} from "lucide-react"
+import { User, Briefcase, FileText, GraduationCap, Tag } from "lucide-react"
 
 // Internal keys map to stored DB values (Hebrew) — preserves existing data
 const CATEGORY_KEYS = {
@@ -35,6 +21,7 @@ const CATEGORY_KEYS = {
   management: "ניהול",
   other: "אחר",
 }
+
 // Reverse: stored value → key
 const DB_TO_KEY = Object.fromEntries(Object.entries(CATEGORY_KEYS).map(([k, v]) => [v, k]))
 
@@ -50,9 +37,13 @@ function ProfileCompleteness({ form, t }) {
     form?.education,
     form?.resume_url,
   ]
+
   const filled = fields.filter(Boolean).length
+
   const pct = Math.round((filled / fields.length) * 100)
+
   const color = pct >= 80 ? "#059669" : pct >= 50 ? "#D97706" : "#DC2626"
+
   const hint =
     pct < 50
       ? t("candidate.profile.completeBasics")
@@ -116,10 +107,15 @@ function Input({ label, value, onChange, placeholder, type = "text", className =
 
 export default function CandidateProfile() {
   const { user } = useAuth()
+
   const queryClient = useQueryClient()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const [skillInput, setSkillInput] = useState("")
+
   const [saveStatus, setSaveStatus] = useState(null) // null | 'saving' | 'saved' | 'error'
 
   const { data: profile, isLoading } = useQuery({
@@ -131,8 +127,14 @@ export default function CandidateProfile() {
   const [form, setForm] = useState(null)
 
   useEffect(() => {
-    if (isLoading) return
-    if (form !== null) return
+    if (isLoading) {
+      return
+    }
+
+    if (form !== null) {
+      return
+    }
+
     if (profile) {
       setForm({ ...profile })
     } else if (user) {
@@ -155,14 +157,17 @@ export default function CandidateProfile() {
         resume_url: "",
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, profile, user])
 
   const upd = (key, val) => setForm((f) => ({ ...f, [key]: val }))
 
   const toSalary = (v) => {
-    if (v === "" || v === null || v === undefined) return null
+    if (v === "" || v === null || v === undefined) {
+      return null
+    }
+
     const n = Number(v)
+
     return isNaN(n) ? null : n
   }
 
@@ -173,16 +178,24 @@ export default function CandidateProfile() {
         desired_salary_min: toSalary(data.desired_salary_min),
         desired_salary_max: toSalary(data.desired_salary_max),
       }
+
       delete sanitized.id
       delete sanitized.user_email
       delete sanitized.created_date
       delete sanitized.updated_date
-      if (profile) return candidateProfileService.update(sanitized)
+
+      if (profile) {
+        return candidateProfileService.update(sanitized)
+      }
+
       return candidateProfileService.create(sanitized)
     },
     onMutate: () => setSaveStatus("saving"),
     onSuccess: (savedData) => {
-      if (savedData) setForm({ ...savedData })
+      if (savedData) {
+        setForm({ ...savedData })
+      }
+
       queryClient.invalidateQueries({ queryKey: ["my-profile"] })
       setSaveStatus("saved")
       setTimeout(() => setSaveStatus(null), 3000)
@@ -195,16 +208,25 @@ export default function CandidateProfile() {
 
   const uploadResume = async (e) => {
     const file = e.target.files[0]
-    if (!file) return
+
+    if (!file) {
+      return
+    }
+
     const { file_url } = await fileService.upload(file)
+
     upd("resume_url", file_url)
   }
 
   const addSkill = () => {
-    if (!skillInput.trim()) return
+    if (!skillInput.trim()) {
+      return
+    }
+
     upd("skills", [...(form.skills || []), skillInput.trim()])
     setSkillInput("")
   }
+
   const removeSkill = (i) =>
     upd(
       "skills",
@@ -216,11 +238,13 @@ export default function CandidateProfile() {
       ...(form.experience || []),
       { company: "", role: "", years: "", description: "" },
     ])
+
   const updateExp = (i, field, val) =>
     upd(
       "experience",
       form.experience.map((e, idx) => (idx === i ? { ...e, [field]: val } : e)),
     )
+
   const removeExp = (i) =>
     upd(
       "experience",
@@ -229,6 +253,7 @@ export default function CandidateProfile() {
 
   const toggleCategory = (dbValue) => {
     const cats = form.categories || []
+
     upd(
       "categories",
       cats.includes(dbValue) ? cats.filter((c) => c !== dbValue) : [...cats, dbValue],
@@ -543,7 +568,9 @@ export default function CandidateProfile() {
         <div className="flex flex-wrap gap-2">
           {Object.entries(CATEGORY_KEYS).map(([key, dbValue]) => {
             const active = (form.categories || []).includes(dbValue)
+
             const label = t(`candidate.profile.categoryList.${key}`, dbValue)
+
             return (
               <button
                 key={key}

@@ -1,11 +1,4 @@
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Send, Tag, X, AlertTriangle, FileText, UserCheck } from "lucide-react"
-import RecruiterDropdown from "./RecruiterDropdown"
-import RejectModal from "./RejectModal"
-import SendToEmployerModal from "./SendToEmployerModal"
-import AssignToJobModal from "./AssignToJobModal"
 import { useTranslation } from "react-i18next"
 
 export default function RecruiterWorkspacePanel({
@@ -54,11 +47,17 @@ export default function RecruiterWorkspacePanel({
   ]
 
   const [tagInput, setTagInput] = useState("")
+
   const [showSendModal, setShowSendModal] = useState(false)
+
   const [showRejectModal, setShowRejectModal] = useState(false)
+
   const [showDocRequest, setShowDocRequest] = useState(false)
+
   const [showAssignModal, setShowAssignModal] = useState(false)
+
   const [docRequestType, setDocRequestType] = useState("")
+
   const [saving, setSaving] = useState({})
 
   const setSavingKey = (key, val) => setSaving((p) => ({ ...p, [key]: val }))
@@ -70,7 +69,10 @@ export default function RecruiterWorkspacePanel({
   }
 
   const handleAddTag = async (tag) => {
-    if (!tag.trim()) return
+    if (!tag.trim()) {
+      return
+    }
+
     setSavingKey("tag", true)
     await onAddTag(tag.trim())
     setTagInput("")
@@ -83,7 +85,10 @@ export default function RecruiterWorkspacePanel({
   }
 
   const handleRequestDocuments = async () => {
-    if (!docRequestType) return
+    if (!docRequestType) {
+      return
+    }
+
     setSavingKey("docReq", true)
     await onRequestDocuments?.(docRequestType)
     setDocRequestType("")
@@ -272,7 +277,10 @@ export default function RecruiterWorkspacePanel({
           onClose={() => setShowAssignModal(false)}
           onAssignSuccess={() => {
             setShowAssignModal(false)
-            if (onReload) onReload()
+
+            if (onReload) {
+              onReload()
+            }
           }}
         />
       )}

@@ -10,12 +10,12 @@ import {
   XCircle,
   Send,
   Upload,
-  Filter,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 export default function CandidateTimeline({ timeline, loading }) {
   const { t } = useTranslation()
+
   const [filter, setFilter] = useState("all")
 
   const EVENT_CONFIG = {
@@ -91,7 +91,7 @@ export default function CandidateTimeline({ timeline, loading }) {
 
   const filtered = filter === "all" ? timeline : timeline.filter((e) => e.event_type === filter)
 
-  if (loading)
+  if (loading) {
     return (
       <div className="space-y-3">
         {[...Array(4)].map((_, i) => (
@@ -99,6 +99,7 @@ export default function CandidateTimeline({ timeline, loading }) {
         ))}
       </div>
     )
+  }
 
   return (
     <div>
@@ -119,8 +120,13 @@ export default function CandidateTimeline({ timeline, loading }) {
           "sent_to_employer",
         ].map((type) => {
           const count = timeline.filter((e) => e.event_type === type).length
-          if (!count) return null
+
+          if (!count) {
+            return null
+          }
+
           const cfg = EVENT_CONFIG[type]
+
           return (
             <button
               key={type}
@@ -146,7 +152,9 @@ export default function CandidateTimeline({ timeline, loading }) {
           <div className="space-y-1">
             {filtered.map((event, idx) => {
               const cfg = EVENT_CONFIG[event.event_type] || EVENT_CONFIG.note_added
+
               const Icon = cfg.icon
+
               return (
                 <div
                   key={event.id || idx}

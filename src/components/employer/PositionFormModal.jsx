@@ -1,10 +1,4 @@
-import React, { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { X, Plus } from "lucide-react"
+import { useState } from "react"
 
 export default function PositionFormModal({ open, onOpenChange, position, onSubmit, loading }) {
   const [formData, setFormData] = useState(
@@ -18,6 +12,7 @@ export default function PositionFormModal({ open, onOpenChange, position, onSubm
       salary_max: null,
     },
   )
+
   const [newSkill, setNewSkill] = useState("")
 
   const handleAddSkill = () => {

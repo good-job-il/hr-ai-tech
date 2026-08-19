@@ -1,8 +1,6 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { applicationService } from "@/api/services/applicationService"
-import AdminLayout from "@/components/admin/AdminLayout"
-import { Search, FileText, ExternalLink } from "lucide-react"
 
 const statusLabels = {
   new: "חדש",
@@ -40,10 +38,15 @@ const sourceLabels = {
 
 export default function AdminApplications() {
   const [search, setSearch] = useState("")
+
   const [filterStatus, setFilterStatus] = useState("")
+
   const [filterSource, setFilterSource] = useState("")
+
   const [filterEmployer, setFilterEmployer] = useState("")
+
   const [dateFrom, setDateFrom] = useState("")
+
   const [dateTo, setDateTo] = useState("")
 
   const { data: applications = [], isLoading } = useQuery({
@@ -56,17 +59,24 @@ export default function AdminApplications() {
 
   const filtered = applications.filter((app) => {
     const searchLower = search.toLowerCase()
+
     const matchSearch =
       !search ||
       app.candidate_name?.toLowerCase().includes(searchLower) ||
       app.candidate_email?.toLowerCase().includes(searchLower) ||
       app.job_title?.toLowerCase().includes(searchLower) ||
       app.company?.toLowerCase().includes(searchLower)
+
     const matchStatus = !filterStatus || app.status === filterStatus
+
     const matchSource = !filterSource || app.source === filterSource
+
     const matchEmployer = !filterEmployer || app.employer_id === filterEmployer
+
     const matchDateFrom = !dateFrom || new Date(app.created_date) >= new Date(dateFrom)
+
     const matchDateTo = !dateTo || new Date(app.created_date) <= new Date(dateTo + "T23:59:59")
+
     return (
       matchSearch && matchStatus && matchSource && matchEmployer && matchDateFrom && matchDateTo
     )

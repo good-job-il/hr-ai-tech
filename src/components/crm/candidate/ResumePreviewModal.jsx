@@ -1,27 +1,25 @@
-import {
-  X,
-  FileText,
-  MapPin,
-  Briefcase,
-  Building2,
-  Globe,
-  Download,
-  ExternalLink,
-} from "lucide-react"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { useTranslation } from "react-i18next"
 
 export default function ResumePreviewModal({ candidate, onClose }) {
   const { t, i18n } = useTranslation()
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const isRTL = currentLang === "he"
+
   const { can } = usePermissionMatrix()
 
-  if (!candidate) return null
+  if (!candidate) {
+    return null
+  }
 
   const resumeUrl = candidate.resume_url
+
   const convertedUrl = candidate.converted_resume_url
+
   const originalUrl = candidate.original_resume_url
+
   const isPdf =
     resumeUrl &&
     (candidate.original_file_type === "pdf" || resumeUrl.toLowerCase().includes(".pdf"))

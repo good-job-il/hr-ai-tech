@@ -1,13 +1,14 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { companyService } from "@/api/services/companyService"
-import { Trash2, Search, Edit2 } from "lucide-react"
-import AdminLayout from "@/components/admin/AdminLayout"
 
 export default function AdminManageCompanies() {
   const queryClient = useQueryClient()
+
   const [search, setSearch] = useState("")
+
   const [editingCompany, setEditingCompany] = useState(null)
+
   const [editForm, setEditForm] = useState({})
 
   const { data: companies = [], isLoading } = useQuery({

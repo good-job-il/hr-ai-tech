@@ -2,6 +2,7 @@ import { roleAliasService } from "@/api/services/permissionService"
 import { taxonomyService } from "@/api/services/taxonomyService"
 
 let cachedAliases = null
+
 let cachedRoles = null
 
 /**
@@ -9,7 +10,9 @@ let cachedRoles = null
  * e.g., "SDR", "Backend Engineer", "Frontend Developer" → canonical role name
  */
 export async function resolveRoleAlias(roleNameOrAlias) {
-  if (!roleNameOrAlias) return null
+  if (!roleNameOrAlias) {
+    return null
+  }
 
   // Load aliases if not cached
   if (!cachedAliases) {
@@ -24,6 +27,7 @@ export async function resolveRoleAlias(roleNameOrAlias) {
 
   // First, check if it's an alias
   const aliasMatch = cachedAliases.find((a) => a.alias.toLowerCase() === normalized)
+
   if (aliasMatch?.canonical_role) {
     return aliasMatch.canonical_role
   }
@@ -36,7 +40,9 @@ export async function resolveRoleAlias(roleNameOrAlias) {
  * Resolve a role name to its entity
  */
 export async function resolveRoleEntity(roleNameOrAlias) {
-  if (!roleNameOrAlias) return null
+  if (!roleNameOrAlias) {
+    return null
+  }
 
   // Load roles if not cached
   if (!cachedRoles) {

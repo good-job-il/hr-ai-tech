@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { directionForLanguage } from "@/domain/agency/rmAcceptance"
 
@@ -8,7 +8,9 @@ import { directionForLanguage } from "@/domain/agency/rmAcceptance"
  */
 export default function LanguageProvider({ children }) {
   const { i18n } = useTranslation()
+
   const direction = directionForLanguage(i18n.language)
+
   const lang = direction === "ltr" ? "en" : "he"
 
   useEffect(() => {

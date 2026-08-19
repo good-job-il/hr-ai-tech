@@ -1,4 +1,3 @@
-import { Navigate, Outlet } from "react-router-dom"
 import { useAuth } from "@/lib/AuthContext"
 
 // Roles that bypass all checks
@@ -32,14 +31,20 @@ export default function ProtectedRoute({
     )
   }
 
-  if (authError || !user) return unauthenticatedElement
+  if (authError || !user) {
+    return unauthenticatedElement
+  }
 
   const rawRole = user.role || user.user_type
+
   const effectiveRole = rawRole === "hiring_manager" ? "employer" : rawRole
+
   const isSuperAdmin = SUPER_ROLES.includes(effectiveRole)
 
   // superAdminOnly routes
-  if (superAdminOnly && !isSuperAdmin) return unauthorizedElement
+  if (superAdminOnly && !isSuperAdmin) {
+    return unauthorizedElement
+  }
 
   // Role check (super admins bypass)
   if (requiredRoles.length > 0 && !isSuperAdmin && !requiredRoles.includes(effectiveRole)) {
@@ -51,6 +56,7 @@ export default function ProtectedRoute({
     // Super admin has no org, allow them through org-type gates
     if (!isSuperAdmin) {
       console.warn("Blocked by orgType:", { user, orgType, requiredOrgTypes })
+
       return unauthorizedElement
     }
   }

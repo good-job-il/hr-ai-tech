@@ -1,24 +1,36 @@
-import React, { useState } from "react"
-import { Linkedin, MessageCircle, Facebook, Copy, Check } from "lucide-react"
+import { useState } from "react"
+import { Linkedin, MessageCircle, Facebook } from "lucide-react"
 import { useAuth } from "@/lib/AuthContext"
 import { toast } from "sonner"
 
 export default function ShareButtons({ job }) {
   const { user } = useAuth()
+
   const [copied, setCopied] = useState(false)
+
   const jobUrl = typeof window !== "undefined" ? `${window.location.origin}/jobs/${job.id}` : ""
 
   const getShareText = () => {
     const role = user?.role
-    if (role === "admin") return `הזדמנות חדשה באתר headhunter 👇\n${job.title}`
-    if (role === "employer" || role === "hiring_manager")
+
+    if (role === "admin") {
+      return `הזדמנות חדשה באתר headhunter 👇\n${job.title}`
+    }
+
+    if (role === "employer" || role === "hiring_manager") {
       return `אנחנו מגייסים לתפקיד ${job.title} 👇`
-    if (role === "recruiter") return `אנחנו מגייסים לתפקיד ${job.title} 👇`
+    }
+
+    if (role === "recruiter") {
+      return `אנחנו מגייסים לתפקיד ${job.title} 👇`
+    }
+
     // candidate or not logged in
     return `חברים, תראו איזו משרה מצאתי 👇\n${job.title}`
   }
 
   const shareText = getShareText()
+
   const fullMessage = `${shareText}\n${jobUrl}`
 
   const shareLinks = [
@@ -59,6 +71,7 @@ export default function ShareButtons({ job }) {
     <div className="flex gap-3 flex-wrap">
       {shareLinks.map((share) => {
         const IconComponent = share.icon
+
         return (
           <a
             key={share.name}

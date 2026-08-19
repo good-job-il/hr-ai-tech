@@ -29,36 +29,53 @@ export const getRLSFilter = (role, entityName, userId, userMeta = {}) => {
   const { organizationId, employerCompanyId, email, orgType } = userMeta
 
   // ─── Admin (platform operator) — גלובלי ────────────────────
-  if (role === "admin") return {}
+  if (role === "admin") {
+    return {}
+  }
 
   switch (role) {
     // ─── Org Admin — כל הארגון ────────────────────────────────
     case "org_admin": {
-      if (!organizationId) return { id: "__BLOCKED__" }
+      if (!organizationId) {
+        return { id: "__BLOCKED__" }
+      }
+
       return getOrgFilter(entityName, organizationId, null, null, null, employerCompanyId, email)
     }
 
     // ─── Recruitment Manager — כל הארגון ─────────────────────
     case "recruitment_manager": {
-      if (!organizationId) return { id: "__BLOCKED__" }
+      if (!organizationId) {
+        return { id: "__BLOCKED__" }
+      }
+
       return getOrgFilter(entityName, organizationId, null, null, null, null, email)
     }
 
     // ─── Team Manager — הצוות שלו בתוך הארגון ────────────────
     case "team_manager": {
-      if (!organizationId) return { id: "__BLOCKED__" }
+      if (!organizationId) {
+        return { id: "__BLOCKED__" }
+      }
+
       return getOrgFilter(entityName, organizationId, null, userId, null, null, email)
     }
 
     // ─── Recruiter — רק שלו בתוך הארגון ──────────────────────
     case "recruiter": {
-      if (!organizationId) return { id: "__BLOCKED__" }
+      if (!organizationId) {
+        return { id: "__BLOCKED__" }
+      }
+
       return getOrgFilter(entityName, organizationId, userId, null, null, null, email)
     }
 
     // ─── Employer — לפי employer_company_id בלבד ──────────────
     case "employer": {
-      if (!employerCompanyId) return { id: "__BLOCKED__" }
+      if (!employerCompanyId) {
+        return { id: "__BLOCKED__" }
+      }
+
       switch (entityName) {
         case "Job":
           return { employer_company_id: employerCompanyId }
@@ -130,6 +147,7 @@ function getOrgFilter(
     if (orgType !== "staffing_agency") {
       return { id: "__BLOCKED__" }
     }
+
     return { organization_id: orgId }
   }
 
@@ -165,6 +183,7 @@ function getOrgFilter(
   if (recruiterId) {
     return { ...base, recruiter_id: recruiterId }
   }
+
   if (teamManagerId) {
     return { ...base, team_manager_id: teamManagerId }
   }

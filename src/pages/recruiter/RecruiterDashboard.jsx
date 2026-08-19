@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
 import { candidateService } from "@/api/services/candidateService"
 import { applicationService } from "@/api/services/applicationService"
 import { interviewService } from "@/api/services/interviewService"
 import { compensationPlanService } from "@/api/services/compensationPlanService"
 import { useAuth } from "@/lib/AuthContext"
-import { Users, Briefcase, Calendar, RefreshCw, ChevronLeft, DollarSign } from "lucide-react"
+import { Users, Briefcase, Calendar, DollarSign } from "lucide-react"
 
 function StatCard({ icon: Icon, label, value, color, href, loading }) {
   const content = (
@@ -29,20 +28,30 @@ function StatCard({ icon: Icon, label, value, color, href, loading }) {
       {href && <ChevronLeft className="w-4 h-4 text-[#CBD5E1]" />}
     </div>
   )
+
   return href ? <Link to={href}>{content}</Link> : content
 }
 
 export default function RecruiterDashboard() {
   const { user } = useAuth()
+
   const [stats, setStats] = useState(null)
+
   const [recentCandidates, setRecentCandidates] = useState([])
+
   const [recentApplications, setRecentApplications] = useState([])
+
   const [compensation, setCompensation] = useState(null)
+
   const [loading, setLoading] = useState(true)
+
   const [loadError, setLoadError] = useState("")
 
   const load = async () => {
-    if (!user) return
+    if (!user) {
+      return
+    }
+
     setLoading(true)
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -53,6 +62,7 @@ export default function RecruiterDashboard() {
     //  To grant access to unassigned records: set user.can_view_unassigned = true.
     // ─────────────────────────────────────────────────────────────────────────
     setLoadError("")
+
     try {
       const [candidates, applications, interviews, plans] = await Promise.all([
         candidateService.list({
@@ -90,6 +100,7 @@ export default function RecruiterDashboard() {
               : plan.recruiter_compensation)
           )
         }
+
         return sum
       }, 0)
 

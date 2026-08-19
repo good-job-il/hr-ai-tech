@@ -1,13 +1,10 @@
-import React from "react"
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
-import ApplicationCard from "./ApplicationCard"
-
 export default function KanbanBoard({ stages, applications, onDragEnd, onDeleteApplication }) {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="flex gap-4 overflow-x-auto pb-4 h-[600px]" dir="rtl">
         {stages.map((stage) => {
           const stageApps = applications.filter((app) => app.status === stage.name)
+
           return (
             <Droppable key={stage.id} droppableId={stage.id}>
               {(provided, snapshot) => (

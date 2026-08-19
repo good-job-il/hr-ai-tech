@@ -1,7 +1,3 @@
-import React from "react"
-import AdminLayout from "@/components/admin/AdminLayout"
-import { CreditCard } from "lucide-react"
-
 export default function AdminFinances() {
   return (
     <AdminLayout>

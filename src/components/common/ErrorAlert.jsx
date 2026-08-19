@@ -1,6 +1,3 @@
-import React from "react"
-import { AlertCircle, X, RefreshCw, HelpCircle } from "lucide-react"
-
 export default function ErrorAlert({
   error,
   onDismiss,
@@ -8,12 +5,17 @@ export default function ErrorAlert({
   details = null,
   source = null,
 }) {
-  if (!error) return null
+  if (!error) {
+    return null
+  }
 
   // Parse error message if it's structured
   const isStructured = typeof error === "object"
+
   const message = isStructured ? error.message : error
+
   const code = isStructured ? error.code : null
+
   const context = isStructured ? error.context : null
 
   return (

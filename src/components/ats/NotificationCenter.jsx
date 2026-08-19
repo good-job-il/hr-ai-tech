@@ -2,32 +2,47 @@
  * NotificationCenter
  * Bell icon with unread counter + dropdown list of pipeline notifications.
  */
-import React, { useState, useEffect, useCallback } from "react"
-import { Bell, CheckCheck, X, Clock } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
 import { useTranslation } from "react-i18next"
 import { notificationService } from "@/api/services/notificationService"
 
 function timeAgo(dateStr, t) {
   const diff = (Date.now() - new Date(dateStr).getTime()) / 1000
-  if (diff < 60) return t("pipeline.time.now")
-  if (diff < 3600) return t("pipeline.time.minutesAgo", { count: Math.floor(diff / 60) })
-  if (diff < 86400) return t("pipeline.time.hoursAgo", { count: Math.floor(diff / 3600) })
+
+  if (diff < 60) {
+    return t("pipeline.time.now")
+  }
+
+  if (diff < 3600) {
+    return t("pipeline.time.minutesAgo", { count: Math.floor(diff / 60) })
+  }
+
+  if (diff < 86400) {
+    return t("pipeline.time.hoursAgo", { count: Math.floor(diff / 3600) })
+  }
+
   return t("pipeline.time.daysAgo", { count: Math.floor(diff / 86400) })
 }
 
 export default function NotificationCenter() {
   const { t, i18n } = useTranslation()
+
   const [open, setOpen] = useState(false)
+
   const [notifications, setNotifications] = useState([])
+
   const [loading, setLoading] = useState(false)
+
   const [loadError, setLoadError] = useState(null)
 
   const isRTL = !i18n.language?.startsWith("en")
 
   const loadNotifications = useCallback(async () => {
     setLoading(true)
+
     try {
       const data = await notificationService.list({ limit: 30 })
+
       setNotifications(data || [])
       setLoadError(null)
     } catch (error) {
@@ -40,7 +55,9 @@ export default function NotificationCenter() {
 
   useEffect(() => {
     loadNotifications()
+
     const interval = setInterval(loadNotifications, 30000)
+
     return () => clearInterval(interval)
   }, [loadNotifications])
 
@@ -61,7 +78,10 @@ export default function NotificationCenter() {
       <button
         onClick={() => {
           setOpen((o) => !o)
-          if (!open) loadNotifications()
+
+          if (!open) {
+            loadNotifications()
+          }
         }}
         className="relative w-10 h-10 rounded-xl border border-[#E4ECFF] bg-white flex items-center justify-center hover:border-[#C4B5FD] transition-all"
       >

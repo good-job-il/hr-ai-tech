@@ -3,24 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { candidateService } from "@/api/services/candidateService"
 import { useAuth } from "@/lib/AuthContext"
-import {
-  Search,
-  RefreshCw,
-  User,
-  ChevronLeft,
-  UsersRound,
-  UserCheck,
-  Clock3,
-  ShieldAlert,
-} from "lucide-react"
-import { Input } from "@/components/ui/input"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-} from "@/components/platform/PlatformUI"
+import { User, UsersRound, UserCheck, Clock3, ShieldAlert } from "lucide-react"
+
 import { getAgencyScopeFilter, isAgencyUser } from "@/domain/agency/access"
 
 const STATUS_COLORS = {
@@ -37,22 +21,35 @@ const PAGE_SIZE = 50 // Performance: Load only 50 candidates at a time
 
 export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate" }) {
   const navigate = useNavigate()
+
   const location = useLocation()
+
   const { user } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const [candidates, setCandidates] = useState([])
+
   const [loading, setLoading] = useState(true)
+
   const [error, setError] = useState(null)
+
   const [search, setSearch] = useState("")
+
   const [statusFilter, setStatusFilter] = useState("all")
+
   const [hasMore, setHasMore] = useState(false)
+
   const [page, setPage] = useState(1)
+
   const [appendLoading, setAppendLoading] = useState(false)
 
   const isRTL = i18n.language === "he"
 
   const loadCandidates = async (append = false) => {
-    if (!user) return
+    if (!user) {
+      return
+    }
 
     if (append) {
       setAppendLoading(true)
@@ -61,24 +58,40 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
     }
 
     setError(null)
+
     try {
       // ───────────────────────────────────────────────────────────────────────
       // VISIBILITY POLICY — CandidateListCRMPage
       // PERFORMANCE: Paginated loading with 50 records per page
       // ───────────────────────────────────────────────────────────────────────
       const filter = { search: search.trim() || undefined }
+
       const importBatchId = new URLSearchParams(location.search).get("importBatchId")
-      if (importBatchId) filter.import_batch_id = Number(importBatchId)
-      if (statusFilter !== "all") filter.status = statusFilter
+
+      if (importBatchId) {
+        filter.import_batch_id = Number(importBatchId)
+      }
+
+      if (statusFilter !== "all") {
+        filter.status = statusFilter
+      }
+
       const routeMode = location.pathname.split("/").pop()
-      if (routeMode === "active") filter.active = true
-      if (routeMode === "pipeline") filter.in_pipeline = true
+
+      if (routeMode === "active") {
+        filter.active = true
+      }
+
+      if (routeMode === "pipeline") {
+        filter.in_pipeline = true
+      }
 
       if (isAgencyUser(user)) {
         Object.assign(filter, getAgencyScopeFilter(user))
       }
 
       const requestedPage = append ? page + 1 : 1
+
       const response = await candidateService.listPage({
         ...filter,
         page: requestedPage,
@@ -86,6 +99,7 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
         order: "DESC",
         limit: PAGE_SIZE,
       })
+
       setHasMore(response.pagination.hasNextPage)
       setPage(requestedPage)
       setCandidates((previous) =>
@@ -102,7 +116,10 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
         status: requestError?.status || requestError?.response?.status || null,
         message: requestError?.message || "Unable to load candidates",
       })
-      if (!append) setCandidates([])
+
+      if (!append) {
+        setCandidates([])
+      }
     } finally {
       setLoading(false)
       setAppendLoading(false)
@@ -112,8 +129,11 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
   // Performance: Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (user) loadCandidates()
+      if (user) {
+        loadCandidates()
+      }
     }, 300)
+
     return () => clearTimeout(timer)
   }, [statusFilter, search, user?.id, location.pathname, location.search, location.key])
 
@@ -127,6 +147,7 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
       ).length,
     [candidates],
   )
+
   const hiredCount = useMemo(
     () => candidates.filter((candidate) => candidate.status === "hired").length,
     [candidates],
@@ -289,6 +310,7 @@ const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick, 
       .join("")
       .slice(0, 2)
       .toUpperCase() || "??"
+
   const score = candidate.data_quality_score || candidate.parsing_confidence || 0
 
   return (

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
 import { authService } from "@/api/services/authService"
 import { useAuth } from "@/lib/AuthContext"
-import { Building2, Mail, Phone, User, Save, Check } from "lucide-react"
 
 export default function EmployerSettingsPage() {
   const { user } = useAuth()
+
   const [form, setForm] = useState({
     company_name: "",
     contact_name: "",
@@ -12,11 +12,16 @@ export default function EmployerSettingsPage() {
     contact_phone: "",
     notification_email: "",
   })
+
   const [saved, setSaved] = useState(false)
+
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!user) return
+    if (!user) {
+      return
+    }
+
     setForm((f) => ({
       ...f,
       contact_name: user.full_name || "",
@@ -27,6 +32,7 @@ export default function EmployerSettingsPage() {
 
   const handleSave = async () => {
     setLoading(true)
+
     try {
       await authService.updateMe({
         full_name: form.contact_name,

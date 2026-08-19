@@ -1,8 +1,4 @@
-import React from "react"
-import { Droppable, Draggable } from "@hello-pangea/dnd"
 import { useTranslation } from "react-i18next"
-import CandidateCard from "./CandidateCard"
-import { Users } from "lucide-react"
 
 export default function StageColumn({
   stage,
@@ -15,8 +11,12 @@ export default function StageColumn({
   const { t } = useTranslation()
 
   const hasSlaBreaches = applications.some((a) => {
-    if (!stage.slaHours || !a.stage_entered_at) return false
+    if (!stage.slaHours || !a.stage_entered_at) {
+      return false
+    }
+
     const hours = (Date.now() - new Date(a.stage_entered_at)) / 3600000
+
     return hours > stage.slaHours
   })
 

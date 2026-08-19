@@ -1,9 +1,7 @@
 import * as React from "react"
 import useEmblaCarousel from "embla-carousel-react"
-import { ArrowLeft, ArrowRight } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 
 const CarouselContext = React.createContext(null)
 
@@ -26,7 +24,9 @@ const Carousel = React.forwardRef(
       },
       plugins,
     )
+
     const [canScrollPrev, setCanScrollPrev] = React.useState(false)
+
     const [canScrollNext, setCanScrollNext] = React.useState(false)
 
     const onSelect = React.useCallback((api) => {
@@ -108,6 +108,7 @@ const Carousel = React.forwardRef(
     )
   },
 )
+
 Carousel.displayName = "Carousel"
 
 const CarouselContent = React.forwardRef(({ className, ...props }, ref) => {
@@ -123,6 +124,7 @@ const CarouselContent = React.forwardRef(({ className, ...props }, ref) => {
     </div>
   )
 })
+
 CarouselContent.displayName = "CarouselContent"
 
 const CarouselItem = React.forwardRef(({ className, ...props }, ref) => {
@@ -142,6 +144,7 @@ const CarouselItem = React.forwardRef(({ className, ...props }, ref) => {
     />
   )
 })
+
 CarouselItem.displayName = "CarouselItem"
 
 const CarouselPrevious = React.forwardRef(
@@ -170,6 +173,7 @@ const CarouselPrevious = React.forwardRef(
     )
   },
 )
+
 CarouselPrevious.displayName = "CarouselPrevious"
 
 const CarouselNext = React.forwardRef(
@@ -198,6 +202,7 @@ const CarouselNext = React.forwardRef(
     )
   },
 )
+
 CarouselNext.displayName = "CarouselNext"
 
 export { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext }

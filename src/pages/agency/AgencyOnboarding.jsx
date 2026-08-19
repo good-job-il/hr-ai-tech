@@ -1,18 +1,10 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { organizationService } from "@/api/services/organizationService"
 import { useAuth } from "@/lib/AuthContext"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
-import { AlertCircle, Building2 } from "lucide-react"
-import {
-  PlatformCard,
-  PlatformPageHeader,
-  PlatformPageShell,
-} from "@/components/platform/PlatformUI"
+import { Building2 } from "lucide-react"
 
 /**
  * AgencyOnboarding
@@ -25,13 +17,19 @@ import {
  */
 export default function AgencyOnboarding() {
   const { i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const navigate = useNavigate()
+
   const { organization, isLoadingAuth, checkUserAuth } = useAuth()
 
   const [name, setName] = useState("")
+
   const [contactEmail, setContactEmail] = useState("")
+
   const [error, setError] = useState("")
+
   const [loading, setLoading] = useState(false)
 
   // Already onboarded (has an org) — nothing to do here, go straight in.
@@ -47,10 +45,12 @@ export default function AgencyOnboarding() {
 
     if (!name.trim()) {
       setError(isRtl ? "יש להזין שם לחברת ההשמה" : "Please enter your agency name")
+
       return
     }
 
     setLoading(true)
+
     try {
       await organizationService.onboardAgency({
         name: name.trim(),
@@ -66,6 +66,7 @@ export default function AgencyOnboarding() {
         err?.response?.data?.message ||
         err?.message ||
         (isRtl ? "שגיאה ביצירת הארגון" : "Error creating organization")
+
       setError(msg)
       toast({ title: msg, variant: "destructive" })
     } finally {

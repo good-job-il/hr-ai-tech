@@ -1,6 +1,4 @@
-import { Bell } from "lucide-react"
 import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/Card"
 
 export function NotificationBell({ unread = 0, notifications = [] }) {
   const [open, setOpen] = useState(false)

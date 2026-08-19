@@ -3,22 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useCandidateCRM } from "@/hooks/useCandidateCRM"
 import { useAuth } from "@/lib/AuthContext"
-import CandidateProfileHeader from "@/components/crm/candidate/CandidateProfileHeader"
-import CandidateTimeline from "@/components/crm/candidate/CandidateTimeline"
-import CandidateNotesPanel from "@/components/crm/candidate/CandidateNotesPanel"
-import InterviewsPanel from "@/components/crm/candidate/InterviewsPanel"
-import RecruiterWorkspacePanel from "@/components/crm/candidate/RecruiterWorkspacePanel"
-import DocumentsPanel from "@/components/crm/candidate/DocumentsPanel"
-import ApplicationsPanel from "@/components/crm/candidate/ApplicationsPanel"
-import WhatsAppPanel from "@/components/crm/candidate/WhatsAppPanel"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
-import { ArrowRight, RefreshCw, AlertCircle, Trash2 } from "lucide-react"
 import { candidateService } from "@/api/services/candidateService"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 
 export default function CandidateCRMPage() {
   const { t, i18n } = useTranslation()
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const isRTL = currentLang === "he"
 
   const TABS = [
@@ -30,28 +22,40 @@ export default function CandidateCRMPage() {
     { id: "whatsapp", label: t("candidateCRM.tabs.whatsapp") },
     { id: "timeline", label: t("candidateCRM.tabs.timeline") },
   ]
+
   const location = useLocation()
+
   const navigate = useNavigate()
+
   const { user } = useAuth()
+
   const { can } = usePermissionMatrix()
+
   const canUpdate = can("update")
+
   const canDelete = can("delete")
+
   const [activeTab, setActiveTab] = useState("overview")
 
   // Get candidateId from query param: /crm/candidate?id=xxx
   const params = new URLSearchParams(location.search)
+
   const candidateId = params.get("id")
 
   const [deleting, setDeleting] = useState(false)
 
   const handleDelete = async () => {
-    if (!window.confirm(t("candidateCRM.deleteConfirm"))) return
+    if (!window.confirm(t("candidateCRM.deleteConfirm"))) {
+      return
+    }
+
     setDeleting(true)
     await candidateService.remove(candidateId)
     navigate(-1)
   }
 
   const crm = useCandidateCRM(candidateId)
+
   const {
     candidate,
     notes,
@@ -86,8 +90,14 @@ export default function CandidateCRMPage() {
   const handleTabChange = useCallback(
     (tabId) => {
       setActiveTab(tabId)
-      if (tabId === "timeline" || tabId === "overview") loadTimeline()
-      if (tabId === "whatsapp") loadCommunications()
+
+      if (tabId === "timeline" || tabId === "overview") {
+        loadTimeline()
+      }
+
+      if (tabId === "whatsapp") {
+        loadCommunications()
+      }
     },
     [loadTimeline, loadCommunications],
   )

@@ -3,23 +3,11 @@
  * Lists all cross-org CandidateAccess records (shared + purchased).
  * Allows granting new access and revoking existing ones.
  */
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { candidateAccessService } from "@/api/services/candidateAccessService"
 import { organizationService } from "@/api/services/organizationService"
-import {
-  Users,
-  Search,
-  Plus,
-  Share2,
-  CreditCard,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Trash2,
-  Filter,
-  RefreshCw,
-} from "lucide-react"
+import { Users, Share2, CreditCard } from "lucide-react"
 
 const ACCESS_TYPE_CFG = {
   owner: { bg: "bg-purple-50", text: "text-purple-700", label: "Owner", icon: Users },
@@ -34,7 +22,9 @@ const ACCESS_TYPE_CFG = {
 
 function AccessBadge({ type }) {
   const cfg = ACCESS_TYPE_CFG[type] || ACCESS_TYPE_CFG.owner
+
   const Icon = cfg.icon
+
   return (
     <span
       className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${cfg.bg} ${cfg.text}`}
@@ -47,7 +37,9 @@ function AccessBadge({ type }) {
 
 function StatusBadge({ access }) {
   const now = new Date()
+
   const expired = access.expires_at && new Date(access.expires_at) <= now
+
   if (!access.is_active || expired) {
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-600">
@@ -56,6 +48,7 @@ function StatusBadge({ access }) {
       </span>
     )
   }
+
   return (
     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700">
       <CheckCircle className="w-3 h-3" />
@@ -73,10 +66,14 @@ function GrantModal({ orgs, onClose, onGrant }) {
     expires_at: "",
     notes: "",
   })
+
   const [saving, setSaving] = useState(false)
 
   const handleSubmit = async () => {
-    if (!form.candidate_id.trim() || !form.owner_organization_id) return
+    if (!form.candidate_id.trim() || !form.owner_organization_id) {
+      return
+    }
+
     setSaving(true)
     await onGrant({
       ...form,
@@ -194,9 +191,13 @@ function GrantModal({ orgs, onClose, onGrant }) {
 
 export default function MarketplaceCandidatesPage() {
   const [search, setSearch] = useState("")
+
   const [typeFilter, setTypeFilter] = useState("all")
+
   const [statusFilter, setStatusFilter] = useState("all")
+
   const [showGrant, setShowGrant] = useState(false)
+
   const qc = useQueryClient()
 
   const { data: accesses = [], isLoading } = useQuery({
@@ -213,6 +214,7 @@ export default function MarketplaceCandidatesPage() {
   })
 
   const orgMap = Object.fromEntries(orgs.map((o) => [o.id, o]))
+
   const now = new Date()
 
   // Only show cross-org accesses (not internal owner records)
@@ -220,15 +222,21 @@ export default function MarketplaceCandidatesPage() {
 
   const filtered = crossOrg.filter((a) => {
     const ownerName = orgMap[a.owner_organization_id]?.name ?? ""
+
     const accessorName = orgMap[a.accessor_organization_id]?.name ?? ""
+
     const matchSearch =
       !search ||
       a.candidate_id?.toLowerCase().includes(search.toLowerCase()) ||
       ownerName.toLowerCase().includes(search.toLowerCase()) ||
       accessorName.toLowerCase().includes(search.toLowerCase())
+
     const matchType = typeFilter === "all" || a.access_type === typeFilter
+
     const expired = a.expires_at && new Date(a.expires_at) <= now
+
     const isActive = a.is_active && !expired
+
     const matchStatus =
       statusFilter === "all"
         ? true
@@ -237,6 +245,7 @@ export default function MarketplaceCandidatesPage() {
           : statusFilter === "expired"
             ? !isActive
             : true
+
     return matchSearch && matchType && matchStatus
   })
 
@@ -260,7 +269,10 @@ export default function MarketplaceCandidatesPage() {
   }
 
   const handleDelete = async (acc) => {
-    if (!window.confirm("Delete this access grant permanently?")) return
+    if (!window.confirm("Delete this access grant permanently?")) {
+      return
+    }
+
     await candidateAccessService.remove(acc.id)
     qc.invalidateQueries(["marketplace-accesses"])
   }
@@ -386,8 +398,11 @@ export default function MarketplaceCandidatesPage() {
               ) : (
                 filtered.map((acc) => {
                   const ownerOrg = orgMap[acc.owner_organization_id]
+
                   const accessorOrg = orgMap[acc.accessor_organization_id]
+
                   const expired = acc.expires_at && new Date(acc.expires_at) <= now
+
                   return (
                     <tr
                       key={acc.id}

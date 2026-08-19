@@ -1,13 +1,12 @@
-import { ChevronDown, LogOut, Settings } from "lucide-react"
 import { useState } from "react"
-import { Link } from "react-router-dom"
 import { authService } from "@/api/services/authService"
-import Avatar from "./Avatar"
 
 export function UserMenu({ user }) {
   const [open, setOpen] = useState(false)
 
-  if (!user) return null
+  if (!user) {
+    return null
+  }
 
   return (
     <div className="relative">

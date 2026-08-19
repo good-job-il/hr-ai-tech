@@ -1,9 +1,5 @@
-import React from "react"
-import { Link } from "react-router-dom"
 import { companyService } from "@/api/services/companyService"
 import { useQuery } from "@tanstack/react-query"
-import { ArrowRight } from "lucide-react"
-import PublicLayout from "@/components/layouts/PublicLayout"
 
 export default function Companies() {
   const { data: companies = [], isLoading } = useQuery({

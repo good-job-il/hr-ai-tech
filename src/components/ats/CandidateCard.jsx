@@ -1,26 +1,39 @@
-import React, { useMemo } from "react"
-import { Clock, MapPin, User, AlertTriangle } from "lucide-react"
+import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import AIMatchBadge from "@/components/ai/AIMatchBadge"
 import { scoreMatch } from "@/lib/aiMatching"
 
 const SOURCE_KEYS = ["linkedin", "app", "jobsite", "import", "facebook", "other"]
 
 function timeInStage(enteredAt, t) {
-  if (!enteredAt) return null
+  if (!enteredAt) {
+    return null
+  }
+
   const hours = Math.floor((Date.now() - new Date(enteredAt)) / 3600000)
-  if (hours < 1) return t("pipeline.time.lessThanHour")
-  if (hours < 24) return t("pipeline.candidateCard.hoursInStage", { count: hours })
+
+  if (hours < 1) {
+    return t("pipeline.time.lessThanHour")
+  }
+
+  if (hours < 24) {
+    return t("pipeline.candidateCard.hoursInStage", { count: hours })
+  }
+
   return t("pipeline.candidateCard.daysInStage", { count: Math.floor(hours / 24) })
 }
 
 export default function CandidateCard({ application, stageColor, slaHours, onClick, isDragging }) {
   const { t } = useTranslation()
+
   const timeLabel = timeInStage(application.stage_entered_at, t)
 
   const sourceLabel = (source) => {
-    if (!source) return source
+    if (!source) {
+      return source
+    }
+
     const key = `pipeline.sources.${source}`
+
     return SOURCE_KEYS.includes(source) ? t(key) : source
   }
 
@@ -34,13 +47,17 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
       desired_salary_min: application.desired_salary_min,
       desired_salary_max: application.desired_salary_max,
     }
+
     const job = {
       title: application.job_title,
       domain_id: application.domain_id,
       location: application.location,
     }
+
     const { score, explanation } = scoreMatch(candidate, job)
+
     const finalScore = application.match_score != null ? application.match_score : score
+
     return {
       score: finalScore,
       missingRequired: !explanation.requiredMet,

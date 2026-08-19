@@ -1,34 +1,9 @@
 import { useState, useMemo } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { interviewService } from "@/api/services/interviewService"
 import { useAuth } from "@/lib/AuthContext"
-import { Button } from "@/components/ui/Button"
-import {
-  Calendar,
-  RefreshCw,
-  Clock,
-  Video,
-  Phone,
-  MapPin,
-  X,
-  Briefcase,
-  User,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  RotateCcw,
-  UserX,
-  Plus,
-  Edit,
-  FileText,
-  ThumbsUp,
-  ThumbsDown,
-  Mail,
-  Star,
-  Filter,
-} from "lucide-react"
+import { Calendar, CheckCircle2, XCircle, AlertCircle, RotateCcw, UserX } from "lucide-react"
 
 // ─── Status config ─────────────────────────────────────────────────────────────
 
@@ -53,19 +28,40 @@ const STATUS_ICON = {
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 function TypeIcon({ type, className = "w-5 h-5" }) {
-  if (type === "video") return <Video className={className} />
-  if (type === "phone") return <Phone className={className} />
-  if (type === "in_person") return <MapPin className={className} />
-  if (type === "technical") return <Briefcase className={className} />
-  if (type === "hr") return <User className={className} />
-  if (type === "final") return <Star className={className} />
+  if (type === "video") {
+    return <Video className={className} />
+  }
+
+  if (type === "phone") {
+    return <Phone className={className} />
+  }
+
+  if (type === "in_person") {
+    return <MapPin className={className} />
+  }
+
+  if (type === "technical") {
+    return <Briefcase className={className} />
+  }
+
+  if (type === "hr") {
+    return <User className={className} />
+  }
+
+  if (type === "final") {
+    return <Star className={className} />
+  }
+
   return <Calendar className={className} />
 }
 
 function StatusBadge({ status }) {
   const { t } = useTranslation()
+
   const style = STATUS_STYLE[status] || { color: "#64748B", bg: "#F8FAFC", border: "#E2E8F0" }
+
   const label = t(`company.interviews.status.${status}`, { defaultValue: status })
+
   const Icon = STATUS_ICON[status] || Calendar
 
   return (
@@ -106,6 +102,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
 
 function InterviewCard({ interview, isSelected, onSelect }) {
   const { t } = useTranslation()
+
   const isUpcoming =
     interview.date >= new Date().toISOString().split("T")[0] &&
     interview.status !== "cancelled" &&
@@ -189,8 +186,11 @@ function InterviewCard({ interview, isSelected, onSelect }) {
 
 function DetailPanel({ interview, onClose, onUpdate }) {
   const { t } = useTranslation()
+
   const [isEditing, setIsEditing] = useState(false)
+
   const [feedback, setFeedback] = useState(interview.feedback || "")
+
   const [rating, setRating] = useState(interview.rating || 0)
 
   const queryClient = useQueryClient()
@@ -200,7 +200,10 @@ function DetailPanel({ interview, onClose, onUpdate }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["company-interviews"] })
       setIsEditing(false)
-      if (onUpdate) onUpdate()
+
+      if (onUpdate) {
+        onUpdate()
+      }
     },
   })
 
@@ -552,8 +555,11 @@ function DetailPanel({ interview, onClose, onUpdate }) {
 
 export default function CompanyInterviews() {
   const { t } = useTranslation()
+
   const { user } = useAuth()
+
   const [filterTab, setFilterTab] = useState("upcoming")
+
   const [selected, setSelected] = useState(null)
 
   const orgId = user?.organization_id
@@ -600,15 +606,19 @@ export default function CompanyInterviews() {
       if (filterTab === "upcoming") {
         return i.date >= todayDate && i.status !== "cancelled" && i.status !== "completed"
       }
+
       if (filterTab === "today") {
         return i.date === todayDate && i.status !== "cancelled" && i.status !== "completed"
       }
+
       if (filterTab === "completed") {
         return i.status === "completed"
       }
+
       if (filterTab === "cancelled") {
         return i.status === "cancelled"
       }
+
       return true
     })
   }, [interviews, filterTab])
@@ -783,7 +793,10 @@ export default function CompanyInterviews() {
               onUpdate={() => {
                 // Update the selected interview with fresh data
                 const updated = interviews.find((i) => i.id === selected.id)
-                if (updated) setSelected(updated)
+
+                if (updated) {
+                  setSelected(updated)
+                }
               }}
             />
           </div>

@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom"
 
 export default function PlaceholderPlatform({ title }) {
   const location = useLocation()
+
   const derived =
     title ||
     location.pathname
@@ -10,6 +11,7 @@ export default function PlaceholderPlatform({ title }) {
       .slice(1)
       .map((s) => s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()))
       .join(" › ")
+
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
       <div className="text-5xl mb-4">🔧</div>

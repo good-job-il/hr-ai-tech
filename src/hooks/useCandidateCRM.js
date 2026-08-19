@@ -24,27 +24,44 @@ function isNotFound(e) {
 
 export function useCandidateCRM(candidateId) {
   const { user } = useAuth()
+
   const [candidate, setCandidate] = useState(null)
+
   const [notes, setNotes] = useState([])
+
   const [interviews, setInterviews] = useState([])
+
   const [timeline, setTimeline] = useState([])
+
   const [tags, setTags] = useState([])
+
   const [documents, setDocuments] = useState([])
+
   const [communications, setCommunications] = useState([])
+
   const [applications, setApplications] = useState([])
+
   const [loading, setLoading] = useState(true)
+
   const [timelineLoading, setTimelineLoading] = useState(false)
+
   const [commsLoading, setCommsLoading] = useState(false)
+
   const [error, setError] = useState(null)
+
   const timelineLoadedRef = useRef(false)
+
   const commsLoadedRef = useRef(false)
 
   // ── EAGER LOAD (candidate + core data) ──────────────────────────────────
   const loadAll = useCallback(async () => {
-    if (!candidateId) return
+    if (!candidateId) {
+      return
+    }
 
     // Cache hit — avoid redundant fetches within STALE window
     const cached = _cache.get(candidateId)
+
     if (cached && Date.now() - cached.ts < EAGER_STALE_MS) {
       setCandidate(cached.candidate)
       setNotes(cached.notes)
@@ -53,6 +70,7 @@ export function useCandidateCRM(candidateId) {
       setDocuments(cached.documents)
       setTags(cached.tags)
       setLoading(false)
+
       return
     }
 
@@ -64,11 +82,15 @@ export function useCandidateCRM(candidateId) {
 
     try {
       let cand = null
+
       try {
         cand = await candidateCrmService.get(candidateId)
       } catch (e) {
-        if (!isNotFound(e)) throw e
+        if (!isNotFound(e)) {
+          throw e
+        }
       }
+
       setCandidate(cand)
 
       const [notesData, interviewsData, tagsData, docsData, appsData] = await Promise.all([
@@ -107,11 +129,16 @@ export function useCandidateCRM(candidateId) {
 
   // ── LAZY: Timeline ────────────────────────────────────────────────────────
   const loadTimeline = useCallback(async () => {
-    if (!candidateId || timelineLoadedRef.current) return
+    if (!candidateId || timelineLoadedRef.current) {
+      return
+    }
+
     timelineLoadedRef.current = true
     setTimelineLoading(true)
+
     try {
       const data = await candidateCrmService.timeline(candidateId)
+
       setTimeline(data)
     } finally {
       setTimelineLoading(false)
@@ -120,11 +147,16 @@ export function useCandidateCRM(candidateId) {
 
   // ── LAZY: Communications ──────────────────────────────────────────────────
   const loadCommunications = useCallback(async () => {
-    if (!candidateId || commsLoadedRef.current) return
+    if (!candidateId || commsLoadedRef.current) {
+      return
+    }
+
     commsLoadedRef.current = true
     setCommsLoading(true)
+
     try {
       const data = await candidateCrmService.communications(candidateId)
+
       setCommunications(data)
     } finally {
       setCommsLoading(false)
@@ -147,7 +179,10 @@ export function useCandidateCRM(candidateId) {
 
   const addTimelineEvent = useCallback(
     async (eventType, description, metadata = {}, visibilityOpts = {}) => {
-      if (!candidateId || !user?.email) return
+      if (!candidateId || !user?.email) {
+        return
+      }
+
       const event = await candidateCrmService.addTimeline(candidateId, {
         event_type: eventType,
         description,
@@ -155,7 +190,9 @@ export function useCandidateCRM(candidateId) {
         is_visible_to_candidate: visibilityOpts.candidate || false,
         is_visible_to_employer: visibilityOpts.employer || false,
       })
+
       setTimeline((prev) => [event, ...prev])
+
       return event
     },
     [candidateId, candidate, user],
@@ -179,6 +216,7 @@ export function useCandidateCRM(candidateId) {
         related_application_id,
         related_interview_id,
       })
+
       setNotes((prev) => [note, ...prev])
       invalidateCache()
       await addTimelineEvent(
@@ -187,6 +225,7 @@ export function useCandidateCRM(candidateId) {
         { note_id: note.id, visibility },
         { employer: visibility === "employer_visible" },
       )
+
       return note
     },
     [candidateId, candidate, user, addTimelineEvent, invalidateCache],
@@ -195,8 +234,10 @@ export function useCandidateCRM(candidateId) {
   const updateNote = useCallback(
     async (noteId, updates) => {
       const updated = await candidateCrmService.updateNote(noteId, updates)
+
       setNotes((prev) => prev.map((n) => (n.id === noteId ? updated : n)))
       invalidateCache()
+
       return updated
     },
     [invalidateCache],
@@ -219,6 +260,7 @@ export function useCandidateCRM(candidateId) {
         candidate_id: candidateId,
         candidate_name: candidate?.full_name || "",
       })
+
       setInterviews((prev) => [interview, ...prev])
       invalidateCache()
       await addTimelineEvent(
@@ -227,6 +269,7 @@ export function useCandidateCRM(candidateId) {
         { interview_id: interview.id, job_title: interview.job_title },
         { candidate: true },
       )
+
       return interview
     },
     [candidateId, candidate, user, addTimelineEvent, invalidateCache],
@@ -235,17 +278,23 @@ export function useCandidateCRM(candidateId) {
   const updateInterview = useCallback(
     async (interviewId, updates) => {
       const updated = await candidateCrmService.updateInterview(interviewId, updates)
+
       setInterviews((prev) => prev.map((i) => (i.id === interviewId ? updated : i)))
+
       if (updates.status) {
         const statusMap = { completed: "interview_completed", cancelled: "interview_cancelled" }
+
         const evType = statusMap[updates.status]
-        if (evType)
+
+        if (evType) {
           await addTimelineEvent(
             evType,
             `ראיון ${updates.status === "completed" ? "הושלם" : "בוטל"}`,
             { interview_id: interviewId },
           )
+        }
       }
+
       return updated
     },
     [addTimelineEvent],
@@ -255,19 +304,24 @@ export function useCandidateCRM(candidateId) {
   const updateStatus = useCallback(
     async (newStatus, rejectReason) => {
       const oldStatus = candidate?.status
+
       const updated = await candidateCrmService.update(candidateId, { status: newStatus })
+
       setCandidate(updated)
       invalidateCache()
+
       const description =
         newStatus === "rejected" && rejectReason
           ? `מועמד נדחה — סיבה: ${rejectReason}`
           : `סטטוס שונה מ-${oldStatus} ל-${newStatus}`
+
       await addTimelineEvent(
         "status_changed",
         description,
         { old_value: oldStatus, new_value: newStatus, reject_reason: rejectReason },
         { candidate: true },
       )
+
       return updated
     },
     [candidateId, candidate, addTimelineEvent, invalidateCache],
@@ -277,6 +331,7 @@ export function useCandidateCRM(candidateId) {
   const assignRecruiter = useCallback(
     async (recruiterId, recruiterName, recruiterEmail) => {
       const updated = await candidateCrmService.update(candidateId, { recruiter_id: recruiterId })
+
       setCandidate(updated)
       invalidateCache()
       await addTimelineEvent(
@@ -287,6 +342,7 @@ export function useCandidateCRM(candidateId) {
           recruiter_email: recruiterEmail || null,
         },
       )
+
       return updated
     },
     [candidateId, addTimelineEvent, invalidateCache],
@@ -296,11 +352,17 @@ export function useCandidateCRM(candidateId) {
   const addTag = useCallback(
     async (tag, color = "#7C3AED") => {
       const existing = tags.find((t) => t.tag === tag)
-      if (existing) return existing
+
+      if (existing) {
+        return existing
+      }
+
       const newTag = await candidateCrmService.addTag(candidateId, tag, color)
+
       setTags((prev) => [...prev, newTag])
       invalidateCache()
       await addTimelineEvent("tag_added", `תגית נוספה: ${tag}`, { tag })
+
       return newTag
     },
     [candidateId, tags, user, addTimelineEvent, invalidateCache],
@@ -320,12 +382,14 @@ export function useCandidateCRM(candidateId) {
   const uploadDocument = useCallback(
     async (file, docType = "cv") => {
       const doc = await candidateCrmService.uploadDocument(candidateId, file, docType)
+
       setDocuments((prev) => [doc, ...prev])
       invalidateCache()
       await addTimelineEvent("document_uploaded", `מסמך הועלה: ${file.name} (${docType})`, {
         doc_id: doc.id,
         doc_type: docType,
       })
+
       return doc
     },
     [candidateId, candidate, user, addTimelineEvent, invalidateCache],
@@ -336,6 +400,7 @@ export function useCandidateCRM(candidateId) {
     async (_employerId, jobId, _jobTitle) => {
       await candidateCrmService.presentCandidate(candidateId, Number(jobId))
       invalidateCache()
+
       return candidate
     },
     [candidateId, candidate, addTimelineEvent, invalidateCache],

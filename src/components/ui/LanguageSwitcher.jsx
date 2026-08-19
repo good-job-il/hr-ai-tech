@@ -1,13 +1,13 @@
-import React from "react"
 import { useTranslation } from "react-i18next"
-import { Globe } from "lucide-react"
 
 export default function LanguageSwitcher({ className = "", variant = "default" }) {
   const { i18n } = useTranslation()
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
 
   const toggle = () => {
     const next = currentLang === "he" ? "en" : "he"
+
     i18n.changeLanguage(next)
     // Update document direction and lang attribute
     document.documentElement.lang = next

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import { analyticsService } from "@/api/services/analyticsService"
-import { Link } from "react-router-dom"
 import {
   Users,
   Building2,
@@ -8,36 +7,21 @@ import {
   Activity,
   AlertCircle,
   FileText,
-  RefreshCw,
   CheckCircle2,
   XCircle,
   Clock,
   Download,
   Zap,
   ArrowUpRight,
-  ArrowDownRight,
-  BarChart3,
   UserPlus,
   Shield,
   Database,
-  PieChart,
 } from "lucide-react"
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart as RePieChart,
-  Pie,
-  Cell,
-} from "recharts"
 
 // ── Stat Card with % change ──────────────────────────────────────────────────
 function StatCard({ icon: Icon, label, value, change, color = "#7C3AED", loading }) {
   const isPositive = change >= 0
+
   return (
     <div className="bg-white rounded-2xl border border-[#E4ECFF] p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
       <div
@@ -89,7 +73,9 @@ function HealthRow({ label, status, loading }) {
     ok: { dot: "bg-emerald-500", text: "תקין", color: "text-emerald-600" },
     pending: { dot: "bg-amber-500", text: "בתהליך", color: "text-amber-600" },
   }
+
   const s = statusMap[status] || statusMap.inactive
+
   return (
     <div className="flex items-center justify-between py-2.5 border-b border-[#F1F5F9] last:border-0">
       <span className="text-sm font-semibold text-[#374151]">{label}</span>
@@ -125,16 +111,22 @@ const ICON_MAP = {
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null)
+
   const [loading, setLoading] = useState(true)
+
   const [error, setError] = useState(null)
+
   const [lastUpdated, setLastUpdated] = useState(null)
+
   const [chartView, setChartView] = useState("candidates")
 
   const loadStats = async () => {
     setLoading(true)
     setError(null)
+
     try {
       const res = await analyticsService.dashboard()
+
       setStats(res.data)
       setLastUpdated(new Date())
     } catch (e) {
@@ -150,7 +142,9 @@ export default function AdminDashboard() {
   }, [])
 
   const importSourceData = stats?.importSourceData || []
+
   const recentImports = stats?.recentImports || []
+
   const recentActivity = (stats?.recentActivity || []).map((a) => ({
     ...a,
     icon: ICON_MAP[a.icon] || Activity,
@@ -395,6 +389,7 @@ export default function AdminDashboard() {
             ) : (
               recentActivity.map((item, i) => {
                 const Icon = item.icon
+
                 return (
                   <div key={i} className="flex items-start gap-3">
                     <div
@@ -509,6 +504,7 @@ export default function AdminDashboard() {
           },
         ].map((item) => {
           const Icon = item.icon
+
           return (
             <div
               key={item.label}

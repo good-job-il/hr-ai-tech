@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -24,6 +23,7 @@ const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const DialogContent = React.forwardRef(({ className, children, ...props }, ref) => (
@@ -45,11 +45,13 @@ const DialogContent = React.forwardRef(({ className, children, ...props }, ref) 
     </DialogPrimitive.Content>
   </DialogPortal>
 ))
+
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 const DialogHeader = ({ className, ...props }) => (
   <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props} />
 )
+
 DialogHeader.displayName = "DialogHeader"
 
 const DialogFooter = ({ className, ...props }) => (
@@ -58,6 +60,7 @@ const DialogFooter = ({ className, ...props }) => (
     {...props}
   />
 )
+
 DialogFooter.displayName = "DialogFooter"
 
 const DialogTitle = React.forwardRef(({ className, ...props }, ref) => (
@@ -67,6 +70,7 @@ const DialogTitle = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 DialogTitle.displayName = DialogPrimitive.Title.displayName
 
 const DialogDescription = React.forwardRef(({ className, ...props }, ref) => (
@@ -76,6 +80,7 @@ const DialogDescription = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 export {

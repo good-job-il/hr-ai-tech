@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
-import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -36,6 +35,7 @@ const Menubar = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 Menubar.displayName = MenubarPrimitive.Root.displayName
 
 const MenubarTrigger = React.forwardRef(({ className, ...props }, ref) => (
@@ -48,6 +48,7 @@ const MenubarTrigger = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName
 
 const MenubarSubTrigger = React.forwardRef(({ className, inset, children, ...props }, ref) => (
@@ -64,6 +65,7 @@ const MenubarSubTrigger = React.forwardRef(({ className, inset, children, ...pro
     <ChevronRight className="ml-auto h-4 w-4" />
   </MenubarPrimitive.SubTrigger>
 ))
+
 MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName
 
 const MenubarSubContent = React.forwardRef(({ className, ...props }, ref) => (
@@ -76,6 +78,7 @@ const MenubarSubContent = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName
 
 const MenubarContent = React.forwardRef(
@@ -95,6 +98,7 @@ const MenubarContent = React.forwardRef(
     </MenubarPrimitive.Portal>
   ),
 )
+
 MenubarContent.displayName = MenubarPrimitive.Content.displayName
 
 const MenubarItem = React.forwardRef(({ className, inset, ...props }, ref) => (
@@ -108,6 +112,7 @@ const MenubarItem = React.forwardRef(({ className, inset, ...props }, ref) => (
     {...props}
   />
 ))
+
 MenubarItem.displayName = MenubarPrimitive.Item.displayName
 
 const MenubarCheckboxItem = React.forwardRef(({ className, children, checked, ...props }, ref) => (
@@ -128,6 +133,7 @@ const MenubarCheckboxItem = React.forwardRef(({ className, children, checked, ..
     {children}
   </MenubarPrimitive.CheckboxItem>
 ))
+
 MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName
 
 const MenubarRadioItem = React.forwardRef(({ className, children, ...props }, ref) => (
@@ -147,6 +153,7 @@ const MenubarRadioItem = React.forwardRef(({ className, children, ...props }, re
     {children}
   </MenubarPrimitive.RadioItem>
 ))
+
 MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName
 
 const MenubarLabel = React.forwardRef(({ className, inset, ...props }, ref) => (
@@ -156,6 +163,7 @@ const MenubarLabel = React.forwardRef(({ className, inset, ...props }, ref) => (
     {...props}
   />
 ))
+
 MenubarLabel.displayName = MenubarPrimitive.Label.displayName
 
 const MenubarSeparator = React.forwardRef(({ className, ...props }, ref) => (
@@ -165,6 +173,7 @@ const MenubarSeparator = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName
 
 const MenubarShortcut = ({ className, ...props }) => {
@@ -175,6 +184,7 @@ const MenubarShortcut = ({ className, ...props }) => {
     />
   )
 }
+
 MenubarShortcut.displayname = "MenubarShortcut"
 
 export {

@@ -1,5 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
-
 export function ChartCard({ title, description, children }) {
   return (
     <Card hoverable>

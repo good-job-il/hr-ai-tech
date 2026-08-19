@@ -1,23 +1,11 @@
-import React, { useState, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "@/lib/AuthContext"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { agencyClientService } from "@/api/services/agencyClientService"
 import { toast } from "sonner"
-import {
-  Building2,
-  Plus,
-  Search,
-  Briefcase,
-  Users,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  TrendingUp,
-  Mail,
-} from "lucide-react"
+import { Building2, Briefcase, Users, ChevronLeft, ChevronRight, TrendingUp } from "lucide-react"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -64,7 +52,9 @@ function getInitials(name = "") {
 }
 
 function getIndustryKey(value, t) {
-  if (!value || INDUSTRY_KEYS.includes(value)) return value
+  if (!value || INDUSTRY_KEYS.includes(value)) {
+    return value
+  }
 
   return (
     INDUSTRY_KEYS.find(
@@ -77,12 +67,15 @@ function getIndustryKey(value, t) {
 
 function getIndustryLabel(value, t) {
   const key = getIndustryKey(value, t)
+
   return INDUSTRY_KEYS.includes(key) ? t(`agencyClients.industries.${key}`) : value
 }
 
 function CompanyAvatar({ company, size = "md" }) {
   const sz = size === "lg" ? "w-16 h-16 text-lg" : "w-12 h-12 text-sm"
+
   const color = company.color || PALETTE[0]
+
   const initials = company.initials || getInitials(company.name)
 
   if (company.logo_url) {
@@ -94,6 +87,7 @@ function CompanyAvatar({ company, size = "md" }) {
       />
     )
   }
+
   return (
     <div
       className={`${sz} rounded-xl flex items-center justify-center text-white font-black flex-shrink-0`}
@@ -108,6 +102,7 @@ function CompanyAvatar({ company, size = "md" }) {
 
 function CreateClientModal({ isOpen, onClose, onSuccess }) {
   const { t, i18n } = useTranslation()
+
   const [form, setForm] = useState({
     name: "",
     industry: "",
@@ -115,7 +110,9 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
     website: "",
     color: PALETTE[0],
   })
+
   const [saving, setSaving] = useState(false)
+
   const [error, setError] = useState("")
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }))
@@ -123,10 +120,13 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
   const handleSubmit = async () => {
     if (!form.name.trim()) {
       setError(t("agencyClients.createModal.clientNameRequired"))
+
       return
     }
+
     setError("")
     setSaving(true)
+
     try {
       await agencyClientService.create({
         name: form.name.trim(),
@@ -149,10 +149,14 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
   }
 
   const handleKey = (e) => {
-    if (e.key === "Enter") handleSubmit()
+    if (e.key === "Enter") {
+      handleSubmit()
+    }
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   const dir = i18n.language?.startsWith("he") ? "rtl" : "ltr"
 
@@ -287,8 +291,11 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
 
 function ClientCard({ company }) {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const DirectionIcon = isRtl ? ChevronLeft : ChevronRight
+
   return (
     <Link
       to={`/agency/clients/${company.id}`}
@@ -350,7 +357,9 @@ function StatCard({ icon: Icon, label, value, color, loading }) {
     amber: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100" },
     green: { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-100" },
   }
+
   const c = colors[color] || colors.purple
+
   return (
     <div className={`bg-white border ${c.border} rounded-2xl p-5 shadow-sm`}>
       <div className="flex items-center gap-3 mb-3">
@@ -372,16 +381,24 @@ function StatCard({ icon: Icon, label, value, color, loading }) {
 
 export default function AgencyClients() {
   const { t, i18n } = useTranslation()
+
   const { user } = useAuth()
+
   const { can } = usePermissionMatrix()
+
   const orgId = user?.organization_id
+
   const canManageClients =
     ["org_admin", "recruitment_manager", "admin"].includes(user?.role) && can("create")
+
   const queryClient = useQueryClient()
 
   const [search, setSearch] = useState("")
+
   const [filterIndustry, setFilterIndustry] = useState("")
+
   const [filterActive, setFilterActive] = useState("all") // 'all' | 'active' | 'inactive'
+
   const [showCreate, setShowCreate] = useState(false)
 
   const dir = i18n.language?.startsWith("he") ? "rtl" : "ltr"
@@ -409,7 +426,10 @@ export default function AgencyClients() {
       .filter((client) => client.status !== "archived")
       .sort((a, b) => {
         // Active clients first, then by name
-        if (b.isActive !== a.isActive) return b.isActive - a.isActive
+        if (b.isActive !== a.isActive) {
+          return b.isActive - a.isActive
+        }
+
         return a.name.localeCompare(b.name, i18n.language?.startsWith("he") ? "he" : "en")
       })
   }, [clients, i18n.language])
@@ -418,16 +438,29 @@ export default function AgencyClients() {
 
   const filtered = useMemo(() => {
     return clientsWithStats.filter((c) => {
-      if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false
-      if (filterIndustry && getIndustryKey(c.industry, t) !== filterIndustry) return false
-      if (filterActive === "active" && !c.isActive) return false
-      if (filterActive === "inactive" && c.isActive) return false
+      if (search && !c.name.toLowerCase().includes(search.toLowerCase())) {
+        return false
+      }
+
+      if (filterIndustry && getIndustryKey(c.industry, t) !== filterIndustry) {
+        return false
+      }
+
+      if (filterActive === "active" && !c.isActive) {
+        return false
+      }
+
+      if (filterActive === "inactive" && c.isActive) {
+        return false
+      }
+
       return true
     })
   }, [clientsWithStats, search, filterIndustry, filterActive, t])
 
   const industries = useMemo(() => {
     const set = new Set(clientsWithStats.map((c) => getIndustryKey(c.industry, t)).filter(Boolean))
+
     return [...set].sort((a, b) =>
       getIndustryLabel(a, t).localeCompare(getIndustryLabel(b, t), i18n.language),
     )

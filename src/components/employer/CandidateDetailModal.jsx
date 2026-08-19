@@ -1,5 +1,4 @@
-import React, { useState } from "react"
-import { X, FileText, Mail, Phone, ExternalLink, MessageSquare } from "lucide-react"
+import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { applicationService } from "@/api/services/applicationService"
 
@@ -39,7 +38,9 @@ const sourceLabels = {
 
 export default function CandidateDetailModal({ application: app, onClose, onStatusChange }) {
   const [notes, setNotes] = useState(app.notes || "")
+
   const [editingNotes, setEditingNotes] = useState(false)
+
   const queryClient = useQueryClient()
 
   const updateMutation = useMutation({

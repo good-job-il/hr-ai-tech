@@ -1,39 +1,11 @@
 import { useMemo, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import {
-  AlertTriangle,
-  Briefcase,
-  CheckCircle2,
-  Clock3,
-  Filter,
-  Kanban,
-  RefreshCw,
-  Send,
-  Users,
-} from "lucide-react"
+import { AlertTriangle, Briefcase, CheckCircle2, Clock3, Kanban, Users } from "lucide-react"
 import { recruitmentManagementService } from "@/api/services/recruitmentManagementService"
 import { agencyTeamsService } from "@/api/services/agencyTeamsService"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-  platformFieldClassName,
-} from "@/components/platform/PlatformUI"
+
+import { platformFieldClassName } from "@/components/platform/PlatformUI"
 import { REASSIGN_INVALIDATION_KEYS } from "@/domain/agency/rmAcceptance"
 
 const STAGES = [
@@ -48,6 +20,7 @@ const STAGES = [
   "completed",
   "rejected",
 ]
+
 const parseIds = (value) => [
   ...new Set(
     value
@@ -56,11 +29,14 @@ const parseIds = (value) => [
       .filter(Number.isInteger),
   ),
 ]
+
 const isoDate = (date) => date.toISOString().slice(0, 10)
 
 export default function RecruitmentManagerDashboard() {
   const { i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const text = isRtl
     ? {
         title: "ניהול גיוס",
@@ -132,7 +108,9 @@ export default function RecruitmentManagerDashboard() {
         to: "To",
         all: "All",
       }
+
   const queryClient = useQueryClient()
+
   const [filters, setFilters] = useState({
     date_from: isoDate(new Date(Date.now() - 90 * 86400000)),
     date_to: isoDate(new Date()),
@@ -141,17 +119,21 @@ export default function RecruitmentManagerDashboard() {
     recruiter_id: "",
     team_id: "",
   })
+
   const reportQuery = Object.fromEntries(
     Object.entries(filters)
       .filter(([, value]) => value !== "")
       .map(([key, value]) => [key, key.endsWith("_id") ? Number(value) : value]),
   )
+
   const dashboard = useQuery({
     queryKey: ["recruitment-manager-dashboard", reportQuery],
     queryFn: () => recruitmentManagementService.dashboard(reportQuery),
     refetchInterval: 5 * 60_000,
   })
+
   const teamsQuery = useQuery({ queryKey: ["agency-teams"], queryFn: agencyTeamsService.overview })
+
   const [form, setForm] = useState({
     job_ids: "",
     candidate_ids: "",
@@ -160,11 +142,17 @@ export default function RecruitmentManagerDashboard() {
     recruiter_id: "none",
     reason: "",
   })
+
   const [formError, setFormError] = useState("")
+
   const [saved, setSaved] = useState(false)
+
   const data = dashboard.data
+
   const dimensions = data?.dimensions || { clients: [], jobs: [], recruiters: [], teams: [] }
+
   const teams = teamsQuery.data?.teams || []
+
   const recruiters = useMemo(
     () =>
       (teamsQuery.data?.members || []).filter(
@@ -175,6 +163,7 @@ export default function RecruitmentManagerDashboard() {
       ),
     [form.team_id, teamsQuery.data],
   )
+
   const assignment = useMutation({
     mutationFn: recruitmentManagementService.assign,
     onSuccess: () => {
@@ -193,9 +182,11 @@ export default function RecruitmentManagerDashboard() {
     },
     onError: (error) => setFormError(error?.message || text.loadError),
   })
+
   const submit = (event) => {
     event.preventDefault()
     setSaved(false)
+
     const payload = {
       job_ids: parseIds(form.job_ids),
       candidate_ids: parseIds(form.candidate_ids),
@@ -204,17 +195,20 @@ export default function RecruitmentManagerDashboard() {
       recruiter_id: form.recruiter_id === "none" ? null : Number(form.recruiter_id),
       reason: form.reason.trim(),
     }
+
     if (
       !payload.reason ||
       ![...payload.job_ids, ...payload.candidate_ids, ...payload.application_ids].length
     ) {
       setFormError(text.required)
+
       return
     }
+
     assignment.mutate(payload)
   }
 
-  if (dashboard.isError)
+  if (dashboard.isError) {
     return (
       <PlatformPageShell dir={isRtl ? "rtl" : "ltr"}>
         <PlatformCard className="p-6">
@@ -227,7 +221,10 @@ export default function RecruitmentManagerDashboard() {
         </PlatformCard>
       </PlatformPageShell>
     )
+  }
+
   const maxFunnel = Math.max(1, ...Object.values(data?.funnel || {}))
+
   return (
     <PlatformPageShell dir={isRtl ? "rtl" : "ltr"}>
       <div className="space-y-6">

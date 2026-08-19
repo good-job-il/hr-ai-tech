@@ -6,23 +6,10 @@
  *   - Organizations participating in the marketplace
  *   - Recent access grants (activity feed)
  */
-import React from "react"
-import { Link } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
 import { candidateAccessService } from "@/api/services/candidateAccessService"
 import { organizationService } from "@/api/services/organizationService"
-import {
-  ShoppingCart,
-  Users,
-  Share2,
-  CreditCard,
-  Building2,
-  TrendingUp,
-  Clock,
-  CheckCircle,
-  XCircle,
-  ArrowRight,
-} from "lucide-react"
+import { ShoppingCart, Share2, CreditCard, Building2, CheckCircle } from "lucide-react"
 
 function KpiCard({ icon: Icon, label, value, sub, color = "purple", loading, to }) {
   const colorMap = {
@@ -32,6 +19,7 @@ function KpiCard({ icon: Icon, label, value, sub, color = "purple", loading, to 
     amber: "bg-amber-50  text-amber-600",
     red: "bg-red-50    text-red-600",
   }
+
   const inner = (
     <div
       className={`bg-white border border-gray-100 rounded-2xl p-5 shadow-sm transition-shadow ${to ? "hover:shadow-md cursor-pointer" : ""}`}
@@ -52,6 +40,7 @@ function KpiCard({ icon: Icon, label, value, sub, color = "purple", loading, to 
       )}
     </div>
   )
+
   return to ? <Link to={to}>{inner}</Link> : inner
 }
 
@@ -61,7 +50,9 @@ function AccessTypeBadge({ type }) {
     shared: { bg: "bg-blue-50", text: "text-blue-700", label: "Shared" },
     purchased: { bg: "bg-emerald-50", text: "text-emerald-700", label: "Purchased" },
   }
+
   const { bg, text, label } = cfg[type] || cfg.owner
+
   return (
     <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${bg} ${text}`}>
       {label}
@@ -86,25 +77,31 @@ export default function MarketplacePage() {
   const loading = loadingAccesses || loadingOrgs
 
   const now = new Date()
+
   const active = accesses.filter(
     (a) => a.is_active && (!a.expires_at || new Date(a.expires_at) > now),
   )
+
   const expired = accesses.filter(
     (a) => !a.is_active || (a.expires_at && new Date(a.expires_at) <= now),
   )
+
   const purchased = accesses.filter((a) => a.access_type === "purchased")
+
   const shared = accesses.filter((a) => a.access_type === "shared")
 
   // Orgs that have exposed at least one candidate (have non-owner access granted from them)
   const exposedOrgIds = new Set(
     accesses.filter((a) => a.access_type !== "owner").map((a) => a.owner_organization_id),
   )
+
   const exposedOrgs = orgs.filter((o) => exposedOrgIds.has(o.id))
 
   // Orgs that purchased / received access
   const buyerOrgIds = new Set(
     accesses.filter((a) => a.accessor_organization_id).map((a) => a.accessor_organization_id),
   )
+
   const buyerOrgs = orgs.filter((o) => buyerOrgIds.has(o.id))
 
   // Recent activity (last 10 non-owner accesses)
@@ -116,6 +113,7 @@ export default function MarketplacePage() {
       const orgAccesses = accesses.filter(
         (a) => a.owner_organization_id === org.id && a.access_type !== "owner",
       )
+
       return {
         ...org,
         sharedCount: orgAccesses.filter((a) => a.access_type === "shared").length,

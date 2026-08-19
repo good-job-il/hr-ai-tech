@@ -1,11 +1,13 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { interviewService } from "@/api/services/interviewService"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Video, Phone, Users as UsersIcon } from "lucide-react"
 
 export default function InterviewScheduler({ applicationId, candidateName }) {
   const queryClient = useQueryClient()
+
   const [showForm, setShowForm] = useState(false)
+
   const [formData, setFormData] = useState({
     date: "",
     time: "",

@@ -1,12 +1,10 @@
-import React, { useState, useMemo, useCallback } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { organizationService } from "@/api/services/organizationService"
 import {
   Flag,
   Search,
   Building2,
-  ChevronDown,
-  ChevronUp,
   Zap,
   BarChart3,
   Users,
@@ -15,19 +13,7 @@ import {
   Globe,
   Layers,
   DollarSign,
-  Save,
-  RotateCcw,
-  Info,
-  SlidersHorizontal,
 } from "lucide-react"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-} from "@/components/platform/PlatformUI"
 
 // ─── Feature catalogue ───────────────────────────────────────────────────────
 
@@ -221,8 +207,12 @@ const LS_KEY = "platform_flag_matrix"
 function loadMatrix() {
   try {
     const saved = localStorage.getItem(LS_KEY)
-    if (saved) return { ...PLAN_DEFAULTS, ...JSON.parse(saved) }
+
+    if (saved) {
+      return { ...PLAN_DEFAULTS, ...JSON.parse(saved) }
+    }
   } catch {}
+
   return { ...PLAN_DEFAULTS }
 }
 
@@ -250,8 +240,11 @@ function Toggle({ value, onChange, disabled }) {
 
 function PlanMatrixTab() {
   const [matrix, setMatrix] = useState(loadMatrix)
+
   const [dirty, setDirty] = useState(false)
+
   const [saved, setSaved] = useState(false)
+
   const [expandedCats, setExpandedCats] = useState(() => new Set(CATEGORIES.map((c) => c.id)))
 
   const toggleFeature = (plan, featureId) => {
@@ -279,7 +272,9 @@ function PlanMatrixTab() {
   const toggleCat = (catId) => {
     setExpandedCats((prev) => {
       const next = new Set(prev)
+
       next.has(catId) ? next.delete(catId) : next.add(catId)
+
       return next
     })
   }
@@ -333,6 +328,7 @@ function PlanMatrixTab() {
             </div>
             {PLANS.map((plan) => {
               const c = PLAN_COLORS[plan]
+
               return (
                 <div key={plan} className="px-3 py-4 text-center">
                   <span
@@ -348,8 +344,11 @@ function PlanMatrixTab() {
           {/* Feature rows grouped by category */}
           {CATEGORIES.map((cat) => {
             const CatIcon = cat.icon
+
             const features = FEATURES.filter((f) => f.category === cat.id)
+
             const expanded = expandedCats.has(cat.id)
+
             return (
               <div key={cat.id} className="border-b border-slate-100 last:border-0">
                 {/* Category header */}
@@ -373,6 +372,7 @@ function PlanMatrixTab() {
                   </div>
                   {PLANS.map((plan) => {
                     const enabledCount = features.filter((f) => matrix[plan]?.[f.id]).length
+
                     return (
                       <div key={plan} className="px-3 py-3 text-center">
                         <span className="rounded-full bg-white px-2 py-1 text-[10px] font-bold text-slate-400 shadow-sm">
@@ -423,11 +423,17 @@ function PlanMatrixTab() {
 
 function OrgOverridesTab() {
   const [search, setSearch] = useState("")
+
   const [planFilter, setPlanFilter] = useState("all")
+
   const [expandedOrg, setExpandedOrg] = useState(null)
+
   const [saving, setSaving] = useState({})
+
   const [savedOrgs, setSavedOrgs] = useState({})
+
   const [localOverrides, setLocalOverrides] = useState({})
+
   const qc = useQueryClient()
 
   const { data: orgs = [], isLoading } = useQuery({
@@ -438,14 +444,19 @@ function OrgOverridesTab() {
 
   const filtered = orgs.filter((o) => {
     const matchSearch = !search || o.name?.toLowerCase().includes(search.toLowerCase())
+
     const matchPlan = planFilter === "all" || o.plan === planFilter
+
     return matchSearch && matchPlan
   })
 
   const getOrgFlags = useCallback(
     (org) => {
       // local edits take precedence over stored settings
-      if (localOverrides[org.id] !== undefined) return localOverrides[org.id]
+      if (localOverrides[org.id] !== undefined) {
+        return localOverrides[org.id]
+      }
+
       return org.settings?.feature_flags || {}
     },
     [localOverrides],
@@ -453,7 +464,9 @@ function OrgOverridesTab() {
 
   const handleToggleOverride = (org, featureId) => {
     const current = getOrgFlags(org)
+
     const planDefault = loadMatrix()[org.plan || "trial"]?.[featureId] ?? false
+
     const currentValue = current[featureId] !== undefined ? current[featureId] : planDefault
 
     setLocalOverrides((prev) => ({
@@ -468,8 +481,13 @@ function OrgOverridesTab() {
 
   const handleSaveOrg = async (org) => {
     const flags = localOverrides[org.id]
-    if (!flags) return
+
+    if (!flags) {
+      return
+    }
+
     setSaving((prev) => ({ ...prev, [org.id]: true }))
+
     try {
       await organizationService.update(org.id, {
         settings: { ...(org.settings || {}), feature_flags: flags },
@@ -485,14 +503,18 @@ function OrgOverridesTab() {
   const handleResetOrg = (org) => {
     setLocalOverrides((prev) => {
       const next = { ...prev }
+
       delete next[org.id]
+
       return next
     })
   }
 
   const countOverrides = (org) => {
     const flags = getOrgFlags(org)
+
     const planDefaults = loadMatrix()[org.plan || "trial"] || {}
+
     return Object.entries(flags).filter(([k, v]) => planDefaults[k] !== v).length
   }
 
@@ -552,11 +574,17 @@ function OrgOverridesTab() {
         ) : (
           filtered.map((org) => {
             const plan = org.plan || "trial"
+
             const c = PLAN_COLORS[plan]
+
             const isExpanded = expandedOrg === org.id
+
             const flags = getOrgFlags(org)
+
             const planDefaults = loadMatrix()[plan] || {}
+
             const overridesCount = countOverrides(org)
+
             const isDirty = localOverrides[org.id] !== undefined
 
             return (
@@ -599,7 +627,9 @@ function OrgOverridesTab() {
                   <div className="space-y-5 border-t border-slate-100 bg-slate-50/30 px-5 py-5">
                     {CATEGORIES.map((cat) => {
                       const CatIcon = cat.icon
+
                       const catFeatures = FEATURES.filter((f) => f.category === cat.id)
+
                       return (
                         <div key={cat.id}>
                           <div className="mb-2 flex items-center gap-2">
@@ -613,8 +643,11 @@ function OrgOverridesTab() {
                           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                             {catFeatures.map((feat) => {
                               const planVal = planDefaults[feat.id] ?? false
+
                               const overrideVal = flags[feat.id]
+
                               const activeVal = overrideVal !== undefined ? overrideVal : planVal
+
                               const isOverridden =
                                 overrideVal !== undefined && overrideVal !== planVal
 
@@ -701,10 +734,13 @@ export default function FlagsPage() {
 
   const stats = useMemo(() => {
     const matrix = loadMatrix()
+
     const counts = {}
+
     PLANS.forEach((plan) => {
       counts[plan] = Object.values(matrix[plan] || {}).filter(Boolean).length
     })
+
     return counts
   }, [])
 
@@ -760,6 +796,7 @@ export default function FlagsPage() {
             { id: "overrides", label: "Org Overrides", icon: Building2 },
           ].map((item) => {
             const TabIcon = item.icon
+
             return (
               <button
                 key={item.id}

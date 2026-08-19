@@ -1,26 +1,7 @@
-import React, { useState } from "react"
-import AdminLayout from "@/components/admin/AdminLayout"
+import { useState } from "react"
 import { importSourceService } from "@/api/services/importSourceService"
 import { jobService } from "@/api/services/jobService"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import {
-  Plus,
-  Trash2,
-  Pencil,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Play,
-  Globe,
-  ChevronDown,
-  ChevronUp,
-  AlertTriangle,
-  Search,
-  FileText,
-  Loader2,
-  ExternalLink,
-  Layers,
-} from "lucide-react"
 
 const SOURCE_TYPES = [
   { value: "career_page", label: "עמוד קריירה רגיל" },
@@ -40,8 +21,12 @@ const INTERVALS = [
 
 function ScanResultPanel({ result, onClose }) {
   const [showLog, setShowLog] = useState(false)
+
   const [showErrors, setShowErrors] = useState(false)
-  if (!result) return null
+
+  if (!result) {
+    return null
+  }
 
   return (
     <div className="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm">
@@ -144,11 +129,16 @@ function SourceFormModal({ source, onClose, onSaved }) {
     is_active: source?.is_active ?? true,
     company_name: source?.company_name || "",
   })
+
   const [saving, setSaving] = useState(false)
 
   const save = async () => {
-    if (!form.name || !form.url) return
+    if (!form.name || !form.url) {
+      return
+    }
+
     setSaving(true)
+
     if (source?.id) {
       await importSourceService.update(source.id, form)
     } else {
@@ -160,6 +150,7 @@ function SourceFormModal({ source, onClose, onSaved }) {
         jobs_closed: 0,
       })
     }
+
     setSaving(false)
     onSaved()
   }
@@ -271,14 +262,23 @@ function SourceFormModal({ source, onClose, onSaved }) {
 
 export default function ImportJobs() {
   const queryClient = useQueryClient()
+
   const [showModal, setShowModal] = useState(false)
+
   const [editingSource, setEditingSource] = useState(null)
+
   const [scanResults, setScanResults] = useState({})
+
   const [scanning, setScanning] = useState({})
+
   const [expandedLogs, setExpandedLogs] = useState({})
+
   const [quickUrl, setQuickUrl] = useState("")
+
   const [quickName, setQuickName] = useState("")
+
   const [quickScanning, setQuickScanning] = useState(false)
+
   const [quickResult, setQuickResult] = useState(null)
 
   const { data: sources = [], isLoading } = useQuery({
@@ -295,8 +295,10 @@ export default function ImportJobs() {
   const scanSource = async (source) => {
     setScanning((prev) => ({ ...prev, [source.id]: true }))
     setScanResults((prev) => ({ ...prev, [source.id]: null }))
+
     try {
       const result = await importSourceService.run(source.id)
+
       setScanResults((prev) => ({ ...prev, [source.id]: result }))
     } catch (err) {
       setScanResults((prev) => ({ ...prev, [source.id]: { success: false, error: err.message } }))
@@ -307,11 +309,16 @@ export default function ImportJobs() {
   }
 
   const quickScan = async () => {
-    if (!quickUrl) return
+    if (!quickUrl) {
+      return
+    }
+
     setQuickScanning(true)
     setQuickResult(null)
+
     try {
       const result = await importSourceService.preview(quickUrl, quickName || "חברה")
+
       setQuickResult(result)
     } catch (err) {
       setQuickResult({ success: false, error: err.message })
@@ -321,22 +328,34 @@ export default function ImportJobs() {
   }
 
   const statusIcon = (source) => {
-    if (scanning[source.id]) return <Loader2 className="w-3.5 h-3.5 text-purple-500 animate-spin" />
-    if (source.last_sync_status === "success")
+    if (scanning[source.id]) {
+      return <Loader2 className="w-3.5 h-3.5 text-purple-500 animate-spin" />
+    }
+
+    if (source.last_sync_status === "success") {
       return <CheckCircle className="w-3.5 h-3.5 text-green-500" />
-    if (source.last_sync_status === "error") return <XCircle className="w-3.5 h-3.5 text-red-500" />
+    }
+
+    if (source.last_sync_status === "error") {
+      return <XCircle className="w-3.5 h-3.5 text-red-500" />
+    }
+
     return <Clock className="w-3.5 h-3.5 text-gray-400" />
   }
 
   const totalActive = sources.filter((s) => s.is_active).length
+
   const totalErrors = sources.filter((s) => s.last_sync_status === "error").length
+
   const totalNew = sources.reduce((sum, s) => sum + (s.jobs_added || 0), 0)
+
   const totalUpdated = sources.reduce((sum, s) => sum + (s.jobs_updated || 0), 0)
 
   const { data: activeJobsCount = 0 } = useQuery({
     queryKey: ["active-jobs-count"],
     queryFn: async () => {
       const jobs = await jobService.list({ is_closed: false })
+
       return jobs.length
     },
   })

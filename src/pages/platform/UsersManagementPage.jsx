@@ -6,27 +6,14 @@ import { organizationService } from "@/api/services/organizationService"
 import {
   BriefcaseBusiness,
   Pencil,
-  Plus,
   Search,
   ShieldCheck,
-  SlidersHorizontal,
   Trash2,
   UserCog,
   UserRound,
   Users,
-  X,
 } from "lucide-react"
-import { Button } from "@/components/ui/Button"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformModal,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-  platformFieldClassName,
-} from "@/components/platform/PlatformUI"
+import { platformFieldClassName } from "@/components/platform/PlatformUI"
 
 const ROLE_CONFIG = {
   admin: { bg: "bg-red-100", text: "text-red-800" },
@@ -63,6 +50,7 @@ const EMPTY_FORM = {
 // ─── User Form Modal ─────────────────────────────────────────────────────────
 function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
   const isEdit = !!user?.id
+
   const [form, setForm] = useState(
     isEdit
       ? {
@@ -76,6 +64,7 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
         }
       : { ...EMPTY_FORM },
   )
+
   const [errors, setErrors] = useState({})
 
   // Sync form when user prop changes
@@ -100,29 +89,45 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
 
   const set = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }))
-    if (errors[k]) setErrors((e) => ({ ...e, [k]: null }))
+
+    if (errors[k]) {
+      setErrors((e) => ({ ...e, [k]: null }))
+    }
   }
 
   const validate = () => {
     const e = {}
-    if (!form.full_name?.trim())
+
+    if (!form.full_name?.trim()) {
       e.full_name = t("platform.usersManagement.modal.required", "Required")
-    if (!form.email?.trim()) e.email = t("platform.usersManagement.modal.required", "Required")
-    if (!isEdit && (!form.password || form.password.length < 8))
+    }
+
+    if (!form.email?.trim()) {
+      e.email = t("platform.usersManagement.modal.required", "Required")
+    }
+
+    if (!isEdit && (!form.password || form.password.length < 8)) {
       e.password = t("platform.usersManagement.modal.passwordHint")
+    }
+
     return e
   }
 
   const handleSubmit = () => {
     const e = validate()
+
     if (Object.keys(e).length > 0) {
       setErrors(e)
+
       return
     }
+
     onSave(form)
   }
 
-  if (!open) return null
+  if (!open) {
+    return null
+  }
 
   return (
     <PlatformModal
@@ -292,7 +297,10 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
 
 // ─── Delete Confirmation ──────────────────────────────────────────────────────
 function DeleteConfirm({ open, onClose, user, onConfirm, isDeleting, t, isRTL }) {
-  if (!open || !user) return null
+  if (!open || !user) {
+    return null
+  }
+
   return (
     <PlatformModal
       dir={isRTL ? "rtl" : "ltr"}
@@ -338,9 +346,14 @@ function DeleteConfirm({ open, onClose, user, onConfirm, isDeleting, t, isRTL })
 function Toast({ message, type, onClose }) {
   React.useEffect(() => {
     const timer = setTimeout(onClose, 3500)
+
     return () => clearTimeout(timer)
   }, [message])
-  if (!message) return null
+
+  if (!message) {
+    return null
+  }
+
   return (
     <div
       className={`fixed bottom-6 right-6 z-[60] flex items-center gap-2 rounded-2xl border border-white/20 px-5 py-3 text-sm font-bold text-white shadow-[0_16px_35px_rgba(30,41,59,0.2)] transition-all ${type === "error" ? "bg-rose-600" : "bg-emerald-600"}`}
@@ -356,13 +369,21 @@ function Toast({ message, type, onClose }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function UsersManagementPage() {
   const { t, i18n } = useTranslation()
+
   const queryClient = useQueryClient()
+
   const [search, setSearch] = useState("")
+
   const [roleFilter, setRoleFilter] = useState("all")
+
   const [modalOpen, setModalOpen] = useState(false)
+
   const [editUser, setEditUser] = useState(null)
+
   const [deleteTarget, setDeleteTarget] = useState(null)
+
   const [toast, setToast] = useState(null)
+
   const isRTL = i18n.language?.startsWith("he")
 
   const showToast = (message, type = "success") => setToast({ message, type })
@@ -426,16 +447,21 @@ export default function UsersManagementPage() {
 
     if (editUser?.id) {
       const { email: _email, password: _password, ...rest } = sanitized
+
       updateMutation.mutate({ id: editUser.id, data: rest })
     } else {
       if (!sanitized.password || sanitized.password.length < 8) {
         showToast(t("platform.usersManagement.modal.passwordHint"), "error")
+
         return
       }
+
       if (!sanitized.full_name) {
         showToast(t("platform.usersManagement.modal.fullName") + " — required", "error")
+
         return
       }
+
       createMutation.mutate(sanitized)
     }
   }
@@ -444,10 +470,12 @@ export default function UsersManagementPage() {
     setEditUser(null)
     setModalOpen(true)
   }
+
   const openEdit = (u) => {
     setEditUser(u)
     setModalOpen(true)
   }
+
   const openDelete = (u) => setDeleteTarget(u)
 
   const filtered = users.filter((u) => {
@@ -455,7 +483,9 @@ export default function UsersManagementPage() {
       !search ||
       u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
       u.email?.toLowerCase().includes(search.toLowerCase())
+
     const matchRole = roleFilter === "all" || u.role === roleFilter
+
     return matchSearch && matchRole
   })
 
@@ -648,9 +678,13 @@ export default function UsersManagementPage() {
                 ) : (
                   filtered.map((u, index) => {
                     const role = ROLE_CONFIG[u.role] || { bg: "bg-gray-50", text: "text-gray-600" }
+
                     const roleLabel = getRoleLabel(u.role)
+
                     const orgName = orgMap[u.organization_id] || u.organization_id || "—"
+
                     const locale = isRTL ? "he-IL" : "en-US"
+
                     return (
                       <tr key={u.id} className="group transition-colors hover:bg-violet-50/35">
                         <td className="px-5 py-4">

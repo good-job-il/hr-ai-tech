@@ -1,7 +1,4 @@
-import React from "react"
-import { Navigate, Outlet } from "react-router-dom"
 import { useAuth } from "@/lib/AuthContext"
-import UnauthorizedAccess from "./UnauthorizedAccess"
 
 export default function EmployerRoute() {
   const { user, isLoadingAuth } = useAuth()

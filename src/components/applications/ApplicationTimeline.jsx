@@ -1,4 +1,3 @@
-import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { applicationService } from "@/api/services/applicationService"
 import { MessageCircle, CheckCircle2, Clock, AlertCircle, FileText, Award, Eye } from "lucide-react"
@@ -45,6 +44,7 @@ export default function ApplicationTimeline({ applicationId }) {
     <div className="space-y-4">
       {timeline.map((event, index) => {
         const IconComponent = eventIcons[event.event_type] || Clock
+
         const label = eventLabels[event.event_type] || event.event_type
 
         return (

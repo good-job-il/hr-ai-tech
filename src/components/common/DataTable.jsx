@@ -1,5 +1,3 @@
-import { Card, CardContent } from "@/components/ui/Card"
-
 export function DataTable({ columns, data, onRowClick }) {
   return (
     <Card>

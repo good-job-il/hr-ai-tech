@@ -1,13 +1,11 @@
-import React from "react"
-import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { Linkedin, Facebook, Instagram, Youtube } from "lucide-react"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 
 const LOGO = "/logo.png"
 
 export default function Footer() {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   const LINKS = {

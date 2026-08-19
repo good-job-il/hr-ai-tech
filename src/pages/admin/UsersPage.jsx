@@ -2,17 +2,17 @@ import { useState, useEffect } from "react"
 import { userService } from "@/api/services/userService"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useAuth } from "@/lib/AuthContext"
-import { Pencil, User, Mail } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "sonner"
 
 export default function AdminUsersPage() {
   const { user } = useAuth()
+
   const qc = useQueryClient()
+
   const [editingUser, setEditingUser] = useState(null)
+
   const [editName, setEditName] = useState("")
+
   const [companyFilter, setCompanyFilter] = useState(null)
 
   useEffect(() => {
@@ -26,10 +26,12 @@ export default function AdminUsersPage() {
     queryKey: ["admin-users", companyFilter],
     queryFn: async () => {
       const allUsers = await userService.list({ limit: 500 })
+
       // Admin sees all, employer sees only their company
       if (companyFilter) {
         return allUsers.filter((u) => u.data?.company_id === companyFilter)
       }
+
       return allUsers
     },
   })
@@ -49,7 +51,10 @@ export default function AdminUsersPage() {
   })
 
   const handleSave = async () => {
-    if (!editName.trim() || !editingUser) return
+    if (!editName.trim() || !editingUser) {
+      return
+    }
+
     await updateName.mutateAsync({ userId: editingUser.id, newName: editName.trim() })
   }
 

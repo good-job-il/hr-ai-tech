@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react"
 import { interviewService } from "@/api/services/interviewService"
 import { useAuth } from "@/lib/AuthContext"
-import { Link } from "react-router-dom"
-import { Calendar, RefreshCw, Clock, Video, Phone, MapPin } from "lucide-react"
+import { Clock, Video, Phone, MapPin } from "lucide-react"
 
 const STATUS_COLORS = {
   scheduled: "bg-blue-100 text-blue-700",
@@ -12,6 +11,7 @@ const STATUS_COLORS = {
   no_show: "bg-orange-100 text-orange-700",
   rescheduled: "bg-yellow-100 text-yellow-700",
 }
+
 const STATUS_LABELS = {
   scheduled: "מתוזמן",
   confirmed: "אושר",
@@ -20,19 +20,28 @@ const STATUS_LABELS = {
   no_show: "לא הגיע",
   rescheduled: "נדחה",
 }
+
 const TYPE_ICONS = { phone: Phone, video: Video, in_person: MapPin }
 
 export default function RecruiterInterviewsPage() {
   const { user } = useAuth()
+
   const [interviews, setInterviews] = useState([])
+
   const [loading, setLoading] = useState(true)
+
   const [filter, setFilter] = useState("upcoming")
+
   const [error, setError] = useState("")
 
   const load = async () => {
-    if (!user) return
+    if (!user) {
+      return
+    }
+
     setLoading(true)
     setError("")
+
     try {
       const data = await interviewService.list({
         organization_id: user.organization_id,
@@ -41,6 +50,7 @@ export default function RecruiterInterviewsPage() {
         order: "DESC",
         limit: 100,
       })
+
       setInterviews(data)
     } catch (requestError) {
       setInterviews([])
@@ -55,10 +65,20 @@ export default function RecruiterInterviewsPage() {
   }, [user?.id])
 
   const today = new Date().toISOString().split("T")[0]
+
   const filtered = interviews.filter((i) => {
-    if (filter === "upcoming") return i.date >= today && i.status !== "cancelled"
-    if (filter === "past") return i.date < today || i.status === "completed"
-    if (filter === "cancelled") return i.status === "cancelled"
+    if (filter === "upcoming") {
+      return i.date >= today && i.status !== "cancelled"
+    }
+
+    if (filter === "past") {
+      return i.date < today || i.status === "completed"
+    }
+
+    if (filter === "cancelled") {
+      return i.status === "cancelled"
+    }
+
     return true
   })
 
@@ -124,6 +144,7 @@ export default function RecruiterInterviewsPage() {
         <div className="space-y-3">
           {filtered.map((interview) => {
             const TypeIcon = TYPE_ICONS[interview.type] || Clock
+
             return (
               <div
                 key={interview.id}

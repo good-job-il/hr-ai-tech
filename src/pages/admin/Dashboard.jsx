@@ -1,20 +1,4 @@
-import React from "react"
-import {
-  Users,
-  BriefcaseBusiness,
-  Building2,
-  TrendingUp,
-  Bell,
-  Activity,
-  Brain,
-  ShieldCheck,
-  ArrowUpRight,
-  Clock3,
-  UserCheck,
-  AlertTriangle,
-  Sparkles,
-} from "lucide-react"
-import AdminLayout from "@/components/admin/AdminLayout"
+import { Users, BriefcaseBusiness, Building2, TrendingUp } from "lucide-react"
 
 const glass =
   "bg-white/80 backdrop-blur-2xl border border-[#DDEBFF] rounded-lg shadow-[0_24px_80px_rgba(79,124,255,0.10)]"

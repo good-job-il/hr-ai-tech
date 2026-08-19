@@ -3,8 +3,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { candidateProfileService } from "@/api/services/candidateProfileService"
 import { fileService } from "@/api/services/fileService"
 import { useAuth } from "@/lib/AuthContext"
-import Navbar from "@/components/home/Navbar"
-import { Plus, Trash2, Upload, Save } from "lucide-react"
 
 const CATEGORIES = [
   "פיתוח תוכנה",
@@ -22,8 +20,11 @@ const CATEGORIES = [
 
 export default function CandidateProfilePage() {
   const { user } = useAuth()
+
   const queryClient = useQueryClient()
+
   const [skillInput, setSkillInput] = useState("")
+
   const [saved, setSaved] = useState(false)
 
   const { data: profile = null, isLoading } = useQuery({
@@ -62,7 +63,11 @@ export default function CandidateProfilePage() {
   const saveMutation = useMutation({
     mutationFn: async (data) => {
       const { id: _id, user_email: _userEmail, ...profileData } = data
-      if (profile) return candidateProfileService.update(profileData)
+
+      if (profile) {
+        return candidateProfileService.update(profileData)
+      }
+
       return candidateProfileService.create(profileData)
     },
     onSuccess: () => {
@@ -74,13 +79,21 @@ export default function CandidateProfilePage() {
 
   const uploadResume = async (e) => {
     const file = e.target.files[0]
-    if (!file) return
+
+    if (!file) {
+      return
+    }
+
     const { file_url } = await fileService.upload(file)
+
     setForm((f) => ({ ...f, resume_url: file_url }))
   }
 
   const addSkill = () => {
-    if (!skillInput.trim()) return
+    if (!skillInput.trim()) {
+      return
+    }
+
     setForm((f) => ({ ...f, skills: [...(f.skills || []), skillInput.trim()] }))
     setSkillInput("")
   }
@@ -93,15 +106,17 @@ export default function CandidateProfilePage() {
       ...f,
       experience: [...(f.experience || []), { company: "", role: "", years: "", description: "" }],
     }))
+
   const updateExp = (i, field, val) =>
     setForm((f) => ({
       ...f,
       experience: f.experience.map((e, idx) => (idx === i ? { ...e, [field]: val } : e)),
     }))
+
   const removeExp = (i) =>
     setForm((f) => ({ ...f, experience: f.experience.filter((_, idx) => idx !== i) }))
 
-  if (isLoading || !form)
+  if (isLoading || !form) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: "#eaf7fb" }} dir="rtl">
         <Navbar />
@@ -110,6 +125,7 @@ export default function CandidateProfilePage() {
         </div>
       </div>
     )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white" dir="rtl">

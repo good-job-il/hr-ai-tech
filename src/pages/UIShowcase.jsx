@@ -1,10 +1,3 @@
-import React from "react"
-import Button from "@/components/design/Button"
-import Card from "@/components/design/Card"
-import Input from "@/components/design/Input"
-import Badge from "@/components/design/Badge"
-import { H1, H2, H3, H4, Body1, Body2, Caption, Label } from "@/components/design/Typography"
-
 export default function UIShowcase() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-12" dir="rtl">

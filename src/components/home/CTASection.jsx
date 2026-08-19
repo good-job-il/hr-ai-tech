@@ -1,6 +1,4 @@
-import React from "react"
-import { Link } from "react-router-dom"
-import { UserPlus, Lock, Clock, Zap, Shield, Sparkles } from "lucide-react"
+import { Lock, Clock, Zap, Shield } from "lucide-react"
 
 const TRUST = [
   { icon: Lock, label: "מאובטח ופרטי" },
@@ -155,6 +153,7 @@ export default function CTASection() {
         >
           {TRUST.map((t, i) => {
             const Icon = t.icon
+
             return (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Icon style={{ width: 14, height: 14, color: "rgba(255,255,255,0.7)" }} />

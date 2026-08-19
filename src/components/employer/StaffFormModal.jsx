@@ -1,15 +1,4 @@
-import React, { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { useState } from "react"
 
 const ROLE_LABELS = {
   hiring_manager: "מנהל גיוס",
@@ -39,10 +28,13 @@ export default function StaffFormModal({
 
   const handleSubmit = (e) => {
     e.preventDefault()
+
     if (!formData.manager_email && formData.role !== "hiring_manager") {
       alert("יש לבחור מנהל")
+
       return
     }
+
     onSubmit(formData)
   }
 

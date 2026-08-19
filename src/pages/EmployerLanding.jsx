@@ -1,7 +1,4 @@
-import React from "react"
-import { Link } from "react-router-dom"
-import { Sparkles, Users, BarChart3, Zap, Filter, Brain } from "lucide-react"
-import Header from "@/components/home/Header"
+import { Users, BarChart3, Zap, Brain } from "lucide-react"
 
 export default function EmployerLanding() {
   return (
@@ -130,6 +127,7 @@ export default function EmployerLanding() {
               },
             ].map((item, idx) => {
               const Icon = item.icon
+
               return (
                 <div
                   key={idx}

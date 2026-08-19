@@ -1,15 +1,17 @@
 import { useState } from "react"
-import { Link, useLocation, useNavigate, Outlet } from "react-router-dom"
-import { Menu, X, LogOut, ChevronDown, Sparkles } from "lucide-react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { AI_WORKSPACE_NAV } from "@/config/navigation"
-import GlobalHeader from "@/components/layout/GlobalHeader"
 import { useAuth } from "@/lib/AuthContext"
 
 export default function AIWorkspaceLayout() {
   const { user, logout } = useAuth()
+
   const location = useLocation()
+
   const navigate = useNavigate()
+
   const [mobileOpen, setMobileOpen] = useState(false)
+
   const [expandedMenu, setExpandedMenu] = useState(null)
 
   const handleLogout = async () => {
@@ -22,7 +24,9 @@ export default function AIWorkspaceLayout() {
   const renderNavItems = (items) =>
     items.map((item) => {
       const active = isActive(item.route)
+
       const hasChildren = item.children && item.children.length > 0
+
       const isExpanded = expandedMenu === item.id
 
       return (

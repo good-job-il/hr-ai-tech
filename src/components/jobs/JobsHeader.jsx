@@ -1,14 +1,17 @@
-import React, { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { useState } from "react"
+import { useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { Menu, X, UserPlus, Search, Bell } from "lucide-react"
 import { useAuth } from "@/lib/AuthContext"
 
 export default function JobsHeader() {
   const { user } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const location = useLocation()
+
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const NAV = [
@@ -45,6 +48,7 @@ export default function JobsHeader() {
         <nav className="hidden lg:flex items-center gap-2">
           {NAV.map((link, i) => {
             const active = location.pathname === link.href
+
             return (
               <Link
                 key={i}

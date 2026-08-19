@@ -1,7 +1,3 @@
-import React from "react"
-import AdminLayout from "@/components/admin/AdminLayout"
-import { Settings } from "lucide-react"
-
 export default function AdminSystemSettings() {
   return (
     <AdminLayout>

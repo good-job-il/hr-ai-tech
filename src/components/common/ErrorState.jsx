@@ -1,6 +1,3 @@
-import { Card, CardContent } from "@/components/ui/Card"
-import { AlertCircle } from "lucide-react"
-
 export function ErrorState({ title, message, action }) {
   return (
     <Card>

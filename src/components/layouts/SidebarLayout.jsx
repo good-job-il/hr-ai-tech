@@ -3,20 +3,10 @@
  * Accepts: navItems, roleTitle
  */
 import { useState } from "react"
-import { Link, useLocation, Outlet } from "react-router-dom"
-import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  Building2,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react"
+import { useLocation } from "react-router-dom"
+
 import { useAuth } from "@/lib/AuthContext"
 import { useTranslation } from "react-i18next"
-import DashboardHeader from "@/components/layout/DashboardHeader"
-import Logo from "@/components/branding/Logo"
 
 const THEME = {
   activeBg: "bg-[#EEF4FF] text-[#6C4DFF]",
@@ -30,16 +20,26 @@ const THEME = {
 
 export default function SidebarLayout({ navItems = [], roleTitle = "", platformStyle = false }) {
   const { user, logout, orgType, organization, isImpersonating, exitOrganization } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const location = useLocation()
+
   const [mobileOpen, setMobileOpen] = useState(false)
+
   const [expandedMenu, setExpandedMenu] = useState(null)
+
   const [exiting, setExiting] = useState(false)
 
   const handleExitWorkspace = async () => {
-    if (exiting) return
+    if (exiting) {
+      return
+    }
+
     setExiting(true)
+
     try {
       await exitOrganization()
       window.location.href = "/platform/organizations/staffing"
@@ -60,15 +60,21 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
   const renderNavItems = (items) =>
     items.map((item) => {
       const active = isActive(item.route)
+
       const hasChildren = item.children?.length > 0
+
       const isExpanded = expandedMenu === item.id
+
       const showChildren = isExpanded || (platformStyle && active)
+
       const itemBaseClass = platformStyle
         ? "min-h-[46px] rounded-[14px] px-4 py-3 text-[13px] font-bold"
         : "rounded-xl px-3 py-2.5 text-sm font-medium"
+
       const activeClass = platformStyle
         ? "bg-[#F5EDFF] text-[#7C3AED] shadow-[inset_0_0_0_1px_rgba(124,58,237,0.02)]"
         : `${THEME.activeBg} font-semibold`
+
       const inactiveClass = platformStyle
         ? "text-[#59637C] hover:bg-[#F8F5FF] hover:text-[#6C4DFF]"
         : `${THEME.inactiveText} ${THEME.hoverBg}`

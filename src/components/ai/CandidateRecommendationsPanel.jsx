@@ -2,46 +2,54 @@
  * CandidateRecommendationsPanel
  * Shows top matching Jobs for a given Candidate.
  */
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { jobService } from "@/api/services/jobService"
 import { rankJobsForCandidate } from "@/lib/aiMatching"
-import AIMatchBadge from "./AIMatchBadge"
-import { Briefcase, MapPin, ChevronRight, Loader2 } from "lucide-react"
 
 export default function CandidateRecommendationsPanel({ candidate, onAssignToJob }) {
   const { t, i18n } = useTranslation()
+
   const isRTL = i18n.language === "he"
+
   const [results, setResults] = useState([])
+
   const [loading, setLoading] = useState(true)
+
   const [expanded, setExpanded] = useState(null)
 
   useEffect(() => {
-    if (!candidate) return
+    if (!candidate) {
+      return
+    }
+
     setLoading(true)
     jobService
       .list({ is_closed: false, sort: "created_date", order: "DESC", limit: 50 })
       .then((jobs) => {
         const ranked = rankJobsForCandidate(candidate, jobs || []).slice(0, 10)
+
         setResults(ranked)
       })
       .catch(() => setResults([]))
       .finally(() => setLoading(false))
   }, [candidate?.id])
 
-  if (loading)
+  if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
         <Loader2 className="w-5 h-5 animate-spin text-[#7C3AED]" />
       </div>
     )
+  }
 
-  if (!results.length)
+  if (!results.length) {
     return (
       <div className="py-8 text-center text-[#94A3B8] text-sm font-semibold">
         {t("aiMatching.candidatePanel.noJobsFound")}
       </div>
     )
+  }
 
   return (
     <div className="space-y-3" dir={isRTL ? "rtl" : "ltr"}>

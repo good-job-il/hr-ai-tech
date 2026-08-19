@@ -1,7 +1,4 @@
-import { Menu, LogOut, Search, Bell, ChevronDown, Zap } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import EditNameModal from "./EditNameModal"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 
 export default function DashboardHeader({
   user,
@@ -12,10 +9,12 @@ export default function DashboardHeader({
   platformStyle = false,
 }) {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
 
   if (platformStyle) {
     const avatarUrl = user?.avatar_url || user?.picture || user?.profile_image
+
     const displayName =
       user?.full_name?.trim() ||
       user?.email?.split("@")[0] ||
@@ -141,10 +140,13 @@ export default function DashboardHeader({
               <div className="text-sm font-black text-[#0F172A] leading-tight">
                 {(() => {
                   const name = user?.full_name?.trim()
+
                   const greeting = isRtl ? "שלום" : "Hello"
+
                   if (name && name.length > 1) {
                     return `${greeting}, ${name}`
                   }
+
                   return greeting
                 })()}
               </div>

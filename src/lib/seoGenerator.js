@@ -92,6 +92,7 @@ function mapEmploymentType(type) {
     daily: "TEMPORARY",
     remote: "FULL_TIME",
   }
+
   return map[type] || "FULL_TIME"
 }
 

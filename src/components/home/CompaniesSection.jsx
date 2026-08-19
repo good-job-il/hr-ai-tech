@@ -1,5 +1,3 @@
-import React from "react"
-import { Link } from "react-router-dom"
 import { companyService } from "@/api/services/companyService"
 import { useQuery } from "@tanstack/react-query"
 

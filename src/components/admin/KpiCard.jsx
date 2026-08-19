@@ -1,7 +1,3 @@
-import React from "react"
-import { TrendingUp, TrendingDown, Minus } from "lucide-react"
-import { Link } from "react-router-dom"
-
 export default function KpiCard({ label, value, pct, icon: Icon, color, bg, link, suffix = "" }) {
   const card = (
     <div

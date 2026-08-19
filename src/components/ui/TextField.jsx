@@ -1,7 +1,7 @@
 /**
  * Unified Text Input Component
  */
-import { GLASS_STYLES, SHADOWS, RADIUS } from "@/theme/tokens"
+import { GLASS_STYLES } from "@/theme/tokens"
 import { cn } from "@/lib/utils"
 
 export function TextField({

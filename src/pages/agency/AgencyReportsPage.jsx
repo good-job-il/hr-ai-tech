@@ -4,8 +4,6 @@ import {
   Activity,
   BriefcaseBusiness,
   Clock3,
-  Download,
-  Filter,
   PieChart,
   UsersRound,
   WalletCards,
@@ -13,19 +11,12 @@ import {
 import { useTranslation } from "react-i18next"
 import { managementReportService } from "@/api/services/managementReportService"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
-import { Button } from "@/components/ui/button"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-  platformFieldClassName,
-} from "@/components/platform/PlatformUI"
+import { platformFieldClassName } from "@/components/platform/PlatformUI"
 
 const isoDate = (date) => date.toISOString().slice(0, 10)
+
 const initialFrom = () => isoDate(new Date(Date.now() - 90 * 86400000))
+
 const money = (value) =>
   new Intl.NumberFormat("he-IL", {
     style: "currency",
@@ -35,8 +26,11 @@ const money = (value) =>
 
 export default function AgencyReportsPage() {
   const { i18n } = useTranslation()
+
   const isRTL = !i18n.language?.startsWith("en")
+
   const { can } = usePermissionMatrix()
+
   const [filters, setFilters] = useState({
     date_from: initialFrom(),
     date_to: isoDate(new Date()),
@@ -45,12 +39,15 @@ export default function AgencyReportsPage() {
     recruiter_id: "",
     team_id: "",
   })
+
   const [exportError, setExportError] = useState("")
+
   const query = Object.fromEntries(
     Object.entries(filters)
       .filter(([, value]) => value !== "")
       .map(([key, value]) => [key, key.endsWith("_id") ? Number(value) : value]),
   )
+
   const {
     data: report,
     isLoading,
@@ -128,16 +125,24 @@ export default function AgencyReportsPage() {
       }
 
   const exportCsv = async () => {
-    if (!report) return
+    if (!report) {
+      return
+    }
+
     setExportError("")
+
     let exportedReport
+
     try {
       exportedReport = await managementReportService.export(query)
     } catch (requestError) {
       setExportError(requestError?.message || text.loadError)
+
       return
     }
+
     const rows = [["dimension", "name", "applications", "placements", "conversion_rate"]]
+
     ;[
       ["source", exportedReport.source_effectiveness, "source"],
       ["recruiter", exportedReport.recruiter_performance, "recruiter_name"],
@@ -149,13 +154,17 @@ export default function AgencyReportsPage() {
         rows.push([dimension, row[nameKey], row.applications, row.placements, row.conversion_rate]),
       )
     })
+
     const escape = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`
+
     const url = URL.createObjectURL(
       new Blob([rows.map((row) => row.map(escape).join(",")).join("\n")], {
         type: "text/csv;charset=utf-8",
       }),
     )
+
     const link = document.createElement("a")
+
     link.href = url
     link.download = `agency-report-${filters.date_from}-${filters.date_to}.csv`
     link.click()
@@ -163,6 +172,7 @@ export default function AgencyReportsPage() {
   }
 
   const dimensions = report?.dimensions || { clients: [], jobs: [], recruiters: [], teams: [] }
+
   const update = (key, value) => setFilters((current) => ({ ...current, [key]: value }))
 
   return (
@@ -386,6 +396,7 @@ function FilterField({ label, value, onChange, type, options, all }) {
 
 function MetricBars({ title, rows, labelKey, valueKey, suffix }) {
   const max = Math.max(1, ...rows.map((row) => Number(row[valueKey]) || 0))
+
   return (
     <PlatformCard className="p-5">
       <PlatformWidgetHeader title={title} />

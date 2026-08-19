@@ -1,15 +1,17 @@
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { AlertTriangle, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 export default function RejectModal({ candidateName, onConfirm, onClose }) {
   const { t, i18n } = useTranslation()
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const isRTL = currentLang === "he"
 
   const [reason, setReason] = useState("")
+
   const [custom, setCustom] = useState("")
+
   const [loading, setLoading] = useState(false)
 
   const REJECT_REASONS = [
@@ -26,7 +28,10 @@ export default function RejectModal({ candidateName, onConfirm, onClose }) {
   const finalReason = reason === t("candidateCRM.rejectModal.reasons.other") ? custom : reason
 
   const handleConfirm = async () => {
-    if (!finalReason.trim()) return
+    if (!finalReason.trim()) {
+      return
+    }
+
     setLoading(true)
     await onConfirm(finalReason.trim())
     setLoading(false)

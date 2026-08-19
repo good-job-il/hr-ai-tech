@@ -1,12 +1,9 @@
-import React, { useState } from "react"
-import { useParams, Link } from "react-router-dom"
+import { useState } from "react"
+import { useParams } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { companyService } from "@/api/services/companyService"
 import { publicJobService } from "@/api/services/publicJobService"
 import { useAuth } from "@/lib/AuthContext"
-import Navbar from "@/components/home/Navbar"
-import { Star, Plus, ArrowRight } from "lucide-react"
-import SEOHead from "@/components/SEOHead"
 
 function StarRating({ value, onChange }) {
   return (
@@ -24,9 +21,13 @@ function StarRating({ value, onChange }) {
 
 export default function CompanyProfile() {
   const { id } = useParams()
+
   const { user } = useAuth()
+
   const queryClient = useQueryClient()
+
   const [showReviewForm, setShowReviewForm] = useState(false)
+
   const [reviewForm, setReviewForm] = useState({
     rating_overall: 0,
     rating_salary: 0,
@@ -73,7 +74,7 @@ export default function CompanyProfile() {
     ? (reviews.reduce((s, r) => s + r.rating_overall, 0) / reviews.length).toFixed(1)
     : null
 
-  if (!company)
+  if (!company) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: "#eaf7fb" }} dir="rtl">
         <Navbar />
@@ -82,6 +83,7 @@ export default function CompanyProfile() {
         </div>
       </div>
     )
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#eaf7fb" }} dir="rtl">

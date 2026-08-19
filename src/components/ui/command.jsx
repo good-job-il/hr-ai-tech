@@ -1,9 +1,7 @@
 import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
-import { Search } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 const Command = React.forwardRef(({ className, ...props }, ref) => (
   <CommandPrimitive
@@ -15,6 +13,7 @@ const Command = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 Command.displayName = CommandPrimitive.displayName
 
 const CommandDialog = ({ children, ...props }) => {
@@ -81,6 +80,7 @@ const CommandSeparator = React.forwardRef(({ className, ...props }, ref) => (
     {...props}
   />
 ))
+
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
 const CommandItem = React.forwardRef(({ className, ...props }, ref) => (
@@ -104,6 +104,7 @@ const CommandShortcut = ({ className, ...props }) => {
     />
   )
 }
+
 CommandShortcut.displayName = "CommandShortcut"
 
 export {

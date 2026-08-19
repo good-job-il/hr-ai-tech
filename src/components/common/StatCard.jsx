@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/Card"
 import { cn } from "@/lib/utils"
 
 export function StatCard({ icon: Icon, label, value, change, trend }) {

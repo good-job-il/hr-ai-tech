@@ -1,4 +1,3 @@
-import React from "react"
 import { Bot, Zap, Shield, Bell, TrendingUp } from "lucide-react"
 
 const FEATURES = [
@@ -80,6 +79,7 @@ export default function WhyHeadHunter() {
         >
           {FEATURES.map((f, i) => {
             const Icon = f.icon
+
             return (
               <div
                 key={i}

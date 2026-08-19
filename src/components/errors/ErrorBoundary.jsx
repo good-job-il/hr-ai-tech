@@ -1,5 +1,4 @@
 import React from "react"
-import { AlertTriangle, RotateCcw } from "lucide-react"
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -20,6 +19,7 @@ export class ErrorBoundary extends React.Component {
       if (this.props.fallback) {
         return this.props.fallback(this.state.error, () => this.retry())
       }
+
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center p-8 max-w-md">
@@ -37,6 +37,7 @@ export class ErrorBoundary extends React.Component {
         </div>
       )
     }
+
     return this.props.children
   }
 }

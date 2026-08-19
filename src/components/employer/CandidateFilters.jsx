@@ -1,6 +1,4 @@
-import React, { useState } from "react"
-import { X, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react"
 
 export default function CandidateFilters({ isOpen, onClose, filters, onFilterChange }) {
   const [expanded, setExpanded] = useState({})
@@ -48,9 +46,11 @@ export default function CandidateFilters({ isOpen, onClose, filters, onFilterCha
 
   const handleCheck = (section, value) => {
     const current = filters[section] || []
+
     const updated = current.includes(value)
       ? current.filter((v) => v !== value)
       : [...current, value]
+
     onFilterChange({ ...filters, [section]: updated })
   }
 
@@ -58,7 +58,9 @@ export default function CandidateFilters({ isOpen, onClose, filters, onFilterCha
     onFilterChange({})
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   return (
     <>

@@ -1,15 +1,19 @@
-import React, { useState } from "react"
-import { Plus, Trash2, Edit2, Check, X } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { useState } from "react"
 
 export default function PipelineManager({ stages, onAdd, onDelete, onUpdate }) {
   const [newName, setNewName] = useState("")
+
   const [newColor, setNewColor] = useState("#3da8c8")
+
   const [editingId, setEditingId] = useState(null)
+
   const [editName, setEditName] = useState("")
 
   const handleAdd = () => {
-    if (!newName.trim()) return
+    if (!newName.trim()) {
+      return
+    }
+
     onAdd({ name: newName, color: newColor, order: stages.length })
     setNewName("")
     setNewColor("#3da8c8")
@@ -21,7 +25,10 @@ export default function PipelineManager({ stages, onAdd, onDelete, onUpdate }) {
   }
 
   const handleSaveEdit = (id) => {
-    if (!editName.trim()) return
+    if (!editName.trim()) {
+      return
+    }
+
     onUpdate(id, { name: editName })
     setEditingId(null)
   }

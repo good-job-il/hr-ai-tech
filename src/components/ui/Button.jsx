@@ -2,7 +2,7 @@
  * Unified Button Component System
  * Centralized styling using design tokens
  */
-import { SHADOWS, SPACING, TRANSITIONS } from "@/theme/tokens"
+import { SPACING, TRANSITIONS } from "@/theme/tokens"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = {
@@ -113,6 +113,7 @@ export function Button({
   ...props
 }) {
   const variantStyles = buttonVariants[variant]
+
   const sizeStyles = sizes[size]
 
   const baseStyle = {

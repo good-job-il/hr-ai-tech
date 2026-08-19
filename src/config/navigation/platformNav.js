@@ -6,13 +6,6 @@ import {
   BarChart3,
   ShieldCheck,
   Settings,
-  Users,
-  Zap,
-  Activity,
-  FileText,
-  Globe,
-  AlertTriangle,
-  Cpu,
   Eye,
 } from "lucide-react"
 

@@ -1,5 +1,3 @@
-import { Card, CardContent } from "@/components/ui/Card"
-import { ChevronDown } from "lucide-react"
 import { useState } from "react"
 
 export function FilterPanel({ title, filters, onFilterChange }) {

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 
 const TOAST_LIMIT = 20
+
 const TOAST_REMOVE_DELAY = 1000000
 
 const actionTypes = {
@@ -15,6 +16,7 @@ let count = 0
 
 function genId() {
   count = (count + 1) % Number.MAX_VALUE
+
   return count.toString()
 }
 
@@ -38,6 +40,7 @@ const addToRemoveQueue = (toastId) => {
 
 const _clearFromRemoveQueue = (toastId) => {
   const timeout = toastTimeouts.get(toastId)
+
   if (timeout) {
     clearTimeout(timeout)
     toastTimeouts.delete(toastId)
@@ -90,6 +93,7 @@ export const reducer = (state, action) => {
           toasts: [],
         }
       }
+
       return {
         ...state,
         toasts: state.toasts.filter((t) => t.id !== action.toastId),
@@ -126,7 +130,9 @@ function toast({ ...props }) {
       id,
       open: true,
       onOpenChange: (open) => {
-        if (!open) dismiss()
+        if (!open) {
+          dismiss()
+        }
       },
     },
   })
@@ -143,8 +149,10 @@ function useToast() {
 
   useEffect(() => {
     listeners.push(setState)
+
     return () => {
       const index = listeners.indexOf(setState)
+
       if (index > -1) {
         listeners.splice(index, 1)
       }

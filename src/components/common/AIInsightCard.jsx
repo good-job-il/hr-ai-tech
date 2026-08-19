@@ -1,6 +1,3 @@
-import { Card, CardContent } from "@/components/ui/Card"
-import { Sparkles } from "lucide-react"
-
 export function AIInsightCard({ title, insight, action }) {
   return (
     <Card

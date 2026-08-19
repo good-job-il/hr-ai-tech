@@ -1,9 +1,8 @@
-import PublicLayout from '@/components/layouts/PublicLayout';
 import { useTranslation } from 'react-i18next';
-import { Clock, User } from 'lucide-react';
 
 export default function BlogPage() {
   const { i18n } = useTranslation();
+
   const isRtl = !i18n.language?.startsWith('en');
 
   const POSTS = [

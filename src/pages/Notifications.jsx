@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { notificationService } from "@/api/services/notificationService"
 import { useAuth } from "@/lib/AuthContext"
-import { Bell, CheckCheck, Trash2, X } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import Navbar from "@/components/home/Navbar"
 import {
   getNotifIcon,
   getNotifColor,
@@ -12,16 +10,25 @@ import {
 
 export default function Notifications() {
   const { user } = useAuth()
+
   const navigate = useNavigate()
+
   const [notifications, setNotifications] = useState([])
+
   const [loading, setLoading] = useState(true)
+
   const [loadError, setLoadError] = useState(null)
+
   const [filter, setFilter] = useState("all") // all | unread | read
 
   const fetchNotifications = async () => {
-    if (!user?.email) return
+    if (!user?.email) {
+      return
+    }
+
     try {
       const result = await notificationService.list({ limit: 100 })
+
       setNotifications(result || [])
       setLoadError(null)
     } catch {
@@ -33,7 +40,9 @@ export default function Notifications() {
 
   useEffect(() => {
     fetchNotifications()
+
     const interval = window.setInterval(fetchNotifications, 15000)
+
     return () => window.clearInterval(interval)
   }, [user?.email])
 
@@ -58,8 +67,13 @@ export default function Notifications() {
   }
 
   const handleClick = async (notif) => {
-    if (!notif.is_read) await markAsRead(notif.id)
-    if (notif.metadata?.link) navigate(notif.metadata.link)
+    if (!notif.is_read) {
+      await markAsRead(notif.id)
+    }
+
+    if (notif.metadata?.link) {
+      navigate(notif.metadata.link)
+    }
   }
 
   const timeStr = (dateStr) => {

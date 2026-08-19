@@ -1,5 +1,3 @@
-import React from "react"
-
 const COMPANIES = [
   { name: "WiX", color: "#0F172A", size: 20, weight: 900 },
   { name: "monday.com", color: "#F6543C", size: 15, weight: 800 },

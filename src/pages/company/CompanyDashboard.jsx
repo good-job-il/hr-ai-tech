@@ -1,11 +1,10 @@
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { jobService } from "@/api/services/jobService"
 import { candidateService } from "@/api/services/candidateService"
 import { interviewService } from "@/api/services/interviewService"
 import { applicationService } from "@/api/services/applicationService"
 import { useAuth } from "@/lib/AuthContext"
-import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import {
   Briefcase,
@@ -13,9 +12,7 @@ import {
   Calendar,
   TrendingUp,
   Sparkles,
-  ArrowLeft,
   CheckCircle2,
-  Clock,
   UserCheck,
   Activity,
 } from "lucide-react"
@@ -29,7 +26,9 @@ function StatCard({ icon: Icon, label, value, color = "green", loading, to }) {
     purple: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-100" },
     amber: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100" },
   }
+
   const c = colors[color] || colors.green
+
   const inner = (
     <div
       className={`bg-white border ${c.border} rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow ${to ? "cursor-pointer" : ""}`}
@@ -47,13 +46,17 @@ function StatCard({ icon: Icon, label, value, color = "green", loading, to }) {
       )}
     </div>
   )
+
   return to ? <Link to={to}>{inner}</Link> : inner
 }
 
 export default function CompanyDashboard() {
   const { user, organization } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const orgId = user?.organization_id
+
   const isRTL = i18n.language === "he"
 
   const { data: jobs = [], isLoading: jobsLoading } = useQuery({
@@ -123,6 +126,7 @@ export default function CompanyDashboard() {
   )
 
   const recentJobs = useMemo(() => jobs.filter((j) => !j.is_closed).slice(0, 5), [jobs])
+
   const upcomingInterviews = useMemo(
     () => interviews.filter((i) => i.status === "scheduled").slice(0, 5),
     [interviews],

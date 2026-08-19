@@ -1,5 +1,3 @@
-import { Card, CardContent } from "@/components/ui/Card"
-
 export function EmptyState({ icon: Icon, title, description, action }) {
   return (
     <Card>

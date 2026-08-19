@@ -1,23 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
-import {
-  AlertCircle,
-  Briefcase,
-  CreditCard,
-  Download,
-  Receipt,
-  Sparkles,
-  Users,
-} from "lucide-react"
+import { AlertCircle, Briefcase, CreditCard, Receipt, Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { billingService } from "@/api/services/billingService"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-} from "@/components/platform/PlatformUI"
 
 const PLAN_NAMES = {
   trial: "Trial",
@@ -25,6 +9,7 @@ const PLAN_NAMES = {
   pro: "Professional",
   enterprise: "Enterprise",
 }
+
 const money = (minor, currency) =>
   new Intl.NumberFormat("he-IL", { style: "currency", currency: currency || "ILS" }).format(
     (minor || 0) / 100,
@@ -32,12 +17,15 @@ const money = (minor, currency) =>
 
 export default function BillingSettings() {
   const { i18n } = useTranslation()
+
   const isRTL = !i18n.language?.startsWith("en")
+
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ["billing-overview"],
     queryFn: billingService.overview,
     staleTime: 60_000,
   })
+
   const text = isRTL
     ? {
         title: "חיוב ותמחור",
@@ -71,7 +59,8 @@ export default function BillingSettings() {
         unlimited: "Unlimited",
         ai: "AI Matching",
       }
-  if (error)
+
+  if (error) {
     return (
       <PlatformPageShell dir={isRTL ? "rtl" : "ltr"}>
         <PlatformCard className="p-5">
@@ -91,6 +80,7 @@ export default function BillingSettings() {
         </PlatformCard>
       </PlatformPageShell>
     )
+  }
 
   return (
     <PlatformPageShell dir={isRTL ? "rtl" : "ltr"}>
@@ -251,6 +241,7 @@ function limitText(limit, text) {
 }
 function Usage({ label, value, limit }) {
   const percent = limit ? Math.min(100, (value / limit) * 100) : 0
+
   return (
     <div>
       <div className="mb-1.5 flex justify-between text-xs font-bold text-slate-600">

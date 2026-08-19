@@ -1,8 +1,6 @@
-import React, { useState, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { importSourceService } from "@/api/services/importSourceService"
-import AdminLayout from "@/components/admin/AdminLayout"
-import { AlertCircle, CheckCircle, Clock, Loader2, RefreshCw } from "lucide-react"
 
 export default function ImportMonitoring() {
   const [sortBy, setSortBy] = useState("last_sync")
@@ -20,7 +18,9 @@ export default function ImportMonitoring() {
   // Calculate stats
   const stats = useMemo(() => {
     const now = new Date()
+
     const oneHourAgo = new Date(now - 60 * 60 * 1000)
+
     const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000)
 
     return {
@@ -36,6 +36,7 @@ export default function ImportMonitoring() {
 
   const sortedSources = useMemo(() => {
     const sorted = [...sources]
+
     if (sortBy === "last_sync") {
       sorted.sort((a, b) => new Date(b.last_sync || 0) - new Date(a.last_sync || 0))
     } else if (sortBy === "status") {
@@ -43,6 +44,7 @@ export default function ImportMonitoring() {
     } else if (sortBy === "jobs") {
       sorted.sort((a, b) => (b.jobs_added || 0) - (a.jobs_added || 0))
     }
+
     return sorted
   }, [sources, sortBy])
 
@@ -66,19 +68,33 @@ export default function ImportMonitoring() {
         </span>
       )
     }
+
     return null
   }
 
   const formatTime = (date) => {
-    if (!date) return "—"
+    if (!date) {
+      return "—"
+    }
+
     const d = new Date(date)
+
     const now = new Date()
+
     const diff = now - d
+
     const hours = Math.floor(diff / (1000 * 60 * 60))
+
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
 
-    if (hours > 0) return `${hours}h ${minutes}m`
-    if (minutes > 0) return `${minutes}m`
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`
+    }
+
+    if (minutes > 0) {
+      return `${minutes}m`
+    }
+
     return "עכשיו"
   }
 

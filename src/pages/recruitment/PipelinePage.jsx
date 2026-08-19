@@ -1,28 +1,9 @@
-import React, { useState, useCallback, useRef, useEffect } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "@/lib/AuthContext"
-import PipelineBoard from "@/components/ats/PipelineBoard"
-import MobilePipelineView from "@/components/ats/MobilePipelineView"
-import PipelineFilters from "@/components/ats/PipelineFilters"
-import CandidateDrawer from "@/components/ats/CandidateDrawer"
 import { usePipelineData } from "@/hooks/usePipelineData"
-import {
-  SlidersHorizontal,
-  RefreshCw,
-  Kanban,
-  FlaskConical,
-  Sparkles,
-  Users,
-  ShieldAlert,
-} from "lucide-react"
-import NotificationCenter from "@/components/ats/NotificationCenter"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-} from "@/components/platform/PlatformUI"
+import { Kanban, Sparkles, Users, ShieldAlert } from "lucide-react"
+
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 
 // Minimum px per stage column to render Kanban without forced horizontal scroll
@@ -30,13 +11,21 @@ const MIN_PX_PER_STAGE = 160
 
 export default function PipelinePage() {
   const { t, i18n } = useTranslation()
+
   const { user } = useAuth()
+
   const { can } = usePermissionMatrix()
+
   const canUpdate = can("update")
+
   const boardContainerRef = useRef(null)
+
   const [containerWidth, setContainerWidth] = useState(null)
+
   const [selectedCandidate, setSelectedCandidate] = useState(null)
+
   const [drawerOpen, setDrawerOpen] = useState(false)
+
   const [filters, setFilters] = useState({
     role: "",
     recruiter: "",
@@ -47,9 +36,11 @@ export default function PipelinePage() {
     expMin: "",
     expMax: "",
   })
+
   const [showFilters, setShowFilters] = useState(false)
 
   const [notifKey, setNotifKey] = useState(0)
+
   const handleNotificationCreated = useCallback(() => setNotifKey((k) => k + 1), [])
 
   const { stages, applications, loading, error, moveApplication, refresh, isMockData } =
@@ -57,24 +48,31 @@ export default function PipelinePage() {
 
   // Get current language direction
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const isRTL = currentLang === "he"
 
   // Observe the actual container width — this is the real available space after sidebars
   useEffect(() => {
-    if (!boardContainerRef.current) return
+    if (!boardContainerRef.current) {
+      return
+    }
+
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         setContainerWidth(entry.contentRect.width)
       }
     })
+
     observer.observe(boardContainerRef.current)
     // Set initial width immediately
     setContainerWidth(boardContainerRef.current.getBoundingClientRect().width)
+
     return () => observer.disconnect()
   }, [])
 
   // Use Mobile view if container is too narrow to fit all stage columns without horizontal drag
   const stageCount = stages.length || 7
+
   const useMobileView = containerWidth !== null && containerWidth < stageCount * MIN_PX_PER_STAGE
 
   const handleCandidateClick = (application) => {
@@ -94,6 +92,7 @@ export default function PipelinePage() {
   const activeStages = stages.filter((stage) =>
     applications.some((application) => application.status === stage.id),
   ).length
+
   const scoredCandidates = applications.filter(
     (application) => application.match_score != null,
   ).length
@@ -229,7 +228,9 @@ export default function PipelinePage() {
           open={drawerOpen}
           onClose={handleClose}
           onStageChange={(appId, newStage) => {
-            if (canUpdate) moveApplication(appId, newStage)
+            if (canUpdate) {
+              moveApplication(appId, newStage)
+            }
           }}
           onApplicationUpdated={refresh}
           canChangeStage={canUpdate}

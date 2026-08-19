@@ -1,19 +1,23 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { publicWorkflowService } from "@/api/services/publicWorkflowService"
 import { useAuth } from "@/lib/AuthContext"
-import { Link } from "react-router-dom"
-import { Zap } from "lucide-react"
 
 export default function RecommendedJobsAI() {
   const { user } = useAuth()
+
   const [jobs, setJobs] = useState([])
+
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchRecommendations = async () => {
-      if (!user?.email) return
+      if (!user?.email) {
+        return
+      }
+
       try {
         const result = await publicWorkflowService.recommendedJobs()
+
         setJobs(result.jobs || [])
       } catch (error) {
         console.error("Error fetching recommendations:", error)
@@ -25,9 +29,17 @@ export default function RecommendedJobsAI() {
     fetchRecommendations()
   }, [user?.email])
 
-  if (!user) return null
-  if (loading) return <div className="text-center py-4 text-gray-400">טוען המלצות AI...</div>
-  if (jobs.length === 0) return null
+  if (!user) {
+    return null
+  }
+
+  if (loading) {
+    return <div className="text-center py-4 text-gray-400">טוען המלצות AI...</div>
+  }
+
+  if (jobs.length === 0) {
+    return null
+  }
 
   return (
     <section className="bg-gradient-to-b from-[#0f1629] to-background border-t border-purple-500/20">

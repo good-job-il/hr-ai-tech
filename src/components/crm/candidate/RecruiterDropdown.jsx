@@ -1,26 +1,35 @@
 import { useState, useEffect, useRef } from "react"
 import { userService } from "@/api/services/userService"
-import { ChevronDown, UserCheck, Search } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
   const { t } = useTranslation()
+
   const [open, setOpen] = useState(false)
+
   const [recruiters, setRecruiters] = useState([])
+
   const [search, setSearch] = useState("")
+
   const [loading, setLoading] = useState(false)
+
   const ref = useRef(null)
 
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      return
+    }
+
     setLoading(true)
     userService
       .list({ limit: 200, is_active: true })
       .then((users) => {
         const RECRUITER_ROLES = ["recruiter", "team_manager", "recruitment_manager", "admin"]
+
         const filtered = users.filter(
           (u) => RECRUITER_ROLES.includes(u.role) || RECRUITER_ROLES.includes(u.user_type),
         )
+
         setRecruiters(filtered)
       })
       .finally(() => setLoading(false))
@@ -28,9 +37,13 @@ export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
 
   useEffect(() => {
     const handleClick = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false)
+      }
     }
+
     document.addEventListener("mousedown", handleClick)
+
     return () => document.removeEventListener("mousedown", handleClick)
   }, [])
 

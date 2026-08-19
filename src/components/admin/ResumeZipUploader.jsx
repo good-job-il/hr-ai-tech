@@ -1,23 +1,29 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { candidateImportService } from "@/api/services/candidateImportService"
 import { fileService } from "@/api/services/fileService"
 import { staffService } from "@/api/services/staffService"
-import { Upload, AlertCircle, CheckCircle2, Loader2, X } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
-import ResumeImportReview from "./ResumeImportReview"
-import ImportValidationCheck from "./ImportValidationCheck"
 import { useAuth } from "@/lib/AuthContext"
 
 export default function ResumeZipUploader({ onImportComplete }) {
   const { user } = useAuth()
+
   const [uploading, setUploading] = useState(false)
+
   const [zipFile, setZipFile] = useState(null)
+
   const [parseError, setParseError] = useState(null)
+
   const [parseResults, setParseResults] = useState(null)
+
   const [recruiterId, setRecruiterId] = useState("")
+
   const [employerId, setEmployerId] = useState("")
+
   const [importSource, setImportSource] = useState("linkedin")
+
   const [initialStatus, setInitialStatus] = useState("new")
+
   const [validationResults, setValidationResults] = useState(null)
 
   // Fetch staff members for dropdown
@@ -25,6 +31,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
     queryKey: ["staff-members"],
     queryFn: async () => {
       const result = await staffService.list({ sort: "created_date", order: "DESC", limit: 1000 })
+
       return result || []
     },
   })
@@ -39,7 +46,9 @@ export default function ResumeZipUploader({ onImportComplete }) {
   }
 
   const handleUploadAndParse = async () => {
-    if (!zipFile) return
+    if (!zipFile) {
+      return
+    }
 
     setUploading(true)
     setParseError(null)
@@ -47,6 +56,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
     try {
       // 1. Upload ZIP file
       const uploadResult = await fileService.upload(zipFile)
+
       const zipUrl = uploadResult.file_url
 
       // 2. Create import batch record
@@ -110,6 +120,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
             const validation = await candidateImportService.validateBatch(
               parseResults.importBatchId,
             )
+
             setValidationResults(validation)
           } catch (err) {
             console.error("Validation failed:", err)

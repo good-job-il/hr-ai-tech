@@ -1,6 +1,4 @@
-import React from "react"
-import { ArrowUpRight, ChevronRight, Sparkles, X } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const statTones = {
@@ -113,6 +111,7 @@ export function PlatformStatCard({
   className,
 }) {
   const colors = statTones[tone] || statTones.violet
+
   const content = (
     <div
       className={cn(
@@ -222,6 +221,7 @@ export function PlatformModal({
   dir,
 }) {
   const colors = statTones[tone] || statTones.violet
+
   return (
     <div
       dir={dir}

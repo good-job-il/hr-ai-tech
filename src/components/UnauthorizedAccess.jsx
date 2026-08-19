@@ -1,7 +1,3 @@
-import React from "react"
-import { Link } from "react-router-dom"
-import { Lock } from "lucide-react"
-
 export default function UnauthorizedAccess({ userType, requiredType }) {
   const typeLabels = {
     candidate: "מועמד",

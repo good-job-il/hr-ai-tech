@@ -1,7 +1,6 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { interviewService } from "@/api/services/interviewService"
 import { applicationService } from "@/api/services/applicationService"
-import { X, Calendar } from "lucide-react"
 
 export default function InterviewModal({ application: app, onClose, onSaved }) {
   const [form, setForm] = useState({
@@ -11,14 +10,18 @@ export default function InterviewModal({ application: app, onClose, onSaved }) {
     location_or_link: "",
     notes: "",
   })
+
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     if (!form.date || !form.time) {
       alert("יש למלא תאריך ושעה")
+
       return
     }
+
     setLoading(true)
     await interviewService.create({
       ...form,

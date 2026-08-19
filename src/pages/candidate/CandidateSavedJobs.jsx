@@ -1,20 +1,9 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { savedJobService } from "@/api/services/savedJobService"
 import { useAuth } from "@/lib/AuthContext"
-import {
-  Bookmark,
-  Search,
-  X,
-  Briefcase,
-  Building2,
-  RefreshCw,
-  Trash2,
-  ExternalLink,
-  BookmarkX,
-} from "lucide-react"
+import { Bookmark, Building2 } from "lucide-react"
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 
@@ -106,8 +95,11 @@ function SavedJobCard({ item, onRemove, isRemoving }) {
 
 export default function CandidateSavedJobs() {
   const { t } = useTranslation()
+
   const { user } = useAuth()
+
   const queryClient = useQueryClient()
+
   const [search, setSearch] = useState("")
 
   const {

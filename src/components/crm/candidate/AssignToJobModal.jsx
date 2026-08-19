@@ -3,23 +3,29 @@
  * Modal for manually assigning a candidate from the general pool to an open job.
  */
 import { useState, useEffect } from "react"
-import { X, Briefcase, CheckCircle2, Loader2, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { jobService } from "@/api/services/jobService"
 import { applicationService } from "@/api/services/applicationService"
 import { useTranslation } from "react-i18next"
 
 export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }) {
   const { t, i18n } = useTranslation()
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const isRTL = currentLang === "he"
+
   const [jobs, setJobs] = useState([])
+
   const [filteredJobs, setFilteredJobs] = useState([])
+
   const [searchQuery, setSearchQuery] = useState("")
+
   const [selectedJob, setSelectedJob] = useState(null)
+
   const [assigning, setAssigning] = useState(false)
+
   const [result, setResult] = useState(null) // { success, message }
+
   const [loading, setLoading] = useState(true)
 
   // Fetch open jobs on mount
@@ -32,6 +38,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
           order: "DESC",
           limit: 100,
         })
+
         setJobs(openJobs)
         setFilteredJobs(openJobs)
       } catch (err) {
@@ -40,6 +47,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
         setLoading(false)
       }
     }
+
     fetchJobs()
   }, [])
 
@@ -49,6 +57,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
       setFilteredJobs(jobs)
     } else {
       const query = searchQuery.toLowerCase()
+
       setFilteredJobs(
         jobs.filter(
           (job) =>
@@ -62,7 +71,9 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
   }, [searchQuery, jobs])
 
   const handleAssign = async () => {
-    if (!selectedJob) return
+    if (!selectedJob) {
+      return
+    }
 
     setAssigning(true)
     setResult(null)
@@ -74,7 +85,10 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
         success: true,
         message: t("candidateCRM.assignToJob.successMessage", { jobTitle: selectedJob.title }),
       })
-      if (onAssignSuccess) onAssignSuccess(application.id)
+
+      if (onAssignSuccess) {
+        onAssignSuccess(application.id)
+      }
     } catch (err) {
       setResult({
         success: false,
@@ -177,6 +191,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {filteredJobs.map((job) => {
                 const isSelected = selectedJob?.id === job.id
+
                 return (
                   <button
                     key={job.id}

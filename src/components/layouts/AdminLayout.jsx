@@ -3,7 +3,6 @@
  * All /admin/* routes redirect to /platform/* via App.jsx.
  * Kept only to avoid import errors; remove in Phase D cleanup.
  */
-import { Navigate } from "react-router-dom"
 
 export default function AdminLayout() {
   return <Navigate to="/platform/dashboard" replace />

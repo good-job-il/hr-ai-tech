@@ -1,19 +1,27 @@
 import { useState } from "react"
 import { authService } from "@/api/services/authService"
-import { Pencil, X, Check } from "lucide-react"
 
 export default function EditNameModal({ user, onUpdated }) {
   const [open, setOpen] = useState(false)
+
   const [name, setName] = useState(user?.full_name || "")
+
   const [saving, setSaving] = useState(false)
 
   const handleSave = async () => {
-    if (!name.trim()) return
+    if (!name.trim()) {
+      return
+    }
+
     setSaving(true)
     await authService.updateMe({ full_name: name.trim() })
     setSaving(false)
     setOpen(false)
-    if (onUpdated) onUpdated()
+
+    if (onUpdated) {
+      onUpdated()
+    }
+
     window.location.reload() // reload so auth context picks up new name
   }
 

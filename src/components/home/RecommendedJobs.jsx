@@ -1,5 +1,4 @@
 import React from "react"
-import { Link } from "react-router-dom"
 import { publicJobService } from "@/api/services/publicJobService"
 import { useQuery } from "@tanstack/react-query"
 
@@ -58,6 +57,7 @@ export default function RecommendedJobs() {
 
   React.useEffect(() => {
     const city = localStorage.getItem("selectedCity") || "תל אביב"
+
     setSelectedCity(city)
   }, [])
 
@@ -75,7 +75,9 @@ export default function RecommendedJobs() {
       return openJobs
         .sort((a, b) => {
           const aMatch = a.location?.toLowerCase() === selectedCity.toLowerCase() ? 0 : 1
+
           const bMatch = b.location?.toLowerCase() === selectedCity.toLowerCase() ? 0 : 1
+
           return aMatch - bMatch
         })
         .slice(0, 6)

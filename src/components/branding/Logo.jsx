@@ -24,13 +24,17 @@ function getHomeRoute(role) {
 
 export default function Logo({ size = "md", href, className = "" }) {
   const navigate = useNavigate()
+
   const { user } = useAuth()
 
   const destination = href !== undefined ? href : getHomeRoute(user?.role)
 
   const handleClick = (e) => {
     e.preventDefault()
-    if (destination) navigate(destination)
+
+    if (destination) {
+      navigate(destination)
+    }
   }
 
   return (

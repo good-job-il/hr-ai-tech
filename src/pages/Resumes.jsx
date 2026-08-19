@@ -1,24 +1,28 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { httpClient } from "@/api/client/httpClient"
 import { useAuth } from "@/lib/AuthContext"
-import { FileText, Download } from "lucide-react"
-import Navbar from "@/components/home/Navbar"
 
 export default function Resumes() {
   const [filter, setFilter] = useState("incoming") // incoming | mine | submitted
+
   const { user } = useAuth()
 
   // קורות חיים שהגיעו למעסיקים שלך (אם אתה מעסיק)
   const { data: incomingResumes = [] } = useQuery({
     queryKey: ["incoming-resumes", user?.email],
     queryFn: async () => {
-      if (!user) return []
+      if (!user) {
+        return []
+      }
+
       const applications = await httpClient.get(
         `/applications?employer_id=${encodeURIComponent(user.email)}`,
         { cache: false },
       )
+
       const arr = Array.isArray(applications) ? applications : applications?.data || []
+
       return arr
         .filter((a) => a.resume_url)
         .map((a) => ({
@@ -38,14 +42,23 @@ export default function Resumes() {
   const { data: myResumes = [] } = useQuery({
     queryKey: ["my-resumes", user?.email],
     queryFn: async () => {
-      if (!user) return []
+      if (!user) {
+        return []
+      }
+
       const raw = await httpClient.get(
         `/candidates/profiles?user_email=${encodeURIComponent(user.email)}`,
         { cache: false },
       )
+
       const profiles = Array.isArray(raw) ? raw : raw?.data || []
+
       const profile = profiles[0]
-      if (!profile || !profile.resume_url) return []
+
+      if (!profile || !profile.resume_url) {
+        return []
+      }
+
       return [
         {
           id: profile.id,
@@ -65,12 +78,17 @@ export default function Resumes() {
   const { data: submittedResumes = [] } = useQuery({
     queryKey: ["submitted-resumes", user?.email],
     queryFn: async () => {
-      if (!user) return []
+      if (!user) {
+        return []
+      }
+
       const applications = await httpClient.get(
         `/applications?candidate_email=${encodeURIComponent(user.email)}`,
         { cache: false },
       )
+
       const arr = Array.isArray(applications) ? applications : applications?.data || []
+
       return arr
         .filter((a) => a.resume_url)
         .map((a) => ({
@@ -88,6 +106,7 @@ export default function Resumes() {
 
   const filtered =
     filter === "incoming" ? incomingResumes : filter === "mine" ? myResumes : submittedResumes
+
   const isEmployer = user?.role === "employer" || incomingResumes.length > 0
 
   return (

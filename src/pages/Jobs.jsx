@@ -1,35 +1,10 @@
-import React, { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { publicJobService } from "@/api/services/publicJobService"
 import { publicWorkflowService } from "@/api/services/publicWorkflowService"
 import { useQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
-import {
-  Search,
-  MapPin,
-  Bookmark,
-  Share2,
-  Calendar,
-  Briefcase,
-  Sparkles,
-  SlidersHorizontal,
-  LayoutGrid,
-  List,
-  BarChart2,
-  TrendingUp,
-  ChevronDown,
-  ChevronUp,
-  RotateCcw,
-  Tag,
-  Brain,
-  ShieldCheck,
-  Zap,
-  Building2,
-  ArrowLeft,
-  Wand2,
-} from "lucide-react"
-import SEOHead from "@/components/SEOHead"
-import Navbar from "@/components/home/Navbar"
+import { Brain, ShieldCheck, Zap, Building2 } from "lucide-react"
 
 const glass = {
   background: "rgba(255,255,255,0.78)",
@@ -42,8 +17,11 @@ const glass = {
 
 function MatchBadge({ score }) {
   const { i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const high = score >= 90
+
   const label = high ? (isRtl ? "התאמה גבוהה" : "High match") : isRtl ? "התאמה טובה" : "Good match"
 
   return (
@@ -109,16 +87,22 @@ function FilterBlock({ title, open, onToggle, children }) {
 
 function JobCard({ job }) {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const initials = job.company_initials || (job.company || "").slice(0, 2) || "HR"
+
   const daysAgo = Math.max(
     0,
     Math.floor((Date.now() - new Date(job.created_date || Date.now())) / 86400000),
   )
+
   const typeLabel = isRtl
     ? { full: "משרה מלאה", part: "חלקית", remote: "מרחוק", daily: "יומי" }[job.type] || ""
     : { full: "Full-time", part: "Part-time", remote: "Remote", daily: "Daily" }[job.type] || ""
+
   const matchScore = 78 + (job.id?.charCodeAt?.(0) % 20 || 14)
+
   const isNew = daysAgo <= 3
 
   return (
@@ -245,8 +229,11 @@ function JobCard({ job }) {
 
 export default function Jobs() {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const urlP = new URLSearchParams(window.location.search)
+
   const navigate = useNavigate()
 
   const JOB_TYPES = [
@@ -264,9 +251,13 @@ export default function Jobs() {
   ]
 
   const [search, setSearch] = useState(urlP.get("search") || urlP.get("q") || "")
+
   const [loc, setLoc] = useState("")
+
   const [jobTypes, setJobTypes] = useState([])
+
   const [viewMode, setViewMode] = useState("list")
+
   const [openFilters, setOpenFilters] = useState({
     type: true,
     exp: true,
@@ -275,6 +266,7 @@ export default function Jobs() {
   })
 
   const toggle = (k) => setOpenFilters((f) => ({ ...f, [k]: !f[k] }))
+
   const toggleType = (v) =>
     setJobTypes((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]))
 
@@ -288,6 +280,7 @@ export default function Jobs() {
           type: "search",
           limit: 100,
         })
+
         return r.jobs || []
       }
 
@@ -298,8 +291,13 @@ export default function Jobs() {
         limit: 100,
       })
 
-      if (jobTypes.length) all = all.filter((j) => jobTypes.includes(j.type))
-      if (loc) all = all.filter((j) => j.location?.toLowerCase().includes(loc.toLowerCase()))
+      if (jobTypes.length) {
+        all = all.filter((j) => jobTypes.includes(j.type))
+      }
+
+      if (loc) {
+        all = all.filter((j) => j.location?.toLowerCase().includes(loc.toLowerCase()))
+      }
 
       return all
     },
@@ -307,8 +305,11 @@ export default function Jobs() {
   })
 
   const handleSearch = () => {
-    if (search) navigate(`/jobs?search=${encodeURIComponent(search)}`)
-    else navigate("/jobs")
+    if (search) {
+      navigate(`/jobs?search=${encodeURIComponent(search)}`)
+    } else {
+      navigate("/jobs")
+    }
   }
 
   return (

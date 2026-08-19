@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next"
 import { applicationService } from "@/api/services/applicationService"
 import { messageService } from "@/api/services/messageService"
 import { useAuth } from "@/lib/AuthContext"
-import { MessageCircle, Send, RefreshCw, X, Briefcase, Inbox, MessagesSquare } from "lucide-react"
+import { MessageCircle, Inbox } from "lucide-react"
 
 // ─── Conversation List ─────────────────────────────────────────────────────────
 
@@ -45,8 +45,11 @@ function ConversationItem({ application, isSelected, onSelect, unreadCount }) {
 
 function ChatWindow({ application, user, onClose }) {
   const { t } = useTranslation()
+
   const [text, setText] = useState("")
+
   const bottomRef = useRef(null)
+
   const queryClient = useQueryClient()
 
   const { data: messages = [], isLoading } = useQuery({
@@ -58,6 +61,7 @@ function ChatWindow({ application, user, onClose }) {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+
     if (application && messages.length > 0) {
       if (messages.some((m) => !m.is_read && m.sender_email !== user?.email)) {
         messageService.markApplicationRead(application.id)
@@ -75,7 +79,9 @@ function ChatWindow({ application, user, onClose }) {
   })
 
   const handleSend = () => {
-    if (text.trim()) sendMutation.mutate()
+    if (text.trim()) {
+      sendMutation.mutate()
+    }
   }
 
   return (
@@ -137,6 +143,7 @@ function ChatWindow({ application, user, onClose }) {
         ) : (
           messages.map((msg) => {
             const isMine = msg.sender_email === user?.email
+
             return (
               <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
                 <div
@@ -188,6 +195,7 @@ function ChatWindow({ application, user, onClose }) {
 
 function SelectConversationPrompt() {
   const { t } = useTranslation()
+
   return (
     <div className="flex-1 bg-white rounded-2xl border border-[#E4ECFF] flex flex-col items-center justify-center py-20 text-center">
       <div className="w-16 h-16 rounded-2xl bg-[#F3EFFF] flex items-center justify-center mb-4">
@@ -230,8 +238,11 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
 
 export default function CandidateMessages() {
   const { t } = useTranslation()
+
   const { user } = useAuth()
+
   const [selected, setSelected] = useState(null)
+
   const queryClient = useQueryClient()
 
   const {
@@ -252,6 +263,7 @@ export default function CandidateMessages() {
           messageService.list({ application_id: app.id, is_read: false, limit: 100 }),
         ),
       )
+
       return results.flat().filter((message) => message.sender_email !== user.email)
     },
     enabled: applications.length > 0,
@@ -259,6 +271,7 @@ export default function CandidateMessages() {
   })
 
   const unreadCounts = {}
+
   unreadMessages.forEach((m) => {
     unreadCounts[m.application_id] = (unreadCounts[m.application_id] || 0) + 1
   })

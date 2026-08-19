@@ -1,114 +1,33 @@
-import { Toaster } from "@/components/ui/toaster"
-import LanguageProvider from "@/lib/LanguageProvider"
-import { QueryClientProvider } from "@tanstack/react-query"
 import { queryClientInstance } from "@/lib/query-client"
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom"
-import PageNotFound from "./lib/PageNotFound"
-import RoleFallback from "./lib/RoleFallback"
-import Unauthorized from "./pages/Unauthorized"
-import { AuthProvider, useAuth } from "@/lib/AuthContext"
-import UserNotRegisteredError from "@/components/UserNotRegisteredError"
-import ProtectedRoute from "@/lib/ProtectedRoute"
+import { useAuth } from "@/lib/AuthContext"
 
 // Infrastructure
-import { ErrorBoundary } from "@/components/errors/ErrorBoundary"
-import { NotificationProvider } from "@/components/notifications/NotificationProvider"
-import { ModalContainer } from "@/components/dialogs/ModalContainer"
-import { DrawerContainer } from "@/components/dialogs/DrawerContainer"
-import { ToastContainer } from "@/components/notifications/ToastContainer"
 
 // ── Layouts ──────────────────────────────────────────────────────────
-import CandidateLayout from "@/components/layouts/CandidateLayout"
-import SuperAdminLayout from "@/components/layouts/SuperAdminLayout"
-import StaffingAgencyLayout from "@/components/layouts/StaffingAgencyLayout"
-import CompanyHRLayout from "@/components/layouts/CompanyHRLayout"
-import AgencyRecruiterLayout from "@/components/layouts/AgencyRecruiterLayout"
 // Legacy layouts kept for /employer/* route
-import EmployerLayout from "@/components/layouts/EmployerLayout"
 
 // ── Public Pages ──────────────────────────────────────────────────────
-import Home from "./pages/Home"
-import Jobs from "./pages/Jobs"
-import JobDetail from "./pages/JobDetail"
-import Companies from "./pages/Companies"
-import CompanyProfile from "./pages/CompanyProfile"
-import PricingPage from "./pages/public/PricingPage"
-import ContactPage from "./pages/public/ContactPage"
-import AboutPage from "./pages/public/AboutPage"
-import BlogPage from "./pages/public/BlogPage"
-import AICareerPage from "./pages/public/AICareerPage"
-import HowItWorksPage from "./pages/public/HowItWorksPage"
-import ResourcesPage from "./pages/public/ResourcesPage"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
-import ForgotPassword from "./pages/ForgotPassword"
-import ResetPassword from "./pages/ResetPassword"
-import StaffInvite from "./pages/StaffInvite"
 
 // ── Shared Feature Pages ──────────────────────────────────────────────
-import PipelinePage from "./pages/recruitment/PipelinePage"
-import AIMatchingPage from "./pages/ai/AIMatchingPage"
-import CandidateCRMPage from "./pages/crm/CandidateCRMPage"
-import CandidateListCRMPage from "./pages/crm/CandidateListCRMPage"
-import ImportDashboard from "./pages/admin/ImportDashboard"
-import ManageJobsPage from "./pages/admin/ManageJobsPage"
-import CompensationPage from "./pages/admin/CompensationPage"
-import PermissionsPage from "./pages/admin/PermissionsPage"
-import RoleSettingsPage from "./pages/admin/RoleSettingsPage"
-import BillingSettings from "./pages/admin/BillingSettings"
-import IntegrationsSettings from "./pages/admin/IntegrationsSettings"
-import AuditLogPage from "./pages/admin/AuditLogPage"
 
 // ── Platform Pages (Super Admin) ──────────────────────────────────────
-import PlatformDashboard from "./pages/platform/PlatformDashboard"
-import PlaceholderPlatform from "./pages/platform/PlaceholderPlatform"
-import SubscriptionsPage from "./pages/platform/SubscriptionsPage"
-import InvoicesPage from "./pages/platform/InvoicesPage"
-import FlagsPage from "./pages/platform/FlagsPage"
-import OrganizationsPage from "./pages/platform/OrganizationsPage"
-import UsersManagementPage from "./pages/platform/UsersManagementPage"
-import MarketplacePage from "./pages/platform/marketplace/MarketplacePage"
-import MarketplaceCandidatesPage from "./pages/platform/marketplace/MarketplaceCandidatesPage"
-import MarketplaceExposurePage from "./pages/platform/marketplace/MarketplaceExposurePage"
 
 // ── Agency Pages (Staffing Agency) ────────────────────────────────────
-import AgencyDashboard from "./pages/agency/AgencyDashboard"
-import AgencyOnboarding from "./pages/agency/AgencyOnboarding"
-import AgencyClients from "./pages/agency/AgencyClients"
-import AgencyClientDetail from "./pages/agency/AgencyClientDetail"
-import AgencyTeamsPage from "./pages/agency/AgencyTeamsPage"
-import RecruitmentManagerDashboard from "./pages/agency/RecruitmentManagerDashboard"
 
 // ── Company Pages (Company HR) ────────────────────────────────────────
-import CompanyDashboard from "./pages/company/CompanyDashboard"
-import CompanyInterviews from "./pages/company/CompanyInterviews"
-import CompanyTeamPage from "./pages/company/CompanyTeamPage"
-import CompanyAnalyticsPage from "./pages/company/CompanyAnalyticsPage"
 
 // ── Candidate Pages ───────────────────────────────────────────────────
-import CandidateDashboard from "./pages/candidate/CandidateDashboard"
-import CandidateProfile from "./pages/candidate/CandidateProfile"
-import CandidateApplications from "./pages/candidate/CandidateApplications"
-import CandidateSavedJobs from "./pages/candidate/CandidateSavedJobs"
-import CandidateInterviews from "./pages/candidate/CandidateInterviews"
-import CandidateMessages from "./pages/candidate/CandidateMessages"
-import Notifications from "./pages/Notifications"
-import RecommendedJobsAI from "./components/home/RecommendedJobsAI"
 
 // ── Employer Pages (legacy) ───────────────────────────────────────────
-import EmployerDashboard from "./pages/employer/EmployerDashboard"
-import EmployerAnalyticsPage from "./pages/employer/EmployerAnalyticsPage"
-import EmployerSettingsPage from "./pages/employer/EmployerSettingsPage"
 
 // ── Placeholder ───────────────────────────────────────────────────────
-import PlaceholderPage from "./pages/placeholder/PlaceholderPage"
-import AgencyReportsPage from "./pages/agency/AgencyReportsPage"
 
 // TODO: Ask Rudik about this component
 // import AdminDashboard from "./pages/admin/AdminDashboard.jsx"
 
 const AgencyDashboardRoute = () => {
   const { user } = useAuth()
+
   return user?.role === "recruitment_manager" ? (
     <RecruitmentManagerDashboard />
   ) : (
@@ -131,9 +50,13 @@ const AuthenticatedApp = () => {
   }
 
   if (authError) {
-    if (authError.type === "user_not_registered") return <UserNotRegisteredError />
+    if (authError.type === "user_not_registered") {
+      return <UserNotRegisteredError />
+    }
+
     if (authError.type === "auth_required") {
       navigateToLogin()
+
       return null
     }
   }

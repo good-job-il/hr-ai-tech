@@ -5,31 +5,8 @@ import { useTranslation } from "react-i18next"
 import { userService } from "@/api/services/userService"
 import { useAuth } from "@/lib/AuthContext"
 import { useToast } from "@/components/ui/use-toast"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import {
-  Users,
-  UserPlus,
-  Search,
-  Edit2,
-  Trash2,
-  Mail,
-  Phone,
-  ShieldCheck,
-  Briefcase,
-  Crown,
-  Plus,
-  AlertCircle,
-} from "lucide-react"
+
+import { Users, ShieldCheck, Briefcase, Crown } from "lucide-react"
 
 // ─── Role config ──────────────────────────────────────────────────────────────
 
@@ -68,8 +45,11 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
 
 function RoleBadge({ role, t }) {
   const style = ROLE_STYLE[role] || ROLE_STYLE.hr_manager
+
   const { Icon } = style
+
   const label = t(`company.team.roles.${role}`, { defaultValue: role })
+
   return (
     <span
       className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg font-bold whitespace-nowrap"
@@ -170,6 +150,7 @@ const EMPTY_FORM = { full_name: "", email: "", phone: "", role: "hr_manager" }
 
 function MemberModal({ open, onOpenChange, member, onSubmit, loading, isRtl, t }) {
   const isEdit = Boolean(member?.id)
+
   const [form, setForm] = useState(EMPTY_FORM)
 
   useEffect(() => {
@@ -311,22 +292,37 @@ function MemberSkeleton() {
 
 export default function CompanyTeamPage() {
   const { t, i18n } = useTranslation()
+
   const isRtl = !i18n.language?.startsWith("en")
+
   const { organization } = useAuth()
+
   const { toast } = useToast()
+
   const queryClient = useQueryClient()
+
   const location = useLocation()
 
   const [search, setSearch] = useState("")
+
   const [roleFilter, setRoleFilter] = useState("all")
+
   const [showModal, setShowModal] = useState(false)
+
   const [editingMember, setEditingMember] = useState(null)
+
   const [deletingMember, setDeletingMember] = useState(null)
 
   // Determine which sub-route is active
   const routeFilter = useMemo(() => {
-    if (location.pathname.endsWith("/members")) return "members"
-    if (location.pathname.endsWith("/recruiters")) return "recruiters"
+    if (location.pathname.endsWith("/members")) {
+      return "members"
+    }
+
+    if (location.pathname.endsWith("/recruiters")) {
+      return "recruiters"
+    }
+
     return "all"
   }, [location.pathname])
 
@@ -376,6 +372,7 @@ export default function CompanyTeamPage() {
     // Search
     if (search.trim()) {
       const q = search.toLowerCase()
+
       list = list.filter(
         (s) => s.full_name?.toLowerCase().includes(q) || s.email?.toLowerCase().includes(q),
       )
@@ -400,6 +397,7 @@ export default function CompanyTeamPage() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => {
       const { email: _email, ...updates } = data
+
       return userService.update(id, updates)
     },
     onSuccess: () => {
@@ -606,8 +604,11 @@ export default function CompanyTeamPage() {
       <MemberModal
         open={showModal}
         onOpenChange={(v) => {
-          if (!v) handleCloseModal()
-          else setShowModal(true)
+          if (!v) {
+            handleCloseModal()
+          } else {
+            setShowModal(true)
+          }
         }}
         member={editingMember}
         onSubmit={handleSubmit}
@@ -619,7 +620,9 @@ export default function CompanyTeamPage() {
       <DeleteConfirmDialog
         open={Boolean(deletingMember)}
         onOpenChange={(v) => {
-          if (!v) setDeletingMember(null)
+          if (!v) {
+            setDeletingMember(null)
+          }
         }}
         member={deletingMember}
         onConfirm={() => deletingMember?.id && deleteMutation.mutate(deletingMember.id)}

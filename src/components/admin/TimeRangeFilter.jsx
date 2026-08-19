@@ -1,6 +1,3 @@
-import React from "react"
-import { Calendar } from "lucide-react"
-
 const ranges = [
   { key: "today", label: "היום" },
   { key: "yesterday", label: "אתמול" },

@@ -1,7 +1,4 @@
-import React, { useState } from "react"
-import { Edit2, Trash2, Plus, Users } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import StaffFormModal from "@/components/employer/StaffFormModal"
+import { useState } from "react"
 
 export default function StaffSection({
   staff,
@@ -13,6 +10,7 @@ export default function StaffSection({
   loading,
 }) {
   const [showModal, setShowModal] = useState(false)
+
   const [editingStaff, setEditingStaff] = useState(null)
 
   const handleSubmit = (data) => {
@@ -21,6 +19,7 @@ export default function StaffSection({
     } else {
       onAdd(data)
     }
+
     setShowModal(false)
     setEditingStaff(null)
   }

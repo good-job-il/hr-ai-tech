@@ -1,7 +1,5 @@
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { MessageSquare, Pin, Eye, Trash2, Plus, Lock } from "lucide-react"
+import { Eye, Lock } from "lucide-react"
 import { format } from "date-fns"
 import { he, enUS } from "date-fns/locale"
 import { useTranslation } from "react-i18next"
@@ -14,7 +12,9 @@ export default function CandidateNotesPanel({
   userRole,
 }) {
   const { t, i18n } = useTranslation()
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const dateLocale = currentLang === "he" ? he : enUS
 
   const VISIBILITY_CONFIG = {
@@ -47,14 +47,22 @@ export default function CandidateNotesPanel({
   }
 
   const [showForm, setShowForm] = useState(false)
+
   const [content, setContent] = useState("")
+
   const [visibility, setVisibility] = useState("internal")
+
   const [noteType, setNoteType] = useState("general")
+
   const [isPinned, setIsPinned] = useState(false)
+
   const [saving, setSaving] = useState(false)
 
   const handleSubmit = async () => {
-    if (!content.trim()) return
+    if (!content.trim()) {
+      return
+    }
+
     setSaving(true)
     await onAddNote({
       content: content.trim(),
@@ -68,6 +76,7 @@ export default function CandidateNotesPanel({
   }
 
   const pinned = notes.filter((n) => n.is_pinned)
+
   const regular = notes.filter((n) => !n.is_pinned)
 
   return (
@@ -96,7 +105,9 @@ export default function CandidateNotesPanel({
             {/* Visibility */}
             {["internal", "employer_visible"].map((v) => {
               const cfg = VISIBILITY_CONFIG[v]
+
               const Ico = cfg.icon
+
               return (
                 <button
                   key={v}
@@ -201,6 +212,7 @@ export default function CandidateNotesPanel({
 
 function NoteCard({ note, onDelete, onUpdate, visibilityConfig, typeLabels, dateLocale }) {
   const cfg = visibilityConfig[note.visibility] || visibilityConfig.internal
+
   const Ico = cfg.icon
 
   return (

@@ -3,25 +3,19 @@
  * Shows full AI match explanation: strengths, gaps, risks,
  * recommendations, screening questions, next action.
  */
-import React, { useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  Lightbulb,
-  MessageSquare,
-  Zap,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react"
-import AIMatchBadge from "./AIMatchBadge"
+import { CheckCircle2, XCircle, AlertTriangle, Lightbulb } from "lucide-react"
 
 function Section({ icon: Icon, title, items, color, emptyText }) {
   if (!items || items.length === 0) {
-    if (emptyText) return null
+    if (emptyText) {
+      return null
+    }
+
     return null
   }
+
   return (
     <div>
       <div className={`flex items-center gap-2 mb-2`}>
@@ -49,9 +43,14 @@ export default function MatchExplanationCard({
   collapsed = false,
 }) {
   const { t, i18n } = useTranslation()
+
   const isRTL = i18n.language === "he"
+
   const [open, setOpen] = useState(!collapsed)
-  if (!explanation) return null
+
+  if (!explanation) {
+    return null
+  }
 
   return (
     <div

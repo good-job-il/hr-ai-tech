@@ -1,14 +1,14 @@
 /**
  * AIMatchBadge — compact score pill used in cards and tables.
  */
-import React from "react"
 import { useTranslation } from "react-i18next"
-import { Sparkles, AlertTriangle } from "lucide-react"
 
 export default function AIMatchBadge({ score, missingRequired = false, size = "sm" }) {
   const { t } = useTranslation()
 
-  if (score == null) return null
+  if (score == null) {
+    return null
+  }
 
   const color =
     score >= 85

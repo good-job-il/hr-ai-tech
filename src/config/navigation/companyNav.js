@@ -5,8 +5,6 @@ import {
   Calendar,
   BarChart3,
   Settings,
-  FileText,
-  Globe,
   UserCheck,
   Sparkles,
 } from "lucide-react"

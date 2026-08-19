@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { jobService } from "@/api/services/jobService"
 import { candidateService } from "@/api/services/candidateService"
@@ -6,37 +6,15 @@ import { interviewService } from "@/api/services/interviewService"
 import { applicationService } from "@/api/services/applicationService"
 import { useAuth } from "@/lib/AuthContext"
 import { useTranslation } from "react-i18next"
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts"
-import {
-  Briefcase,
-  Users,
-  Calendar,
-  CheckCircle2,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  BarChart3,
-  FileText,
-} from "lucide-react"
+
+import { Briefcase, Users, Calendar, CheckCircle2, BarChart3, FileText } from "lucide-react"
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const STALE = 3 * 60 * 1000
+
 const EMERALD = "#7C3AED"
+
 const COLORS = ["#7C3AED", "#2563EB", "#059669", "#EA580C", "#0891B2", "#DC2626"]
 
 const APPLICATION_STATUSES = [
@@ -54,19 +32,28 @@ const APPLICATION_STATUSES = [
 
 function buildDateRange(range) {
   const now = new Date()
+
   const start = (d) => {
     const x = new Date(d)
+
     x.setHours(0, 0, 0, 0)
+
     return x
   }
+
   const end = (d) => {
     const x = new Date(d)
+
     x.setHours(23, 59, 59, 999)
+
     return x
   }
+
   const daysAgo = (n) => {
     const d = new Date(now)
+
     d.setDate(d.getDate() - n)
+
     return start(d)
   }
 
@@ -76,31 +63,48 @@ function buildDateRange(range) {
     quarter: { from: daysAgo(89), to: end(now) },
     year: { from: daysAgo(364), to: end(now) },
   }
+
   return ranges[range] || ranges.month
 }
 
 function inRange(dateStr, from, to) {
   const d = new Date(dateStr)
+
   return !isNaN(d) && d >= from && d <= to
 }
 
 function pctChange(cur, prev) {
-  if (prev === 0 && cur === 0) return null
-  if (prev === 0) return null
+  if (prev === 0 && cur === 0) {
+    return null
+  }
+
+  if (prev === 0) {
+    return null
+  }
+
   return Math.round(((cur - prev) / prev) * 100)
 }
 
 function buildDailyChart(items, dateField, range) {
   const { from, to } = buildDateRange(range)
+
   const days = Math.ceil((to - from) / 86400000) + 1
+
   return Array.from({ length: Math.min(days, 90) }, (_, i) => {
     const d = new Date(from)
+
     d.setDate(d.getDate() + i)
+
     const label = d.toLocaleDateString("he-IL", { day: "2-digit", month: "2-digit" })
+
     const dayStart = new Date(d)
+
     dayStart.setHours(0, 0, 0, 0)
+
     const dayEnd = new Date(d)
+
     dayEnd.setHours(23, 59, 59, 999)
+
     return {
       date: label,
       count: items.filter((x) => inRange(x[dateField], dayStart, dayEnd)).length,
@@ -117,6 +121,7 @@ function RangeTabs({ value, onChange, t }) {
     { id: "quarter", label: t("company.analytics.ranges.quarter") },
     { id: "year", label: t("company.analytics.ranges.year") },
   ]
+
   return (
     <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
       {tabs.map((tab) => (
@@ -137,20 +142,27 @@ function RangeTabs({ value, onChange, t }) {
 }
 
 function TrendBadge({ pct }) {
-  if (pct === null || pct === undefined) return null
-  if (pct > 0)
+  if (pct === null || pct === undefined) {
+    return null
+  }
+
+  if (pct > 0) {
     return (
       <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
         <TrendingUp className="w-3 h-3" />+{pct}%
       </span>
     )
-  if (pct < 0)
+  }
+
+  if (pct < 0) {
     return (
       <span className="inline-flex items-center gap-0.5 text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">
         <TrendingDown className="w-3 h-3" />
         {pct}%
       </span>
     )
+  }
+
   return (
     <span className="inline-flex items-center gap-0.5 text-xs font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
       <Minus className="w-3 h-3" />
@@ -168,7 +180,9 @@ function KpiCard({ icon: Icon, label, value, pct, color = "green", loading, sub 
     red: { bg: "bg-red-50", text: "text-red-600", border: "border-red-100" },
     cyan: { bg: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-100" },
   }
+
   const c = colors[color] || colors.green
+
   return (
     <div className={`bg-white border ${c.border} rounded-2xl p-5 shadow-sm flex flex-col gap-3`}>
       <div className="flex items-center gap-3">
@@ -205,9 +219,13 @@ function SectionCard({ title, children }) {
 
 export default function CompanyAnalyticsPage() {
   const { user } = useAuth()
+
   const { t, i18n } = useTranslation()
+
   const isRTL = i18n.language === "he"
+
   const orgId = user?.organization_id
+
   const [range, setRange] = useState("month")
 
   // ── Data fetching ────────────────────────────────────────────────────────
@@ -268,56 +286,77 @@ export default function CompanyAnalyticsPage() {
 
   const stats = useMemo(() => {
     const { from, to } = buildDateRange(range)
+
     const diff = to - from
+
     const prevFrom = new Date(from - diff)
+
     const prevTo = new Date(from - 1)
 
     const cur = (items, field) => items.filter((x) => inRange(x[field], from, to)).length
+
     const prev = (items, field) => items.filter((x) => inRange(x[field], prevFrom, prevTo)).length
 
     const appsNow = cur(applications, "created_date")
+
     const appsPrev = prev(applications, "created_date")
+
     const hiredNow = applications.filter(
       (a) => a.status === "hired" && inRange(a.updated_date, from, to),
     ).length
+
     const hiredPrev = applications.filter(
       (a) => a.status === "hired" && inRange(a.updated_date, prevFrom, prevTo),
     ).length
+
     const intNow = cur(interviews, "created_date")
+
     const intPrev = prev(interviews, "created_date")
+
     const candNow = cur(candidates, "created_date")
+
     const candPrev = prev(candidates, "created_date")
+
     const openJobs = jobs.filter((j) => !j.is_closed).length
+
     const totalViews = jobs.reduce((s, j) => s + (j.views || 0), 0)
+
     const convRate = totalViews > 0 ? ((applications.length / totalViews) * 100).toFixed(1) : "0"
 
     // Funnel: count by status for current range
     const funnelMap = {}
+
     APPLICATION_STATUSES.forEach((s) => {
       funnelMap[s] = 0
     })
     applications
       .filter((a) => inRange(a.created_date, from, to))
       .forEach((a) => {
-        if (funnelMap[a.status] !== undefined) funnelMap[a.status]++
+        if (funnelMap[a.status] !== undefined) {
+          funnelMap[a.status]++
+        }
       })
 
     // Sources pie
     const srcMap = { app: 0, linkedin: 0, facebook: 0, jobsite: 0, other: 0 }
+
     applications
       .filter((a) => inRange(a.created_date, from, to))
       .forEach((a) => {
         const k = a.source in srcMap ? a.source : "other"
+
         srcMap[k]++
       })
 
     // Top jobs by applications in range
     const jobCountMap = {}
+
     applications
       .filter((a) => inRange(a.created_date, from, to))
       .forEach((a) => {
         jobCountMap[a.job_id] = (jobCountMap[a.job_id] || 0) + 1
       })
+
     const topJobs = jobs
       .map((j) => ({
         ...j,
@@ -352,16 +391,24 @@ export default function CompanyAnalyticsPage() {
 
   const appsChartData = useMemo(() => {
     const daily = buildDailyChart(applications, "created_date", range)
+
     const bucketSize = range === "year" ? 7 : range === "quarter" ? 3 : 1
-    if (bucketSize === 1) return daily
+
+    if (bucketSize === 1) {
+      return daily
+    }
+
     const bucketed = []
+
     for (let i = 0; i < daily.length; i += bucketSize) {
       const slice = daily.slice(i, i + bucketSize)
+
       bucketed.push({
         date: slice[0].date,
         count: slice.reduce((s, x) => s + x.count, 0),
       })
     }
+
     return bucketed
   }, [applications, range])
 
@@ -382,6 +429,7 @@ export default function CompanyAnalyticsPage() {
       jobsite: t("company.analytics.sources.jobsite"),
       other: t("company.analytics.sources.other"),
     }
+
     return Object.entries(stats.srcMap || {})
       .map(([k, v]) => ({ name: srcLabels[k] || k, value: v }))
       .filter((d) => d.value > 0)

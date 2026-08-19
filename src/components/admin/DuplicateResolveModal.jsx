@@ -1,6 +1,3 @@
-import React from "react"
-import { X, AlertCircle, Users } from "lucide-react"
-
 export default function DuplicateResolveModal({ duplicate, onResolve, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" dir="rtl">

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { organizationService } from "@/api/services/organizationService"
 import {
@@ -9,17 +9,8 @@ import {
   CreditCard,
   Crown,
   Search,
-  SlidersHorizontal,
   XCircle,
 } from "lucide-react"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-} from "@/components/platform/PlatformUI"
 
 const PLAN_COLORS = {
   trial: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", label: "Trial" },
@@ -43,7 +34,9 @@ const PLAN_PRICES = { trial: 0, starter: 499, pro: 1499, enterprise: 2999 }
 
 export default function SubscriptionsPage() {
   const [search, setSearch] = useState("")
+
   const [planFilter, setPlanFilter] = useState("all")
+
   const [statusFilter, setStatusFilter] = useState("all")
 
   const { data: orgs = [], isLoading } = useQuery({
@@ -54,8 +47,11 @@ export default function SubscriptionsPage() {
 
   const filtered = orgs.filter((o) => {
     const matchSearch = !search || o.name?.toLowerCase().includes(search.toLowerCase())
+
     const matchPlan = planFilter === "all" || o.plan === planFilter
+
     const matchStatus = statusFilter === "all" || o.status === statusFilter
+
     return matchSearch && matchPlan && matchStatus
   })
 
@@ -229,8 +225,11 @@ export default function SubscriptionsPage() {
                 ) : (
                   filtered.map((org, index) => {
                     const plan = PLAN_COLORS[org.plan] || PLAN_COLORS.trial
+
                     const status = STATUS_COLORS[org.status] || STATUS_COLORS.inactive
+
                     const StatusIcon = status.icon
+
                     return (
                       <tr key={org.id} className="group transition-colors hover:bg-violet-50/35">
                         <td className="px-5 py-4">

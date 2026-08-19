@@ -17,6 +17,7 @@ export function GlassCard({ children, className, variant = "card", ...props }) {
 
 export function GlassPanel({ children, className, padding = 6, ...props }) {
   const baseStyles = GLASS_STYLES.panel
+
   const paddingValue = SPACING[padding]
 
   return (

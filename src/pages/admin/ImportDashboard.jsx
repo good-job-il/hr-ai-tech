@@ -17,25 +17,12 @@ import {
   RefreshCw,
   Users,
   FileText,
-  Eye,
-  Play,
-  ChevronDown,
-  ChevronUp,
-  Download,
   XCircle,
   Info,
   FileScan,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { format } from "date-fns"
 import { he } from "date-fns/locale"
-import ResumeFileImporter from "@/components/admin/ResumeFileImporter"
-import {
-  PlatformCard,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-} from "@/components/platform/PlatformUI"
 
 // ── 3 validation test candidates ─────────────────────────────────────────────
 const TEST_CSV = `full_name,email,phone,role_name,domain_name,location,experience_years,skills,summary,resume_url
@@ -54,16 +41,27 @@ const STATUS_CONFIG = {
 
 export default function ImportDashboard() {
   const { user } = useAuth()
+
   const navigate = useNavigate()
+
   const location = useLocation()
+
   const qc = useQueryClient()
+
   const [activeTab, setActiveTab] = useState("resume") // 'resume' | 'csv'
+
   const [file, setFile] = useState(null)
+
   const [uploading, setUploading] = useState(false)
+
   const [uploadMsg, setUploadMsg] = useState(null) // { type: 'success'|'error', text }
+
   const [expandedBatch, setExpandedBatch] = useState(null)
+
   const [runningValidation, setRunningValidation] = useState(false)
+
   const [validationResult, setValidationResult] = useState(null)
+
   const showValidationTools = import.meta.env.DEV && user?.role === "admin"
 
   const { data: batches = [], refetch } = useQuery({
@@ -71,28 +69,39 @@ export default function ImportDashboard() {
     queryFn: () => candidateImportService.list({ sort: "created_date", order: "DESC", limit: 50 }),
     refetchInterval: (query) => {
       const data = query.state?.data
+
       const hasActive =
         Array.isArray(data) &&
         data.some((b) => ["pending", "processing", "in_progress"].includes(b.status))
+
       return hasActive ? 4000 : false
     },
   })
 
   // ── File upload & import ──────────────────────────────────────────────────
   const handleUpload = async () => {
-    if (!file) return
+    if (!file) {
+      return
+    }
+
     if (!file.name.toLowerCase().endsWith(".csv")) {
       setUploadMsg({ type: "error", text: "CSV files only" })
+
       return
     }
+
     if (file.size > 100 * 1024 * 1024) {
       setUploadMsg({ type: "error", text: "File exceeds the 100MB limit" })
+
       return
     }
+
     setUploading(true)
     setUploadMsg(null)
+
     try {
       const { file_url } = await fileService.upload(file)
+
       const batch = await candidateImportService.create({
         batch_name: `${file.name.replace(/\.[^/.]+$/, "")} — ${format(new Date(), "dd/MM/yyyy HH:mm", { locale: he })}`,
         source_file: file_url,
@@ -105,8 +114,11 @@ export default function ImportDashboard() {
         team_manager_id: user?.role === "team_manager" ? user.id : user?.team_manager_id,
         recruitment_manager_id: user?.recruitment_manager_id,
       })
+
       const queued = await candidateImportService.queueFileImport(batch.id, file_url, file.name)
+
       const d = await candidateImportService.waitForJob(queued.id)
+
       setUploadMsg({
         type: "success",
         text: `יובאו ${d.successful} מועמדים • ${d.duplicates} כפילויות • ${d.failed} כשלונות`,
@@ -125,10 +137,14 @@ export default function ImportDashboard() {
   const runValidationTest = async () => {
     setRunningValidation(true)
     setValidationResult(null)
+
     try {
       const blob = new Blob([TEST_CSV], { type: "text/csv" })
+
       const testFile = new File([blob], "validation_test.csv", { type: "text/csv" })
+
       const { file_url } = await fileService.upload(testFile)
+
       const batch = await candidateImportService.create({
         batch_name: `Validation Test — ${format(new Date(), "dd/MM/yyyy HH:mm", { locale: he })}`,
         source_file: "validation_test.csv",
@@ -137,12 +153,15 @@ export default function ImportDashboard() {
         team_manager_id: user?.role === "team_manager" ? user.id : user?.team_manager_id,
         recruitment_manager_id: user?.recruitment_manager_id,
       })
+
       const queued = await candidateImportService.queueFileImport(
         batch.id,
         file_url,
         "validation_test.csv",
       )
+
       const d = await candidateImportService.waitForJob(queued.id)
+
       setValidationResult({
         success: true,
         batch_id: batch.id,
@@ -174,11 +193,17 @@ export default function ImportDashboard() {
 
   // ── Retry failed batch ────────────────────────────────────────────────────
   const retryBatch = async (batch) => {
-    if (!batch.source_file) return
+    if (!batch.source_file) {
+      return
+    }
+
     setUploadMsg({ type: "success", text: `מנסה שוב batch: ${batch.batch_name}...` })
+
     try {
       const queued = await candidateImportService.retryBatch(batch.id)
+
       const result = await candidateImportService.waitForJob(queued.id)
+
       setUploadMsg({
         type: "success",
         text: `Retry completed: ${result.successful} succeeded • ${result.failed} failed • ${result.duplicates} duplicates`,
@@ -191,15 +216,20 @@ export default function ImportDashboard() {
 
   const downloadErrorReport = (batch) => {
     const errors = Array.isArray(batch.error_log) ? batch.error_log : []
+
     const escape = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`
+
     const csv = [
       "row_number,full_name,email,message",
       ...errors.map((error) =>
         [error.row_number, error.full_name, error.email, error.message].map(escape).join(","),
       ),
     ].join("\n")
+
     const link = document.createElement("a")
+
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }))
+
     link.href = url
     link.download = `import-errors-${batch.id}.csv`
     link.click()
@@ -210,16 +240,22 @@ export default function ImportDashboard() {
   const downloadTemplate = () => {
     const template =
       "full_name,email,phone,role_name,domain_name,location,experience_years,desired_salary_min,desired_salary_max,skills,languages,summary,resume_url,resume_filename,recruiter_id,employer_id,job_id\n"
+
     const a = document.createElement("a")
+
     a.href = URL.createObjectURL(new Blob([template], { type: "text/csv" }))
     a.download = "candidates_import_template.csv"
     a.click()
   }
 
   const totalImported = batches.reduce((s, b) => s + (b.successful_imports || 0), 0)
+
   const totalDuplicates = batches.reduce((s, b) => s + (b.duplicate_found || 0), 0)
+
   const totalFailed = batches.reduce((s, b) => s + (b.failed_imports || 0), 0)
+
   const totalConversionFailed = batches.reduce((s, b) => s + (b.conversion_failures || 0), 0)
+
   const totalParsingFailed = batches.reduce((s, b) => s + (b.parsing_failures || 0), 0)
 
   return (
@@ -447,7 +483,9 @@ export default function ImportDashboard() {
             <div className="space-y-2">
               {batches.map((batch) => {
                 const cfg = STATUS_CONFIG[batch.status] || STATUS_CONFIG.pending
+
                 const StatusIcon = cfg.icon
+
                 const isExpanded = expandedBatch === batch.id
 
                 return (

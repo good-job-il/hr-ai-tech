@@ -2,24 +2,25 @@
  * Global Header - Unified across entire platform
  * Used on all pages (public, auth, dashboard, etc)
  */
-import React, { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { useState } from "react"
+import { useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { Menu, X } from "lucide-react"
 import { SPACING, SHADOWS, COLORS } from "@/theme/tokens"
-import Logo from "@/components/branding/Logo"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 
 const HEADER_HEIGHT = 88
+
 const HEADER_PADDING = SPACING[6] // 24px
 
 export default function GlobalHeader({ user, variant = "public" }) {
   const { t, i18n } = useTranslation()
+
   const location = useLocation()
+
   const [mobileOpen, setMobileOpen] = useState(false)
 
   // Get current language direction
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const isRTL = currentLang === "he"
 
   const navLinks = [
@@ -59,6 +60,7 @@ export default function GlobalHeader({ user, variant = "public" }) {
         <nav className="hidden lg:flex items-center gap-2">
           {navLinks.map((link) => {
             const isActive = location.pathname === link.href
+
             return (
               <Link
                 key={link.href}

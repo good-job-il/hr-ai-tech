@@ -1,21 +1,6 @@
-import React, { useEffect, useState, useMemo } from "react"
-import {
-  X,
-  User,
-  Phone,
-  Mail,
-  MapPin,
-  Briefcase,
-  Sparkles,
-  Clock,
-  MessageSquare,
-  Calendar,
-  Send,
-  AlertTriangle,
-} from "lucide-react"
+import { useEffect, useState, useMemo } from "react"
+import { User, Phone, Mail, MapPin, Briefcase, Sparkles, Clock, MessageSquare } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import ActivityTimeline from "./ActivityTimeline"
-import MatchExplanationCard from "@/components/ai/MatchExplanationCard"
 import { scoreMatch } from "@/lib/aiMatching"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { APPLICATION_STATUS_VALUES } from "@/domain/agency/contracts"
@@ -23,17 +8,20 @@ import { applicationService } from "@/api/services/applicationService"
 import { interviewService } from "@/api/services/interviewService"
 import { messageService } from "@/api/services/messageService"
 import { jobService } from "@/api/services/jobService"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 
 const STAGE_VALUES = APPLICATION_STATUS_VALUES
 
 const TAB_IDS = ["details", "ai", "timeline", "notes"]
 
 function matchColor(score) {
-  if (score >= 90) return "text-green-600 bg-green-50"
-  if (score >= 75) return "text-yellow-600 bg-yellow-50"
+  if (score >= 90) {
+    return "text-green-600 bg-green-50"
+  }
+
+  if (score >= 75) {
+    return "text-yellow-600 bg-yellow-50"
+  }
+
   return "text-red-600 bg-red-50"
 }
 
@@ -47,40 +35,61 @@ export default function CandidateDrawer({
   canChangeStage = true,
 }) {
   const { t, i18n } = useTranslation()
+
   const [activeTab, setActiveTab] = useState("details")
+
   const [note, setNote] = useState("")
+
   const [savingNote, setSavingNote] = useState(false)
+
   const [messageOpen, setMessageOpen] = useState(false)
+
   const [message, setMessage] = useState("")
+
   const [interviewOpen, setInterviewOpen] = useState(false)
+
   const [interview, setInterview] = useState({
     date: "",
     time: "",
     type: "video",
     location_or_link: "",
   })
+
   const [actionPending, setActionPending] = useState(false)
+
   const [actionError, setActionError] = useState("")
+
   const [jobDetails, setJobDetails] = useState(null)
+
   const isMobile = useIsMobile()
 
   const isRTL = !i18n.language?.startsWith("en")
+
   useEffect(() => {
     setNote("")
     setActionError("")
   }, [application?.id])
 
   useEffect(() => {
-    if (!open || !application?.job_id || job) return
+    if (!open || !application?.job_id || job) {
+      return
+    }
+
     let active = true
+
     jobService
       .get(application.job_id)
       .then((value) => {
-        if (active) setJobDetails(value)
+        if (active) {
+          setJobDetails(value)
+        }
       })
       .catch(() => {
-        if (active) setJobDetails(null)
+        if (active) {
+          setJobDetails(null)
+        }
       })
+
     return () => {
       active = false
     }
@@ -93,7 +102,10 @@ export default function CandidateDrawer({
   }))
 
   const aiMatch = useMemo(() => {
-    if (!application) return null
+    if (!application) {
+      return null
+    }
+
     const candidate = {
       id: application.candidate_id || application.id,
       full_name: application.candidate_name,
@@ -106,6 +118,7 @@ export default function CandidateDrawer({
       desired_salary_min: application.desired_salary_min,
       desired_salary_max: application.desired_salary_max,
     }
+
     const jobObj = job ||
       jobDetails || {
         id: application.job_id,
@@ -114,18 +127,27 @@ export default function CandidateDrawer({
         location: application.location,
         domain_id: application.domain_id,
       }
+
     const { score, explanation } = scoreMatch(candidate, jobObj)
+
     return { score, explanation }
   }, [application?.id, job?.id, jobDetails?.id])
 
-  if (!open || !application) return null
+  if (!open || !application) {
+    return null
+  }
 
   const addNote = async () => {
-    if (!note.trim()) return
+    if (!note.trim()) {
+      return
+    }
+
     setSavingNote(true)
     setActionError("")
+
     try {
       const updated = await applicationService.addNote(application.id, note.trim())
+
       setNote("")
       onApplicationUpdated?.(updated)
     } catch (error) {
@@ -136,9 +158,13 @@ export default function CandidateDrawer({
   }
 
   const sendMessage = async () => {
-    if (!message.trim()) return
+    if (!message.trim()) {
+      return
+    }
+
     setActionPending(true)
     setActionError("")
+
     try {
       await messageService.send(application.id, message.trim())
       setMessage("")
@@ -151,9 +177,13 @@ export default function CandidateDrawer({
   }
 
   const scheduleInterview = async () => {
-    if (!interview.date || !interview.time) return
+    if (!interview.date || !interview.time) {
+      return
+    }
+
     setActionPending(true)
     setActionError("")
+
     try {
       await interviewService.create({
         ...interview,
@@ -244,6 +274,7 @@ export default function CandidateDrawer({
         >
           {tabs.map((tab) => {
             const Icon = tab.icon
+
             return (
               <button
                 key={tab.id}
@@ -469,7 +500,10 @@ function Section({ title, children }) {
 }
 
 function InfoRow({ icon: Icon, label, value }) {
-  if (!value) return null
+  if (!value) {
+    return null
+  }
+
   return (
     <div className="flex items-center gap-3 py-2 border-b border-[#F1F5F9]">
       <Icon className="w-4 h-4 text-[#94A3B8]" />

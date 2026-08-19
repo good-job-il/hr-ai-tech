@@ -4,25 +4,15 @@
  * Includes: To, CC, Subject, recruiter note, document selection, preview, send.
  */
 import { useState, useMemo } from "react"
-import {
-  X,
-  Send,
-  Eye,
-  Paperclip,
-  CheckSquare,
-  Square,
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+
 import { candidateCrmService } from "@/api/services/candidateCrmService"
 import { useTranslation } from "react-i18next"
 
 export default function SendToEmployerModal({ candidate, documents, job, onClose, onSuccess }) {
   const { t, i18n } = useTranslation()
+
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+
   const isRTL = currentLang === "he"
 
   const DOC_TYPE_LABELS = {
@@ -36,21 +26,29 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
   }
 
   const [to, setTo] = useState(candidate?.employer_id || "")
+
   const [cc, setCc] = useState("")
+
   const [subject, setSubject] = useState(
     t("candidateCRM.sendToEmployer.defaultSubject", {
       name: candidate?.full_name || "",
       job: job?.title ? ` — ${job.title}` : "",
     }),
   )
+
   const [recruiterNote, setRecruiterNote] = useState("")
+
   const [preview, setPreview] = useState(false)
+
   const [sending, setSending] = useState(false)
+
   const [result, setResult] = useState(null)
 
   const allDocs = useMemo(() => {
     const docs = []
+
     const primaryCvUrl = candidate?.original_resume_url || candidate?.resume_url
+
     if (primaryCvUrl) {
       docs.push({
         id: "__original_cv",
@@ -63,6 +61,7 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
         badge: candidate.original_file_type?.toUpperCase() || "CV",
       })
     }
+
     if (candidate?.converted_resume_url && candidate.converted_resume_url !== primaryCvUrl) {
       docs.push({
         id: "__converted_cv",
@@ -73,6 +72,7 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
         badge: "DOCX",
       })
     }
+
     documents.forEach((doc) => {
       docs.push({
         id: doc.id,
@@ -83,48 +83,65 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
         badge: doc.doc_type === "cv" ? "CV" : null,
       })
     })
+
     return docs
   }, [candidate, documents, t])
 
   const [selectedDocs, setSelectedDocs] = useState(() => {
     const firstCv = allDocs.find((d) => d.doc_type === "cv")
+
     return firstCv ? new Set([firstCv.id]) : new Set()
   })
 
   const toggleDoc = (id) => {
     setSelectedDocs((prev) => {
       const next = new Set(prev)
+
       next.has(id) ? next.delete(id) : next.add(id)
+
       return next
     })
   }
 
   const selectedDocsList = allDocs.filter((d) => selectedDocs.has(d.id))
+
   const hasCV = selectedDocsList.some((d) => d.doc_type === "cv")
 
   const handleSend = async () => {
-    if (!to.trim()) return
+    if (!to.trim()) {
+      return
+    }
+
     if (!hasCV) {
       alert(t("candidateCRM.sendToEmployer.mustAttachCV"))
+
       return
     }
 
     setSending(true)
     setResult(null)
+
     try {
-      if (!job?.id)
+      if (!job?.id) {
         throw new Error(
           t("candidateCRM.sendToEmployer.selectJob", { defaultValue: "Select a job first" }),
         )
+      }
+
       const res = await candidateCrmService.presentCandidate(candidate.id, job.id, recruiterNote)
+
       setResult({
         success: true,
         message: res?.message || t("candidateCRM.sendToEmployer.sentSuccessfully"),
       })
-      if (onSuccess) onSuccess()
+
+      if (onSuccess) {
+        onSuccess()
+      }
     } catch (e) {
       const errorMsg =
         e.response?.data?.error || e.message || t("candidateCRM.sendToEmployer.sendError")
+
       setResult({ success: false, message: errorMsg })
     } finally {
       setSending(false)
@@ -275,6 +292,7 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
               <div className="space-y-2">
                 {allDocs.map((doc) => {
                   const checked = selectedDocs.has(doc.id)
+
                   return (
                     <button
                       key={doc.id}
