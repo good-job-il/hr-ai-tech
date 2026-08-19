@@ -53,15 +53,19 @@ export class AuthService {
       where: { email: email.toLowerCase().trim(), is_active: true },
     })
 
-    if (!user) return null
+    if (!user) {
+      return null
+    }
 
     const isMatch = await bcrypt.compare(password, user.password_hash)
+
     return isMatch ? user : null
   }
 
   // ─── Login ─────────────────────────────────────────────────────────────
   async login(email: string, password: string): Promise<AuthResponse> {
     const user = await this.validateCredentials(email, password)
+
     if (!user) {
       throw new UnauthorizedException("Invalid email or password")
     }
@@ -72,6 +76,7 @@ export class AuthService {
     })
 
     const tokens = await this.generateTokens(user)
+
     await this.saveRefreshToken(user.id, tokens.refresh_token)
 
     return { ...tokens, user: this.sanitizeUser(user) }
@@ -103,7 +108,9 @@ export class AuthService {
     })
 
     const saved = await this.userRepository.save(user)
+
     const tokens = await this.generateTokens(saved)
+
     await this.saveRefreshToken(saved.id, tokens.refresh_token)
 
     return { ...tokens, user: this.sanitizeUser(saved) }
@@ -144,6 +151,7 @@ export class AuthService {
     ]
 
     const safeUpdates: Partial<UserEntity> = {}
+
     for (const key of allowedFields) {
       if (key in updates) {
         ;(safeUpdates as any)[key] = (updates as any)[key]
@@ -151,6 +159,7 @@ export class AuthService {
     }
 
     await this.userRepository.update(userId, safeUpdates)
+
     return this.getMe(userId)
   }
 
@@ -175,11 +184,13 @@ export class AuthService {
     }
 
     const isValid = await bcrypt.compare(refreshToken, user.refresh_token_hash)
+
     if (!isValid) {
       throw new UnauthorizedException("Refresh token mismatch")
     }
 
     const tokens = await this.generateTokens(user)
+
     await this.saveRefreshToken(user.id, tokens.refresh_token)
 
     return tokens
@@ -197,7 +208,9 @@ export class AuthService {
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex")
+
     const resetTokenHash = await bcrypt.hash(resetToken, this.SALT_ROUNDS)
+
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 
     await this.userRepository.update(user.id, {
@@ -220,10 +233,16 @@ export class AuthService {
     let targetUser: UserEntity | null = null
 
     for (const user of users) {
-      if (!user.reset_token_hash || !user.reset_token_expires) continue
-      if (new Date() > user.reset_token_expires) continue
+      if (!user.reset_token_hash || !user.reset_token_expires) {
+        continue
+      }
+
+      if (new Date() > user.reset_token_expires) {
+        continue
+      }
 
       const isMatch = await bcrypt.compare(token, user.reset_token_hash)
+
       if (isMatch) {
         targetUser = user
         break
@@ -262,6 +281,7 @@ export class AuthService {
     }
 
     const org = await this.organizationRepository.findOne({ where: { id: organizationId } })
+
     if (!org) {
       throw new NotFoundException(`Organization ${organizationId} not found`)
     }
@@ -305,7 +325,10 @@ export class AuthService {
   // and reverts to the admin's normal access token. This call only exists
   // to leave an audit trail.
   async exitOrganization(admin: UserEntity, organizationId: number | null): Promise<void> {
-    if (!organizationId) return
+    if (!organizationId) {
+      return
+    }
+
     await this.auditService.log({
       organization_id: String(organizationId),
       actor_user_id: String(admin.id),
@@ -349,12 +372,14 @@ export class AuthService {
 
   private async saveRefreshToken(userId: number, refreshToken: string): Promise<void> {
     const hash = await bcrypt.hash(refreshToken, this.SALT_ROUNDS)
+
     await this.userRepository.update(userId, { refresh_token_hash: hash })
   }
 
   sanitizeUser(user: UserEntity): any {
     const { password_hash, refresh_token_hash, reset_token_hash, reset_token_expires, ...rest } =
       user as any
+
     return rest
   }
 }

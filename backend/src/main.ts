@@ -16,13 +16,18 @@ async function bootstrap() {
   })
 
   const configService = app.get(ConfigService)
+
   const port = configService.get<number>("PORT", 3001)
+
   const frontendUrl = configService.get<string>("FRONTEND_URL", "http://localhost:5173")
+
   const metrics = app.get(OperationalMetricsService)
 
   app.use((request, response, next) => {
     const incoming = request.header("x-request-id")
+
     const requestId = incoming && /^[A-Za-z0-9._-]{1,100}$/.test(incoming) ? incoming : randomUUID()
+
     request.requestId = requestId
     response.setHeader("X-Request-Id", requestId)
     response.on("finish", () => metrics.recordHttp(request.path, response.statusCode))
@@ -33,6 +38,7 @@ async function bootstrap() {
   // Served OUTSIDE the /api prefix so file_url values are directly usable
   // by <img>/<a> tags without going through the REST interceptors.
   const uploadDir = configService.get<string>("UPLOAD_DIR", "./uploads")
+
   app.useStaticAssets(join(process.cwd(), uploadDir), { prefix: "/uploads/" })
 
   // ─── Global prefix ────────────────────────────────────────────────────
@@ -64,7 +70,9 @@ async function bootstrap() {
       .setVersion("1.0")
       .addBearerAuth()
       .build()
+
     const document = SwaggerModule.createDocument(app, swaggerConfig)
+
     SwaggerModule.setup("api/docs", app, document)
   }
 

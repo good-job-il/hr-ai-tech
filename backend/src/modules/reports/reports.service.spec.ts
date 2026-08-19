@@ -6,7 +6,9 @@ const repo = () => ({ find: jest.fn().mockResolvedValue([]), findOne: jest.fn() 
 describe("ReportsService OA-3", () => {
   it("builds metrics only from the current organization scope", async () => {
     const applications = repo()
+
     const created = new Date("2026-01-01T00:00:00Z")
+
     applications.find.mockResolvedValue([
       {
         id: 1,
@@ -37,7 +39,9 @@ describe("ReportsService OA-3", () => {
         updated_date: new Date("2026-01-11T00:00:00Z"),
       },
     ])
+
     const timelines = repo()
+
     timelines.find.mockResolvedValue([
       {
         application_id: 1,
@@ -46,15 +50,19 @@ describe("ReportsService OA-3", () => {
         created_date: new Date("2026-01-06T00:00:00Z"),
       },
     ])
+
     const users = repo()
+
     users.find.mockResolvedValue([
       { id: 7, role: UserRole.RECRUITER, full_name: "Recruiter", email: "r@test" },
     ])
+
     const permissions = {
       getEffectivePermissions: jest
         .fn()
         .mockResolvedValue({ permissions: { view_compensation: true } }),
     }
+
     const service = new ReportsService(
       applications as any,
       timelines as any,

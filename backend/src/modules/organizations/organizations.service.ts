@@ -33,18 +33,28 @@ export class OrganizationsService {
         user.organization_id != null
           ? await this.repo.findOne({ where: { id: user.organization_id } })
           : null
+
       const data = org ? [org] : []
+
       return buildPaginatedResponse(data, data.length, { page, limit, sort, order })
     }
 
     const where: Record<string, any> = {}
-    if (org_type) where.org_type = org_type
-    if (status) where.status = status
+
+    if (org_type) {
+      where.org_type = org_type
+    }
+
+    if (status) {
+      where.status = status
+    }
 
     const skip = getSkipTake(page, limit).skip
+
     const take = getSkipTake(page, limit).take
 
     let findWhere: any = where
+
     if (search) {
       findWhere = [
         { ...where, name: Like(`%${search}%`) },
@@ -64,7 +74,10 @@ export class OrganizationsService {
 
   async findById(id: number, user: UserEntity): Promise<OrganizationEntity> {
     const org = await this.repo.findOne({ where: { id } })
-    if (!org) throw new NotFoundException(`Organization ${id} not found`)
+
+    if (!org) {
+      throw new NotFoundException(`Organization ${id} not found`)
+    }
 
     // Non-admins can only view their own org
     if (user.role !== UserRole.ADMIN && user.organization_id !== id) {
@@ -80,6 +93,7 @@ export class OrganizationsService {
     }
 
     const org = this.repo.create(dto as any)
+
     return this.repo.save(org) as unknown as Promise<OrganizationEntity>
   }
 
@@ -93,6 +107,7 @@ export class OrganizationsService {
     if (user.role !== UserRole.ORG_ADMIN) {
       throw new ForbiddenException("Only an organization admin can create an agency")
     }
+
     if (user.organization_id) {
       throw new ForbiddenException("You already belong to an organization")
     }
@@ -105,6 +120,7 @@ export class OrganizationsService {
       contact_email: dto.contact_email ?? null,
       logo_url: dto.logo_url ?? null,
     })
+
     const saved = (await this.repo.save(org)) as unknown as OrganizationEntity
 
     await this.userRepo.update(user.id, {
@@ -128,6 +144,7 @@ export class OrganizationsService {
 
     if (user.role !== UserRole.ADMIN) {
       const platformOnlyFields: (keyof UpdateOrganizationDto)[] = ["org_type", "status", "plan"]
+
       if (platformOnlyFields.some((field) => dto[field] !== undefined)) {
         throw new ForbiddenException(
           "Only platform admins can change organization type, status or plan",
@@ -141,8 +158,11 @@ export class OrganizationsService {
       status: org.status,
       plan: org.plan,
     }
+
     Object.assign(org, dto)
+
     const saved = await this.repo.save(org)
+
     await this.audit.log({
       organization_id: String(saved.id),
       actor_user_id: String(user.id),
@@ -154,6 +174,7 @@ export class OrganizationsService {
       action: "update",
       metadata: { before, after: dto },
     })
+
     return saved
   }
 
@@ -163,7 +184,10 @@ export class OrganizationsService {
     }
 
     const org = await this.repo.findOne({ where: { id } })
-    if (!org) throw new NotFoundException(`Organization ${id} not found`)
+
+    if (!org) {
+      throw new NotFoundException(`Organization ${id} not found`)
+    }
 
     await this.repo.remove(org)
   }

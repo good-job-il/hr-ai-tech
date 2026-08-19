@@ -48,6 +48,7 @@ export class PublicWorkflowController {
       (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
       (req.headers["x-real-ip"] as string) ||
       req.ip
+
     return this.misc.getLocationFromIP(ip)
   }
 }

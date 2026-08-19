@@ -26,7 +26,9 @@ export class AgencyOwnershipScope1752100000000 implements MigrationInterface {
     `)
 
     const interviewsTable = await queryRunner.getTable("interviews")
+
     const legacyRecruiterColumn = interviewsTable?.findColumnByName("recruiter_id")
+
     const recruiterNeedsConversion = legacyRecruiterColumn?.type !== "int"
 
     if (recruiterNeedsConversion) {
@@ -37,6 +39,7 @@ export class AgencyOwnershipScope1752100000000 implements MigrationInterface {
         "INT NULL AFTER recruiter_id",
       )
     }
+
     await this.addColumnIfMissing(
       queryRunner,
       "interviews",
@@ -71,6 +74,7 @@ export class AgencyOwnershipScope1752100000000 implements MigrationInterface {
           CHANGE n_recruiter_id recruiter_id INT NULL;
       `)
     }
+
     await this.addIndexIfMissing(
       queryRunner,
       "interviews",
@@ -147,6 +151,7 @@ export class AgencyOwnershipScope1752100000000 implements MigrationInterface {
     columnName: string,
   ): Promise<void> {
     const table = await queryRunner.getTable(tableName)
+
     if (!table?.indices.some((index) => index.name === indexName)) {
       await queryRunner.query(
         `ALTER TABLE \`${tableName}\` ADD INDEX \`${indexName}\` (\`${columnName}\`)`,

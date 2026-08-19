@@ -18,6 +18,7 @@ describe("AgencyActionPolicyGuard RM-1", () => {
     const permissions = {
       getEffectivePermissions: jest.fn().mockResolvedValue({ permissions: { update: false } }),
     }
+
     const guard = new AgencyActionPolicyGuard(reflector, permissions as any)
 
     await expect(
@@ -27,6 +28,7 @@ describe("AgencyActionPolicyGuard RM-1", () => {
 
   it("does not apply agency policy to an employer workflow", async () => {
     const permissions = { getEffectivePermissions: jest.fn() }
+
     const guard = new AgencyActionPolicyGuard(reflector, permissions as any)
 
     await expect(guard.canActivate(contextFor({ id: 8, org_type: "organization" }))).resolves.toBe(

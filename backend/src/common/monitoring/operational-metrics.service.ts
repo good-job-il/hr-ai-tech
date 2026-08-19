@@ -20,9 +20,15 @@ export class OperationalMetricsService {
   }
 
   recordHttp(path: string, status: number) {
-    if (status >= 500) this.increment("http_5xx")
-    else if (status >= 400) this.increment("http_4xx")
-    if (status >= 400 && path.startsWith("/api/auth/")) this.increment("auth_failures")
+    if (status >= 500) {
+      this.increment("http_5xx")
+    } else if (status >= 400) {
+      this.increment("http_4xx")
+    }
+
+    if (status >= 400 && path.startsWith("/api/auth/")) {
+      this.increment("auth_failures")
+    }
   }
 
   increment(name: MetricName) {

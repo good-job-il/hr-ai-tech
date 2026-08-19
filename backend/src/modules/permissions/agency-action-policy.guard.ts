@@ -16,20 +16,32 @@ export class AgencyActionPolicyGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const user = context.switchToHttp().getRequest().user as UserEntity | undefined
-    if (!user) throw new ForbiddenException("No user context")
-    if (user.org_type !== OrgType.STAFFING_AGENCY) return true
+
+    if (!user) {
+      throw new ForbiddenException("No user context")
+    }
+
+    if (user.org_type !== OrgType.STAFFING_AGENCY) {
+      return true
+    }
 
     const required = this.reflector.getAllAndOverride<PermissionKey[]>(REQUIRED_PERMISSIONS_KEY, [
       context.getHandler(),
       context.getClass(),
     ])
-    if (!required?.length) return true
+
+    if (!required?.length) {
+      return true
+    }
 
     const effective = await this.permissionsService.getEffectivePermissions(user)
+
     const missing = required.filter((permission) => !effective.permissions[permission])
+
     if (missing.length) {
       throw new ForbiddenException(`Missing required permission: ${missing.join(", ")}`)
     }
+
     return true
   }
 }

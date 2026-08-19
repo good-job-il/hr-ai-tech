@@ -18,6 +18,7 @@ export const AssignRecruitmentWorkSchema = z
         message: "At least one record is required",
       })
     }
+
     if (value.team_id === undefined && value.recruiter_id === undefined) {
       context.addIssue({
         code: z.ZodIssueCode.custom,

@@ -5,6 +5,7 @@ import { ForbiddenException } from "@nestjs/common"
 describe("JobsService OA-2 state filters", () => {
   it("applies the route state as a server-side filter", async () => {
     const jobs = { findAndCount: jest.fn().mockResolvedValue([[], 0]) }
+
     const service = new JobsService(
       jobs as any,
       {} as any,
@@ -41,6 +42,7 @@ describe("JobsService OA-2 state filters", () => {
 
   it("does not allow a public query to override the open state boundary", async () => {
     const jobs = { findAndCount: jest.fn().mockResolvedValue([[], 0]) }
+
     const service = new JobsService(
       jobs as any,
       {} as any,
@@ -69,9 +71,13 @@ describe("JobsService OA-2 state filters", () => {
 
   it("rejects an assignee outside the agency tenant or expected role", async () => {
     const jobs = { create: jest.fn(), save: jest.fn() }
+
     const agencyClients = { findOne: jest.fn().mockResolvedValue({ id: 3 }) }
+
     const companies = { findOne: jest.fn().mockResolvedValue({ id: 9, name: "Client" }) }
+
     const users = { findOne: jest.fn().mockResolvedValue(null) }
+
     const service = new JobsService(
       jobs as any,
       {} as any,

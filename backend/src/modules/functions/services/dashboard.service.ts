@@ -55,20 +55,29 @@ export class DashboardService {
     ])
 
     const totalImported = batches.reduce((s, b) => s + (b.successful_imports || 0), 0)
+
     const failedImports = batches.reduce((s, b) => s + (b.failed_imports || 0), 0)
+
     const conversionFailed = batches.reduce((s, b) => s + (b.conversion_failures || 0), 0)
+
     const pendingBatches = batches.filter(
       (b) => b.status === "processing" || b.status === "pending",
     ).length
 
     // ── 7-day trend ──────────────────────────────────────────────────────
     const now = new Date()
+
     const trendData = []
+
     for (let i = 6; i >= 0; i--) {
       const d = new Date(now)
+
       d.setDate(d.getDate() - i)
+
       const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+
       const dayEnd = new Date(dayStart.getTime() + 86400000)
+
       const label = `${d.getDate()}/${d.getMonth() + 1}`
 
       trendData.push({
@@ -115,12 +124,18 @@ export class DashboardService {
       note_added: { icon: "MessageSquare", color: "#6366F1", bg: "#EEF2FF" },
       sent_to_employer: { icon: "Send", color: "#0891B2", bg: "#E0F2FE" },
     }
+
     const recentActivity = recentTimelines.slice(0, 6).map((t) => {
       const meta = typeMap[t.event_type] || { icon: "Activity", color: "#64748B", bg: "#F1F5F9" }
+
       const elapsed = Date.now() - new Date(t.created_date).getTime()
+
       const hours = Math.floor(elapsed / 3600000)
+
       const minutes = Math.floor((elapsed % 3600000) / 60000)
+
       const timeAgo = hours > 0 ? `לפני ${hours} שעות` : `לפני ${minutes} דקות`
+
       return {
         icon: meta.icon,
         color: meta.color,
@@ -133,10 +148,13 @@ export class DashboardService {
 
     // ── Import source breakdown ──────────────────────────────────────────
     const sourceCounts: Record<string, number> = {}
+
     recentCandidates.forEach((c) => {
       const src = c.source || "manual"
+
       sourceCounts[src] = (sourceCounts[src] || 0) + 1
     })
+
     const sourceLabels: Record<string, string> = {
       manual: "ידני",
       import: "ייבוא",
@@ -144,6 +162,7 @@ export class DashboardService {
       upload: "העלאה",
       crawl: "סריקה",
     }
+
     const importSourceData = Object.entries(sourceCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)

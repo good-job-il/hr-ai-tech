@@ -18,6 +18,7 @@ const actor = {
 describe("RecruitmentManagementService RM-2", () => {
   it("builds funnel, SLA, workload and placement metrics", async () => {
     const old = new Date(Date.now() - 72 * 3_600_000)
+
     const applications = {
       find: jest.fn().mockResolvedValue([
         {
@@ -40,9 +41,11 @@ describe("RecruitmentManagementService RM-2", () => {
         },
       ]),
     }
+
     const jobs = {
       find: jest.fn().mockResolvedValue([{ id: 8, recruiter_id: 31, is_closed: false }]),
     }
+
     const users = {
       find: jest
         .fn()
@@ -50,8 +53,11 @@ describe("RecruitmentManagementService RM-2", () => {
           { id: 31, email: "r@test", full_name: "Recruiter", team_id: 4, team_manager_id: 41 },
         ]),
     }
+
     const teams = { find: jest.fn().mockResolvedValue([{ id: 4, manager_id: 41, name: "Alpha" }]) }
+
     const notifications = { createUnreadOnce: jest.fn().mockResolvedValue({}) }
+
     const service = new RecruitmentManagementService(
       applications as any,
       {} as any,
@@ -82,11 +88,14 @@ describe("RecruitmentManagementService RM-2", () => {
       candidates: [{ id: 2, organization_id: 12 }],
       applications: [{ id: 3, organization_id: 12 }],
     }
+
     const manager = {
       findOne: jest.fn(async (entity) => {
-        if (entity === AgencyTeamEntity)
+        if (entity === AgencyTeamEntity) {
           return { id: 4, organization_id: 12, manager_id: 41, is_active: true }
-        if (entity === UserEntity)
+        }
+
+        if (entity === UserEntity) {
           return {
             id: 31,
             organization_id: 12,
@@ -95,6 +104,8 @@ describe("RecruitmentManagementService RM-2", () => {
             email: "r@test",
             full_name: "Recruiter",
           }
+        }
+
         return null
       }),
       find: jest.fn(async (entity) =>
@@ -109,9 +120,13 @@ describe("RecruitmentManagementService RM-2", () => {
       save: jest.fn(async (_entity, value) => value),
       create: jest.fn((_entity, value) => value),
     }
+
     const dataSource = { transaction: jest.fn(async (callback) => callback(manager)) }
+
     const users = { findOne: jest.fn().mockResolvedValue({ id: 31, email: "r@test" }) }
+
     const notifications = { create: jest.fn().mockResolvedValue({}) }
+
     const service = new RecruitmentManagementService(
       {} as any,
       {} as any,
@@ -159,7 +174,9 @@ describe("RecruitmentManagementService RM-2", () => {
       save: jest.fn(),
       create: jest.fn((_entity, value) => value),
     }
+
     const dataSource = { transaction: jest.fn(async (callback) => callback(manager)) }
+
     const service = new RecruitmentManagementService(
       {} as any,
       {} as any,
@@ -188,10 +205,12 @@ describe("RecruitmentManagementService RM-2", () => {
 
   it("reassigns work between teams and recruiters with both audit reasons", async () => {
     const application = { id: 3, organization_id: 12 }
+
     const teams = [
       { id: 4, organization_id: 12, manager_id: 41, is_active: true },
       { id: 5, organization_id: 12, manager_id: 42, is_active: true },
     ]
+
     const recruiters = [
       {
         id: 31,
@@ -210,26 +229,36 @@ describe("RecruitmentManagementService RM-2", () => {
         email: "b@test",
       },
     ]
+
     const savedValues: any[] = []
+
     const manager = {
       findOne: jest.fn(async (entity, options) => {
-        if (entity === AgencyTeamEntity)
+        if (entity === AgencyTeamEntity) {
           return teams.find((team) => team.id === options.where.id) || null
-        if (entity === UserEntity)
+        }
+
+        if (entity === UserEntity) {
           return recruiters.find((recruiter) => recruiter.id === options.where.id) || null
+        }
+
         return null
       }),
       find: jest.fn(async (entity) => (entity === ApplicationEntity ? [application] : [])),
       save: jest.fn(async (_entity, value) => {
         savedValues.push(value)
+
         return value
       }),
       create: jest.fn((_entity, value) => value),
     }
+
     const dataSource = { transaction: jest.fn(async (callback) => callback(manager)) }
+
     const users = {
       findOne: jest.fn(async ({ where }) => recruiters.find((item) => item.id === where.id)),
     }
+
     const service = new RecruitmentManagementService(
       {} as any,
       {} as any,
@@ -293,9 +322,11 @@ describe("RecruitmentManagementService RM-2", () => {
   it("rejects a recruiter who is not a member of the selected team", async () => {
     const manager = {
       findOne: jest.fn(async (entity) => {
-        if (entity === AgencyTeamEntity)
+        if (entity === AgencyTeamEntity) {
           return { id: 4, organization_id: 12, manager_id: 41, is_active: true }
-        if (entity === UserEntity)
+        }
+
+        if (entity === UserEntity) {
           return {
             id: 32,
             organization_id: 12,
@@ -303,12 +334,15 @@ describe("RecruitmentManagementService RM-2", () => {
             team_id: 5,
             is_active: true,
           }
+        }
+
         return null
       }),
       find: jest.fn(),
       save: jest.fn(),
       create: jest.fn((_entity, value) => value),
     }
+
     const service = new RecruitmentManagementService(
       {} as any,
       {} as any,

@@ -5,8 +5,11 @@ import { AgencyClientsService } from "./agency-clients.service"
 describe("AgencyClientsService RM-1 assignments", () => {
   it("rejects an account manager outside the tenant or allowed manager roles", async () => {
     const clients = { create: jest.fn(), save: jest.fn() }
+
     const users = { findOne: jest.fn().mockResolvedValue(null) }
+
     const dataSource = { transaction: jest.fn() }
+
     const service = new AgencyClientsService(
       clients as any,
       {} as any,

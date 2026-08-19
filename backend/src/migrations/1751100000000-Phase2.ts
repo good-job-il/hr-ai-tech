@@ -582,6 +582,7 @@ export class Phase21751100000000 implements MigrationInterface {
       "candidate_notes",
       "candidates",
     ]
+
     for (const t of tables) {
       await queryRunner.query(`DROP TABLE IF EXISTS \`${t}\``)
     }

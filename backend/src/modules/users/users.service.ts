@@ -58,11 +58,17 @@ export class UsersService {
       where.organization_id = requestingUser.organization_id
     }
 
-    if (role) where.role = role
+    if (role) {
+      where.role = role
+    }
+
     if (organization_id && requestingUser.role === UserRole.ADMIN) {
       where.organization_id = organization_id
     }
-    if (is_active !== undefined) where.is_active = is_active
+
+    if (is_active !== undefined) {
+      where.is_active = is_active
+    }
 
     const findOptions: FindManyOptions<UserEntity> = {
       where,
@@ -91,7 +97,9 @@ export class UsersService {
   async findById(id: number, requestingUser: UserEntity): Promise<UserEntity> {
     const user = await this.repo.findOne({ where: { id } })
 
-    if (!user) throw new NotFoundException(`User ${id} not found`)
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found`)
+    }
 
     // Can only view own user or same org (admins unrestricted)
     if (
@@ -113,9 +121,12 @@ export class UsersService {
     if (dto.role && ![UserRole.ADMIN, UserRole.ORG_ADMIN].includes(requestingUser.role)) {
       throw new ForbiddenException("Only administrators can change user roles")
     }
+
     if (requestingUser.role === UserRole.ORG_ADMIN) {
-      if (user.organization_id !== requestingUser.organization_id)
+      if (user.organization_id !== requestingUser.organization_id) {
         throw new ForbiddenException("Access denied")
+      }
+
       if (
         user.id === requestingUser.id ||
         user.role === UserRole.ORG_ADMIN ||
@@ -125,6 +136,7 @@ export class UsersService {
           "Organization administrators cannot manage administrator accounts",
         )
       }
+
       if (
         dto.organization_id !== undefined ||
         dto.org_type !== undefined ||
@@ -132,8 +144,10 @@ export class UsersService {
       ) {
         throw new ForbiddenException("Organization ownership cannot be changed")
       }
-      if (dto.role === UserRole.ADMIN || dto.role === UserRole.ORG_ADMIN)
+
+      if (dto.role === UserRole.ADMIN || dto.role === UserRole.ORG_ADMIN) {
         throw new ForbiddenException("Role cannot be assigned")
+      }
     }
 
     const before = {
@@ -141,8 +155,11 @@ export class UsersService {
       organization_id: user.organization_id,
       is_active: user.is_active,
     }
+
     Object.assign(user, dto)
+
     const saved = await this.repo.save(user)
+
     await this.logUserAdminChange(requestingUser, saved, "update", {
       before,
       after: {
@@ -151,17 +168,25 @@ export class UsersService {
         is_active: saved.is_active,
       },
     })
+
     return this.sanitize(saved)
   }
 
   async invite(dto: InviteOrganizationUserDto, requestingUser: UserEntity): Promise<any> {
     const organizationId = requestingUser.organization_id
-    if (!organizationId) throw new ForbiddenException("An organization workspace is required")
+
+    if (!organizationId) {
+      throw new ForbiddenException("An organization workspace is required")
+    }
+
     const email = dto.email.toLowerCase().trim()
-    if (await this.repo.findOne({ where: { email } }))
+
+    if (await this.repo.findOne({ where: { email } })) {
       throw new ConflictException("A user with this email already exists")
+    }
 
     const token = randomBytes(32).toString("hex")
+
     const user = this.repo.create({
       email,
       password_hash: await bcrypt.hash(randomBytes(32).toString("hex"), 10),
@@ -174,9 +199,12 @@ export class UsersService {
       reset_token_hash: createHash("sha256").update(token).digest("hex"),
       reset_token_expires: new Date(Date.now() + 48 * 60 * 60 * 1000),
     })
+
     const saved = await this.repo.save(user)
+
     await this.emailService.sendStaffInvite({ email, fullName: saved.full_name, token })
     await this.logUserAdminChange(requestingUser, saved, "create", { role: saved.role })
+
     return this.sanitize(saved)
   }
 
@@ -188,6 +216,7 @@ export class UsersService {
     const existing = await this.repo.findOne({
       where: { email: dto.email.toLowerCase().trim() },
     })
+
     if (existing) {
       throw new ConflictException("A user with this email already exists")
     }
@@ -205,6 +234,7 @@ export class UsersService {
     })
 
     const saved = await this.repo.save(user)
+
     return this.sanitize(saved)
   }
 
@@ -218,7 +248,11 @@ export class UsersService {
     }
 
     const user = await this.repo.findOne({ where: { id } })
-    if (!user) throw new NotFoundException(`User ${id} not found`)
+
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found`)
+    }
+
     if (requestingUser.role === UserRole.ORG_ADMIN) {
       if (
         user.organization_id !== requestingUser.organization_id ||
@@ -226,11 +260,14 @@ export class UsersService {
       ) {
         throw new ForbiddenException("Access denied")
       }
+
       user.is_active = false
       await this.repo.save(user)
       await this.logUserAdminChange(requestingUser, user, "deactivate", { is_active: false })
+
       return
     }
+
     await this.logUserAdminChange(requestingUser, user, "delete", { role: user.role })
     await this.repo.remove(user)
   }
@@ -238,6 +275,7 @@ export class UsersService {
   sanitize(user: UserEntity): any {
     const { password_hash, refresh_token_hash, reset_token_hash, reset_token_expires, ...rest } =
       user as any
+
     return rest
   }
 }

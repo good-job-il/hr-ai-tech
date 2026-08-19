@@ -32,30 +32,44 @@ export class CommunicationService {
   // ─── Communication Log ───────────────────────────────────────────────────
   async findAll(query: QueryCommunicationLogsDto, user: UserEntity) {
     const { page, limit, sort, order, candidate_id, channel } = query
+
     const where: Record<string, any> = {}
+
     if (user.role !== UserRole.ADMIN) {
       where.organization_id = user.organization_id
     }
-    if (candidate_id) where.candidate_id = candidate_id
-    if (channel) where.channel = channel
+
+    if (candidate_id) {
+      where.candidate_id = candidate_id
+    }
+
+    if (channel) {
+      where.channel = channel
+    }
 
     const { skip, take } = getSkipTake(page, limit)
+
     const [data, total] = await this.logRepo.findAndCount({
       where,
       order: { [sort]: order },
       skip,
       take,
     })
+
     return buildPaginatedResponse(data, total, { page, limit })
   }
 
   async presentCandidate(dto: PresentCandidateDto, user: UserEntity) {
     const candidate = await this.candidatesService.findById(dto.candidate_id, user)
+
     const job = await this.jobsService.findById(dto.job_id, user)
+
     const recipient = job.contact_email || job.employer_id
+
     if (!recipient || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
       throw new BadRequestException("The job has no employer contact email")
     }
+
     await this.emailService.sendCandidatePresentation({
       recipientEmail: recipient,
       candidateName: candidate.full_name,
@@ -65,6 +79,7 @@ export class CommunicationService {
       recruiterNote: dto.recruiter_note,
       resumeUrl: candidate.resume_url || candidate.converted_resume_url,
     })
+
     const log = await this.create(
       {
         candidate_id: candidate.id,
@@ -77,11 +92,13 @@ export class CommunicationService {
       },
       user,
     )
+
     return { success: true, communication_log_id: log.id }
   }
 
   async create(dto: CreateCommunicationLogDto, user: UserEntity): Promise<CommunicationLogEntity> {
     const candidate = await this.candidatesService.findById(dto.candidate_id, user)
+
     const log = this.logRepo.create({
       ...dto,
       organization_id: user.organization_id,
@@ -89,7 +106,9 @@ export class CommunicationService {
       sender_email: user.email,
       sender_name: user.full_name,
     } as any)
+
     const saved = await (this.logRepo.save(log) as unknown as Promise<CommunicationLogEntity>)
+
     await this.candidatesService.createTimelineEvent(
       {
         candidate_id: candidate.id,
@@ -99,19 +118,23 @@ export class CommunicationService {
       },
       user,
     )
+
     return saved
   }
 
   // ─── Employer Timeline ────────────────────────────────────────────────────
   async getEmployerTimeline(query: QueryEmployerTimelineDto) {
     const { page, limit, employer_email } = query
+
     const { skip, take } = getSkipTake(page, limit)
+
     const [data, total] = await this.timelineRepo.findAndCount({
       where: { employer_email },
       order: { created_date: "DESC" },
       skip,
       take,
     })
+
     return buildPaginatedResponse(data, total, { page, limit })
   }
 
@@ -119,6 +142,7 @@ export class CommunicationService {
     dto: CreateEmployerTimelineDto,
   ): Promise<EmployerTimelineEntity> {
     const event = this.timelineRepo.create(dto as any)
+
     return this.timelineRepo.save(event) as unknown as Promise<EmployerTimelineEntity>
   }
 }

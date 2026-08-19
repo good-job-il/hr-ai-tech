@@ -20,8 +20,11 @@ const actor = {
 
 describe("ApplicationsService OA-2 lifecycle", () => {
   let apps: ReturnType<typeof repository>
+
   let jobs: ReturnType<typeof repository>
+
   let candidates: ReturnType<typeof repository>
+
   let service: ApplicationsService
 
   beforeEach(() => {
@@ -56,11 +59,14 @@ describe("ApplicationsService OA-2 lifecycle", () => {
 
   it("reopens a rejected application through the explicit audited operation", async () => {
     apps.findOne.mockResolvedValue({ id: 2, organization_id: 11, status: "rejected" })
+
     const manager = {
       save: jest.fn(async (_entity, value) => value),
       create: jest.fn((_entity, value) => value),
     }
+
     const dataSource = (service as any).dataSource
+
     dataSource.transaction.mockImplementation(async (callback) => callback(manager))
 
     await expect(

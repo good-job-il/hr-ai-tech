@@ -63,6 +63,7 @@ async function seed(ds: DataSource) {
       [domain.domain_id, domain.name],
     )
   }
+
   console.log(`  ✅ ${DOMAINS.length} domains`)
 
   for (const wm of WORK_MODES) {
@@ -71,6 +72,7 @@ async function seed(ds: DataSource) {
       [wm.mode_id, wm.name],
     )
   }
+
   console.log(`  ✅ ${WORK_MODES.length} work modes`)
 
   for (const et of EMPLOYMENT_TYPES) {
@@ -79,6 +81,7 @@ async function seed(ds: DataSource) {
       [et.type_id, et.name],
     )
   }
+
   console.log(`  ✅ ${EMPLOYMENT_TYPES.length} employment types`)
 
   for (const el of EXPERIENCE_LEVELS) {
@@ -87,6 +90,7 @@ async function seed(ds: DataSource) {
       [el.level_id, el.name],
     )
   }
+
   console.log(`  ✅ ${EXPERIENCE_LEVELS.length} experience levels`)
 
   console.log("✅ Taxonomy seed complete.")

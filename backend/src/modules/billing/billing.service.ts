@@ -38,9 +38,16 @@ export class BillingService {
   ) {}
 
   async overview(user: UserEntity) {
-    if (!user.organization_id) throw new ForbiddenException("Organization context required")
+    if (!user.organization_id) {
+      throw new ForbiddenException("Organization context required")
+    }
+
     const organization = await this.organizations.findOne({ where: { id: user.organization_id } })
-    if (!organization) throw new NotFoundException("Organization not found")
+
+    if (!organization) {
+      throw new NotFoundException("Organization not found")
+    }
+
     const [account, invoices, activeJobs, candidates, seats] = await Promise.all([
       this.accounts.findOne({ where: { organization_id: organization.id } }),
       this.invoices.find({
@@ -54,8 +61,11 @@ export class BillingService {
       this.candidates.count({ where: { organization_id: organization.id, is_deleted: false } }),
       this.users.count({ where: { organization_id: organization.id, is_active: true } }),
     ])
+
     const canViewInvoices = [UserRole.ADMIN, UserRole.ORG_ADMIN].includes(user.role)
+
     const visibleInvoices = canViewInvoices ? invoices : []
+
     return {
       plan: organization.plan,
       limits: PLAN_LIMITS[organization.plan],

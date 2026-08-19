@@ -17,9 +17,12 @@ export class NoImpersonationGuard implements CanActivate {
       context.getClass(),
     ])
 
-    if (!isBlocked) return true
+    if (!isBlocked) {
+      return true
+    }
 
     const { user } = context.switchToHttp().getRequest()
+
     if (user?.impersonating) {
       throw new ForbiddenException(
         "This action is not available while inside an organization workspace. Exit the workspace first.",

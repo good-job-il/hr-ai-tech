@@ -2,6 +2,7 @@ import { z } from "zod"
 import { createZodDto } from "nestjs-zod"
 
 const ClientStatus = z.enum(["prospect", "active", "inactive", "archived"])
+
 const MutableClientStatus = z.enum(["prospect", "active", "inactive"])
 
 export const CreateAgencyClientSchema = z

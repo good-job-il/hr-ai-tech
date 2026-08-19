@@ -26,6 +26,7 @@ import {
   PLACEMENT_APPLICATION_STATUSES,
 } from "../../common/utils/recruitment-kpis"
 const APPLICATION_OVERLOAD = 20
+
 const JOB_OVERLOAD = 5
 
 @Injectable()
@@ -45,11 +46,13 @@ export class RecruitmentManagementService {
     if (user.org_type !== OrgType.STAFFING_AGENCY || !user.organization_id) {
       throw new ForbiddenException("Staffing agency organization context required")
     }
+
     return user.organization_id
   }
 
   async dashboard(user: UserEntity, sendAlerts = false, query: ManagementReportQueryDto = {}) {
     const organizationId = this.organizationId(user)
+
     const [organizationApplications, organizationJobs, recruiters, teams] = await Promise.all([
       this.applications.find({ where: { organization_id: organizationId, is_deleted: false } }),
       this.jobs.find({ where: { organization_id: organizationId, is_deleted: false } }),
@@ -58,14 +61,23 @@ export class RecruitmentManagementService {
       }),
       this.teams.find({ where: { organization_id: organizationId, is_active: true } }),
     ])
+
     const from = query.date_from
       ? new Date(`${query.date_from}T00:00:00.000Z`)
       : new Date(Date.now() - 90 * 86400000)
+
     const to = query.date_to ? new Date(`${query.date_to}T23:59:59.999Z`) : new Date()
-    if (from > to) throw new BadRequestException("date_from must be before date_to")
+
+    if (from > to) {
+      throw new BadRequestException("date_from must be before date_to")
+    }
+
     const selectedTeam = query.team_id ? teams.find((team) => team.id === query.team_id) : null
-    if (query.team_id && !selectedTeam)
+
+    if (query.team_id && !selectedTeam) {
       throw new NotFoundException(`Team ${query.team_id} not found`)
+    }
+
     const applications = organizationApplications.filter(
       (application) =>
         new Date(application.created_date) >= from &&
@@ -75,6 +87,7 @@ export class RecruitmentManagementService {
         (!query.recruiter_id || application.recruiter_id === query.recruiter_id) &&
         (!selectedTeam || application.team_manager_id === selectedTeam.manager_id),
     )
+
     const jobs = organizationJobs.filter(
       (job) =>
         (!query.client_id || job.employer_company_id === query.client_id) &&
@@ -84,6 +97,7 @@ export class RecruitmentManagementService {
     )
 
     const now = Date.now()
+
     const overdue = applications
       .filter(
         (application) =>
@@ -109,6 +123,7 @@ export class RecruitmentManagementService {
     const teamByManager = new Map(
       teams.filter((team) => team.manager_id).map((team) => [team.manager_id, team]),
     )
+
     const workload = recruiters
       .map((recruiter) => {
         const activeApplications = applications.filter(
@@ -116,9 +131,11 @@ export class RecruitmentManagementService {
             application.recruiter_id === recruiter.id &&
             ACTIVE_APPLICATION_STATUSES.has(application.status),
         ).length
+
         const openJobs = jobs.filter(
           (job) => job.recruiter_id === recruiter.id && !job.is_closed,
         ).length
+
         return {
           recruiter_id: recruiter.id,
           recruiter_name: recruiter.full_name || recruiter.email,
@@ -137,9 +154,11 @@ export class RecruitmentManagementService {
         applications.filter((application) => application.status === status).length,
       ]),
     )
+
     const placements = applications.filter((application) =>
       PLACEMENT_APPLICATION_STATUSES.has(application.status),
     )
+
     const dashboard = {
       summary: {
         open_jobs: jobs.filter((job) => !job.is_closed).length,
@@ -191,26 +210,37 @@ export class RecruitmentManagementService {
       },
     }
 
-    if (sendAlerts && user.email) await this.sendOperationalAlerts(user, dashboard)
+    if (sendAlerts && user.email) {
+      await this.sendOperationalAlerts(user, dashboard)
+    }
+
     return dashboard
   }
 
   async assign(dto: AssignRecruitmentWorkDto, user: UserEntity) {
     const organizationId = this.organizationId(user)
+
     const jobIds = [...new Set(dto.job_ids)]
+
     const candidateIds = [...new Set(dto.candidate_ids)]
+
     const applicationIds = [...new Set(dto.application_ids)]
 
     const result = await this.dataSource.transaction(async (manager) => {
       let team: AgencyTeamEntity | null = null
+
       let recruiter: UserEntity | null = null
 
       if (dto.team_id != null) {
         team = await manager.findOne(AgencyTeamEntity, {
           where: { id: dto.team_id, organization_id: organizationId, is_active: true },
         })
-        if (!team) throw new NotFoundException(`Team ${dto.team_id} not found`)
+
+        if (!team) {
+          throw new NotFoundException(`Team ${dto.team_id} not found`)
+        }
       }
+
       if (dto.recruiter_id != null) {
         recruiter = await manager.findOne(UserEntity, {
           where: {
@@ -220,9 +250,15 @@ export class RecruitmentManagementService {
             is_active: true,
           },
         })
-        if (!recruiter) throw new NotFoundException(`Recruiter ${dto.recruiter_id} not found`)
-        if (team && recruiter.team_id !== team.id)
+
+        if (!recruiter) {
+          throw new NotFoundException(`Recruiter ${dto.recruiter_id} not found`)
+        }
+
+        if (team && recruiter.team_id !== team.id) {
           throw new BadRequestException("Recruiter must belong to the selected team")
+        }
+
         if (!team && recruiter.team_id) {
           team = await manager.findOne(AgencyTeamEntity, {
             where: { id: recruiter.team_id, organization_id: organizationId, is_active: true },
@@ -247,18 +283,25 @@ export class RecruitmentManagementService {
             })
           : [],
       ])
-      if (jobs.length !== jobIds.length)
+
+      if (jobs.length !== jobIds.length) {
         throw new NotFoundException("One or more jobs were not found")
-      if (candidates.length !== candidateIds.length)
+      }
+
+      if (candidates.length !== candidateIds.length) {
         throw new NotFoundException("One or more candidates were not found")
-      if (applications.length !== applicationIds.length)
+      }
+
+      if (applications.length !== applicationIds.length) {
         throw new NotFoundException("One or more applications were not found")
+      }
 
       const target = {
         recruiter_id: recruiter?.id ?? null,
         team_manager_id: team?.manager_id ?? null,
         ...(user.role === UserRole.RECRUITMENT_MANAGER ? { recruitment_manager_id: user.id } : {}),
       }
+
       jobs.forEach((record) => Object.assign(record, target))
       candidates.forEach((record) => Object.assign(record, target))
       applications.forEach((record) =>
@@ -270,6 +313,7 @@ export class RecruitmentManagementService {
         candidates.length ? manager.save(CandidateEntity, candidates) : Promise.resolve([]),
         applications.length ? manager.save(ApplicationEntity, applications) : Promise.resolve([]),
       ])
+
       if (applications.length) {
         await manager.save(
           ApplicationTimelineEntity,
@@ -285,6 +329,7 @@ export class RecruitmentManagementService {
           ),
         )
       }
+
       await manager.save(
         AuditLogEntity,
         manager.create(AuditLogEntity, {
@@ -323,6 +368,7 @@ export class RecruitmentManagementService {
       const recruiter = await this.users.findOne({
         where: { id: result.recruiter_id, organization_id: organizationId },
       })
+
       if (recruiter?.email) {
         await this.notifications
           .create({
@@ -336,6 +382,7 @@ export class RecruitmentManagementService {
           .catch(() => undefined)
       }
     }
+
     return result
   }
 
@@ -348,6 +395,7 @@ export class RecruitmentManagementService {
         is_active: true,
       },
     })
+
     for (const manager of managers) {
       await this.dashboard(manager, true).catch(() => undefined)
     }
@@ -367,6 +415,7 @@ export class RecruitmentManagementService {
         metadata: { alert_type: "sla_overdue", count: dashboard.summary.overdue_stages },
       } as any)
     }
+
     if (dashboard.summary.overloaded_recruiters > 0) {
       await this.notifications.createUnreadOnce({
         organization_id: user.organization_id,

@@ -31,10 +31,14 @@ export class IntegrationConnectionsService {
 
   async list(user: UserEntity) {
     const organizationId = this.organizationId(user)
+
     const existing = await this.connections.find({ where: { organization_id: organizationId } })
+
     return Object.entries(PROVIDERS).map(([provider, definition]) => {
       const connection = existing.find((item) => item.provider === provider)
+
       const connectUrl = this.connectUrl(provider)
+
       return {
         provider,
         name: definition.name,
@@ -53,18 +57,29 @@ export class IntegrationConnectionsService {
 
   async connect(provider: string, dto: ConnectIntegrationDto, user: UserEntity) {
     this.assertCanManage(user)
+
     const organizationId = this.organizationId(user)
+
     const definition = this.definition(provider)
+
     const connectUrl = this.connectUrl(provider)
-    if (!this.enabled(provider) || !connectUrl)
+
+    if (!this.enabled(provider) || !connectUrl) {
       throw new ConflictException(`${definition.name} integration is not enabled`)
+    }
+
     const requestedScopes = dto.scopes?.length ? dto.scopes : [...definition.scopes]
-    if (requestedScopes.some((scope) => !definition.scopes.includes(scope as never)))
+
+    if (requestedScopes.some((scope) => !definition.scopes.includes(scope as never))) {
       throw new ForbiddenException("Unsupported integration scope")
+    }
+
     const state = randomUUID()
+
     let connection = await this.connections.findOne({
       where: { organization_id: organizationId, provider },
     })
+
     connection = this.connections.create({
       ...(connection || {}),
       organization_id: organizationId,
@@ -75,7 +90,9 @@ export class IntegrationConnectionsService {
       last_error: null,
       disconnected_at: null,
     })
+
     const saved = await this.connections.save(connection)
+
     await this.audit.log({
       organization_id: String(organizationId),
       actor_user_id: String(user.id),
@@ -87,8 +104,11 @@ export class IntegrationConnectionsService {
       action: "update",
       metadata: { status: "pending", scopes: requestedScopes },
     })
+
     const url = new URL(connectUrl)
+
     url.searchParams.set("state", state)
+
     return { authorization_url: url.toString(), connection: saved }
   }
 
@@ -98,16 +118,25 @@ export class IntegrationConnectionsService {
 
   async disconnect(provider: string, user: UserEntity) {
     this.assertCanManage(user)
+
     const organizationId = this.organizationId(user)
+
     const definition = this.definition(provider)
+
     const connection = await this.connections.findOne({
       where: { organization_id: organizationId, provider },
     })
-    if (!connection) throw new NotFoundException(`${definition.name} connection not found`)
+
+    if (!connection) {
+      throw new NotFoundException(`${definition.name} connection not found`)
+    }
+
     connection.status = "disconnected"
     connection.oauth_state = null
     connection.disconnected_at = new Date()
+
     const saved = await this.connections.save(connection)
+
     await this.audit.log({
       organization_id: String(organizationId),
       actor_user_id: String(user.id),
@@ -119,12 +148,17 @@ export class IntegrationConnectionsService {
       action: "delete",
       metadata: { status: "disconnected" },
     })
+
     return saved
   }
 
   private definition(provider: string) {
     const definition = PROVIDERS[provider as keyof typeof PROVIDERS]
-    if (!definition) throw new NotFoundException(`Integration ${provider} not found`)
+
+    if (!definition) {
+      throw new NotFoundException(`Integration ${provider} not found`)
+    }
+
     return definition
   }
 
@@ -139,7 +173,10 @@ export class IntegrationConnectionsService {
   }
 
   private organizationId(user: UserEntity) {
-    if (!user.organization_id) throw new ForbiddenException("Organization context required")
+    if (!user.organization_id) {
+      throw new ForbiddenException("Organization context required")
+    }
+
     return user.organization_id
   }
 

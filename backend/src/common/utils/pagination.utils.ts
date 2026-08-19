@@ -23,8 +23,11 @@ export interface PaginatedResult<T> {
  */
 export function parsePagination(query: Record<string, any>): PaginationOptions {
   const page = Math.max(1, parseInt(query.page, 10) || 1)
+
   const limit = Math.min(500, Math.max(1, parseInt(query.limit, 10) || 20))
+
   const sort = query.sort || "created_date"
+
   const order = (query.order?.toUpperCase() as "ASC" | "DESC") === "ASC" ? "ASC" : "DESC"
 
   return { page, limit, sort, order }
@@ -39,7 +42,9 @@ export function buildPaginatedResponse<T>(
   options: PaginationOptions,
 ): PaginatedResult<T> {
   const page = options.page ?? 1
+
   const limit = options.limit ?? 20
+
   const totalPages = Math.ceil(total / limit)
 
   return {

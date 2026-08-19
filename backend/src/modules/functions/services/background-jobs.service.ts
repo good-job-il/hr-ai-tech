@@ -31,8 +31,13 @@ export class BackgroundJobsService {
     user: UserEntity,
   ) {
     const scopedKey = `${type}:${user.organization_id ?? "platform"}:${idempotencyKey}`
+
     const existing = await this.jobs.findOne({ where: { idempotency_key: scopedKey } })
-    if (existing) return existing
+
+    if (existing) {
+      return existing
+    }
+
     try {
       const created = await this.jobs.save(
         this.jobs.create({
@@ -49,19 +54,32 @@ export class BackgroundJobsService {
           run_after: new Date(),
         }),
       )
-      if (type === "candidate_file_import") this.metrics.increment("imports_enqueued")
+
+      if (type === "candidate_file_import") {
+        this.metrics.increment("imports_enqueued")
+      }
+
       return created
     } catch (error) {
       const raced = await this.jobs.findOne({ where: { idempotency_key: scopedKey } })
-      if (raced) return raced
+
+      if (raced) {
+        return raced
+      }
+
       throw error
     }
   }
 
   async findById(id: number, user: UserEntity) {
     const where = user.role === "admin" ? { id } : { id, organization_id: user.organization_id }
+
     const job = await this.jobs.findOne({ where })
-    if (!job) throw new NotFoundException(`Background job ${id} not found`)
+
+    if (!job) {
+      throw new NotFoundException(`Background job ${id} not found`)
+    }
+
     return job
   }
 
@@ -74,9 +92,17 @@ export class BackgroundJobsService {
       order: { created_date: "DESC" },
       take: 200,
     })
+
     const job = recent.find((candidate) => Number(candidate.payload.batch_id) === batchId)
-    if (!job) throw new NotFoundException(`No import job found for batch ${batchId}`)
-    if (job.status === "running") throw new ConflictException("Import is already running")
+
+    if (!job) {
+      throw new NotFoundException(`No import job found for batch ${batchId}`)
+    }
+
+    if (job.status === "running") {
+      throw new ConflictException("Import is already running")
+    }
+
     Object.assign(job, {
       status: "pending",
       attempts: 0,
@@ -88,20 +114,30 @@ export class BackgroundJobsService {
       completed_at: null,
     })
     this.metrics.increment("queue_retries")
+
     return this.jobs.save(job)
   }
 
   @Interval(2000)
   async processNext() {
-    if (this.processing) return
+    if (this.processing) {
+      return
+    }
+
     this.processing = true
+
     try {
       await this.recoverAbandonedJobs()
+
       const job = await this.jobs.findOne({
         where: { status: "pending", run_after: LessThanOrEqual(new Date()) },
         order: { created_date: "ASC" },
       })
-      if (!job) return
+
+      if (!job) {
+        return
+      }
+
       const claim = await this.jobs.update(
         { id: job.id, status: "pending" },
         {
@@ -110,7 +146,11 @@ export class BackgroundJobsService {
           attempts: job.attempts + 1,
         },
       )
-      if (!claim.affected) return
+
+      if (!claim.affected) {
+        return
+      }
+
       await this.execute(job.id)
     } finally {
       this.processing = false
@@ -120,14 +160,28 @@ export class BackgroundJobsService {
   @Interval(60_000)
   async scheduleDueImportSources() {
     const admin = await this.users.findOne({ where: { role: UserRole.ADMIN, is_active: true } })
-    if (!admin) return
+
+    if (!admin) {
+      return
+    }
+
     const now = Date.now()
+
     const sources = await this.sources.find({ where: { is_active: true } })
+
     for (const source of sources) {
-      if (!source.interval_hours) continue
+      if (!source.interval_hours) {
+        continue
+      }
+
       const intervalMs = source.interval_hours * 60 * 60 * 1000
-      if (source.last_sync && now - source.last_sync.getTime() < intervalMs) continue
+
+      if (source.last_sync && now - source.last_sync.getTime() < intervalMs) {
+        continue
+      }
+
       const window = Math.floor(now / intervalMs)
+
       await this.enqueue(
         "import_source_sync",
         { source_id: source.id },
@@ -139,10 +193,16 @@ export class BackgroundJobsService {
 
   private async execute(id: number) {
     const job = await this.jobs.findOneOrFail({ where: { id } })
+
     try {
       const user = await this.users.findOne({ where: { id: job.requested_by } })
-      if (!user || !user.is_active) throw new Error("Requesting user is no longer active")
+
+      if (!user || !user.is_active) {
+        throw new Error("Requesting user is no longer active")
+      }
+
       let result: Record<string, unknown>
+
       if (job.type === "candidate_file_import") {
         result = await this.imports.importCandidatesFromFile(
           {
@@ -155,7 +215,11 @@ export class BackgroundJobsService {
         )
       } else {
         const source = await this.sources.findOne({ where: { id: Number(job.payload.source_id) } })
-        if (!source) throw new Error("Import source not found")
+
+        if (!source) {
+          throw new Error("Import source not found")
+        }
+
         result = await this.crawler.crawlCareerPage(
           {
             url: source.url,
@@ -164,9 +228,12 @@ export class BackgroundJobsService {
           },
           user,
         )
-        if ((result as any).errors_count > 0)
+
+        if ((result as any).errors_count > 0) {
           throw new Error((result as any).errors?.join("; ") || "Import source failed")
+        }
       }
+
       Object.assign(job, {
         status: "completed",
         result,
@@ -177,10 +244,16 @@ export class BackgroundJobsService {
       await this.jobs.save(job)
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
-      if (job.type === "candidate_file_import") this.metrics.increment("import_failures")
+
+      if (job.type === "candidate_file_import") {
+        this.metrics.increment("import_failures")
+      }
+
       const exhausted = job.attempts >= job.max_attempts
+
       if (job.type === "import_source_sync") {
         const source = await this.sources.findOne({ where: { id: Number(job.payload.source_id) } })
+
         if (source) {
           source.last_sync_status = "error"
           source.last_error = message
@@ -189,6 +262,7 @@ export class BackgroundJobsService {
           await this.sources.save(source)
         }
       }
+
       Object.assign(job, {
         status: exhausted ? "failed" : "pending",
         error: message,
@@ -206,6 +280,7 @@ export class BackgroundJobsService {
 
   private async recoverAbandonedJobs() {
     const cutoff = new Date(Date.now() - 15 * 60 * 1000)
+
     await this.jobs.update(
       { status: "running", locked_at: LessThan(cutoff) },
       {

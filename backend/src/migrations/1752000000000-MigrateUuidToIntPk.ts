@@ -836,6 +836,7 @@ export class MigrateUuidToIntPk1752000000000 implements MigrationInterface {
 
     // Drop all affected tables and let the previous migration recreate them
     const allTables = [...MAIN_TABLES]
+
     for (const table of [...allTables].reverse()) {
       await queryRunner.query(`DROP TABLE IF EXISTS \`${table}\``)
     }

@@ -14,9 +14,12 @@ export function parseFilters(query: Record<string, any>): Record<string, any> {
   for (const key of Object.keys(query)) {
     // Match filter[someKey] pattern
     const match = key.match(/^filter\[(.+)\]$/)
+
     if (match) {
       const fieldName = match[1]
+
       const rawValue = query[key]
+
       filters[fieldName] = castFilterValue(rawValue)
     }
   }
@@ -28,14 +31,28 @@ export function parseFilters(query: Record<string, any>): Record<string, any> {
  * Cast string query param values to appropriate types.
  */
 function castFilterValue(value: string): any {
-  if (value === "true") return true
-  if (value === "false") return false
-  if (value === "null") return null
-  if (value === "") return undefined
+  if (value === "true") {
+    return true
+  }
+
+  if (value === "false") {
+    return false
+  }
+
+  if (value === "null") {
+    return null
+  }
+
+  if (value === "") {
+    return undefined
+  }
 
   // Numeric check
   const num = Number(value)
-  if (!isNaN(num) && value.trim() !== "") return num
+
+  if (!isNaN(num) && value.trim() !== "") {
+    return num
+  }
 
   return value
 }
@@ -55,6 +72,7 @@ export function buildWhereClause(
     if (allowedFields.length > 0 && !allowedFields.includes(key)) {
       continue
     }
+
     if (value !== undefined && value !== null) {
       where[key] = value
     }

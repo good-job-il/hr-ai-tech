@@ -7,13 +7,16 @@ describe("EffectivePermissionsGuard", () => {
     const reflector = {
       getAllAndOverride: jest.fn().mockReturnValue(["manage_users"]),
     } as unknown as Reflector
+
     const permissionsService = {
       getEffectivePermissions: jest
         .fn()
         .mockResolvedValueOnce({ permissions: { manage_users: true } })
         .mockResolvedValueOnce({ permissions: { manage_users: false } }),
     }
+
     const guard = new EffectivePermissionsGuard(reflector, permissionsService as any)
+
     const context = {
       getHandler: jest.fn(),
       getClass: jest.fn(),

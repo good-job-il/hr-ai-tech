@@ -61,6 +61,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
         impersonating: true,
         real_organization_id: user.organization_id,
       }) as UserEntity
+
       return effectiveUser
     }
 

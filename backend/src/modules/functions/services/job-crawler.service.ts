@@ -33,25 +33,42 @@ export class JobCrawlerService {
    */
   async crawlCareerPage(dto: CrawlCareerPageDto, user: UserEntity) {
     const log: string[] = []
+
     const errors: string[] = []
+
     let created = 0
+
     let updated = 0
 
     try {
       log.push(`Fetching ${dto.url}`)
+
       const response = await this.fetchPublicPage(dto.url)
-      if (!response.ok) throw new Error(`Career page returned HTTP ${response.status}`)
+
+      if (!response.ok) {
+        throw new Error(`Career page returned HTTP ${response.status}`)
+      }
+
       const html = await response.text()
+
       const $ = cheerio.load(html)
 
       const links = new Map<string, string>()
+
       $("a").each((_, el) => {
         const href = $(el).attr("href")
+
         const text = $(el).text().trim()
-        if (!href || !text || text.length < 3) return
+
+        if (!href || !text || text.length < 3) {
+          return
+        }
+
         const haystack = `${href} ${text}`.toLowerCase()
+
         if (JOB_KEYWORDS.some((kw) => haystack.includes(kw))) {
           const absoluteUrl = new URL(href, dto.url).toString()
+
           links.set(absoluteUrl, text)
         }
       })
@@ -61,10 +78,12 @@ export class JobCrawlerService {
       for (const [url, title] of links) {
         try {
           const existing = await this.jobRepo.findOne({ where: { apply_url: url } })
+
           if (existing) {
             updated++
             continue
           }
+
           await this.jobRepo.save(
             this.jobRepo.create({
               title,
@@ -85,6 +104,7 @@ export class JobCrawlerService {
 
       if (dto.source_id) {
         const source = await this.sourceRepo.findOne({ where: { id: dto.source_id } })
+
         if (source) {
           source.last_sync = new Date()
           source.last_sync_status = errors.length ? "error" : "success"
@@ -112,6 +132,7 @@ export class JobCrawlerService {
     } catch (err) {
       this.logger.error(`crawlCareerPage failed: ${(err as Error).message}`)
       errors.push((err as Error).message)
+
       return {
         success: false,
         summary: `Failed to crawl ${dto.url}`,
@@ -128,40 +149,64 @@ export class JobCrawlerService {
   }
 
   private async fetchPublicPage(input: string, redirects = 0): Promise<Response> {
-    if (redirects > 3) throw new BadRequestException("Too many redirects")
+    if (redirects > 3) {
+      throw new BadRequestException("Too many redirects")
+    }
+
     const url = new URL(input)
-    if (!["http:", "https:"].includes(url.protocol))
+
+    if (!["http:", "https:"].includes(url.protocol)) {
       throw new BadRequestException("Unsupported URL protocol")
+    }
+
     const addresses = isIP(url.hostname)
       ? [{ address: url.hostname }]
       : await lookup(url.hostname, { all: true })
+
     if (addresses.some(({ address }) => this.isPrivateAddress(address))) {
       throw new BadRequestException("Private network URLs are not allowed")
     }
+
     const response = await fetch(url, {
       redirect: "manual",
       headers: { "User-Agent": "Mozilla/5.0 HireIsraelBot/1.0" },
       signal: AbortSignal.timeout(20_000),
     })
+
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get("location")
-      if (!location) throw new BadRequestException("Redirect has no location")
+
+      if (!location) {
+        throw new BadRequestException("Redirect has no location")
+      }
+
       return this.fetchPublicPage(new URL(location, url).toString(), redirects + 1)
     }
+
     return response
   }
 
   private isPrivateAddress(address: string) {
     const normalized = address.toLowerCase()
-    if (normalized === "::1" || normalized === "0.0.0.0") return true
+
+    if (normalized === "::1" || normalized === "0.0.0.0") {
+      return true
+    }
+
     if (
       normalized.startsWith("fc") ||
       normalized.startsWith("fd") ||
       normalized.startsWith("fe80:")
-    )
+    ) {
       return true
+    }
+
     const parts = normalized.split(".").map(Number)
-    if (parts.length !== 4 || parts.some(Number.isNaN)) return false
+
+    if (parts.length !== 4 || parts.some(Number.isNaN)) {
+      return false
+    }
+
     return (
       parts[0] === 10 ||
       parts[0] === 127 ||

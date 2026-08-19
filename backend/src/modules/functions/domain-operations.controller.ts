@@ -40,6 +40,7 @@ const IMPORT_ROLES = [
   UserRole.TEAM_MANAGER,
   UserRole.ADMIN,
 ]
+
 const APPLICATION_MANAGE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN]
 
 @ApiTags("Domain operations")
@@ -81,6 +82,7 @@ export class DomainOperationsController {
   ) {
     await this.candidates.getBatch(id, user)
     await this.candidates.updateBatch(id, { status: "pending" }, user)
+
     return this.backgroundJobs.enqueue(
       "candidate_file_import",
       {
@@ -110,6 +112,7 @@ export class DomainOperationsController {
   ) {
     await this.candidates.getBatch(id, user)
     await this.candidates.updateBatch(id, { status: "pending" }, user)
+
     return this.backgroundJobs.retryCandidateBatch(id, user)
   }
 

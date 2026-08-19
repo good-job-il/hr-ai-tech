@@ -36,12 +36,14 @@ import { RequiresPermission } from "../../common/decorators/requires-permission.
 
 /** Roles allowed to create/modify candidate records (agency & admin staff only) */
 const CANDIDATE_WRITE_ROLES = [...ORG_ROLES, UserRole.ADMIN]
+
 const IMPORT_WRITE_ROLES = [
   UserRole.ORG_ADMIN,
   UserRole.RECRUITMENT_MANAGER,
   UserRole.TEAM_MANAGER,
   UserRole.ADMIN,
 ]
+
 const ACCESS_WRITE_ROLES = [UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, UserRole.ADMIN]
 
 @ApiTags("Candidates")

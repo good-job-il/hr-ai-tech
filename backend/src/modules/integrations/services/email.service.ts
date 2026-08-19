@@ -47,6 +47,7 @@ export class EmailService {
 
   constructor(private readonly config: ConfigService) {
     const host = this.config.get<string>("SMTP_HOST")
+
     this.transporter = host
       ? nodemailer.createTransport({
           host,
@@ -85,8 +86,12 @@ export class EmailService {
   }
 
   async sendInterviewScheduled(event: InterviewScheduledEmail): Promise<DeliveryResult | null> {
-    if (!event.candidateEmail || !this.isEmail(event.candidateEmail)) return null
+    if (!event.candidateEmail || !this.isEmail(event.candidateEmail)) {
+      return null
+    }
+
     const location = event.locationOrLink ? `\nLocation/link: ${event.locationOrLink}` : ""
+
     return this.deliver(
       event.candidateEmail,
       `Interview scheduled — ${event.jobTitle || "Hire Israel"}`,
@@ -97,7 +102,9 @@ export class EmailService {
 
   async sendStaffInvite(event: StaffInviteEmail): Promise<DeliveryResult> {
     const appUrl = this.config.get<string>("FRONTEND_URL", "http://localhost:5173")
+
     const link = `${appUrl}/reset-password?token=${encodeURIComponent(event.token)}`
+
     return this.deliver(
       event.email,
       "You were invited to Hire Israel",
@@ -108,7 +115,9 @@ export class EmailService {
 
   async sendPasswordReset(event: PasswordResetEmail): Promise<DeliveryResult> {
     const appUrl = this.config.get<string>("FRONTEND_URL", "http://localhost:5173")
+
     const link = `${appUrl}/reset-password?token=${encodeURIComponent(event.token)}`
+
     return this.deliver(
       event.email,
       "Reset your Hire Israel password",
@@ -119,8 +128,11 @@ export class EmailService {
 
   async sendCandidatePresentation(event: CandidatePresentationEmail): Promise<DeliveryResult> {
     const contact = event.candidateEmail ? `\nCandidate email: ${event.candidateEmail}` : ""
+
     const resume = event.resumeUrl ? `\nResume: ${event.resumeUrl}` : ""
+
     const note = event.recruiterNote ? `\nRecruiter note: ${event.recruiterNote}` : ""
+
     return this.deliver(
       event.recipientEmail,
       `Candidate presentation — ${event.candidateName} — ${event.jobTitle}`,
@@ -143,14 +155,17 @@ export class EmailService {
 
     if (!this.transporter) {
       this.logger.log(`[Email:MOCK] event=${event} delivery skipped (SMTP not configured)`)
+
       return { success: true, message: "Email skipped (SMTP not configured)" }
     }
 
     try {
       await this.transporter.sendMail({ from, to, subject, text: body })
+
       return { success: true, message: "Email sent" }
     } catch (error) {
       this.logger.error(`Email delivery failed for event=${event}: ${(error as Error).message}`)
+
       return { success: false, message: "Email delivery failed" }
     }
   }

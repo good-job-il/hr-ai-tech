@@ -67,23 +67,48 @@ export class JobsService {
         })
       : { state: "open", is_deleted: false }
 
-    if (isBlocked(rlsWhere)) return buildPaginatedResponse([], 0, { page, limit })
+    if (isBlocked(rlsWhere)) {
+      return buildPaginatedResponse([], 0, { page, limit })
+    }
 
     const where: Record<string, any> = { ...rlsWhere }
+
     if (organization_id && user?.role === UserRole.ADMIN && !user.impersonating) {
       where.organization_id = organization_id
     }
-    if (employer_company_id && !("employer_company_id" in rlsWhere))
+
+    if (employer_company_id && !("employer_company_id" in rlsWhere)) {
       where.employer_company_id = employer_company_id
-    if (recruiter_id && !("recruiter_id" in rlsWhere)) where.recruiter_id = recruiter_id
-    if (domain_id) where.domain_id = domain_id
-    if (type) where.type = type
-    if (state && user) where.state = state
-    if (is_closed !== undefined && user && !("is_closed" in rlsWhere)) where.is_closed = is_closed
-    if (is_deleted !== undefined && !("is_deleted" in rlsWhere)) where.is_deleted = is_deleted
+    }
+
+    if (recruiter_id && !("recruiter_id" in rlsWhere)) {
+      where.recruiter_id = recruiter_id
+    }
+
+    if (domain_id) {
+      where.domain_id = domain_id
+    }
+
+    if (type) {
+      where.type = type
+    }
+
+    if (state && user) {
+      where.state = state
+    }
+
+    if (is_closed !== undefined && user && !("is_closed" in rlsWhere)) {
+      where.is_closed = is_closed
+    }
+
+    if (is_deleted !== undefined && !("is_deleted" in rlsWhere)) {
+      where.is_deleted = is_deleted
+    }
 
     const { skip, take } = getSkipTake(page, limit)
+
     let findWhere: any = where
+
     if (search) {
       findWhere = [
         { ...where, title: Like(`%${search}%`) },
@@ -112,16 +137,27 @@ export class JobsService {
           impersonating: user.impersonating,
         })
       : { state: "open", is_deleted: false }
-    if (isBlocked(rlsWhere)) throw new NotFoundException(`Job ${id} not found`)
+
+    if (isBlocked(rlsWhere)) {
+      throw new NotFoundException(`Job ${id} not found`)
+    }
+
     const job = await this.jobRepo.findOne({ where: { ...rlsWhere, id } as any })
-    if (!job) throw new NotFoundException(`Job ${id} not found`)
+
+    if (!job) {
+      throw new NotFoundException(`Job ${id} not found`)
+    }
+
     return job
   }
 
   async create(dto: CreateJobDto, user: UserEntity): Promise<JobEntity> {
     this.assertValidJob(dto)
+
     const clientCompany = await this.resolveAgencyClientCompany(dto.employer_company_id, user)
+
     await this.assertAgencyAssignments(dto, user)
+
     const job = this.jobRepo.create({
       ...dto,
       ...(clientCompany
@@ -142,39 +178,55 @@ export class JobsService {
       state: dto.state ?? (dto.is_closed ? "closed" : "open"),
       is_closed: dto.state ? ["filled", "closed"].includes(dto.state) : dto.is_closed,
     } as any)
+
     return this.jobRepo.save(job) as unknown as Promise<JobEntity>
   }
 
   async update(id: number, dto: UpdateJobDto, user: UserEntity): Promise<JobEntity> {
     const job = await this.findById(id, user)
+
     await this.assertAgencyAssignments(dto, user)
+
     const clientCompany = await this.resolveAgencyClientCompany(
       dto.employer_company_id ?? job.employer_company_id,
       user,
     )
+
     Object.assign(job, dto)
-    if (dto.state) job.is_closed = ["filled", "closed"].includes(dto.state)
-    else if (dto.is_closed !== undefined) job.state = dto.is_closed ? "closed" : "open"
+
+    if (dto.state) {
+      job.is_closed = ["filled", "closed"].includes(dto.state)
+    } else if (dto.is_closed !== undefined) {
+      job.state = dto.is_closed ? "closed" : "open"
+    }
+
     if (clientCompany) {
       job.employer_company_id = clientCompany.id
       job.company = clientCompany.name
       job.company_initials = clientCompany.initials
       job.company_color = clientCompany.color
     }
+
     this.assertValidJob(job)
+
     if (dto.is_deleted && !job.deleted_at) {
       job.deleted_at = new Date()
       job.deleted_by = user.id
     }
+
     return this.jobRepo.save(job) as unknown as Promise<JobEntity>
   }
 
   async changeState(id: number, state: JobEntity["state"], user: UserEntity) {
     const job = await this.findById(id, user)
+
     const previous = job.state
+
     job.state = state
     job.is_closed = ["filled", "closed"].includes(state)
+
     const saved = await this.jobRepo.save(job)
+
     await this.audit.log({
       organization_id: saved.organization_id == null ? null : String(saved.organization_id),
       actor_user_id: String(user.id),
@@ -186,6 +238,7 @@ export class JobsService {
       action: "status_change",
       metadata: { previous_state: previous, state },
     })
+
     return saved
   }
 
@@ -193,6 +246,7 @@ export class JobsService {
     if (job.salary_min != null && job.salary_max != null && job.salary_min > job.salary_max) {
       throw new BadRequestException("salary_min cannot be greater than salary_max")
     }
+
     if (job.show_contact_details && !job.contact_email && !job.contact_phone) {
       throw new BadRequestException(
         "Contact email or phone is required when contact details are visible",
@@ -201,21 +255,34 @@ export class JobsService {
   }
 
   private async assertAgencyAssignments(dto: Partial<CreateJobDto>, user: UserEntity) {
-    if (user.org_type !== OrgType.STAFFING_AGENCY) return
-    if (!user.organization_id) throw new ForbiddenException("Organization context required")
+    if (user.org_type !== OrgType.STAFFING_AGENCY) {
+      return
+    }
+
+    if (!user.organization_id) {
+      throw new ForbiddenException("Organization context required")
+    }
 
     const assignments: Array<[keyof CreateJobDto, UserRole]> = [
       ["recruiter_id", UserRole.RECRUITER],
       ["team_manager_id", UserRole.TEAM_MANAGER],
       ["recruitment_manager_id", UserRole.RECRUITMENT_MANAGER],
     ]
+
     for (const [field, role] of assignments) {
       const id = dto[field]
-      if (id == null) continue
+
+      if (id == null) {
+        continue
+      }
+
       const assignee = await this.userRepo.findOne({
         where: { id: Number(id), organization_id: user.organization_id, role, is_active: true },
       })
-      if (!assignee) throw new ForbiddenException(`Invalid ${String(field)} assignment`)
+
+      if (!assignee) {
+        throw new ForbiddenException(`Invalid ${String(field)} assignment`)
+      }
     }
   }
 
@@ -234,31 +301,56 @@ export class JobsService {
    */
   private async resolveAgencyClientCompany(companyId: number | null | undefined, user: UserEntity) {
     if (user.role === UserRole.ADMIN && !user.impersonating) {
-      if (!companyId) return null
+      if (!companyId) {
+        return null
+      }
+
       const company = await this.companyRepo.findOne({
         where: { id: companyId, is_deleted: false },
       })
-      if (!company) throw new NotFoundException(`Company ${companyId} not found`)
+
+      if (!company) {
+        throw new NotFoundException(`Company ${companyId} not found`)
+      }
+
       return company
     }
+
     if (user.org_type !== OrgType.STAFFING_AGENCY) {
       if (user.role === UserRole.EMPLOYER || user.employer_company_id) {
-        if (!user.employer_company_id)
+        if (!user.employer_company_id) {
           throw new ForbiddenException("Employer company context required")
+        }
+
         if (companyId && companyId !== user.employer_company_id) {
           throw new ForbiddenException("You can only create jobs for your own employer company")
         }
+
         const company = await this.companyRepo.findOne({
           where: { id: user.employer_company_id, is_deleted: false },
         })
-        if (!company) throw new NotFoundException(`Company ${user.employer_company_id} not found`)
+
+        if (!company) {
+          throw new NotFoundException(`Company ${user.employer_company_id} not found`)
+        }
+
         return company
       }
-      if (companyId) throw new ForbiddenException("Employer company ownership is required")
+
+      if (companyId) {
+        throw new ForbiddenException("Employer company ownership is required")
+      }
+
       return null
     }
-    if (!user.organization_id) throw new ForbiddenException("Organization context required")
-    if (!companyId) throw new BadRequestException("An active agency client is required")
+
+    if (!user.organization_id) {
+      throw new ForbiddenException("Organization context required")
+    }
+
+    if (!companyId) {
+      throw new BadRequestException("An active agency client is required")
+    }
 
     const relationship = await this.agencyClientRepo.findOne({
       where: {
@@ -267,36 +359,58 @@ export class JobsService {
         status: "active",
       },
     })
+
     if (!relationship) {
       throw new BadRequestException("The selected company is not an active client of this agency")
     }
 
     const company = await this.companyRepo.findOne({ where: { id: companyId, is_deleted: false } })
-    if (!company) throw new NotFoundException(`Company ${companyId} not found`)
+
+    if (!company) {
+      throw new NotFoundException(`Company ${companyId} not found`)
+    }
+
     return company
   }
 
   // ─── Saved Jobs ──────────────────────────────────────────────────────────
   async getSavedJobs(user: UserEntity, jobId?: string) {
     const where: any = { user_id: user.id }
-    if (jobId) where.job_id = jobId
+
+    if (jobId) {
+      where.job_id = jobId
+    }
+
     return this.savedJobRepo.find({ where, order: { created_date: "DESC" } as any })
   }
 
   async saveJob(dto: CreateSavedJobDto, user: UserEntity): Promise<SavedJobEntity> {
     const owned = { ...dto, user_id: user.id, user_email: user.email }
+
     const existing = await this.savedJobRepo.findOne({
       where: { user_id: user.id, job_id: dto.job_id } as any,
     })
-    if (existing) return existing
+
+    if (existing) {
+      return existing
+    }
+
     const saved = this.savedJobRepo.create(owned as any)
+
     return this.savedJobRepo.save(saved) as unknown as Promise<SavedJobEntity>
   }
 
   async unsaveJob(id: number, user: UserEntity): Promise<void> {
     const saved = await this.savedJobRepo.findOne({ where: { id } })
-    if (!saved) throw new NotFoundException("Saved job not found")
-    if (saved.user_id !== user.id) throw new ForbiddenException("Access denied")
+
+    if (!saved) {
+      throw new NotFoundException("Saved job not found")
+    }
+
+    if (saved.user_id !== user.id) {
+      throw new ForbiddenException("Access denied")
+    }
+
     await this.savedJobRepo.remove(saved)
   }
 
@@ -311,21 +425,37 @@ export class JobsService {
       user_id: user.id,
       user_email: user.email,
     } as any)
+
     return this.alertRepo.save(alert) as unknown as Promise<JobAlertEntity>
   }
 
   async updateAlert(id: number, dto: UpdateJobAlertDto, user: UserEntity): Promise<JobAlertEntity> {
     const alert = await this.alertRepo.findOne({ where: { id } as any })
-    if (!alert) throw new NotFoundException(`Alert ${id} not found`)
-    if (alert.user_id !== user.id) throw new ForbiddenException("Access denied")
+
+    if (!alert) {
+      throw new NotFoundException(`Alert ${id} not found`)
+    }
+
+    if (alert.user_id !== user.id) {
+      throw new ForbiddenException("Access denied")
+    }
+
     Object.assign(alert, dto)
+
     return this.alertRepo.save(alert) as unknown as Promise<JobAlertEntity>
   }
 
   async deleteAlert(id: number, user: UserEntity): Promise<void> {
     const alert = await this.alertRepo.findOne({ where: { id } as any })
-    if (!alert) throw new NotFoundException(`Alert ${id} not found`)
-    if (alert.user_id !== user.id) throw new ForbiddenException("Access denied")
+
+    if (!alert) {
+      throw new NotFoundException(`Alert ${id} not found`)
+    }
+
+    if (alert.user_id !== user.id) {
+      throw new ForbiddenException("Access denied")
+    }
+
     await this.alertRepo.remove(alert)
   }
 }

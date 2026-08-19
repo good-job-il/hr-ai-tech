@@ -23,6 +23,7 @@ const user = (overrides: Record<string, unknown> = {}) =>
 
 describe("PermissionsService OA-1 boundary", () => {
   let matrixRepo: ReturnType<typeof repo>
+
   let service: PermissionsService
 
   beforeEach(() => {
@@ -108,6 +109,7 @@ describe("PermissionsService OA-1 boundary", () => {
 
   it("rejects recruitment manager permission matrix mutations", async () => {
     const manager = user({ role: UserRole.RECRUITMENT_MANAGER })
+
     matrixRepo.findOne.mockResolvedValue({
       id: 46,
       organization_id: 7,

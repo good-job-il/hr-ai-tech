@@ -4,6 +4,7 @@ import { RecruitmentManagementService } from "./recruitment-management.service"
 describe("RecruitmentManagementService RM-4 large-list acceptance", () => {
   it("aggregates 10,000 applications without truncating management totals", async () => {
     const now = new Date()
+
     const recruiters = Array.from({ length: 200 }, (_, index) => ({
       id: index + 1,
       email: `recruiter-${index + 1}@test`,
@@ -13,6 +14,7 @@ describe("RecruitmentManagementService RM-4 large-list acceptance", () => {
       team_manager_id: (index % 20) + 1001,
       is_active: true,
     }))
+
     const applications = Array.from({ length: 10_000 }, (_, index) => ({
       id: index + 1,
       organization_id: 12,
@@ -27,6 +29,7 @@ describe("RecruitmentManagementService RM-4 large-list acceptance", () => {
       created_date: now,
       updated_date: now,
     }))
+
     const jobs = Array.from({ length: 1_000 }, (_, index) => ({
       id: index + 1,
       title: `Job ${index + 1}`,
@@ -35,12 +38,14 @@ describe("RecruitmentManagementService RM-4 large-list acceptance", () => {
       employer_company_id: (index % 100) + 1,
       is_closed: false,
     }))
+
     const teams = Array.from({ length: 20 }, (_, index) => ({
       id: index + 1,
       manager_id: index + 1001,
       name: `Team ${index + 1}`,
       is_active: true,
     }))
+
     const service = new RecruitmentManagementService(
       { find: jest.fn().mockResolvedValue(applications) } as any,
       {} as any,
@@ -52,6 +57,7 @@ describe("RecruitmentManagementService RM-4 large-list acceptance", () => {
     )
 
     const startedAt = performance.now()
+
     const result = await service.dashboard({
       id: 9,
       email: "manager@test",
@@ -59,6 +65,7 @@ describe("RecruitmentManagementService RM-4 large-list acceptance", () => {
       organization_id: 12,
       org_type: "staffing_agency",
     } as any)
+
     const elapsedMs = performance.now() - startedAt
 
     expect(result.summary.applications).toBe(10_000)

@@ -248,6 +248,7 @@ export class Phase31751200000000 implements MigrationInterface {
       "communication_logs",
       "audit_logs",
     ]
+
     for (const t of tables) {
       await queryRunner.query(`DROP TABLE IF EXISTS \`${t}\``)
     }

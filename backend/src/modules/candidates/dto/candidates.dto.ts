@@ -10,8 +10,11 @@ const statusEnum = z.enum([
   "rejected",
   "inactive",
 ])
+
 const sourceEnum = z.enum(["import", "manual", "linkedin", "upload", "crawl", "pool"])
+
 const parsingStatusEnum = z.enum(["pending", "success", "partial", "failed"])
+
 const conversionStatusEnum = z.enum(["pending", "success", "failed"])
 
 // ─── Create Candidate ─────────────────────────────────────────────────────

@@ -35,6 +35,7 @@ export class TaxonomyService {
 
   getRoles(domainId?: number) {
     const where: any = domainId ? { domain_id: domainId } : {}
+
     return this.roleRepo.find({ where, order: { name: "ASC" } })
   }
 
@@ -44,6 +45,7 @@ export class TaxonomyService {
 
   getSpecializations(roleName?: string) {
     const where: any = roleName ? { role_name: roleName } : {}
+
     return this.specRepo.find({ where, order: { name: "ASC" } })
   }
 

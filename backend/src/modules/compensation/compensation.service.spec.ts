@@ -14,7 +14,9 @@ const repo = () => ({
 describe("CompensationService OA-2 canonical relations", () => {
   it("resolves a job only inside the current organization", async () => {
     const plans = repo()
+
     const jobs = repo()
+
     const service = new CompensationService(
       plans as any,
       jobs as any,
@@ -23,6 +25,7 @@ describe("CompensationService OA-2 canonical relations", () => {
       repo() as any,
       { log: jest.fn() } as any,
     )
+
     const actor = {
       id: 4,
       email: "owner@agency.test",
@@ -40,6 +43,7 @@ describe("CompensationService OA-2 canonical relations", () => {
 
   it("scopes an impersonating admin to the entered organization", async () => {
     const plans = repo()
+
     const service = new CompensationService(
       plans as any,
       repo() as any,
@@ -75,6 +79,7 @@ describe("CompensationService OA-2 canonical relations", () => {
 
   it("keeps a platform admin unrestricted outside a workspace", async () => {
     const plans = repo()
+
     const service = new CompensationService(
       plans as any,
       repo() as any,

@@ -5,11 +5,17 @@ import { UserRole } from "../../common/enums/user-role.enum"
 describe("BillingService OA-3", () => {
   it("returns persisted plan, real usage and an honest unconfigured payment state", async () => {
     const organizations = { findOne: jest.fn().mockResolvedValue({ id: 14, plan: OrgPlan.PRO }) }
+
     const accounts = { findOne: jest.fn().mockResolvedValue(null) }
+
     const invoices = { find: jest.fn().mockResolvedValue([]) }
+
     const jobs = { count: jest.fn().mockResolvedValue(4) }
+
     const candidates = { count: jest.fn().mockResolvedValue(250) }
+
     const users = { count: jest.fn().mockResolvedValue(9) }
+
     const service = new BillingService(
       organizations as any,
       accounts as any,
@@ -31,6 +37,7 @@ describe("BillingService OA-3", () => {
     const organizations = {
       findOne: jest.fn().mockResolvedValue({ id: 14, plan: OrgPlan.ENTERPRISE }),
     }
+
     const accounts = {
       findOne: jest.fn().mockResolvedValue({
         provider: "stripe",
@@ -40,12 +47,15 @@ describe("BillingService OA-3", () => {
         cancel_at_period_end: false,
       }),
     }
+
     const invoices = {
       find: jest
         .fn()
         .mockResolvedValue([{ id: 3, invoice_pdf_url: "https://billing.test/invoice.pdf" }]),
     }
+
     const counter = { count: jest.fn().mockResolvedValue(1) }
+
     const service = new BillingService(
       organizations as any,
       accounts as any,
@@ -69,6 +79,7 @@ describe("BillingService OA-3", () => {
 
   it("limits a recruitment manager to billing status without invoice access", async () => {
     const organizations = { findOne: jest.fn().mockResolvedValue({ id: 14, plan: OrgPlan.PRO }) }
+
     const accounts = {
       findOne: jest.fn().mockResolvedValue({
         provider: "stripe",
@@ -78,12 +89,15 @@ describe("BillingService OA-3", () => {
         cancel_at_period_end: false,
       }),
     }
+
     const invoices = {
       find: jest
         .fn()
         .mockResolvedValue([{ id: 3, invoice_pdf_url: "https://billing.test/invoice.pdf" }]),
     }
+
     const counter = { count: jest.fn().mockResolvedValue(1) }
+
     const service = new BillingService(
       organizations as any,
       accounts as any,

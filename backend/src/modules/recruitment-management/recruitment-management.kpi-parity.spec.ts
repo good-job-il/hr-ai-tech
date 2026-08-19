@@ -5,6 +5,7 @@ import { RecruitmentManagementService } from "./recruitment-management.service"
 describe("RM-4 dashboard/report KPI parity", () => {
   it("returns identical application, placement and funnel totals for one filter set", async () => {
     const now = new Date()
+
     const applications = [
       {
         id: 1,
@@ -52,8 +53,11 @@ describe("RM-4 dashboard/report KPI parity", () => {
         is_deleted: false,
       },
     ]
+
     const applicationRepo = { find: jest.fn().mockResolvedValue(applications) }
+
     const emptyRepo = { find: jest.fn().mockResolvedValue([]), findOne: jest.fn() }
+
     const users = {
       find: jest.fn().mockResolvedValue([
         {
@@ -65,6 +69,7 @@ describe("RM-4 dashboard/report KPI parity", () => {
         },
       ]),
     }
+
     const reports = new ReportsService(
       applicationRepo as any,
       emptyRepo as any,
@@ -77,6 +82,7 @@ describe("RM-4 dashboard/report KPI parity", () => {
           .mockResolvedValue({ permissions: { view_compensation: false } }),
       } as any,
     )
+
     const dashboard = new RecruitmentManagementService(
       applicationRepo as any,
       {} as any,
@@ -96,6 +102,7 @@ describe("RM-4 dashboard/report KPI parity", () => {
       {} as any,
       {} as any,
     )
+
     const actor = {
       id: 9,
       email: "manager@test",
@@ -103,6 +110,7 @@ describe("RM-4 dashboard/report KPI parity", () => {
       organization_id: 12,
       org_type: "staffing_agency",
     } as any
+
     const query = {
       date_from: now.toISOString().slice(0, 10),
       date_to: now.toISOString().slice(0, 10),
@@ -115,6 +123,7 @@ describe("RM-4 dashboard/report KPI parity", () => {
       reports.getManagementReport(query, actor),
       dashboard.dashboard(actor, false, query),
     ])
+
     const reportFunnel = Object.fromEntries(
       reportResult.funnel.map((row) => [row.status, row.count]),
     )

@@ -33,6 +33,7 @@ export class ReportsController {
   @RequiresPermission("export")
   async exportReport(@Query() query: ManagementReportQueryDto, @CurrentUser() user: UserEntity) {
     const report = await this.reports.getManagementReport(query, user)
+
     await this.audit.log({
       organization_id: user.organization_id == null ? null : String(user.organization_id),
       actor_user_id: String(user.id),
@@ -44,6 +45,7 @@ export class ReportsController {
       action: "export",
       metadata: { filters: query },
     })
+
     return report
   }
 }

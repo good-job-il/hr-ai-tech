@@ -33,6 +33,7 @@ import { RequiresPermission } from "../../common/decorators/requires-permission.
 
 /** Candidates apply for themselves; agency/admin staff can also create on behalf of a candidate */
 const APPLICATION_CREATE_ROLES = [UserRole.CANDIDATE, ...ORG_ROLES, UserRole.ADMIN]
+
 /** Only agency staff / employer / admin manage application status & pipeline */
 const APPLICATION_MANAGE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN]
 

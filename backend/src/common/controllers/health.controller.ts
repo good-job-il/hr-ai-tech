@@ -15,9 +15,11 @@ export class HealthController {
   async check() {
     try {
       await this.dataSource.query("SELECT 1")
+
       const rows: Array<{ status: string; count: string | number }> = await this.dataSource.query(
         "SELECT status, COUNT(*) AS count FROM background_jobs GROUP BY status",
       )
+
       return {
         status: "ok",
         database: "ok",

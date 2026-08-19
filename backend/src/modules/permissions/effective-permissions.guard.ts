@@ -17,16 +17,25 @@ export class EffectivePermissionsGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ])
-    if (!required?.length) return true
+
+    if (!required?.length) {
+      return true
+    }
 
     const user = context.switchToHttp().getRequest().user as UserEntity | undefined
-    if (!user) throw new ForbiddenException("No user context")
+
+    if (!user) {
+      throw new ForbiddenException("No user context")
+    }
 
     const effective = await this.permissionsService.getEffectivePermissions(user)
+
     const missing = required.filter((permission) => !effective.permissions[permission])
+
     if (missing.length) {
       throw new ForbiddenException(`Missing required permission: ${missing.join(", ")}`)
     }
+
     return true
   }
 }

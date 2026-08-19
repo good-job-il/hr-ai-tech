@@ -56,6 +56,7 @@ describe("getRlsWhere", () => {
         employer_company_id: 21,
       }),
     )
+
     expect(filter).toBe(BLOCKED_FILTER)
     expect(isBlocked(filter)).toBe(true)
   })

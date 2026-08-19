@@ -4,6 +4,7 @@ import { AgencyTeamsService } from "./agency-teams.service"
 
 describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
   const organizationId = 71
+
   const actor = {
     id: 1,
     email: "owner@acceptance.test",
@@ -13,8 +14,11 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
   } as any
 
   let storedUsers: any[]
+
   let storedTeams: any[]
+
   let storedInvitations: any[]
+
   let service: AgencyTeamsService
 
   beforeEach(() => {
@@ -31,17 +35,21 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
       ),
       save: jest.fn(async (value) => {
         const saved = { id: value.id || storedUsers.length + 1, ...value }
+
         storedUsers = [...storedUsers.filter((item) => item.id !== saved.id), saved]
+
         return saved
       }),
       create: jest.fn((value) => value),
       update: jest.fn(async (criteria, patch) => {
         const where = typeof criteria === "number" ? { id: criteria } : criteria
+
         storedUsers = storedUsers.map((item) =>
           Object.entries(where).every(([key, value]) => item[key] === value)
             ? { ...item, ...patch }
             : item,
         )
+
         return { affected: 1 }
       }),
       count: jest.fn(
@@ -52,6 +60,7 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
       ),
       find: jest.fn(async () => storedUsers),
     }
+
     const teams = {
       findOne: jest.fn(
         async ({ where }) =>
@@ -61,7 +70,9 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
       ),
       save: jest.fn(async (value) => {
         const saved = { id: value.id || storedTeams.length + 101, is_active: true, ...value }
+
         storedTeams = [...storedTeams.filter((item) => item.id !== saved.id), saved]
+
         return saved
       }),
       create: jest.fn((value) => value),
@@ -73,6 +84,7 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
       ),
       find: jest.fn(async () => storedTeams),
     }
+
     const invitations = {
       findOne: jest.fn(
         async ({ where }) =>
@@ -82,7 +94,9 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
       ),
       save: jest.fn(async (value) => {
         const saved = { id: value.id || storedInvitations.length + 201, ...value }
+
         storedInvitations = [...storedInvitations.filter((item) => item.id !== saved.id), saved]
+
         return saved
       }),
       create: jest.fn(() => ({})),
@@ -106,6 +120,7 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
 
   it("creates a team, invites a recruiter, accepts the invitation and manages access", async () => {
     const team = await service.createTeam({ name: "North Team" } as any, actor)
+
     const invitation = await service.invite(
       {
         full_name: "New Recruiter",
@@ -117,6 +132,7 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
     )
 
     const accepted = await service.accept(invitation.invite_token, "StrongPass123!")
+
     expect(accepted).toEqual(
       expect.objectContaining({
         email: "new.recruiter@acceptance.test",
@@ -126,6 +142,7 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
     expect(storedInvitations[0].status).toBe("accepted")
 
     const deactivated = await service.updateMember(accepted.id, { is_active: false } as any, actor)
+
     expect(deactivated.is_active).toBe(false)
     expect((deactivated as any).password_hash).toBeUndefined()
   })

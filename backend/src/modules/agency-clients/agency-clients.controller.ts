@@ -27,6 +27,7 @@ import { EffectivePermissionsGuard } from "../permissions/effective-permissions.
 import { RequiresPermission } from "../../common/decorators/requires-permission.decorator"
 
 const CLIENT_READ_ROLES = [...ORG_ROLES, UserRole.ADMIN]
+
 const CLIENT_WRITE_ROLES = [UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, UserRole.ADMIN]
 
 @ApiTags("Agency Clients")

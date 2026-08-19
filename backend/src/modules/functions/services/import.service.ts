@@ -42,9 +42,13 @@ export class ImportService {
     await this.batchRepo.save(batch)
 
     let successful = 0
+
     let duplicates = 0
+
     let failed = 0
+
     let missingEmail = 0
+
     const rowErrors: Array<{
       row_number: number
       message: string
@@ -54,29 +58,57 @@ export class ImportService {
 
     try {
       const fileUrl = assertOwnedFileUrl(dto.fileUrl)
+
       const res = await fetch(fileUrl, { signal: AbortSignal.timeout(30_000) })
-      if (!res.ok) throw new Error(`Import file returned HTTP ${res.status}`)
+
+      if (!res.ok) {
+        throw new Error(`Import file returned HTTP ${res.status}`)
+      }
+
       const declaredSize = Number(res.headers.get("content-length") || 0)
-      if (declaredSize > 100 * 1024 * 1024) throw new Error("Import file exceeds 100MB")
+
+      if (declaredSize > 100 * 1024 * 1024) {
+        throw new Error("Import file exceeds 100MB")
+      }
+
       const buffer = Buffer.from(await res.arrayBuffer())
-      if (buffer.byteLength > 100 * 1024 * 1024) throw new Error("Import file exceeds 100MB")
+
+      if (buffer.byteLength > 100 * 1024 * 1024) {
+        throw new Error("Import file exceeds 100MB")
+      }
+
       const workbook = new ExcelJS.Workbook()
+
       const contentType = res.headers.get("content-type") || ""
+
       const isCsv =
         contentType.includes("text/csv") || new URL(fileUrl).pathname.toLowerCase().endsWith(".csv")
+
       const sheet = isCsv
         ? await workbook.csv.read(Readable.from(buffer))
         : (await workbook.xlsx.load(buffer as unknown as ExcelJS.Buffer), workbook.worksheets[0])
-      if (!sheet) throw new Error("Import workbook does not contain a worksheet")
+
+      if (!sheet) {
+        throw new Error("Import workbook does not contain a worksheet")
+      }
+
       const headers = (sheet.getRow(1).values as ExcelJS.CellValue[])
         .slice(1)
         .map((value) => this.cellText(value))
+
       let rows: Record<string, any>[] = []
+
       sheet.eachRow((row, rowNumber) => {
-        if (rowNumber === 1) return
+        if (rowNumber === 1) {
+          return
+        }
+
         const record: Record<string, any> = {}
+
         headers.forEach((header, index) => {
-          if (header) record[header] = row.getCell(index + 1).value
+          if (header) {
+            record[header] = row.getCell(index + 1).value
+          }
         })
         record.__row_number = rowNumber
         rows.push(record)
@@ -86,13 +118,18 @@ export class ImportService {
         const failedRows = new Set(
           (batch.error_log || []).map((error) => Number(error.row_number)).filter(Number.isFinite),
         )
-        if (failedRows.size) rows = rows.filter((row) => failedRows.has(Number(row.__row_number)))
+
+        if (failedRows.size) {
+          rows = rows.filter((row) => failedRows.has(Number(row.__row_number)))
+        }
       }
 
       for (const row of rows) {
         try {
           const rowNumber = Number(row.__row_number)
+
           const email = row.email || row.Email || row["אימייל"]
+
           const fullName = row.full_name || row.name || row["שם מלא"] || "לא ידוע"
 
           const importedRow = await this.candidateRepo.findOne({
@@ -102,17 +139,21 @@ export class ImportService {
               import_row_number: rowNumber,
             },
           })
+
           if (importedRow) {
             duplicates++
             continue
           }
 
-          if (!email) missingEmail++
+          if (!email) {
+            missingEmail++
+          }
 
           if (email) {
             const existing = await this.candidateRepo.findOne({
               where: { email, organization_id: user.organization_id, is_deleted: false },
             })
+
             if (existing) {
               duplicates++
               continue
@@ -144,6 +185,7 @@ export class ImportService {
             imported_at: new Date(),
             imported_by: user.email,
           } as any)
+
           await this.candidateRepo.save(candidate)
           successful++
         } catch (rowErr) {
@@ -151,6 +193,7 @@ export class ImportService {
             duplicates++
             continue
           }
+
           this.logger.warn(`Row import failed: ${(rowErr as Error).message}`)
           failed++
           rowErrors.push({
@@ -162,7 +205,10 @@ export class ImportService {
         }
       }
 
-      if (!dto.retryFailedOnly) batch.total_records = rows.length
+      if (!dto.retryFailedOnly) {
+        batch.total_records = rows.length
+      }
+
       batch.successful_imports = dto.retryFailedOnly
         ? batch.successful_imports + successful
         : successful
@@ -193,15 +239,20 @@ export class ImportService {
   // ─── createBulkCandidates — creates candidates from pre-parsed data ──────
   async createBulkCandidates(dto: CreateBulkCandidatesDto, user: UserEntity) {
     const created: any[] = []
+
     const failed: any[] = []
 
-    if (dto.import_batch_id) await this.requireBatch(dto.import_batch_id, user)
+    if (dto.import_batch_id) {
+      await this.requireBatch(dto.import_batch_id, user)
+    }
+
     for (const data of dto.candidates_data) {
       try {
         await this.candidatesService.assertOrganizationUsers(
           [data.recruiter_id, data.team_manager_id, data.recruitment_manager_id],
           user,
         )
+
         const candidate = this.candidateRepo.create({
           ...data,
           organization_id: user.organization_id,
@@ -210,7 +261,9 @@ export class ImportService {
           imported_by: user.email,
           source: "import",
         } as any)
+
         const saved = await this.candidateRepo.save(candidate)
+
         created.push(saved)
       } catch (err) {
         failed.push({ data, error: (err as Error).message })
@@ -219,6 +272,7 @@ export class ImportService {
 
     if (dto.import_batch_id) {
       const batch = await this.batchRepo.findOne({ where: { id: dto.import_batch_id } })
+
       if (batch) {
         batch.successful_imports += created.length
         batch.failed_imports += failed.length
@@ -238,6 +292,7 @@ export class ImportService {
     const candidates = await this.candidateRepo.find({
       where: { import_batch_id: dto.import_batch_id },
     })
+
     const total = candidates.length || 1
 
     const checks = {
@@ -258,28 +313,40 @@ export class ImportService {
     }
 
     const passedChecks = Object.values(checks).filter((c: any) => c.passed).length
+
     const totalChecks = Object.values(checks).length
+
     const readinessScore = Math.round((passedChecks / totalChecks) * 100)
 
     const recommendations: string[] = []
-    if (!checks.email_validation.passed)
+
+    if (!checks.email_validation.passed) {
       recommendations.push(
         `⚠️ ${candidates.filter((c) => !c.email).length} candidates missing email`,
       )
-    if (!checks.phone_validation.passed)
+    }
+
+    if (!checks.phone_validation.passed) {
       recommendations.push(
         `⚠️ ${candidates.filter((c) => !c.phone).length} candidates missing phone`,
       )
-    if (!checks.role_validation.passed)
+    }
+
+    if (!checks.role_validation.passed) {
       recommendations.push(
         `⚠️ ${candidates.filter((c) => !c.role_name).length} candidates missing role`,
       )
-    if (!checks.duplicate_detection.passed)
+    }
+
+    if (!checks.duplicate_detection.passed) {
       recommendations.push(
         `⚠️ ${candidates.filter((c) => c.is_duplicate_suspected).length} suspected duplicates`,
       )
-    if (checks.data_quality.avg_score < 60)
+    }
+
+    if (checks.data_quality.avg_score < 60) {
       recommendations.push(`⚠️ Average data quality is ${checks.data_quality.avg_score}%`)
+    }
 
     return {
       batch_id: dto.import_batch_id,
@@ -295,6 +362,7 @@ export class ImportService {
 
   private check(candidates: CandidateEntity[], predicate: (c: CandidateEntity) => boolean) {
     const passing = candidates.filter(predicate).length
+
     return {
       passed: passing === candidates.length,
       total: candidates.length,
@@ -304,22 +372,41 @@ export class ImportService {
   }
 
   private cellText(value: ExcelJS.CellValue | undefined): string {
-    if (value === null || value === undefined) return ""
-    if (typeof value === "object") {
-      if ("text" in value) return String(value.text)
-      if ("result" in value) return String(value.result ?? "")
-      if ("richText" in value) return value.richText.map((part) => part.text).join("")
+    if (value === null || value === undefined) {
+      return ""
     }
+
+    if (typeof value === "object") {
+      if ("text" in value) {
+        return String(value.text)
+      }
+
+      if ("result" in value) {
+        return String(value.result ?? "")
+      }
+
+      if ("richText" in value) {
+        return value.richText.map((part) => part.text).join("")
+      }
+    }
+
     return String(value)
   }
 
   // ─── importResumeFiles — bulk resume upload + extraction ────────────────
   async importResumeFiles(dto: ImportResumeFilesDto, user: UserEntity) {
-    if (dto.batchId) await this.requireBatch(dto.batchId, user)
+    if (dto.batchId) {
+      await this.requireBatch(dto.batchId, user)
+    }
+
     await this.candidatesService.assertOrganizationUsers([dto.recruiter_id], user)
+
     const results: any[] = []
+
     let successful = 0
+
     let failed = 0
+
     let duplicates = 0
 
     for (const file of dto.files) {
@@ -327,9 +414,11 @@ export class ImportService {
         const existingDoc = await this.documentRepo.findOne({
           where: { file_url: file.file_url, organization_id: user.organization_id },
         })
+
         const existingCandidate = await this.candidateRepo.findOne({
           where: { resume_url: file.file_url, organization_id: user.organization_id },
         })
+
         if (existingDoc || existingCandidate) {
           duplicates++
           results.push({ filename: file.filename, status: "duplicate" })
@@ -360,6 +449,7 @@ export class ImportService {
           imported_at: new Date(),
           imported_by: user.email,
         } as any) as unknown as CandidateEntity
+
         const saved = (await this.candidateRepo.save(candidate)) as unknown as CandidateEntity
 
         await this.documentRepo.save(
@@ -392,15 +482,18 @@ export class ImportService {
   // ─── parseResumeBatch — parse a ZIP of resumes (metadata pass) ───────────
   async parseResumeBatch(dto: ParseResumeBatchDto, user: UserEntity) {
     await this.candidatesService.assertOrganizationUsers([dto.recruiter_id], user)
+
     // NOTE: Actual ZIP extraction requires unzip on the server (e.g. `unzipper`
     // or `adm-zip`). This implementation validates the batch shell and
     // prepares it for `importResumeFiles` once individual file URLs are known
     // (typically after client-side unzip + upload, matching the frontend flow
     // in ResumeZipUploader.jsx which uploads extracted files individually).
     let batch: CandidateImportBatchEntity | null = null
+
     if (dto.import_batch_id) {
       batch = await this.requireBatch(dto.import_batch_id, user)
     }
+
     if (!batch) {
       batch = this.batchRepo.create({
         batch_name: `ZIP Import ${new Date().toISOString()}`,
@@ -425,12 +518,20 @@ export class ImportService {
   }
 
   private async requireBatch(id: number | null | undefined, user: UserEntity) {
-    if (!id) throw new NotFoundException("Import batch not found")
+    if (!id) {
+      throw new NotFoundException("Import batch not found")
+    }
+
     const batch = await this.batchRepo.findOne({ where: { id } })
-    if (!batch) throw new NotFoundException("Import batch not found")
+
+    if (!batch) {
+      throw new NotFoundException("Import batch not found")
+    }
+
     if (user.role !== UserRole.ADMIN && batch.organization_id !== user.organization_id) {
       throw new ForbiddenException("Import batch belongs to another organization")
     }
+
     return batch
   }
 }

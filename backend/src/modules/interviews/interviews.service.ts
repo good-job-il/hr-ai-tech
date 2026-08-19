@@ -32,21 +32,38 @@ export class InterviewsService {
       email: user.email,
       impersonating: user.impersonating,
     })
-    if (isBlocked(rlsWhere)) return buildPaginatedResponse([], 0, { page, limit })
+
+    if (isBlocked(rlsWhere)) {
+      return buildPaginatedResponse([], 0, { page, limit })
+    }
 
     const where: Record<string, any> = { ...rlsWhere }
-    if (application_id) where.application_id = application_id
-    if (candidate_id) where.candidate_id = candidate_id
-    if (recruiter_id && !("recruiter_id" in rlsWhere)) where.recruiter_id = recruiter_id
-    if (status) where.status = status
+
+    if (application_id) {
+      where.application_id = application_id
+    }
+
+    if (candidate_id) {
+      where.candidate_id = candidate_id
+    }
+
+    if (recruiter_id && !("recruiter_id" in rlsWhere)) {
+      where.recruiter_id = recruiter_id
+    }
+
+    if (status) {
+      where.status = status
+    }
 
     const { skip, take } = getSkipTake(page, limit)
+
     const [data, total] = await this.repo.findAndCount({
       where,
       order: { [sort]: order },
       skip,
       take,
     })
+
     return buildPaginatedResponse(data, total, { page, limit, sort, order })
   }
 
@@ -59,9 +76,17 @@ export class InterviewsService {
       email: user.email,
       impersonating: user.impersonating,
     })
-    if (isBlocked(rlsWhere)) throw new NotFoundException(`Interview ${id} not found`)
+
+    if (isBlocked(rlsWhere)) {
+      throw new NotFoundException(`Interview ${id} not found`)
+    }
+
     const item = await this.repo.findOne({ where: { ...rlsWhere, id } as any })
-    if (!item) throw new NotFoundException(`Interview ${id} not found`)
+
+    if (!item) {
+      throw new NotFoundException(`Interview ${id} not found`)
+    }
+
     return item
   }
 
@@ -69,6 +94,7 @@ export class InterviewsService {
     const application = dto.application_id
       ? await this.applicationsService.findById(dto.application_id, user)
       : null
+
     const item = this.repo.create({
       ...dto,
       organization_id: application?.organization_id ?? user.organization_id,
@@ -84,10 +110,12 @@ export class InterviewsService {
       recruitment_manager_id:
         dto.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
     } as any)
+
     const saved = await this.dataSource.transaction(async (manager) => {
       const stored = await manager
         .getRepository(InterviewEntity)
         .save(item as unknown as InterviewEntity)
+
       if (stored.application_id) {
         await manager.save(
           ApplicationTimelineEntity,
@@ -101,8 +129,10 @@ export class InterviewsService {
           } as any),
         )
       }
+
       return stored
     })
+
     await this.emailService
       .sendInterviewScheduled({
         candidateEmail: saved.candidate_email,
@@ -114,17 +144,21 @@ export class InterviewsService {
         locationOrLink: saved.location_or_link,
       })
       .catch(() => undefined)
+
     return saved
   }
 
   async update(id: number, dto: UpdateInterviewDto, user: UserEntity): Promise<InterviewEntity> {
     const item = await this.findById(id, user)
+
     Object.assign(item, dto)
+
     return this.repo.save(item) as unknown as Promise<InterviewEntity>
   }
 
   async remove(id: number, user: UserEntity): Promise<void> {
     const item = await this.findById(id, user)
+
     await this.repo.remove(item)
   }
 }

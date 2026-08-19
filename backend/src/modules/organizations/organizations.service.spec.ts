@@ -9,8 +9,11 @@ describe("OrganizationsService OA-4 onboarding acceptance", () => {
     create: jest.fn((value) => value),
     save: jest.fn(async (value) => ({ id: 41, ...value })),
   }
+
   const users = { update: jest.fn().mockResolvedValue({ affected: 1 }) }
+
   const audit = { log: jest.fn() }
+
   let service: OrganizationsService
 
   beforeEach(() => {

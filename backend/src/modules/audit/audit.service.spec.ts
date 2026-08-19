@@ -3,7 +3,9 @@ import { AuditService } from "./audit.service"
 describe("AuditService OA-3 filters", () => {
   it("applies actor and date filters together with tenant scope", async () => {
     const repo = { findAndCount: jest.fn().mockResolvedValue([[], 0]) }
+
     const service = new AuditService(repo as any)
+
     await service.findAll(
       {
         page: 1,
@@ -33,6 +35,7 @@ describe("AuditService OA-3 filters", () => {
       create: jest.fn((value) => value),
       save: jest.fn((value) => Promise.resolve(value)),
     }
+
     const service = new AuditService(repo as any)
 
     const result = await service.export(

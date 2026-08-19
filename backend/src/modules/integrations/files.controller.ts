@@ -15,7 +15,10 @@ import { existsSync, mkdirSync } from "fs"
 import { Request } from "express"
 
 const uploadDir = process.env.UPLOAD_DIR || "./uploads"
-if (!existsSync(uploadDir)) mkdirSync(uploadDir, { recursive: true })
+
+if (!existsSync(uploadDir)) {
+  mkdirSync(uploadDir, { recursive: true })
+}
 
 @ApiTags("Files")
 @ApiBearerAuth()
@@ -34,12 +37,16 @@ export class FilesController {
     }),
   )
   upload(@UploadedFile() file: Express.Multer.File, @Req() request: Request) {
-    if (!file) throw new BadRequestException("No file provided")
+    if (!file) {
+      throw new BadRequestException("No file provided")
+    }
+
     const host =
       process.env.API_PUBLIC_URL ||
       (process.env.NODE_ENV === "production"
         ? `${request.protocol}://${request.get("host")}`
         : `http://localhost:${process.env.PORT || 3001}`)
+
     return {
       file_url: `${host}/uploads/${file.filename}`,
       filename: file.originalname,

@@ -38,9 +38,11 @@ export class ResumeExtractionService {
     dto: ExtractResumeFnDto,
   ): Promise<{ success: boolean; data: ExtractedResumeData }> {
     const resumeHash = this.hashContent(dto.file_url)
+
     const text = await this.extractTextFromFile(dto.file_url)
 
     let extracted: Partial<ExtractedResumeData> = {}
+
     if (process.env.OPENAI_API_KEY) {
       extracted = await this.extractWithLLM(text)
     } else {
@@ -65,11 +67,20 @@ export class ResumeExtractionService {
   /** Best-effort file download + text extraction. Falls back to empty string on failure. */
   async extractTextFromFile(fileUrl: string): Promise<string> {
     const ownedUrl = assertOwnedFileUrl(fileUrl)
+
     try {
       const res = await fetch(ownedUrl, { signal: AbortSignal.timeout(20_000) })
-      if (!res.ok) throw new Error(`Resume file returned HTTP ${res.status}`)
+
+      if (!res.ok) {
+        throw new Error(`Resume file returned HTTP ${res.status}`)
+      }
+
       const buffer = Buffer.from(await res.arrayBuffer())
-      if (buffer.byteLength > 25 * 1024 * 1024) throw new Error("Resume file exceeds 25MB")
+
+      if (buffer.byteLength > 25 * 1024 * 1024) {
+        throw new Error("Resume file exceeds 25MB")
+      }
+
       const contentType = res.headers.get("content-type") || ""
 
       if (contentType.includes("pdf") || fileUrl.toLowerCase().endsWith(".pdf")) {
@@ -81,19 +92,24 @@ export class ResumeExtractionService {
       return buffer.toString("utf-8")
     } catch (err) {
       this.logger.warn(`Failed to fetch/extract file text: ${(err as Error).message}`)
+
       return ""
     }
   }
 
   private stripBinaryToText(buffer: Buffer): string {
     const raw = buffer.toString("latin1")
+
     const matches = raw.match(/[\x20-\x7E\u0590-\u05FF]{4,}/g) || []
+
     return matches.join(" ").slice(0, 20000)
   }
 
   private extractWithHeuristics(text: string): Partial<ExtractedResumeData> {
     const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)
+
     const phoneMatch = text.match(/(?:\+972|0)([-\s]?\d){8,9}/)
+
     const nameMatch = text.match(/^[A-Za-z\u0590-\u05FF ]{3,60}/)
 
     return {
@@ -132,13 +148,19 @@ export class ResumeExtractionService {
       })
 
       const json = (await response.json()) as any
+
       const content = json?.choices?.[0]?.message?.content
-      if (!content) return this.extractWithHeuristics(text)
+
+      if (!content) {
+        return this.extractWithHeuristics(text)
+      }
+
       return JSON.parse(content)
     } catch (err) {
       this.logger.warn(
         `LLM extraction failed, falling back to heuristics: ${(err as Error).message}`,
       )
+
       return this.extractWithHeuristics(text)
     }
   }

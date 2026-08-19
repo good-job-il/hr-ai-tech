@@ -58,6 +58,7 @@ export class AuthController {
   @ApiOperation({ summary: "Logout and revoke refresh token" })
   async logout(@CurrentUser() user: UserEntity) {
     await this.authService.logout(user.id)
+
     return { message: "Logged out successfully" }
   }
 
@@ -86,6 +87,7 @@ export class AuthController {
   @ApiOperation({ summary: "Update current user profile" })
   async updateMe(@CurrentUser() user: UserEntity, @Body() dto: UpdateMeDto) {
     const updated = await this.authService.updateMe(user.id, dto as any)
+
     return this.authService.sanitizeUser(updated)
   }
 
@@ -105,6 +107,7 @@ export class AuthController {
   @ApiOperation({ summary: "Reset password using reset token" })
   async resetPassword(@Body() dto: ResetPasswordDto) {
     await this.authService.resetPassword(dto.token, dto.password)
+
     return { message: "Password reset successfully" }
   }
 
@@ -131,6 +134,7 @@ export class AuthController {
   })
   async exitOrganization(@CurrentUser() user: UserEntity) {
     await this.authService.exitOrganization(user, user.organization_id)
+
     return { message: "Exited organization workspace" }
   }
 }

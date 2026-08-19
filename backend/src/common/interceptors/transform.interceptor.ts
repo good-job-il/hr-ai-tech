@@ -20,6 +20,7 @@ export interface TransformedResponse<T> {
 export class TransformInterceptor<T> implements NestInterceptor<T, TransformedResponse<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<TransformedResponse<T>> {
     const httpContext = context.switchToHttp()
+
     const response = httpContext.getResponse()
 
     return next.handle().pipe(

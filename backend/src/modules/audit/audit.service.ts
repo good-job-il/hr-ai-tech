@@ -28,33 +28,57 @@ export class AuditService {
       date_from,
       date_to,
     } = query
+
     const where: Record<string, any> = {}
 
     // Only admin sees all logs; others are scoped to their org
     if (user.role !== UserRole.ADMIN) {
       where.organization_id = user.organization_id
     }
-    if (entity_type) where.entity_type = entity_type
-    if (entity_id) where.entity_id = entity_id
-    if (action) where.action = action
-    if (actor_user_id) where.actor_user_id = actor_user_id
-    if (actor_email) where.actor_email = Like(`%${actor_email}%`)
-    if (date_from && date_to) where.created_date = Between(date_from, date_to)
-    else if (date_from) where.created_date = MoreThanOrEqual(date_from)
-    else if (date_to) where.created_date = LessThanOrEqual(date_to)
+
+    if (entity_type) {
+      where.entity_type = entity_type
+    }
+
+    if (entity_id) {
+      where.entity_id = entity_id
+    }
+
+    if (action) {
+      where.action = action
+    }
+
+    if (actor_user_id) {
+      where.actor_user_id = actor_user_id
+    }
+
+    if (actor_email) {
+      where.actor_email = Like(`%${actor_email}%`)
+    }
+
+    if (date_from && date_to) {
+      where.created_date = Between(date_from, date_to)
+    } else if (date_from) {
+      where.created_date = MoreThanOrEqual(date_from)
+    } else if (date_to) {
+      where.created_date = LessThanOrEqual(date_to)
+    }
 
     const { skip, take } = getSkipTake(page, limit)
+
     const [data, total] = await this.repo.findAndCount({
       where,
       order: { [sort]: order },
       skip,
       take,
     })
+
     return buildPaginatedResponse(data, total, { page, limit })
   }
 
   async export(query: QueryAuditLogsDto, user: UserEntity) {
     const result = await this.findAll({ ...query, page: 1, limit: 500 } as QueryAuditLogsDto, user)
+
     await this.log({
       organization_id: user.organization_id == null ? null : String(user.organization_id),
       actor_user_id: String(user.id),
@@ -76,6 +100,7 @@ export class AuditService {
         exported_records: result.data.length,
       },
     })
+
     return result
   }
 
@@ -87,12 +112,14 @@ export class AuditService {
       actor_email: user.email,
       actor_role: user.role,
     } as any)
+
     return this.repo.save(log) as unknown as Promise<AuditLogEntity>
   }
 
   /** Internal helper — used by other services to write audit entries without HTTP context */
   async log(entry: Partial<AuditLogEntity>): Promise<AuditLogEntity> {
     const log = this.repo.create(entry)
+
     return this.repo.save(log)
   }
 }

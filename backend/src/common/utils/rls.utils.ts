@@ -62,7 +62,10 @@ export function getRlsWhere(
   // Scoped exactly like that org's ORG_ADMIN — never the unrestricted
   // platform view — so admins see the data the same way real org users do.
   if (role === UserRole.ADMIN && impersonating) {
-    if (!organization_id) return BLOCKED_FILTER
+    if (!organization_id) {
+      return BLOCKED_FILTER
+    }
+
     return buildFinal(entityName, { organization_id }, extraFilters)
   }
 
@@ -76,32 +79,48 @@ export function getRlsWhere(
     case UserRole.ORG_ADMIN:
     case UserRole.RECRUITMENT_MANAGER:
     case UserRole.HR_MANAGER: {
-      if (!organization_id) return BLOCKED_FILTER
+      if (!organization_id) {
+        return BLOCKED_FILTER
+      }
+
       return buildFinal(entityName, { organization_id }, extraFilters)
     }
 
     case UserRole.TEAM_MANAGER: {
-      if (!organization_id) return BLOCKED_FILTER
+      if (!organization_id) {
+        return BLOCKED_FILTER
+      }
+
       const base = getOrgFilter(entityName, organization_id, null, userId)
+
       return base === BLOCKED_FILTER ? BLOCKED_FILTER : buildFinal(entityName, base, extraFilters)
     }
 
     case UserRole.RECRUITER:
     case UserRole.INTERNAL_RECRUITER: {
-      if (!organization_id) return BLOCKED_FILTER
+      if (!organization_id) {
+        return BLOCKED_FILTER
+      }
+
       const base = getOrgFilter(entityName, organization_id, userId, null)
+
       return base === BLOCKED_FILTER ? BLOCKED_FILTER : buildFinal(entityName, base, extraFilters)
     }
 
     case UserRole.EMPLOYER: {
-      if (!employer_company_id) return BLOCKED_FILTER
+      if (!employer_company_id) {
+        return BLOCKED_FILTER
+      }
+
       const employerEntityFilter: Record<string, Record<string, any>> = {
         Job: { employer_company_id },
         Application: { employer_company_id },
         Candidate: { employer_company_id },
         Interview: { employer_company_id },
       }
+
       const filter = employerEntityFilter[entityName]
+
       return filter ? buildFinal(entityName, filter, extraFilters) : BLOCKED_FILTER
     }
 
@@ -114,7 +133,9 @@ export function getRlsWhere(
         Interview: { candidate_user_id: userId },
         JobAlert: { user_id: userId },
       }
+
       const filter = candidateFilters[entityName]
+
       return filter ? buildFinal(entityName, filter, extraFilters) : BLOCKED_FILTER
     }
 
@@ -146,6 +167,7 @@ function getOrgFilter(
   if (recruiterId) {
     return { ...base, recruiter_id: recruiterId }
   }
+
   if (teamManagerId) {
     return { ...base, team_manager_id: teamManagerId }
   }

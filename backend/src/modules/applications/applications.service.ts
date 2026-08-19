@@ -64,32 +64,62 @@ export class ApplicationsService {
       email: user.email,
       impersonating: user.impersonating,
     })
-    if (isBlocked(rlsWhere)) return buildPaginatedResponse([], 0, { page, limit })
+
+    if (isBlocked(rlsWhere)) {
+      return buildPaginatedResponse([], 0, { page, limit })
+    }
 
     const isRecruiterScope = [UserRole.RECRUITER, UserRole.INTERNAL_RECRUITER].includes(user.role)
+
     const scopeFilters: Record<string, any>[] = isRecruiterScope
       ? [
           { ...rlsWhere, recruiter_id: user.id },
           { ...rlsWhere, recruiter_id: undefined, assigned_to: user.id },
         ]
       : [{ ...rlsWhere }]
+
     const withQueryFilters = scopeFilters.map((where) => {
       const result = { ...where }
-      if (job_id) result.job_id = job_id
-      if (candidate_id) result.candidate_id = candidate_id
-      if (candidate_email && !("candidate_email" in rlsWhere))
+
+      if (job_id) {
+        result.job_id = job_id
+      }
+
+      if (candidate_id) {
+        result.candidate_id = candidate_id
+      }
+
+      if (candidate_email && !("candidate_email" in rlsWhere)) {
         result.candidate_email = candidate_email
-      if (status) result.status = status
-      if (recruiter_id && !isRecruiterScope) result.recruiter_id = recruiter_id
-      if (employer_company_id && !("employer_company_id" in rlsWhere))
+      }
+
+      if (status) {
+        result.status = status
+      }
+
+      if (recruiter_id && !isRecruiterScope) {
+        result.recruiter_id = recruiter_id
+      }
+
+      if (employer_company_id && !("employer_company_id" in rlsWhere)) {
         result.employer_company_id = employer_company_id
-      if (assigned_to && !isRecruiterScope) result.assigned_to = assigned_to
-      if (is_deleted !== undefined && !("is_deleted" in rlsWhere)) result.is_deleted = is_deleted
+      }
+
+      if (assigned_to && !isRecruiterScope) {
+        result.assigned_to = assigned_to
+      }
+
+      if (is_deleted !== undefined && !("is_deleted" in rlsWhere)) {
+        result.is_deleted = is_deleted
+      }
+
       return result
     })
 
     const { skip, take } = getSkipTake(page, limit)
+
     let findWhere: any = withQueryFilters
+
     if (search) {
       findWhere = withQueryFilters.flatMap((where) => [
         { ...where, candidate_name: Like(`%${search}%`) },
@@ -97,12 +127,14 @@ export class ApplicationsService {
         { ...where, job_title: Like(`%${search}%`) },
       ])
     }
+
     const [data, total] = await this.appRepo.findAndCount({
       where: findWhere,
       order: { [sort]: order },
       skip,
       take,
     })
+
     return buildPaginatedResponse(data, total, { page, limit, sort, order })
   }
 
@@ -115,16 +147,26 @@ export class ApplicationsService {
       email: user.email,
       impersonating: user.impersonating,
     })
-    if (isBlocked(rlsWhere)) throw new NotFoundException(`Application ${id} not found`)
+
+    if (isBlocked(rlsWhere)) {
+      throw new NotFoundException(`Application ${id} not found`)
+    }
+
     const isRecruiterScope = [UserRole.RECRUITER, UserRole.INTERNAL_RECRUITER].includes(user.role)
+
     const where = isRecruiterScope
       ? [
           { ...rlsWhere, recruiter_id: user.id, id },
           { ...rlsWhere, recruiter_id: undefined, assigned_to: user.id, id },
         ]
       : { ...rlsWhere, id }
+
     const app = await this.appRepo.findOne({ where: where as any })
-    if (!app) throw new NotFoundException(`Application ${id} not found`)
+
+    if (!app) {
+      throw new NotFoundException(`Application ${id} not found`)
+    }
+
     return app
   }
 
@@ -134,6 +176,7 @@ export class ApplicationsService {
     candidateUserId: number | null = null,
   ): Promise<ApplicationEntity> {
     await this.assertAgencyAssignments(dto, user)
+
     const jobScope = getRlsWhere("Job", {
       id: user.id,
       role: user.role,
@@ -142,9 +185,16 @@ export class ApplicationsService {
       email: user.email,
       impersonating: user.impersonating,
     })
-    if (isBlocked(jobScope)) throw new NotFoundException(`Job ${dto.job_id} not found`)
+
+    if (isBlocked(jobScope)) {
+      throw new NotFoundException(`Job ${dto.job_id} not found`)
+    }
+
     const job = await this.jobRepo.findOne({ where: { ...jobScope, id: dto.job_id } as any })
-    if (!job?.organization_id) throw new NotFoundException(`Job ${dto.job_id} not found`)
+
+    if (!job?.organization_id) {
+      throw new NotFoundException(`Job ${dto.job_id} not found`)
+    }
 
     if (dto.candidate_id != null) {
       const duplicate = await this.appRepo.findOne({
@@ -155,11 +205,14 @@ export class ApplicationsService {
           is_deleted: false,
         },
       })
-      if (duplicate)
+
+      if (duplicate) {
         throw new ConflictException("This candidate is already in the pipeline for this job")
+      }
     }
 
     const isCandidate = user.role === UserRole.CANDIDATE
+
     const app = this.appRepo.create({
       ...dto,
       organization_id: job.organization_id,
@@ -176,12 +229,15 @@ export class ApplicationsService {
       status: isCandidate ? "new" : dto.status,
       source: isCandidate ? "app" : dto.source,
     } as any)
+
     let saved: ApplicationEntity
+
     try {
       saved = await this.dataSource.transaction(async (manager) => {
         const stored = await manager
           .getRepository(ApplicationEntity)
           .save(app as unknown as ApplicationEntity)
+
         await manager.save(
           ApplicationTimelineEntity,
           manager.create(ApplicationTimelineEntity, {
@@ -193,14 +249,17 @@ export class ApplicationsService {
             performed_by_role: user.role,
           } as any),
         )
+
         return stored
       })
     } catch (error: any) {
       if (error?.code === "ER_DUP_ENTRY") {
         throw new ConflictException("This candidate is already in the pipeline for this job")
       }
+
       throw error
     }
+
     await this.emailService
       .sendApplicationSubmitted({
         candidateEmail: saved.candidate_email,
@@ -209,6 +268,7 @@ export class ApplicationsService {
         employerEmail: job.contact_email || job.employer_id,
       })
       .catch(() => undefined)
+
     return saved
   }
 
@@ -234,17 +294,26 @@ export class ApplicationsService {
       email: user.email,
       impersonating: user.impersonating,
     })
-    if (isBlocked(candidateScope))
+
+    if (isBlocked(candidateScope)) {
       throw new NotFoundException(`Candidate ${dto.candidate_id} not found`)
+    }
+
     const candidate = await this.candidateRepo.findOne({
       where: { ...candidateScope, id: dto.candidate_id } as any,
     })
-    if (!candidate) throw new NotFoundException(`Candidate ${dto.candidate_id} not found`)
+
+    if (!candidate) {
+      throw new NotFoundException(`Candidate ${dto.candidate_id} not found`)
+    }
+
     const candidateUser = candidate.email
       ? await this.userRepo.findOne({ where: { email: candidate.email } })
       : null
+
     const recruiterId =
       candidate.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null)
+
     return this.create(
       {
         job_id: dto.job_id,
@@ -275,18 +344,28 @@ export class ApplicationsService {
     reason?: string,
   ): Promise<ApplicationEntity> {
     await this.assertAgencyAssignments(dto, user)
+
     const app = await this.findById(id, user)
+
     const prev = app.status
-    if (dto.status && dto.status !== prev) this.assertStatusTransition(prev, dto.status)
+
+    if (dto.status && dto.status !== prev) {
+      this.assertStatusTransition(prev, dto.status)
+    }
+
     Object.assign(app, dto)
+
     if (dto.is_deleted && !app.deleted_at) {
       app.deleted_at = new Date()
       app.deleted_by = user.id
     }
+
     const statusChanged = Boolean(dto.status && dto.status !== prev)
+
     const saved = statusChanged
       ? await this.dataSource.transaction(async (manager) => {
           const stored = await manager.save(ApplicationEntity, app as ApplicationEntity)
+
           await manager.save(
             ApplicationTimelineEntity,
             manager.create(ApplicationTimelineEntity, {
@@ -324,9 +403,11 @@ export class ApplicationsService {
               },
             }),
           )
+
           return stored
         })
       : await (this.appRepo.save(app) as unknown as Promise<ApplicationEntity>)
+
     if (statusChanged) {
       await this.notificationsService
         .create({
@@ -341,6 +422,7 @@ export class ApplicationsService {
         } as any)
         .catch(() => undefined)
     }
+
     return saved
   }
 
@@ -359,15 +441,23 @@ export class ApplicationsService {
     reason: string,
     user: UserEntity,
   ) {
-    if (!reason?.trim())
+    if (!reason?.trim()) {
       throw new BadRequestException("A reason is required to reopen a rejected application")
+    }
+
     const app = await this.findById(id, user)
-    if (app.status !== "rejected")
+
+    if (app.status !== "rejected") {
       throw new BadRequestException("Only rejected applications can be reopened")
+    }
+
     const previous = app.status
+
     app.status = status!
+
     return this.dataSource.transaction(async (manager) => {
       const saved = await manager.save(ApplicationEntity, app)
+
       await manager.save(
         ApplicationTimelineEntity,
         manager.create(ApplicationTimelineEntity, {
@@ -403,44 +493,66 @@ export class ApplicationsService {
           },
         }),
       )
+
       return saved
     })
   }
 
   private assertStatusTransition(previous: string, next: string) {
-    if (previous === "completed")
+    if (previous === "completed") {
       throw new BadRequestException("Completed applications cannot be reopened")
+    }
+
     if (previous === "rejected" && next !== "rejected") {
       throw new BadRequestException("Use the reopen operation for rejected applications")
     }
   }
 
   private async assertAgencyAssignments(dto: Partial<CreateApplicationDto>, user: UserEntity) {
-    if (user.org_type !== "staffing_agency") return
-    if (!user.organization_id) throw new BadRequestException("Organization context required")
+    if (user.org_type !== "staffing_agency") {
+      return
+    }
+
+    if (!user.organization_id) {
+      throw new BadRequestException("Organization context required")
+    }
+
     const fields: Array<[keyof CreateApplicationDto, UserRole]> = [
       ["recruiter_id", UserRole.RECRUITER],
       ["assigned_to", UserRole.RECRUITER],
       ["team_manager_id", UserRole.TEAM_MANAGER],
       ["recruitment_manager_id", UserRole.RECRUITMENT_MANAGER],
     ]
+
     for (const [field, role] of fields) {
       const id = dto[field]
-      if (id == null) continue
+
+      if (id == null) {
+        continue
+      }
+
       const assignee = await this.userRepo.findOne({
         where: { id: Number(id), organization_id: user.organization_id, role, is_active: true },
       })
-      if (!assignee) throw new BadRequestException(`Invalid ${String(field)} assignment`)
+
+      if (!assignee) {
+        throw new BadRequestException(`Invalid ${String(field)} assignment`)
+      }
     }
   }
 
   async addNote(id: number, content: string, user: UserEntity) {
     const app = await this.findById(id, user)
+
     const timestamp = new Date().toISOString()
+
     const line = `[${timestamp}] ${user.full_name || user.email}: ${content.trim()}`
+
     return this.dataSource.transaction(async (manager) => {
       app.notes = app.notes ? `${app.notes}\n${line}` : line
+
       const saved = await manager.save(ApplicationEntity, app)
+
       await manager.save(
         ApplicationTimelineEntity,
         manager.create(ApplicationTimelineEntity, {
@@ -452,6 +564,7 @@ export class ApplicationsService {
           performed_by_role: user.role,
         } as any),
       )
+
       return saved
     })
   }
@@ -463,6 +576,7 @@ export class ApplicationsService {
   // ─── Timeline ────────────────────────────────────────────────────────────
   async getTimeline(applicationId: number, user: UserEntity) {
     await this.findById(applicationId, user)
+
     return this.timelineRepo.find({
       where: { application_id: applicationId },
       order: { created_date: "DESC" },
@@ -471,6 +585,7 @@ export class ApplicationsService {
 
   async createTimelineEvent(data: Partial<ApplicationTimelineEntity>) {
     const event = this.timelineRepo.create(data)
+
     return this.timelineRepo.save(event)
   }
 }
