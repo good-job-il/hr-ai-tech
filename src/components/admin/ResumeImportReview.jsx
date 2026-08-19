@@ -69,7 +69,9 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
           <ArrowRight className="w-4 h-4" />
           חזרה
         </button>
+
         <h2 className="text-2xl font-bold text-gray-900">בדיקה של קורות חיים</h2>
+
         <p className="text-gray-600 mt-2">בדוק את הנתונים שהוצאו ופתור כפילויות לפני יצירה</p>
       </div>
 
@@ -77,22 +79,31 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-xs text-gray-600 font-medium mb-1">סה״כ resumes</p>
+
           <p className="text-2xl font-bold text-gray-900">{results.total}</p>
         </div>
+
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-xs text-gray-600 font-medium mb-1">עובדו בהצלחה</p>
+
           <p className="text-2xl font-bold text-green-600">{results.processed}</p>
         </div>
+
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-xs text-gray-600 font-medium mb-1">כפילויות</p>
+
           <p className="text-2xl font-bold text-yellow-600">{results.duplicates.length}</p>
         </div>
+
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-xs text-gray-600 font-medium mb-1">נכשלו</p>
+
           <p className="text-2xl font-bold text-red-600">{results.failed}</p>
         </div>
+
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-xs text-gray-600 font-medium mb-1">ליצירה</p>
+
           <p className="text-2xl font-bold text-purple-600">{totalToCreate}</p>
         </div>
       </div>
@@ -100,6 +111,7 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
       {importError && (
         <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+
           <p className="text-sm text-red-700">{importError}</p>
         </div>
       )}
@@ -108,36 +120,45 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
       {results.duplicates.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">כפילויות שנמצאו</h3>
+
           <div className="space-y-3">
             {results.duplicates.map((dup, idx) => (
               <div key={idx} className="border border-yellow-200 bg-yellow-50 rounded-lg p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900">{dup.extracted.full_name}</p>
+
                     <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-600">
                       {dup.extracted.email && (
                         <span className="flex items-center gap-1">
                           <Mail className="w-4 h-4" />
+
                           {dup.extracted.email}
                         </span>
                       )}
+
                       {dup.extracted.phone && (
                         <span className="flex items-center gap-1">
                           <Phone className="w-4 h-4" />
+
                           {dup.extracted.phone}
                         </span>
                       )}
+
                       {dup.extracted.role_name && (
                         <span className="flex items-center gap-1">
                           <Briefcase className="w-4 h-4" />
+
                           {dup.extracted.role_name}
                         </span>
                       )}
                     </div>
+
                     <p className="text-xs text-yellow-700 mt-2">
                       ⚠️ קיים כבר: {dup.existingCandidate.full_name} ({dup.reason})
                     </p>
                   </div>
+
                   <button
                     onClick={() => setSelectedDuplicate(idx)}
                     className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm font-medium transition-all"
@@ -157,6 +178,7 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             מועמדים ליצירה ({totalToCreate}/{results.candidates.length})
           </h3>
+
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {results.candidates.map((candidate, idx) => (
               <div
@@ -164,15 +186,21 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
                 className="border border-gray-200 rounded-lg p-3 flex items-start gap-3"
               >
                 <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-900 truncate">{candidate.data.full_name}</p>
+
                   <div className="flex flex-wrap gap-3 mt-1 text-xs text-gray-500">
                     {candidate.data.email && <span>{candidate.data.email}</span>}
+
                     {candidate.data.phone && <span>{candidate.data.phone}</span>}
                   </div>
+
                   <div className="flex flex-wrap gap-2 mt-1 text-xs text-gray-500">
                     <span>איכות: {candidate.data.data_quality_score}%</span>
+
                     <span>ביטחון: {candidate.data.parsing_confidence}%</span>
+
                     {candidate.data.review_required && (
                       <span className="text-orange-600 font-medium">⚠️ דורש ביקורת</span>
                     )}
@@ -190,6 +218,7 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             קובצים שנכשלו ({results.errors.length})
           </h3>
+
           <div className="space-y-2">
             {results.errors.map((err, idx) => (
               <div
@@ -197,8 +226,10 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
                 className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm"
               >
                 <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+
                 <div>
                   <p className="font-medium text-red-900">{err.filename}</p>
+
                   <p className="text-xs text-red-700">{err.error}</p>
                 </div>
               </div>
@@ -215,6 +246,7 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
         >
           ביטול
         </button>
+
         <button
           onClick={handleCreateCandidates}
           disabled={importing || totalToCreate === 0}

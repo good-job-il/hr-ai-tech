@@ -144,6 +144,7 @@ export default function Navbar() {
               </Link>
             )
           })}
+
           {user?.role === "admin" && (
             <Link
               to="/admin/dashboard"
@@ -162,6 +163,7 @@ export default function Navbar() {
               className="hidden md:flex items-center gap-1 text-[#64748B] text-sm hover:text-[#6C4DFF] transition cursor-pointer"
             >
               <MapPin className="w-3.5 h-3.5" />
+
               <span>{selectedCity}</span>
             </div>
           )}
@@ -176,6 +178,7 @@ export default function Navbar() {
               >
                 {t("common.dashboard")}
               </Link>
+
               <button
                 onClick={() => authService.logout("/")}
                 className="inline-flex h-12 px-7 items-center justify-center rounded-2xl bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white font-bold shadow-[0_16px_35px_rgba(108,77,255,0.28)] hover:scale-[1.02] transition"
@@ -191,11 +194,13 @@ export default function Navbar() {
               >
                 {t("common.login")}
               </Link>
+
               <Link
                 to="/register"
                 className="inline-flex h-12 px-7 items-center justify-center rounded-2xl bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white font-bold shadow-[0_16px_35px_rgba(108,77,255,0.28)] hover:scale-[1.02] transition gap-2"
               >
                 <UserPlus className="w-5 h-5" />
+
                 {isRtl ? "הרשמה כמועמד חדש" : "Register as Candidate"}
               </Link>
             </>
@@ -220,6 +225,7 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
           {user?.role === "admin" && (
             <Link
               to="/admin/dashboard"
@@ -229,6 +235,7 @@ export default function Navbar() {
               🛡 {isRtl ? "ניהול" : "Admin"}
             </Link>
           )}
+
           <div className="flex gap-3 pt-4">
             {user ? (
               <>
@@ -239,6 +246,7 @@ export default function Navbar() {
                 >
                   {t("common.dashboard")}
                 </Link>
+
                 <button
                   onClick={() => {
                     authService.logout("/")
@@ -258,6 +266,7 @@ export default function Navbar() {
                 >
                   {t("common.login")}
                 </Link>
+
                 <Link
                   to="/register"
                   className="flex-1 text-center py-3 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#A855F7] text-white font-bold text-sm"
@@ -268,6 +277,7 @@ export default function Navbar() {
               </>
             )}
           </div>
+
           <div className="pt-3">
             <LanguageSwitcher variant="badge" />
           </div>

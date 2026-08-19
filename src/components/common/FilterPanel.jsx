@@ -11,6 +11,7 @@ export function FilterPanel({ title, filters, onFilterChange }) {
           className="w-full flex items-center justify-between mb-4"
         >
           <h3 className="text-lg font-bold text-[#0F172A]">{title}</h3>
+
           <ChevronDown
             className={`w-5 h-5 text-[#7C3AED] transition-transform ${open ? "rotate-180" : ""}`}
           />
@@ -25,6 +26,7 @@ export function FilterPanel({ title, filters, onFilterChange }) {
                   onChange={(e) => onFilterChange?.(filter.id, e.target.checked)}
                   className="w-4 h-4 rounded accent-[#7C3AED]"
                 />
+
                 <span className="text-[#475569] font-medium">{filter.label}</span>
               </label>
             ))}

@@ -85,6 +85,7 @@ export default function CategoryJobs() {
           ],
         }}
       />
+
       <Navbar />
 
       <div className="max-w-[1200px] mx-auto px-4 py-10">
@@ -93,11 +94,15 @@ export default function CategoryJobs() {
           <Link to="/" className="hover:text-cyan-300 transition-colors">
             בית
           </Link>
+
           <span>/</span>
+
           <Link to="/jobs" className="hover:text-cyan-300 transition-colors">
             משרות
           </Link>
+
           <span>/</span>
+
           <span className="text-cyan-300">{decodedCategory}</span>
         </nav>
 
@@ -113,6 +118,7 @@ export default function CategoryJobs() {
           >
             דרושים {decodedCategory}
           </h1>
+
           <p className="text-gray-400 text-lg">
             {isLoading ? "טוען..." : `${jobs.length} משרות פתוחות בתחום ${decodedCategory}`}
           </p>
@@ -125,7 +131,9 @@ export default function CategoryJobs() {
         ) : jobs.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
             <Briefcase className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+
             <p className="text-lg">לא נמצאו משרות בתחום {decodedCategory} כרגע</p>
+
             <Link to="/jobs" className="mt-4 inline-block text-cyan-300 hover:text-purple-300">
               חפש בכל התחומים →
             </Link>
@@ -145,19 +153,23 @@ export default function CategoryJobs() {
                   >
                     {job.company_initials || job.company?.slice(0, 2)}
                   </div>
+
                   <div>
                     <h2 className="font-bold text-white group-hover:text-cyan-300 transition-colors text-lg leading-tight">
                       {job.title}
                     </h2>
+
                     <p className="text-cyan-300 text-sm mt-0.5">{job.company}</p>
                   </div>
                 </div>
+
                 {job.salary_min && job.salary_max && (
                   <div className="text-xl font-bold text-cyan-300 mb-3">
                     ₪{job.salary_min.toLocaleString("he-IL")} – ₪
                     {job.salary_max.toLocaleString("he-IL")}
                   </div>
                 )}
+
                 {job.location && (
                   <div className="text-sm text-gray-400 mt-auto">📍 {job.location}</div>
                 )}
@@ -169,6 +181,7 @@ export default function CategoryJobs() {
         {/* Internal linking - by city for this category */}
         <div className="mt-16 border-t border-white/10 pt-10">
           <h2 className="text-xl font-bold text-white mb-6">{decodedCategory} לפי עיר</h2>
+
           <div className="flex flex-wrap gap-3 mb-10">
             {CITIES.map((c) => (
               <Link
@@ -182,6 +195,7 @@ export default function CategoryJobs() {
           </div>
 
           <h2 className="text-xl font-bold text-white mb-6">תחומים נוספים</h2>
+
           <div className="flex flex-wrap gap-3">
             {CATEGORIES.filter((c) => c !== decodedCategory).map((c) => (
               <Link

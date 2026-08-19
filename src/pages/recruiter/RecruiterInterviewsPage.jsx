@@ -90,11 +90,14 @@ export default function RecruiterInterviewsPage() {
       >
         <span>←</span> חזרה לדשבורד
       </button>
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black text-[#0F172A]">ראיונות</h1>
+
           <p className="text-[#64748B] font-semibold mt-1">{filtered.length} ראיונות</p>
         </div>
+
         <button
           onClick={load}
           disabled={loading}
@@ -120,6 +123,7 @@ export default function RecruiterInterviewsPage() {
           </button>
         ))}
       </div>
+
       {error && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
           {error}
@@ -138,6 +142,7 @@ export default function RecruiterInterviewsPage() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-[#E4ECFF]">
           <Calendar className="w-12 h-12 text-[#CBD5E1] mx-auto mb-3" />
+
           <p className="font-bold text-[#94A3B8]">אין ראיונות להצגה</p>
         </div>
       ) : (
@@ -153,28 +158,34 @@ export default function RecruiterInterviewsPage() {
                 <div className="w-12 h-12 rounded-xl bg-[#F3EFFF] flex items-center justify-center flex-shrink-0">
                   <TypeIcon className="w-5 h-5 text-[#7C3AED]" />
                 </div>
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm font-black text-[#0F172A]">
                       {interview.candidate_name}
                     </span>
+
                     <span
                       className={`text-xs font-bold px-2 py-0.5 rounded-full ${STATUS_COLORS[interview.status] || "bg-gray-100 text-gray-600"}`}
                     >
                       {STATUS_LABELS[interview.status] || interview.status}
                     </span>
                   </div>
+
                   <div className="text-xs text-[#64748B]">{interview.job_title}</div>
+
                   <div className="flex items-center gap-3 mt-1.5 text-xs text-[#94A3B8]">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {interview.date} {interview.time}
                     </span>
+
                     {interview.location_or_link && (
                       <span className="truncate max-w-xs">{interview.location_or_link}</span>
                     )}
                   </div>
                 </div>
+
                 {interview.candidate_id && (
                   <Link
                     to={`/recruiter/crm/candidate?id=${interview.candidate_id}`}

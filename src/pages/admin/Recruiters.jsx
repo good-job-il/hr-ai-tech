@@ -35,6 +35,7 @@ export default function AdminRecruiters() {
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Users className="w-6 h-6 text-purple-500" /> מגייסים וצוותים
           </h1>
+
           <p className="text-sm text-gray-500 mt-1">
             ניהול כלל המגייסים, מנהלי הצוות ומנהלי הגיוס במערכת
           </p>
@@ -44,28 +45,37 @@ export default function AdminRecruiters() {
         <div className="flex gap-4 mb-6 flex-wrap">
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-gray-900">{staff.length}</div>
+
             <div className="text-xs text-gray-500">סה"כ עובדים</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-purple-600">
               {staff.filter((s) => s.role === "hiring_manager").length}
             </div>
+
             <div className="text-xs text-gray-500">מנהלי גיוס</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-blue-600">
               {staff.filter((s) => s.role === "team_manager").length}
             </div>
+
             <div className="text-xs text-gray-500">מנהלי צוות</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-green-600">
               {staff.filter((s) => s.role === "recruiter").length}
             </div>
+
             <div className="text-xs text-gray-500">רכזי גיוס</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-gray-700">{companies.length}</div>
+
             <div className="text-xs text-gray-500">חברות</div>
           </div>
         </div>
@@ -88,11 +98,14 @@ export default function AdminRecruiters() {
                 <div key={companyId}>
                   <div className="flex items-center gap-2 mb-3">
                     <div className="h-px flex-1 bg-gray-200" />
+
                     <span className="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
                       {companyId}
                     </span>
+
                     <div className="h-px flex-1 bg-gray-200" />
                   </div>
+
                   <HierarchyStaffSection
                     staff={companyStaff}
                     hiringManager={hm}

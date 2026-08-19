@@ -297,10 +297,12 @@ export default function AuditLogPage() {
               disabled={!can("export") || logs.length === 0}
             >
               <Download className="h-4 w-4" />
+
               {t("auditLog.exportCSV")}
             </Button>
           }
         />
+
         {exportError && (
           <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm font-bold text-rose-700">
             {exportError}
@@ -316,6 +318,7 @@ export default function AuditLogPage() {
             loading={isLoading}
             meta={`${t("auditLog.tableHeaders.date")} ${page + 1}`}
           />
+
           <PlatformStatCard
             icon={Users}
             label={t("auditLog.tableHeaders.user")}
@@ -324,6 +327,7 @@ export default function AuditLogPage() {
             loading={isLoading}
             meta={t("auditLog.userEmail")}
           />
+
           <PlatformStatCard
             icon={ShieldCheck}
             label={t("auditLog.tableHeaders.action")}
@@ -345,17 +349,20 @@ export default function AuditLogPage() {
               </div>
             }
           />
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
             <div>
               <label className="mb-2 block text-xs font-semibold text-slate-500">
                 {t("auditLog.entity")}
               </label>
+
               <select
                 value={filters.entity_type}
                 onChange={(e) => updateFilter("entity_type", e.target.value)}
                 className={platformFieldClassName}
               >
                 <option value="">{t("auditLog.allEntities")}</option>
+
                 {ENTITY_TYPES.map((type) => (
                   <option key={type} value={type}>
                     {type}
@@ -363,16 +370,19 @@ export default function AuditLogPage() {
                 ))}
               </select>
             </div>
+
             <div>
               <label className="mb-2 block text-xs font-semibold text-slate-500">
                 {t("auditLog.action")}
               </label>
+
               <select
                 value={filters.action}
                 onChange={(e) => updateFilter("action", e.target.value)}
                 className={platformFieldClassName}
               >
                 <option value="">{t("auditLog.allActions")}</option>
+
                 {ACTIONS.map((action) => (
                   <option key={action} value={action}>
                     {ACTION_CONFIG[action]?.label || action}
@@ -380,10 +390,12 @@ export default function AuditLogPage() {
                 ))}
               </select>
             </div>
+
             <div>
               <label className="mb-2 block text-xs font-semibold text-slate-500">
                 {t("auditLog.userEmail")}
               </label>
+
               <input
                 type="text"
                 value={filters.actor_email}
@@ -392,10 +404,12 @@ export default function AuditLogPage() {
                 className={platformFieldClassName}
               />
             </div>
+
             <div>
               <label className="mb-2 block text-xs font-semibold text-slate-500">
                 {t("auditLog.fromDate")}
               </label>
+
               <input
                 type="date"
                 value={filters.date_from}
@@ -403,10 +417,12 @@ export default function AuditLogPage() {
                 className={platformFieldClassName}
               />
             </div>
+
             <div>
               <label className="mb-2 block text-xs font-semibold text-slate-500">
                 {t("auditLog.toDate")}
               </label>
+
               <input
                 type="date"
                 value={filters.date_to}
@@ -415,15 +431,18 @@ export default function AuditLogPage() {
               />
             </div>
           </div>
+
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
             <div className="flex items-center gap-2">
               <Button size="sm" onClick={clearFilters} variant="outline" className="text-xs gap-1">
                 <XCircle className="w-3.5 h-3.5" /> {t("auditLog.clearFilters")}
               </Button>
+
               <span className="text-xs text-slate-400">
                 {logs.length} {t("auditLog.recordsInPage")} {page + 1}
               </span>
             </div>
+
             <div className="flex items-center gap-1">
               <Button
                 size="sm"
@@ -434,7 +453,9 @@ export default function AuditLogPage() {
               >
                 {isRTL ? "←" : "→"} {t("auditLog.previous")}
               </Button>
+
               <span className="px-2 text-xs font-bold text-slate-500">{page + 1}</span>
+
               <Button
                 size="sm"
                 variant="outline"
@@ -453,6 +474,7 @@ export default function AuditLogPage() {
           <PlatformCard className="p-5">
             <PlatformEmptyState icon={AlertTriangle}>
               <p>{error?.status === 403 ? t("auditLog.accessDenied") : t("auditLog.loadFailed")}</p>
+
               <Button className="mt-4" variant="outline" onClick={() => refetch()}>
                 {t("auditLog.tryAgain")}
               </Button>
@@ -463,6 +485,7 @@ export default function AuditLogPage() {
             <div className="border-b border-slate-100 p-5">
               <PlatformWidgetHeader title={t("auditLog.title")} subtitle={t("auditLog.subtitle")} />
             </div>
+
             <div className="overflow-x-auto">
               <table className="w-full min-w-[980px]">
                 <thead className="border-b border-slate-100 bg-slate-50/60">
@@ -484,6 +507,7 @@ export default function AuditLogPage() {
                     ))}
                   </tr>
                 </thead>
+
                 <tbody>
                   {isLoading ? (
                     <tr>
@@ -517,18 +541,22 @@ export default function AuditLogPage() {
                                   })
                                 : ""}
                             </td>
+
                             <td className="p-3.5 text-xs font-semibold text-slate-700">
                               {log.actor_email || "—"}
                             </td>
+
                             <td className="p-3.5">
                               <span
                                 className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold"
                                 style={{ backgroundColor: `${cfg.color}15`, color: cfg.color }}
                               >
                                 <Icon className="h-3.5 w-3.5" />
+
                                 {cfg.label}
                               </span>
                             </td>
+
                             <td className="p-3.5 text-xs font-semibold text-slate-600">
                               {relatedPath(log) ? (
                                 <button
@@ -541,9 +569,11 @@ export default function AuditLogPage() {
                                 log.entity_type
                               )}
                             </td>
+
                             <td className="max-w-xs truncate p-3.5 text-xs text-slate-500">
                               {log.entity_label || "—"}
                             </td>
+
                             <td className="p-3.5">
                               <button
                                 onClick={() => setExpandedLog(isExpanded ? null : log.id)}
@@ -554,10 +584,12 @@ export default function AuditLogPage() {
                                 ) : (
                                   <ChevronDown className="h-3.5 w-3.5" />
                                 )}
+
                                 {t("auditLog.details")}
                               </button>
                             </td>
                           </tr>
+
                           {isExpanded && (
                             <tr>
                               <td
@@ -569,23 +601,28 @@ export default function AuditLogPage() {
                                     <span className="font-semibold text-slate-500">
                                       {t("auditLog.entityId")}:
                                     </span>
+
                                     <span
                                       className={`text-slate-700 ${isRTL ? "mr-2" : "ml-2"} font-mono`}
                                     >
                                       {log.entity_id}
                                     </span>
                                   </div>
+
                                   <div>
                                     <span className="font-semibold text-slate-500">
                                       {t("auditLog.actorRole")}:
                                     </span>
+
                                     <span className={`text-slate-700 ${isRTL ? "mr-2" : "ml-2"}`}>
                                       {log.actor_role || "—"}
                                     </span>
                                   </div>
+
                                   {log.ip_address && (
                                     <div>
                                       <span className="font-semibold text-slate-500">IP:</span>
+
                                       <span
                                         className={`text-slate-700 ${isRTL ? "mr-2" : "ml-2"} font-mono`}
                                       >
@@ -593,11 +630,13 @@ export default function AuditLogPage() {
                                       </span>
                                     </div>
                                   )}
+
                                   {log.user_agent && (
                                     <div className="col-span-2">
                                       <span className="font-semibold text-slate-500">
                                         User-Agent:
                                       </span>
+
                                       <span
                                         className={`text-slate-700 ${isRTL ? "mr-2" : "ml-2"} mt-1 block font-mono text-[10px]`}
                                       >
@@ -605,17 +644,20 @@ export default function AuditLogPage() {
                                       </span>
                                     </div>
                                   )}
+
                                   {log.metadata && (
                                     <div className="col-span-2">
                                       <span className="font-semibold text-slate-500">
                                         Metadata:
                                       </span>
+
                                       {"before" in log.metadata || "after" in log.metadata ? (
                                         <div className="mt-2 grid gap-3 md:grid-cols-2">
                                           <MetadataBlock
                                             title="Before"
                                             value={log.metadata.before}
                                           />
+
                                           <MetadataBlock title="After" value={log.metadata.after} />
                                         </div>
                                       ) : (
@@ -645,6 +687,7 @@ function MetadataBlock({ title, value }) {
   return (
     <div>
       {title && <p className="mb-1 text-[10px] font-black uppercase text-slate-400">{title}</p>}
+
       <pre className="overflow-x-auto rounded-xl border border-slate-200 bg-white p-3 text-[10px] text-slate-700">
         {JSON.stringify(value ?? null, null, 2)}
       </pre>

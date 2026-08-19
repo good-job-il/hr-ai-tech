@@ -134,6 +134,7 @@ export default function PopularCategories() {
           <Zap className="w-6 h-6 text-amber-500 fill-amber-500" />
           תחומים פופולריים
         </h2>
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {visible.map((cat, i) => (
             <Link
@@ -144,13 +145,16 @@ export default function PopularCategories() {
               <div className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors text-base leading-snug">
                 {cat.title}
               </div>
+
               {cat.salary && (
                 <div className="text-xs text-gray-600 mt-2 font-medium">{cat.salary}</div>
               )}
+
               <div className="text-xs text-gray-500 mt-2">{cat.count}</div>
             </Link>
           ))}
         </div>
+
         {!showAll && CATEGORIES.length > 16 && (
           <button
             onClick={() => setShowAll(true)}

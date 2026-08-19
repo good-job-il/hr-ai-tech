@@ -84,11 +84,13 @@ export default function ShareButtons({ job }) {
           </a>
         )
       })}
+
       <button
         onClick={handleCopyLink}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-600/20 hover:bg-gray-600/30 text-gray-300 text-sm font-medium transition-all"
       >
         {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+
         {copied ? "הועתק" : "העתק"}
       </button>
     </div>

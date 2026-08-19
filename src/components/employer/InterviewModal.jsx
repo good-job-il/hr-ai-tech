@@ -40,18 +40,22 @@ export default function InterviewModal({ application: app, onClose, onSaved }) {
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div>
             <h2 className="font-bold text-gray-900">תזמון ראיון</h2>
+
             <p className="text-xs text-gray-500 mt-0.5">
               {app.candidate_name} · {app.job_title}
             </p>
           </div>
+
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
+
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">תאריך *</label>
+
               <input
                 type="date"
                 value={form.date}
@@ -60,8 +64,10 @@ export default function InterviewModal({ application: app, onClose, onSaved }) {
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
               />
             </div>
+
             <div>
               <label className="text-sm font-medium text-gray-700 block mb-1">שעה *</label>
+
               <input
                 type="time"
                 value={form.time}
@@ -71,22 +77,28 @@ export default function InterviewModal({ application: app, onClose, onSaved }) {
               />
             </div>
           </div>
+
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">סוג ראיון</label>
+
             <select
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value })}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
             >
               <option value="video">וידאו (Zoom/Meet)</option>
+
               <option value="phone">טלפון</option>
+
               <option value="in_person">פגישה פיזית</option>
             </select>
           </div>
+
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">
               {form.type === "in_person" ? "כתובת" : "קישור לפגישה"}
             </label>
+
             <input
               value={form.location_or_link}
               onChange={(e) => setForm({ ...form, location_or_link: e.target.value })}
@@ -94,8 +106,10 @@ export default function InterviewModal({ application: app, onClose, onSaved }) {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
             />
           </div>
+
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">הערות</label>
+
             <textarea
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
@@ -103,6 +117,7 @@ export default function InterviewModal({ application: app, onClose, onSaved }) {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 resize-none"
             />
           </div>
+
           <div className="flex gap-3 pt-1">
             <button
               type="button"
@@ -111,12 +126,14 @@ export default function InterviewModal({ application: app, onClose, onSaved }) {
             >
               ביטול
             </button>
+
             <button
               type="submit"
               disabled={loading}
               className="flex-1 bg-hhblue text-white py-2 rounded-lg text-sm font-semibold hover:bg-hhblue/90 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <Calendar className="w-4 h-4" />
+
               {loading ? "שומר..." : "קבע ראיון"}
             </button>
           </div>

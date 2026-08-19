@@ -95,6 +95,7 @@ export default function JobFilters({ isOpen, onClose, filters, onFilterChange, o
       >
         <div className="sticky top-0 bg-gradient-to-b from-[#1a1f3a] to-[#0f1629] border-b border-white/10 px-6 py-5 flex items-center justify-between">
           <h2 className="font-bold text-white text-lg">סינון משרות</h2>
+
           <button
             onClick={onClose}
             className="p-2.5 hover:bg-white/10 rounded-lg transition-colors active:scale-90 -mr-2"
@@ -107,6 +108,7 @@ export default function JobFilters({ isOpen, onClose, filters, onFilterChange, o
           {/* Location */}
           <div className="border border-white/15 rounded-2xl p-5 bg-white/5 hover:border-white/25 transition-colors">
             <label className="text-base font-semibold text-cyan-300 block mb-4">🏙️ מיקום</label>
+
             <input
               type="text"
               value={tempFilters.location || ""}
@@ -120,6 +122,7 @@ export default function JobFilters({ isOpen, onClose, filters, onFilterChange, o
           {/* Salary Range */}
           <div className="border border-white/15 rounded-2xl p-5 bg-white/5 hover:border-white/25 transition-colors">
             <label className="text-base font-semibold text-cyan-300 block mb-4">💰 טווח שכר</label>
+
             <div className="space-y-3">
               <input
                 type="number"
@@ -129,6 +132,7 @@ export default function JobFilters({ isOpen, onClose, filters, onFilterChange, o
                 className="w-full border border-white/20 rounded-xl px-5 py-3.5 text-base bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500/50 placeholder:text-gray-500 transition-all"
                 style={{ color: "#ffffff" }}
               />
+
               <input
                 type="number"
                 value={tempFilters.salary_max || ""}
@@ -151,6 +155,7 @@ export default function JobFilters({ isOpen, onClose, filters, onFilterChange, o
                 className="w-full flex items-center justify-between p-5 hover:bg-white/10 font-semibold text-base text-white transition-all active:bg-white/15"
               >
                 {section.label}
+
                 <ChevronDown
                   className={`w-5 h-5 text-gray-400 transition-transform ${expanded[section.id] ? "rotate-180" : ""}`}
                 />
@@ -169,6 +174,7 @@ export default function JobFilters({ isOpen, onClose, filters, onFilterChange, o
                         onChange={() => handleCheck(section.id, opt.value)}
                         className="w-5 h-5 rounded accent-purple-600 cursor-pointer"
                       />
+
                       <span className="text-base text-gray-300 font-medium">{opt.label}</span>
                     </label>
                   ))}
@@ -185,6 +191,7 @@ export default function JobFilters({ isOpen, onClose, filters, onFilterChange, o
           >
             חיפוש משרות
           </Button>
+
           <Button
             onClick={handleReset}
             className="w-full border border-white/20 text-gray-300 font-semibold h-12 rounded-xl text-base hover:bg-white/10 transition-all active:scale-95 touch-highlight-transparent"

@@ -87,6 +87,7 @@ export default function IntegrationsSettings() {
             <p role="alert" className="font-bold text-slate-700">
               {text.error}
             </p>
+
             <Button
               className="mt-4"
               variant="outline"
@@ -111,6 +112,7 @@ export default function IntegrationsSettings() {
     <PlatformPageShell dir={isRTL ? "rtl" : "ltr"}>
       <div className="space-y-6">
         <PlatformPageHeader title={text.title} subtitle={text.subtitle} icon={Plug} />
+
         <div className="grid gap-4 sm:grid-cols-3">
           <PlatformStatCard
             icon={CheckCircle2}
@@ -119,6 +121,7 @@ export default function IntegrationsSettings() {
             loading={isLoading}
             tone="emerald"
           />
+
           <PlatformStatCard
             icon={Plug}
             label={text.available}
@@ -126,6 +129,7 @@ export default function IntegrationsSettings() {
             loading={isLoading}
             tone="violet"
           />
+
           <PlatformStatCard
             icon={AlertCircle}
             label="Errors"
@@ -134,8 +138,10 @@ export default function IntegrationsSettings() {
             tone="rose"
           />
         </div>
+
         <PlatformCard className="p-5">
           <PlatformWidgetHeader title={text.title} subtitle={`${integrations.length}`} />
+
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             {integrations.map((item) => {
               const Icon = ICONS[item.provider] || Plug
@@ -151,37 +157,45 @@ export default function IntegrationsSettings() {
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
                       <Icon className="h-5 w-5" />
                     </div>
+
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <h3 className="font-black text-slate-800">{item.name}</h3>
+
                         <Status value={item.status} />
                       </div>
+
                       <p className="mt-1 text-xs font-semibold text-slate-400">
                         {item.external_account_label || item.provider}
                       </p>
                     </div>
                   </div>
+
                   <div className="mt-4 space-y-2 text-xs text-slate-500">
                     <p>
                       <strong>{text.scopes}:</strong>{" "}
                       {(item.scopes.length ? item.scopes : item.required_scopes).join(", ") || "—"}
                     </p>
+
                     <p>
                       <strong>{text.lastSync}:</strong>{" "}
                       {item.last_sync_at ? new Date(item.last_sync_at).toLocaleString() : "—"}{" "}
                       {item.last_sync_status ? `(${item.last_sync_status})` : ""}
                     </p>
+
                     {item.last_error && (
                       <p className="rounded-lg bg-rose-100 p-2 font-bold text-rose-700">
                         {item.last_error}
                       </p>
                     )}
+
                     {!item.feature_available && item.status !== "connected" && (
                       <p className="rounded-lg bg-slate-100 p-2 font-bold text-slate-500">
                         {text.notEnabled}
                       </p>
                     )}
                   </div>
+
                   {can("manage_settings") && (
                     <div className="mt-4 flex justify-end gap-2">
                       {item.status === "connected" ? (
@@ -194,6 +208,7 @@ export default function IntegrationsSettings() {
                           }
                         >
                           <Unplug className="h-4 w-4" />
+
                           {text.disconnect}
                         </Button>
                       ) : (
@@ -213,6 +228,7 @@ export default function IntegrationsSettings() {
                             ) : (
                               <Plug className="h-4 w-4" />
                             )}
+
                             {item.status === "error" ? text.reconnect : text.connect}
                           </Button>
                         )
@@ -223,11 +239,13 @@ export default function IntegrationsSettings() {
               )
             })}
           </div>
+
           {!isLoading && connected === 0 && (
             <PlatformEmptyState icon={Shield} className="mt-5">
               {text.noConnections}
             </PlatformEmptyState>
           )}
+
           {mutation.error && (
             <p className="mt-4 rounded-xl bg-rose-50 p-3 text-sm font-bold text-rose-700">
               {mutation.error.message}

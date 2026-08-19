@@ -56,6 +56,7 @@ export default function AdminManageCompanies() {
       <div className="p-6" dir="rtl">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">ניהול חברות</h1>
+
           <p className="text-sm text-gray-500 mt-1">כל החברות במערכת</p>
         </div>
 
@@ -63,12 +64,15 @@ export default function AdminManageCompanies() {
         <div className="flex gap-4 mb-5 flex-wrap">
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-gray-900">{companies.length}</div>
+
             <div className="text-xs text-gray-500">חברות בסה"כ</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-blue-600">
               {companies.reduce((sum, c) => sum + (c.job_count || 0), 0)}
             </div>
+
             <div className="text-xs text-gray-500">משרות</div>
           </div>
         </div>
@@ -77,6 +81,7 @@ export default function AdminManageCompanies() {
         <div className="flex gap-3 mb-4 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -106,6 +111,7 @@ export default function AdminManageCompanies() {
                       placeholder="שם החברה"
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
                     />
+
                     <input
                       type="text"
                       value={editForm.industry || ""}
@@ -113,6 +119,7 @@ export default function AdminManageCompanies() {
                       placeholder="תעשייה"
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
                     />
+
                     <input
                       type="number"
                       value={editForm.job_count || 0}
@@ -122,6 +129,7 @@ export default function AdminManageCompanies() {
                       placeholder="מספר משרות"
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
                     />
+
                     <div className="flex gap-2">
                       <button
                         onClick={handleSave}
@@ -129,6 +137,7 @@ export default function AdminManageCompanies() {
                       >
                         שמור
                       </button>
+
                       <button
                         onClick={() => setEditingCompany(null)}
                         className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200"
@@ -146,13 +155,17 @@ export default function AdminManageCompanies() {
                       >
                         {company.initials || company.name?.slice(0, 2)}
                       </div>
+
                       <div className="min-w-0 flex-1">
                         <div className="font-semibold text-gray-900 text-sm truncate">
                           {company.name}
                         </div>
+
                         <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-2 flex-wrap">
                           {company.industry && <span>{company.industry}</span>}
+
                           {company.industry && company.job_count > 0 && <span>·</span>}
+
                           {company.job_count > 0 && (
                             <span className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-xs">
                               {company.job_count} משרות
@@ -161,6 +174,7 @@ export default function AdminManageCompanies() {
                         </div>
                       </div>
                     </div>
+
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <button
                         onClick={() => handleEdit(company)}
@@ -168,6 +182,7 @@ export default function AdminManageCompanies() {
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
+
                       <button
                         onClick={() => deleteMutation.mutate(company.id)}
                         className="p-1.5 hover:bg-red-50 rounded-lg text-red-400"
@@ -179,6 +194,7 @@ export default function AdminManageCompanies() {
                 )}
               </div>
             ))}
+
             {filtered.length === 0 && (
               <div className="text-center py-12 text-gray-400 text-sm">לא נמצאו חברות</div>
             )}

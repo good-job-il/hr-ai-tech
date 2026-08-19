@@ -43,12 +43,14 @@ export default function EditNameModal({ user, onUpdated }) {
   return (
     <>
       <div className="fixed inset-0 bg-black/30 z-50" onClick={() => setOpen(false)} />
+
       <div
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-2xl border border-[#E4ECFF] p-6 w-80"
         dir="rtl"
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-black text-[#0F172A]">עדכון שם מלא</h3>
+
           <button
             onClick={() => setOpen(false)}
             className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[#F0F1F5]"
@@ -56,6 +58,7 @@ export default function EditNameModal({ user, onUpdated }) {
             <X className="w-4 h-4 text-[#94A3B8]" />
           </button>
         </div>
+
         <input
           type="text"
           value={name}
@@ -65,6 +68,7 @@ export default function EditNameModal({ user, onUpdated }) {
           autoFocus
           className="w-full h-10 px-3 rounded-xl border border-[#E4ECFF] text-sm font-semibold text-[#0F172A] focus:outline-none focus:border-[#7C3AED] mb-4"
         />
+
         <div className="flex gap-2">
           <button
             onClick={handleSave}
@@ -72,8 +76,10 @@ export default function EditNameModal({ user, onUpdated }) {
             className="flex-1 h-9 rounded-xl bg-[#7C3AED] text-white text-sm font-bold flex items-center justify-center gap-1.5 disabled:opacity-50"
           >
             <Check className="w-3.5 h-3.5" />
+
             {saving ? "שומר..." : "שמור"}
           </button>
+
           <button
             onClick={() => setOpen(false)}
             className="flex-1 h-9 rounded-xl border border-[#E4ECFF] text-[#64748B] text-sm font-bold"

@@ -56,6 +56,7 @@ export default function Footer() {
               alt="HeadHunter HR-Tech"
               style={{ height: 44, width: "auto", objectFit: "contain", marginBottom: 16 }}
             />
+
             <p
               style={{
                 fontSize: 13,
@@ -69,6 +70,7 @@ export default function Footer() {
                 ? "פלטפורמת גיוס AI המובילה בישראל — מחברים מועמדים ומעסיקים בצורה חכמה ויעילה."
                 : "Israel's leading AI recruitment platform — connecting candidates and employers smartly and efficiently."}
             </p>
+
             <div style={{ display: "flex", gap: 10 }}>
               {[
                 { Icon: Linkedin, href: "#" },
@@ -120,6 +122,7 @@ export default function Footer() {
               >
                 {category}
               </h4>
+
               <ul
                 style={{
                   listStyle: "none",
@@ -167,8 +170,10 @@ export default function Footer() {
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", margin: 0 }}>
             {t("home.footer.allRightsReserved")}
           </p>
+
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <LanguageSwitcher variant="minimal" className="text-white/40 hover:text-white/70" />
+
             <Link
               to="/terms"
               style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", textDecoration: "none" }}
@@ -177,6 +182,7 @@ export default function Footer() {
             >
               {t("home.footer.terms")}
             </Link>
+
             <Link
               to="/privacy"
               style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", textDecoration: "none" }}
@@ -185,6 +191,7 @@ export default function Footer() {
             >
               {t("home.footer.privacy")}
             </Link>
+
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.2)" }}>
               Made with ❤ in Israel
             </span>

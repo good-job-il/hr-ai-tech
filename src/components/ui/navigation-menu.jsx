@@ -11,6 +11,7 @@ const NavigationMenu = React.forwardRef(({ className, children, ...props }, ref)
     {...props}
   >
     {children}
+
     <NavigationMenuViewport />
   </NavigationMenuPrimitive.Root>
 ))

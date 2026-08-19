@@ -15,6 +15,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
       >
         <Icon className="w-6 h-6" style={{ color }} />
       </div>
+
       <div>
         <div className="text-2xl font-black text-[#0F172A]">
           {loading ? (
@@ -23,6 +24,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
             value
           )}
         </div>
+
         <div className="text-sm font-semibold text-[#64748B]">{label}</div>
       </div>
     </div>
@@ -79,10 +81,12 @@ export default function EmployerDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black text-[#0F172A]">Employer</h1>
+
           <p className="text-lg font-bold text-[#7C3AED] mt-0.5">
             {user?.full_name || user?.email}
           </p>
         </div>
+
         <div className="flex items-center gap-2">
           <button
             onClick={load}
@@ -91,6 +95,7 @@ export default function EmployerDashboard() {
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
+
           <button
             onClick={() => setModalOpen(true)}
             className="h-10 px-5 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center gap-2"
@@ -109,6 +114,7 @@ export default function EmployerDashboard() {
           color="#7C3AED"
           loading={loading}
         />
+
         <StatCard
           icon={Users}
           label="Candidates"
@@ -116,6 +122,7 @@ export default function EmployerDashboard() {
           color="#2563EB"
           loading={loading}
         />
+
         <StatCard
           icon={Clock}
           label="Scheduled Interviews"
@@ -123,6 +130,7 @@ export default function EmployerDashboard() {
           color="#059669"
           loading={loading}
         />
+
         <StatCard
           icon={TrendingUp}
           label="Applications"
@@ -131,6 +139,7 @@ export default function EmployerDashboard() {
           loading={loading}
         />
       </div>
+
       {loadError && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
           {loadError}
@@ -144,9 +153,12 @@ export default function EmployerDashboard() {
         >
           <div className="flex items-center gap-3 mb-2">
             <Users2 className="w-6 h-6 text-blue-600" />
+
             <h3 className="text-lg font-black text-blue-900">Candidates</h3>
           </div>
+
           <p className="text-blue-700 font-semibold text-2xl">{stats?.candidates ?? "—"}</p>
+
           <p className="text-blue-600 text-sm mt-1">Candidates sent to you</p>
         </Link>
 
@@ -156,9 +168,12 @@ export default function EmployerDashboard() {
         >
           <div className="flex items-center gap-3 mb-2">
             <Target className="w-6 h-6 text-purple-600" />
+
             <h3 className="text-lg font-black text-purple-900">Hiring Pipeline</h3>
           </div>
+
           <p className="text-purple-700 font-semibold text-2xl">{stats?.applications ?? "—"}</p>
+
           <p className="text-purple-600 text-sm mt-1">Applications in progress</p>
         </Link>
       </div>

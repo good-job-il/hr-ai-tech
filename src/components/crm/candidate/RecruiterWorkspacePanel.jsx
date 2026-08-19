@@ -107,6 +107,7 @@ export default function RecruiterWorkspacePanel({
         <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
           {t("candidateCRM.workspace.candidateStatus")}
         </div>
+
         <div className="grid grid-cols-2 gap-1.5">
           {STATUS_OPTIONS.map((opt) => (
             <button
@@ -131,6 +132,7 @@ export default function RecruiterWorkspacePanel({
         <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
           {t("candidateCRM.workspace.tags")}
         </div>
+
         <div className="flex flex-wrap gap-1.5 mb-2">
           {tags.map((t) => (
             <span
@@ -143,6 +145,7 @@ export default function RecruiterWorkspacePanel({
               }}
             >
               {t.tag}
+
               <button
                 onClick={() => onRemoveTag(t.id, t.tag)}
                 className="hover:opacity-70 transition-opacity"
@@ -152,6 +155,7 @@ export default function RecruiterWorkspacePanel({
             </span>
           ))}
         </div>
+
         <div className="flex gap-2 mb-2">
           <Input
             value={tagInput}
@@ -160,6 +164,7 @@ export default function RecruiterWorkspacePanel({
             placeholder={t("candidateCRM.workspace.newTag")}
             className="text-xs h-8 flex-1"
           />
+
           <Button
             size="sm"
             onClick={() => handleAddTag(tagInput)}
@@ -169,6 +174,7 @@ export default function RecruiterWorkspacePanel({
             <Tag className="w-3 h-3" />
           </Button>
         </div>
+
         <div className="flex flex-wrap gap-1">
           {PRESET_TAGS.filter((pt) => !tags.find((t) => t.tag === pt)).map((pt) => (
             <button
@@ -187,6 +193,7 @@ export default function RecruiterWorkspacePanel({
         <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
           {t("candidateCRM.workspace.responsibleRecruiter")}
         </div>
+
         <RecruiterDropdown
           currentRecruiterId={candidate?.recruiter_id}
           onSelect={(id, name, email) => onAssignRecruiter(id, name, email)}
@@ -198,6 +205,7 @@ export default function RecruiterWorkspacePanel({
         <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
           {t("candidateCRM.workspace.documentRequest")}
         </div>
+
         {!showDocRequest ? (
           <button
             onClick={() => setShowDocRequest(true)}
@@ -218,6 +226,7 @@ export default function RecruiterWorkspacePanel({
                 </button>
               ))}
             </div>
+
             <div className="flex gap-2 mt-2">
               <Button
                 size="sm"
@@ -229,6 +238,7 @@ export default function RecruiterWorkspacePanel({
                   ? t("candidateCRM.workspace.sending")
                   : t("candidateCRM.workspace.sendRequest")}
               </Button>
+
               <Button
                 size="sm"
                 variant="ghost"
@@ -247,6 +257,7 @@ export default function RecruiterWorkspacePanel({
         <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
           {t("candidateCRM.workspace.jobAssignment")}
         </div>
+
         <button
           onClick={() => setShowAssignModal(true)}
           className="w-full flex items-center gap-2 text-sm font-semibold text-[#94A3B8] hover:text-[#8B5CF6] px-4 py-2.5 rounded-xl border border-dashed border-[#E4ECFF] hover:border-[#8B5CF6] transition-all"
@@ -261,6 +272,7 @@ export default function RecruiterWorkspacePanel({
           <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
             {t("candidateCRM.workspace.sendToEmployer")}
           </div>
+
           <button
             onClick={() => setShowSendModal(true)}
             className="w-full flex items-center gap-2 text-sm font-semibold text-[#94A3B8] hover:text-[#10B981] px-4 py-2.5 rounded-xl border border-dashed border-[#E4ECFF] hover:border-[#10B981] transition-all"

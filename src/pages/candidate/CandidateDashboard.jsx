@@ -15,6 +15,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
       >
         <Icon className="w-6 h-6" style={{ color }} />
       </div>
+
       <div>
         <div className="text-2xl font-black text-[#0F172A]">
           {loading ? (
@@ -23,6 +24,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
             value
           )}
         </div>
+
         <div className="text-sm font-semibold text-[#64748B]">{label}</div>
       </div>
     </div>
@@ -75,8 +77,10 @@ export default function CandidateDashboard() {
           <h1 className="text-3xl font-black text-[#0F172A]">
             שלום, {user?.full_name?.split(" ")[0] || ""} 👋
           </h1>
+
           <p className="text-[#64748B] font-semibold mt-1">סיכום הפעילות וההתקדמות שלך</p>
         </div>
+
         <button
           onClick={load}
           disabled={loading}
@@ -94,6 +98,7 @@ export default function CandidateDashboard() {
           color="#2563EB"
           loading={loading}
         />
+
         <StatCard
           icon={Target}
           label="ראיונות קרובים"
@@ -101,6 +106,7 @@ export default function CandidateDashboard() {
           color="#059669"
           loading={loading}
         />
+
         <StatCard
           icon={BookOpen}
           label="משרות שמורות"
@@ -114,6 +120,7 @@ export default function CandidateDashboard() {
         <div className="lg:col-span-2 bg-white rounded-2xl border border-[#E4ECFF] p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-black text-[#0F172A]">משרות אחרונות</h3>
+
             <Link
               to="/candidate/jobs/all"
               className="text-sm font-bold text-[#7C3AED] hover:underline"
@@ -121,6 +128,7 @@ export default function CandidateDashboard() {
               כל המשרות
             </Link>
           </div>
+
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -140,8 +148,10 @@ export default function CandidateDashboard() {
                   <div className="w-9 h-9 rounded-xl bg-[#F3EFFF] flex items-center justify-center flex-shrink-0">
                     <Briefcase className="w-4 h-4 text-[#7C3AED]" />
                   </div>
+
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-bold text-[#0F172A] truncate">{job.title}</div>
+
                     <div className="text-xs text-[#94A3B8] truncate">
                       {job.company} • {job.location}
                     </div>
@@ -151,8 +161,10 @@ export default function CandidateDashboard() {
             </div>
           )}
         </div>
+
         <div className="bg-white rounded-2xl border border-[#E4ECFF] p-6">
           <h3 className="text-lg font-black text-[#0F172A] mb-4">פעולות מהירות</h3>
+
           <div className="space-y-2">
             <Link
               to="/candidate/jobs/all"
@@ -160,6 +172,7 @@ export default function CandidateDashboard() {
             >
               <Sparkles className="w-4 h-4 text-[#7C3AED]" /> חפש משרות
             </Link>
+
             <Link
               to="/candidate/profile"
               className="flex items-center gap-2 p-3 rounded-xl border border-[#E4ECFF] hover:border-[#C4B5FD] transition-colors text-sm font-bold text-[#374151]"

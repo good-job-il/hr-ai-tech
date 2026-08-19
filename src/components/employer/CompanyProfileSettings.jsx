@@ -66,6 +66,7 @@ export default function CompanyProfileSettings() {
     <div className="bg-white rounded-xl p-6 border border-gray-200 space-y-6" dir="rtl">
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-2">תרבות החברה</label>
+
         <textarea
           value={profileData.company_culture}
           onChange={(e) => setProfileData((prev) => ({ ...prev, company_culture: e.target.value }))}
@@ -77,6 +78,7 @@ export default function CompanyProfileSettings() {
 
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-2">הטבות</label>
+
         <textarea
           value={profileData.benefits}
           onChange={(e) => setProfileData((prev) => ({ ...prev, benefits: e.target.value }))}
@@ -88,13 +90,17 @@ export default function CompanyProfileSettings() {
 
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-2">גלריה של תמונות</label>
+
         <label className="flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:bg-gray-50 transition-colors">
           <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+
           <div className="flex flex-col items-center gap-2">
             <ImageIcon className="w-6 h-6 text-gray-400" />
+
             <span className="text-sm text-gray-600">העלה תמונות</span>
           </div>
         </label>
+
         <div className="flex flex-wrap gap-2 mt-3">
           {profileData.gallery_urls.map((url, idx) => (
             <img key={idx} src={url} alt="gallery" className="w-20 h-20 rounded-lg object-cover" />
@@ -104,10 +110,13 @@ export default function CompanyProfileSettings() {
 
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-2">סרטון תרבות</label>
+
         <label className="flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:bg-gray-50 transition-colors">
           <input type="file" accept="video/*" onChange={handleVideoUpload} className="hidden" />
+
           <div className="flex flex-col items-center gap-2">
             <Video className="w-6 h-6 text-gray-400" />
+
             <span className="text-sm text-gray-600">העלה סרטון</span>
           </div>
         </label>

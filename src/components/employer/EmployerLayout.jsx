@@ -102,8 +102,10 @@ export default function EmployerLayout({ children }) {
                   >
                     <div className="flex items-center gap-3">
                       <item.icon className="w-5 h-5" />
+
                       {item.label}
                     </div>
+
                     {isSubmenuOpen ? (
                       <ChevronUp className="w-4 h-4" />
                     ) : (
@@ -133,6 +135,7 @@ export default function EmployerLayout({ children }) {
                             ].join(" ")}
                           >
                             {SubIcon && <SubIcon className="w-4 h-4" />}
+
                             {subitem.label}
                           </Link>
                         )
@@ -158,6 +161,7 @@ export default function EmployerLayout({ children }) {
                 ].join(" ")}
               >
                 <item.icon className="w-5 h-5" />
+
                 {item.label}
               </Link>
             )
@@ -170,15 +174,18 @@ export default function EmployerLayout({ children }) {
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white">
                 <Sparkles className="w-5 h-5" />
               </div>
+
               <div>
                 <div className="text-[#0F172A] font-black text-sm">
                   {isEn ? "AI for Employers" : "AI למעסיקים"}
                 </div>
+
                 <div className="text-[#64748B] text-xs">
                   {isEn ? "Smart candidate matching" : "התאמת מועמדים חכמה"}
                 </div>
               </div>
             </div>
+
             <Link
               to="/employer/recruitment"
               className={`h-10 rounded-xl ${isEn ? "bg-gradient-to-r" : "bg-gradient-to-l"} from-[#2F80FF] to-[#8B5CF6] text-white text-sm font-black flex items-center justify-center`}
@@ -236,10 +243,12 @@ export default function EmployerLayout({ children }) {
                   {isEn ? "E" : "מ"}
                 </div>
               </div>
+
               <div>
                 <div className="font-black text-[#0F172A] text-sm leading-tight">
                   {isEn ? "Hello, Manager" : "שלום, מנהל"}
                 </div>
+
                 <div className="text-xs text-[#94A3B8] font-medium">
                   {isEn ? "Employer Area" : "אזור מעסיק"}
                 </div>
@@ -257,11 +266,13 @@ export default function EmployerLayout({ children }) {
             }}
           >
             <Search className="w-4 h-4 text-[#94A3B8] flex-shrink-0" />
+
             <input
               dir={dir}
               placeholder={isEn ? "Search..." : "חיפוש במערכת..."}
               className="w-full bg-transparent outline-none text-sm font-semibold text-[#0F172A] placeholder:text-[#94A3B8]"
             />
+
             <kbd className="text-[10px] text-[#94A3B8] bg-white/90 border border-[#E4ECFF] px-2 py-0.5 rounded-md font-mono flex-shrink-0">
               ⌘K
             </kbd>

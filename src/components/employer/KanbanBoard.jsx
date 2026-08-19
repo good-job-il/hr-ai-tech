@@ -20,7 +20,9 @@ export default function KanbanBoard({ stages, applications, onDragEnd, onDeleteA
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: stage.color || "#ccc" }}
                     />
+
                     <h3 className="font-semibold text-gray-900">{stage.name}</h3>
+
                     <span className="text-xs bg-gray-200 px-2 py-1 rounded-full text-gray-700 mr-auto">
                       {stageApps.length}
                     </span>

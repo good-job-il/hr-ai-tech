@@ -77,10 +77,12 @@ export default function AICenterSection() {
               }}
             >
               <Sparkles style={{ width: 12, height: 12, color: "#6C4DFF" }} />
+
               <span style={{ fontSize: 12, fontWeight: 700, color: "#6C4DFF" }}>
                 חדש! מרכז AI לקריירה
               </span>
             </div>
+
             <h2
               style={{
                 fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)",
@@ -92,12 +94,14 @@ export default function AICenterSection() {
             >
               מרכז AI לקריירה
             </h2>
+
             <p
               style={{ fontSize: 15, color: "#64748B", maxWidth: 420, lineHeight: 1.75, margin: 0 }}
             >
               כלים חכמים שמלווים אותך בכל שלב — מהרשמה עד לקבלת העבודה שלך.
             </p>
           </div>
+
           <button
             onClick={() => navigate("/register")}
             style={{
@@ -175,6 +179,7 @@ export default function AICenterSection() {
                 >
                   <Icon style={{ width: 24, height: 24, color: s.color }} />
                 </div>
+
                 <h3
                   style={{
                     fontSize: 15.5,
@@ -186,11 +191,13 @@ export default function AICenterSection() {
                 >
                   {s.title}
                 </h3>
+
                 <p
                   style={{ fontSize: 13.5, color: "#64748B", lineHeight: 1.7, margin: "0 0 18px" }}
                 >
                   {s.desc}
                 </p>
+
                 <button
                   style={{
                     display: "flex",

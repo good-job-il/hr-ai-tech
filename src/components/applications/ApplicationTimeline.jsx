@@ -54,6 +54,7 @@ export default function ApplicationTimeline({ applicationId }) {
               <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-500/50 flex items-center justify-center flex-shrink-0">
                 <IconComponent className="w-4 h-4 text-purple-300" />
               </div>
+
               {index < timeline.length - 1 && <div className="w-0.5 h-8 bg-purple-500/30 my-2" />}
             </div>
 
@@ -62,6 +63,7 @@ export default function ApplicationTimeline({ applicationId }) {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="font-semibold text-white text-sm">{label}</p>
+
                   <p className="text-gray-400 text-xs mt-1">{event.description}</p>
 
                   {event.previous_value && event.new_value && (
@@ -85,6 +87,7 @@ export default function ApplicationTimeline({ applicationId }) {
                     hour12: false,
                   })}
                 </span>
+
                 {event.performed_by && (
                   <span>
                     • {event.performed_by} ({event.performed_by_role})

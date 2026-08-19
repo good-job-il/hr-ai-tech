@@ -9,6 +9,7 @@ export default function EmployerLanding() {
       <section className="relative min-h-screen flex items-center overflow-hidden pt-32 pb-20 bg-gradient-to-br from-blue-50 via-white to-blue-50">
         {/* Glows */}
         <div className="absolute top-40 right-20 w-96 h-96 bg-purple-400/8 blur-3xl rounded-full animate-pulse"></div>
+
         <div
           className="absolute bottom-40 left-40 w-96 h-96 bg-blue-400/8 blur-3xl rounded-full"
           style={{ animation: "pulse 4s ease-in-out infinite" }}
@@ -19,6 +20,7 @@ export default function EmployerLanding() {
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-blue-100/50 border border-blue-200">
               <Sparkles className="w-4 h-4 text-purple-600" />
+
               <span className="text-blue-700 text-xs font-semibold">ATS + AI Matching</span>
             </div>
 
@@ -37,6 +39,7 @@ export default function EmployerLanding() {
               >
                 פתיחת חשבון מעסיק
               </Link>
+
               <button className="bg-white border-2 border-purple-600 text-purple-600 hover:bg-purple-50 text-lg font-bold px-8 py-4 rounded-xl transition-all active:scale-95">
                 קביעת דמו
               </button>
@@ -54,8 +57,10 @@ export default function EmployerLanding() {
                 <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <Filter className="w-5 h-5 text-purple-600" />
+
                     <span className="font-bold text-gray-900">ATS מתקדם</span>
                   </div>
+
                   <p className="text-sm text-gray-600">ניהול מלא של משרות ומועמדים</p>
                 </div>
 
@@ -63,8 +68,10 @@ export default function EmployerLanding() {
                 <div className="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <Users className="w-5 h-5 text-blue-600" />
+
                     <span className="font-bold text-gray-900">1,200+ מועמדים</span>
                   </div>
+
                   <p className="text-sm text-gray-600">בחיפוש משרה כרגע</p>
                 </div>
 
@@ -72,8 +79,10 @@ export default function EmployerLanding() {
                 <div className="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <Brain className="w-5 h-5 text-indigo-600" />
+
                     <span className="font-bold text-gray-900">AI Matching</span>
                   </div>
+
                   <p className="text-sm text-gray-600">זיהוי מועמדים בעלי התאמה מושלמת</p>
                 </div>
 
@@ -81,8 +90,10 @@ export default function EmployerLanding() {
                 <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <BarChart3 className="w-5 h-5 text-amber-600" />
+
                     <span className="font-bold text-gray-900">Analytics</span>
                   </div>
+
                   <p className="text-sm text-gray-600">דוחות ותובנות בזמן אמת</p>
                 </div>
               </div>
@@ -136,7 +147,9 @@ export default function EmployerLanding() {
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <Icon className="w-7 h-7 text-white" />
                   </div>
+
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
+
                   <p className="text-gray-600">{item.desc}</p>
                 </div>
               )
@@ -166,6 +179,7 @@ export default function EmployerLanding() {
                 className="bg-white border border-blue-200/80 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all"
               >
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.title}</h3>
+
                 <p className="text-gray-600 text-sm">{feature.desc}</p>
               </div>
             ))}
@@ -177,6 +191,7 @@ export default function EmployerLanding() {
       <section className="py-24 bg-gradient-to-r from-purple-600 to-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center text-white">
           <h2 className="text-5xl md:text-6xl font-bold mb-6">מוכנים להתחיל?</h2>
+
           <p className="text-xl mb-12 opacity-90">
             הצטרפו לחברות המובילות שכבר משתמשות ב־HeadHunter כדי לגייס בחכמה.
           </p>
@@ -188,6 +203,7 @@ export default function EmployerLanding() {
             >
               פתיחת חשבון מעסיק
             </Link>
+
             <button className="bg-white/20 border-2 border-white text-white hover:bg-white/30 text-lg font-bold px-8 py-4 rounded-xl transition-all active:scale-95">
               דברו עם מומחה
             </button>

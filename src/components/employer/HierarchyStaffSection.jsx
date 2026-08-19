@@ -61,6 +61,7 @@ export default function HierarchyStaffSection({
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-gray-900">{member.full_name}</h3>
+
             <span
               className={`inline-block px-2 py-1 text-xs rounded font-medium ${
                 member.role === "hiring_manager"
@@ -77,9 +78,12 @@ export default function HierarchyStaffSection({
                   : "👤 רכז גיוס"}
             </span>
           </div>
+
           <p className="text-sm text-gray-600 mt-1">{member.email}</p>
+
           {member.phone && <p className="text-xs text-gray-500 mt-1">📞 {member.phone}</p>}
         </div>
+
         <div className="flex gap-2 mr-4">
           <Button
             variant="outline"
@@ -89,6 +93,7 @@ export default function HierarchyStaffSection({
           >
             <Edit2 className="w-4 h-4" />
           </Button>
+
           <Button
             variant="outline"
             size="icon"
@@ -146,11 +151,14 @@ export default function HierarchyStaffSection({
               <div className="bg-purple-100 p-3 rounded-lg">
                 <Users className="w-5 h-5 text-purple-600" />
               </div>
+
               <div>
                 <h2 className="text-xl font-bold text-gray-900">מנהלי גיוס</h2>
+
                 <p className="text-sm text-gray-500">{hiringManagers.length} בכירים בחברה</p>
               </div>
             </div>
+
             {(isAdmin || hiringManagers.some((m) => m.email === hiringManager?.email)) && (
               <Button
                 onClick={() => handleOpenModal()}
@@ -166,6 +174,7 @@ export default function HierarchyStaffSection({
           {hiringManagers.length === 0 ? (
             <div className="text-center py-12">
               <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+
               <p className="text-gray-600 mb-4">אין מנהלי גיוס בחברה עדיין</p>
             </div>
           ) : (
@@ -187,8 +196,10 @@ export default function HierarchyStaffSection({
                 <div className="bg-blue-100 p-3 rounded-lg">
                   <Users className="w-5 h-5 text-blue-600" />
                 </div>
+
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">מנהלי צוות</h2>
+
                   <p className="text-sm text-gray-500">{teamManagers.length} מנהלי צוות</p>
                 </div>
               </div>
@@ -219,8 +230,10 @@ export default function HierarchyStaffSection({
               <div className="bg-green-100 p-3 rounded-lg">
                 <Users className="w-5 h-5 text-green-600" />
               </div>
+
               <div>
                 <h2 className="text-xl font-bold text-gray-900">רכזי גיוס</h2>
+
                 <p className="text-sm text-gray-500">
                   {recruiters.filter((r) => !r.manager_email).length} רכזים בלתי תלויים
                 </p>

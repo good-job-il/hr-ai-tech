@@ -44,6 +44,7 @@ export default function HeroNew() {
             filter: "blur(40px)",
           }}
         />
+
         <div
           style={{
             position: "absolute",
@@ -56,6 +57,7 @@ export default function HeroNew() {
             filter: "blur(50px)",
           }}
         />
+
         <div
           style={{
             position: "absolute",
@@ -108,6 +110,7 @@ export default function HeroNew() {
                   boxShadow: "0 0 8px rgba(108,77,255,0.8)",
                 }}
               />
+
               <span style={{ fontSize: 12.5, fontWeight: 700, color: "#6C4DFF" }}>
                 פלטפורמת הגיוס המובילה AI בישראל ✨
               </span>
@@ -126,6 +129,7 @@ export default function HeroNew() {
             >
               הקריירה שלך
             </h1>
+
             <h1
               style={{
                 fontSize: "clamp(3rem, 5.5vw, 4.8rem)",
@@ -190,6 +194,7 @@ export default function HeroNew() {
                 <Search style={{ width: 16, height: 16 }} />
                 חיפוש משרות
               </button>
+
               <button
                 onClick={() => navigate("/register")}
                 style={{
@@ -259,6 +264,7 @@ export default function HeroNew() {
                     />
                   </div>
                 ))}
+
                 <div
                   style={{
                     width: 34,
@@ -280,6 +286,7 @@ export default function HeroNew() {
                   +
                 </div>
               </div>
+
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                   {[1, 2, 3, 4, 5].map((s) => (
@@ -288,10 +295,12 @@ export default function HeroNew() {
                       style={{ width: 12, height: 12, color: "#F59E0B", fill: "#F59E0B" }}
                     />
                   ))}
+
                   <span style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", marginRight: 2 }}>
                     4.9
                   </span>
                 </div>
+
                 <p style={{ fontSize: 12, color: "#94A3B8", margin: "2px 0 0", fontWeight: 500 }}>
                   מאלפי מועמדים כבר מצאו את הקריירה שלהם
                 </p>
@@ -383,6 +392,7 @@ export default function HeroNew() {
                       onError={(e) => (e.currentTarget.style.display = "none")}
                     />
                   </div>
+
                   <div>
                     <p
                       style={{
@@ -395,6 +405,7 @@ export default function HeroNew() {
                     >
                       דניאל כהן
                     </p>
+
                     <p
                       style={{
                         fontSize: 11.5,
@@ -405,12 +416,15 @@ export default function HeroNew() {
                     >
                       Full Stack Developer
                     </p>
+
                     <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 3 }}>
                       <MapPin style={{ width: 10, height: 10, color: "#94A3B8" }} />
+
                       <span style={{ fontSize: 10.5, color: "#94A3B8" }}>תל אביב, ישראל</span>
                     </div>
                   </div>
                 </div>
+
                 {/* Match circle */}
                 <div style={{ textAlign: "center", flexShrink: 0 }}>
                   <div style={{ position: "relative", width: 44, height: 44 }}>
@@ -426,6 +440,7 @@ export default function HeroNew() {
                         stroke="#EEF2FF"
                         strokeWidth="3.5"
                       />
+
                       <circle
                         cx="22"
                         cy="22"
@@ -437,13 +452,16 @@ export default function HeroNew() {
                         strokeDasharray="106.8"
                         strokeDashoffset="5.34"
                       />
+
                       <defs>
                         <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                           <stop offset="0%" stopColor="#6C4DFF" />
+
                           <stop offset="100%" stopColor="#4F7CFF" />
                         </linearGradient>
                       </defs>
                     </svg>
+
                     <div
                       style={{
                         position: "absolute",
@@ -461,6 +479,7 @@ export default function HeroNew() {
                       </span>
                     </div>
                   </div>
+
                   <span style={{ fontSize: 9, color: "#94A3B8", display: "block", marginTop: 2 }}>
                     התאמה
                   </span>
@@ -566,10 +585,12 @@ export default function HeroNew() {
                     >
                       <Icon style={{ width: 12, height: 12, color: item.color }} />
                     </div>
+
                     <div>
                       <p style={{ fontSize: 10.5, fontWeight: 800, color: "#0F172A", margin: 0 }}>
                         {item.title}
                       </p>
+
                       <p style={{ fontSize: 10, color: "#94A3B8", margin: "2px 0 0" }}>
                         {item.sub}
                       </p>
@@ -611,10 +632,12 @@ export default function HeroNew() {
               >
                 <CheckCircle style={{ width: 16, height: 16, color: "#059669" }} />
               </div>
+
               <div>
                 <p style={{ fontSize: 11, fontWeight: 900, color: "#059669", margin: 0 }}>
                   +24% ביקוש
                 </p>
+
                 <p style={{ fontSize: 10.5, color: "#94A3B8", margin: 0 }}>בתחום הפיתוח</p>
               </div>
             </div>
@@ -651,8 +674,10 @@ export default function HeroNew() {
               >
                 <Star style={{ width: 13, height: 13, color: "#6C4DFF", fill: "#6C4DFF" }} />
               </div>
+
               <div>
                 <p style={{ fontSize: 13, fontWeight: 900, color: "#0F172A", margin: 0 }}>8,500+</p>
+
                 <p style={{ fontSize: 10, color: "#94A3B8", margin: 0 }}>משרות פתוחות</p>
               </div>
             </div>

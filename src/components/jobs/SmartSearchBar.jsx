@@ -18,6 +18,7 @@ export default function SmartSearchBar() {
   return (
     <div className="relative w-full max-w-2xl" dir="rtl">
       <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+
       <input
         type="text"
         placeholder="חפש משרות, חברות, תחומים..."

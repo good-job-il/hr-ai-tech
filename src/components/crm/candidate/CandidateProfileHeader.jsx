@@ -68,6 +68,7 @@ export default function CandidateProfileHeader({
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#2563EB] flex items-center justify-center text-white text-2xl font-black">
             {initials}
           </div>
+
           {score >= 70 && (
             <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
               <Star className="w-3 h-3 text-white fill-white" />
@@ -79,11 +80,13 @@ export default function CandidateProfileHeader({
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <h1 className="text-2xl font-black text-[#0F172A]">{candidate.full_name}</h1>
+
             <span
               className={`text-xs font-bold px-3 py-1 rounded-full ${STATUS_COLORS[candidate.status] || "bg-gray-100 text-gray-600"}`}
             >
               {STATUS_LABELS[candidate.status] || candidate.status}
             </span>
+
             {candidate.review_required && (
               <span className="text-xs font-bold px-3 py-1 rounded-full bg-orange-100 text-orange-700">
                 {t("candidateCRM.profileHeader.reviewRequired")}
@@ -93,7 +96,9 @@ export default function CandidateProfileHeader({
 
           <div className="text-base font-semibold text-[#64748B] mb-3">
             {candidate.role_name && <span>{candidate.role_name}</span>}
+
             {candidate.domain_name && <span> · {candidate.domain_name}</span>}
+
             {candidate.experience_years && (
               <span>
                 {" "}
@@ -106,27 +111,33 @@ export default function CandidateProfileHeader({
             {candidate.location && (
               <span className="flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5" />
+
                 {candidate.location}
               </span>
             )}
+
             {candidate.email && (
               <a
                 href={`mailto:${candidate.email}`}
                 className="flex items-center gap-1 hover:text-[#7C3AED] transition-colors"
               >
                 <Mail className="w-3.5 h-3.5" />
+
                 {candidate.email}
               </a>
             )}
+
             {candidate.phone && (
               <a
                 href={`tel:${candidate.phone}`}
                 className="flex items-center gap-1 hover:text-[#7C3AED] transition-colors"
               >
                 <Phone className="w-3.5 h-3.5" />
+
                 {candidate.phone}
               </a>
             )}
+
             {candidate.desired_salary_min && (
               <span className="flex items-center gap-1">
                 <Briefcase className="w-3.5 h-3.5" />₪
@@ -166,6 +177,7 @@ export default function CandidateProfileHeader({
             >
               {score}%
             </div>
+
             <div className="text-xs text-[#94A3B8] font-semibold">
               {t("candidateCRM.profileHeader.aiScore")}
             </div>
@@ -179,15 +191,19 @@ export default function CandidateProfileHeader({
                 {SOURCE_LABELS[candidate.source] || candidate.source || "—"}
               </span>
             </div>
+
             {candidate.created_date && (
               <div className="text-xs text-[#94A3B8] flex items-center justify-end gap-1 mt-0.5">
                 <Calendar className="w-3 h-3" />
+
                 {new Date(candidate.created_date).toLocaleDateString("he-IL")}
               </div>
             )}
+
             {candidate.recruiter_id && (
               <div className="text-xs text-[#94A3B8] flex items-center justify-end gap-1 mt-0.5">
                 <UserCheck className="w-3 h-3" />
+
                 <span className="text-[#7C3AED] font-semibold">{candidate.recruiter_id}</span>
               </div>
             )}
@@ -215,6 +231,7 @@ export default function CandidateProfileHeader({
             >
               <Plus className="w-3.5 h-3.5" /> {t("candidateCRM.profileHeader.assignToJob")}
             </Button>
+
             {(candidate.resume_url || candidate.summary || candidate.skills?.length > 0) && (
               <Button
                 size="sm"
@@ -225,6 +242,7 @@ export default function CandidateProfileHeader({
                 <FileText className="w-3.5 h-3.5" /> {t("candidateCRM.profileHeader.resume")}
               </Button>
             )}
+
             {onEdit && (
               <Button size="sm" variant="outline" onClick={onEdit} className="text-xs gap-1">
                 <Edit2 className="w-3.5 h-3.5" /> {t("candidateCRM.profileHeader.edit")}
@@ -235,6 +253,7 @@ export default function CandidateProfileHeader({
           {showResume && (
             <ResumePreviewModal candidate={candidate} onClose={() => setShowResume(false)} />
           )}
+
           {showAssignModal && (
             <AssignToJobModal
               candidate={candidate}
@@ -262,6 +281,7 @@ export default function CandidateProfileHeader({
               {skill}
             </span>
           ))}
+
           {candidate.skills.length > 12 && (
             <span className="text-xs text-[#94A3B8] font-semibold px-2 py-1">
               +{candidate.skills.length - 12} {t("candidateCRM.profileHeader.more")}

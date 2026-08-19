@@ -43,9 +43,12 @@ function CompField({ label, value, type, totalFee }) {
     <div className="flex flex-col gap-0.5 bg-purple-50 rounded-lg px-3 py-1.5 text-sm border border-purple-100">
       <div className="flex items-center gap-1.5">
         {icon}
+
         <span className="text-gray-500 text-xs">{label}:</span>
+
         <span className="font-bold text-purple-700">{displayValue}</span>
       </div>
+
       {calculatedAmount != null && (
         <div className="text-xs text-green-600 font-bold pr-5">
           {calculatedAmount.toLocaleString()} ₪
@@ -258,7 +261,9 @@ export default function CompensationPage() {
       <div className="flex items-center justify-center min-h-[60vh]" dir="rtl">
         <div className="text-center text-gray-500">
           <DollarSign className="w-12 h-12 mx-auto mb-3 opacity-30" />
+
           <p className="font-semibold text-lg">מערכת תגמולים אינה זמינה</p>
+
           <p className="text-sm mt-1">אין לך הרשאה לצפות בדף זה.</p>
         </div>
       </div>
@@ -284,6 +289,7 @@ export default function CompensationPage() {
                   טמפלט הגדרות
                 </Button>
               )}
+
               {isAdmin && (
                 <Button
                   onClick={openNew}
@@ -304,6 +310,7 @@ export default function CompensationPage() {
             {/* משרות עם תגמולים */}
             <div>
               <h2 className="text-lg font-bold text-gray-900 mb-3">משרות ותגמולים</h2>
+
               {jobs.length === 0 ? (
                 <p className="text-center py-8 text-gray-400">אין משרות</p>
               ) : (
@@ -323,13 +330,16 @@ export default function CompensationPage() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <span className="font-bold text-gray-900">{job.title}</span>
+
                               <span className="text-xs text-gray-400">{job.company}</span>
+
                               {jobPlan && (
                                 <span className="text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full border border-amber-200">
                                   מקצה משרה
                                 </span>
                               )}
                             </div>
+
                             {finalPlan && (
                               <div className="flex flex-wrap gap-2 items-center">
                                 {visibleFields.includes("recruiter") && (
@@ -340,6 +350,7 @@ export default function CompensationPage() {
                                     totalFee={finalPlan.total_fee}
                                   />
                                 )}
+
                                 {visibleFields.includes("team_manager") && (
                                   <CompField
                                     label={FIELD_LABELS.team_manager}
@@ -348,6 +359,7 @@ export default function CompensationPage() {
                                     totalFee={finalPlan.total_fee}
                                   />
                                 )}
+
                                 {visibleFields.includes("recruitment_manager") && (
                                   <CompField
                                     label={FIELD_LABELS.recruitment_manager}
@@ -356,9 +368,11 @@ export default function CompensationPage() {
                                     totalFee={finalPlan.total_fee}
                                   />
                                 )}
+
                                 {finalPlan.warranty_period_days != null && (
                                   <div className="flex items-center gap-1 bg-blue-50 rounded-lg px-3 py-1.5 text-xs border border-blue-100">
                                     <span className="text-blue-500">אחריות:</span>
+
                                     <span className="font-bold text-blue-700">
                                       {finalPlan.warranty_period_days} ימים
                                     </span>
@@ -366,10 +380,12 @@ export default function CompensationPage() {
                                 )}
                               </div>
                             )}
+
                             {!finalPlan && (
                               <p className="text-xs text-gray-400 mt-1">לא הוגדר תגמול</p>
                             )}
                           </div>
+
                           {canEditing && (
                             <button
                               onClick={() => {
@@ -421,6 +437,7 @@ export default function CompensationPage() {
             {isAdmin && (
               <div>
                 <h2 className="text-lg font-bold text-gray-900 mb-3">תוכניות כלליות (לפי לקוח)</h2>
+
                 {plans.filter((p) => !p.job_id).length === 0 ? (
                   <p className="text-center py-8 text-gray-400">אין תוכניות כלליות</p>
                 ) : (
@@ -432,6 +449,7 @@ export default function CompensationPage() {
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1">
                               <span className="font-bold text-gray-900">{plan.client_name}</span>
+
                               <div className="flex flex-wrap gap-2 mt-2">
                                 {visibleFields.includes("recruiter") && (
                                   <CompField
@@ -441,6 +459,7 @@ export default function CompensationPage() {
                                     totalFee={plan.total_fee}
                                   />
                                 )}
+
                                 {visibleFields.includes("team_manager") && (
                                   <CompField
                                     label={FIELD_LABELS.team_manager}
@@ -449,6 +468,7 @@ export default function CompensationPage() {
                                     totalFee={plan.total_fee}
                                   />
                                 )}
+
                                 {visibleFields.includes("recruitment_manager") && (
                                   <CompField
                                     label={FIELD_LABELS.recruitment_manager}
@@ -459,6 +479,7 @@ export default function CompensationPage() {
                                 )}
                               </div>
                             </div>
+
                             <div className="flex gap-1">
                               <button
                                 onClick={() => openEdit(plan)}
@@ -466,6 +487,7 @@ export default function CompensationPage() {
                               >
                                 <Pencil className="w-4 h-4" />
                               </button>
+
                               <button
                                 onClick={() => deleteMutation.mutate(plan.id)}
                                 className="p-2 rounded-lg hover:bg-red-50 text-red-400"
@@ -495,9 +517,11 @@ export default function CompensationPage() {
                     : "תוכנית תגמול חדשה"}
               </DialogTitle>
             </DialogHeader>
+
             <div className="space-y-4 mt-2">
               <div>
                 <Label>לקוח / חברה *</Label>
+
                 <Select
                   value={String(form.employer_company_id || "")}
                   onValueChange={(value) => {
@@ -514,6 +538,7 @@ export default function CompensationPage() {
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="בחר לקוח" />
                   </SelectTrigger>
+
                   <SelectContent>
                     {clients.map((client) => (
                       <SelectItem key={client.id} value={String(client.company_id)}>
@@ -523,8 +548,10 @@ export default function CompensationPage() {
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
                 <Label>עמלה כוללת מהחברה (₪) *</Label>
+
                 <Input
                   type="number"
                   value={form.total_fee}
@@ -534,8 +561,10 @@ export default function CompensationPage() {
                   dir="ltr"
                 />
               </div>
+
               <div>
                 <Label>תקופת אחריות (ימים)</Label>
+
                 <Input
                   type="number"
                   value={form.warranty_period_days}
@@ -545,12 +574,15 @@ export default function CompensationPage() {
                   dir="ltr"
                 />
               </div>
+
               {totalFee > 0 && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <Calculator className="w-4 h-4 text-green-600" />
+
                     <span className="text-sm font-bold text-green-700">חישוב מהיר</span>
                   </div>
+
                   <div className="space-y-1 text-xs">
                     {["recruiter", "team_manager", "recruitment_manager"].map((key) => {
                       const val = form[`${key}_compensation`]
@@ -566,8 +598,10 @@ export default function CompensationPage() {
                       return (
                         <div key={key} className="flex justify-between">
                           <span className="text-gray-600">{FIELD_LABELS[key]}:</span>
+
                           <span className="font-bold text-green-700">
                             {amount ? `${amount.toLocaleString()} ₪` : "—"}
+
                             {type === "percent" && (
                               <span className="text-gray-400 mr-1">({val}%)</span>
                             )}
@@ -578,8 +612,10 @@ export default function CompensationPage() {
                   </div>
                 </div>
               )}
+
               <div>
                 <Label>משרה (אופציונלי)</Label>
+
                 <Select
                   value={String(form.job_id || "all")}
                   onValueChange={(value) => {
@@ -596,8 +632,10 @@ export default function CompensationPage() {
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
+
                   <SelectContent>
                     <SelectItem value="all">כל משרות הלקוח</SelectItem>
+
                     {jobs
                       .filter(
                         (job) =>
@@ -624,6 +662,7 @@ export default function CompensationPage() {
               ].map(({ key, label, roles }) => (
                 <div key={key}>
                   <Label>{label} (אופציונלי)</Label>
+
                   <Select
                     value={String(form[key] || "all")}
                     onValueChange={(value) =>
@@ -633,8 +672,10 @@ export default function CompensationPage() {
                     <SelectTrigger className="mt-1">
                       <SelectValue />
                     </SelectTrigger>
+
                     <SelectContent>
                       <SelectItem value="all">ללא שיוך</SelectItem>
+
                       {members
                         .filter((member) => roles.includes(member.role))
                         .map((member) => (
@@ -660,6 +701,7 @@ export default function CompensationPage() {
               ].map(({ key, label }) => (
                 <div key={key}>
                   <Label>{label}</Label>
+
                   <div className="flex gap-2 mt-1">
                     <Input
                       type="number"
@@ -671,6 +713,7 @@ export default function CompensationPage() {
                       className="flex-1"
                       dir="ltr"
                     />
+
                     <Select
                       value={form[`${key}_compensation_type`]}
                       onValueChange={(v) =>
@@ -680,8 +723,10 @@ export default function CompensationPage() {
                       <SelectTrigger className="w-28">
                         <SelectValue />
                       </SelectTrigger>
+
                       <SelectContent>
                         <SelectItem value="fixed">₪ קבוע</SelectItem>
+
                         <SelectItem value="percent">% אחוז</SelectItem>
                       </SelectContent>
                     </Select>
@@ -691,6 +736,7 @@ export default function CompensationPage() {
 
               <div>
                 <Label>הערות</Label>
+
                 <Input
                   value={form.notes}
                   onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
@@ -714,6 +760,7 @@ export default function CompensationPage() {
                     {deleteMutation.isPending ? "מוחק..." : "מחק"}
                   </Button>
                 )}
+
                 <Button
                   onClick={handleSave}
                   disabled={!form.employer_company_id || saveMutation.isPending}
@@ -721,6 +768,7 @@ export default function CompensationPage() {
                 >
                   {saveMutation.isPending ? "שומר..." : "שמור"}
                 </Button>
+
                 <Button variant="outline" onClick={() => setShowModal(false)} className="flex-1">
                   ביטול
                 </Button>

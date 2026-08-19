@@ -36,7 +36,9 @@ export default function ForgotPassword() {
           <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg mx-auto mb-3">
             HH
           </div>
+
           <h1 className="text-xl font-bold text-gray-900">{t("auth.forgotPassword.title")}</h1>
+
           <p className="text-sm text-gray-500 mt-1">{t("auth.forgotPassword.subtitle")}</p>
         </div>
 
@@ -47,14 +49,17 @@ export default function ForgotPassword() {
         {sent ? (
           <div className="text-center">
             <div className="text-4xl mb-4">📬</div>
+
             <p className="text-green-700 font-semibold mb-1">
               {isRtl ? "שלחנו לך אימייל!" : "Email sent!"}
             </p>
+
             <p className="text-gray-500 text-sm mb-5">
               {isRtl
                 ? "אם הכתובת קיימת אצלנו — הקישור כבר בדרך. בדוק גם את תיקיית הספאם."
                 : "If the address exists in our system — the link is on its way. Check spam too."}
             </p>
+
             <Link to="/login" className="text-blue-600 text-sm font-semibold hover:underline">
               {t("auth.forgotPassword.backToLogin")}
             </Link>
@@ -63,6 +68,7 @@ export default function ForgotPassword() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label className="text-sm text-gray-700">{t("auth.forgotPassword.email")}</Label>
+
               <Input
                 type="email"
                 value={email}
@@ -72,6 +78,7 @@ export default function ForgotPassword() {
                 dir="ltr"
               />
             </div>
+
             <Button
               type="submit"
               disabled={loading}
@@ -79,9 +86,11 @@ export default function ForgotPassword() {
             >
               {loading ? t("auth.forgotPassword.sending") : t("auth.forgotPassword.sendButton")}
             </Button>
+
             <p className="text-center">
               <Link to="/login" className="text-blue-600 text-sm hover:underline">
                 {isRtl ? "← " : ""}
+
                 {t("auth.forgotPassword.backToLogin")}
               </Link>
             </p>

@@ -43,12 +43,15 @@ export default function AIWorkspaceLayout() {
               >
                 <span className="flex items-center gap-2">
                   {item.icon && <item.icon className="w-4 h-4" />}
+
                   {item.label}
                 </span>
+
                 <ChevronDown
                   className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
                 />
               </button>
+
               {isExpanded && (
                 <div className="ml-4 mt-1 space-y-1 border-l-2 border-[#E4ECFF] pl-2">
                   {item.children.map((child) => (
@@ -80,7 +83,9 @@ export default function AIWorkspaceLayout() {
             >
               <span className="flex items-center gap-2">
                 {item.icon && <item.icon className="w-4 h-4" />}
+
                 {item.label}
+
                 {item.badge && (
                   <span className="ml-auto text-xs bg-amber-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
                     {item.badge}
@@ -106,8 +111,10 @@ export default function AIWorkspaceLayout() {
         <div className="h-24 border-b border-[#E4ECFF] flex items-center justify-between px-6 bg-gradient-to-l from-[#2F80FF]/5 to-[#8B5CF6]/5">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-[#7C3AED]" />
+
             <img src="/headhunter-logo.png" alt="HeadHunter" className="h-8 w-auto" />
           </div>
+
           <button onClick={() => setMobileOpen(false)} className="md:hidden">
             <X className="w-5 h-5" />
           </button>
@@ -120,7 +127,9 @@ export default function AIWorkspaceLayout() {
         <div className="p-4 border-t border-[#E4ECFF] space-y-2">
           <div className="p-3 rounded-lg bg-gradient-to-br from-[#A855F7]/10 to-[#2F80FF]/10 border border-[#DDEBFF]">
             <div className="text-xs font-bold text-[#6C4DFF] mb-1">ניתוחים פעילים</div>
+
             <div className="text-2xl font-black text-[#7C3AED]">3</div>
+
             <div className="text-xs text-[#94A3B8]">עד למסקנות מלאות</div>
           </div>
 
@@ -136,6 +145,7 @@ export default function AIWorkspaceLayout() {
 
       <div className="flex-1 md:mr-72 flex flex-col min-h-screen">
         <GlobalHeader user={user} variant="private" />
+
         <main className="flex-1 p-7 max-w-[1600px] w-full mx-auto">
           <Outlet />
         </main>

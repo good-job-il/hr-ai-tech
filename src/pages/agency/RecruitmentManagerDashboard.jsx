@@ -214,6 +214,7 @@ export default function RecruitmentManagerDashboard() {
         <PlatformCard className="p-6">
           <PlatformEmptyState icon={AlertTriangle}>
             <p>{text.loadError}</p>
+
             <Button className="mt-4" onClick={() => dashboard.refetch()}>
               {text.refresh}
             </Button>
@@ -239,15 +240,18 @@ export default function RecruitmentManagerDashboard() {
               onClick={() => dashboard.refetch()}
             >
               <RefreshCw className={`h-4 w-4 ${dashboard.isFetching ? "animate-spin" : ""}`} />
+
               {text.refresh}
             </Button>
           }
         />
+
         <PlatformCard className="p-5">
           <PlatformWidgetHeader
             title={text.filters}
             action={<Filter className="h-4 w-4 text-violet-600" />}
           />
+
           <div className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
             <DashboardFilter
               label={text.from}
@@ -255,12 +259,14 @@ export default function RecruitmentManagerDashboard() {
               value={filters.date_from}
               onChange={(value) => setFilters((current) => ({ ...current, date_from: value }))}
             />
+
             <DashboardFilter
               label={text.to}
               type="date"
               value={filters.date_to}
               onChange={(value) => setFilters((current) => ({ ...current, date_to: value }))}
             />
+
             <DashboardFilter
               label={text.client}
               value={filters.client_id}
@@ -268,6 +274,7 @@ export default function RecruitmentManagerDashboard() {
               all={text.all}
               onChange={(value) => setFilters((current) => ({ ...current, client_id: value }))}
             />
+
             <DashboardFilter
               label={text.job}
               value={filters.job_id}
@@ -275,6 +282,7 @@ export default function RecruitmentManagerDashboard() {
               all={text.all}
               onChange={(value) => setFilters((current) => ({ ...current, job_id: value }))}
             />
+
             <DashboardFilter
               label={text.team}
               value={filters.team_id}
@@ -282,6 +290,7 @@ export default function RecruitmentManagerDashboard() {
               all={text.all}
               onChange={(value) => setFilters((current) => ({ ...current, team_id: value }))}
             />
+
             <DashboardFilter
               label={text.recruiter}
               value={filters.recruiter_id}
@@ -291,6 +300,7 @@ export default function RecruitmentManagerDashboard() {
             />
           </div>
         </PlatformCard>
+
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
           <PlatformStatCard
             icon={Briefcase}
@@ -300,6 +310,7 @@ export default function RecruitmentManagerDashboard() {
             tone="violet"
             to="/agency/jobs/open"
           />
+
           <PlatformStatCard
             icon={Users}
             label={text.applications}
@@ -308,6 +319,7 @@ export default function RecruitmentManagerDashboard() {
             tone="cyan"
             to="/agency/pipeline"
           />
+
           <PlatformStatCard
             icon={Kanban}
             label={text.active}
@@ -316,6 +328,7 @@ export default function RecruitmentManagerDashboard() {
             tone="blue"
             to="/agency/pipeline"
           />
+
           <PlatformStatCard
             icon={Clock3}
             label={text.overdue}
@@ -323,6 +336,7 @@ export default function RecruitmentManagerDashboard() {
             loading={dashboard.isLoading}
             tone="amber"
           />
+
           <PlatformStatCard
             icon={CheckCircle2}
             label={text.placements}
@@ -330,6 +344,7 @@ export default function RecruitmentManagerDashboard() {
             loading={dashboard.isLoading}
             tone="emerald"
           />
+
           <PlatformStatCard
             icon={AlertTriangle}
             label={text.overloaded}
@@ -338,16 +353,20 @@ export default function RecruitmentManagerDashboard() {
             tone="rose"
           />
         </div>
+
         <div className="grid gap-5 xl:grid-cols-2">
           <PlatformCard className="p-5">
             <PlatformWidgetHeader title={text.funnel} />
+
             <div className="mt-5 space-y-3">
               {STAGES.map((stage) => (
                 <div key={stage}>
                   <div className="mb-1 flex justify-between text-xs font-bold text-slate-600">
                     <span>{stage.replaceAll("_", " ")}</span>
+
                     <span>{data?.funnel?.[stage] || 0}</span>
                   </div>
+
                   <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-violet-500 to-blue-500"
@@ -358,6 +377,7 @@ export default function RecruitmentManagerDashboard() {
               ))}
             </div>
           </PlatformCard>
+
           <PlatformCard className="overflow-hidden">
             <div className="p-5">
               <PlatformWidgetHeader
@@ -369,6 +389,7 @@ export default function RecruitmentManagerDashboard() {
                 }
               />
             </div>
+
             {!data?.workload.length ? (
               <PlatformEmptyState icon={Users} className="m-5">
                 {text.none}
@@ -382,12 +403,16 @@ export default function RecruitmentManagerDashboard() {
                   >
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-bold text-slate-800">{item.recruiter_name}</p>
+
                       <p className="text-xs text-slate-400">{item.team_name || "—"}</p>
                     </div>
+
                     <span className="text-sm font-black text-violet-700">
                       {item.active_applications} apps
                     </span>
+
                     <span className="text-sm font-black text-blue-700">{item.open_jobs} jobs</span>
+
                     {item.overloaded && <AlertTriangle className="h-4 w-4 text-rose-600" />}
                   </div>
                 ))}
@@ -395,8 +420,10 @@ export default function RecruitmentManagerDashboard() {
             )}
           </PlatformCard>
         </div>
+
         <PlatformCard className="p-5">
           <PlatformWidgetHeader title={text.assign} />
+
           <form className="mt-5 space-y-4" onSubmit={submit}>
             <div className="grid gap-4 lg:grid-cols-3">
               {[
@@ -406,6 +433,7 @@ export default function RecruitmentManagerDashboard() {
               ].map(([key, label]) => (
                 <div key={key}>
                   <Label htmlFor={key}>{label}</Label>
+
                   <Input
                     id={key}
                     dir="ltr"
@@ -417,9 +445,11 @@ export default function RecruitmentManagerDashboard() {
                 </div>
               ))}
             </div>
+
             <div className="grid gap-4 lg:grid-cols-3">
               <div>
                 <Label>{text.team}</Label>
+
                 <Select
                   value={form.team_id}
                   onValueChange={(team_id) => setForm({ ...form, team_id, recruiter_id: "none" })}
@@ -427,8 +457,10 @@ export default function RecruitmentManagerDashboard() {
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
+
                   <SelectContent>
                     <SelectItem value="none">{text.unassigned}</SelectItem>
+
                     {teams
                       .filter((team) => team.is_active)
                       .map((team) => (
@@ -439,8 +471,10 @@ export default function RecruitmentManagerDashboard() {
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
                 <Label>{text.recruiter}</Label>
+
                 <Select
                   value={form.recruiter_id}
                   onValueChange={(recruiter_id) => setForm({ ...form, recruiter_id })}
@@ -448,8 +482,10 @@ export default function RecruitmentManagerDashboard() {
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
+
                   <SelectContent>
                     <SelectItem value="none">{text.unassigned}</SelectItem>
+
                     {recruiters.map((recruiter) => (
                       <SelectItem key={recruiter.id} value={String(recruiter.id)}>
                         {recruiter.full_name || recruiter.email}
@@ -458,8 +494,10 @@ export default function RecruitmentManagerDashboard() {
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
                 <Label htmlFor="assignment-reason">{text.reason}</Label>
+
                 <Input
                   id="assignment-reason"
                   className="mt-1"
@@ -470,24 +508,29 @@ export default function RecruitmentManagerDashboard() {
                 />
               </div>
             </div>
+
             {formError && (
               <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm font-bold text-rose-700">
                 {formError}
               </p>
             )}
+
             {saved && (
               <p className="rounded-xl bg-emerald-50 p-3 text-sm font-bold text-emerald-700">
                 {text.success}
               </p>
             )}
+
             <div className="flex justify-end">
               <Button disabled={assignment.isPending}>
                 <Send className="h-4 w-4" />
+
                 {text.submit}
               </Button>
             </div>
           </form>
         </PlatformCard>
+
         <div className="grid gap-5 xl:grid-cols-2">
           <ListCard
             title={text.overdueTitle}
@@ -500,16 +543,19 @@ export default function RecruitmentManagerDashboard() {
               >
                 <div>
                   <p className="font-bold text-slate-800">{item.candidate_name}</p>
+
                   <p className="text-xs text-slate-400">
                     {item.job_title} · {item.status}
                   </p>
                 </div>
+
                 <span className="font-black text-amber-700">
                   {item.overdue_hours} {text.hours}
                 </span>
               </Link>
             )}
           />
+
           <ListCard
             title={text.recentPlacements}
             rows={data?.placements || []}
@@ -518,10 +564,12 @@ export default function RecruitmentManagerDashboard() {
               <div className="flex items-center justify-between p-4">
                 <div>
                   <p className="font-bold text-slate-800">{item.candidate_name}</p>
+
                   <p className="text-xs text-slate-400">
                     {item.job_title} · {item.company}
                   </p>
                 </div>
+
                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
               </div>
             )}
@@ -538,6 +586,7 @@ function ListCard({ title, rows, empty, render }) {
       <div className="p-5">
         <PlatformWidgetHeader title={title} />
       </div>
+
       {rows.length ? (
         <div className="max-h-96 divide-y divide-slate-100 overflow-y-auto">
           {rows.map((row, index) => (
@@ -557,6 +606,7 @@ function DashboardFilter({ label, value, onChange, type, options = [], all }) {
   return (
     <label className="text-xs font-bold text-slate-500">
       {label}
+
       {type ? (
         <input
           type={type}
@@ -571,6 +621,7 @@ function DashboardFilter({ label, value, onChange, type, options = [], all }) {
           className={`${platformFieldClassName} mt-2`}
         >
           <option value="">{all}</option>
+
           {options.map((option) => (
             <option key={option.id} value={option.id}>
               {option.name}

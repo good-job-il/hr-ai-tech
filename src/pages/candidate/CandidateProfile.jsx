@@ -57,16 +57,19 @@ function ProfileCompleteness({ form, t }) {
         <span className="text-sm font-bold text-[#0F172A]">
           {t("candidate.profile.completeness")}
         </span>
+
         <span className="text-sm font-black" style={{ color }}>
           {pct}%
         </span>
       </div>
+
       <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${pct}%`, backgroundColor: color }}
         />
       </div>
+
       {pct < 100 && <p className="text-xs text-[#94A3B8] mt-2">{hint}</p>}
     </div>
   )
@@ -82,8 +85,10 @@ function SectionCard({ icon: Icon, title, children, accent = "#7C3AED" }) {
         >
           <Icon className="w-4 h-4" style={{ color: accent }} />
         </div>
+
         <h2 className="text-base font-black text-[#0F172A]">{title}</h2>
       </div>
+
       {children}
     </div>
   )
@@ -93,6 +98,7 @@ function Input({ label, value, onChange, placeholder, type = "text", className =
   return (
     <div className={className}>
       {label && <label className="text-xs font-bold text-[#64748B] block mb-1.5">{label}</label>}
+
       <input
         type={type}
         value={value ?? ""}
@@ -292,8 +298,10 @@ export default function CandidateProfile() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black text-[#0F172A]">{t("candidate.profile.title")}</h1>
+
           <p className="text-[#64748B] font-semibold mt-1">{t("candidate.profile.subtitle")}</p>
         </div>
+
         <button
           onClick={() => saveMutation.mutate(form)}
           disabled={saveStatus === "saving"}
@@ -313,6 +321,7 @@ export default function CandidateProfile() {
           ) : (
             <Save className="w-4 h-4" />
           )}
+
           {saveBtnLabel}
         </button>
       </div>
@@ -322,6 +331,7 @@ export default function CandidateProfile() {
         <div className="sm:col-span-2">
           <ProfileCompleteness form={form} t={t} />
         </div>
+
         <div className="bg-white rounded-2xl border border-[#E4ECFF] p-5 flex flex-col gap-3">
           <label className="flex items-center justify-between cursor-pointer select-none">
             <div className="flex items-center gap-2 text-sm font-bold text-[#374151]">
@@ -330,8 +340,10 @@ export default function CandidateProfile() {
               ) : (
                 <EyeOff className="w-4 h-4 text-[#94A3B8]" />
               )}
+
               {t("candidate.profile.visibleToEmployers")}
             </div>
+
             <button
               type="button"
               onClick={() => upd("is_public", !form.is_public)}
@@ -351,17 +363,20 @@ export default function CandidateProfile() {
               />
             </button>
           </label>
+
           <label className="flex items-center justify-between cursor-pointer select-none">
             <div className="flex items-center gap-2 text-sm font-bold">
               <Zap
                 className={`w-4 h-4 ${form.is_open_to_work ? "text-[#059669]" : "text-[#94A3B8]"}`}
               />
+
               <span className={form.is_open_to_work ? "text-[#059669]" : "text-[#374151]"}>
                 {form.is_open_to_work
                   ? t("candidate.profile.activelyLooking")
                   : t("candidate.profile.openToWork")}
               </span>
             </div>
+
             <button
               type="button"
               onClick={() => upd("is_open_to_work", !form.is_open_to_work)}
@@ -392,21 +407,26 @@ export default function CandidateProfile() {
             value={form.full_name}
             onChange={(v) => upd("full_name", v)}
           />
+
           <Input label={t("common.phone")} value={form.phone} onChange={(v) => upd("phone", v)} />
+
           <Input
             label={t("candidate.profile.location")}
             value={form.location}
             onChange={(v) => upd("location", v)}
           />
+
           <Input
             label={t("candidate.profile.desiredTitle")}
             value={form.title}
             onChange={(v) => upd("title", v)}
           />
+
           <div className="sm:col-span-2">
             <label className="text-xs font-bold text-[#64748B] block mb-1.5">
               {t("candidate.profile.bio")}
             </label>
+
             <textarea
               value={form.summary ?? ""}
               onChange={(e) => upd("summary", e.target.value)}
@@ -430,6 +450,7 @@ export default function CandidateProfile() {
             className="flex-1 border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-sm outline-none
               focus:ring-2 focus:ring-[#7C3AED]/25 focus:border-[#7C3AED] transition-all"
           />
+
           <button
             onClick={addSkill}
             className="px-4 py-2.5 rounded-xl text-white text-sm font-bold transition-all active:scale-95"
@@ -438,6 +459,7 @@ export default function CandidateProfile() {
             <Plus className="w-4 h-4" />
           </button>
         </div>
+
         {(form.skills || []).length === 0 ? (
           <p className="text-sm text-[#94A3B8] text-center py-3">
             {t("candidate.profile.noSkills")}
@@ -450,6 +472,7 @@ export default function CandidateProfile() {
                 className="flex items-center gap-1.5 bg-[#F3EFFF] text-[#7C3AED] text-xs px-3 py-1.5 rounded-full font-semibold"
               >
                 {s}
+
                 <button
                   onClick={() => removeSkill(i)}
                   className="hover:text-red-500 transition-colors"
@@ -473,11 +496,13 @@ export default function CandidateProfile() {
                   value={exp.company}
                   onChange={(v) => updateExp(i, "company", v)}
                 />
+
                 <Input
                   placeholder={t("candidate.profile.rolePlaceholder")}
                   value={exp.role}
                   onChange={(v) => updateExp(i, "role", v)}
                 />
+
                 <div className="col-span-2">
                   <Input
                     placeholder={t("candidate.profile.periodPlaceholder")}
@@ -486,6 +511,7 @@ export default function CandidateProfile() {
                   />
                 </div>
               </div>
+
               <textarea
                 value={exp.description}
                 onChange={(e) => updateExp(i, "description", e.target.value)}
@@ -494,6 +520,7 @@ export default function CandidateProfile() {
                 className="w-full border border-[#E2E8F0] rounded-xl px-3 py-2.5 text-sm outline-none
                   focus:ring-2 focus:ring-[#059669]/25 focus:border-[#059669] transition-all resize-none"
               />
+
               <button
                 onClick={() => removeExp(i)}
                 className="flex items-center gap-1.5 text-xs font-bold text-red-500 hover:text-red-700 transition-colors active:scale-95"
@@ -503,6 +530,7 @@ export default function CandidateProfile() {
             </div>
           ))}
         </div>
+
         <button
           onClick={addExp}
           className="flex items-center gap-2 text-sm font-bold text-[#059669] hover:text-[#047857] transition-colors"
@@ -525,16 +553,19 @@ export default function CandidateProfile() {
               onChange={(v) => upd("education", v)}
             />
           </div>
+
           <Input
             label={t("candidate.profile.experienceYears")}
             type="number"
             value={form.experience_years}
             onChange={(v) => upd("experience_years", Number(v))}
           />
+
           <div>
             <label className="text-xs font-bold text-[#64748B] block mb-1.5">
               {t("candidate.profile.jobType")}
             </label>
+
             <select
               value={form.job_type}
               onChange={(e) => upd("job_type", e.target.value)}
@@ -548,12 +579,14 @@ export default function CandidateProfile() {
               ))}
             </select>
           </div>
+
           <Input
             label={t("candidate.profile.minSalary")}
             type="number"
             value={form.desired_salary_min ?? ""}
             onChange={(v) => upd("desired_salary_min", v === "" ? null : Number(v))}
           />
+
           <Input
             label={t("candidate.profile.maxSalary")}
             type="number"
@@ -595,19 +628,24 @@ export default function CandidateProfile() {
           cursor-pointer hover:bg-[#F3EFFF] transition-colors group"
         >
           <Upload className="w-5 h-5 text-[#7C3AED]" />
+
           <div>
             <div className="text-sm font-bold text-[#374151] group-hover:text-[#7C3AED] transition-colors">
               {form.resume_url
                 ? t("candidate.profile.replaceFile")
                 : t("candidate.profile.uploadResume")}
             </div>
+
             <div className="text-xs text-[#94A3B8] mt-0.5">{t("candidate.profile.fileTypes")}</div>
           </div>
+
           <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={uploadResume} />
         </label>
+
         {form.resume_url && (
           <div className="flex items-center gap-2 mt-3 p-3 bg-green-50 rounded-xl border border-green-200">
             <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+
             <a
               href={form.resume_url}
               target="_blank"
@@ -630,6 +668,7 @@ export default function CandidateProfile() {
           style={{ background: "linear-gradient(135deg,#7C3AED,#2563EB)" }}
         >
           <Save className="w-4 h-4" />
+
           {saveBtnLabel}
         </button>
       </div>

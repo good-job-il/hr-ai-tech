@@ -86,6 +86,7 @@ export default function SearchSection() {
           >
             חפש משרות שמתאימות לך
           </h2>
+
           <p style={{ fontSize: 15, color: "#64748B", margin: 0 }}>מצא את ההדמנות הבאה שלך</p>
         </div>
 
@@ -117,6 +118,7 @@ export default function SearchSection() {
             }}
           >
             <Search style={{ width: 16, height: 16, color: "#6C4DFF", flexShrink: 0 }} />
+
             <input
               type="text"
               dir="rtl"
@@ -135,6 +137,7 @@ export default function SearchSection() {
               }}
             />
           </div>
+
           {/* Location */}
           <div
             style={{
@@ -147,6 +150,7 @@ export default function SearchSection() {
             }}
           >
             <MapPin style={{ width: 16, height: 16, color: "#94A3B8", flexShrink: 0 }} />
+
             <input
               type="text"
               dir="rtl"
@@ -164,6 +168,7 @@ export default function SearchSection() {
               }}
             />
           </div>
+
           {/* Domain */}
           <div
             style={{
@@ -196,6 +201,7 @@ export default function SearchSection() {
                 <option key={d}>{d}</option>
               ))}
             </select>
+
             <ChevronDown
               style={{
                 width: 13,
@@ -206,6 +212,7 @@ export default function SearchSection() {
               }}
             />
           </div>
+
           {/* Type */}
           <div
             style={{
@@ -237,6 +244,7 @@ export default function SearchSection() {
                 <option key={t}>{t}</option>
               ))}
             </select>
+
             <ChevronDown
               style={{
                 width: 13,
@@ -247,6 +255,7 @@ export default function SearchSection() {
               }}
             />
           </div>
+
           {/* Button */}
           <button
             onClick={handleSearch}
@@ -294,6 +303,7 @@ export default function SearchSection() {
           <span style={{ fontSize: 12.5, color: "#94A3B8", fontWeight: 600 }}>
             חיפושים אחרונים:
           </span>
+
           {QUICK_TAGS.map((tag) => (
             <button
               key={tag}

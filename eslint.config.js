@@ -54,6 +54,15 @@ export default [
         },
       ],
 
+      "react/jsx-newline": [
+        "error",
+        {
+          prevent: false,
+        },
+      ],
+
+      "react/jsx-one-expression-per-line": "off",
+
       "react/prop-types": "off",
 
       "react/no-unknown-property": [

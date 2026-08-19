@@ -72,6 +72,7 @@ export default function GlobalHeader({ user, variant = "public" }) {
                 }}
               >
                 {link.label}
+
                 {isActive && (
                   <span
                     style={{

@@ -16,8 +16,10 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
       ) : (
         <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
       )}
+
       <div className="flex-1 min-w-0">
         <p className={`font-medium ${passed ? "text-green-900" : "text-orange-900"}`}>{label}</p>
+
         <p className={`text-sm mt-1 ${passed ? "text-green-700" : "text-orange-700"}`}>{detail}</p>
       </div>
     </div>
@@ -34,7 +36,9 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
           <ArrowRight className="w-4 h-4" />
           חזרה
         </button>
+
         <h2 className="text-2xl font-bold text-gray-900">בדיקת יכולת ייבוא</h2>
+
         <p className="text-gray-600 mt-2">בדיקת אמינות הייבוא לפני ייבוא המוני</p>
       </div>
 
@@ -43,8 +47,10 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
         <div className="flex items-end justify-between">
           <div>
             <p className="text-gray-600 text-sm font-medium">ניקוד יכולת ייבוא</p>
+
             <p className="text-4xl font-bold text-purple-600 mt-2">{readinessScore}%</p>
           </div>
+
           <div
             className={`px-4 py-2 rounded-lg font-semibold ${
               isProduction ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
@@ -60,8 +66,10 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
         <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-0.5" />
+
             <div>
               <p className="font-semibold text-orange-900 mb-3">סוגיות שנמצאו</p>
+
               <ul className="space-y-2">
                 {results.recommendations.map((rec, idx) => (
                   <li key={idx} className="text-sm text-orange-800">
@@ -77,47 +85,56 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
       {/* Detailed Checks */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">בדיקות פירוט</h3>
+
         <div className="space-y-3">
           <CheckItem
             label="העלאת קורות חיים"
             passed={checks.resume_upload?.passed}
             detail={`${checks.resume_upload?.success || 0} / ${checks.resume_upload?.total || 0} הוצלחו`}
           />
+
           <CheckItem
             label="המרה ל-DOCX"
             passed={checks.docx_conversion?.passed}
             detail={`${checks.docx_conversion?.success || 0} / ${checks.docx_conversion?.total || 0} הוצלחו`}
           />
+
           <CheckItem
             label="Parsing קורות חיים"
             passed={checks.parsing_success?.passed}
             detail={`${checks.parsing_success?.success || 0} הצליחו, ${checks.parsing_success?.partial || 0} חלקית, ${checks.parsing_success?.failed || 0} כשלו`}
           />
+
           <CheckItem
             label="אימייל"
             passed={checks.email_validation?.passed}
             detail={`${checks.email_validation?.success || 0} / ${checks.email_validation?.total || 0} עם אימייל`}
           />
+
           <CheckItem
             label="טלפון"
             passed={checks.phone_validation?.passed}
             detail={`${checks.phone_validation?.success || 0} / ${checks.phone_validation?.total || 0} עם טלפון`}
           />
+
           <CheckItem
             label="תפקיד"
             passed={checks.role_validation?.passed}
             detail={`${checks.role_validation?.success || 0} / ${checks.role_validation?.total || 0} עם תפקיד`}
           />
+
           <CheckItem
             label="זיהוי כפילויות"
             passed={checks.duplicate_detection?.passed}
             detail={`${checks.duplicate_detection?.clean || 0} נקיים, ${checks.duplicate_detection?.suspected || 0} חשודים`}
           />
+
           <CheckItem
             label="הקצאה למגייס"
             passed={checks.recruiter_assignment?.passed}
             detail={`${checks.recruiter_assignment?.assigned || 0} / ${checks.recruiter_assignment?.total || 0} מוקצים`}
           />
+
           <CheckItem
             label="איכות נתונים"
             passed={checks.data_quality?.passed}
@@ -129,39 +146,51 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
       {/* Summary */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">סיכום</h3>
+
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div>
             <p className="text-sm text-gray-600">סה״כ מועמדים</p>
+
             <p className="text-2xl font-bold text-gray-900">
               {results.summary?.total_candidates || 0}
             </p>
           </div>
+
           <div>
             <p className="text-sm text-gray-600">כפילויות חשודות</p>
+
             <p className="text-2xl font-bold text-red-600">
               {results.summary?.duplicates_suspected || 0}
             </p>
           </div>
+
           <div>
             <p className="text-sm text-gray-600">בעיות parsing</p>
+
             <p className="text-2xl font-bold text-orange-600">
               {results.summary?.parsing_issues || 0}
             </p>
           </div>
+
           <div>
             <p className="text-sm text-gray-600">חסר אימייל</p>
+
             <p className="text-2xl font-bold text-red-600">
               {results.summary?.missing_data?.email || 0}
             </p>
           </div>
+
           <div>
             <p className="text-sm text-gray-600">חסר טלפון</p>
+
             <p className="text-2xl font-bold text-red-600">
               {results.summary?.missing_data?.phone || 0}
             </p>
           </div>
+
           <div>
             <p className="text-sm text-gray-600">חסר תפקיד</p>
+
             <p className="text-2xl font-bold text-orange-600">
               {results.summary?.missing_data?.role || 0}
             </p>
@@ -177,6 +206,7 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
         >
           ביטול
         </button>
+
         <button
           onClick={onApprove}
           disabled={!isProduction}
@@ -187,6 +217,7 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
           }`}
         >
           <CheckCircle2 className="w-5 h-5" />
+
           {isProduction ? "אישור ייבוא" : "בדיקות נכשלו"}
         </button>
       </div>

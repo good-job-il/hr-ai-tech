@@ -65,10 +65,12 @@ export default function HeroSection() {
     >
       {/* Soft glow orbs */}
       <div className="absolute top-20 -right-40 w-96 h-96 bg-purple-400/8 blur-3xl rounded-full animate-pulse"></div>
+
       <div
         className="absolute bottom-0 -left-40 w-96 h-96 bg-blue-400/8 blur-3xl rounded-full"
         style={{ animation: "pulse 4s ease-in-out infinite" }}
       ></div>
+
       <div
         className="absolute top-1/2 right-1/3 w-64 h-64 bg-indigo-300/6 blur-3xl rounded-full"
         style={{ animation: "pulse 5s ease-in-out infinite 1s" }}
@@ -111,6 +113,7 @@ export default function HeroSection() {
               className="bg-white border border-blue-100 text-gray-900 text-base h-14 rounded-lg flex-1 px-5 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all placeholder-gray-400"
               dir={isRtl ? "rtl" : "ltr"}
             />
+
             <button
               onClick={handleSubmit}
               className="bg-gradient-to-r from-[#7C4DFF] to-[#4F7CFF] hover:from-[#6B3EEE] hover:to-[#4070EE] text-white h-14 px-8 text-base font-bold rounded-lg whitespace-nowrap transition-all shadow-lg hover:shadow-xl active:scale-95"
@@ -118,6 +121,7 @@ export default function HeroSection() {
               {t("home.hero.searchButton")}
             </button>
           </div>
+
           <p className="text-gray-500 text-xs leading-relaxed">
             {t("home.hero.termsNote")}{" "}
             <span className="text-blue-600 cursor-pointer hover:text-blue-700">
@@ -138,10 +142,12 @@ export default function HeroSection() {
             <div className="text-3xl font-bold text-blue-600">
               {userCount.toLocaleString(locale)}
             </div>
+
             <div className="text-gray-600 text-sm mt-3 font-medium">
               {t("home.stats.activeCandidates")}
             </div>
           </button>
+
           <button
             onClick={() => handleStatClick("/jobs")}
             className="group hover:scale-105 active:scale-95 transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-white border border-purple-200 rounded-2xl px-6 py-6 hover:shadow-lg hover:border-purple-400 relative min-h-28"
@@ -150,13 +156,17 @@ export default function HeroSection() {
               className={`absolute -top-4 ${isRtl ? "-right-4" : "-left-4"} bg-gradient-to-r from-[#7C4DFF] to-[#4F7CFF] text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 flex-row-reverse shadow-lg`}
             >
               <Sparkles className="w-4 h-4" />
+
               {t("home.stats.openJobs")}
             </div>
+
             <div className="text-3xl font-bold text-purple-600">
               {jobCount.toLocaleString(locale)}
             </div>
+
             <div className="text-gray-600 text-sm mt-3 font-medium">{t("home.stats.jobs")}</div>
           </button>
+
           <button
             onClick={() => handleStatClick("/companies")}
             className="group hover:scale-105 active:scale-95 transition-all cursor-pointer bg-white border border-blue-100 rounded-2xl px-6 py-6 hover:shadow-lg hover:border-blue-300 min-h-28"
@@ -164,6 +174,7 @@ export default function HeroSection() {
             <div className="text-3xl font-bold text-blue-600">
               {companyCount.toLocaleString(locale)}
             </div>
+
             <div className="text-gray-600 text-sm mt-3 font-medium">
               {t("home.stats.hiringCompanies")}
             </div>

@@ -80,7 +80,9 @@ export default function AdminLayout({ children }) {
                 ].join(" ")}
               >
                 <Icon className={active ? "w-5 h-5 text-white" : "w-5 h-5 text-[#7C3AED]"} />
+
                 <span className="flex-1 truncate">{item.label}</span>
+
                 {active && <ChevronRight className="w-4 h-4 rotate-180 opacity-70" />}
               </Link>
             )
@@ -96,8 +98,10 @@ export default function AdminLayout({ children }) {
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white">
                 <Sparkles className="w-5 h-5" />
               </div>
+
               <div>
                 <div className="text-[#0F172A] font-black text-sm">מרכז AI למנהלים</div>
+
                 <div className="text-[#64748B] text-xs">תובנות חכמות על המערכת</div>
               </div>
             </div>
@@ -150,10 +154,12 @@ export default function AdminLayout({ children }) {
                   {user?.full_name?.[0] || "מ"}
                 </div>
               </div>
+
               <div>
                 <div className="font-black text-[#0F172A] text-sm leading-tight">
                   {user?.full_name || "שלום, מנהל"}
                 </div>
+
                 <div className="text-xs text-[#94A3B8] font-medium">מנהל מערכת</div>
               </div>
             </div>
@@ -164,6 +170,7 @@ export default function AdminLayout({ children }) {
               style={{ boxShadow: "0 2px 8px rgba(108,77,255,0.10)" }}
             >
               <Bell className="w-4 h-4 lg:w-5 lg:h-5 text-[#6C4DFF]" />
+
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#7C3AED] rounded-full border-2 border-white shadow-[0_0_6px_rgba(124,58,237,0.8)]" />
             </button>
           </div>
@@ -176,11 +183,13 @@ export default function AdminLayout({ children }) {
             }}
           >
             <Search className="w-4 h-4 text-[#94A3B8] flex-shrink-0" />
+
             <input
               dir="rtl"
               placeholder="חיפוש בכל המערכת..."
               className="w-full bg-transparent outline-none text-sm font-semibold text-[#0F172A] placeholder:text-[#94A3B8]"
             />
+
             <kbd className="text-[10px] text-[#94A3B8] bg-white/90 border border-[#E4ECFF] px-2 py-0.5 rounded-md font-mono flex-shrink-0">
               ⌘K
             </kbd>

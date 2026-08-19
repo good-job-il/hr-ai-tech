@@ -44,13 +44,16 @@ export default function DashboardHeader({
                 displayName[0]?.toUpperCase()
               )}
             </div>
+
             <div className="max-w-[150px]">
               <div className="flex items-center gap-1.5">
                 <p className="truncate text-sm font-black text-[#172036]">
                   {isRtl ? `שלום, ${displayName}` : `Hello, ${displayName}`}
                 </p>
+
                 <EditNameModal user={user} />
               </div>
+
               <p className="mt-0.5 truncate text-[11px] font-semibold text-[#8F9AB2]">
                 {roleTitle}
               </p>
@@ -64,6 +67,7 @@ export default function DashboardHeader({
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" strokeWidth={1.8} />
+
             <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-white bg-[#7C3AED] px-1 text-[9px] font-black text-white">
               3
             </span>
@@ -76,7 +80,9 @@ export default function DashboardHeader({
             dir={isRtl ? "rtl" : "ltr"}
           >
             <ChevronDown className="h-4 w-4" />
+
             <span>{isRtl ? "פעולות מהירות" : "Quick actions"}</span>
+
             <Zap className="h-4 w-4 text-[#8B5CF6]" />
           </button>
         </div>
@@ -86,11 +92,13 @@ export default function DashboardHeader({
             className={`absolute ${isRtl ? "right-5" : "left-5"} top-1/2 h-5 w-5 -translate-y-1/2 text-[#69748E]`}
             strokeWidth={1.8}
           />
+
           <input
             type="text"
             placeholder={isRtl ? "חיפוש בכל המערכת..." : "Search across the platform..."}
             className={`h-11 w-full rounded-[18px] border border-[#E6E9F1] bg-white text-sm text-[#374151] shadow-[0_3px_12px_rgba(54,74,138,0.035)] outline-none transition placeholder:text-[#B0B7C7] focus:border-[#BDB1FF] focus:ring-4 focus:ring-[#F1EEFF] ${isRtl ? "pr-13 pl-16" : "pl-13 pr-16"}`}
           />
+
           <kbd
             className={`absolute ${isRtl ? "left-4" : "right-4"} top-1/2 -translate-y-1/2 rounded-lg bg-[#F6F7FA] px-2 py-1 text-[10px] font-semibold text-[#8F97A9]`}
           >
@@ -100,6 +108,7 @@ export default function DashboardHeader({
 
         <div className="ml-auto flex items-center gap-1">
           <LanguageSwitcher variant="minimal" className="hidden text-[#7A849B] xl:flex" />
+
           <button
             onClick={onLogout}
             className="flex h-10 w-10 items-center justify-center rounded-xl text-[#A2AABC] transition hover:bg-red-50 hover:text-red-500"
@@ -128,6 +137,7 @@ export default function DashboardHeader({
             <Menu className="w-5 h-5 text-[#64748B]" />
           </button>
         )}
+
         <div className="hidden sm:flex items-center gap-3">
           <div
             className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white text-sm font-black flex-shrink-0"
@@ -135,6 +145,7 @@ export default function DashboardHeader({
           >
             {(user?.full_name || user?.email || "?")[0].toUpperCase()}
           </div>
+
           <div>
             <div className="flex items-center gap-1.5">
               <div className="text-sm font-black text-[#0F172A] leading-tight">
@@ -150,8 +161,10 @@ export default function DashboardHeader({
                   return greeting
                 })()}
               </div>
+
               <EditNameModal user={user} />
             </div>
+
             <div className="text-xs font-semibold text-[#94A3B8]">{roleTitle}</div>
           </div>
         </div>
@@ -163,11 +176,13 @@ export default function DashboardHeader({
           <Search
             className={`absolute ${isRtl ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]`}
           />
+
           <input
             type="text"
             placeholder={isRtl ? "חיפוש בכל המערכת..." : "Search the system..."}
             className={`w-full h-9 ${isRtl ? "pr-9 pl-4" : "pl-9 pr-4"} bg-[#F7FBFF] border border-[#E4ECFF] rounded-xl text-sm text-[#374151] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#8B5CF6] transition-all`}
           />
+
           <kbd className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded font-mono">
             ⌘K
           </kbd>
@@ -178,6 +193,7 @@ export default function DashboardHeader({
       <div className="flex items-center gap-3">
         <button className="relative w-9 h-9 rounded-xl flex items-center justify-center hover:bg-[#F7FBFF] transition-all">
           <Bell className="w-4 h-4 text-[#64748B]" />
+
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
         </button>
 
@@ -188,6 +204,7 @@ export default function DashboardHeader({
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-[#EF4444] hover:bg-red-50 transition-all"
         >
           <span className="hidden sm:inline">{t("common.logout")}</span>
+
           <LogOut className="w-4 h-4" />
         </button>
       </div>

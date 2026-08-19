@@ -215,6 +215,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
       <div className="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold">{job ? "Edit Job" : "Post New Job"}</h2>
+
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X className="w-5 h-5" />
           </button>
@@ -234,21 +235,26 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 <span className="text-xs font-bold text-[#64748B] w-24 flex-shrink-0">
                   Job Code
                 </span>
+
                 <span className="font-mono text-sm font-black text-[#7C3AED] bg-[#F3EFFF] px-2.5 py-0.5 rounded-lg">
                   {job.job_code}
                 </span>
               </div>
+
               {job.apply_email && (
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold text-[#64748B] w-24 flex-shrink-0">
                     Email alias
                   </span>
+
                   <span className="font-mono text-sm text-[#374151] break-all flex-1">
                     {job.apply_email}
                   </span>
+
                   <CopyInline text={job.apply_email} />
                 </div>
               )}
+
               <p className="text-xs text-[#94A3B8]">
                 Send resumes to this address — the system will process them automatically
               </p>
@@ -261,6 +267,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Job Title (Position) *
               </label>
+
               <input
                 required
                 placeholder="Software Engineer, Sales Manager..."
@@ -269,10 +276,12 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
               />
             </div>
+
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Company Name *
               </label>
+
               {isAgency ? (
                 <select
                   required
@@ -296,6 +305,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                   <option value="">
                     {clientsLoading ? "Loading clients…" : "Select a client"}
                   </option>
+
                   {agencyClients.map((client) => (
                     <option key={client.id} value={client.company_id}>
                       {client.name}
@@ -311,6 +321,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
                 />
               )}
+
               {isAgency && clientsError && (
                 <p className="mt-1.5 text-xs font-semibold text-red-600">
                   {clientsError}. Close and reopen the form to retry.
@@ -322,6 +333,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">Category *</label>
+
               <select
                 required
                 value={form.category}
@@ -329,16 +341,24 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
               >
                 <option value="">Select a category</option>
+
                 <option value="תכנות">Programming</option>
+
                 <option value="עיצוב">Design</option>
+
                 <option value="בחסות">Sponsored</option>
+
                 <option value="מכירות">Sales</option>
+
                 <option value="ניהול">Management</option>
+
                 <option value="הנדסה">Engineering</option>
               </select>
             </div>
+
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">Job Type *</label>
+
               <select
                 required
                 value={form.type}
@@ -346,8 +366,11 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
               >
                 <option value="full">Full-time</option>
+
                 <option value="part">Part-time</option>
+
                 <option value="remote">Remote</option>
+
                 <option value="daily">Daily</option>
               </select>
             </div>
@@ -355,6 +378,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
 
           <div>
             <label className="block text-sm font-semibold text-gray-900 mb-2">Location</label>
+
             <input
               placeholder="Tel Aviv"
               value={form.location}
@@ -368,6 +392,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Minimum Salary
               </label>
+
               <input
                 type="number"
                 placeholder="15000"
@@ -376,10 +401,12 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
               />
             </div>
+
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Maximum Salary
               </label>
+
               <input
                 type="number"
                 placeholder="25000"
@@ -394,6 +421,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
             <label className="block text-sm font-semibold text-gray-900 mb-2">
               Job Description
             </label>
+
             <textarea
               placeholder="Detailed description of the role, requirements and benefits..."
               value={form.description}
@@ -424,8 +452,10 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                   }
                   className="w-4 h-4 rounded border-gray-300"
                 />
+
                 <div>
                   <div className="text-sm font-medium text-gray-900">Anonymous Job</div>
+
                   <div className="text-xs text-gray-500">Hide company name and details</div>
                 </div>
               </label>
@@ -439,6 +469,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                       onChange={(e) => setForm({ ...form, show_company_name: e.target.checked })}
                       className="w-4 h-4 rounded border-gray-300"
                     />
+
                     <div className="text-sm font-medium text-gray-900">Show Company Name</div>
                   </label>
 
@@ -449,6 +480,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                       onChange={(e) => setForm({ ...form, show_company_info: e.target.checked })}
                       className="w-4 h-4 rounded border-gray-300"
                     />
+
                     <div className="text-sm font-medium text-gray-900">Show Company Info</div>
                   </label>
                 </>
@@ -461,6 +493,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                   onChange={(e) => setForm({ ...form, show_contact_details: e.target.checked })}
                   className="w-4 h-4 rounded border-gray-300"
                 />
+
                 <div className="text-sm font-medium text-gray-900">Show Contact Details</div>
               </label>
 
@@ -473,6 +506,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                     onChange={(e) => setForm({ ...form, contact_email: e.target.value })}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
                   />
+
                   <input
                     placeholder="Phone"
                     value={form.contact_phone}
@@ -490,6 +524,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
               {/* Warranty period — visible to all roles that can see this modal */}
               <div className="flex items-center justify-between p-2 bg-white rounded-lg">
                 <span className="text-xs font-bold text-blue-700">Warranty Period (days):</span>
+
                 {["admin", "recruitment_manager", "team_manager"].includes(user?.role) ? (
                   <input
                     type="number"
@@ -544,6 +579,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                           <span className="text-xs font-bold text-green-700">
                             {user?.role === "recruiter" ? "My Compensation" : "Recruiter"}:
                           </span>
+
                           <span className="text-sm font-black text-green-800">
                             {formatComp(
                               compensationPlan.recruiter_compensation,
@@ -553,12 +589,14 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                           </span>
                         </div>
                       )}
+
                     {compensationPlan.team_manager_compensation &&
                       (canSeeAll || user?.role === "team_manager") && (
                         <div className="flex items-center justify-between p-2 bg-white rounded-lg">
                           <span className="text-xs font-bold text-green-700">
                             {user?.role === "team_manager" ? "My Compensation" : "Team Manager"}:
                           </span>
+
                           <span className="text-sm font-black text-green-800">
                             {formatComp(
                               compensationPlan.team_manager_compensation,
@@ -568,6 +606,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                           </span>
                         </div>
                       )}
+
                     {compensationPlan.recruitment_manager_compensation && canSeeAll && (
                       <div className="flex items-center justify-between p-2 bg-white rounded-lg">
                         <span className="text-xs font-bold text-green-700">
@@ -576,6 +615,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                             : "Recruitment Manager"}
                           :
                         </span>
+
                         <span className="text-sm font-black text-green-800">
                           {formatComp(
                             compensationPlan.recruitment_manager_compensation,
@@ -600,6 +640,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
             >
               Cancel
             </button>
+
             <button
               type="submit"
               disabled={loading}

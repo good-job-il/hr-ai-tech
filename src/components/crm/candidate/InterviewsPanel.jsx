@@ -117,11 +117,13 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
           <h4 className="font-black text-[#0F172A] mb-3 text-sm">
             {t("candidateCRM.interviews.scheduleNew")}
           </h4>
+
           <div className="grid grid-cols-2 gap-3 mb-3">
             <div>
               <label className="text-xs font-bold text-[#64748B] mb-1 block">
                 {t("candidateCRM.interviews.form.date")} *
               </label>
+
               <Input
                 type="date"
                 value={form.date}
@@ -129,10 +131,12 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
                 className="text-sm"
               />
             </div>
+
             <div>
               <label className="text-xs font-bold text-[#64748B] mb-1 block">
                 {t("candidateCRM.interviews.form.time")} *
               </label>
+
               <Input
                 type="time"
                 value={form.time}
@@ -140,10 +144,12 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
                 className="text-sm"
               />
             </div>
+
             <div>
               <label className="text-xs font-bold text-[#64748B] mb-1 block">
                 {t("candidateCRM.interviews.form.type")}
               </label>
+
               <select
                 value={form.type}
                 onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))}
@@ -156,10 +162,12 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
                 ))}
               </select>
             </div>
+
             <div>
               <label className="text-xs font-bold text-[#64748B] mb-1 block">
                 {t("candidateCRM.interviews.form.stage")}
               </label>
+
               <select
                 value={form.stage}
                 onChange={(e) => setForm((p) => ({ ...p, stage: e.target.value }))}
@@ -172,10 +180,12 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
                 ))}
               </select>
             </div>
+
             <div className="col-span-2">
               <label className="text-xs font-bold text-[#64748B] mb-1 block">
                 {t("candidateCRM.interviews.form.locationLink")}
               </label>
+
               <Input
                 value={form.location_or_link}
                 onChange={(e) => setForm((p) => ({ ...p, location_or_link: e.target.value }))}
@@ -183,20 +193,24 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
                 className="text-sm"
               />
             </div>
+
             <div>
               <label className="text-xs font-bold text-[#64748B] mb-1 block">
                 {t("candidateCRM.interviews.form.interviewer")}
               </label>
+
               <Input
                 value={form.interviewer_name}
                 onChange={(e) => setForm((p) => ({ ...p, interviewer_name: e.target.value }))}
                 className="text-sm"
               />
             </div>
+
             <div>
               <label className="text-xs font-bold text-[#64748B] mb-1 block">
                 {t("candidateCRM.interviews.form.job")}
               </label>
+
               <Input
                 value={form.job_title}
                 onChange={(e) => setForm((p) => ({ ...p, job_title: e.target.value }))}
@@ -204,6 +218,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
               />
             </div>
           </div>
+
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -215,6 +230,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
                 ? t("candidateCRM.interviews.saving")
                 : t("candidateCRM.interviews.scheduleInterview")}
             </Button>
+
             <Button
               size="sm"
               variant="ghost"
@@ -233,6 +249,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
           <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
             {t("candidateCRM.interviews.upcoming")}
           </div>
+
           <div className="space-y-2">
             {upcoming.map((i) => (
               <InterviewCard
@@ -254,6 +271,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
           <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
             {t("candidateCRM.interviews.past")}
           </div>
+
           <div className="space-y-2">
             {past.map((i) => (
               <InterviewCard
@@ -272,6 +290,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
       {interviews.length === 0 && (
         <div className="text-center py-8 text-[#94A3B8]">
           <Calendar className="w-8 h-8 mx-auto mb-2 opacity-40" />
+
           <p className="text-sm font-semibold">{t("candidateCRM.interviews.noInterviews")}</p>
         </div>
       )}
@@ -304,30 +323,38 @@ function InterviewCard({ interview, onUpdate, typeLabels, stageLabels, statusCfg
           <div className="w-9 h-9 rounded-lg bg-[#EEF4FF] flex items-center justify-center flex-shrink-0">
             <TypeIcon className="w-4 h-4 text-[#7C3AED]" />
           </div>
+
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-black text-[#0F172A]">
                 {typeLabels[interview.type]} — {stageLabels[interview.stage]}
               </span>
+
               <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${status.color}`}>
                 {status.label}
               </span>
             </div>
+
             <div className="flex items-center gap-3 mt-1 text-xs text-[#64748B] flex-wrap">
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
+
                 {interview.date}
               </span>
+
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
+
                 {interview.time}
               </span>
+
               {interview.job_title && (
                 <span className="text-[#7C3AED] font-semibold">{interview.job_title}</span>
               )}
             </div>
           </div>
         </div>
+
         {interview.status === "scheduled" && (
           <div className="flex gap-1">
             <Button
@@ -338,6 +365,7 @@ function InterviewCard({ interview, onUpdate, typeLabels, stageLabels, statusCfg
             >
               {t("candidateCRM.interviews.feedback")}
             </Button>
+
             <Button
               size="sm"
               variant="outline"
@@ -360,6 +388,7 @@ function InterviewCard({ interview, onUpdate, typeLabels, stageLabels, statusCfg
           ))}
         </div>
       )}
+
       {interview.feedback && (
         <p className="text-xs text-[#64748B] mt-2 bg-[#F7F8FC] rounded-lg px-3 py-2">
           {interview.feedback}
@@ -377,16 +406,19 @@ function InterviewCard({ interview, onUpdate, typeLabels, stageLabels, statusCfg
               </button>
             ))}
           </div>
+
           <textarea
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             placeholder={t("candidateCRM.interviews.feedbackPlaceholder")}
             className="w-full text-sm border border-[#E4ECFF] rounded-lg px-3 py-2 min-h-[60px] resize-none focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/20"
           />
+
           <div className="flex gap-2 mt-2">
             <Button size="sm" onClick={saveFeedback} className="bg-[#7C3AED] text-white text-xs">
               {t("candidateCRM.interviews.saveFeedback")}
             </Button>
+
             <Button
               size="sm"
               variant="ghost"

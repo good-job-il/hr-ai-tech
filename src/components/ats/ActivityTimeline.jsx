@@ -192,12 +192,15 @@ export default function ActivityTimeline({ application }) {
           {t("common.refreshFailed", { defaultValue: "Unable to refresh activity" })}
         </div>
       )}
+
       {allEvents.length === 0 && (
         <div className="text-center py-8 text-[#94A3B8]">
           <Clock className="w-8 h-8 mx-auto mb-2" />
+
           <p className="text-sm font-semibold">{t("pipeline.activityTimeline.noActivity")}</p>
         </div>
       )}
+
       {allEvents.map((ev, i) => {
         const Icon = ev.icon
 
@@ -210,13 +213,18 @@ export default function ActivityTimeline({ application }) {
               >
                 <Icon className="w-4 h-4" style={{ color: ev.color }} />
               </div>
+
               {i < allEvents.length - 1 && <div className="w-0.5 flex-1 bg-[#E4ECFF] mt-1" />}
             </div>
+
             <div className="pb-2">
               <div className="font-bold text-sm text-[#0F172A]">{ev.title}</div>
+
               {ev.desc && <div className="text-xs text-[#64748B] mt-0.5">{ev.desc}</div>}
+
               <div className="text-xs text-[#94A3B8] mt-1 flex items-center gap-1.5">
                 <span>{timeAgo(ev.time, t, locale)}</span>
+
                 {ev.time && <span className="opacity-60">• {formatTime(ev.time, locale)}</span>}
               </div>
             </div>

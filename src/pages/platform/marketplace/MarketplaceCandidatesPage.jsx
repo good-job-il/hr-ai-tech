@@ -30,6 +30,7 @@ function AccessBadge({ type }) {
       className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${cfg.bg} ${cfg.text}`}
     >
       <Icon className="w-3 h-3" />
+
       {cfg.label}
     </span>
   )
@@ -44,6 +45,7 @@ function StatusBadge({ access }) {
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-600">
         <XCircle className="w-3 h-3" />
+
         {expired ? "Expired" : "Inactive"}
       </span>
     )
@@ -88,9 +90,11 @@ function GrantModal({ orgs, onClose, onGrant }) {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
         <h3 className="text-xl font-black text-gray-900 mb-5">Grant Marketplace Access</h3>
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">Candidate ID *</label>
+
             <input
               type="text"
               value={form.candidate_id}
@@ -99,16 +103,19 @@ function GrantModal({ orgs, onClose, onGrant }) {
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             />
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Owner Organization *
             </label>
+
             <select
               value={form.owner_organization_id}
               onChange={(e) => setForm((p) => ({ ...p, owner_organization_id: e.target.value }))}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             >
               <option value="">Select owner org…</option>
+
               {orgs.map((o) => (
                 <option key={o.id} value={o.id}>
                   {o.name}
@@ -116,16 +123,19 @@ function GrantModal({ orgs, onClose, onGrant }) {
               ))}
             </select>
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Accessor Organization
             </label>
+
             <select
               value={form.accessor_organization_id}
               onChange={(e) => setForm((p) => ({ ...p, accessor_organization_id: e.target.value }))}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             >
               <option value="">None (pool-level exposure)</option>
+
               {orgs
                 .filter((o) => o.id !== form.owner_organization_id)
                 .map((o) => (
@@ -135,21 +145,26 @@ function GrantModal({ orgs, onClose, onGrant }) {
                 ))}
             </select>
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">Access Type</label>
+
             <select
               value={form.access_type}
               onChange={(e) => setForm((p) => ({ ...p, access_type: e.target.value }))}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             >
               <option value="shared">Shared</option>
+
               <option value="purchased">Purchased</option>
             </select>
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Expires At (optional)
             </label>
+
             <input
               type="datetime-local"
               value={form.expires_at}
@@ -157,8 +172,10 @@ function GrantModal({ orgs, onClose, onGrant }) {
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             />
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">Notes</label>
+
             <input
               type="text"
               value={form.notes}
@@ -167,6 +184,7 @@ function GrantModal({ orgs, onClose, onGrant }) {
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             />
           </div>
+
           <div className="flex gap-3 pt-2">
             <button
               onClick={onClose}
@@ -175,6 +193,7 @@ function GrantModal({ orgs, onClose, onGrant }) {
             >
               Cancel
             </button>
+
             <button
               onClick={handleSubmit}
               disabled={saving || !form.candidate_id.trim() || !form.owner_organization_id}
@@ -283,10 +302,12 @@ export default function MarketplaceCandidatesPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-black text-slate-900">Candidate Pool</h1>
+
           <p className="text-slate-500 mt-1 font-semibold">
             All cross-organization access grants in the marketplace
           </p>
         </div>
+
         <button
           onClick={() => setShowGrant(true)}
           className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors"
@@ -305,6 +326,7 @@ export default function MarketplaceCandidatesPage() {
         ].map((s) => (
           <div key={s.label} className={`rounded-2xl p-5 ${s.color}`}>
             <p className="text-3xl font-black">{isLoading ? "..." : s.value}</p>
+
             <p className="text-sm font-semibold mt-1 opacity-80">{s.label}</p>
           </div>
         ))}
@@ -313,8 +335,10 @@ export default function MarketplaceCandidatesPage() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 items-center bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
         <Filter className="w-4 h-4 text-gray-400" />
+
         <div className="flex items-center gap-2 flex-1 min-w-48 border border-gray-200 rounded-xl px-3 py-2">
           <Search className="w-4 h-4 text-gray-400" />
+
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -322,30 +346,38 @@ export default function MarketplaceCandidatesPage() {
             className="outline-none text-sm w-full bg-transparent"
           />
         </div>
+
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
           className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold outline-none"
         >
           <option value="all">All Types</option>
+
           <option value="shared">Shared</option>
+
           <option value="purchased">Purchased</option>
         </select>
+
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold outline-none"
         >
           <option value="all">All Statuses</option>
+
           <option value="active">Active</option>
+
           <option value="expired">Expired / Inactive</option>
         </select>
+
         <button
           onClick={() => qc.invalidateQueries(["marketplace-accesses"])}
           className="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
         >
           <RefreshCw className="w-4 h-4 text-gray-500" />
         </button>
+
         <span className="text-sm text-gray-400 font-semibold">{filtered.length} records</span>
       </div>
 
@@ -356,15 +388,23 @@ export default function MarketplaceCandidatesPage() {
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="text-left font-black text-gray-600 px-5 py-3">Candidate</th>
+
                 <th className="text-left font-black text-gray-600 px-5 py-3">Owner Org</th>
+
                 <th className="text-left font-black text-gray-600 px-5 py-3">Accessor Org</th>
+
                 <th className="text-left font-black text-gray-600 px-5 py-3">Type</th>
+
                 <th className="text-left font-black text-gray-600 px-5 py-3">Status</th>
+
                 <th className="text-left font-black text-gray-600 px-5 py-3">Granted</th>
+
                 <th className="text-left font-black text-gray-600 px-5 py-3">Expires</th>
+
                 <th className="text-left font-black text-gray-600 px-5 py-3">Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {isLoading ? (
                 Array(6)
@@ -385,7 +425,9 @@ export default function MarketplaceCandidatesPage() {
                   <td colSpan={8} className="px-5 py-16 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <Users className="w-12 h-12 text-gray-200" />
+
                       <p className="text-gray-400 font-semibold">No access grants found</p>
+
                       <button
                         onClick={() => setShowGrant(true)}
                         className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700"
@@ -413,20 +455,24 @@ export default function MarketplaceCandidatesPage() {
                           <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
                             <Users className="w-4 h-4 text-purple-600" />
                           </div>
+
                           <div>
                             <p className="font-bold text-gray-900 font-mono text-xs">
                               {acc.candidate_id?.slice(0, 12)}…
                             </p>
+
                             {acc.notes && (
                               <p className="text-xs text-gray-400 truncate max-w-32">{acc.notes}</p>
                             )}
                           </div>
                         </div>
                       </td>
+
                       <td className="px-5 py-4">
                         {ownerOrg ? (
                           <div>
                             <p className="font-bold text-gray-800 text-sm">{ownerOrg.name}</p>
+
                             <p className="text-xs text-gray-400">
                               {ownerOrg.org_type === "staffing_agency" ? "Staffing" : "HR"}
                             </p>
@@ -437,10 +483,12 @@ export default function MarketplaceCandidatesPage() {
                           </span>
                         )}
                       </td>
+
                       <td className="px-5 py-4">
                         {accessorOrg ? (
                           <div>
                             <p className="font-bold text-gray-800 text-sm">{accessorOrg.name}</p>
+
                             <p className="text-xs text-gray-400">
                               {accessorOrg.org_type === "staffing_agency" ? "Staffing" : "HR"}
                             </p>
@@ -449,17 +497,21 @@ export default function MarketplaceCandidatesPage() {
                           <span className="text-gray-300 text-xs">—</span>
                         )}
                       </td>
+
                       <td className="px-5 py-4">
                         <AccessBadge type={acc.access_type} />
                       </td>
+
                       <td className="px-5 py-4">
                         <StatusBadge access={acc} />
                       </td>
+
                       <td className="px-5 py-4 text-gray-500 text-xs">
                         {acc.granted_at
                           ? new Date(acc.granted_at).toLocaleDateString("en-GB")
                           : "—"}
                       </td>
+
                       <td className="px-5 py-4 text-xs">
                         {acc.expires_at ? (
                           <span className={expired ? "text-red-500 font-bold" : "text-gray-500"}>
@@ -469,6 +521,7 @@ export default function MarketplaceCandidatesPage() {
                           <span className="text-gray-300">∞ Permanent</span>
                         )}
                       </td>
+
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-2">
                           {acc.is_active && !expired && (
@@ -479,6 +532,7 @@ export default function MarketplaceCandidatesPage() {
                               <Clock className="w-3 h-3" /> Revoke
                             </button>
                           )}
+
                           <button
                             onClick={() => handleDelete(acc)}
                             className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"

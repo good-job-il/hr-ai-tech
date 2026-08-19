@@ -15,10 +15,12 @@ function JobCard({ job }) {
         >
           {job.company_initials || job.company?.slice(0, 2)}
         </div>
+
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors text-base leading-tight line-clamp-2">
             {job.title}
           </h3>
+
           <p className="text-base text-blue-600 mt-1 font-semibold">{job.company}</p>
         </div>
       </div>
@@ -26,6 +28,7 @@ function JobCard({ job }) {
       {job.salary_min && job.salary_max && (
         <div className="mb-4 pb-4 border-b border-blue-100">
           <p className="text-xs text-gray-500 mb-1">טווח שכר</p>
+
           <div className="text-xl font-bold text-blue-700">
             ₪{job.salary_min.toLocaleString("he-IL")} – ₪{job.salary_max.toLocaleString("he-IL")}
           </div>
@@ -35,6 +38,7 @@ function JobCard({ job }) {
       {job.location && (
         <div className="flex items-center gap-2 mb-3 text-sm text-gray-600">
           <span>📍</span>
+
           <span className="font-semibold">{job.location}</span>
         </div>
       )}
@@ -90,6 +94,7 @@ export default function RecommendedJobs() {
       <div className="max-w-[1200px] mx-auto px-4 py-12" dir="rtl">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">משרות שיכולות להתאים לך</h2>
+
           <Link
             to="/jobs"
             className="text-blue-600 text-sm hover:text-blue-700 transition-colors font-medium inline-flex items-center gap-1"
@@ -98,6 +103,7 @@ export default function RecommendedJobs() {
             <span>←</span>
           </Link>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {jobs.map((job) => (
             <JobCard key={job.id} job={job} />

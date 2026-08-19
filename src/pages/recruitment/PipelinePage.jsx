@@ -109,6 +109,7 @@ export default function PipelinePage() {
             actions={
               <div className="flex flex-wrap items-center gap-3">
                 <NotificationCenter key={notifKey} />
+
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className={`h-10 px-4 rounded-xl border font-bold text-sm flex items-center gap-2 transition-all ${
@@ -118,13 +119,16 @@ export default function PipelinePage() {
                   }`}
                 >
                   <SlidersHorizontal className="w-4 h-4" />
+
                   {t("pipeline.page.filter")}
                 </button>
+
                 <button
                   onClick={refresh}
                   className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600 transition-all hover:border-[#C4B5FD] hover:text-[#6C4DFF]"
                 >
                   <RefreshCw className="w-4 h-4" />
+
                   {t("pipeline.page.refresh")}
                 </button>
               </div>
@@ -147,6 +151,7 @@ export default function PipelinePage() {
             loading={loading}
             meta="In the recruitment board"
           />
+
           <PlatformStatCard
             icon={Kanban}
             label={t("pipeline.page.stagesCount", { count: stages.length })}
@@ -155,6 +160,7 @@ export default function PipelinePage() {
             loading={loading}
             meta="Stages with candidates"
           />
+
           <PlatformStatCard
             icon={Sparkles}
             label="AI scored"
@@ -169,6 +175,7 @@ export default function PipelinePage() {
         {isMockData && !loading && (
           <div className="mx-4 md:mx-6 mt-4 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2">
             <FlaskConical className="w-4 h-4 text-amber-600 flex-shrink-0" />
+
             <span className="text-sm font-bold text-amber-700">
               {t("pipeline.page.demoDataBanner")}
             </span>
@@ -182,6 +189,7 @@ export default function PipelinePage() {
               <div className="flex items-center justify-center h-96">
                 <div className="text-center">
                   <div className="w-12 h-12 border-4 border-[#E4ECFF] border-t-[#7C3AED] rounded-full animate-spin mx-auto mb-4" />
+
                   <p className="text-[#64748B] font-bold">{t("pipeline.page.loading")}</p>
                 </div>
               </div>
@@ -192,6 +200,7 @@ export default function PipelinePage() {
                     ? t("common.accessDenied", { defaultValue: "Access denied" })
                     : t("common.loadError", { defaultValue: "Unable to load the pipeline" })}
                 </p>
+
                 <button
                   onClick={refresh}
                   className="mt-3 text-sm font-bold text-violet-600 hover:underline"

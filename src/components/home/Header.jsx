@@ -97,6 +97,7 @@ export default function Header() {
               >
                 {t("common.login")}
               </Link>
+
               <Link
                 to="/register"
                 style={{
@@ -124,6 +125,7 @@ export default function Header() {
                 }}
               >
                 <UserPlus style={{ width: 14, height: 14 }} />
+
                 {isRtl ? "הרשמה כמועמד חדש" : "Register as Candidate"}
               </Link>
             </>
@@ -153,6 +155,7 @@ export default function Header() {
               {t("common.dashboard")}
             </Link>
           )}
+
           <button
             className="lg:hidden"
             onClick={() => setOpen(!open)}
@@ -213,6 +216,7 @@ export default function Header() {
               </Link>
             )
           })}
+
           <LanguageSwitcher variant="minimal" className="text-[#64748B] ml-2" />
         </nav>
 
@@ -258,6 +262,7 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
+
           <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
             <Link
               to="/login"
@@ -276,6 +281,7 @@ export default function Header() {
             >
               {t("common.login")}
             </Link>
+
             <Link
               to="/register"
               style={{
@@ -294,6 +300,7 @@ export default function Header() {
               {t("common.register")}
             </Link>
           </div>
+
           <div style={{ marginTop: 16 }}>
             <LanguageSwitcher variant="badge" />
           </div>

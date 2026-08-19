@@ -204,6 +204,7 @@ export default function PermissionsPage() {
                   >
                     {t("permissionsMatrix.staffingAgency")}
                   </button>
+
                   <button
                     onClick={() => setOrgType("organization")}
                     className={`rounded-lg px-4 py-2 font-semibold transition-all ${orgType === "organization" ? "bg-white text-violet-700 shadow-sm" : "text-slate-500"}`}
@@ -212,6 +213,7 @@ export default function PermissionsPage() {
                   </button>
                 </div>
               )}
+
               <button
                 onClick={load}
                 disabled={loading}
@@ -220,9 +222,11 @@ export default function PermissionsPage() {
               >
                 <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               </button>
+
               {canEdit && (
                 <Button onClick={handleSaveAll} disabled={saving || !hasDirty} className="gap-2">
                   <Save className="w-4 h-4" />
+
                   {saving
                     ? t("permissionsMatrix.saving")
                     : saved
@@ -246,6 +250,7 @@ export default function PermissionsPage() {
                 : t("permissionsMatrix.organization")
             }
           />
+
           <PlatformStatCard
             icon={Lock}
             label={t("permissionsMatrix.title")}
@@ -253,6 +258,7 @@ export default function PermissionsPage() {
             tone="blue"
             meta={t("permissionsMatrix.footer")}
           />
+
           <PlatformStatCard
             icon={Save}
             label={t("permissionsMatrix.modified")}
@@ -283,6 +289,7 @@ export default function PermissionsPage() {
                   ? t("permissionsMatrix.accessDenied")
                   : t("common.loadError", { defaultValue: "Unable to load permissions" })}
               </p>
+
               {error.status !== 403 && (
                 <Button className="mt-4" variant="outline" onClick={load}>
                   {t("common.retry")}
@@ -298,6 +305,7 @@ export default function PermissionsPage() {
                 subtitle={t("permissionsMatrix.subtitle")}
               />
             </div>
+
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -307,6 +315,7 @@ export default function PermissionsPage() {
                     >
                       {t("permissionsMatrix.roleColumn")}
                     </th>
+
                     {PERM_KEYS.map((key) => (
                       <th
                         key={key}
@@ -317,6 +326,7 @@ export default function PermissionsPage() {
                     ))}
                   </tr>
                 </thead>
+
                 <tbody>
                   {roleKeys.map((roleKey, i) => (
                     <tr
@@ -325,13 +335,16 @@ export default function PermissionsPage() {
                     >
                       <td className={`px-5 py-4 ${stickyColClass} bg-inherit z-10`}>
                         <div className="font-bold text-slate-900">{roleLabel(roleKey)}</div>
+
                         <div className="font-mono text-xs text-slate-400">{roleKey}</div>
+
                         {dirty[roleKey] && (
                           <span className="text-xs text-amber-600 font-semibold">
                             {t("permissionsMatrix.modified")}
                           </span>
                         )}
                       </td>
+
                       {PERM_KEYS.map((permKey) => (
                         <td key={permKey} className="px-3 py-4 text-center">
                           <button

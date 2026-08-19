@@ -89,6 +89,7 @@ export default function StatsSection() {
                 >
                   <Icon style={{ width: 26, height: 26, color: s.color }} />
                 </div>
+
                 <div
                   style={{
                     fontSize: "clamp(2rem, 3.5vw, 2.8rem)",
@@ -101,6 +102,7 @@ export default function StatsSection() {
                 >
                   {s.value}
                 </div>
+
                 <div style={{ fontSize: 14, color: "#64748B", fontWeight: 500 }}>{s.label}</div>
               </div>
             )

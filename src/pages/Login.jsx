@@ -63,7 +63,9 @@ export default function Login() {
             alt="HeadHunter HR-Tech"
             className="h-16 w-auto object-contain mx-auto mb-3"
           />
+
           <h1 className="text-xl font-bold text-gray-900">{t("auth.login.title")}</h1>
+
           <p className="text-sm text-gray-500 mt-1">{t("auth.login.subtitle")}</p>
         </div>
 
@@ -76,6 +78,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label className="text-sm text-gray-700">{t("auth.login.email")}</Label>
+
             <Input
               type="email"
               value={email}
@@ -85,8 +88,10 @@ export default function Login() {
               dir="ltr"
             />
           </div>
+
           <div>
             <Label className="text-sm text-gray-700">{t("auth.login.password")}</Label>
+
             <Input
               type="password"
               value={password}
@@ -96,11 +101,13 @@ export default function Login() {
               dir="ltr"
             />
           </div>
+
           <div className={isRtl ? "text-left" : "text-right"}>
             <Link to="/forgot-password" className="text-hhblue text-sm hover:underline">
               {t("auth.login.forgotPassword")}
             </Link>
           </div>
+
           <Button
             type="submit"
             disabled={loading}

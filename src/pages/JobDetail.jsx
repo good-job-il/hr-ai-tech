@@ -321,11 +321,14 @@ export default function JobDetail() {
         style={{ background: "linear-gradient(to bottom, #F7FBFF 0%, #EEF5FF 100%)" }}
       >
         <Navbar />
+
         <div className="flex flex-col items-center justify-center py-32 gap-5">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent animate-pulse" />
+
             <div className="w-7 h-7 border-4 border-white/30 border-t-white rounded-full animate-spin" />
           </div>
+
           <p className="text-[15px] font-bold text-[#64748B]">Loading job details...</p>
         </div>
       </div>
@@ -339,20 +342,24 @@ export default function JobDetail() {
         style={{ background: "linear-gradient(to bottom, #F7FBFF 0%, #EEF5FF 100%)" }}
       >
         <Navbar />
+
         <div className="flex flex-col items-center justify-center py-32 gap-6 text-center px-4">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FEE2E2] to-[#FECACA] flex items-center justify-center shadow-lg">
             <AlertCircle className="w-10 h-10 text-[#DC2626]" />
           </div>
+
           <div className="max-w-md">
             <h2 className="text-[22px] font-black text-[#0F172A] mb-2">
               {jobLoadError ? "Error Loading Job" : "Job Not Found"}
             </h2>
+
             <p className="text-[15px] font-semibold text-[#64748B]">
               {jobLoadError
                 ? "A server connection error occurred. Please try again."
                 : "This job may have been removed or the link is invalid."}
             </p>
           </div>
+
           <div className="flex gap-3">
             {jobLoadError && (
               <button
@@ -366,6 +373,7 @@ export default function JobDetail() {
                 Try Again
               </button>
             )}
+
             <Link
               to="/jobs"
               className="flex items-center gap-2 border-2 border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] px-6 h-11 rounded-xl text-[14px] font-bold transition-all active:scale-95"
@@ -469,6 +477,7 @@ export default function JobDetail() {
         canonical={`https://headhunter.co.il/jobs/${id}`}
         schemaData={jobPostingSchema}
       />
+
       <Navbar />
 
       <div className="max-w-[1200px] mx-auto px-4 py-8">
@@ -489,6 +498,7 @@ export default function JobDetail() {
               style={glass}
             >
               <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-l from-[#A855F7] via-[#6C4DFF] to-[#2FB8FF]" />
+
               <div className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
 
               <div className="p-8 relative">
@@ -509,6 +519,7 @@ export default function JobDetail() {
                           ✨ New
                         </span>
                       )}
+
                       {job.views > 0 && (
                         <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0] inline-flex items-center gap-1.5">
                           <Eye className="w-3.5 h-3.5" />
@@ -520,23 +531,29 @@ export default function JobDetail() {
                     <h1 className="text-[32px] leading-[1.25] font-black text-[#0F172A] mb-2">
                       {job.title}
                     </h1>
+
                     <p className="text-[18px] font-black text-[#7C3AED] mb-4">{job.company}</p>
 
                     <div className="flex flex-wrap items-center gap-4 text-[14px] font-bold text-[#64748B]">
                       {job.location && (
                         <span className="flex items-center gap-1.5">
                           <MapPin className="w-4 h-4 text-[#60A5FA]" />
+
                           {job.location}
                         </span>
                       )}
+
                       {job.type && (
                         <span className="flex items-center gap-1.5">
                           <Briefcase className="w-4 h-4 text-[#8B5CF6]" />
+
                           {typeLabels[job.type]}
                         </span>
                       )}
+
                       <span className="flex items-center gap-1.5">
                         <Clock className="w-4 h-4 text-[#94A3B8]" />
+
                         {new Date(job.created_date).toLocaleDateString("en-US")}
                       </span>
                     </div>
@@ -549,11 +566,14 @@ export default function JobDetail() {
                 {job.salary_min && job.salary_max && (
                   <div className="mb-6 pb-6 border-b border-[#E4ECFF]">
                     <p className="text-[13px] font-bold text-[#64748B] mb-2">💰 Monthly Salary</p>
+
                     <div className="inline-flex items-baseline gap-2 px-5 py-3 rounded-2xl bg-gradient-to-br from-[#F0F9FF] to-[#E0F2FE] border border-[#BAE6FD]">
                       <span className="text-[28px] font-black bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] bg-clip-text text-transparent">
                         ₪{job.salary_min.toLocaleString()}
                       </span>
+
                       <span className="text-[18px] font-bold text-[#64748B]">-</span>
+
                       <span className="text-[28px] font-black bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] bg-clip-text text-transparent">
                         ₪{job.salary_max.toLocaleString()}
                       </span>
@@ -570,6 +590,7 @@ export default function JobDetail() {
                       </span>
                       Job Description
                     </h2>
+
                     <div className="prose prose-sm max-w-none">
                       <p className="text-[15px] leading-relaxed text-[#475569] whitespace-pre-wrap">
                         {job.description}
@@ -597,6 +618,7 @@ export default function JobDetail() {
                 <h3 className="text-[16px] font-black text-[#0F172A] mb-4 flex items-center gap-2">
                   🔗 Related Jobs
                 </h3>
+
                 <div className="flex flex-wrap gap-2.5">
                   {job.location && (
                     <Link
@@ -606,6 +628,7 @@ export default function JobDetail() {
                       📍 Jobs in {job.location}
                     </Link>
                   )}
+
                   {job.category && (
                     <Link
                       to={`/jobs/category/${encodeURIComponent(job.category)}`}
@@ -614,6 +637,7 @@ export default function JobDetail() {
                       💼 {job.category} Jobs
                     </Link>
                   )}
+
                   {job.location && job.category && (
                     <Link
                       to={`/jobs?search=${encodeURIComponent(job.category)}&location=${encodeURIComponent(job.location)}`}
@@ -622,6 +646,7 @@ export default function JobDetail() {
                       {job.category} in {job.location}
                     </Link>
                   )}
+
                   <Link
                     to="/jobs"
                     className="px-4 py-2.5 rounded-xl text-[13px] font-bold bg-white text-[#64748B] border border-[#E2E8F0] hover:border-[#CBD5E1] hover:shadow-lg transition-all active:scale-95"
@@ -652,7 +677,9 @@ export default function JobDetail() {
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#EF4444] to-[#DC2626] flex items-center justify-center text-white text-2xl mx-auto mb-4 shadow-lg">
                       🚫
                     </div>
+
                     <p className="text-[16px] font-black text-[#DC2626]">This Job is Closed</p>
+
                     <p className="text-[13px] font-medium text-[#991B1B] mt-2">
                       This position is no longer active
                     </p>
@@ -682,12 +709,15 @@ export default function JobDetail() {
                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center text-white text-3xl mx-auto mb-4 shadow-lg">
                       🎉
                     </div>
+
                     <h3 className="text-[20px] font-black text-[#047857] mb-2">
                       Application Submitted!
                     </h3>
+
                     <p className="text-[14px] font-semibold text-[#059669] mb-6">
                       We've sent a confirmation to your email. The team will get back to you soon.
                     </p>
+
                     <button
                       onClick={() => {
                         setSubmitted(false)
@@ -718,6 +748,7 @@ export default function JobDetail() {
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white shadow-lg">
                         📝
                       </div>
+
                       <h3 className="text-[18px] font-black text-[#0F172A]">Submit Application</h3>
                     </div>
 
@@ -725,6 +756,7 @@ export default function JobDetail() {
                     {applyError && (
                       <div className="flex items-start gap-2.5 bg-[#FEF2F2] border border-[#FECACA] rounded-xl px-4 py-3.5">
                         <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#DC2626]" />
+
                         <span className="text-[13px] font-semibold text-[#DC2626]">
                           {applyError}
                         </span>
@@ -742,6 +774,7 @@ export default function JobDetail() {
                           }}
                           className={`w-full h-11 border rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none transition-all placeholder:text-[#94A3B8] placeholder:font-medium ${formErrors.candidate_name ? "border-[#F87171] focus:ring-2 focus:ring-[#FCA5A5]" : "border-[#E2E8F0] focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE]"}`}
                         />
+
                         {formErrors.candidate_name && (
                           <p className="text-[#DC2626] text-xs font-semibold mt-1.5 pr-1">
                             {formErrors.candidate_name}
@@ -761,6 +794,7 @@ export default function JobDetail() {
                           }}
                           className={`w-full h-11 border rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none transition-all placeholder:text-[#94A3B8] placeholder:font-medium ${formErrors.candidate_email ? "border-[#F87171] focus:ring-2 focus:ring-[#FCA5A5]" : "border-[#E2E8F0] focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE]"}`}
                         />
+
                         {formErrors.candidate_email && (
                           <p className="text-[#DC2626] text-xs font-semibold mt-1.5 pr-1">
                             {formErrors.candidate_email}
@@ -778,6 +812,7 @@ export default function JobDetail() {
                           }}
                           className={`w-full h-11 border rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none transition-all placeholder:text-[#94A3B8] placeholder:font-medium ${formErrors.candidate_phone ? "border-[#F87171] focus:ring-2 focus:ring-[#FCA5A5]" : "border-[#E2E8F0] focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE]"}`}
                         />
+
                         {formErrors.candidate_phone && (
                           <p className="text-[#DC2626] text-xs font-semibold mt-1.5 pr-1">
                             {formErrors.candidate_phone}
@@ -806,6 +841,7 @@ export default function JobDetail() {
                           }}
                           className="w-full h-11 border border-[#E2E8F0] rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE] transition-all placeholder:text-[#94A3B8] placeholder:font-medium"
                         />
+
                         <div>
                           <input
                             type="number"
@@ -820,6 +856,7 @@ export default function JobDetail() {
                             }}
                             className={`w-full h-11 border rounded-xl px-4 text-[14px] font-semibold bg-white text-[#0F172A] outline-none transition-all placeholder:text-[#94A3B8] placeholder:font-medium ${formErrors.desired_salary_max ? "border-[#F87171] focus:ring-2 focus:ring-[#FCA5A5]" : "border-[#E2E8F0] focus:border-[#7C3AED] focus:ring-2 focus:ring-[#DDD6FE]"}`}
                           />
+
                           {formErrors.desired_salary_max && (
                             <p className="text-[#DC2626] text-xs font-semibold mt-1.5 pr-1">
                               {formErrors.desired_salary_max}
@@ -841,6 +878,7 @@ export default function JobDetail() {
                     {profileResume && (
                       <div className="space-y-2">
                         <p className="text-[13px] text-[#64748B] font-bold">Resume:</p>
+
                         <div className="flex flex-col gap-2">
                           <button
                             type="button"
@@ -857,6 +895,7 @@ export default function JobDetail() {
                           >
                             ✓ Use Resume from Profile
                           </button>
+
                           <button
                             type="button"
                             onClick={() => {
@@ -888,9 +927,11 @@ export default function JobDetail() {
                           className="hidden"
                           disabled={extracting || uploading}
                         />
+
                         <Upload
                           className={`w-7 h-7 mx-auto mb-3 ${uploadError ? "text-[#DC2626]" : "text-[#94A3B8]"}`}
                         />
+
                         <div
                           className={`text-[14px] font-bold mb-1.5 ${uploadError ? "text-[#DC2626]" : "text-[#0F172A]"}`}
                         >
@@ -902,6 +943,7 @@ export default function JobDetail() {
                                 ? `✓ ${form.resume_filename}`
                                 : "Upload Resume"}
                         </div>
+
                         {uploadError ? (
                           <p className="text-[#DC2626] text-xs font-semibold">{uploadError}</p>
                         ) : (
@@ -933,6 +975,7 @@ export default function JobDetail() {
                       >
                         Cancel
                       </button>
+
                       <button
                         type="submit"
                         disabled={applyMutation.isPending || uploading || extracting}

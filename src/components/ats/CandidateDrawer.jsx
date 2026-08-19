@@ -229,11 +229,14 @@ export default function CandidateDrawer({
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white text-2xl font-black">
               {(application.candidate_name || "?")[0]}
             </div>
+
             <div>
               <h2 className="text-xl font-black text-[#0F172A]">{application.candidate_name}</h2>
+
               <p className="text-[#7C3AED] font-bold">{application.job_title}</p>
             </div>
           </div>
+
           <button
             onClick={onClose}
             className="w-9 h-9 rounded-xl border border-[#E4ECFF] flex items-center justify-center text-[#64748B] hover:text-red-500 transition-all"
@@ -245,6 +248,7 @@ export default function CandidateDrawer({
         <div className="px-6 py-3 bg-[#F7FBFF] border-b border-[#E4ECFF]">
           <div className="flex items-center gap-3">
             <span className="text-sm font-bold text-[#64748B]">{t("pipeline.drawer.stage")}</span>
+
             <select
               value={application.status}
               onChange={(e) => onStageChange(application.id, e.target.value)}
@@ -257,6 +261,7 @@ export default function CandidateDrawer({
                 </option>
               ))}
             </select>
+
             {application.match_score != null && (
               <div
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-black ${matchColor(application.match_score)}`}
@@ -286,6 +291,7 @@ export default function CandidateDrawer({
                 }`}
               >
                 <Icon className="w-4 h-4" />
+
                 {tab.label}
               </button>
             )
@@ -301,16 +307,19 @@ export default function CandidateDrawer({
                   label={t("pipeline.drawer.email")}
                   value={application.candidate_email}
                 />
+
                 <InfoRow
                   icon={Phone}
                   label={t("pipeline.drawer.phone")}
                   value={application.candidate_phone}
                 />
+
                 <InfoRow
                   icon={MapPin}
                   label={t("pipeline.drawer.location")}
                   value={application.location}
                 />
+
                 <InfoRow
                   icon={Briefcase}
                   label={t("pipeline.drawer.experience")}
@@ -322,6 +331,7 @@ export default function CandidateDrawer({
                       : null
                   }
                 />
+
                 <InfoRow
                   icon={User}
                   label={t("pipeline.drawer.recruiter")}
@@ -351,6 +361,7 @@ export default function CandidateDrawer({
               {aiMatch && !aiMatch.explanation.requiredMet && (
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
                   <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+
                   <span className="text-sm font-bold text-amber-700">
                     {t("pipeline.drawer.missingRequiredWarning")}
                   </span>
@@ -384,6 +395,7 @@ export default function CandidateDrawer({
                   rows={3}
                   className="flex-1 p-3 rounded-xl border border-[#E4ECFF] text-sm font-semibold text-[#0F172A] outline-none resize-none focus:border-[#C4B5FD]"
                 />
+
                 <button
                   onClick={addNote}
                   disabled={savingNote}
@@ -392,11 +404,13 @@ export default function CandidateDrawer({
                   {savingNote ? "…" : t("pipeline.drawer.save")}
                 </button>
               </div>
+
               {application.notes && (
                 <div className="p-4 rounded-xl bg-[#F7FBFF] border border-[#E4ECFF]">
                   <p className="text-sm font-semibold text-[#0F172A]">{application.notes}</p>
                 </div>
               )}
+
               {actionError && <p className="text-sm font-bold text-red-600">{actionError}</p>}
             </div>
           )}
@@ -408,13 +422,16 @@ export default function CandidateDrawer({
             className="flex-1 h-11 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center justify-center gap-2"
           >
             <Send className="w-4 h-4" />
+
             {t("pipeline.drawer.sendMessage")}
           </button>
+
           <button
             onClick={() => setInterviewOpen(true)}
             className="flex-1 h-11 rounded-xl border border-[#E4ECFF] bg-white text-[#64748B] font-bold text-sm flex items-center justify-center gap-2 hover:border-[#C4B5FD]"
           >
             <Calendar className="w-4 h-4" />
+
             {t("pipeline.drawer.scheduleInterview")}
           </button>
         </div>
@@ -425,13 +442,16 @@ export default function CandidateDrawer({
           <DialogHeader>
             <DialogTitle>{t("pipeline.drawer.sendMessage")}</DialogTitle>
           </DialogHeader>
+
           <textarea
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             rows={5}
             className="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none focus:border-violet-300"
           />
+
           {actionError && <p className="text-sm font-bold text-red-600">{actionError}</p>}
+
           <Button onClick={sendMessage} disabled={!message.trim() || actionPending}>
             {actionPending ? "…" : t("pipeline.drawer.sendMessage")}
           </Button>
@@ -443,6 +463,7 @@ export default function CandidateDrawer({
           <DialogHeader>
             <DialogTitle>{t("pipeline.drawer.scheduleInterview")}</DialogTitle>
           </DialogHeader>
+
           <div className="grid grid-cols-2 gap-3">
             <Input
               type="date"
@@ -451,6 +472,7 @@ export default function CandidateDrawer({
                 setInterview((value) => ({ ...value, date: event.target.value }))
               }
             />
+
             <Input
               type="time"
               value={interview.time}
@@ -459,17 +481,23 @@ export default function CandidateDrawer({
               }
             />
           </div>
+
           <select
             value={interview.type}
             onChange={(event) => setInterview((value) => ({ ...value, type: event.target.value }))}
             className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm"
           >
             <option value="video">Video</option>
+
             <option value="phone">Phone</option>
+
             <option value="in_person">In person</option>
+
             <option value="technical">Technical</option>
+
             <option value="final">Final</option>
           </select>
+
           <Input
             value={interview.location_or_link}
             onChange={(event) =>
@@ -477,7 +505,9 @@ export default function CandidateDrawer({
             }
             placeholder="Location or meeting link"
           />
+
           {actionError && <p className="text-sm font-bold text-red-600">{actionError}</p>}
+
           <Button
             onClick={scheduleInterview}
             disabled={!interview.date || !interview.time || actionPending}
@@ -494,6 +524,7 @@ function Section({ title, children }) {
   return (
     <div>
       <h3 className="text-sm font-black text-[#64748B] uppercase tracking-wide mb-3">{title}</h3>
+
       <div className="space-y-1">{children}</div>
     </div>
   )
@@ -507,7 +538,9 @@ function InfoRow({ icon: Icon, label, value }) {
   return (
     <div className="flex items-center gap-3 py-2 border-b border-[#F1F5F9]">
       <Icon className="w-4 h-4 text-[#94A3B8]" />
+
       <span className="text-xs text-[#94A3B8] font-semibold w-20">{label}</span>
+
       <span className="text-sm font-bold text-[#0F172A]">{value}</span>
     </div>
   )

@@ -69,6 +69,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
       >
         <Icon className="w-5 h-5" style={{ color }} />
       </div>
+
       <div>
         <div className="text-2xl font-black text-[#0F172A]">
           {loading ? (
@@ -77,6 +78,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
             value
           )}
         </div>
+
         <div className="text-xs font-semibold text-[#64748B]">{label}</div>
       </div>
     </div>
@@ -113,6 +115,7 @@ function InterviewCard({ interview, isSelected, onSelect }) {
           <h3 className="font-black text-[#0F172A] text-sm leading-tight truncate">
             {interview.job_title || t("candidate.interviews.noJobTitle")}
           </h3>
+
           <p className="text-xs font-semibold text-[#7C3AED] mt-0.5 truncate">
             {interview.company_name || interview.organization_name}
           </p>
@@ -125,17 +128,22 @@ function InterviewCard({ interview, isSelected, onSelect }) {
       <div className="flex items-center gap-3 text-xs text-[#64748B] mt-2">
         <span className="flex items-center gap-1 font-semibold">
           <Calendar className="w-3 h-3" />
+
           {new Date(interview.date).toLocaleDateString()}
         </span>
+
         {interview.time && (
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
+
             {interview.time}
           </span>
         )}
+
         {interview.type && (
           <span className="flex items-center gap-1">
             <TypeIcon type={interview.type} className="w-3 h-3" />
+
             {t(`candidate.interviews.types.${interview.type}`, { defaultValue: interview.type })}
           </span>
         )}
@@ -145,6 +153,7 @@ function InterviewCard({ interview, isSelected, onSelect }) {
       {isUpcoming && (
         <div className="mt-3 flex items-center gap-2 text-xs font-bold text-[#7C3AED] bg-[#F3EFFF] border border-[#C4B5FD] rounded-lg px-3 py-1.5">
           <AlertCircle className="w-3.5 h-3.5" />
+
           {t("candidate.interviews.upcomingBanner")}
         </div>
       )}
@@ -165,17 +174,21 @@ function DetailPanel({ interview, onClose }) {
           <div className="w-10 h-10 rounded-xl bg-[#F3EFFF] flex items-center justify-center flex-shrink-0">
             <TypeIcon type={interview.type} className="w-5 h-5 text-[#7C3AED]" />
           </div>
+
           <div className="min-w-0">
             <h2 className="font-black text-[#0F172A] text-base leading-tight truncate">
               {interview.job_title || t("candidate.interviews.noJobTitle")}
             </h2>
+
             <p className="text-sm font-semibold text-[#7C3AED] mt-0.5">
               {interview.company_name || interview.organization_name}
             </p>
           </div>
         </div>
+
         <div className="flex items-center gap-2 flex-shrink-0">
           <StatusBadge status={interview.status || "scheduled"} />
+
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-lg border border-[#E4ECFF] flex items-center justify-center text-[#94A3B8] hover:text-[#374151] hover:border-[#C4B5FD] transition-colors"
@@ -193,33 +206,40 @@ function DetailPanel({ interview, onClose }) {
             <div className="text-xs font-medium text-[#94A3B8] mb-0.5">
               {t("candidate.interviews.detail.date")}
             </div>
+
             <div className="font-semibold text-[#0F172A]">
               {new Date(interview.date).toLocaleDateString()}
             </div>
           </div>
+
           {interview.time && (
             <div>
               <div className="text-xs font-medium text-[#94A3B8] mb-0.5">
                 {t("candidate.interviews.detail.time")}
               </div>
+
               <div className="font-semibold text-[#0F172A]">{interview.time}</div>
             </div>
           )}
+
           <div>
             <div className="text-xs font-medium text-[#94A3B8] mb-0.5">
               {t("candidate.interviews.detail.type")}
             </div>
+
             <div className="font-semibold text-[#0F172A]">
               {t(`candidate.interviews.types.${interview.type}`, {
                 defaultValue: interview.type || "—",
               })}
             </div>
           </div>
+
           {interview.interviewer_name && (
             <div>
               <div className="text-xs font-medium text-[#94A3B8] mb-0.5">
                 {t("candidate.interviews.detail.interviewer")}
               </div>
+
               <div className="font-semibold text-[#0F172A]">{interview.interviewer_name}</div>
             </div>
           )}
@@ -233,9 +253,11 @@ function DetailPanel({ interview, onClose }) {
                 ? t("candidate.interviews.detail.location")
                 : t("candidate.interviews.detail.joinLink")}
             </div>
+
             {interview.type === "in_person" ? (
               <div className="flex items-center gap-2 text-sm font-semibold text-[#0F172A]">
                 <MapPin className="w-4 h-4 text-[#7C3AED] flex-shrink-0" />
+
                 {interview.location_or_link}
               </div>
             ) : (
@@ -246,6 +268,7 @@ function DetailPanel({ interview, onClose }) {
                 className="flex items-center gap-2 text-sm font-semibold text-[#7C3AED] hover:underline break-all"
               >
                 <Video className="w-4 h-4 flex-shrink-0" />
+
                 {interview.location_or_link}
               </a>
             )}
@@ -258,6 +281,7 @@ function DetailPanel({ interview, onClose }) {
             <div className="text-xs font-medium text-[#94A3B8] mb-1.5">
               {t("candidate.interviews.detail.notes")}
             </div>
+
             <div className="text-sm text-[#374151] bg-[#F8FAFC] rounded-xl p-3 leading-relaxed">
               {interview.notes}
             </div>
@@ -273,7 +297,9 @@ function DetailPanel({ interview, onClose }) {
             className="flex items-center justify-center gap-2 w-full h-9 rounded-xl border border-[#E4ECFF] text-sm font-bold text-[#374151] hover:border-[#C4B5FD] hover:text-[#7C3AED] transition-colors"
           >
             <Briefcase className="w-4 h-4" />
+
             {t("candidate.interviews.viewJob")}
+
             <ChevronLeft className="w-4 h-4" />
           </Link>
         </div>
@@ -335,8 +361,10 @@ export default function CandidateInterviews() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black text-[#0F172A]">{t("candidate.interviews.title")}</h1>
+
           <p className="text-[#64748B] font-semibold mt-1">{t("candidate.interviews.subtitle")}</p>
         </div>
+
         <button
           onClick={() => refetch()}
           disabled={isLoading}
@@ -355,6 +383,7 @@ export default function CandidateInterviews() {
           color="#2563EB"
           loading={isLoading}
         />
+
         <StatCard
           icon={AlertCircle}
           label={t("candidate.interviews.stats.upcoming")}
@@ -362,6 +391,7 @@ export default function CandidateInterviews() {
           color="#7C3AED"
           loading={isLoading}
         />
+
         <StatCard
           icon={CheckCircle2}
           label={t("candidate.interviews.stats.completed")}
@@ -411,11 +441,13 @@ export default function CandidateInterviews() {
               <div className="w-16 h-16 rounded-2xl bg-[#F3EFFF] flex items-center justify-center mb-4">
                 <Calendar className="w-8 h-8 text-[#7C3AED]" />
               </div>
+
               {interviews.length === 0 ? (
                 <>
                   <p className="text-[#0F172A] font-black text-lg">
                     {t("candidate.interviews.noInterviews")}
                   </p>
+
                   <p className="text-[#64748B] font-semibold text-sm mt-1">
                     {t("candidate.interviews.noInterviewsHint")}
                   </p>
@@ -425,9 +457,11 @@ export default function CandidateInterviews() {
                   <p className="text-[#0F172A] font-black text-lg">
                     {t("candidate.interviews.noResults")}
                   </p>
+
                   <p className="text-[#64748B] font-semibold text-sm mt-1">
                     {t("candidate.interviews.noResultsHint")}
                   </p>
+
                   <button
                     onClick={() => setFilterTab("all")}
                     className="mt-4 text-sm font-bold text-[#7C3AED] hover:underline"

@@ -50,6 +50,7 @@ export default function AdminManageJobs() {
       <div className="p-6" dir="rtl">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">ניהול משרות</h1>
+
           <p className="text-sm text-gray-500 mt-1">כל המשרות במערכת</p>
         </div>
 
@@ -57,14 +58,19 @@ export default function AdminManageJobs() {
         <div className="flex gap-4 mb-5 flex-wrap">
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-gray-900">{jobs.length}</div>
+
             <div className="text-xs text-gray-500">סה"כ</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-green-600">{activeCount}</div>
+
             <div className="text-xs text-gray-500">פעילות</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-gray-400">{closedCount}</div>
+
             <div className="text-xs text-gray-500">סגורות</div>
           </div>
         </div>
@@ -73,6 +79,7 @@ export default function AdminManageJobs() {
         <div className="flex gap-3 mb-4 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -80,12 +87,14 @@ export default function AdminManageJobs() {
               className="w-full border border-gray-200 rounded-lg pr-9 pl-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 bg-white text-gray-900"
             />
           </div>
+
           <select
             value={filterSource}
             onChange={(e) => setFilterSource(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none bg-white text-gray-900"
           >
             <option value="all">כל המקורות</option>
+
             {importSources.map((s) => (
               <option key={s} value={s}>
                 {SOURCE_LABELS[s] || s}
@@ -112,12 +121,17 @@ export default function AdminManageJobs() {
                   >
                     {job.company_initials || job.company?.slice(0, 2)}
                   </div>
+
                   <div className="min-w-0">
                     <div className="font-semibold text-gray-900 text-sm truncate">{job.title}</div>
+
                     <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-2 flex-wrap">
                       <span>{job.company}</span>
+
                       <span>·</span>
+
                       <span>{job.location}</span>
+
                       {job.employer_id && SOURCE_LABELS[job.employer_id] && (
                         <span className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-xs">
                           {SOURCE_LABELS[job.employer_id]}
@@ -126,12 +140,14 @@ export default function AdminManageJobs() {
                     </div>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <span
                     className={`text-xs px-2 py-1 rounded-full font-medium ${job.is_closed ? "bg-gray-100 text-gray-500" : "bg-green-100 text-green-700"}`}
                   >
                     {job.is_closed ? "סגורה" : "פעילה"}
                   </span>
+
                   <button
                     onClick={() => toggleCloseMutation.mutate(job)}
                     title={job.is_closed ? "פתח משרה" : "סגור משרה"}
@@ -143,6 +159,7 @@ export default function AdminManageJobs() {
                       <ToggleRight className="w-4 h-4" />
                     )}
                   </button>
+
                   <button
                     onClick={() => deleteMutation.mutate(job.id)}
                     className="p-2 hover:bg-red-50 rounded-lg text-red-400 transition-all active:scale-90"
@@ -152,6 +169,7 @@ export default function AdminManageJobs() {
                 </div>
               </div>
             ))}
+
             {filtered.length === 0 && (
               <div className="text-center py-12 text-gray-400 text-sm">לא נמצאו משרות</div>
             )}

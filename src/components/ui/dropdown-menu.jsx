@@ -26,6 +26,7 @@ const DropdownMenuSubTrigger = React.forwardRef(({ className, inset, children, .
     {...props}
   >
     {children}
+
     <ChevronRight className="ml-auto" />
   </DropdownMenuPrimitive.SubTrigger>
 ))
@@ -92,6 +93,7 @@ const DropdownMenuCheckboxItem = React.forwardRef(
           <Check className="h-4 w-4" />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
+
       {children}
     </DropdownMenuPrimitive.CheckboxItem>
   ),
@@ -113,6 +115,7 @@ const DropdownMenuRadioItem = React.forwardRef(({ className, children, ...props 
         <Circle className="h-2 w-2 fill-current" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
+
     {children}
   </DropdownMenuPrimitive.RadioItem>
 ))

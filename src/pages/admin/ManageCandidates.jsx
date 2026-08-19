@@ -59,6 +59,7 @@ export default function AdminManageCandidates() {
       <div className="p-6" dir="rtl">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">ניהול מועמדים</h1>
+
           <p className="text-sm text-gray-500 mt-1">כל המועמדויות לכל החברות</p>
         </div>
 
@@ -66,18 +67,25 @@ export default function AdminManageCandidates() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center">
             <div className="text-xl font-bold text-gray-900">{stats.total}</div>
+
             <div className="text-xs text-gray-500 mt-1">סה"כ</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center">
             <div className="text-xl font-bold text-blue-600">{stats.new}</div>
+
             <div className="text-xs text-gray-500 mt-1">חדשה</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center">
             <div className="text-xl font-bold text-green-600">{stats.hired}</div>
+
             <div className="text-xs text-gray-500 mt-1">נשכרו</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center">
             <div className="text-xl font-bold text-red-600">{stats.rejected}</div>
+
             <div className="text-xs text-gray-500 mt-1">נדחו</div>
           </div>
         </div>
@@ -86,6 +94,7 @@ export default function AdminManageCandidates() {
         <div className="flex gap-3 mb-4 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -93,12 +102,14 @@ export default function AdminManageCandidates() {
               className="w-full border border-gray-200 rounded-lg pr-9 pl-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
             />
           </div>
+
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
           >
             <option value="all">כל הסטטוסים</option>
+
             {statuses.map((s) => (
               <option key={s} value={s}>
                 {s === "new"
@@ -144,14 +155,20 @@ export default function AdminManageCandidates() {
                       <div className="font-semibold text-gray-900 text-sm">
                         {app.candidate_name}
                       </div>
+
                       <div className="text-xs text-gray-500">{app.candidate_email}</div>
                     </div>
                   </div>
+
                   <div className="text-xs text-gray-500 flex items-center gap-2 flex-wrap">
                     <span className="font-medium">{app.job_title}</span>
+
                     <span>·</span>
+
                     <span>{app.company}</span>
+
                     <span>·</span>
+
                     <span
                       className={`px-2 py-1 rounded-full font-medium ${STATUS_COLORS[app.status] || STATUS_COLORS.new}`}
                     >
@@ -179,6 +196,7 @@ export default function AdminManageCandidates() {
                     </span>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2 flex-shrink-0 mr-4">
                   {app.resume_url && (
                     <a
@@ -190,6 +208,7 @@ export default function AdminManageCandidates() {
                       <Eye className="w-4 h-4" />
                     </a>
                   )}
+
                   <button
                     onClick={() => deleteMutation.mutate(app.id)}
                     className="p-1.5 hover:bg-red-50 rounded-lg text-red-400"
@@ -199,6 +218,7 @@ export default function AdminManageCandidates() {
                 </div>
               </div>
             ))}
+
             {filtered.length === 0 && (
               <div className="text-center py-12 text-gray-400 text-sm">לא נמצאו מועמדויות</div>
             )}

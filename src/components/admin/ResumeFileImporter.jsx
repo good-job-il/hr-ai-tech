@@ -41,22 +41,29 @@ function FileRow({ file, status }) {
     <div className="border border-[#E4ECFF] rounded-xl overflow-hidden">
       <div className="flex items-center gap-3 px-4 py-3">
         <FileText className="w-4 h-4 text-[#94A3B8] flex-shrink-0" />
+
         <span className={`text-xs font-bold px-2 py-0.5 rounded-md border ${typeColor}`}>
           {TYPE_LABELS[ext] || ext.toUpperCase()}
         </span>
+
         <span className="text-sm font-semibold text-[#0F172A] flex-1 truncate">{file.name}</span>
+
         <span className="text-xs text-[#94A3B8]">{(file.size / 1024).toFixed(0)} KB</span>
 
         {!status && (
           <span className="w-4 h-4 rounded-full border-2 border-[#E4ECFF] flex-shrink-0" />
         )}
+
         {status === "uploading" && (
           <Loader2 className="w-4 h-4 text-[#7C3AED] animate-spin flex-shrink-0" />
         )}
+
         {status?.candidate_id && <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />}
+
         {status?.errors?.length > 0 && !status?.candidate_id && (
           <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
         )}
+
         {status?.duplicate_of_id && (
           <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
         )}
@@ -82,6 +89,7 @@ function FileRow({ file, status }) {
                 ) : (
                   <CheckCircle2 className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
                 )}
+
                 <span className="text-xs text-[#64748B]">
                   <b>{key}:</b> {String(val).substring(0, 40)}
                 </span>
@@ -103,6 +111,7 @@ function FileRow({ file, status }) {
               )}
             </p>
           )}
+
           {status.duplicate_of_id && (
             <p className="text-xs text-amber-700 font-semibold">
               ⚠ כפילות — קיים מועמד: {status.duplicate_of_id}
@@ -263,8 +272,11 @@ export default function ResumeFileImporter({ onImportComplete }) {
         onDrop={handleDrop}
       >
         <Upload className="w-10 h-10 text-[#CBD5E1] mx-auto mb-3" />
+
         <p className="font-bold text-[#374151]">גרור קבצי קורות חיים כאן או לחץ להעלאה</p>
+
         <p className="text-xs text-[#94A3B8] mt-1">PDF • DOC • DOCX • TXT • כמה קבצים בו זמנית</p>
+
         <input
           ref={inputRef}
           type="file"
@@ -283,6 +295,7 @@ export default function ResumeFileImporter({ onImportComplete }) {
               <div className="flex-1">
                 <FileRow file={file} status={fileStatuses[file.name] || null} />
               </div>
+
               {!running && !fileStatuses[file.name] && (
                 <button
                   onClick={() => removeFile(idx)}
@@ -301,8 +314,10 @@ export default function ResumeFileImporter({ onImportComplete }) {
         <div className="bg-green-50 border border-green-200 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <FileCheck2 className="w-4 h-4 text-green-600" />
+
             <span className="font-bold text-green-800">הייבוא הסתיים</span>
           </div>
+
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 text-center">
             {[
               { label: "נקלטו", val: summary.successful, color: "text-green-700" },
@@ -313,18 +328,22 @@ export default function ResumeFileImporter({ onImportComplete }) {
             ].map((s) => (
               <div key={s.label} className="bg-white rounded-lg border border-green-100 p-2">
                 <div className={`text-lg font-black ${s.color}`}>{s.val ?? 0}</div>
+
                 <div className="text-xs text-[#94A3B8]">{s.label}</div>
               </div>
             ))}
           </div>
+
           <p className="text-xs text-[#64748B] mt-2">
             Batch ID: <span className="font-mono">{summary.batch_id}</span>
           </p>
         </div>
       )}
+
       {summary?.error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
+
           <span className="text-sm font-semibold text-red-700">{summary.error}</span>
         </div>
       )}
@@ -348,6 +367,7 @@ export default function ResumeFileImporter({ onImportComplete }) {
             </>
           )}
         </Button>
+
         {files.length > 0 && !running && (
           <Button
             variant="outline"

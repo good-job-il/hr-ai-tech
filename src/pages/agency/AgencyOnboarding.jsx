@@ -85,6 +85,7 @@ export default function AgencyOnboarding() {
           className="h-8 w-8 animate-spin rounded-full border-4 border-[#E4ECFF] border-t-[#7C3AED]"
           aria-hidden="true"
         />
+
         <span className="sr-only">{isRtl ? "טוען" : "Loading"}</span>
       </div>
     )
@@ -106,6 +107,7 @@ export default function AgencyOnboarding() {
           icon={Building2}
           className="justify-center text-center sm:flex-col"
         />
+
         <PlatformCard className="p-6 sm:p-8">
           {error && (
             <div
@@ -113,6 +115,7 @@ export default function AgencyOnboarding() {
               role="alert"
             >
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+
               <span>{error}</span>
             </div>
           )}
@@ -125,6 +128,7 @@ export default function AgencyOnboarding() {
               >
                 {isRtl ? "שם חברת ההשמה" : "Agency name"}
               </Label>
+
               <Input
                 id="agency-name"
                 type="text"
@@ -135,6 +139,7 @@ export default function AgencyOnboarding() {
                 placeholder={isRtl ? 'לדוגמה: השמה פרו בע"מ' : "e.g. Acme Staffing Ltd."}
               />
             </div>
+
             <div>
               <Label
                 htmlFor="agency-contact-email"
@@ -142,6 +147,7 @@ export default function AgencyOnboarding() {
               >
                 {isRtl ? "אימייל ליצירת קשר (אופציונלי)" : "Contact email (optional)"}
               </Label>
+
               <Input
                 id="agency-contact-email"
                 type="email"
@@ -152,6 +158,7 @@ export default function AgencyOnboarding() {
                 dir="ltr"
               />
             </div>
+
             <Button
               type="submit"
               disabled={loading}

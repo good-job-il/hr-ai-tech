@@ -26,6 +26,7 @@ export default function SimilarJobsList({ jobId, title }) {
   return (
     <div className="mt-12" dir="rtl">
       <h2 className="text-xl font-bold text-gray-900 mb-4">משרות דומות</h2>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {recommendations.map((job) => (
           <Link
@@ -41,10 +42,12 @@ export default function SimilarJobsList({ jobId, title }) {
               >
                 {job.company_initials || "ח"}
               </div>
+
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 group-hover:text-purple-600 transition">
                   {job.title}
                 </h3>
+
                 <p className="text-xs text-gray-500 mt-0.5">{job.company}</p>
               </div>
             </div>
@@ -53,12 +56,14 @@ export default function SimilarJobsList({ jobId, title }) {
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2 text-gray-600">
                 <span>📍</span>
+
                 <span>{job.location}</span>
               </div>
 
               {job.salary_min && job.salary_max && (
                 <div className="flex items-center gap-2 text-green-700 font-semibold">
                   <span>💰</span>
+
                   <span>
                     ₪{(job.salary_min / 1000).toFixed(0)}k - ₪{(job.salary_max / 1000).toFixed(0)}k
                   </span>
@@ -67,6 +72,7 @@ export default function SimilarJobsList({ jobId, title }) {
 
               <div className="flex items-center gap-2 text-gray-600">
                 <span>🏢</span>
+
                 <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
                   {job.category || "כללי"}
                 </span>
@@ -76,6 +82,7 @@ export default function SimilarJobsList({ jobId, title }) {
             {/* CTA */}
             <div className="mt-3 flex items-center gap-2 text-purple-600 font-semibold group-hover:translate-x-1 transition">
               <span>צפה בפרטים</span>
+
               <ArrowLeft className="w-4 h-4" />
             </div>
           </Link>

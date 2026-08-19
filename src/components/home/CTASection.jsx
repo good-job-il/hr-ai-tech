@@ -32,6 +32,7 @@ export default function CTASection() {
             filter: "blur(40px)",
           }}
         />
+
         <div
           style={{
             position: "absolute",
@@ -44,6 +45,7 @@ export default function CTASection() {
             filter: "blur(50px)",
           }}
         />
+
         {/* Grid overlay */}
         <div
           style={{
@@ -78,6 +80,7 @@ export default function CTASection() {
           }}
         >
           <Sparkles style={{ width: 12, height: 12, color: "white" }} />
+
           <span style={{ fontSize: 12, fontWeight: 700, color: "white" }}>
             מוכנים לשדרג את הגיוס שלכם?
           </span>
@@ -98,6 +101,7 @@ export default function CTASection() {
           <br />
           בקריירה שלך?
         </h2>
+
         <p
           style={{
             fontSize: 16,
@@ -157,6 +161,7 @@ export default function CTASection() {
             return (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Icon style={{ width: 14, height: 14, color: "rgba(255,255,255,0.7)" }} />
+
                 <span style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", fontWeight: 600 }}>
                   {t.label}
                 </span>

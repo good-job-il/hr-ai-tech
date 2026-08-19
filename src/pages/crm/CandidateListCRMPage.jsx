@@ -181,6 +181,7 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
             loading={loading}
             meta="Total profiles"
           />
+
           <PlatformStatCard
             icon={Clock3}
             label="Active process"
@@ -189,6 +190,7 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
             loading={loading}
             meta="Candidates in progress"
           />
+
           <PlatformStatCard
             icon={UserCheck}
             label={t("crm.statusHired")}
@@ -205,6 +207,7 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
             <Search
               className={`absolute ${isRTL ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]`}
             />
+
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -212,6 +215,7 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
               className={`${isRTL ? "pr-9" : "pl-9"} h-11 rounded-xl border-slate-200 bg-slate-50/60 text-sm shadow-none focus-visible:border-[#A78BFA] focus-visible:ring-[#F3EFFF]`}
             />
           </div>
+
           <div className="flex gap-1.5 flex-wrap">
             {["all", "new", "contacted", "interview", "offer", "hired", "rejected"].map((s) => (
               <button
@@ -245,6 +249,7 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
                   ? t("common.accessDenied", { defaultValue: "Access denied" })
                   : t("common.loadError", { defaultValue: "Unable to load candidates" })}
               </p>
+
               <button
                 onClick={() => loadCandidates()}
                 className="mt-3 text-sm font-bold text-violet-600 hover:underline"
@@ -261,12 +266,18 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
               {/* Header Row */}
               <div className="grid min-w-[900px] grid-cols-12 gap-4 border-b border-[#EAF0F8] bg-[#F7FAFF] px-5 py-3 text-xs font-black uppercase tracking-wide text-[#94A3B8]">
                 <div className="col-span-4">{t("crm.columnCandidate")}</div>
+
                 <div className="col-span-2">{t("crm.columnRole")}</div>
+
                 <div className="col-span-2">{t("crm.columnDomain")}</div>
+
                 <div className="col-span-1 text-center">{t("crm.columnExperience")}</div>
+
                 <div className="col-span-1 text-center">{t("crm.columnScore")}</div>
+
                 <div className="col-span-2 text-center">{t("crm.columnStatus")}</div>
               </div>
+
               {filtered.map((candidate) => (
                 <CandidateRowMemo
                   key={candidate.id}
@@ -276,12 +287,14 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
                   isRTL={isRTL}
                 />
               ))}
+
               {/* Infinite Scroll Loading */}
               {hasMore && (
                 <div className="p-4 text-center text-gray-400 text-sm">
                   {appendLoading ? (
                     <div className="flex items-center justify-center gap-2">
                       <RefreshCw className="w-4 h-4 animate-spin" />
+
                       {t("crm.loadingMore")}
                     </div>
                   ) : (
@@ -323,26 +336,33 @@ const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick, 
         <div className="gradient-brand flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[14px] text-xs font-black text-white shadow-[0_5px_14px_rgba(99,72,210,0.18)]">
           {initials}
         </div>
+
         <div className="min-w-0">
           <div className="text-sm font-bold text-[#0F172A] truncate">{candidate.full_name}</div>
+
           <div className="text-xs text-[#94A3B8] truncate">{candidate.email}</div>
         </div>
       </div>
+
       {/* Role */}
       <div className="col-span-2 text-sm text-[#64748B] truncate">{candidate.role_name || "—"}</div>
+
       {/* Domain */}
       <div className="col-span-2 text-sm text-[#64748B] truncate">
         {candidate.domain_name || "—"}
       </div>
+
       {/* Experience */}
       <div className="col-span-1 text-center">
         <span className="text-sm font-bold text-[#0F172A]">
           {candidate.experience_years ?? "—"}
         </span>
+
         {candidate.experience_years && (
           <span className="text-xs text-[#94A3B8]">{t("crm.experienceYears")}</span>
         )}
       </div>
+
       {/* Score */}
       <div className="col-span-1 text-center">
         <span
@@ -351,6 +371,7 @@ const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick, 
           {score ? `${score}%` : "—"}
         </span>
       </div>
+
       {/* Status */}
       <div className="col-span-2 flex items-center justify-center gap-2">
         <span
@@ -360,6 +381,7 @@ const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick, 
             `crm.status${candidate.status?.charAt(0).toUpperCase() + candidate.status?.slice(1)}`,
           ) || candidate.status}
         </span>
+
         {isRTL ? (
           <ChevronLeft className="w-4 h-4 text-[#CBD5E1] group-hover:text-[#7C3AED] transition-colors" />
         ) : (

@@ -35,22 +35,27 @@ function ExposureLevelBar({ shared, purchased, total }) {
     <div className="space-y-2">
       <div className="flex items-center gap-2">
         <span className="w-16 text-[10px] font-semibold text-slate-400">Shared</span>
+
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
           <div
             className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400"
             style={{ width: `${sharedPct}%` }}
           />
         </div>
+
         <span className="w-7 text-right text-[10px] font-extrabold text-slate-700">{shared}</span>
       </div>
+
       <div className="flex items-center gap-2">
         <span className="w-16 text-[10px] font-semibold text-slate-400">Purchased</span>
+
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
           <div
             className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400"
             style={{ width: `${purchasedPct}%` }}
           />
         </div>
+
         <span className="w-7 text-right text-[10px] font-extrabold text-slate-700">
           {purchased}
         </span>
@@ -158,8 +163,10 @@ export default function MarketplaceExposurePage() {
           actions={
             <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/85 px-4 py-3 shadow-[0_8px_25px_rgba(66,81,130,0.07)]">
               <TrendingUp className="h-5 w-5 text-violet-500" />
+
               <div>
                 <p className="text-xs font-bold text-slate-700">Marketplace visibility</p>
+
                 <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                   Live cross-organization activity
                 </p>
@@ -174,8 +181,10 @@ export default function MarketplaceExposurePage() {
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-blue-500 shadow-sm">
               <Info className="h-5 w-5" />
             </div>
+
             <div>
               <p className="text-sm font-extrabold text-blue-900">How Marketplace Exposure Works</p>
+
               <p className="mt-1 text-sm leading-6 text-blue-700">
                 An organization is <strong>"exposing"</strong> when it has granted{" "}
                 <strong>shared</strong> or <strong>purchased</strong> access to candidates in its
@@ -197,6 +206,7 @@ export default function MarketplaceExposurePage() {
             loading={loading}
             meta="Sharing candidate pools"
           />
+
           <PlatformStatCard
             icon={Users}
             label="Receiving organizations"
@@ -205,6 +215,7 @@ export default function MarketplaceExposurePage() {
             loading={loading}
             meta="With external access"
           />
+
           <PlatformStatCard
             icon={Share2}
             label="Shared grants"
@@ -213,6 +224,7 @@ export default function MarketplaceExposurePage() {
             loading={loading}
             meta="Cross-org sharing"
           />
+
           <PlatformStatCard
             icon={CreditCard}
             label="Purchased grants"
@@ -234,9 +246,11 @@ export default function MarketplaceExposurePage() {
               </div>
             }
           />
+
           <div className="mt-4 flex flex-col gap-3 lg:flex-row">
             <div className="relative min-w-0 flex-1">
               <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -244,6 +258,7 @@ export default function MarketplaceExposurePage() {
                 className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pl-10 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-50"
               />
             </div>
+
             <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70 p-1">
               <button
                 type="button"
@@ -256,6 +271,7 @@ export default function MarketplaceExposurePage() {
               >
                 Exposing Only
               </button>
+
               <button
                 type="button"
                 onClick={() => setView("all")}
@@ -268,6 +284,7 @@ export default function MarketplaceExposurePage() {
                 All Orgs
               </button>
             </div>
+
             <button
               type="button"
               onClick={() => {
@@ -297,6 +314,7 @@ export default function MarketplaceExposurePage() {
               <p className="text-base font-bold text-slate-500">
                 No organizations exposing pools yet
               </p>
+
               <p className="mt-2 max-w-xl text-sm font-medium text-slate-300">
                 {view === "exposing"
                   ? "Grant cross-org access from the Candidate Pool page to start seeing exposure data."
@@ -318,6 +336,7 @@ export default function MarketplaceExposurePage() {
                     org.isExposing ? "bg-violet-200" : "bg-slate-200"
                   }`}
                 />
+
                 {/* Org Header */}
                 <div className="relative mb-5 flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -332,21 +351,25 @@ export default function MarketplaceExposurePage() {
                     >
                       <Building2 className="h-5 w-5" strokeWidth={1.8} />
                     </div>
+
                     <div className="min-w-0">
                       <p className="truncate text-sm font-black leading-tight text-slate-900 transition group-hover:text-violet-700">
                         {org.name}
                       </p>
+
                       <div className="mt-1">
                         <OrgTypeTag type={org.org_type} />
                       </div>
                     </div>
                   </div>
+
                   <div
                     className={`flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold ${
                       org.isExposing ? "bg-violet-50 text-violet-700" : "bg-slate-50 text-slate-400"
                     }`}
                   >
                     {org.isExposing ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+
                     {org.isExposing ? "Exposing" : "Private"}
                   </div>
                 </div>
@@ -355,14 +378,19 @@ export default function MarketplaceExposurePage() {
                 <div className="relative mb-5 grid grid-cols-3 gap-2">
                   <div className="rounded-xl bg-slate-50/80 p-2.5 text-center">
                     <p className="text-xl font-black text-slate-800">{org.totalExposed}</p>
+
                     <p className="text-[10px] font-semibold text-slate-400">Exposed</p>
                   </div>
+
                   <div className="rounded-xl bg-blue-50 p-2.5 text-center">
                     <p className="text-xl font-black text-blue-800">{org.sharedOut}</p>
+
                     <p className="text-[10px] font-semibold text-blue-400">Shared</p>
                   </div>
+
                   <div className="rounded-xl bg-emerald-50 p-2.5 text-center">
                     <p className="text-xl font-black text-emerald-800">{org.purchasedOut}</p>
+
                     <p className="text-[10px] font-semibold text-emerald-400">Sold</p>
                   </div>
                 </div>
@@ -382,13 +410,16 @@ export default function MarketplaceExposurePage() {
                 <div className="relative flex items-center justify-between border-t border-slate-100 pt-3 text-[10px] font-medium text-slate-400">
                   <div className="flex items-center gap-1">
                     <Users className="h-3.5 w-3.5" />
+
                     <span>
                       <strong className="text-slate-600">{org.uniqueBuyers}</strong> unique buyer
                       {org.uniqueBuyers !== 1 ? "s" : ""}
                     </span>
                   </div>
+
                   <div className="flex items-center gap-1">
                     <TrendingUp className="h-3.5 w-3.5" />
+
                     <span>
                       <strong className="text-slate-600">{org.totalReceived}</strong> received
                     </span>
@@ -410,6 +441,7 @@ export default function MarketplaceExposurePage() {
               </div>
             }
           />
+
           <div className="mt-6 space-y-5">
             {[
               {
@@ -438,16 +470,19 @@ export default function MarketplaceExposurePage() {
                 <div key={item.label}>
                   <div className="mb-2 flex items-center justify-between gap-4">
                     <span className="text-xs font-semibold text-slate-600">{item.label}</span>
+
                     <span className="text-xs font-black text-slate-900">
                       {item.sublabel || `${item.value} / ${item.total}`}
                     </span>
                   </div>
+
                   <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
                     <div
                       className={`h-full rounded-full ${item.color} transition-all duration-500`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
+
                   <p className="mt-1 text-[10px] font-semibold text-slate-400">{pct}%</p>
                 </div>
               )

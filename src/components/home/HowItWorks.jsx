@@ -74,6 +74,7 @@ export default function HowItWorks() {
           >
             איך זה עובד?
           </h2>
+
           <p style={{ fontSize: 15, color: "#64748B", margin: 0 }}>
             4 שלבים פשוטים למצוא עבודה טוב יותר
           </p>
@@ -129,6 +130,7 @@ export default function HowItWorks() {
                   >
                     {step.n}
                   </div>
+
                   <div
                     style={{
                       width: 64,
@@ -143,6 +145,7 @@ export default function HowItWorks() {
                   >
                     <Icon style={{ width: 30, height: 30, color: step.color }} />
                   </div>
+
                   <h3
                     style={{
                       fontSize: 16,
@@ -154,10 +157,12 @@ export default function HowItWorks() {
                   >
                     {step.title}
                   </h3>
+
                   <p style={{ fontSize: 13.5, color: "#64748B", lineHeight: 1.7, margin: 0 }}>
                     {step.desc}
                   </p>
                 </div>
+
                 {i < STEPS.length - 1 && CONNECTOR}
               </React.Fragment>
             )

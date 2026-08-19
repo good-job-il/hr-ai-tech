@@ -215,6 +215,7 @@ export default function ManageJobsPage() {
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
               </button>
+
               {canCreate && (
                 <button
                   onClick={handleNew}
@@ -237,6 +238,7 @@ export default function ManageJobsPage() {
             loading={loading}
             meta="Total vacancies"
           />
+
           <PlatformStatCard
             icon={CheckCircle}
             label="Open jobs"
@@ -245,6 +247,7 @@ export default function ManageJobsPage() {
             loading={loading}
             meta="Currently recruiting"
           />
+
           <PlatformStatCard
             icon={XCircle}
             label="Closed jobs"
@@ -259,6 +262,7 @@ export default function ManageJobsPage() {
         <PlatformCard className="flex flex-wrap items-center gap-3 p-4">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -266,6 +270,7 @@ export default function ManageJobsPage() {
               className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#A78BFA] focus:ring-4 focus:ring-[#F3EFFF]"
             />
           </div>
+
           {!routeState && (
             <label className="flex items-center gap-2 text-sm font-semibold text-[#64748B] cursor-pointer">
               <input
@@ -283,7 +288,9 @@ export default function ManageJobsPage() {
         {loadError ? (
           <PlatformEmptyState icon={AlertCircle} className="min-h-[300px]">
             <p className="text-red-700 font-bold text-lg">Unable to load jobs</p>
+
             <p className="text-slate-500 text-sm mt-1">{loadError}</p>
+
             <button
               onClick={loadJobs}
               className="mt-4 h-10 px-5 rounded-xl bg-[#6C4DFF] text-white font-bold text-sm"
@@ -303,7 +310,9 @@ export default function ManageJobsPage() {
         ) : filtered.length === 0 ? (
           <PlatformEmptyState icon={Briefcase} className="min-h-[300px]">
             <p className="text-[#64748B] font-bold text-lg">No jobs</p>
+
             <p className="text-[#94A3B8] text-sm mt-1">Click "New Job" to create</p>
+
             {canCreate && (
               <button
                 onClick={handleNew}
@@ -323,27 +332,35 @@ export default function ManageJobsPage() {
                     <th className="text-left text-xs font-black text-[#64748B] px-5 py-3">
                       Position
                     </th>
+
                     <th className="text-left text-xs font-black text-[#64748B] px-5 py-3 hidden md:table-cell">
                       Company
                     </th>
+
                     <th className="text-left text-xs font-black text-[#64748B] px-5 py-3 hidden md:table-cell">
                       Location
                     </th>
+
                     <th className="text-left text-xs font-black text-[#64748B] px-5 py-3">
                       Code / Email / Link
                     </th>
+
                     <th className="text-left text-xs font-black text-[#64748B] px-5 py-3">
                       Compensation
                     </th>
+
                     <th className="text-left text-xs font-black text-[#64748B] px-5 py-3">
                       Warranty
                     </th>
+
                     <th className="text-left text-xs font-black text-[#64748B] px-5 py-3">
                       Status
                     </th>
+
                     <th className="px-5 py-3" />
                   </tr>
                 </thead>
+
                 <tbody>
                   {filtered.map((job) => (
                     <tr
@@ -352,38 +369,49 @@ export default function ManageJobsPage() {
                     >
                       <td className="px-5 py-4">
                         <div className="font-bold text-[#0F172A] text-sm">{job.title}</div>
+
                         <div className="text-xs text-[#94A3B8] mt-0.5">{job.category || "—"}</div>
                       </td>
+
                       <td className="px-5 py-4 hidden md:table-cell">
                         <div className="flex items-center gap-2 text-sm text-[#374151]">
                           <Building2 className="w-3.5 h-3.5 text-[#94A3B8]" />
+
                           {job.company || "—"}
                         </div>
                       </td>
+
                       <td className="px-5 py-4 hidden md:table-cell">
                         <div className="flex items-center gap-2 text-sm text-[#374151]">
                           <MapPin className="w-3.5 h-3.5 text-[#94A3B8]" />
+
                           {job.location || "—"}
                         </div>
                       </td>
+
                       <td className="px-5 py-4 min-w-[260px]">
                         {job.job_code ? (
                           <div className="space-y-1.5">
                             <span className="inline-block px-2 py-0.5 bg-[#F3EFFF] text-[#7C3AED] text-xs font-black rounded-lg">
                               {job.job_code}
                             </span>
+
                             {job.apply_email && (
                               <div className="flex items-center gap-1.5">
                                 <Mail className="w-3 h-3 text-[#94A3B8] flex-shrink-0" />
+
                                 <span className="text-xs text-[#374151] font-mono break-all">
                                   {job.apply_email}
                                 </span>
+
                                 <CopyButton text={job.apply_email} />
                               </div>
                             )}
+
                             {job.apply_url && (
                               <div className="flex items-center gap-1.5">
                                 <span className="text-xs text-[#94A3B8]">🔗</span>
+
                                 <a
                                   href={job.apply_url}
                                   target="_blank"
@@ -392,6 +420,7 @@ export default function ManageJobsPage() {
                                 >
                                   {job.apply_url.replace("https://", "")}
                                 </a>
+
                                 <CopyButton text={job.apply_url} />
                               </div>
                             )}
@@ -400,6 +429,7 @@ export default function ManageJobsPage() {
                           <span className="text-xs text-[#CBD5E1]">Waiting for code...</span>
                         )}
                       </td>
+
                       <td className="px-5 py-4">
                         {(() => {
                           const plan = getCompensation(job)
@@ -433,6 +463,7 @@ export default function ManageJobsPage() {
                           )
                         })()}
                       </td>
+
                       <td className="px-5 py-4">
                         {(() => {
                           const plan = getCompensation(job)
@@ -446,6 +477,7 @@ export default function ManageJobsPage() {
                           return <span className="text-[#374151] text-xs">{days} days</span>
                         })()}
                       </td>
+
                       <td className="px-5 py-4">
                         {canUpdate ? (
                           <select
@@ -455,9 +487,13 @@ export default function ManageJobsPage() {
                             className={`rounded-full border-0 px-2.5 py-1 text-xs font-bold outline-none ${STATUS_COLORS[job.state || (job.is_closed ? "closed" : "open")]}`}
                           >
                             <option value="draft">Draft</option>
+
                             <option value="open">Open</option>
+
                             <option value="on_hold">On hold</option>
+
                             <option value="filled">Filled</option>
+
                             <option value="closed">Closed</option>
                           </select>
                         ) : (
@@ -468,6 +504,7 @@ export default function ManageJobsPage() {
                           </span>
                         )}
                       </td>
+
                       <td className="px-5 py-4">
                         {canUpdate && (
                           <div className="flex items-center gap-2 justify-end">
@@ -477,6 +514,7 @@ export default function ManageJobsPage() {
                             >
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
+
                             <button
                               onClick={() => handleToggleClose(job)}
                               disabled={updatingId === job.id}

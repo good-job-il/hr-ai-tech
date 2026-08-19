@@ -113,6 +113,7 @@ const CandidateImport = () => {
         <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-gray-900">עדכון קובץ</h2>
+
             <p className="text-sm text-gray-600">תמוך ב־CSV, Excel, JSON או ZIP של קורות חיים</p>
 
             <div
@@ -120,8 +121,11 @@ const CandidateImport = () => {
               onClick={() => document.getElementById("fileInput").click()}
             >
               <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+
               <p className="text-gray-900 font-medium">גרור קובץ כאן או לחץ להעלאה</p>
+
               <p className="text-xs text-gray-500 mt-1">עד 100MB</p>
+
               <input
                 id="fileInput"
                 type="file"
@@ -135,8 +139,10 @@ const CandidateImport = () => {
               <div className="bg-blue-50 rounded-lg p-3 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-900">{file.name}</p>
+
                   <p className="text-xs text-gray-600">{(file.size / 1024).toFixed(2)} KB</p>
                 </div>
+
                 <button onClick={() => setFile(null)} className="text-gray-400 hover:text-gray-600">
                   ✕
                 </button>
@@ -146,6 +152,7 @@ const CandidateImport = () => {
             {uploadError && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+
                 <p className="text-sm text-red-800">{uploadError}</p>
               </div>
             )}
@@ -153,6 +160,7 @@ const CandidateImport = () => {
             {successMessage && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+
                 <p className="text-sm text-green-800">{successMessage}</p>
               </div>
             )}
@@ -184,7 +192,9 @@ const CandidateImport = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">{batch.batch_name}</p>
+
                       <p className="text-sm text-gray-600 mt-1">קובץ: {batch.source_file}</p>
+
                       <p className="text-xs text-gray-500 mt-1">
                         {new Date(batch.created_date).toLocaleDateString("he-IL")}
                       </p>
@@ -194,12 +204,15 @@ const CandidateImport = () => {
                       {batch.status === "completed" && (
                         <CheckCircle2 className="w-5 h-5 text-green-600" />
                       )}
+
                       {batch.status === "in_progress" && (
                         <Clock className="w-5 h-5 text-yellow-600 animate-spin" />
                       )}
+
                       {batch.status === "failed" && (
                         <AlertTriangle className="w-5 h-5 text-red-600" />
                       )}
+
                       {batch.status === "pending" && <Clock className="w-5 h-5 text-gray-400" />}
                     </div>
                   </div>
@@ -210,30 +223,39 @@ const CandidateImport = () => {
                         <p className="text-2xl font-bold text-purple-600">
                           {batch.successful_imports || 0}
                         </p>
+
                         <p className="text-xs text-gray-600 mt-1">נקלטו</p>
                       </div>
+
                       <div className="text-center">
                         <p className="text-2xl font-bold text-red-600">
                           {batch.failed_imports || 0}
                         </p>
+
                         <p className="text-xs text-gray-600 mt-1">נכשלו</p>
                       </div>
+
                       <div className="text-center">
                         <p className="text-2xl font-bold text-yellow-600">
                           {batch.duplicate_found || 0}
                         </p>
+
                         <p className="text-xs text-gray-600 mt-1">כפילויות</p>
                       </div>
+
                       <div className="text-center">
                         <p className="text-2xl font-bold text-orange-600">
                           {batch.missing_email || 0}
                         </p>
+
                         <p className="text-xs text-gray-600 mt-1">בלי אימייל</p>
                       </div>
+
                       <div className="text-center">
                         <p className="text-2xl font-bold text-blue-600">
                           {batch.missing_phone || 0}
                         </p>
+
                         <p className="text-xs text-gray-600 mt-1">בלי טלפון</p>
                       </div>
                     </div>

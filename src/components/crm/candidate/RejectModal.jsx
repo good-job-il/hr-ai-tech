@@ -52,13 +52,16 @@ export default function RejectModal({ candidateName, onConfirm, onClose }) {
             <div className="w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center">
               <AlertTriangle className="w-4 h-4 text-red-500" />
             </div>
+
             <div>
               <h2 className="font-black text-[#0F172A] text-base">
                 {t("candidateCRM.rejectModal.title")}
               </h2>
+
               <p className="text-xs text-[#94A3B8]">{candidateName}</p>
             </div>
           </div>
+
           <button
             onClick={onClose}
             className="text-[#94A3B8] hover:text-[#0F172A] transition-colors"
@@ -71,6 +74,7 @@ export default function RejectModal({ candidateName, onConfirm, onClose }) {
           <p className="text-sm font-semibold text-[#64748B]">
             {t("candidateCRM.rejectModal.selectReason")}
           </p>
+
           <div className="grid grid-cols-1 gap-2">
             {REJECT_REASONS.map((r) => (
               <button
@@ -101,6 +105,7 @@ export default function RejectModal({ candidateName, onConfirm, onClose }) {
           <Button variant="ghost" onClick={onClose} className="flex-1 text-sm">
             {t("candidateCRM.rejectModal.cancel")}
           </Button>
+
           <Button
             onClick={handleConfirm}
             disabled={!finalReason.trim() || loading}

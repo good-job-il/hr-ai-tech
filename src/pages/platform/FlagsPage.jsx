@@ -295,6 +295,7 @@ function PlanMatrixTab() {
                 <RotateCcw className="h-3.5 w-3.5" />
                 Reset defaults
               </button>
+
               <button
                 type="button"
                 onClick={handleSave}
@@ -308,6 +309,7 @@ function PlanMatrixTab() {
                 }`}
               >
                 <Save className="h-3.5 w-3.5" />
+
                 {saved ? "Saved!" : "Save changes"}
               </button>
             </div>
@@ -326,6 +328,7 @@ function PlanMatrixTab() {
             <div className="px-5 py-4 text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
               Feature
             </div>
+
             {PLANS.map((plan) => {
               const c = PLAN_COLORS[plan]
 
@@ -361,15 +364,18 @@ function PlanMatrixTab() {
                     <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-50 text-violet-500">
                       <CatIcon className="h-3.5 w-3.5" />
                     </div>
+
                     <span className="text-xs font-black uppercase tracking-wide text-slate-600">
                       {cat.label}
                     </span>
+
                     {expanded ? (
                       <ChevronUp className="ml-auto h-3.5 w-3.5 text-slate-400" />
                     ) : (
                       <ChevronDown className="ml-auto h-3.5 w-3.5 text-slate-400" />
                     )}
                   </div>
+
                   {PLANS.map((plan) => {
                     const enabledCount = features.filter((f) => matrix[plan]?.[f.id]).length
 
@@ -393,8 +399,10 @@ function PlanMatrixTab() {
                     >
                       <div className="px-5 py-3.5 pl-14">
                         <p className="text-sm font-bold text-slate-800">{feat.label}</p>
+
                         <p className="mt-0.5 text-xs text-slate-400">{feat.description}</p>
                       </div>
+
                       {PLANS.map((plan) => (
                         <div key={plan} className="px-3 py-3 flex justify-center">
                           <Toggle
@@ -531,9 +539,11 @@ function OrgOverridesTab() {
             </div>
           }
         />
+
         <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-[minmax(260px,1fr)_210px]">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -541,12 +551,14 @@ function OrgOverridesTab() {
               className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pl-10 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-50"
             />
           </div>
+
           <select
             value={planFilter}
             onChange={(e) => setPlanFilter(e.target.value)}
             className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-50"
           >
             <option value="all">All Plans</option>
+
             {PLANS.map((p) => (
               <option key={p} value={p}>
                 {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -564,6 +576,7 @@ function OrgOverridesTab() {
             .map((_, i) => (
               <PlatformCard key={i} className="animate-pulse p-5">
                 <div className="mb-2 h-5 w-48 rounded bg-slate-100" />
+
                 <div className="h-4 w-32 rounded bg-slate-100" />
               </PlatformCard>
             ))
@@ -597,22 +610,27 @@ function OrgOverridesTab() {
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-blue-50 text-violet-600">
                     <Building2 className="h-5 w-5" strokeWidth={1.8} />
                   </div>
+
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-black text-slate-900">{org.name}</p>
+
                     <p className="mt-0.5 text-xs text-slate-400">
                       {org.org_type === "staffing_agency" ? "Staffing Agency" : "Internal HR"}
                     </p>
                   </div>
+
                   <span
                     className={`rounded-full border px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide ${c.bg} ${c.text} ${c.border}`}
                   >
                     {plan.charAt(0).toUpperCase() + plan.slice(1)}
                   </span>
+
                   {overridesCount > 0 && (
                     <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[10px] font-bold text-orange-600">
                       {overridesCount} override{overridesCount !== 1 ? "s" : ""}
                     </span>
                   )}
+
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-400">
                     {isExpanded ? (
                       <ChevronUp className="h-4 w-4" />
@@ -636,10 +654,12 @@ function OrgOverridesTab() {
                             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-50 text-violet-500">
                               <CatIcon className="h-3.5 w-3.5" />
                             </div>
+
                             <span className="text-xs font-black uppercase tracking-wide text-slate-500">
                               {cat.label}
                             </span>
                           </div>
+
                           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                             {catFeatures.map((feat) => {
                               const planVal = planDefaults[feat.id] ?? false
@@ -661,12 +681,14 @@ function OrgOverridesTab() {
                                     <p className="truncate text-sm font-bold text-slate-800">
                                       {feat.label}
                                     </p>
+
                                     {isOverridden && (
                                       <p className="text-xs font-semibold text-orange-500">
                                         override {planVal ? "(plan: on)" : "(plan: off)"}
                                       </p>
                                     )}
                                   </div>
+
                                   <Toggle
                                     value={activeVal}
                                     onChange={() => handleToggleOverride(org, feat.id)}
@@ -690,6 +712,7 @@ function OrgOverridesTab() {
                         <RotateCcw className="h-3.5 w-3.5" />
                         Reset
                       </button>
+
                       <button
                         type="button"
                         onClick={() => handleSaveOrg(org)}
@@ -703,12 +726,14 @@ function OrgOverridesTab() {
                         }`}
                       >
                         <Save className="h-3.5 w-3.5" />
+
                         {saving[org.id]
                           ? "Saving…"
                           : savedOrgs[org.id]
                             ? "Saved!"
                             : "Save overrides"}
                       </button>
+
                       <p className="ml-2 text-xs text-slate-400">
                         Overrides saved to{" "}
                         <code className="rounded bg-slate-100 px-1">
@@ -754,10 +779,12 @@ export default function FlagsPage() {
           actions={
             <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/85 px-4 py-3 shadow-[0_8px_25px_rgba(66,81,130,0.07)]">
               <Shield className="h-5 w-5 text-violet-500" />
+
               <div>
                 <p className="text-xs font-bold text-slate-700">
                   {FEATURES.length} platform features
                 </p>
+
                 <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                   Across {CATEGORIES.length} categories
                 </p>
@@ -809,6 +836,7 @@ export default function FlagsPage() {
                 }`}
               >
                 <TabIcon className="h-4 w-4" />
+
                 {item.label}
               </button>
             )

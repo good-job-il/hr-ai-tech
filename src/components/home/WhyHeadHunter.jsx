@@ -57,6 +57,7 @@ export default function WhyHeadHunter() {
           >
             למה מועמדים בוחרים ב-HeadHunter?
           </h2>
+
           <p
             style={{
               fontSize: 16,
@@ -121,6 +122,7 @@ export default function WhyHeadHunter() {
                     {f.tag}
                   </span>
                 )}
+
                 <div
                   style={{
                     width: 52,
@@ -135,6 +137,7 @@ export default function WhyHeadHunter() {
                 >
                   <Icon style={{ width: 24, height: 24, color: f.color }} />
                 </div>
+
                 <h3
                   style={{
                     fontSize: 15.5,
@@ -146,6 +149,7 @@ export default function WhyHeadHunter() {
                 >
                   {f.title}
                 </h3>
+
                 <p style={{ fontSize: 13.5, color: "#64748B", lineHeight: 1.7, margin: 0 }}>
                   {f.desc}
                 </p>

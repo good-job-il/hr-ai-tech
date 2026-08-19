@@ -46,6 +46,7 @@ export default function PipelineManager({ stages, onAdd, onDelete, onUpdate }) {
                 style={{ backgroundColor: stage.color }}
                 title="בחר צבע"
               />
+
               {editingId === stage.id ? (
                 <Input
                   value={editName}
@@ -67,6 +68,7 @@ export default function PipelineManager({ stages, onAdd, onDelete, onUpdate }) {
                   >
                     <Check className="w-4 h-4" />
                   </button>
+
                   <button
                     onClick={() => setEditingId(null)}
                     className="p-1.5 text-gray-400 hover:bg-gray-200 rounded-lg transition-colors"
@@ -82,6 +84,7 @@ export default function PipelineManager({ stages, onAdd, onDelete, onUpdate }) {
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
+
                   <button
                     onClick={() => onDelete(stage.id)}
                     className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-100 rounded-lg transition-colors"
@@ -103,6 +106,7 @@ export default function PipelineManager({ stages, onAdd, onDelete, onUpdate }) {
             placeholder="שם שלב חדש..."
             className="text-sm h-10"
           />
+
           <input
             type="color"
             value={newColor}
@@ -110,6 +114,7 @@ export default function PipelineManager({ stages, onAdd, onDelete, onUpdate }) {
             className="h-10 w-12 rounded-lg cursor-pointer"
           />
         </div>
+
         <button
           onClick={handleAdd}
           className="bg-hhblue text-white px-4 h-10 rounded-lg hover:bg-hhblue/90 text-sm font-semibold flex items-center gap-2"

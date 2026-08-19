@@ -146,6 +146,7 @@ export default function ImportSources() {
             )}
             תוצאות סריקה
           </span>
+
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xs">
             סגור
           </button>
@@ -171,6 +172,7 @@ export default function ImportSources() {
               className="bg-white border border-gray-100 rounded-lg p-2 text-center"
             >
               <div className={`text-lg font-bold ${s.color}`}>{s.value ?? 0}</div>
+
               <div className="text-xs text-gray-400">{s.label}</div>
             </div>
           ))}
@@ -186,6 +188,7 @@ export default function ImportSources() {
               {result.errors.length} שגיאות{" "}
               {showErrors ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
+
             {showErrors && (
               <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
                 {result.errors.map((e, i) => (
@@ -194,6 +197,7 @@ export default function ImportSources() {
                     className="text-xs bg-red-50 border border-red-100 rounded p-2 text-red-700"
                   >
                     <span className="font-medium">{e.error}</span>
+
                     {e.url && <span className="text-red-400 mr-2 truncate block">{e.url}</span>}
                   </div>
                 ))}
@@ -212,6 +216,7 @@ export default function ImportSources() {
               לוג מפורט{" "}
               {showLog ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
+
             {showLog && (
               <pre className="mt-2 text-xs bg-gray-900 text-green-400 rounded-lg p-3 overflow-auto max-h-56 whitespace-pre-wrap font-mono">
                 {result.log.join("\n")}
@@ -223,6 +228,7 @@ export default function ImportSources() {
         {result.error && !result.success && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-xs">
             <AlertTriangle className="w-4 h-4 inline ml-1" />
+
             {result.error}
           </div>
         )}
@@ -250,10 +256,12 @@ export default function ImportSources() {
         <div className="flex justify-between items-start mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">מנוע ייבוא משרות</h1>
+
             <p className="text-sm text-gray-500 mt-1">
               סריקה אוטומטית + ניהול מקורות - הזן URL אחד, המערכת מגלה את כל המשרות
             </p>
           </div>
+
           <div className="flex items-center gap-2">
             <button
               onClick={() => syncAllMutation.mutate()}
@@ -261,8 +269,10 @@ export default function ImportSources() {
               className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
             >
               <RefreshCw className={`w-4 h-4 ${syncAllMutation.isPending ? "animate-spin" : ""}`} />
+
               {syncAllMutation.isPending ? "מייבא..." : "ייבא הכל"}
             </button>
+
             <button
               onClick={() => {
                 setEditingSource(null)
@@ -280,7 +290,9 @@ export default function ImportSources() {
           <h2 className="font-bold text-purple-800 mb-1 flex items-center gap-2">
             <Search className="w-4 h-4" /> סריקה מהירה — בלי להוסיף מקור
           </h2>
+
           <p className="text-xs text-purple-600 mb-4">הכנס URL לבדיקה חד-פעמית ללא שמירה</p>
+
           <div className="flex gap-2 flex-wrap">
             <input
               value={quickName}
@@ -288,6 +300,7 @@ export default function ImportSources() {
               placeholder="שם חברה (פנימי)"
               className="border border-purple-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-purple-400/30 bg-white text-gray-900 w-44"
             />
+
             <input
               value={quickUrl}
               onChange={(e) => setQuickUrl(e.target.value)}
@@ -295,6 +308,7 @@ export default function ImportSources() {
               dir="ltr"
               className="border border-purple-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-purple-400/30 bg-white text-gray-900 flex-1 min-w-56 text-left"
             />
+
             <button
               onClick={quickScan}
               disabled={!quickUrl || quickScanning}
@@ -305,20 +319,25 @@ export default function ImportSources() {
               ) : (
                 <Play className="w-4 h-4" />
               )}
+
               {quickScanning ? "סורק..." : "סרוק עכשיו"}
             </button>
           </div>
+
           {quickScanning && (
             <div className="mt-4 bg-white/60 rounded-xl p-4 text-sm text-purple-700 flex items-center gap-3">
               <Loader2 className="w-5 h-5 animate-spin text-purple-500 shrink-0" />
+
               <div>
                 <div className="font-semibold">סורק את עמוד הקריירה...</div>
+
                 <div className="text-xs text-purple-500 mt-0.5">
                   המערכת מזהה משרות, עוברת בין עמודים ומחלצת תוכן מלא. זה עשוי לקחת מספר דקות.
                 </div>
               </div>
             </div>
           )}
+
           {quickResult && (
             <ScanResultPanel result={quickResult} onClose={() => setQuickResult(null)} />
           )}
@@ -338,6 +357,7 @@ export default function ImportSources() {
               className="bg-white rounded-xl border border-gray-100 p-4 text-center shadow-sm"
             >
               <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
+
               <div className="text-xs text-gray-500 mt-1">{stat.label}</div>
             </div>
           ))}
@@ -352,6 +372,7 @@ export default function ImportSources() {
             placeholder="חפש לפי שם חברה או URL..."
             className="w-full border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm outline-none focus:ring-2 focus:ring-purple-400/30 bg-white text-gray-900"
           />
+
           <svg
             className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
             fill="none"
@@ -374,6 +395,7 @@ export default function ImportSources() {
         ) : sources.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
             <p className="text-gray-500 mb-4">אין מקורות ייבוא עדיין</p>
+
             <button
               onClick={() => {
                 setEditingSource(null)
@@ -395,26 +417,32 @@ export default function ImportSources() {
                   <div
                     className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${source.is_active ? "bg-green-500" : "bg-gray-300"}`}
                   />
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold text-gray-900 text-sm">{source.name}</span>
+
                       {source.provider && (
                         <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
                           {source.provider}
                         </span>
                       )}
+
                       {!source.is_active && (
                         <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
                           כבוי
                         </span>
                       )}
                     </div>
+
                     <div className="text-xs text-gray-400 mt-0.5 truncate max-w-sm" dir="ltr">
                       {source.url}
                     </div>
+
                     <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                       <span className="flex items-center gap-1 text-xs text-gray-500">
                         {statusIcon(source)}
+
                         {scanning[source.id]
                           ? "סורק..."
                           : source.last_sync
@@ -426,25 +454,31 @@ export default function ImportSources() {
                               })
                             : "לא סונכרן"}
                       </span>
+
                       <span className="text-xs font-medium text-green-600">
                         +{source.jobs_added || 0} חדשות
                       </span>
+
                       <span className="text-xs text-cyan-600">
                         ~{source.jobs_updated || 0} עודכנו
                       </span>
+
                       <span className="text-xs text-orange-500">
                         {source.jobs_closed || 0} נסגרו
                       </span>
+
                       {source.interval_hours > 0 && (
                         <span className="text-xs text-gray-400">כל {source.interval_hours}ש׳</span>
                       )}
                     </div>
+
                     {source.last_sync_status === "error" && source.last_error && (
                       <div className="flex items-center gap-1 text-xs text-red-500 mt-1">
                         <AlertTriangle className="w-3 h-3" /> {source.last_error}
                       </div>
                     )}
                   </div>
+
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     {source.logs && (
                       <button
@@ -455,6 +489,7 @@ export default function ImportSources() {
                         <FileText className="w-4 h-4" />
                       </button>
                     )}
+
                     <a
                       href={source.url}
                       target="_blank"
@@ -464,6 +499,7 @@ export default function ImportSources() {
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
+
                     <button
                       onClick={() => {
                         setEditingSource(source)
@@ -474,6 +510,7 @@ export default function ImportSources() {
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
+
                     <button
                       onClick={() => scanSource(source)}
                       disabled={scanning[source.id]}
@@ -489,6 +526,7 @@ export default function ImportSources() {
                         </>
                       )}
                     </button>
+
                     <button
                       onClick={() => deleteMutation.mutate(source.id)}
                       className="p-2 hover:bg-red-50 rounded-lg text-red-400 transition-colors"

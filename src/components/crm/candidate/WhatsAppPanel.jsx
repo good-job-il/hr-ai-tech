@@ -120,6 +120,7 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
       {!phone && (
         <div className="flex items-center gap-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl">
           <Phone className="w-4 h-4 text-amber-600 flex-shrink-0" />
+
           <p className="text-xs font-bold text-amber-700">{t("candidateCRM.whatsapp.noPhone")}</p>
         </div>
       )}
@@ -129,6 +130,7 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
         <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
           {t("candidateCRM.whatsapp.messageTemplates")}
         </div>
+
         <div className="grid grid-cols-2 gap-1.5">
           {MESSAGE_TEMPLATES.map((tpl) => (
             <button
@@ -150,6 +152,7 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
         <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
           {t("candidateCRM.whatsapp.message")}
         </div>
+
         <textarea
           value={customMsg}
           onChange={(e) => {
@@ -181,6 +184,7 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
         }`}
       >
         <MessageCircle className="w-4 h-4" />
+
         {t("candidateCRM.whatsapp.openWhatsApp")}
       </a>
 
@@ -190,6 +194,7 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
           <div className="text-xs font-black text-[#15803D]">
             {t("candidateCRM.whatsapp.documentConversation")}
           </div>
+
           <textarea
             value={logSummary}
             onChange={(e) => setLogSummary(e.target.value)}
@@ -197,6 +202,7 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
             rows={2}
             className="w-full text-sm border border-green-200 rounded-xl p-3 resize-none outline-none focus:border-[#25D366]"
           />
+
           <div className="flex gap-2">
             {[
               { value: "sent", label: t("candidateCRM.whatsapp.outcomes.sent") },
@@ -212,6 +218,7 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
               </button>
             ))}
           </div>
+
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -221,6 +228,7 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
             >
               {saving ? t("candidateCRM.whatsapp.saving") : t("candidateCRM.whatsapp.saveLog")}
             </Button>
+
             <Button size="sm" variant="ghost" onClick={() => setShowLog(false)} className="text-xs">
               {t("candidateCRM.whatsapp.cancel")}
             </Button>
@@ -241,6 +249,7 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
           <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
             {t("candidateCRM.whatsapp.history")}
           </div>
+
           <div className="space-y-2">
             {waCommunications.slice(0, 5).map((c, i) => (
               <div
@@ -248,15 +257,19 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
                 className="flex items-start gap-3 px-3 py-2.5 bg-white rounded-xl border border-[#E4ECFF]"
               >
                 <CheckCircle2 className="w-4 h-4 text-[#25D366] mt-0.5 flex-shrink-0" />
+
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-[#1F2937] line-clamp-2">{c.content}</p>
+
                   <div className="flex items-center gap-1.5 mt-1">
                     <Clock className="w-3 h-3 text-[#94A3B8]" />
+
                     <span className="text-xs text-[#94A3B8]">
                       {new Date(c.created_date).toLocaleDateString(
                         currentLang === "he" ? "he-IL" : "en-US",
                       )}
                     </span>
+
                     {c.status && <span className="text-xs text-[#94A3B8]">· {c.status}</span>}
                   </div>
                 </div>

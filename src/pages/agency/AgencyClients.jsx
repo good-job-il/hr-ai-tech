@@ -167,6 +167,7 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
           <h3 className="text-xl font-black text-gray-900">
             {t("agencyClients.createModal.title")}
           </h3>
+
           <button
             onClick={onClose}
             aria-label={t("common.close")}
@@ -182,6 +183,7 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
             <label className="block text-sm font-bold text-gray-700 mb-1.5">
               {t("agencyClients.createModal.clientName")} *
             </label>
+
             <input
               type="text"
               value={form.name}
@@ -198,12 +200,14 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
             <label className="block text-sm font-bold text-gray-700 mb-1.5">
               {t("agencyClients.createModal.industry")}
             </label>
+
             <select
               value={form.industry}
               onChange={(e) => set("industry", e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm bg-white"
             >
               <option value="">{t("agencyClients.createModal.selectIndustry")}</option>
+
               {INDUSTRY_KEYS.map((key) => (
                 <option key={key} value={key}>
                   {t(`agencyClients.industries.${key}`)}
@@ -217,6 +221,7 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
             <label className="block text-sm font-bold text-gray-700 mb-1.5">
               {t("agencyClients.createModal.contactEmail")}
             </label>
+
             <input
               type="email"
               value={form.contact_email}
@@ -231,6 +236,7 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
             <label className="block text-sm font-bold text-gray-700 mb-1.5">
               {t("agencyClients.createModal.website")}
             </label>
+
             <input
               type="url"
               value={form.website}
@@ -245,6 +251,7 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
             <label className="block text-sm font-bold text-gray-700 mb-2">
               {t("agencyClients.createModal.color")}
             </label>
+
             <div className="flex gap-2 flex-wrap">
               {PALETTE.map((c) => (
                 <button
@@ -271,6 +278,7 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
             >
               {t("agencyClients.createModal.cancel")}
             </button>
+
             <button
               onClick={handleSubmit}
               disabled={saving || !form.name.trim()}
@@ -303,16 +311,19 @@ function ClientCard({ company }) {
     >
       <div className="flex items-start gap-4 mb-4">
         <CompanyAvatar company={company} />
+
         <div className="flex-1 min-w-0">
           <h3 className="font-black text-gray-900 text-base leading-tight truncate group-hover:text-purple-700 transition-colors">
             {company.name}
           </h3>
+
           {company.industry && (
             <span className="inline-block mt-1 text-xs font-bold px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
               {getIndustryLabel(company.industry, t)}
             </span>
           )}
         </div>
+
         <DirectionIcon className="w-4 h-4 text-gray-300 flex-shrink-0 mt-1 group-hover:text-purple-400 transition-colors" />
       </div>
 
@@ -320,18 +331,23 @@ function ClientCard({ company }) {
       <div className="grid grid-cols-3 gap-2 text-center">
         <div className="bg-gray-50 rounded-xl p-2.5">
           <p className="text-xl font-black text-gray-900">{company.openJobs}</p>
+
           <p className="text-xs text-gray-500 font-semibold mt-0.5">
             {t("agencyClients.stats.jobs")}
           </p>
         </div>
+
         <div className="bg-amber-50 rounded-xl p-2.5">
           <p className="text-xl font-black text-amber-700">{company.inProcess}</p>
+
           <p className="text-xs text-amber-600 font-semibold mt-0.5">
             {t("agencyClients.stats.inProcess")}
           </p>
         </div>
+
         <div className="bg-emerald-50 rounded-xl p-2.5">
           <p className="text-xl font-black text-emerald-700">{company.hired}</p>
+
           <p className="text-xs text-emerald-600 font-semibold mt-0.5">
             {t("agencyClients.stats.hired")}
           </p>
@@ -341,6 +357,7 @@ function ClientCard({ company }) {
       {company.contact_email && (
         <div className="mt-3 flex items-center gap-1.5 text-xs text-gray-400">
           <Mail className="w-3.5 h-3.5" />
+
           <span className="truncate">{company.contact_email}</span>
         </div>
       )}
@@ -366,8 +383,10 @@ function StatCard({ icon: Icon, label, value, color, loading }) {
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${c.bg}`}>
           <Icon className={`w-5 h-5 ${c.text}`} />
         </div>
+
         <span className="text-sm font-semibold text-gray-500">{label}</span>
       </div>
+
       {loading ? (
         <div className="h-8 w-20 bg-gray-100 rounded animate-pulse" />
       ) : (
@@ -486,14 +505,17 @@ export default function AgencyClients() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-900">{t("agencyClients.title")}</h1>
+
           <p className="text-gray-500 mt-1 font-semibold">{t("agencyClients.subtitle")}</p>
         </div>
+
         {canManageClients && (
           <button
             onClick={() => setShowCreate(true)}
             className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
+
             {t("agencyClients.newClient")}
           </button>
         )}
@@ -508,6 +530,7 @@ export default function AgencyClients() {
           color="purple"
           loading={loading}
         />
+
         <StatCard
           icon={TrendingUp}
           label={t("agencyClients.stats.activeClients")}
@@ -515,6 +538,7 @@ export default function AgencyClients() {
           color="blue"
           loading={loading}
         />
+
         <StatCard
           icon={Briefcase}
           label={t("agencyClients.stats.openJobs")}
@@ -522,6 +546,7 @@ export default function AgencyClients() {
           color="amber"
           loading={loading}
         />
+
         <StatCard
           icon={Users}
           label={t("agencyClients.stats.candidatesInProcess")}
@@ -538,6 +563,7 @@ export default function AgencyClients() {
           <Search
             className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400`}
           />
+
           <input
             type="text"
             placeholder={t("agencyClients.filters.searchPlaceholder")}
@@ -555,6 +581,7 @@ export default function AgencyClients() {
             className="px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm bg-white"
           >
             <option value="">{t("agencyClients.filters.allIndustries")}</option>
+
             {industries.map((i) => (
               <option key={i} value={i}>
                 {getIndustryLabel(i, t)}
@@ -596,6 +623,7 @@ export default function AgencyClients() {
       {clientsError ? (
         <div className="rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
           <p className="font-bold text-red-700">{t("agencyClients.loadError")}</p>
+
           <button
             onClick={() => refetch()}
             className="mt-3 text-sm font-bold text-purple-700 hover:underline"
@@ -612,11 +640,14 @@ export default function AgencyClients() {
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 bg-gray-100 rounded-xl flex-shrink-0" />
+
                 <div className="flex-1 space-y-2">
                   <div className="h-4 bg-gray-100 rounded w-32" />
+
                   <div className="h-3 bg-gray-100 rounded w-20" />
                 </div>
               </div>
+
               <div className="grid grid-cols-3 gap-2">
                 {[1, 2, 3].map((j) => (
                   <div key={j} className="h-14 bg-gray-50 rounded-xl" />
@@ -628,16 +659,19 @@ export default function AgencyClients() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
           <Building2 className="w-14 h-14 text-gray-200 mx-auto mb-4" />
+
           <p className="text-gray-600 font-black text-lg">
             {search || filterIndustry || filterActive !== "all"
               ? t("agencyClients.results.noMatchingClients")
               : t("agencyClients.results.noClients")}
           </p>
+
           {!search && !filterIndustry && filterActive === "all" && canManageClients && (
             <>
               <p className="text-gray-400 text-sm mt-1 mb-4">
                 {t("agencyClients.results.addFirstClient")}
               </p>
+
               <button
                 onClick={() => setShowCreate(true)}
                 className="px-5 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors"

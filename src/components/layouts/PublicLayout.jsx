@@ -8,7 +8,9 @@ export default function PublicLayout({ children }) {
   return (
     <div dir={isRtl ? "rtl" : "ltr"} className="min-h-screen bg-white">
       <Navbar />
+
       <main>{children}</main>
+
       <Footer />
     </div>
   )

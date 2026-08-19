@@ -7,6 +7,7 @@ export default function KpiCard({ label, value, pct, icon: Icon, color, bg, link
         <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${color}`} />
         </div>
+
         {pct !== null && pct !== undefined && (
           <div
             className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${
@@ -29,10 +30,13 @@ export default function KpiCard({ label, value, pct, icon: Icon, color, bg, link
           </div>
         )}
       </div>
+
       <div className="text-2xl font-bold text-gray-900">
         {value?.toLocaleString()}
+
         {suffix}
       </div>
+
       <div className="text-xs text-gray-500 mt-1">{label}</div>
     </div>
   )

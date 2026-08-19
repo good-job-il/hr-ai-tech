@@ -30,8 +30,10 @@ export default function JobCompensationDisplay({ job, baseSalary = 0, onEdit }) 
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
           <DollarSign className="w-4 h-4 text-purple-600" />
+
           <h4 className="text-sm font-bold text-gray-900">משכורת ותגמולים (80% משכר בסיס)</h4>
         </div>
+
         {onEdit && (
           <button
             onClick={onEdit}
@@ -55,12 +57,15 @@ export default function JobCompensationDisplay({ job, baseSalary = 0, onEdit }) 
             >
               <div className="flex items-center gap-2">
                 <Percent className="w-3.5 h-3.5 text-purple-600" />
+
                 <span className="text-sm font-medium text-gray-900">{config.label}</span>
               </div>
+
               <div className="flex items-center gap-3">
                 <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-md font-bold">
                   {config.percent}%
                 </span>
+
                 <span className="font-bold text-purple-700 text-sm">
                   {amount.toLocaleString()} ₪
                 </span>

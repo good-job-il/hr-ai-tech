@@ -37,6 +37,7 @@ export default function PipelineFilters({ filters, onChange }) {
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2 h-10 px-4 rounded-xl border border-[#E4ECFF] bg-white">
           <Search className="w-4 h-4 text-[#94A3B8]" />
+
           <input
             type="text"
             placeholder={t("pipeline.filters.searchByRole")}
@@ -52,6 +53,7 @@ export default function PipelineFilters({ filters, onChange }) {
           className="h-10 px-3 rounded-xl border border-[#E4ECFF] bg-white text-sm font-semibold text-[#64748B] outline-none"
         >
           <option value="">{t("pipeline.filters.allSources")}</option>
+
           {SOURCES.map((s) => (
             <option key={s} value={s}>
               {t(`pipeline.sources.${s}`)}
@@ -61,6 +63,7 @@ export default function PipelineFilters({ filters, onChange }) {
 
         <div className="flex items-center gap-2 h-10 px-4 rounded-xl border border-[#E4ECFF] bg-white">
           <span className="text-xs font-bold text-[#64748B]">{t("pipeline.filters.aiMin")}</span>
+
           <input
             type="number"
             min={0}
@@ -70,6 +73,7 @@ export default function PipelineFilters({ filters, onChange }) {
             placeholder="0"
             className="w-12 outline-none text-sm font-bold text-[#0F172A] bg-transparent"
           />
+
           <span className="text-xs text-[#94A3B8]">%</span>
         </div>
 
@@ -82,7 +86,9 @@ export default function PipelineFilters({ filters, onChange }) {
           }`}
         >
           {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+
           {t("pipeline.filters.advancedFilter")}
+
           {hasAdvanced && <span className="w-2 h-2 rounded-full bg-[#7C3AED]" />}
         </button>
 
@@ -92,6 +98,7 @@ export default function PipelineFilters({ filters, onChange }) {
             className="h-10 px-4 rounded-xl bg-red-50 border border-red-200 text-red-500 text-sm font-bold flex items-center gap-2 hover:bg-red-100 transition-all"
           >
             <X className="w-4 h-4" />
+
             {t("pipeline.filters.clearAll")}
           </button>
         )}
@@ -101,6 +108,7 @@ export default function PipelineFilters({ filters, onChange }) {
         <div className="flex flex-wrap items-center gap-3 p-4 bg-[#F7FBFF] rounded-xl border border-[#E4ECFF]">
           <div className="flex items-center gap-2 h-10 px-4 rounded-xl border border-[#E4ECFF] bg-white">
             <Search className="w-4 h-4 text-[#94A3B8]" />
+
             <input
               type="text"
               placeholder={t("pipeline.filters.recruiterName")}
@@ -114,6 +122,7 @@ export default function PipelineFilters({ filters, onChange }) {
             <span className="text-xs font-bold text-[#64748B]">
               {t("pipeline.filters.fromDate")}
             </span>
+
             <input
               type="date"
               value={filters.dateFrom || ""}
@@ -121,8 +130,10 @@ export default function PipelineFilters({ filters, onChange }) {
               className="h-10 px-3 rounded-xl border border-[#E4ECFF] bg-white text-sm text-[#0F172A] outline-none"
             />
           </div>
+
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-[#64748B]">{t("pipeline.filters.toDate")}</span>
+
             <input
               type="date"
               value={filters.dateTo || ""}
@@ -135,6 +146,7 @@ export default function PipelineFilters({ filters, onChange }) {
             <span className="text-xs font-bold text-[#64748B]">
               {t("pipeline.filters.experienceYears")}
             </span>
+
             <input
               type="number"
               min={0}
@@ -144,7 +156,9 @@ export default function PipelineFilters({ filters, onChange }) {
               placeholder={t("pipeline.filters.from")}
               className="w-10 outline-none text-sm font-bold text-[#0F172A] bg-transparent text-center"
             />
+
             <span className="text-xs text-[#94A3B8]">—</span>
+
             <input
               type="number"
               min={0}

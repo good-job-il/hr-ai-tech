@@ -205,9 +205,11 @@ export default function Register() {
               alt="HeadHunter HR-Tech"
               className="h-16 w-auto object-contain mx-auto mb-4"
             />
+
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
               {isRtl ? "הצטרף לHeadHunter" : "Join HeadHunter"}
             </h1>
+
             <p className="text-sm text-gray-600">
               {isRtl
                 ? "אלפי משרות מחכות לך — הרשמה לוקחת פחות מדקה"
@@ -222,6 +224,7 @@ export default function Register() {
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3 mb-6 flex gap-2">
               <span>⚠️</span>
+
               <span>{error}</span>
             </div>
           )}
@@ -233,6 +236,7 @@ export default function Register() {
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     {t("auth.register.fullName")}
                   </Label>
+
                   <Input
                     type="text"
                     value={fullName}
@@ -243,11 +247,13 @@ export default function Register() {
                   />
                 </div>
               )}
+
               {!isFromInvite && (
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     {t("auth.register.email")}
                   </Label>
+
                   <Input
                     type="email"
                     value={email}
@@ -259,11 +265,13 @@ export default function Register() {
                   />
                 </div>
               )}
+
               {!isFromInvite && (
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     {t("auth.register.phone")}
                   </Label>
+
                   <Input
                     type="tel"
                     value={phone}
@@ -275,11 +283,13 @@ export default function Register() {
                   />
                 </div>
               )}
+
               {!isFromInvite && (
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     {isRtl ? "אני מצטרף בתור" : "I am joining as"}
                   </Label>
+
                   <Select
                     value={userType}
                     onValueChange={(v) => {
@@ -290,6 +300,7 @@ export default function Register() {
                     <SelectTrigger className="h-11 border-gray-300">
                       <SelectValue />
                     </SelectTrigger>
+
                     <SelectContent>
                       {USER_TYPES.map((type) => (
                         <SelectItem key={type.id} value={type.id}>
@@ -308,6 +319,7 @@ export default function Register() {
                       ? "הצטרפות לארגון באמצעות הזמנה"
                       : "Joining an organization by invitation"}
                   </p>
+
                   <p className="text-xs text-blue-700">
                     {isRtl
                       ? "הארגון והתפקיד נקבעו באופן מאובטח בהזמנה"
@@ -321,6 +333,7 @@ export default function Register() {
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     {isRtl ? "סוג הארגון" : "Organization type"}
                   </Label>
+
                   <div className="grid grid-cols-2 gap-3">
                     {ORG_TYPES.map((org) => (
                       <button
@@ -334,17 +347,21 @@ export default function Register() {
                         }`}
                       >
                         <div className="text-xl mb-1">{org.icon}</div>
+
                         <div className="text-xs font-bold text-gray-800">{org.label}</div>
+
                         <div className="text-[10px] text-gray-500 mt-0.5">{org.desc}</div>
                       </button>
                     ))}
                   </div>
                 </div>
               )}
+
               <div>
                 <Label className="text-sm font-semibold text-gray-700 block mb-2">
                   {t("auth.register.password")}
                 </Label>
+
                 <Input
                   type="password"
                   value={password}
@@ -353,16 +370,19 @@ export default function Register() {
                   className="h-11 border-gray-300"
                   placeholder="••••••••"
                 />
+
                 <p className="text-xs text-gray-500 mt-1">
                   {isRtl
                     ? "לפחות 6 תווים — בחר משהו שתזכור"
                     : "At least 6 characters — choose something you remember"}
                 </p>
               </div>
+
               <div>
                 <Label className="text-sm font-semibold text-gray-700 block mb-2">
                   {t("auth.register.confirmPassword")}
                 </Label>
+
                 <Input
                   type="password"
                   value={confirmPassword}
@@ -372,6 +392,7 @@ export default function Register() {
                   placeholder="••••••••"
                 />
               </div>
+
               <Button
                 type="submit"
                 disabled={loading}
@@ -388,8 +409,10 @@ export default function Register() {
                         stroke="currentColor"
                         strokeWidth="4"
                       />
+
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                     </svg>
+
                     {t("auth.register.registering")}
                   </span>
                 ) : (
@@ -409,6 +432,7 @@ export default function Register() {
 
         <div className="mt-8 text-center space-y-2 text-xs text-gray-500">
           <p>🔒 {isRtl ? "הנתונים שלך מוצפנים ומאובטחים" : "Your data is encrypted and secure"}</p>
+
           <p>
             ✓{" "}
             {isRtl

@@ -101,6 +101,7 @@ export default function CandidateNotesPanel({
             className="mb-3 min-h-[80px] bg-white"
             autoFocus
           />
+
           <div className="flex flex-wrap items-center gap-2 mb-3">
             {/* Visibility */}
             {["internal", "employer_visible"].map((v) => {
@@ -115,10 +116,12 @@ export default function CandidateNotesPanel({
                   className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full transition-all border ${visibility === v ? `${cfg.bg} ${cfg.color} border-current` : "border-[#E4ECFF] text-[#94A3B8] hover:bg-[#F0F1F5]"}`}
                 >
                   <Ico className="w-3 h-3" />
+
                   {cfg.label}
                 </button>
               )
             })}
+
             {/* Type */}
             <select
               value={noteType}
@@ -131,6 +134,7 @@ export default function CandidateNotesPanel({
                 </option>
               ))}
             </select>
+
             {/* Pin */}
             <button
               onClick={() => setIsPinned(!isPinned)}
@@ -140,6 +144,7 @@ export default function CandidateNotesPanel({
               {isPinned ? t("candidateCRM.notesPanel.pinned") : t("candidateCRM.notesPanel.pin")}
             </button>
           </div>
+
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -149,6 +154,7 @@ export default function CandidateNotesPanel({
             >
               {saving ? t("candidateCRM.notesPanel.saving") : t("candidateCRM.notesPanel.save")}
             </Button>
+
             <Button
               size="sm"
               variant="ghost"
@@ -170,6 +176,7 @@ export default function CandidateNotesPanel({
           <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2 flex items-center gap-1">
             <Pin className="w-3 h-3 text-yellow-500" /> {t("candidateCRM.notesPanel.pinned")}
           </div>
+
           <div className="space-y-2">
             {pinned.map((note) => (
               <NoteCard
@@ -191,9 +198,11 @@ export default function CandidateNotesPanel({
         {regular.length === 0 && pinned.length === 0 && (
           <div className="text-center py-8 text-[#94A3B8]">
             <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-40" />
+
             <p className="text-sm font-semibold">{t("candidateCRM.notesPanel.noNotes")}</p>
           </div>
         )}
+
         {regular.map((note) => (
           <NoteCard
             key={note.id}
@@ -223,6 +232,7 @@ function NoteCard({ note, onDelete, onUpdate, visibilityConfig, typeLabels, date
         <p className="text-sm text-[#1F2937] leading-relaxed whitespace-pre-wrap flex-1">
           {note.content}
         </p>
+
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
           <button
             onClick={() => onUpdate?.(note.id, { is_pinned: !note.is_pinned })}
@@ -230,6 +240,7 @@ function NoteCard({ note, onDelete, onUpdate, visibilityConfig, typeLabels, date
           >
             <Pin className="w-3.5 h-3.5" />
           </button>
+
           <button
             onClick={() => onDelete?.(note.id)}
             className="p-1.5 rounded-lg hover:bg-red-50 text-[#94A3B8] hover:text-red-500 transition-colors"
@@ -238,21 +249,26 @@ function NoteCard({ note, onDelete, onUpdate, visibilityConfig, typeLabels, date
           </button>
         </div>
       </div>
+
       <div className="flex items-center gap-2 mt-2 flex-wrap">
         <span className="text-xs font-bold text-[#7C3AED]">
           {note.author_name || note.author_email}
         </span>
+
         <span
           className={`text-xs font-semibold flex items-center gap-1 px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color}`}
         >
           <Ico className="w-3 h-3" />
+
           {cfg.label}
         </span>
+
         {note.note_type && note.note_type !== "general" && (
           <span className="text-xs bg-[#EEF4FF] text-[#4F46E5] px-2 py-0.5 rounded-full font-semibold">
             {typeLabels[note.note_type] || note.note_type}
           </span>
         )}
+
         {note.created_date && (
           <span className="text-xs text-[#CBD5E1]">
             {format(new Date(note.created_date), "dd MMM, HH:mm", { locale: dateLocale })}

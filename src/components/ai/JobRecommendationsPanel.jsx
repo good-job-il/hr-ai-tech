@@ -56,6 +56,7 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
       <p className="text-xs text-[#94A3B8] font-semibold">
         {t("aiMatching.jobPanel.candidatesRanked", { count: results.length })}
       </p>
+
       {results.map(({ candidate, score, explanation }) => (
         <div
           key={candidate.id}
@@ -68,9 +69,11 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white text-sm font-black flex-shrink-0">
               {(candidate.full_name || "?")[0]}
             </div>
+
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-black text-[#0F172A] text-sm">{candidate.full_name}</span>
+
                 {!explanation.requiredMet && (
                   <AlertTriangle
                     className="w-3.5 h-3.5 text-amber-500"
@@ -78,15 +81,19 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
                   />
                 )}
               </div>
+
               <div className="text-xs text-[#7C3AED] font-semibold">
                 {candidate.role_name || candidate.domain_name}
               </div>
+
               {candidate.location && (
                 <div className="flex items-center gap-1 text-xs text-[#94A3B8] mt-0.5">
                   <MapPin className="w-3 h-3" />
+
                   {candidate.location}
                 </div>
               )}
+
               <div className="flex flex-wrap gap-1 mt-1.5">
                 {(candidate.skills || []).slice(0, 3).map((s) => (
                   <span
@@ -98,8 +105,10 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
                 ))}
               </div>
             </div>
+
             <div className="flex flex-col items-end gap-2 flex-shrink-0">
               <AIMatchBadge score={score} missingRequired={!explanation.requiredMet} />
+
               <ChevronRight
                 className={`w-4 h-4 text-[#94A3B8] transition-transform ${expanded === candidate.id ? "rotate-90" : ""}`}
               />
@@ -113,6 +122,7 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
                   <div className="text-xs font-black text-red-500 mb-1">
                     {t("aiMatching.jobPanel.gaps")}
                   </div>
+
                   {explanation.gaps.map((g, i) => (
                     <div key={i} className="text-xs text-[#374151]">
                       • {g}
@@ -120,11 +130,13 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
                   ))}
                 </div>
               )}
+
               {explanation.recommendations.length > 0 && (
                 <div>
                   <div className="text-xs font-black text-[#7C3AED] mb-1">
                     {t("aiMatching.jobPanel.recommendation")}
                   </div>
+
                   {explanation.recommendations.slice(0, 2).map((r, i) => (
                     <div key={i} className="text-xs text-[#374151]">
                       • {r}
@@ -132,18 +144,22 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
                   ))}
                 </div>
               )}
+
               {explanation.nextAction && (
                 <div className={`text-xs font-black text-[#2F80FF] ${isRTL ? "" : "text-left"}`}>
                   {isRTL ? "← " : "→ "}
+
                   {explanation.nextAction}
                 </div>
               )}
+
               {onAddToPipeline && (
                 <button
                   onClick={() => onAddToPipeline(candidate)}
                   className="w-full h-9 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white text-xs font-black flex items-center justify-center gap-1"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
+
                   {t("aiMatching.jobPanel.addToPipeline")}
                 </button>
               )}

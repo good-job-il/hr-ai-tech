@@ -82,8 +82,10 @@ export default function SubscriptionsPage() {
           actions={
             <div className="flex items-center gap-2 rounded-2xl border border-white bg-white/85 px-4 py-3 shadow-[0_8px_25px_rgba(66,81,130,0.07)]">
               <CircleDollarSign className="h-5 w-5 text-violet-500" />
+
               <div>
                 <p className="text-xs font-bold text-slate-700">Monthly recurring revenue</p>
+
                 <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                   Based on active subscriptions
                 </p>
@@ -101,6 +103,7 @@ export default function SubscriptionsPage() {
             loading={isLoading}
             meta="Across every plan"
           />
+
           <PlatformStatCard
             icon={CheckCircle}
             label="Active subscriptions"
@@ -109,6 +112,7 @@ export default function SubscriptionsPage() {
             loading={isLoading}
             meta="Currently billable"
           />
+
           <PlatformStatCard
             icon={Crown}
             label="Enterprise plans"
@@ -117,6 +121,7 @@ export default function SubscriptionsPage() {
             loading={isLoading}
             meta="Highest tier"
           />
+
           <PlatformStatCard
             icon={CircleDollarSign}
             label="Monthly recurring revenue"
@@ -138,9 +143,11 @@ export default function SubscriptionsPage() {
               </div>
             }
           />
+
           <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-[minmax(240px,1fr)_190px_190px]">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -148,25 +155,34 @@ export default function SubscriptionsPage() {
                 className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pl-10 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-50"
               />
             </div>
+
             <select
               value={planFilter}
               onChange={(e) => setPlanFilter(e.target.value)}
               className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-50"
             >
               <option value="all">All Plans</option>
+
               <option value="trial">Trial</option>
+
               <option value="starter">Starter</option>
+
               <option value="pro">Pro</option>
+
               <option value="enterprise">Enterprise</option>
             </select>
+
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-50"
             >
               <option value="all">All Statuses</option>
+
               <option value="active">Active</option>
+
               <option value="suspended">Suspended</option>
+
               <option value="inactive">Inactive</option>
             </select>
           </div>
@@ -199,6 +215,7 @@ export default function SubscriptionsPage() {
                   ))}
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-slate-100">
                 {isLoading ? (
                   Array(5)
@@ -245,19 +262,23 @@ export default function SubscriptionsPage() {
                             >
                               <Building2 className="h-5 w-5" strokeWidth={1.8} />
                             </div>
+
                             <div>
                               <p className="font-extrabold text-slate-800 transition group-hover:text-violet-700">
                                 {org.name}
                               </p>
+
                               <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                                 {org.contact_email || "—"}
                               </p>
                             </div>
                           </div>
                         </td>
+
                         <td className="px-5 py-4 text-xs font-semibold text-slate-600">
                           {org.org_type === "staffing_agency" ? "Staffing Agency" : "Internal HR"}
                         </td>
+
                         <td className="px-5 py-4">
                           <select
                             defaultValue={org.plan || "trial"}
@@ -265,16 +286,21 @@ export default function SubscriptionsPage() {
                             className={`cursor-pointer rounded-full border px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide outline-none ${plan.bg} ${plan.text} ${plan.border}`}
                           >
                             <option value="trial">Trial</option>
+
                             <option value="starter">Starter</option>
+
                             <option value="pro">Pro</option>
+
                             <option value="enterprise">Enterprise</option>
                           </select>
                         </td>
+
                         <td className="px-5 py-4">
                           <div
                             className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold ${status.bg} ${status.text}`}
                           >
                             <StatusIcon className="h-3 w-3" />
+
                             {org.status === "active"
                               ? "Active"
                               : org.status === "suspended"
@@ -282,18 +308,21 @@ export default function SubscriptionsPage() {
                                 : "Inactive"}
                           </div>
                         </td>
+
                         <td className="px-5 py-4">
                           <span className="font-extrabold text-slate-800">
                             {org.status === "active"
                               ? `₪${(PLAN_PRICES[org.plan] || 0).toLocaleString()}`
                               : "—"}
                           </span>
+
                           {org.status === "active" && (
                             <p className="mt-0.5 text-[9px] font-medium text-slate-400">
                               per month
                             </p>
                           )}
                         </td>
+
                         <td className="px-5 py-4">
                           {org.status === "active" ? (
                             <button

@@ -185,18 +185,22 @@ export default function AgencyReportsPage() {
           actions={
             <Button variant="outline" onClick={exportCsv} disabled={!can("export") || !report}>
               <Download className="h-4 w-4" />
+
               {text.export}
             </Button>
           }
         />
+
         {exportError && (
           <p className="rounded-xl bg-rose-50 p-3 text-sm font-bold text-rose-700">{exportError}</p>
         )}
+
         <PlatformCard className="p-5">
           <PlatformWidgetHeader
             title={text.filters}
             action={<Filter className="h-4 w-4 text-violet-600" />}
           />
+
           <div className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
             <FilterField
               label={text.from}
@@ -204,12 +208,14 @@ export default function AgencyReportsPage() {
               value={filters.date_from}
               onChange={(value) => update("date_from", value)}
             />
+
             <FilterField
               label={text.to}
               type="date"
               value={filters.date_to}
               onChange={(value) => update("date_to", value)}
             />
+
             <FilterField
               label={text.client}
               value={filters.client_id}
@@ -217,6 +223,7 @@ export default function AgencyReportsPage() {
               all={text.all}
               onChange={(value) => update("client_id", value)}
             />
+
             <FilterField
               label={text.job}
               value={filters.job_id}
@@ -224,6 +231,7 @@ export default function AgencyReportsPage() {
               all={text.all}
               onChange={(value) => update("job_id", value)}
             />
+
             <FilterField
               label={text.recruiter}
               value={filters.recruiter_id}
@@ -231,6 +239,7 @@ export default function AgencyReportsPage() {
               all={text.all}
               onChange={(value) => update("recruiter_id", value)}
             />
+
             <FilterField
               label={text.team}
               value={filters.team_id}
@@ -253,6 +262,7 @@ export default function AgencyReportsPage() {
                 loading={isLoading}
                 tone="violet"
               />
+
               <PlatformStatCard
                 icon={BriefcaseBusiness}
                 label={text.placements}
@@ -260,6 +270,7 @@ export default function AgencyReportsPage() {
                 loading={isLoading}
                 tone="emerald"
               />
+
               <PlatformStatCard
                 icon={PieChart}
                 label={text.rate}
@@ -268,6 +279,7 @@ export default function AgencyReportsPage() {
                 loading={isLoading}
                 tone="blue"
               />
+
               <PlatformStatCard
                 icon={Clock3}
                 label={text.time}
@@ -276,6 +288,7 @@ export default function AgencyReportsPage() {
                 loading={isLoading}
                 tone="amber"
               />
+
               {can("view_compensation") && (
                 <PlatformStatCard
                   icon={WalletCards}
@@ -286,6 +299,7 @@ export default function AgencyReportsPage() {
                   tone="cyan"
                 />
               )}
+
               {can("view_compensation") && (
                 <PlatformStatCard
                   icon={WalletCards}
@@ -297,6 +311,7 @@ export default function AgencyReportsPage() {
                 />
               )}
             </div>
+
             {!isLoading && report?.summary.applications === 0 ? (
               <PlatformEmptyState icon={PieChart}>{text.noData}</PlatformEmptyState>
             ) : (
@@ -308,6 +323,7 @@ export default function AgencyReportsPage() {
                   valueKey="count"
                   suffix=""
                 />
+
                 <MetricBars
                   title={text.stageTime}
                   rows={report?.time_in_stage || []}
@@ -315,42 +331,50 @@ export default function AgencyReportsPage() {
                   valueKey="average_days"
                   suffix={` ${text.days}`}
                 />
+
                 <PerformanceTable
                   title={text.sources}
                   rows={report?.source_effectiveness || []}
                   nameKey="source"
                   text={text}
                 />
+
                 <PerformanceTable
                   title={text.recruiters}
                   rows={report?.recruiter_performance || []}
                   nameKey="recruiter_name"
                   text={text}
                 />
+
                 <PerformanceTable
                   title={text.teams}
                   rows={report?.team_performance || []}
                   nameKey="team_name"
                   text={text}
                 />
+
                 <PerformanceTable
                   title={text.clients}
                   rows={report?.client_conversion || []}
                   nameKey="client_name"
                   text={text}
                 />
+
                 <PerformanceTable
                   title={text.jobs}
                   rows={report?.job_conversion || []}
                   nameKey="job_title"
                   text={text}
                 />
+
                 {can("view_compensation") && (
                   <PlatformCard className="p-5">
                     <PlatformWidgetHeader title={text.revenue} />
+
                     <div className="mt-5 text-3xl font-black text-emerald-600">
                       {money(report?.summary.placement_revenue)}
                     </div>
+
                     <div className="mt-2 text-sm font-semibold text-slate-500">
                       {text.compensation}: {money(report?.summary.allocated_compensation)}
                     </div>
@@ -369,6 +393,7 @@ function FilterField({ label, value, onChange, type, options, all }) {
   return (
     <label className="text-xs font-bold text-slate-500">
       {label}
+
       {type ? (
         <input
           type={type}
@@ -383,6 +408,7 @@ function FilterField({ label, value, onChange, type, options, all }) {
           className={`${platformFieldClassName} mt-2`}
         >
           <option value="">{all}</option>
+
           {options.map((option) => (
             <option key={option.id} value={option.id}>
               {option.name}
@@ -400,16 +426,20 @@ function MetricBars({ title, rows, labelKey, valueKey, suffix }) {
   return (
     <PlatformCard className="p-5">
       <PlatformWidgetHeader title={title} />
+
       <div className="mt-4 space-y-3">
         {rows.map((row) => (
           <div key={row[labelKey]}>
             <div className="mb-1 flex justify-between text-xs font-bold text-slate-600">
               <span>{row[labelKey]}</span>
+
               <span>
                 {row[valueKey]}
+
                 {suffix}
               </span>
             </div>
+
             <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-violet-500 to-blue-500"
@@ -429,22 +459,30 @@ function PerformanceTable({ title, rows, nameKey, text }) {
       <div className="p-5">
         <PlatformWidgetHeader title={title} />
       </div>
+
       <div className="overflow-x-auto">
         <table className="w-full min-w-[480px] text-sm">
           <thead className="bg-slate-50 text-xs text-slate-400">
             <tr>
               <th className="p-3 text-start">{text.name}</th>
+
               <th>{text.applications}</th>
+
               <th>{text.placements}</th>
+
               <th>{text.conversion}</th>
             </tr>
           </thead>
+
           <tbody>
             {rows.map((row, index) => (
               <tr key={`${row[nameKey]}-${index}`} className="border-t border-slate-100">
                 <td className="p-3 font-bold text-slate-700">{row[nameKey]}</td>
+
                 <td className="text-center">{row.applications}</td>
+
                 <td className="text-center">{row.placements}</td>
+
                 <td className="text-center font-bold text-violet-600">{row.conversion_rate}%</td>
               </tr>
             ))}

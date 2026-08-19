@@ -67,6 +67,7 @@ export default function StaffFormModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label className="text-sm font-semibold">שם מלא *</Label>
+
             <Input
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
@@ -77,6 +78,7 @@ export default function StaffFormModal({
 
           <div>
             <Label className="text-sm font-semibold">אימייל *</Label>
+
             <Input
               type="email"
               value={formData.email}
@@ -89,6 +91,7 @@ export default function StaffFormModal({
 
           <div>
             <Label className="text-sm font-semibold">טלפון *</Label>
+
             <Input
               type="tel"
               value={formData.phone}
@@ -101,6 +104,7 @@ export default function StaffFormModal({
 
           <div>
             <Label className="text-sm font-semibold">תפקיד *</Label>
+
             <Select
               value={formData.role}
               onValueChange={(value) =>
@@ -110,11 +114,14 @@ export default function StaffFormModal({
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
+
               <SelectContent>
                 {showHiringManagerOption && (
                   <SelectItem value="hiring_manager">{ROLE_LABELS.hiring_manager}</SelectItem>
                 )}
+
                 <SelectItem value="team_manager">{ROLE_LABELS.team_manager}</SelectItem>
+
                 <SelectItem value="recruiter">{ROLE_LABELS.recruiter}</SelectItem>
               </SelectContent>
             </Select>
@@ -123,6 +130,7 @@ export default function StaffFormModal({
           {formData.role !== "hiring_manager" && (
             <div>
               <Label className="text-sm font-semibold">מנהל *</Label>
+
               <Select
                 value={formData.manager_email}
                 onValueChange={(value) => setFormData({ ...formData, manager_email: value })}
@@ -130,6 +138,7 @@ export default function StaffFormModal({
                 <SelectTrigger>
                   <SelectValue placeholder="בחר מנהל" />
                 </SelectTrigger>
+
                 <SelectContent>
                   {availableManagers.map((manager) => (
                     <SelectItem key={manager.email} value={manager.email}>
@@ -145,6 +154,7 @@ export default function StaffFormModal({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               ביטול
             </Button>
+
             <Button type="submit" disabled={loading} className="bg-hhblue hover:bg-hhblue/90">
               {loading ? "⏳ שומר..." : "שמור"}
             </Button>

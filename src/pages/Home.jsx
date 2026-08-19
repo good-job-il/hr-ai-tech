@@ -52,11 +52,14 @@ function CandidateCard() {
         <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#EAF8FF] to-[#EDE9FE] border-4 border-white shadow-xl flex items-center justify-center text-3xl">
           👨‍💻
         </div>
+
         <div>
           <h3 className="text-[#0F172A] text-xl font-extrabold">
             {isRtl ? "דניאל כהן" : "Daniel Cohen"}
           </h3>
+
           <p className="text-[#48556A] font-semibold">Full Stack Developer</p>
+
           <p className="text-[#6C4DFF] text-sm font-semibold mt-1">
             {isRtl ? "תל אביב, ישראל" : "Tel Aviv, Israel"}
           </p>
@@ -67,11 +70,13 @@ function CandidateCard() {
         <div className="w-16 h-16 rounded-full bg-white border-[6px] border-[#AEEFF7] shadow-inner flex items-center justify-center">
           <span className="text-[#12A7A8] font-extrabold text-xl">95%</span>
         </div>
+
         <div className="font-bold text-[#172033]">{isRtl ? "התאמה למשרות" : "Job Match"}</div>
       </div>
 
       <button className="w-full h-13 rounded-2xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold shadow-[0_14px_35px_rgba(79,124,255,0.25)] mb-5 py-4">
         <Sparkles className="inline w-4 h-4 mr-2" />
+
         {isRtl ? "שדרוג קורות החיים עם AI" : "Upgrade Resume with AI"}
       </button>
 
@@ -89,21 +94,28 @@ function CandidateCard() {
       <div className="space-y-4 border-t border-[#E6EEFF] pt-5">
         <div className="flex items-start justify-between gap-5">
           <BriefcaseBusiness className="w-6 h-6 text-[#6C4DFF]" />
+
           <div className="text-right">
             <p className="text-[#0F172A] font-extrabold">
               {isRtl ? "ניסיון תעסוקתי" : "Work Experience"}
             </p>
+
             <p className="text-[#64748B] text-sm">Senior Frontend Developer</p>
+
             <p className="text-[#94A3B8] text-xs">2021 — {isRtl ? "היום" : "Present"}</p>
           </div>
         </div>
+
         <div className="flex items-start justify-between gap-5">
           <Building2 className="w-6 h-6 text-[#2F80FF]" />
+
           <div className="text-right">
             <p className="text-[#0F172A] font-extrabold">{isRtl ? "השכלה" : "Education"}</p>
+
             <p className="text-[#64748B] text-sm">
               {isRtl ? "B.Sc במדעי המחשב" : "B.Sc Computer Science"}
             </p>
+
             <p className="text-[#94A3B8] text-xs">
               {isRtl ? "אוניברסיטת תל אביב" : "Tel Aviv University"}
             </p>
@@ -136,6 +148,7 @@ function AIOrb() {
             "radial-gradient(circle, rgba(108,77,255,0.22) 0%, rgba(47,128,255,0.12) 45%, transparent 72%)",
         }}
       />
+
       <div
         style={{
           position: "absolute",
@@ -145,6 +158,7 @@ function AIOrb() {
           border: "1px solid rgba(164,196,255,0.28)",
         }}
       />
+
       <div
         style={{
           position: "absolute",
@@ -154,6 +168,7 @@ function AIOrb() {
           border: "1px solid rgba(164,196,255,0.22)",
         }}
       />
+
       <div
         style={{
           position: "absolute",
@@ -163,6 +178,7 @@ function AIOrb() {
           border: "1px solid rgba(164,196,255,0.18)",
         }}
       />
+
       <div
         style={{
           position: "absolute",
@@ -183,20 +199,32 @@ function AIOrb() {
           <defs>
             <linearGradient id="nl1" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#fff" stopOpacity="0.8" />
+
               <stop offset="100%" stopColor="#7DE3FF" stopOpacity="0.3" />
             </linearGradient>
           </defs>
+
           <line x1="20" y1="80" x2="130" y2="120" stroke="url(#nl1)" strokeWidth="0.8" />
+
           <line x1="130" y1="120" x2="240" y2="70" stroke="url(#nl1)" strokeWidth="0.8" />
+
           <line x1="130" y1="120" x2="200" y2="180" stroke="url(#nl1)" strokeWidth="0.8" />
+
           <line x1="130" y1="120" x2="60" y2="190" stroke="url(#nl1)" strokeWidth="0.8" />
+
           <line x1="60" y1="190" x2="200" y2="180" stroke="url(#nl1)" strokeWidth="0.8" />
+
           <circle cx="130" cy="120" r="4" fill="white" opacity="0.9" />
+
           <circle cx="20" cy="80" r="3" fill="white" opacity="0.7" />
+
           <circle cx="240" cy="70" r="3" fill="white" opacity="0.7" />
+
           <circle cx="200" cy="180" r="3" fill="white" opacity="0.7" />
+
           <circle cx="60" cy="190" r="3" fill="white" opacity="0.7" />
         </svg>
+
         <div
           style={{
             position: "absolute",
@@ -218,13 +246,17 @@ function AIOrb() {
             <defs>
               <linearGradient id="hf2" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="rgba(255,255,255,0.35)" />
+
                 <stop offset="100%" stopColor="rgba(167,243,252,0.2)" />
               </linearGradient>
+
               <linearGradient id="cl2" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+
                 <stop offset="100%" stopColor="#A5F3FC" stopOpacity="0.7" />
               </linearGradient>
             </defs>
+
             <rect
               x="44"
               y="110"
@@ -235,12 +267,14 @@ function AIOrb() {
               stroke="rgba(255,255,255,0.4)"
               strokeWidth="1"
             />
+
             <path
               d="M60 8 C30 8 16 32 16 58 C16 84 26 100 42 112 L42 122 L78 122 L78 112 C94 100 104 84 104 58 C104 32 90 8 60 8 Z"
               fill="url(#hf2)"
               stroke="rgba(255,255,255,0.55)"
               strokeWidth="1.5"
             />
+
             <rect
               x="8"
               y="52"
@@ -251,6 +285,7 @@ function AIOrb() {
               stroke="rgba(255,255,255,0.4)"
               strokeWidth="1"
             />
+
             <rect
               x="103"
               y="52"
@@ -261,6 +296,7 @@ function AIOrb() {
               stroke="rgba(255,255,255,0.4)"
               strokeWidth="1"
             />
+
             <line
               x1="34"
               y1="52"
@@ -271,6 +307,7 @@ function AIOrb() {
               strokeLinecap="round"
               opacity="0.85"
             />
+
             <line
               x1="63"
               y1="52"
@@ -281,6 +318,7 @@ function AIOrb() {
               strokeLinecap="round"
               opacity="0.85"
             />
+
             <line
               x1="60"
               y1="40"
@@ -291,6 +329,7 @@ function AIOrb() {
               strokeLinecap="round"
               opacity="0.75"
             />
+
             <line
               x1="36"
               y1="66"
@@ -301,6 +340,7 @@ function AIOrb() {
               strokeLinecap="round"
               opacity="0.65"
             />
+
             {[
               [60, 52],
               [60, 66],
@@ -313,10 +353,15 @@ function AIOrb() {
             ].map(([cx, cy], i) => (
               <circle key={i} cx={cx} cy={cy} r="2.8" fill="white" opacity={0.8 + (i % 2) * 0.15} />
             ))}
+
             <ellipse cx="47" cy="56" rx="5.5" ry="3.5" fill="rgba(167,243,252,0.6)" />
+
             <ellipse cx="73" cy="56" rx="5.5" ry="3.5" fill="rgba(167,243,252,0.6)" />
+
             <circle cx="47" cy="56" r="2.2" fill="white" opacity="0.95" />
+
             <circle cx="73" cy="56" r="2.2" fill="white" opacity="0.95" />
+
             <path
               d="M50 88 Q60 94 70 88"
               fill="none"
@@ -327,6 +372,7 @@ function AIOrb() {
           </svg>
         </div>
       </div>
+
       <div
         style={{
           position: "absolute",
@@ -339,6 +385,7 @@ function AIOrb() {
           boxShadow: "0 0 14px rgba(165,243,252,0.9)",
         }}
       />
+
       <div
         style={{
           position: "absolute",
@@ -351,6 +398,7 @@ function AIOrb() {
           boxShadow: "0 0 12px rgba(196,181,253,0.9)",
         }}
       />
+
       <div
         style={{
           position: "absolute",
@@ -363,6 +411,7 @@ function AIOrb() {
           boxShadow: "0 0 10px rgba(147,197,253,0.8)",
         }}
       />
+
       <div
         style={{
           position: "absolute",
@@ -407,7 +456,9 @@ function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-[#F7FBFF]" style={{ minHeight: 820 }}>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(139,92,246,0.18),transparent_28%),radial-gradient(circle_at_78%_18%,rgba(47,128,255,0.18),transparent_32%),linear-gradient(180deg,#F8FCFF_0%,#EEF8FF_100%)]" />
+
       <div className="absolute left-20 top-32 w-72 h-72 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#2FB8FF] opacity-20 blur-3xl" />
+
       <div className="absolute right-28 bottom-24 w-80 h-80 rounded-full bg-[#2FB8FF]/20 blur-3xl" />
 
       <div
@@ -418,6 +469,7 @@ function HeroSection() {
         <div className={isRtl ? "text-right lg:order-1" : "text-left lg:order-1"}>
           <div className="inline-flex items-center gap-2 rounded-full border border-[#D8E4FF] bg-white/75 backdrop-blur-xl px-5 py-2.5 text-[#6C4DFF] font-bold shadow-sm mb-8">
             <Sparkles className="w-4 h-4" />
+
             {isRtl
               ? "פלטפורמת הגיוס המובילה AI בישראל"
               : "Israel's Leading AI Recruitment Platform"}
@@ -451,14 +503,17 @@ function HeroSection() {
               className="h-16 px-11 rounded-2xl bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white font-extrabold text-lg shadow-[0_20px_45px_rgba(108,77,255,0.30)] inline-flex items-center justify-center hover:scale-[1.02] transition"
             >
               <Search className="w-5 h-5 mr-3" />
+
               {t("jobs.searchButton")}
             </Link>
+
             {isAuthenticated && user ? (
               <Link
                 to={dashboardLink()}
                 className="h-16 px-11 rounded-2xl bg-white/85 border border-[#C9D8FF] text-[#6C4DFF] font-extrabold text-lg shadow-[0_20px_45px_rgba(79,124,255,0.10)] inline-flex items-center justify-center hover:scale-[1.02] transition"
               >
                 <Rocket className="w-5 h-5 mr-3" />
+
                 {t("common.dashboard")}
               </Link>
             ) : (
@@ -467,6 +522,7 @@ function HeroSection() {
                 className="h-16 px-11 rounded-2xl bg-white/85 border border-[#C9D8FF] text-[#6C4DFF] font-extrabold text-lg shadow-[0_20px_45px_rgba(79,124,255,0.10)] inline-flex items-center justify-center hover:scale-[1.02] transition"
               >
                 <UserPlus className="w-5 h-5 mr-3" />
+
                 {isRtl ? "הרשמה כמועמד חדש" : "Register as Candidate"}
               </Link>
             )}
@@ -482,10 +538,12 @@ function HeroSection() {
                   {a}
                 </div>
               ))}
+
               <div className="w-12 h-12 rounded-full bg-white border-4 border-white shadow-md flex items-center justify-center text-[#6C4DFF] font-black">
                 +
               </div>
             </div>
+
             <p className="text-[#64748B] font-semibold">
               {isRtl
                 ? "אלפי מועמדים כבר מצאו את המקום שלהם"
@@ -584,13 +642,16 @@ function WhySection() {
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F4EEFF] to-[#EAF8FF] flex items-center justify-center">
                   <item.icon className="w-8 h-8 text-[#6C4DFF]" />
                 </div>
+
                 {item.badge && (
                   <span className="px-3 py-1 rounded-full bg-[#6C4DFF] text-white text-xs font-bold">
                     {item.badge}
                   </span>
                 )}
               </div>
+
               <h3 className="text-xl font-extrabold text-[#0F172A] mb-3">{item.title}</h3>
+
               <p className="text-[#64748B] leading-7">{item.text}</p>
             </div>
           ))}
@@ -650,10 +711,12 @@ function SearchSection() {
         >
           {isRtl ? "חפש משרות שמתאימות לך" : "Find jobs that match you"}
         </h2>
+
         <div className={`${glassCard} p-9`}>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_220px] gap-4">
             <div className="h-16 rounded-2xl bg-white border border-[#DCE8FF] flex items-center px-5">
               <Search className="w-5 h-5 text-[#9AA8BD] mr-3" />
+
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
@@ -665,11 +728,13 @@ function SearchSection() {
 
             <div className="h-16 rounded-2xl bg-white border border-[#DCE8FF] flex items-center justify-between px-5 text-[#64748B] font-semibold">
               <span>{isRtl ? "מיקום" : "Location"}</span>
+
               <ChevronDown className="w-5 h-5" />
             </div>
 
             <div className="h-16 rounded-2xl bg-white border border-[#DCE8FF] flex items-center justify-between px-5 text-[#64748B] font-semibold">
               <span>{isRtl ? "כל התחומים" : "All fields"}</span>
+
               <ChevronDown className="w-5 h-5" />
             </div>
 
@@ -745,6 +810,7 @@ function AICenter() {
             <span className="inline-flex px-3 py-1 rounded-full bg-[#6C4DFF] text-white text-xs font-bold mb-5">
               {isRtl ? "חדש" : "New"}
             </span>
+
             <h2
               style={{
                 fontSize: 44,
@@ -756,11 +822,13 @@ function AICenter() {
             >
               {isRtl ? "מרכז AI לקריירה" : "AI Career Center"}
             </h2>
+
             <p className="text-[#64748B] leading-7 mb-6">
               {isRtl
                 ? "סט כלים חכמים לשדרוג הסיכויים שלך לקבל את העבודה הבאה."
                 : "A smart set of tools to boost your chances of landing the next job."}
             </p>
+
             <Link
               to="/register"
               className="h-12 px-6 rounded-2xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold inline-flex items-center"
@@ -776,7 +844,9 @@ function AICenter() {
               return (
                 <div key={card.title} className={`${glassCard} p-7`}>
                   <Icon className="w-9 h-9 text-[#6C4DFF] mb-6" />
+
                   <h3 className="text-xl font-extrabold text-[#0F172A] mb-3">{card.title}</h3>
+
                   <p className="text-[#64748B] leading-7">{card.text}</p>
                 </div>
               )
@@ -812,7 +882,9 @@ function StatsSection() {
             return (
               <div key={s.label} className="p-9 text-center">
                 <Icon className="w-10 h-10 text-[#6C4DFF] mx-auto mb-4" />
+
                 <div className="text-4xl font-black text-[#6C4DFF] mb-2">{s.value}</div>
+
                 <div className="text-[#64748B] font-bold">{s.label}</div>
               </div>
             )
@@ -874,6 +946,7 @@ function HowItWorks() {
         >
           {isRtl ? "איך זה עובד?" : "How does it work?"}
         </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {steps.map((step, index) => {
             const Icon = step.icon
@@ -883,8 +956,11 @@ function HowItWorks() {
                 <div className="absolute top-5 right-5 w-9 h-9 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] text-white flex items-center justify-center font-black">
                   {index + 1}
                 </div>
+
                 <Icon className="w-12 h-12 text-[#6C4DFF] mx-auto mb-6 mt-6" />
+
                 <h3 className="text-xl font-extrabold text-[#0F172A] mb-3">{step.title}</h3>
+
                 <p className="text-[#64748B] leading-7">{step.text}</p>
               </div>
             )
@@ -910,12 +986,14 @@ function CTASection() {
                 ? "מוכן לעשות את הצעד הבא בקריירה שלך?"
                 : "Ready to take the next step in your career?"}
             </h2>
+
             <p className="text-white/80 text-lg">
               {isRtl
                 ? "הצטרף עכשיו לאלפי מועמדים שמצאו את העבודה המשתלמת דרך HeadHunter."
                 : "Join thousands of candidates who found their dream job through HeadHunter."}
             </p>
           </div>
+
           <Link
             to="/register"
             className="h-16 px-10 rounded-2xl bg-white text-[#6C4DFF] font-black inline-flex items-center shadow-xl whitespace-nowrap"
@@ -953,6 +1031,7 @@ function HomeFooter() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-10 mb-12">
           <div className="md:col-span-2">
             <HHLogo />
+
             <p className="text-white/60 leading-8 mt-5 max-w-md">
               {isRtl
                 ? "פלטפורמת הגיוס החכמה בישראל. מחברת בין מועמדים איכותיים לחברות מובילות באמצעות AI."
@@ -963,6 +1042,7 @@ function HomeFooter() {
           {columns.map(([title, ...links]) => (
             <div key={title}>
               <h4 className="font-black mb-5">{title}</h4>
+
               <div className="space-y-3 text-white/55">
                 {links.map((l) => (
                   <div key={l}>{l}</div>
@@ -978,9 +1058,12 @@ function HomeFooter() {
               ? "© 2024 HeadHunter. כל הזכויות שמורות."
               : "© 2024 HeadHunter. All rights reserved."}
           </div>
+
           <div className="flex items-center gap-6">
             <LanguageSwitcher variant="minimal" className="text-white/50 hover:text-white/80" />
+
             <span>{isRtl ? "תנאי שימוש" : t("common.terms")}</span>
+
             <span>{isRtl ? "מדיניות פרטיות" : t("common.privacy")}</span>
           </div>
         </div>
@@ -1016,13 +1099,21 @@ export default function Home() {
       />
 
       <Navbar />
+
       <HeroSection />
+
       <WhySection />
+
       <SearchSection />
+
       <AICenter />
+
       <StatsSection />
+
       <HowItWorks />
+
       <CTASection />
+
       <HomeFooter />
     </div>
   )

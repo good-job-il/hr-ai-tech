@@ -162,13 +162,16 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center">
               <Send className="w-4 h-4 text-white" />
             </div>
+
             <div>
               <h2 className="text-lg font-black text-[#0F172A]">
                 {t("candidateCRM.sendToEmployer.title")}
               </h2>
+
               <p className="text-xs text-[#7C3AED] font-semibold">{candidate?.full_name}</p>
             </div>
           </div>
+
           <button
             onClick={onClose}
             disabled={sending}
@@ -188,11 +191,13 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
             ) : (
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
             )}
+
             <p
               className={`text-sm font-bold ${result.success ? "text-green-700" : "text-red-600"}`}
             >
               {result.message}
             </p>
+
             {result.success && (
               <Button size="sm" variant="ghost" onClick={onClose} className="mr-auto text-xs">
                 {t("candidateCRM.sendToEmployer.close")}
@@ -207,13 +212,16 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-2">
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+
                 <div className="text-xs text-blue-800 font-semibold">
                   <p className="font-bold mb-0.5">{t("candidateCRM.sendToEmployer.infoTitle")}</p>
+
                   <p>
                     {t("candidateCRM.sendToEmployer.infoDescription", {
                       email: user?.email || t("candidateCRM.sendToEmployer.recruiter"),
                     })}
                   </p>
+
                   {job?.title && (
                     <p className="mt-1">
                       {t("candidateCRM.sendToEmployer.jobInfo", { title: job.title })}
@@ -227,6 +235,7 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
               <label className="text-xs font-black text-[#94A3B8] w-12 text-right flex-shrink-0">
                 {t("candidateCRM.sendToEmployer.to")}:
               </label>
+
               <Input
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
@@ -234,10 +243,12 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
                 className="flex-1 text-sm h-9"
               />
             </div>
+
             <div className="flex items-center gap-3">
               <label className="text-xs font-black text-[#94A3B8] w-12 text-right flex-shrink-0">
                 {t("candidateCRM.sendToEmployer.cc")}:
               </label>
+
               <Input
                 value={cc}
                 onChange={(e) => setCc(e.target.value)}
@@ -245,10 +256,12 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
                 className="flex-1 text-sm h-9"
               />
             </div>
+
             <div className="flex items-center gap-3">
               <label className="text-xs font-black text-[#94A3B8] w-12 text-right flex-shrink-0">
                 {t("candidateCRM.sendToEmployer.subject")}:
               </label>
+
               <Input
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
@@ -262,6 +275,7 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
             <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
               {t("candidateCRM.sendToEmployer.recruiterNote")}
             </div>
+
             <textarea
               value={recruiterNote}
               onChange={(e) => setRecruiterNote(e.target.value)}
@@ -275,15 +289,18 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Paperclip className="w-4 h-4 text-[#94A3B8]" />
+
               <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide">
                 {t("candidateCRM.sendToEmployer.documentsToAttach")}
               </div>
+
               {!hasCV && selectedDocs.size > 0 && (
                 <span className="text-xs text-orange-600 font-bold">
                   {t("candidateCRM.sendToEmployer.cvRequired")}
                 </span>
               )}
             </div>
+
             {allDocs.length === 0 ? (
               <p className="text-sm text-[#94A3B8] py-3 text-center">
                 {t("candidateCRM.sendToEmployer.noDocuments")}
@@ -304,14 +321,17 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
                       ) : (
                         <Square className="w-4 h-4 text-[#CBD5E1] flex-shrink-0" />
                       )}
+
                       <div className="flex-1 min-w-0 text-right">
                         <div className="text-sm font-bold text-[#0F172A] truncate">
                           {doc.filename}
                         </div>
+
                         <div className="text-xs text-[#94A3B8]">
                           {DOC_TYPE_LABELS[doc.doc_type] || doc.doc_type}
                         </div>
                       </div>
+
                       {doc.badge && (
                         <span className="text-xs bg-[#EEF4FF] text-[#4F46E5] font-bold px-2 py-0.5 rounded-full flex-shrink-0">
                           {doc.badge}
@@ -330,6 +350,7 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
               <div className="text-xs font-black text-[#94A3B8] uppercase mb-3 flex items-center gap-2">
                 <Eye className="w-3.5 h-3.5" /> {t("candidateCRM.sendToEmployer.preview")}
               </div>
+
               <div className="text-xs text-[#374151] leading-relaxed font-mono whitespace-pre-wrap">
                 {t("candidateCRM.sendToEmployer.previewContent", {
                   to,
@@ -349,8 +370,10 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
         <div className="px-6 py-4 border-t border-[#E4ECFF] flex items-center justify-between gap-3 bg-[#F7F8FC]">
           <div className="flex items-center gap-2 text-xs text-[#94A3B8] font-semibold">
             <Paperclip className="w-3.5 h-3.5" />
+
             {t("candidateCRM.sendToEmployer.documentsSelected", { count: selectedDocs.size })}
           </div>
+
           <div className="flex gap-3">
             <Button
               variant="outline"
@@ -359,10 +382,12 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
               className="gap-1.5 text-xs"
             >
               <Eye className="w-3.5 h-3.5" />
+
               {preview
                 ? t("candidateCRM.sendToEmployer.hidePreview")
                 : t("candidateCRM.sendToEmployer.showPreview")}
             </Button>
+
             <Button
               variant="ghost"
               size="sm"
@@ -372,6 +397,7 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
             >
               {t("candidateCRM.sendToEmployer.cancel")}
             </Button>
+
             <Button
               size="sm"
               onClick={handleSend}

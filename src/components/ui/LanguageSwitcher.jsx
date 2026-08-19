@@ -23,6 +23,7 @@ export default function LanguageSwitcher({ className = "", variant = "default" }
         aria-label="Switch language"
       >
         <Globe className="w-4 h-4" />
+
         <span>{currentLang === "he" ? "EN" : "עב"}</span>
       </button>
     )
@@ -40,6 +41,7 @@ export default function LanguageSwitcher({ className = "", variant = "default" }
         aria-label="Switch language"
       >
         <Globe className="w-3.5 h-3.5" />
+
         {currentLang === "he" ? "English" : "עברית"}
       </button>
     )
@@ -53,6 +55,7 @@ export default function LanguageSwitcher({ className = "", variant = "default" }
       aria-label="Switch language"
     >
       <Globe className="w-4 h-4 text-gray-500" />
+
       <span className="text-gray-700">{currentLang === "he" ? "English" : "עברית"}</span>
     </button>
   )

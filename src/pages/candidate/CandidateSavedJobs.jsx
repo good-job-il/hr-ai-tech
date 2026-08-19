@@ -16,6 +16,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
       >
         <Icon className="w-5 h-5" style={{ color }} />
       </div>
+
       <div>
         <div className="text-2xl font-black text-[#0F172A]">
           {loading ? (
@@ -24,6 +25,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
             value
           )}
         </div>
+
         <div className="text-xs font-semibold text-[#64748B]">{label}</div>
       </div>
     </div>
@@ -43,13 +45,16 @@ function SavedJobCard({ item, onRemove, isRemoving }) {
           <h3 className="font-black text-[#0F172A] text-sm leading-tight line-clamp-2">
             {item.job_title || t("candidate.savedJobs.unknownTitle")}
           </h3>
+
           <div className="flex items-center gap-1.5 mt-1">
             <Building2 className="w-3.5 h-3.5 text-[#7C3AED] flex-shrink-0" />
+
             <p className="text-xs font-semibold text-[#7C3AED] truncate">
               {item.company || t("candidate.savedJobs.unknownCompany")}
             </p>
           </div>
         </div>
+
         <button
           onClick={() => onRemove(item.id)}
           disabled={isRemoving}
@@ -75,9 +80,11 @@ function SavedJobCard({ item, onRemove, isRemoving }) {
             className="flex-1 flex items-center justify-center gap-1.5 h-9 rounded-xl bg-[#7C3AED] text-white text-xs font-bold hover:bg-[#6D28D9] transition-colors"
           >
             <ExternalLink className="w-3.5 h-3.5" />
+
             {t("candidate.savedJobs.apply")}
           </Link>
         )}
+
         {item.job_id && (
           <Link
             to={`/jobs/${item.job_id}`}
@@ -132,8 +139,10 @@ export default function CandidateSavedJobs() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black text-[#0F172A]">{t("candidate.savedJobs.title")}</h1>
+
           <p className="text-[#64748B] font-semibold mt-1">{t("candidate.savedJobs.subtitle")}</p>
         </div>
+
         <button
           onClick={() => refetch()}
           disabled={isLoading}
@@ -152,6 +161,7 @@ export default function CandidateSavedJobs() {
           color="#7C3AED"
           loading={isLoading}
         />
+
         <StatCard
           icon={Building2}
           label={t("candidate.savedJobs.stats.companies")}
@@ -164,6 +174,7 @@ export default function CandidateSavedJobs() {
       {/* Search */}
       <div className="relative max-w-sm">
         <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+
         <input
           type="text"
           placeholder={t("candidate.savedJobs.search")}
@@ -171,6 +182,7 @@ export default function CandidateSavedJobs() {
           onChange={(e) => setSearch(e.target.value)}
           className="w-full h-10 pr-9 pl-3 rounded-xl border border-[#E4ECFF] text-sm font-medium text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/10 transition-colors"
         />
+
         {search && (
           <button
             onClick={() => setSearch("")}
@@ -200,14 +212,17 @@ export default function CandidateSavedJobs() {
               <BookmarkX className="w-8 h-8 text-[#7C3AED]" />
             )}
           </div>
+
           {saved.length === 0 ? (
             <>
               <p className="text-[#0F172A] font-black text-lg">
                 {t("candidate.savedJobs.noSaved")}
               </p>
+
               <p className="text-[#64748B] font-semibold text-sm mt-1">
                 {t("candidate.savedJobs.noSavedHint")}
               </p>
+
               <Link
                 to="/candidate/jobs/all"
                 className="mt-4 px-5 py-2 rounded-xl bg-[#7C3AED] text-white text-sm font-bold hover:bg-[#6D28D9] transition-colors"
@@ -220,9 +235,11 @@ export default function CandidateSavedJobs() {
               <p className="text-[#0F172A] font-black text-lg">
                 {t("candidate.savedJobs.noResults")}
               </p>
+
               <p className="text-[#64748B] font-semibold text-sm mt-1">
                 {t("candidate.savedJobs.noResultsHint")}
               </p>
+
               <button
                 onClick={() => setSearch("")}
                 className="mt-4 text-sm font-bold text-[#7C3AED] hover:underline"

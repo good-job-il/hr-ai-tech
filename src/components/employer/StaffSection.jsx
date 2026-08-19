@@ -38,11 +38,14 @@ export default function StaffSection({
             <div className="bg-hhblue/10 p-3 rounded-lg">
               <Users className="w-5 h-5 text-hhblue" />
             </div>
+
             <div>
               <h2 className="text-xl font-bold text-gray-900">צוות גיוס</h2>
+
               <p className="text-sm text-gray-500">{staff.length} חברים בצוות</p>
             </div>
           </div>
+
           <Button
             onClick={() => handleOpenModal()}
             className="bg-hhblue hover:bg-hhblue/90 text-white flex items-center gap-2"
@@ -57,7 +60,9 @@ export default function StaffSection({
         {staff.length === 0 ? (
           <div className="text-center py-12">
             <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+
             <p className="text-gray-600 mb-4">אין עובדים בצוות עדיין</p>
+
             <Button onClick={() => handleOpenModal()} className="bg-hhblue hover:bg-hhblue/90">
               הוסף עובד ראשון
             </Button>
@@ -71,16 +76,20 @@ export default function StaffSection({
               >
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900">{member.full_name}</h3>
+
                   <p className="text-sm text-gray-600">{member.email}</p>
+
                   <div className="flex items-center gap-2 mt-2">
                     <span className="inline-block px-2 py-1 bg-hhblue/10 text-hhblue text-xs rounded font-medium">
                       {member.role === "team_manager" ? "👥 מנהל צוות" : "👤 רכז גיוס"}
                     </span>
+
                     {member.manager_email && (
                       <span className="text-xs text-gray-500">תחת מנהל</span>
                     )}
                   </div>
                 </div>
+
                 <div className="flex gap-2 mr-4">
                   <Button
                     variant="outline"
@@ -90,6 +99,7 @@ export default function StaffSection({
                   >
                     <Edit2 className="w-4 h-4" />
                   </Button>
+
                   <Button
                     variant="outline"
                     size="icon"

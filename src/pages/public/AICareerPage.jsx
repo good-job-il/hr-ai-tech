@@ -112,13 +112,17 @@ export default function AICareerPage() {
         <div className="bg-gradient-to-br from-purple-900 via-purple-700 to-blue-700 text-white py-20 px-4 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 right-20 w-64 h-64 bg-white rounded-full blur-3xl" />
+
             <div className="absolute bottom-10 left-20 w-48 h-48 bg-blue-300 rounded-full blur-3xl" />
           </div>
+
           <div className="max-w-4xl mx-auto text-center relative z-10">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold mb-6">
               <Sparkles className="w-4 h-4" />
+
               {isRtl ? 'מופעל על ידי AI מתקדם' : 'Powered by Advanced AI'}
             </div>
+
             <h1 className="text-4xl md:text-5xl font-black mb-5 leading-tight">
               {isRtl ? (
                 <>AI שעובד בשבילך<br /><span className="text-yellow-300">24/7 לאורך כל הקריירה</span></>
@@ -126,11 +130,13 @@ export default function AICareerPage() {
                 <>AI that works for you<br /><span className="text-yellow-300">24/7 throughout your career</span></>
               )}
             </h1>
+
             <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto leading-relaxed">
               {isRtl
                 ? 'מניתוח קורות חיים, דרך התאמה מדויקת למשרות, ועד אימון לראיונות — HeadHunter AI מלווה אותך בכל שלב.'
                 : 'From resume analysis, through precise job matching, to interview coaching — HeadHunter AI guides you every step of the way.'}
             </p>
+
             <div className="flex gap-4 justify-center flex-wrap">
               <Link
                 to="/register"
@@ -138,6 +144,7 @@ export default function AICareerPage() {
               >
                 {isRtl ? 'התחל בחינם — אין צורך בכרטיס אשראי' : 'Start Free — No Credit Card Required'}
               </Link>
+
               <Link
                 to="/jobs"
                 className="bg-white/20 backdrop-blur text-white font-bold px-8 py-4 rounded-xl hover:bg-white/30 transition-all text-base border border-white/30"
@@ -145,6 +152,7 @@ export default function AICareerPage() {
                 {isRtl ? 'חיפוש משרות' : 'Search Jobs'}
               </Link>
             </div>
+
             <p className="text-purple-200 text-sm mt-4">
               {isRtl ? '+15,000 מועמדים פעילים כבר משתמשים ב-AI שלנו' : '+15,000 active candidates are already using our AI'}
             </p>
@@ -157,13 +165,16 @@ export default function AICareerPage() {
             <h2 className="text-3xl font-black text-center text-gray-900 mb-12">
               {isRtl ? 'איך זה עובד?' : 'How does it work?'}
             </h2>
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {STEPS.map((step, i) => (
                 <div key={i} className="text-center">
                   <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-lg mx-auto mb-3 shadow-md">
                     {step.num}
                   </div>
+
                   <h3 className="font-bold text-gray-900 mb-1">{step.title}</h3>
+
                   <p className="text-sm text-gray-500">{step.desc}</p>
                 </div>
               ))}
@@ -178,17 +189,21 @@ export default function AICareerPage() {
               <h2 className="text-3xl font-black text-gray-900 mb-3">
                 {isRtl ? 'כל הכלים שתצטרך' : 'All the tools you need'}
               </h2>
+
               <p className="text-gray-500 text-lg">
                 {isRtl ? 'חבילה מלאה של כלי AI לקריירה שלך' : 'A complete package of AI tools for your career'}
               </p>
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {FEATURES.map((feat, i) => (
                 <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${feat.color}`}>
                     <feat.icon className="w-5 h-5" />
                   </div>
+
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{feat.title}</h3>
+
                   <p className="text-gray-500 text-sm leading-relaxed">{feat.desc}</p>
                 </div>
               ))}
@@ -202,16 +217,20 @@ export default function AICareerPage() {
             <h2 className="text-3xl font-black text-gray-900 mb-10">
               {isRtl ? 'מה אומרים המשתמשים?' : 'What users say'}
             </h2>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {TESTIMONIALS.map((item, i) => (
                 <div key={i} className={`bg-white rounded-2xl p-6 shadow-sm ${isRtl ? 'text-right' : 'text-left'}`}>
                   <p className="text-gray-600 text-sm leading-relaxed mb-4">"{item.text}"</p>
+
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
                       {item.name[0]}
                     </div>
+
                     <div>
                       <p className="font-bold text-gray-900 text-sm">{item.name}</p>
+
                       <p className="text-gray-400 text-xs">{item.role}</p>
                     </div>
                   </div>
@@ -227,16 +246,19 @@ export default function AICareerPage() {
             <h2 className="text-3xl font-black text-gray-900 mb-4">
               {isRtl ? 'מוכן להתחיל?' : 'Ready to start?'}
             </h2>
+
             <p className="text-gray-500 mb-8">
               {isRtl
                 ? 'הצטרף לאלפי מועמדים שכבר מצאו עבודה עם HeadHunter AI'
                 : 'Join thousands of candidates who have already found a job with HeadHunter AI'}
             </p>
+
             <Link
               to="/register"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-10 py-4 rounded-xl hover:opacity-90 transition-all shadow-lg text-lg"
             >
               <Sparkles className="w-5 h-5" />
+
               {isRtl ? 'הרשמה חינמית' : 'Free Registration'}
             </Link>
           </div>

@@ -70,6 +70,7 @@ function StatusBadge({ status }) {
       style={{ color: style.color, backgroundColor: style.bg, border: `1px solid ${style.border}` }}
     >
       <Icon className="w-3 h-3" />
+
       {label}
     </span>
   )
@@ -84,6 +85,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
       >
         <Icon className="w-5 h-5" style={{ color }} />
       </div>
+
       <div>
         <div className="text-2xl font-black text-gray-900">
           {loading ? (
@@ -92,6 +94,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
             value
           )}
         </div>
+
         <div className="text-xs font-semibold text-gray-500">{label}</div>
       </div>
     </div>
@@ -128,6 +131,7 @@ function InterviewCard({ interview, isSelected, onSelect }) {
           <h3 className="font-black text-gray-900 text-sm leading-tight truncate">
             {interview.candidate_name || t("company.interviews.noCandidate")}
           </h3>
+
           <p className="text-xs font-semibold text-purple-600 mt-0.5 truncate">
             {interview.job_title || t("company.interviews.noJobTitle")}
           </p>
@@ -140,14 +144,18 @@ function InterviewCard({ interview, isSelected, onSelect }) {
       <div className="flex items-center gap-3 text-xs text-gray-500 mt-2 flex-wrap">
         <span className="flex items-center gap-1 font-semibold">
           <Calendar className="w-3 h-3" />
+
           {new Date(interview.date).toLocaleDateString()}
         </span>
+
         {interview.time && (
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
+
             {interview.time}
           </span>
         )}
+
         {interview.stage && (
           <span className="flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded-md">
             {t(`company.interviews.stages.${interview.stage}`, { defaultValue: interview.stage })}
@@ -159,6 +167,7 @@ function InterviewCard({ interview, isSelected, onSelect }) {
       {interview.interviewer_name && (
         <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-600">
           <User className="w-3 h-3" />
+
           <span className="font-medium">{interview.interviewer_name}</span>
         </div>
       )}
@@ -167,6 +176,7 @@ function InterviewCard({ interview, isSelected, onSelect }) {
       {isUpcoming && (
         <div className="mt-3 flex items-center gap-2 text-xs font-bold text-purple-600 bg-purple-50 border border-purple-200 rounded-lg px-3 py-1.5">
           <AlertCircle className="w-3.5 h-3.5" />
+
           {t("company.interviews.upcomingBanner")}
         </div>
       )}
@@ -175,6 +185,7 @@ function InterviewCard({ interview, isSelected, onSelect }) {
       {interview.status === "completed" && interview.feedback && (
         <div className="mt-2 flex items-center gap-1.5 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-md w-fit">
           <FileText className="w-3 h-3" />
+
           {t("company.interviews.hasFeedback")}
         </div>
       )}
@@ -227,17 +238,21 @@ function DetailPanel({ interview, onClose, onUpdate }) {
           <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
             <TypeIcon type={interview.type} className="w-5 h-5 text-purple-600" />
           </div>
+
           <div className="min-w-0">
             <h2 className="font-black text-gray-900 text-base leading-tight truncate">
               {interview.candidate_name || t("company.interviews.noCandidate")}
             </h2>
+
             <p className="text-sm font-semibold text-purple-600 mt-0.5">
               {interview.job_title || t("company.interviews.noJobTitle")}
             </p>
           </div>
         </div>
+
         <div className="flex items-center gap-2 flex-shrink-0">
           <StatusBadge status={interview.status || "scheduled"} />
+
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:border-purple-300 transition-colors"
@@ -258,9 +273,11 @@ function DetailPanel({ interview, onClose, onUpdate }) {
                 className="text-xs font-bold px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition-colors flex items-center gap-1"
               >
                 <CheckCircle2 className="w-3 h-3" />
+
                 {t("company.interviews.actions.confirm")}
               </button>
             )}
+
             {(interview.status === "scheduled" || interview.status === "confirmed") && (
               <>
                 <button
@@ -268,13 +285,16 @@ function DetailPanel({ interview, onClose, onUpdate }) {
                   className="text-xs font-bold px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1"
                 >
                   <CheckCircle2 className="w-3 h-3" />
+
                   {t("company.interviews.actions.complete")}
                 </button>
+
                 <button
                   onClick={() => handleStatusChange("cancelled")}
                   className="text-xs font-bold px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1"
                 >
                   <XCircle className="w-3 h-3" />
+
                   {t("company.interviews.actions.cancel")}
                 </button>
               </>
@@ -288,53 +308,64 @@ function DetailPanel({ interview, onClose, onUpdate }) {
             <div className="text-xs font-medium text-gray-400 mb-0.5">
               {t("company.interviews.detail.date")}
             </div>
+
             <div className="font-semibold text-gray-900">
               {new Date(interview.date).toLocaleDateString()}
             </div>
           </div>
+
           {interview.time && (
             <div>
               <div className="text-xs font-medium text-gray-400 mb-0.5">
                 {t("company.interviews.detail.time")}
               </div>
+
               <div className="font-semibold text-gray-900">{interview.time}</div>
             </div>
           )}
+
           <div>
             <div className="text-xs font-medium text-gray-400 mb-0.5">
               {t("company.interviews.detail.type")}
             </div>
+
             <div className="font-semibold text-gray-900">
               {t(`company.interviews.types.${interview.type}`, {
                 defaultValue: interview.type || "—",
               })}
             </div>
           </div>
+
           <div>
             <div className="text-xs font-medium text-gray-400 mb-0.5">
               {t("company.interviews.detail.stage")}
             </div>
+
             <div className="font-semibold text-gray-900">
               {t(`company.interviews.stages.${interview.stage}`, {
                 defaultValue: interview.stage || "—",
               })}
             </div>
           </div>
+
           {interview.duration_minutes && (
             <div>
               <div className="text-xs font-medium text-gray-400 mb-0.5">
                 {t("company.interviews.detail.duration")}
               </div>
+
               <div className="font-semibold text-gray-900">
                 {interview.duration_minutes} {t("company.interviews.minutes")}
               </div>
             </div>
           )}
+
           {interview.interviewer_name && (
             <div>
               <div className="text-xs font-medium text-gray-400 mb-0.5">
                 {t("company.interviews.detail.interviewer")}
               </div>
+
               <div className="font-semibold text-gray-900">{interview.interviewer_name}</div>
             </div>
           )}
@@ -346,11 +377,13 @@ function DetailPanel({ interview, onClose, onUpdate }) {
             <div className="text-xs font-medium text-gray-500 mb-1">
               {t("company.interviews.detail.contact")}
             </div>
+
             <a
               href={`mailto:${interview.candidate_email}`}
               className="flex items-center gap-2 text-sm font-semibold text-purple-600 hover:underline"
             >
               <Mail className="w-4 h-4" />
+
               {interview.candidate_email}
             </a>
           </div>
@@ -364,9 +397,11 @@ function DetailPanel({ interview, onClose, onUpdate }) {
                 ? t("company.interviews.detail.location")
                 : t("company.interviews.detail.joinLink")}
             </div>
+
             {interview.type === "in_person" ? (
               <div className="flex items-center gap-2 text-sm font-semibold text-gray-900 bg-gray-50 rounded-lg p-3">
                 <MapPin className="w-4 h-4 text-purple-600 flex-shrink-0" />
+
                 {interview.location_or_link}
               </div>
             ) : (
@@ -377,6 +412,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
                 className="flex items-center gap-2 text-sm font-semibold text-purple-600 hover:underline break-all bg-purple-50 rounded-lg p-3"
               >
                 <Video className="w-4 h-4 flex-shrink-0" />
+
                 {interview.location_or_link}
               </a>
             )}
@@ -389,6 +425,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
             <div className="text-xs font-medium text-gray-400 mb-1.5">
               {t("company.interviews.detail.notes")}
             </div>
+
             <div className="text-sm text-gray-700 bg-gray-50 rounded-xl p-3 leading-relaxed">
               {interview.notes}
             </div>
@@ -400,14 +437,17 @@ function DetailPanel({ interview, onClose, onUpdate }) {
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-black text-gray-900 flex items-center gap-2">
               <FileText className="w-4 h-4" />
+
               {t("company.interviews.detail.feedback")}
             </h3>
+
             {interview.status === "completed" && !isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
                 className="text-xs font-bold text-purple-600 hover:underline flex items-center gap-1"
               >
                 <Edit className="w-3 h-3" />
+
                 {t("common.edit")}
               </button>
             )}
@@ -420,6 +460,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
                 <div className="text-xs font-medium text-gray-400 mb-1.5">
                   {t("company.interviews.detail.rating")}
                 </div>
+
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((r) => (
                     <button
@@ -459,6 +500,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
                 >
                   {t("common.save")}
                 </Button>
+
                 <button
                   onClick={() => {
                     setIsEditing(false)
@@ -485,6 +527,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
                   ))}
                 </div>
               )}
+
               {interview.feedback ? (
                 <div className="text-sm text-gray-700 bg-gray-50 rounded-xl p-3 leading-relaxed">
                   {interview.feedback}
@@ -504,6 +547,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
             <div className="text-xs font-medium text-gray-400 mb-1.5">
               {t("company.interviews.detail.recommendation")}
             </div>
+
             <div
               className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-bold text-sm ${
                 interview.recommendation.includes("yes")
@@ -518,6 +562,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
               ) : (
                 <ThumbsDown className="w-4 h-4" />
               )}
+
               {t(`company.interviews.recommendations.${interview.recommendation}`, {
                 defaultValue: interview.recommendation,
               })}
@@ -534,15 +579,18 @@ function DetailPanel({ interview, onClose, onUpdate }) {
             className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 hover:border-purple-300 hover:text-purple-600 transition-colors"
           >
             <User className="w-4 h-4" />
+
             {t("company.interviews.viewCandidate")}
           </Link>
         )}
+
         {interview.job_id && (
           <Link
             to={`/company/jobs/${interview.job_id}`}
             className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 hover:border-purple-300 hover:text-purple-600 transition-colors"
           >
             <Briefcase className="w-4 h-4" />
+
             {t("company.interviews.viewJob")}
           </Link>
         )}
@@ -629,8 +677,10 @@ export default function CompanyInterviews() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black text-gray-900">{t("company.interviews.title")}</h1>
+
           <p className="text-gray-500 font-semibold mt-1">{t("company.interviews.subtitle")}</p>
         </div>
+
         <div className="flex gap-2">
           <button
             onClick={() => refetch()}
@@ -639,12 +689,14 @@ export default function CompanyInterviews() {
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
           </button>
+
           <Link
             to="/company/candidates"
             className="flex items-center gap-2 h-9 px-4 text-white rounded-xl text-sm font-bold transition-all hover:opacity-90 hover:-translate-y-px"
             style={{ background: "linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%)" }}
           >
             <Plus className="w-4 h-4" />
+
             {t("company.interviews.scheduleNew")}
           </Link>
         </div>
@@ -659,6 +711,7 @@ export default function CompanyInterviews() {
           color="#2563EB"
           loading={isLoading}
         />
+
         <StatCard
           icon={AlertCircle}
           label={t("company.interviews.stats.upcoming")}
@@ -666,6 +719,7 @@ export default function CompanyInterviews() {
           color="#7C3AED"
           loading={isLoading}
         />
+
         <StatCard
           icon={CheckCircle2}
           label={t("company.interviews.stats.completed")}
@@ -673,6 +727,7 @@ export default function CompanyInterviews() {
           color="#059669"
           loading={isLoading}
         />
+
         <StatCard
           icon={XCircle}
           label={t("company.interviews.stats.cancelled")}
@@ -680,6 +735,7 @@ export default function CompanyInterviews() {
           color="#DC2626"
           loading={isLoading}
         />
+
         <StatCard
           icon={UserX}
           label={t("company.interviews.stats.noShow")}
@@ -692,6 +748,7 @@ export default function CompanyInterviews() {
       {/* Filter tabs */}
       <div className="flex items-center gap-3">
         <Filter className="w-4 h-4 text-gray-400" />
+
         <div className="flex gap-1 bg-gray-50 border border-gray-200 rounded-xl p-1 flex-wrap">
           {FILTER_TABS.map((tab) => (
             <button
@@ -732,14 +789,17 @@ export default function CompanyInterviews() {
               <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mb-4">
                 <Calendar className="w-8 h-8 text-purple-600" />
               </div>
+
               {interviews.length === 0 ? (
                 <>
                   <p className="text-gray-900 font-black text-lg">
                     {t("company.interviews.noInterviews")}
                   </p>
+
                   <p className="text-gray-500 font-semibold text-sm mt-1 mb-4">
                     {t("company.interviews.noInterviewsHint")}
                   </p>
+
                   <Link
                     to="/company/candidates"
                     className="flex items-center gap-2 px-4 py-2 text-white rounded-xl text-sm font-bold transition-all hover:opacity-90 hover:-translate-y-px"
@@ -748,6 +808,7 @@ export default function CompanyInterviews() {
                     }}
                   >
                     <Plus className="w-4 h-4" />
+
                     {t("company.interviews.scheduleFirst")}
                   </Link>
                 </>
@@ -756,9 +817,11 @@ export default function CompanyInterviews() {
                   <p className="text-gray-900 font-black text-lg">
                     {t("company.interviews.noResults")}
                   </p>
+
                   <p className="text-gray-500 font-semibold text-sm mt-1">
                     {t("company.interviews.noResultsHint")}
                   </p>
+
                   <button
                     onClick={() => setFilterTab("all")}
                     className="mt-4 text-sm font-bold text-purple-600 hover:underline"

@@ -33,6 +33,7 @@ export default function LogoBar() {
         >
           החברות המובילות בוחרות בנו
         </p>
+
         <div
           style={{
             display: "flex",

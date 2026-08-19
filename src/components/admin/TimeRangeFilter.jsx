@@ -20,8 +20,10 @@ export default function TimeRangeFilter({
     <div className="flex flex-wrap items-center gap-2 mb-6" dir="rtl">
       <div className="flex items-center gap-1.5 text-gray-500 text-sm ml-1">
         <Calendar className="w-4 h-4" />
+
         <span className="font-medium">טווח זמן:</span>
       </div>
+
       <div className="flex flex-wrap gap-1.5">
         {ranges.map((r) => (
           <button
@@ -37,6 +39,7 @@ export default function TimeRangeFilter({
           </button>
         ))}
       </div>
+
       {range === "custom" && (
         <div className="flex items-center gap-2 mr-2">
           <input
@@ -45,7 +48,9 @@ export default function TimeRangeFilter({
             onChange={(e) => setCustomFrom(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-purple-500/30 bg-white"
           />
+
           <span className="text-gray-400 text-sm">עד</span>
+
           <input
             type="date"
             value={customTo}

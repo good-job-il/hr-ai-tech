@@ -94,13 +94,17 @@ export default function MobilePipelineView({
       {movingApp && (
         <>
           <div className="fixed inset-0 bg-black/40 z-40" onClick={() => setMovingApp(null)} />
+
           <div
             className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl p-6 shadow-2xl"
             dir={isRTL ? "rtl" : "ltr"}
           >
             <div className="w-10 h-1 rounded-full bg-[#E4ECFF] mx-auto mb-4" />
+
             <p className="text-base font-black text-[#0F172A] mb-1">{movingApp.candidate_name}</p>
+
             <p className="text-sm text-[#64748B] mb-4">{t("pipeline.mobile.moveToStage")}</p>
+
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {stages
                 .filter((s) => s.id !== movingFromStage)
@@ -114,10 +118,12 @@ export default function MobilePipelineView({
                       className="w-3 h-3 rounded-full flex-shrink-0"
                       style={{ background: s.color }}
                     />
+
                     <span className="font-bold text-[#0F172A]">{s.label}</span>
                   </button>
                 ))}
             </div>
+
             <button
               onClick={() => setMovingApp(null)}
               className="w-full h-11 mt-3 rounded-xl border border-[#E4ECFF] text-[#64748B] font-bold text-sm"
@@ -160,6 +166,7 @@ function CompactStageColumn({
         }}
       >
         <span className="font-black text-[#0F172A] text-sm">{stage.label}</span>
+
         <div
           className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white"
           style={{ background: stage.color }}
@@ -177,6 +184,7 @@ function CompactStageColumn({
             <p className="text-xs text-[#CBD5E1] font-semibold">{emptyLabel}</p>
           </div>
         )}
+
         {applications.map((app) => (
           <CompactCard
             key={app.id}
@@ -213,11 +221,14 @@ function CompactCard({
           >
             {(app.candidate_name || "?")[0]}
           </div>
+
           <div className="min-w-0">
             <div className="font-black text-[#0F172A] text-xs truncate">{app.candidate_name}</div>
+
             <div className="text-xs text-[#7C3AED] font-semibold truncate">{app.job_title}</div>
           </div>
         </div>
+
         {app.match_score != null && <AIMatchBadge score={app.match_score} size="sm" />}
       </div>
 
@@ -227,6 +238,7 @@ function CompactCard({
           className="w-full h-7 rounded-lg border border-[#E4ECFF] bg-[#F7FBFF] text-[#7C3AED] font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-[#F3EFFF] transition-all"
         >
           <ArrowRightLeft className="w-3 h-3" />
+
           {changeStageLabel}
         </button>
       )}

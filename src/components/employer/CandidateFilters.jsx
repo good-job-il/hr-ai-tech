@@ -74,6 +74,7 @@ export default function CandidateFilters({ isOpen, onClose, filters, onFilterCha
       >
         <div className="sticky top-0 bg-white border-b border-gray-100 p-4 flex items-center justify-between">
           <h2 className="font-bold text-gray-900">סינון</h2>
+
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg">
             <X className="w-5 h-5" />
           </button>
@@ -87,6 +88,7 @@ export default function CandidateFilters({ isOpen, onClose, filters, onFilterCha
                 className="w-full flex items-center justify-between p-3 hover:bg-gray-50 font-medium text-sm text-gray-900"
               >
                 {section.label}
+
                 <ChevronDown
                   className={`w-4 h-4 text-gray-400 transition-transform ${expanded[section.id] ? "rotate-180" : ""}`}
                 />
@@ -105,6 +107,7 @@ export default function CandidateFilters({ isOpen, onClose, filters, onFilterCha
                         onChange={() => handleCheck(section.id, opt.value)}
                         className="w-4 h-4 text-hhblue rounded"
                       />
+
                       <span className="text-sm text-gray-700">{opt.label}</span>
                     </label>
                   ))}
@@ -121,6 +124,7 @@ export default function CandidateFilters({ isOpen, onClose, filters, onFilterCha
           >
             החל סינון
           </Button>
+
           <Button
             onClick={handleReset}
             variant="outline"

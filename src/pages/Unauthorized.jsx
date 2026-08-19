@@ -39,6 +39,7 @@ export default function Unauthorized() {
         </div>
 
         <h1 className="text-4xl font-black text-[#0F172A] mb-3">גישה מוגבלת111</h1>
+
         <p className="text-lg text-[#64748B] mb-8">
           אין לך הרשאות לגשת לעמוד זה. אם אתה חושב שזה טעות, צור קשר עם המנהל.
         </p>

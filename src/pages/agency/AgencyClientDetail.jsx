@@ -181,6 +181,7 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
       >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-black text-gray-900">עריכת לקוח</h3>
+
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X className="w-5 h-5" />
           </button>
@@ -189,6 +190,7 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1.5">שם החברה *</label>
+
             <input
               type="text"
               value={form.name}
@@ -196,14 +198,17 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             />
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1.5">תעשייה</label>
+
             <select
               value={form.industry}
               onChange={(e) => set("industry", e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm bg-white"
             >
               <option value="">בחר תעשייה</option>
+
               {INDUSTRY_OPTIONS.map((i) => (
                 <option key={i} value={i}>
                   {i}
@@ -211,8 +216,10 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
               ))}
             </select>
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1.5">אימייל</label>
+
             <input
               type="email"
               value={form.contact_email}
@@ -221,8 +228,10 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             />
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1.5">טלפון</label>
+
             <input
               type="tel"
               value={form.contact_phone}
@@ -231,8 +240,10 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             />
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1.5">אתר אינטרנט</label>
+
             <input
               type="url"
               value={form.website}
@@ -241,8 +252,10 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             />
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1.5">כתובת</label>
+
             <input
               type="text"
               value={form.address}
@@ -251,8 +264,10 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             />
           </div>
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">צבע</label>
+
             <div className="flex gap-2 flex-wrap">
               {PALETTE.map((c) => (
                 <button
@@ -275,12 +290,14 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
             >
               ביטול
             </button>
+
             <button
               onClick={handleSave}
               disabled={saving || !form.name.trim()}
               className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 disabled:opacity-50 text-sm transition-colors flex items-center justify-center gap-2"
             >
               <Save className="w-4 h-4" />
+
               {saving ? "שומר..." : "שמור"}
             </button>
           </div>
@@ -301,7 +318,9 @@ function JobsTab({ jobs, clientId }) {
     return (
       <div className="text-center py-12 bg-gray-50 rounded-2xl">
         <Briefcase className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+
         <p className="text-gray-500 font-bold">אין משרות ללקוח זה עדיין</p>
+
         <Link
           to={`/agency/jobs?clientId=${clientId}`}
           className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors"
@@ -316,20 +335,25 @@ function JobsTab({ jobs, clientId }) {
     <div className="flex items-center justify-between px-4 py-3 bg-white border border-gray-100 rounded-xl hover:border-purple-100 hover:shadow-sm transition-all">
       <div className="flex-1 min-w-0">
         <p className="font-bold text-gray-900 text-sm truncate">{job.title}</p>
+
         <div className="flex items-center gap-3 mt-0.5">
           {job.location && (
             <span className="text-xs text-gray-400 flex items-center gap-1">
               <MapPin className="w-3 h-3" />
+
               {job.location}
             </span>
           )}
+
           <span className="text-xs text-gray-400">{formatDate(job.created_date)}</span>
         </div>
       </div>
+
       <div className="flex items-center gap-3 mr-4 flex-shrink-0">
         <span className="text-xs bg-purple-50 text-purple-700 font-bold px-2.5 py-1 rounded-full">
           {job.applications_count || 0} מגישים
         </span>
+
         {job.is_closed ? (
           <span className="text-xs bg-gray-100 text-gray-500 font-bold px-2.5 py-1 rounded-full">
             סגורה
@@ -350,6 +374,7 @@ function JobsTab({ jobs, clientId }) {
           <h3 className="text-sm font-black text-gray-500 uppercase tracking-wider mb-3">
             משרות פתוחות ({open.length})
           </h3>
+
           <div className="space-y-2">
             {open.map((j) => (
               <JobRow key={j.id} job={j} />
@@ -357,11 +382,13 @@ function JobsTab({ jobs, clientId }) {
           </div>
         </div>
       )}
+
       {closed.length > 0 && (
         <div>
           <h3 className="text-sm font-black text-gray-500 uppercase tracking-wider mb-3">
             משרות סגורות ({closed.length})
           </h3>
+
           <div className="space-y-2 opacity-70">
             {closed.map((j) => (
               <JobRow key={j.id} job={j} />
@@ -410,6 +437,7 @@ function CandidatesTab({ applications, jobs }) {
     return (
       <div className="text-center py-12 bg-gray-50 rounded-2xl">
         <Users className="w-10 h-10 text-gray-200 mx-auto mb-3" />
+
         <p className="text-gray-500 font-bold">אין מועמדים בתהליך ללקוח זה</p>
       </div>
     )
@@ -431,6 +459,7 @@ function CandidatesTab({ applications, jobs }) {
         >
           הכל ({applications.length})
         </button>
+
         {activeStatuses.map((s) => {
           const cfg = APPLICATION_STATUS[s]
 
@@ -464,12 +493,15 @@ function CandidatesTab({ applications, jobs }) {
                 <p className="font-bold text-gray-900 text-sm">
                   {app.candidate_name || app.candidate_email || `מועמד #${app.id?.slice(-4)}`}
                 </p>
+
                 {job && <p className="text-xs text-gray-400 mt-0.5 truncate">{job.title}</p>}
               </div>
+
               <div className="flex items-center gap-3 mr-4 flex-shrink-0">
                 {app.match_score != null && (
                   <span className="text-xs text-gray-500 font-bold">{app.match_score}% התאמה</span>
                 )}
+
                 <StatusBadge status={app.status} />
               </div>
             </div>
@@ -506,6 +538,7 @@ function AboutTab({ company, onEdit }) {
       <div className="bg-white border border-gray-100 rounded-2xl p-6">
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-black text-gray-900 text-base">פרטי לקוח</h3>
+
           {onEdit && (
             <button
               onClick={onEdit}
@@ -519,6 +552,7 @@ function AboutTab({ company, onEdit }) {
         {fields.length === 0 ? (
           <div className="text-center py-6 text-gray-400">
             <p className="text-sm font-semibold">לא הוזנו פרטי קשר</p>
+
             {onEdit && (
               <button
                 onClick={onEdit}
@@ -535,8 +569,10 @@ function AboutTab({ company, onEdit }) {
                 <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <f.icon className="w-4 h-4 text-gray-500" />
                 </div>
+
                 <div>
                   <p className="text-xs font-semibold text-gray-400">{f.label}</p>
+
                   {f.href ? (
                     <a
                       href={f.href}
@@ -545,6 +581,7 @@ function AboutTab({ company, onEdit }) {
                       className="text-sm font-bold text-purple-600 hover:underline flex items-center gap-1"
                     >
                       {f.value}
+
                       {f.href.startsWith("http") && <ExternalLink className="w-3 h-3" />}
                     </a>
                   ) : (
@@ -560,6 +597,7 @@ function AboutTab({ company, onEdit }) {
       {/* Quick actions */}
       <div className="bg-white border border-gray-100 rounded-2xl p-6">
         <h3 className="font-black text-gray-900 text-base mb-4">פעולות מהירות</h3>
+
         <div className="grid grid-cols-2 gap-3">
           <Link
             to={`/agency/jobs?clientId=${company.id}`}
@@ -567,18 +605,21 @@ function AboutTab({ company, onEdit }) {
           >
             <Briefcase className="w-4 h-4" /> פרסם משרה
           </Link>
+
           <Link
             to="/agency/pipeline"
             className="flex items-center gap-2 p-3 bg-amber-50 text-amber-700 rounded-xl text-sm font-bold hover:bg-amber-100 transition-colors"
           >
             <Kanban className="w-4 h-4" /> Pipeline
           </Link>
+
           <Link
             to="/agency/crm"
             className="flex items-center gap-2 p-3 bg-blue-50 text-blue-700 rounded-xl text-sm font-bold hover:bg-blue-100 transition-colors"
           >
             <Users className="w-4 h-4" /> CRM מועמדים
           </Link>
+
           <Link
             to="/agency/ai-matching"
             className="flex items-center gap-2 p-3 bg-violet-50 text-violet-700 rounded-xl text-sm font-bold hover:bg-violet-100 transition-colors"
@@ -718,14 +759,18 @@ export default function AgencyClientDetail() {
     return (
       <div dir="rtl" className="max-w-5xl mx-auto space-y-6">
         <div className="h-6 w-32 bg-gray-100 rounded animate-pulse" />
+
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm animate-pulse">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-16 h-16 bg-gray-100 rounded-2xl" />
+
             <div className="space-y-2 flex-1">
               <div className="h-6 bg-gray-100 rounded w-48" />
+
               <div className="h-4 bg-gray-100 rounded w-28" />
             </div>
           </div>
+
           <div className="grid grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-20 bg-gray-50 rounded-xl" />
@@ -740,7 +785,9 @@ export default function AgencyClientDetail() {
     return (
       <div dir="rtl" className="max-w-5xl mx-auto text-center py-16">
         <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-3" />
+
         <p className="text-gray-600 font-black text-lg">שגיאה בטעינת הלקוח</p>
+
         <button
           onClick={() => refetchCompany()}
           className="mt-4 text-purple-600 font-bold hover:underline"
@@ -755,7 +802,9 @@ export default function AgencyClientDetail() {
     return (
       <div dir="rtl" className="max-w-5xl mx-auto text-center py-16">
         <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+
         <p className="text-gray-600 font-black text-lg">לקוח לא נמצא</p>
+
         <Link
           to="/agency/clients"
           className="mt-4 inline-block text-purple-600 font-bold hover:underline"
@@ -782,14 +831,17 @@ export default function AgencyClientDetail() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-4">
             <CompanyAvatar company={company} size="lg" />
+
             <div>
               <h1 className="text-2xl font-black text-gray-900">{company.name}</h1>
+
               <div className="flex items-center gap-3 mt-1">
                 {company.industry && (
                   <span className="text-xs font-bold px-2.5 py-0.5 bg-gray-100 text-gray-600 rounded-full">
                     {company.industry}
                   </span>
                 )}
+
                 {company.status === "active" && (
                   <span className="text-xs font-bold px-2.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full flex items-center gap-1">
                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
@@ -810,6 +862,7 @@ export default function AgencyClientDetail() {
                   <Edit2 className="w-4 h-4" /> עריכה
                 </button>
               )}
+
               {canArchiveClient && (
                 <button
                   onClick={() => setConfirmDelete(true)}
@@ -847,6 +900,7 @@ export default function AgencyClientDetail() {
           ].map((s) => (
             <div key={s.label} className={`${s.bg} rounded-xl p-4 text-center`}>
               <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+
               <p className="text-xs font-bold text-gray-500 mt-0.5">{s.label}</p>
             </div>
           ))}
@@ -856,6 +910,7 @@ export default function AgencyClientDetail() {
       {(jobsError || appsError) && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-700">
           <span className="font-bold">לא ניתן לטעון את כל המשרות או המועמדים של הלקוח.</span>
+
           <button
             onClick={() => {
               refetchJobs()
@@ -883,12 +938,15 @@ export default function AgencyClientDetail() {
               }`}
             >
               <tab.icon className="w-4 h-4" />
+
               {tab.label}
+
               {tab.id === "jobs" && jobs.length > 0 && (
                 <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full font-black">
                   {jobs.length}
                 </span>
               )}
+
               {tab.id === "candidates" && applications.length > 0 && (
                 <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full font-black">
                   {applications.length}
@@ -903,7 +961,9 @@ export default function AgencyClientDetail() {
           {activeTab === "about" && (
             <AboutTab company={company} onEdit={canEditClient ? () => setShowEdit(true) : null} />
           )}
+
           {activeTab === "jobs" && <JobsTab jobs={jobs} clientId={company.id} />}
+
           {activeTab === "candidates" && <CandidatesTab applications={applications} jobs={jobs} />}
         </div>
       </div>
@@ -930,17 +990,21 @@ export default function AgencyClientDetail() {
               <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
                 <Trash2 className="w-5 h-5 text-red-600" />
               </div>
+
               <h3 className="font-black text-gray-900 text-lg">מחיקת לקוח</h3>
             </div>
+
             <p className="text-gray-600 text-sm mb-6">
               להעביר את <strong>{company.name}</strong> לארכיון? ניתן לבצע זאת רק כאשר אין משרות או
               מועמדים בתהליך.
             </p>
+
             {archiveError && (
               <p className="mb-4 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-700">
                 {archiveError}
               </p>
             )}
+
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmDelete(false)}
@@ -948,6 +1012,7 @@ export default function AgencyClientDetail() {
               >
                 ביטול
               </button>
+
               <button
                 onClick={() => {
                   setArchiveError("")

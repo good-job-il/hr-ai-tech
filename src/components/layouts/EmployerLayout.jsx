@@ -52,12 +52,15 @@ export default function EmployerLayout() {
               >
                 <span className="flex items-center gap-2">
                   {item.icon && <item.icon className="w-4 h-4" />}
+
                   {label}
                 </span>
+
                 <ChevronDown
                   className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
                 />
               </button>
+
               {isExpanded && (
                 <div
                   className={`mt-1 space-y-1 border-[#E4ECFF] ${isEn ? "ml-4 pl-2 border-l-2" : "mr-4 pr-2 border-r-2"}`}
@@ -90,7 +93,9 @@ export default function EmployerLayout() {
               }`}
             >
               {item.icon && <item.icon className="w-4 h-4" />}
+
               {label}
+
               {item.badge && (
                 <span
                   className={`${isEn ? "ml-auto" : "mr-auto"} text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center`}
@@ -117,17 +122,21 @@ export default function EmployerLayout() {
         <div className="h-20 border-b border-[#E4ECFF] flex items-center px-6">
           <Logo />
         </div>
+
         <div className="px-4 py-3 border-b border-[#E4ECFF]">
           <div className="text-xs font-bold text-[#94A3B8] uppercase tracking-wide">
             {isEn ? "Employer" : "מעסיק"}
           </div>
+
           <div className="text-sm font-black text-[#0F172A] mt-0.5">
             {user?.full_name || (isEn ? "Employer" : "מעסיק")}
           </div>
         </div>
+
         <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
           {renderNavItems(EMPLOYER_NAV)}
         </nav>
+
         <div className="p-4 border-t border-[#E4ECFF]">
           <button
             onClick={handleLogout}
@@ -145,11 +154,14 @@ export default function EmployerLayout() {
           <button onClick={() => setMobileOpen(true)} className="md:hidden">
             <Menu className="w-5 h-5" />
           </button>
+
           <div className="text-sm font-bold text-[#64748B]">
             {isEn ? "Hello, " : "שלום, "}
+
             <span className="text-[#7C3AED]">{user?.full_name}</span>
           </div>
         </header>
+
         <main className="flex-1 min-w-0 overflow-x-hidden p-6 max-w-[1600px] w-full mx-auto">
           <Outlet />
         </main>
@@ -161,6 +173,7 @@ export default function EmployerLayout() {
             className="fixed inset-0 z-30 bg-black/40 md:hidden"
             onClick={() => setMobileOpen(false)}
           />
+
           <button
             onClick={() => setMobileOpen(false)}
             className={`fixed top-4 z-50 md:hidden w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg ${isEn ? "right-4" : "left-4"}`}

@@ -86,10 +86,12 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
           >
             {(application.candidate_name || "?")[0]}
           </div>
+
           <div>
             <div className="font-black text-[#0F172A] text-sm leading-tight">
               {application.candidate_name}
             </div>
+
             <div className="text-xs text-[#7C3AED] font-semibold">{application.job_title}</div>
           </div>
         </div>
@@ -101,9 +103,11 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
         {application.location && (
           <span className="flex items-center gap-1 text-xs text-[#94A3B8] font-semibold">
             <MapPin className="w-3 h-3" />
+
             {application.location}
           </span>
         )}
+
         {application.source && (
           <span className="text-xs bg-[#F3EFFF] text-[#7C3AED] px-2 py-0.5 rounded-full font-bold">
             {sourceLabel(application.source)}
@@ -127,6 +131,7 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
       {aiData.missingRequired && (
         <div className="flex items-center gap-1 text-xs text-amber-600 font-bold mb-1">
           <AlertTriangle className="w-3 h-3" />
+
           {t("pipeline.candidateCard.missingRequired")}
         </div>
       )}
@@ -134,8 +139,10 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
       <div className="flex items-center justify-between pt-2 border-t border-[#F1F5F9]">
         <div className="flex items-center gap-1 text-xs text-[#94A3B8] font-semibold">
           <User className="w-3 h-3" />
+
           {application.recruiter || t("pipeline.candidateCard.unassigned")}
         </div>
+
         {timeLabel && (
           <div
             className={`flex items-center gap-1 text-xs font-bold ${
@@ -143,7 +150,9 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
             }`}
           >
             <Clock className={`w-3 h-3 ${slaBreached ? "text-red-500" : ""}`} />
+
             {timeLabel}
+
             {slaBreached && <span className="text-red-500">⚠</span>}
           </div>
         )}

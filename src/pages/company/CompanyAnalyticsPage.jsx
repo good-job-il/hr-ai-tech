@@ -191,16 +191,20 @@ function KpiCard({ icon: Icon, label, value, pct, color = "green", loading, sub 
         >
           <Icon className={`w-5 h-5 ${c.text}`} />
         </div>
+
         <span className="text-sm font-semibold text-gray-500">{label}</span>
       </div>
+
       {loading ? (
         <div className="h-8 w-24 bg-gray-100 rounded-xl animate-pulse" />
       ) : (
         <div className="flex items-end justify-between gap-2">
           <p className="text-3xl font-black text-gray-900">{value ?? "—"}</p>
+
           <TrendBadge pct={pct} />
         </div>
       )}
+
       {sub && !loading && <p className="text-xs text-gray-400">{sub}</p>}
     </div>
   )
@@ -210,6 +214,7 @@ function SectionCard({ title, children }) {
   return (
     <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
       <h3 className="font-bold text-gray-800 mb-4 text-sm">{title}</h3>
+
       {children}
     </div>
   )
@@ -445,8 +450,10 @@ export default function CompanyAnalyticsPage() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-900">{t("company.analytics.title")}</h1>
+
           <p className="text-gray-500 mt-1 font-semibold">{t("company.analytics.subtitle")}</p>
         </div>
+
         <RangeTabs value={range} onChange={setRange} t={t} />
       </div>
 
@@ -461,6 +468,7 @@ export default function CompanyAnalyticsPage() {
           loading={loading}
           sub={vsLabel}
         />
+
         <KpiCard
           icon={Briefcase}
           label={t("company.analytics.stats.openJobs")}
@@ -468,6 +476,7 @@ export default function CompanyAnalyticsPage() {
           color="purple"
           loading={loading}
         />
+
         <KpiCard
           icon={Calendar}
           label={t("company.analytics.stats.scheduledInterviews")}
@@ -477,6 +486,7 @@ export default function CompanyAnalyticsPage() {
           loading={loading}
           sub={vsLabel}
         />
+
         <KpiCard
           icon={CheckCircle2}
           label={t("company.analytics.stats.hired")}
@@ -486,6 +496,7 @@ export default function CompanyAnalyticsPage() {
           loading={loading}
           sub={vsLabel}
         />
+
         <KpiCard
           icon={Users}
           label={t("company.analytics.stats.totalCandidates")}
@@ -495,6 +506,7 @@ export default function CompanyAnalyticsPage() {
           loading={loading}
           sub={vsLabel}
         />
+
         <KpiCard
           icon={BarChart3}
           label={t("company.analytics.stats.conversionRate")}
@@ -516,9 +528,13 @@ export default function CompanyAnalyticsPage() {
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={appsChartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+
               <XAxis dataKey="date" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+
               <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
+
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+
               <Line
                 type="monotone"
                 dataKey="count"
@@ -549,9 +565,13 @@ export default function CompanyAnalyticsPage() {
                 margin={{ top: 0, right: 20, left: 10, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" horizontal={false} />
+
                 <XAxis type="number" tick={{ fontSize: 10 }} allowDecimals={false} />
+
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={90} />
+
                 <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+
                 <Bar
                   dataKey="value"
                   radius={[0, 6, 6, 0]}
@@ -590,7 +610,9 @@ export default function CompanyAnalyticsPage() {
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
+
                 <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+
                 <Legend wrapperStyle={{ fontSize: 11 }} />
               </PieChart>
             </ResponsiveContainer>
@@ -620,17 +642,21 @@ export default function CompanyAnalyticsPage() {
                   >
                     {t("company.analytics.topJobs.job")}
                   </th>
+
                   <th className="text-center text-xs text-gray-500 font-semibold pb-2">
                     {t("company.analytics.topJobs.applications")}
                   </th>
+
                   <th className="text-center text-xs text-gray-500 font-semibold pb-2">
                     {t("company.analytics.topJobs.views")}
                   </th>
+
                   <th className="text-center text-xs text-gray-500 font-semibold pb-2">
                     {t("company.analytics.topJobs.conversion")}
                   </th>
                 </tr>
               </thead>
+
               <tbody>
                 {stats.topJobs.map((job) => (
                   <tr
@@ -641,12 +667,16 @@ export default function CompanyAnalyticsPage() {
                       <div className="font-semibold text-gray-800 truncate max-w-[200px]">
                         {job.title}
                       </div>
+
                       <div className="text-xs text-gray-400">{job.location || "—"}</div>
                     </td>
+
                     <td className="text-center font-bold text-purple-600">{job.appCount}</td>
+
                     <td className="text-center text-gray-500">
                       {(job.views || 0).toLocaleString()}
                     </td>
+
                     <td className="text-center">
                       <span
                         className={`text-xs font-semibold px-2 py-0.5 rounded-full ${

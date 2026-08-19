@@ -4,13 +4,19 @@ export function ApplicationsChart({ data }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
       <h3 className="font-bold text-gray-800 mb-4 text-sm">מועמדויות ומשרות לפי יום</h3>
+
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+
           <XAxis dataKey="date" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+
           <YAxis tick={{ fontSize: 10 }} />
+
           <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+
           <Legend wrapperStyle={{ fontSize: 11 }} />
+
           <Line
             type="monotone"
             dataKey="apps"
@@ -19,6 +25,7 @@ export function ApplicationsChart({ data }) {
             dot={false}
             name="מועמדויות"
           />
+
           <Line
             type="monotone"
             dataKey="jobs"
@@ -27,6 +34,7 @@ export function ApplicationsChart({ data }) {
             dot={false}
             name="משרות"
           />
+
           <Line
             type="monotone"
             dataKey="candidates"
@@ -61,6 +69,7 @@ export function SourcesChart({ sourceCount }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
       <h3 className="font-bold text-gray-800 mb-4 text-sm">מקורות מועמדויות</h3>
+
       <ResponsiveContainer width="100%" height={200}>
         <PieChart>
           <Pie
@@ -77,6 +86,7 @@ export function SourcesChart({ sourceCount }) {
               <Cell key={i} fill={COLORS[i % COLORS.length]} />
             ))}
           </Pie>
+
           <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
         </PieChart>
       </ResponsiveContainer>
@@ -88,16 +98,21 @@ export function TopJobsTable({ jobs }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
       <h3 className="font-bold text-gray-800 mb-4 text-sm">משרות מובילות</h3>
+
       <div className="overflow-x-auto">
         <table className="w-full text-sm" dir="rtl">
           <thead>
             <tr className="border-b border-gray-100">
               <th className="text-right text-xs text-gray-500 font-medium pb-2">משרה</th>
+
               <th className="text-center text-xs text-gray-500 font-medium pb-2">צפיות</th>
+
               <th className="text-center text-xs text-gray-500 font-medium pb-2">הגשות</th>
+
               <th className="text-center text-xs text-gray-500 font-medium pb-2">המרה</th>
             </tr>
           </thead>
+
           <tbody>
             {jobs.slice(0, 8).map((job) => (
               <tr key={job.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50">
@@ -105,10 +120,14 @@ export function TopJobsTable({ jobs }) {
                   <div className="font-medium text-gray-800 truncate max-w-[160px]">
                     {job.title}
                   </div>
+
                   <div className="text-xs text-gray-400 truncate">{job.company}</div>
                 </td>
+
                 <td className="text-center text-gray-600">{(job.views || 0).toLocaleString()}</td>
+
                 <td className="text-center font-semibold text-purple-600">{job.appCount}</td>
+
                 <td className="text-center">
                   <span
                     className={`text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -135,18 +154,24 @@ export function TopEmployersTable({ employers }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
       <h3 className="font-bold text-gray-800 mb-4 text-sm">מעסיקים מובילים</h3>
+
       <div className="space-y-3">
         {employers.map((emp, i) => (
           <div key={emp.id} className="flex items-center gap-3">
             <span className="text-xs font-bold text-gray-400 w-4 text-center">{i + 1}</span>
+
             <div className="flex-1 min-w-0">
               <div className="text-xs font-medium text-gray-700 truncate">{emp.id}</div>
+
               <div className="flex gap-3 mt-0.5">
                 <span className="text-xs text-gray-400">{emp.jobs} משרות</span>
+
                 <span className="text-xs text-purple-600 font-medium">{emp.apps} מועמדויות</span>
+
                 <span className="text-xs text-cyan-600">{emp.views.toLocaleString()} צפיות</span>
               </div>
             </div>
+
             <div className="w-16 bg-gray-100 rounded-full h-1.5">
               <div
                 className="bg-purple-500 h-1.5 rounded-full"
@@ -155,6 +180,7 @@ export function TopEmployersTable({ employers }) {
             </div>
           </div>
         ))}
+
         {employers.length === 0 && (
           <p className="text-gray-400 text-sm text-center py-4">אין נתונים</p>
         )}

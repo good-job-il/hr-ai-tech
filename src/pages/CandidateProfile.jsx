@@ -58,7 +58,7 @@ export default function CandidateProfilePage() {
         resume_url: "",
       })
     }
-  }, [profile, user])
+  }, [form, profile, user])
 
   const saveMutation = useMutation({
     mutationFn: async (data) => {
@@ -120,6 +120,7 @@ export default function CandidateProfilePage() {
     return (
       <div className="min-h-screen" style={{ backgroundColor: "#eaf7fb" }} dir="rtl">
         <Navbar />
+
         <div className="flex justify-center py-20">
           <div className="w-8 h-8 border-4 border-gray-200 border-t-hhblue rounded-full animate-spin" />
         </div>
@@ -130,18 +131,22 @@ export default function CandidateProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white" dir="rtl">
       <Navbar />
+
       <div className="max-w-[800px] mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">הפרופיל שלי</h1>
+
             <p className="text-gray-500 text-sm mt-2">נהל את מידע הקורות החיים שלך</p>
           </div>
+
           <button
             onClick={() => saveMutation.mutate(form)}
             disabled={saveMutation.isPending}
             className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-6 h-10 rounded-xl text-sm font-semibold disabled:opacity-50 flex items-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-95"
           >
             <Save className="w-4 h-4" />
+
             {saved ? "✓ נשמר!" : saveMutation.isPending ? "שומר..." : "שמור"}
           </button>
         </div>
@@ -150,6 +155,7 @@ export default function CandidateProfilePage() {
           {/* Basic info */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <h2 className="font-semibold text-gray-900 mb-4">פרטים אישיים</h2>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 ["full_name", "שם מלא"],
@@ -159,6 +165,7 @@ export default function CandidateProfilePage() {
               ].map(([key, label]) => (
                 <div key={key}>
                   <label className="text-xs font-medium text-gray-600 block mb-1">{label}</label>
+
                   <input
                     value={form[key] || ""}
                     onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
@@ -166,8 +173,10 @@ export default function CandidateProfilePage() {
                   />
                 </div>
               ))}
+
               <div className="sm:col-span-2">
                 <label className="text-xs font-medium text-gray-600 block mb-1">סיכום קצר</label>
+
                 <textarea
                   value={form.summary || ""}
                   onChange={(e) => setForm((f) => ({ ...f, summary: e.target.value }))}
@@ -181,6 +190,7 @@ export default function CandidateProfilePage() {
           {/* Skills */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <h2 className="font-semibold text-gray-900 mb-3">כישורים</h2>
+
             <div className="flex gap-2 mb-3">
               <input
                 value={skillInput}
@@ -189,6 +199,7 @@ export default function CandidateProfilePage() {
                 placeholder="הוסף כישור..."
                 className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
               />
+
               <button
                 onClick={addSkill}
                 className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-3.5 h-10 rounded-xl text-sm font-medium shadow-md hover:shadow-lg transition-all active:scale-95"
@@ -196,6 +207,7 @@ export default function CandidateProfilePage() {
                 <Plus className="w-4 h-4" />
               </button>
             </div>
+
             <div className="flex flex-wrap gap-2">
               {(form.skills || []).map((s, i) => (
                 <span
@@ -203,6 +215,7 @@ export default function CandidateProfilePage() {
                   className="flex items-center gap-1 bg-hhblue/10 text-hhblue text-xs px-3 py-1.5 rounded-full"
                 >
                   {s}
+
                   <button onClick={() => removeSkill(i)} className="hover:text-red-500">
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -215,6 +228,7 @@ export default function CandidateProfilePage() {
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <div className="flex justify-between items-center mb-3">
               <h2 className="font-semibold text-gray-900">ניסיון תעסוקתי</h2>
+
               <button
                 onClick={addExp}
                 className="text-purple-600 text-sm font-medium hover:text-purple-700 transition-colors flex items-center gap-1"
@@ -223,6 +237,7 @@ export default function CandidateProfilePage() {
                 הוסף
               </button>
             </div>
+
             <div className="space-y-3">
               {(form.experience || []).map((exp, i) => (
                 <div key={i} className="border border-gray-100 rounded-xl p-3 space-y-2">
@@ -233,12 +248,14 @@ export default function CandidateProfilePage() {
                       placeholder="חברה"
                       className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
                     />
+
                     <input
                       value={exp.role}
                       onChange={(e) => updateExp(i, "role", e.target.value)}
                       placeholder="תפקיד"
                       className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
                     />
+
                     <input
                       value={exp.years}
                       onChange={(e) => updateExp(i, "years", e.target.value)}
@@ -246,6 +263,7 @@ export default function CandidateProfilePage() {
                       className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none col-span-2"
                     />
                   </div>
+
                   <textarea
                     value={exp.description}
                     onChange={(e) => updateExp(i, "description", e.target.value)}
@@ -253,6 +271,7 @@ export default function CandidateProfilePage() {
                     rows={2}
                     className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none resize-none"
                   />
+
                   <button
                     onClick={() => removeExp(i)}
                     className="text-red-500 text-xs font-medium hover:text-red-700 transition-colors flex items-center gap-1 active:scale-95"
@@ -267,9 +286,11 @@ export default function CandidateProfilePage() {
           {/* Preferences */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <h2 className="font-semibold text-gray-900 mb-3">העדפות עבודה</h2>
+
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div>
                 <label className="text-xs font-medium text-gray-600 block mb-1">שנות ניסיון</label>
+
                 <input
                   type="number"
                   value={form.experience_years || ""}
@@ -277,8 +298,10 @@ export default function CandidateProfilePage() {
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
                 />
               </div>
+
               <div>
                 <label className="text-xs font-medium text-gray-600 block mb-1">שכר מינימום</label>
+
                 <input
                   type="number"
                   value={form.desired_salary_min || ""}
@@ -286,21 +309,28 @@ export default function CandidateProfilePage() {
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
                 />
               </div>
+
               <div>
                 <label className="text-xs font-medium text-gray-600 block mb-1">סוג משרה</label>
+
                 <select
                   value={form.job_type}
                   onChange={(e) => setForm((f) => ({ ...f, job_type: e.target.value }))}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
                 >
                   <option value="any">כל הסוגים</option>
+
                   <option value="full">משרה מלאה</option>
+
                   <option value="part">חלקית</option>
+
                   <option value="remote">מרחוק</option>
                 </select>
               </div>
+
               <div className="col-span-2 sm:col-span-3">
                 <label className="text-xs font-medium text-gray-600 block mb-1">השכלה</label>
+
                 <input
                   value={form.education || ""}
                   onChange={(e) => setForm((f) => ({ ...f, education: e.target.value }))}
@@ -309,6 +339,7 @@ export default function CandidateProfilePage() {
                 />
               </div>
             </div>
+
             <label className="flex items-center gap-2 mt-3 text-sm text-gray-700 cursor-pointer">
               <input
                 type="checkbox"
@@ -317,12 +348,14 @@ export default function CandidateProfilePage() {
               />
               פרופיל גלוי למעסיקים
             </label>
+
             <label className="flex items-center gap-2 mt-2 text-sm cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.is_open_to_work || false}
                 onChange={(e) => setForm((f) => ({ ...f, is_open_to_work: e.target.checked }))}
               />
+
               <span
                 className={`font-medium ${form.is_open_to_work ? "text-green-600" : "text-gray-700"}`}
               >
@@ -334,11 +367,14 @@ export default function CandidateProfilePage() {
           {/* Resume upload */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <h2 className="font-semibold text-gray-900 mb-3">קורות חיים (PDF)</h2>
+
             <label className="flex items-center gap-2 bg-gray-50 border border-dashed border-gray-300 rounded-xl p-4 cursor-pointer hover:bg-gray-100 transition-colors">
               <Upload className="w-4 h-4 text-gray-400" />
+
               <span className="text-sm text-gray-600">
                 {form.resume_url ? "עדכן קובץ" : "העלה קורות חיים"}
               </span>
+
               <input
                 type="file"
                 accept=".pdf,.doc,.docx"
@@ -346,6 +382,7 @@ export default function CandidateProfilePage() {
                 onChange={uploadResume}
               />
             </label>
+
             {form.resume_url && (
               <a
                 href={form.resume_url}

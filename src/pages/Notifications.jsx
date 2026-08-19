@@ -98,6 +98,7 @@ export default function Notifications() {
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       <Navbar />
+
       <div className="max-w-3xl mx-auto px-4 py-8">
         {loadError && (
           <div
@@ -107,6 +108,7 @@ export default function Notifications() {
             {loadError}
           </div>
         )}
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -114,10 +116,12 @@ export default function Notifications() {
               <Bell className="w-6 h-6 text-purple-400" />
               ההתראות שלי
             </h1>
+
             {unreadCount > 0 && (
               <p className="text-sm text-gray-400 mt-1">{unreadCount} התראות לא נקראו</p>
             )}
           </div>
+
           <div className="flex gap-2">
             {unreadCount > 0 && (
               <button
@@ -128,6 +132,7 @@ export default function Notifications() {
                 סמן הכל כנקרא
               </button>
             )}
+
             {notifications.length > 0 && (
               <button
                 onClick={deleteAll}
@@ -170,6 +175,7 @@ export default function Notifications() {
           ) : filtered.length === 0 ? (
             <div className="text-center py-20">
               <Bell className="w-14 h-14 text-white/10 mx-auto mb-4" />
+
               <p className="text-gray-400 font-medium">אין התראות להצגה</p>
             </div>
           ) : (
@@ -200,14 +206,18 @@ export default function Notifications() {
                         >
                           {notif.title}
                         </span>
+
                         <span className="text-[10px] bg-white/10 text-gray-400 px-2 py-0.5 rounded-full">
                           {NOTIF_TYPE_LABELS[notif.type] || notif.type}
                         </span>
+
                         {!notif.is_read && <span className="w-2 h-2 bg-purple-400 rounded-full" />}
                       </div>
+
                       {notif.content && (
                         <p className="text-sm text-gray-400 mt-1">{notif.content}</p>
                       )}
+
                       <p className="text-xs text-gray-500 mt-1.5">{timeStr(notif.created_date)}</p>
                     </div>
 
@@ -225,6 +235,7 @@ export default function Notifications() {
                           <CheckCheck className="w-3.5 h-3.5" />
                         </button>
                       )}
+
                       <button
                         onClick={(e) => {
                           e.stopPropagation()

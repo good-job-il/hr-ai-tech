@@ -93,10 +93,12 @@ export default function InvoicesPage() {
           actions={
             <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/85 px-4 py-3 shadow-[0_8px_25px_rgba(66,81,130,0.07)]">
               <TrendingUp className="h-5 w-5 text-violet-500" />
+
               <div>
                 <p className="text-xs font-bold text-slate-700">
                   {t("platform.invoices.stats.revenue")}
                 </p>
+
                 <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                   {t("platform.invoices.stats.paid")}: {stats.paid}
                 </p>
@@ -114,6 +116,7 @@ export default function InvoicesPage() {
             loading={isLoading}
             meta={t("platform.invoices.filters.invoicesCount")}
           />
+
           <PlatformStatCard
             icon={CheckCircle}
             label={t("platform.invoices.stats.paid")}
@@ -122,6 +125,7 @@ export default function InvoicesPage() {
             loading={isLoading}
             meta={t("platform.invoices.status.paid")}
           />
+
           <PlatformStatCard
             icon={Clock}
             label={t("platform.invoices.stats.pending")}
@@ -130,6 +134,7 @@ export default function InvoicesPage() {
             loading={isLoading}
             meta={t("platform.invoices.status.pending")}
           />
+
           <PlatformStatCard
             icon={DollarSign}
             label={t("platform.invoices.stats.revenue")}
@@ -151,9 +156,11 @@ export default function InvoicesPage() {
               </div>
             }
           />
+
           <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-[minmax(260px,1fr)_220px]">
             <div className="relative">
               <Search className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -161,14 +168,18 @@ export default function InvoicesPage() {
                 className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pe-4 ps-10 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-50"
               />
             </div>
+
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-50"
             >
               <option value="all">{t("platform.invoices.filters.allStatuses")}</option>
+
               <option value="paid">{t("platform.invoices.status.paid")}</option>
+
               <option value="pending">{t("platform.invoices.status.pending")}</option>
+
               <option value="overdue">{t("platform.invoices.status.overdue")}</option>
             </select>
           </div>
@@ -209,6 +220,7 @@ export default function InvoicesPage() {
                   ))}
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-slate-100">
                 {isLoading ? (
                   Array(6)
@@ -255,40 +267,49 @@ export default function InvoicesPage() {
                             >
                               <Receipt className="h-4 w-4" strokeWidth={1.8} />
                             </div>
+
                             <span className="font-mono text-xs font-extrabold text-slate-700">
                               {inv.id}
                             </span>
                           </div>
                         </td>
+
                         <td className="px-5 py-4">
                           <p className="font-extrabold text-slate-800 transition group-hover:text-violet-700">
                             {inv.org_name}
                           </p>
+
                           <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                             {String(inv.org_id).slice(0, 8)}
                           </p>
                         </td>
+
                         <td className="px-5 py-4">
                           <span className="inline-flex rounded-full bg-violet-50 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-violet-700">
                             {inv.plan}
                           </span>
                         </td>
+
                         <td className="px-5 py-4 text-xs font-semibold text-slate-500">
                           {inv.date}
                         </td>
+
                         <td className="px-5 py-4">
                           <span className="font-black text-slate-900">
                             ₪{inv.amount.toLocaleString()}
                           </span>
                         </td>
+
                         <td className="px-5 py-4">
                           <div
                             className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold ${st.bg} ${st.text}`}
                           >
                             <StIcon className="h-3 w-3" />
+
                             {statusLabel}
                           </div>
                         </td>
+
                         <td className="px-5 py-4">
                           <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white text-slate-400 shadow-sm transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-600">
                             <Download className="h-4 w-4" />

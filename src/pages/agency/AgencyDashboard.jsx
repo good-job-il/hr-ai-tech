@@ -196,21 +196,26 @@ export default function AgencyDashboard() {
                 className="gradient-brand flex h-11 items-center gap-2 rounded-xl px-5 text-sm font-bold text-white shadow-[0_8px_22px_rgba(93,82,216,0.24)] transition hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <Briefcase className="w-4 h-4" />
+
                 {t("agencyDashboard.actions.addJob")}
               </Link>
+
               <Link
                 to="/agency/crm"
                 className="flex h-11 items-center gap-2 rounded-xl border border-white bg-white/90 px-4 text-sm font-bold text-slate-600 shadow-[0_7px_20px_rgba(60,74,125,0.08)] transition hover:text-[#6C4DFF]"
               >
                 <Users className="w-4 h-4" />
+
                 {t("agencyDashboard.actions.addCandidate")}
               </Link>
+
               {canManageClients && (
                 <button
                   onClick={() => setShowClientModal(true)}
                   className="flex h-11 items-center gap-2 rounded-xl border border-white bg-white/90 px-4 text-sm font-bold text-slate-600 shadow-[0_7px_20px_rgba(60,74,125,0.08)] transition hover:text-[#6C4DFF]"
                 >
                   <Building2 className="w-4 h-4" />
+
                   {t("agencyDashboard.actions.addClient")}
                 </button>
               )}
@@ -221,6 +226,7 @@ export default function AgencyDashboard() {
         {dashboardError && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-700">
             <span className="font-bold">{t("agencyDashboard.error.message")}</span>
+
             <button
               onClick={() => queryClient.invalidateQueries()}
               className="font-black text-purple-700 hover:underline"
@@ -241,6 +247,7 @@ export default function AgencyDashboard() {
             to="/agency/jobs/open"
             meta={t("agencyDashboard.stats.openJobs.meta")}
           />
+
           <PlatformStatCard
             icon={Users}
             label={t("agencyDashboard.stats.totalCandidates.label")}
@@ -250,6 +257,7 @@ export default function AgencyDashboard() {
             to="/agency/crm"
             meta={t("agencyDashboard.stats.totalCandidates.meta")}
           />
+
           <PlatformStatCard
             icon={Kanban}
             label={t("agencyDashboard.stats.inProcess.label")}
@@ -259,6 +267,7 @@ export default function AgencyDashboard() {
             to="/agency/pipeline"
             meta={t("agencyDashboard.stats.inProcess.meta")}
           />
+
           <PlatformStatCard
             icon={CheckCircle2}
             label={t("agencyDashboard.stats.hired.label")}
@@ -267,6 +276,7 @@ export default function AgencyDashboard() {
             loading={loading}
             meta={t("agencyDashboard.stats.hired.meta")}
           />
+
           <PlatformStatCard
             icon={AlertCircle}
             label={t("agencyDashboard.stats.newCandidates.label")}
@@ -276,6 +286,7 @@ export default function AgencyDashboard() {
             to="/agency/crm"
             meta={t("agencyDashboard.stats.newCandidates.meta")}
           />
+
           <PlatformStatCard
             icon={TrendingUp}
             label={t("agencyDashboard.stats.totalApplications.label")}
@@ -284,6 +295,7 @@ export default function AgencyDashboard() {
             loading={loading}
             meta={t("agencyDashboard.stats.totalApplications.meta")}
           />
+
           <PlatformStatCard
             icon={Building2}
             label={t("agencyDashboard.stats.activeClients.label")}
@@ -292,6 +304,7 @@ export default function AgencyDashboard() {
             loading={loading}
             meta={t("agencyDashboard.stats.activeClients.meta")}
           />
+
           <PlatformStatCard
             icon={DollarSign}
             label={t("agencyDashboard.stats.compensationPlans.label")}
@@ -313,6 +326,7 @@ export default function AgencyDashboard() {
               actionLabel={t("agencyDashboard.recentJobs.viewAll")}
               className="mb-4"
             />
+
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
@@ -332,8 +346,10 @@ export default function AgencyDashboard() {
                   >
                     <div>
                       <p className="font-bold text-sm text-gray-800">{job.title}</p>
+
                       <p className="text-xs text-gray-400">{job.company}</p>
                     </div>
+
                     <span className="rounded-full bg-[#F1EAFF] px-2.5 py-1 text-xs font-bold text-[#6C4DFF]">
                       {t("agencyDashboard.recentJobs.applicants", {
                         count: job.applications_count || 0,
@@ -352,6 +368,7 @@ export default function AgencyDashboard() {
               subtitle={t("agencyDashboard.quickActions.subtitle")}
               className="mb-4"
             />
+
             <div className="grid grid-cols-2 gap-3">
               {[
                 {
@@ -407,6 +424,7 @@ export default function AgencyDashboard() {
                   >
                     <a.icon className="w-4 h-4" />
                   </span>
+
                   <span>{a.label}</span>
                 </Link>
               ))}

@@ -63,6 +63,7 @@ export default function StaffInvite() {
         <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
           <div className="text-center mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">הזמן עובד לצוות</h1>
+
             <p className="text-sm text-gray-600">הזמן עובדים חדשים כדי להצטרף לארגון שלך</p>
           </div>
 
@@ -81,6 +82,7 @@ export default function StaffInvite() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label className="text-sm font-semibold text-gray-700 block mb-2">שם מלא</Label>
+
               <Input
                 type="text"
                 value={fullName}
@@ -93,6 +95,7 @@ export default function StaffInvite() {
 
             <div>
               <Label className="text-sm font-semibold text-gray-700 block mb-2">אימייל</Label>
+
               <Input
                 type="email"
                 value={email}
@@ -106,6 +109,7 @@ export default function StaffInvite() {
 
             <div>
               <Label className="text-sm font-semibold text-gray-700 block mb-2">טלפון</Label>
+
               <Input
                 type="tel"
                 value={phone}
@@ -119,10 +123,12 @@ export default function StaffInvite() {
 
             <div>
               <Label className="text-sm font-semibold text-gray-700 block mb-2">תפקיד</Label>
+
               <Select value={role} onValueChange={setRole}>
                 <SelectTrigger className="h-11 border-gray-300">
                   <SelectValue />
                 </SelectTrigger>
+
                 <SelectContent>
                   {ROLES.map((r) => (
                     <SelectItem key={r.id} value={r.id}>

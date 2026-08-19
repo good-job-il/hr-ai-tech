@@ -27,6 +27,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
       >
         <Icon className="w-5 h-5" style={{ color }} />
       </div>
+
       <div>
         <div className="text-2xl font-black text-gray-900">
           {loading ? (
@@ -35,6 +36,7 @@ function StatCard({ icon: Icon, label, value, color = "#7C3AED", loading }) {
             value
           )}
         </div>
+
         <div className="text-xs font-semibold text-gray-500">{label}</div>
       </div>
     </div>
@@ -56,6 +58,7 @@ function RoleBadge({ role, t }) {
       style={{ color: style.color, backgroundColor: style.bg, border: `1px solid ${style.border}` }}
     >
       <Icon className="w-3 h-3" />
+
       {label}
     </span>
   )
@@ -92,10 +95,12 @@ function MemberCard({ member, onEdit, onDelete, isRtl, t }) {
             <h3 className="font-semibold text-gray-900 leading-tight truncate">
               {member.full_name}
             </h3>
+
             <div className="mt-1.5">
               <RoleBadge role={member.role} t={t} />
             </div>
           </div>
+
           {/* Actions — visible on hover */}
           <div
             className={`flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ${isRtl ? "flex-row-reverse" : ""}`}
@@ -108,6 +113,7 @@ function MemberCard({ member, onEdit, onDelete, isRtl, t }) {
             >
               <Edit2 className="w-3.5 h-3.5" />
             </Button>
+
             <Button
               variant="ghost"
               size="icon"
@@ -125,16 +131,19 @@ function MemberCard({ member, onEdit, onDelete, isRtl, t }) {
               className={`flex items-center gap-1.5 text-xs text-gray-500 ${isRtl ? "flex-row-reverse" : ""}`}
             >
               <Mail className="w-3 h-3 flex-shrink-0" />
+
               <span dir="ltr" className="truncate">
                 {member.email}
               </span>
             </div>
           )}
+
           {member.phone && (
             <div
               className={`flex items-center gap-1.5 text-xs text-gray-500 ${isRtl ? "flex-row-reverse" : ""}`}
             >
               <Phone className="w-3 h-3 flex-shrink-0" />
+
               <span dir="ltr">{member.phone}</span>
             </div>
           )}
@@ -176,6 +185,7 @@ function MemberModal({ open, onOpenChange, member, onSubmit, loading, isRtl, t }
         <form onSubmit={handleSubmit} className="space-y-4 pt-1">
           <div>
             <Label className="text-sm font-semibold">{t("company.team.form.fullName")} *</Label>
+
             <Input
               value={form.full_name}
               onChange={(e) => set("full_name", e.target.value)}
@@ -187,6 +197,7 @@ function MemberModal({ open, onOpenChange, member, onSubmit, loading, isRtl, t }
 
           <div>
             <Label className="text-sm font-semibold">{t("company.team.form.email")} *</Label>
+
             <Input
               type="email"
               value={form.email}
@@ -199,6 +210,7 @@ function MemberModal({ open, onOpenChange, member, onSubmit, loading, isRtl, t }
 
           <div>
             <Label className="text-sm font-semibold">{t("company.team.form.phone")}</Label>
+
             <Input
               type="tel"
               value={form.phone}
@@ -211,12 +223,15 @@ function MemberModal({ open, onOpenChange, member, onSubmit, loading, isRtl, t }
 
           <div>
             <Label className="text-sm font-semibold">{t("company.team.form.role")} *</Label>
+
             <Select value={form.role} onValueChange={(val) => set("role", val)}>
               <SelectTrigger className="mt-1">
                 <SelectValue />
               </SelectTrigger>
+
               <SelectContent>
                 <SelectItem value="hr_manager">{t("company.team.roles.hr_manager")}</SelectItem>
+
                 <SelectItem value="internal_recruiter">
                   {t("company.team.roles.internal_recruiter")}
                 </SelectItem>
@@ -228,6 +243,7 @@ function MemberModal({ open, onOpenChange, member, onSubmit, loading, isRtl, t }
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               {t("common.cancel")}
             </Button>
+
             <Button
               type="submit"
               disabled={loading}
@@ -251,17 +267,20 @@ function DeleteConfirmDialog({ open, onOpenChange, member, onConfirm, loading, i
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-red-600">
             <AlertCircle className="w-5 h-5" />
+
             {t("common.confirm")}
           </DialogTitle>
         </DialogHeader>
 
         <p className="text-sm text-gray-600">{t("company.team.confirmDelete")}</p>
+
         {member && <p className="text-sm font-semibold text-gray-900 mt-1">{member.full_name}</p>}
 
         <div className={`flex gap-3 pt-4 border-t ${isRtl ? "flex-row-reverse" : "justify-end"}`}>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("common.cancel")}
           </Button>
+
           <Button variant="destructive" onClick={onConfirm} disabled={loading}>
             {loading ? t("common.loading") : t("common.delete")}
           </Button>
@@ -278,9 +297,12 @@ function MemberSkeleton() {
     <div className="bg-white rounded-xl border border-gray-100 p-5 animate-pulse">
       <div className="flex items-start gap-4">
         <div className="w-12 h-12 rounded-xl bg-gray-100 flex-shrink-0" />
+
         <div className="flex-1 space-y-2">
           <div className="h-4 bg-gray-100 rounded w-2/3" />
+
           <div className="h-5 bg-gray-100 rounded w-1/3" />
+
           <div className="h-3 bg-gray-100 rounded w-3/4 mt-2" />
         </div>
       </div>
@@ -472,8 +494,10 @@ export default function CompanyTeamPage() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-900">{pageTitle}</h1>
+
           <p className="text-gray-500 font-semibold mt-1">{pageSubtitle}</p>
         </div>
+
         <Button
           onClick={() => {
             setEditingMember(null)
@@ -482,6 +506,7 @@ export default function CompanyTeamPage() {
           className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white flex-shrink-0"
         >
           <Plus className="w-4 h-4" />
+
           {t("company.team.invite")}
         </Button>
       </div>
@@ -495,6 +520,7 @@ export default function CompanyTeamPage() {
           color="#059669"
           loading={isLoading}
         />
+
         <StatCard
           icon={Crown}
           label={t("company.team.orgAdmins")}
@@ -502,6 +528,7 @@ export default function CompanyTeamPage() {
           color="#7C3AED"
           loading={isLoading}
         />
+
         <StatCard
           icon={ShieldCheck}
           label={t("company.team.hrManagers")}
@@ -509,6 +536,7 @@ export default function CompanyTeamPage() {
           color="#2563EB"
           loading={isLoading}
         />
+
         <StatCard
           icon={Briefcase}
           label={t("company.team.internalRecruiters")}
@@ -525,6 +553,7 @@ export default function CompanyTeamPage() {
           <Search
             className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none ${isRtl ? "right-3" : "left-3"}`}
           />
+
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -566,12 +595,15 @@ export default function CompanyTeamPage() {
           <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center mb-4">
             <UserPlus className="w-8 h-8 text-purple-600" />
           </div>
+
           <h3 className="font-black text-gray-900 text-lg mb-1">
             {search ? t("company.team.noResults") : t("company.team.noMembers")}
           </h3>
+
           <p className="text-sm text-gray-500 font-semibold mb-4">
             {search ? t("company.team.noResultsHint") : t("company.team.noMembersHint")}
           </p>
+
           {!search && (
             <Button
               onClick={() => {
@@ -581,6 +613,7 @@ export default function CompanyTeamPage() {
               className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
+
               {t("company.team.invite")}
             </Button>
           )}

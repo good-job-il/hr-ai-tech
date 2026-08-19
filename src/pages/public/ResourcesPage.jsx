@@ -85,6 +85,7 @@ export default function ResourcesPage() {
             <span className="inline-block bg-green-100 text-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               {isRtl ? 'משאבים חינמיים' : 'Free Resources'}
             </span>
+
             <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
               {isRtl ? (
                 <>כלים ומשאבים<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600">לקריירה שלך</span></>
@@ -92,6 +93,7 @@ export default function ResourcesPage() {
                 <>Tools and resources<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600">for your career</span></>
               )}
             </h1>
+
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               {isRtl
                 ? 'תבניות, מדריכים, דוחות שוק וכלים חינמיים — הכל במקום אחד'
@@ -107,24 +109,29 @@ export default function ResourcesPage() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-5 h-5 text-yellow-300" />
+
                 <span className="font-bold text-yellow-200 text-sm">
                   {isRtl ? 'כלי AI חינמי' : 'Free AI Tool'}
                 </span>
               </div>
+
               <h3 className="text-2xl font-black mb-2">
                 {isRtl ? 'ניתוח קורות החיים שלך עם AI' : 'Analyze your resume with AI'}
               </h3>
+
               <p className="text-purple-100 text-sm leading-relaxed max-w-md">
                 {isRtl
                   ? 'העלה את ה-CV שלך וקבל ניתוח מעמיק תוך שניות — ציון, המלצות שיפור, וניסוח מחדש'
                   : 'Upload your CV and get a deep analysis within seconds — a score, improvement tips, and rephrasing suggestions'}
               </p>
             </div>
+
             <Link
               to="/ai-career"
               className="flex-shrink-0 bg-white text-purple-700 font-bold px-8 py-3 rounded-xl hover:bg-purple-50 transition-colors flex items-center gap-2"
             >
               <Sparkles className="w-4 h-4" />
+
               {isRtl ? 'נסה בחינם' : 'Try for free'}
             </Link>
           </div>
@@ -138,23 +145,29 @@ export default function ResourcesPage() {
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${cat.color}`}>
                       <cat.icon className="w-5 h-5" />
                     </div>
+
                     <div>
                       <h3 className="font-bold text-gray-900">{cat.title}</h3>
+
                       <p className="text-xs text-gray-500">{cat.desc}</p>
                     </div>
                   </div>
                 </div>
+
                 <div className="divide-y divide-gray-50">
                   {cat.items.map((item, j) => (
                     <div key={j} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 cursor-pointer transition-colors group">
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-800 group-hover:text-purple-700 transition-colors">{item.name}</span>
+
                         {item.tag && (
                           <span className="text-xs bg-purple-100 text-purple-600 font-semibold px-2 py-0.5 rounded-full">{item.tag}</span>
                         )}
                       </div>
+
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{item.type}</span>
+
                         <Download className="w-4 h-4 text-gray-300 group-hover:text-purple-500 transition-colors" />
                       </div>
                     </div>
@@ -168,21 +181,26 @@ export default function ResourcesPage() {
           <div className="mb-12">
             <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
               <Video className="w-6 h-6 text-red-500" />
+
               {isRtl ? 'סרטוני הדרכה' : 'Tutorial Videos'}
             </h2>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {VIDEOS.map((vid, i) => (
                 <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden cursor-pointer group hover:shadow-md transition-shadow">
                   <div className="bg-gradient-to-br from-gray-800 to-gray-900 h-36 flex items-center justify-center">
                     <div className="text-center">
                       <div className="text-4xl mb-2">{vid.thumb}</div>
+
                       <div className="w-12 h-8 bg-red-500 rounded-md flex items-center justify-center mx-auto">
                         <div className="w-0 h-0 border-t-[6px] border-b-[6px] border-l-[10px] border-t-transparent border-b-transparent border-l-white mr-0.5" />
                       </div>
                     </div>
                   </div>
+
                   <div className="p-4">
                     <h3 className="font-semibold text-gray-900 text-sm group-hover:text-purple-700 transition-colors">{vid.title}</h3>
+
                     <p className="text-xs text-gray-400 mt-1">⏱ {vid.duration}</p>
                   </div>
                 </div>
@@ -195,11 +213,13 @@ export default function ResourcesPage() {
             <h3 className="text-2xl font-black text-gray-900 mb-2">
               {isRtl ? 'קבל עדכונים על משאבים חדשים' : 'Get updates on new resources'}
             </h3>
+
             <p className="text-gray-500 mb-6 text-sm">
               {isRtl
                 ? 'נשלח לך תבניות, דוחות וכלים חדשים ישירות לאימייל'
                 : "We'll send you new templates, reports and tools directly to your email"}
             </p>
+
             <div className="flex gap-3 max-w-md mx-auto">
               <input
                 type="email"
@@ -207,6 +227,7 @@ export default function ResourcesPage() {
                 className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-900 text-sm focus:outline-none focus:border-purple-400"
                 dir="ltr"
               />
+
               <button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition-all text-sm">
                 {isRtl ? 'הירשם' : 'Subscribe'}
               </button>

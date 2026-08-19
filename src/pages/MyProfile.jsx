@@ -119,6 +119,7 @@ export default function MyProfile() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white" dir="rtl">
       <Navbar />
+
       <div className="max-w-[900px] mx-auto px-4 py-8">
         <div className="mb-8">
           <Link
@@ -127,7 +128,9 @@ export default function MyProfile() {
           >
             <ArrowRight className="w-4 h-4" /> חזרה לעמוד הבית
           </Link>
+
           <h1 className="text-3xl font-bold text-gray-900">האזור האישי שלי</h1>
+
           <p className="text-gray-500 text-sm mt-2">צפייה בחיפוש העבודה שלך במקום אחד</p>
         </div>
 
@@ -159,7 +162,9 @@ export default function MyProfile() {
             {saved.length === 0 ? (
               <div className="text-center py-24">
                 <Bookmark className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+
                 <p className="text-gray-600 text-lg">עדיין לא שמרת משרות</p>
+
                 <Link
                   to="/jobs"
                   className="text-hhblue font-medium text-sm mt-3 inline-block hover:underline"
@@ -179,8 +184,10 @@ export default function MyProfile() {
                       <h3 className="font-semibold text-gray-900 group-hover:text-hhblue transition-colors">
                         {s.job_title}
                       </h3>
+
                       <p className="text-sm text-gray-600 mt-1">{s.company}</p>
                     </div>
+
                     <Bookmark className="w-5 h-5 text-hhblue fill-hhblue flex-shrink-0 ml-4" />
                   </Link>
                 ))}
@@ -195,7 +202,9 @@ export default function MyProfile() {
             {applications.length === 0 ? (
               <div className="text-center py-24">
                 <Send className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+
                 <p className="text-gray-600 text-lg">עדיין לא הגשת מועמדויות</p>
+
                 <Link
                   to="/jobs"
                   className="text-hhblue font-medium text-sm mt-3 inline-block hover:underline"
@@ -213,17 +222,21 @@ export default function MyProfile() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 text-base">{app.job_title}</h3>
+
                         <p className="text-sm text-gray-600 mt-1">{app.company}</p>
+
                         <p className="text-xs text-gray-500 mt-2">
                           הוגשה {new Date(app.created_date).toLocaleDateString("he-IL")}
                         </p>
                       </div>
+
                       <span
                         className={`text-xs px-3 py-1.5 rounded-full font-medium flex-shrink-0 whitespace-nowrap ${statusColors[app.status]}`}
                       >
                         {statusLabels[app.status]}
                       </span>
                     </div>
+
                     {(app.status === "phone_interview" || app.status === "employer_interview") && (
                       <div className="mt-4 pt-4 border-t border-gray-100">
                         {interviews
@@ -241,16 +254,19 @@ export default function MyProfile() {
                           ))}
                       </div>
                     )}
+
                     {app.status === "offer" && (
                       <div className="mt-4 pt-4 border-t border-gray-100 bg-green-50/50 rounded-lg p-3 text-sm text-green-700 font-medium">
                         💼 התקבלה הצעה עבודה! בדוק/י את המייל לפרטים.
                       </div>
                     )}
+
                     {app.status === "hired" && (
                       <div className="mt-4 pt-4 border-t border-gray-100 bg-emerald-50/50 rounded-lg p-3 text-sm text-emerald-700 font-medium">
                         🏆 כל הכבוד! התחלת עבודה!
                       </div>
                     )}
+
                     {app.status === "completed" && (
                       <div className="mt-4 pt-4 border-t border-gray-100 bg-lime-50/50 rounded-lg p-3 text-sm text-lime-700 font-medium">
                         ✅ עברת בהצלחה את תקופת האחריות!
@@ -269,7 +285,9 @@ export default function MyProfile() {
             {myResumes.length === 0 ? (
               <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-gray-500">
                 <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+
                 <p className="text-lg">📄 העלה קורות חיים בפרופיל שלך</p>
+
                 <Link
                   to="/my-profile"
                   className="text-hhblue font-medium text-sm mt-3 inline-block hover:underline"
@@ -288,12 +306,16 @@ export default function MyProfile() {
                       <div className="w-12 h-12 rounded-lg bg-hhblue/10 flex items-center justify-center flex-shrink-0">
                         <FileText className="w-6 h-6 text-hhblue" />
                       </div>
+
                       <div className="min-w-0 flex-1">
                         <h3 className="font-semibold text-gray-900 truncate">{resume.name}</h3>
+
                         <p className="text-sm text-gray-600 truncate mt-0.5">{resume.job}</p>
+
                         <p className="text-xs text-gray-500 mt-1">{resume.email}</p>
                       </div>
                     </div>
+
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <a
                         href={resume.url}
@@ -322,6 +344,7 @@ export default function MyProfile() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
               <h2 className="font-bold text-gray-900">פרטי הראיון</h2>
+
               <button
                 onClick={() => setSelectedInterview(null)}
                 className="text-gray-400 hover:text-gray-600"
@@ -329,38 +352,50 @@ export default function MyProfile() {
                 ✕
               </button>
             </div>
+
             <div className="p-5 space-y-4">
               <div>
                 <div className="text-xs font-medium text-gray-500 mb-1">משרה</div>
+
                 <div className="text-sm text-gray-900 font-semibold">
                   {selectedInterview.job_title}
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-xs font-medium text-gray-500 mb-1">📅 תאריך</div>
+
                   <div className="text-sm text-gray-900">
                     {new Date(selectedInterview.date).toLocaleDateString("he-IL")}
                   </div>
                 </div>
+
                 <div>
                   <div className="text-xs font-medium text-gray-500 mb-1">🕐 שעה</div>
+
                   <div className="text-sm text-gray-900">{selectedInterview.time}</div>
                 </div>
               </div>
+
               <div>
                 <div className="text-xs font-medium text-gray-500 mb-1">סוג</div>
+
                 <div className="text-sm text-gray-900">
                   {selectedInterview.type === "video" && "🎥 וידאו"}
+
                   {selectedInterview.type === "phone" && "☎️ טלפון"}
+
                   {selectedInterview.type === "in_person" && "🏢 פגישה פיזית"}
                 </div>
               </div>
+
               {selectedInterview.location_or_link && (
                 <div>
                   <div className="text-xs font-medium text-gray-500 mb-1">
                     {selectedInterview.type === "in_person" ? "כתובת" : "קישור"}
                   </div>
+
                   {selectedInterview.type === "in_person" ? (
                     <div className="text-sm text-gray-900">
                       {selectedInterview.location_or_link}
@@ -377,14 +412,17 @@ export default function MyProfile() {
                   )}
                 </div>
               )}
+
               {selectedInterview.notes && (
                 <div>
                   <div className="text-xs font-medium text-gray-500 mb-1">הערות</div>
+
                   <div className="text-sm text-gray-700 bg-gray-50 rounded-lg p-2">
                     {selectedInterview.notes}
                   </div>
                 </div>
               )}
+
               <button
                 onClick={() => setSelectedInterview(null)}
                 className="w-full bg-hhblue text-white py-2 rounded-lg text-sm font-semibold hover:bg-hhblue/90"

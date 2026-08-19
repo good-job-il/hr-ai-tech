@@ -80,6 +80,7 @@ const CandidateVerification = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <p className="text-gray-600 text-sm font-medium">סה״כ מועמדים</p>
+
             <p className="text-3xl font-bold text-purple-600 mt-2">
               {stats.total.toLocaleString("he-IL")}
             </p>
@@ -87,27 +88,34 @@ const CandidateVerification = () => {
 
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <p className="text-gray-600 text-sm font-medium">DOCX מומרים</p>
+
             <p className="text-3xl font-bold text-blue-600 mt-2">{stats.withConvertedResume}</p>
+
             <p className="text-xs text-gray-500 mt-1">{stats.missingConvertedResume} בטיפול</p>
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <p className="text-gray-600 text-sm font-medium">ניקוד איכות</p>
+
             <div className="flex items-center gap-3 mt-2">
               <p className="text-3xl font-bold text-green-600">{dataQualityScore}%</p>
+
               <CheckCircle2 className="w-6 h-6 text-green-600" />
             </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <p className="text-gray-600 text-sm font-medium">שגיאות parsing</p>
+
             <p className="text-3xl font-bold text-orange-600 mt-2">{stats.parsingFailed}</p>
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <p className="text-gray-600 text-sm font-medium">כפילויות</p>
+
             <div className="flex items-center gap-3 mt-2">
               <p className="text-3xl font-bold text-red-600">{stats.suspectedDuplicates}</p>
+
               <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
           </div>
@@ -116,6 +124,7 @@ const CandidateVerification = () => {
         {/* Data Completeness Grid */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">שלמות נתונים</h2>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {
@@ -164,6 +173,7 @@ const CandidateVerification = () => {
                 className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors text-left"
               >
                 <p className="text-sm font-medium text-gray-900">{item.label}</p>
+
                 <div className="flex items-center gap-2 mt-2">
                   <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
@@ -171,10 +181,12 @@ const CandidateVerification = () => {
                       style={{ width: `${(item.have / stats.total) * 100}%` }}
                     />
                   </div>
+
                   <p className="text-xs font-semibold text-gray-600 w-12 text-right">
                     {Math.round((item.have / stats.total) * 100)}%
                   </p>
                 </div>
+
                 <p className="text-xs text-gray-500 mt-1">
                   {item.have} / {stats.total}
                 </p>
@@ -187,6 +199,7 @@ const CandidateVerification = () => {
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">מועמדים ({filtered.length})</h2>
+
             {selectedStatus !== "all" && (
               <button
                 onClick={() => setSelectedStatus("all")}
@@ -211,6 +224,7 @@ const CandidateVerification = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-gray-900 truncate">{candidate.full_name}</p>
+
                       {candidate.parsing_confidence && (
                         <span
                           className={`text-xs font-semibold px-2 py-0.5 rounded ${
@@ -225,26 +239,36 @@ const CandidateVerification = () => {
                         </span>
                       )}
                     </div>
+
                     <div className="flex items-center gap-1 flex-wrap text-xs text-gray-600 mt-1">
                       {!candidate.email && <span className="text-red-600">❌ אין אימייל</span>}
+
                       {!candidate.phone && <span className="text-red-600">❌ אין טלפון</span>}
+
                       {!candidate.domain_name && (
                         <span className="text-orange-600">⚠ אין תחום</span>
                       )}
+
                       {!candidate.role_name && <span className="text-orange-600">⚠ אין תפקיד</span>}
+
                       {!candidate.resume_url && <span className="text-orange-600">⚠ אין קו"ח</span>}
+
                       {!candidate.converted_resume_url && (
                         <span className="text-blue-600">⚙️ DOCX בטיפול</span>
                       )}
+
                       {candidate.conversion_status === "failed" && (
                         <span className="text-red-600">❌ המרה נכשלה</span>
                       )}
+
                       {candidate.parsing_status === "failed" && (
                         <span className="text-red-600">❌ parsing נכשל</span>
                       )}
+
                       {candidate.is_duplicate_suspected && (
                         <span className="text-red-600">🔄 כפילות חשודה</span>
                       )}
+
                       {candidate.review_required && (
                         <span className="text-orange-600">👁 דורש ביקורת</span>
                       )}

@@ -21,6 +21,7 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
     {...props}
   >
     {children}
+
     <SelectPrimitive.Icon asChild>
       <ChevronDown className="h-4 w-4 opacity-50" />
     </SelectPrimitive.Icon>
@@ -68,6 +69,7 @@ const SelectContent = React.forwardRef(
         {...props}
       >
         <SelectScrollUpButton />
+
         <SelectPrimitive.Viewport
           className={cn(
             "p-1",
@@ -77,6 +79,7 @@ const SelectContent = React.forwardRef(
         >
           {children}
         </SelectPrimitive.Viewport>
+
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
@@ -109,6 +112,7 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
         <Check className="h-4 w-4" />
       </SelectPrimitive.ItemIndicator>
     </span>
+
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))

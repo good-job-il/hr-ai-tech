@@ -125,6 +125,7 @@ export default function HowItWorksPage() {
             <span className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               {isRtl ? 'איך זה עובד?' : 'How does it work?'}
             </span>
+
             <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
               {isRtl ? (
                 <>פשוט, חכם, יעיל —<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">מוצא לך עבודה</span></>
@@ -132,6 +133,7 @@ export default function HowItWorksPage() {
                 <>Simple, smart, effective —<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">finds you a job</span></>
               )}
             </h1>
+
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               {isRtl
                 ? 'HeadHunter משלב AI מתקדם עם פשטות השימוש כדי לחבר בין מועמדים לעבודות בדיוק מדהים'
@@ -146,6 +148,7 @@ export default function HowItWorksPage() {
             {STATS.map((s, i) => (
               <div key={i}>
                 <p className="text-3xl font-black text-purple-600 mb-1">{s.num}</p>
+
                 <p className="text-sm text-gray-500">{s.label}</p>
               </div>
             ))}
@@ -159,10 +162,12 @@ export default function HowItWorksPage() {
               <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
                 <UserPlus className="w-5 h-5 text-purple-600" />
               </div>
+
               <div>
                 <p className="text-xs font-bold text-purple-600 uppercase tracking-wider">
                   {isRtl ? 'למועמדים' : 'For Candidates'}
                 </p>
+
                 <h2 className="text-2xl font-black text-gray-900">
                   {isRtl ? 'מוצא עבודה בדרך שלך' : 'Find a job your way'}
                 </h2>
@@ -175,11 +180,14 @@ export default function HowItWorksPage() {
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center text-white font-black text-lg flex-shrink-0 shadow-md">
                     {step.num}
                   </div>
+
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="text-lg font-bold text-gray-900">{step.title}</h3>
+
                       <span className="text-xs bg-green-100 text-green-700 font-semibold px-2 py-1 rounded-full">{step.time}</span>
                     </div>
+
                     <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
                   </div>
                 </div>
@@ -192,6 +200,7 @@ export default function HowItWorksPage() {
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-8 py-4 rounded-xl hover:opacity-90 transition-all shadow-lg"
               >
                 <UserPlus className="w-4 h-4" />
+
                 {isRtl ? 'התחל לחפש עבודה — בחינם' : 'Start Job Searching — Free'}
               </Link>
             </div>
@@ -208,10 +217,12 @@ export default function HowItWorksPage() {
               <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                 <Building2 className="w-5 h-5 text-blue-600" />
               </div>
+
               <div>
                 <p className="text-xs font-bold text-blue-600 uppercase tracking-wider">
                   {isRtl ? 'למעסיקים' : 'For Employers'}
                 </p>
+
                 <h2 className="text-2xl font-black text-gray-900">
                   {isRtl ? 'גייס מהר יותר, חכם יותר' : 'Hire faster, smarter'}
                 </h2>
@@ -224,10 +235,13 @@ export default function HowItWorksPage() {
                   <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <step.icon className="w-5 h-5 text-blue-600" />
                   </div>
+
                   <span className="text-xs font-bold text-blue-500 mb-2 block">
                     {isRtl ? `שלב ${step.num}` : `Step ${step.num}`}
                   </span>
+
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
+
                   <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
                 </div>
               ))}
@@ -239,6 +253,7 @@ export default function HowItWorksPage() {
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold px-8 py-4 rounded-xl hover:opacity-90 transition-all shadow-lg"
               >
                 <Building2 className="w-4 h-4" />
+
                 {isRtl ? 'פרסם משרה ראשונה — בחינם' : 'Post Your First Job — Free'}
               </Link>
             </div>
@@ -251,10 +266,12 @@ export default function HowItWorksPage() {
             <h2 className="text-3xl font-black text-center text-gray-900 mb-10">
               {isRtl ? 'שאלות נפוצות' : 'Frequently Asked Questions'}
             </h2>
+
             <div className="space-y-4">
               {FAQ.map((item, i) => (
                 <div key={i} className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
                   <h3 className="font-bold text-gray-900 mb-2">{item.q}</h3>
+
                   <p className="text-gray-500 text-sm leading-relaxed">{item.a}</p>
                 </div>
               ))}

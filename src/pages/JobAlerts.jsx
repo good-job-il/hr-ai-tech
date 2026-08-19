@@ -77,11 +77,13 @@ export default function JobAlerts() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#eaf7fb" }} dir="rtl">
       <Navbar />
+
       <div className="max-w-[700px] mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Bell className="w-6 h-6 text-hhblue" /> התראות משרות
           </h1>
+
           <button
             onClick={() => setShowForm(true)}
             className="bg-hhblue text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-hhblue/90 flex items-center gap-2"
@@ -93,6 +95,7 @@ export default function JobAlerts() {
         {showForm && (
           <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-4 shadow-sm">
             <h2 className="font-semibold text-gray-900 mb-4">התראה חדשה</h2>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input
                 value={form.keywords}
@@ -100,24 +103,28 @@ export default function JobAlerts() {
                 placeholder="מילות מפתח (תפקיד, חברה...)"
                 className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 sm:col-span-2"
               />
+
               <input
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
                 placeholder="מיקום (רשות)"
                 className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
               />
+
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
               >
                 <option value="">כל הקטגוריות</option>
+
                 {CATEGORIES.filter(Boolean).map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
                 ))}
               </select>
+
               <select
                 value={form.job_type}
                 onChange={(e) => setForm({ ...form, job_type: e.target.value })}
@@ -129,6 +136,7 @@ export default function JobAlerts() {
                   </option>
                 ))}
               </select>
+
               <input
                 type="number"
                 value={form.salary_min}
@@ -136,15 +144,18 @@ export default function JobAlerts() {
                 placeholder="שכר מינימום (₪)"
                 className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
               />
+
               <select
                 value={form.frequency}
                 onChange={(e) => setForm({ ...form, frequency: e.target.value })}
                 className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
               >
                 <option value="daily">יומי</option>
+
                 <option value="weekly">שבועי</option>
               </select>
             </div>
+
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => setShowForm(false)}
@@ -152,6 +163,7 @@ export default function JobAlerts() {
               >
                 ביטול
               </button>
+
               <button
                 onClick={() => createMutation.mutate(form)}
                 disabled={createMutation.isPending}
@@ -166,7 +178,9 @@ export default function JobAlerts() {
         {alerts.length === 0 ? (
           <div className="bg-white rounded-2xl p-10 text-center border border-gray-100">
             <Bell className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+
             <p className="text-gray-500 text-sm">אין לך התראות עדיין</p>
+
             <p className="text-gray-400 text-xs mt-1">צור התראה כדי לקבל משרות מתאימות למייל</p>
           </div>
         ) : (
@@ -179,14 +193,18 @@ export default function JobAlerts() {
                 <div>
                   <div className="font-medium text-gray-900 text-sm">
                     {alert.keywords || "כל המשרות"}
+
                     {alert.location && <span className="text-gray-500"> | {alert.location}</span>}
+
                     {alert.category && <span className="text-gray-500"> | {alert.category}</span>}
                   </div>
+
                   <div className="text-xs text-gray-400 mt-0.5">
                     {typeLabels[alert.job_type]} · {alert.frequency === "daily" ? "יומי" : "שבועי"}
                     {alert.salary_min && ` · שכר ₪${Number(alert.salary_min).toLocaleString()}+`}
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => toggleMutation.mutate(alert)}
@@ -198,6 +216,7 @@ export default function JobAlerts() {
                       <BellOff className="w-4 h-4" />
                     )}
                   </button>
+
                   <button
                     onClick={() => deleteMutation.mutate(alert.id)}
                     className="text-gray-400 hover:text-red-500 p-1"

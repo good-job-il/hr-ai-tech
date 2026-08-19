@@ -114,8 +114,10 @@ export default function ImportMonitoring() {
         <div className="flex justify-between items-start mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">ניטור ייבוא משרות</h1>
+
             <p className="text-sm text-gray-500 mt-1">ניטור real-time של כל המקורות</p>
           </div>
+
           <button
             onClick={() => refetch()}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700"
@@ -138,7 +140,9 @@ export default function ImportMonitoring() {
               className="bg-white rounded-xl border border-gray-100 p-4 text-center shadow-sm hover:shadow-md transition"
             >
               <div className="text-2xl mb-1">{stat.icon}</div>
+
               <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+
               <div className="text-xs text-gray-500 mt-1">{stat.label}</div>
             </div>
           ))}
@@ -148,12 +152,15 @@ export default function ImportMonitoring() {
         <div className="grid grid-cols-2 gap-3 mb-8">
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 p-4">
             <div className="text-sm text-green-700 font-semibold">משרות שנוספו</div>
+
             <div className="text-3xl font-bold text-green-600 mt-1">
               {stats.totalJobsAdded.toLocaleString("he-IL")}
             </div>
           </div>
+
           <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl border border-red-200 p-4">
             <div className="text-sm text-red-700 font-semibold">משרות שנסגרו</div>
+
             <div className="text-3xl font-bold text-red-600 mt-1">
               {stats.totalJobsClosed.toLocaleString("he-IL")}
             </div>
@@ -164,13 +171,16 @@ export default function ImportMonitoring() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-900">מקורות ייבוא</h2>
+
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
             >
               <option value="last_sync">סדר לפי סינכרון אחרון</option>
+
               <option value="status">סדר לפי סטטוס</option>
+
               <option value="jobs">סדר לפי משרות שנוספו</option>
             </select>
           </div>
@@ -180,47 +190,61 @@ export default function ImportMonitoring() {
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
                   <th className="px-4 py-3 text-right font-semibold text-gray-700">שם מקור</th>
+
                   <th className="px-4 py-3 text-right font-semibold text-gray-700">סטטוס</th>
+
                   <th className="px-4 py-3 text-right font-semibold text-gray-700">
                     סינכרון אחרון
                   </th>
+
                   <th className="px-4 py-3 text-right font-semibold text-gray-700">משרות</th>
+
                   <th className="px-4 py-3 text-right font-semibold text-gray-700">תוכן</th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-gray-100">
                 {sortedSources.map((source) => (
                   <tr key={source.id} className="hover:bg-gray-50 transition">
                     <td className="px-4 py-3">
                       <div className="font-semibold text-gray-900">{source.name}</div>
+
                       <div className="text-xs text-gray-500 mt-0.5">{source.provider}</div>
                     </td>
+
                     <td className="px-4 py-3">
                       <StatusBadge status={source.last_sync_status} />
                     </td>
+
                     <td className="px-4 py-3">
                       <div className="text-sm text-gray-600">{formatTime(source.last_sync)}</div>
+
                       {source.last_error && (
                         <div className="text-xs text-red-600 mt-0.5">⚠️ {source.last_error}</div>
                       )}
                     </td>
+
                     <td className="px-4 py-3">
                       <div className="text-sm">
                         <span className="text-green-700 font-semibold">
                           +{source.jobs_added || 0}
                         </span>
+
                         <span className="text-gray-500 mx-1">/</span>
+
                         <span className="text-red-700 font-semibold">
                           -{source.jobs_closed || 0}
                         </span>
                       </div>
                     </td>
+
                     <td className="px-4 py-3">
                       {source.logs ? (
                         <details className="cursor-pointer">
                           <summary className="text-xs text-purple-600 hover:text-purple-700">
                             צפה בלוג
                           </summary>
+
                           <pre className="text-xs bg-gray-50 p-2 rounded mt-1 max-h-20 overflow-auto text-gray-700">
                             {source.logs}
                           </pre>
@@ -244,6 +268,7 @@ export default function ImportMonitoring() {
         {stats.errors > 0 && (
           <div className="mt-8 bg-red-50 border border-red-200 rounded-2xl p-6">
             <h3 className="font-semibold text-red-900 mb-3">⚠️ מקורות עם שגיאות</h3>
+
             <div className="space-y-2">
               {sortedSources
                 .filter((s) => s.last_sync_status === "error")

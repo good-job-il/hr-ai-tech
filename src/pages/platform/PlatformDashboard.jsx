@@ -273,10 +273,13 @@ export default function PlatformDashboard() {
                   Retry
                 </button>
               )}
+
               <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/85 px-4 py-3 shadow-[0_8px_25px_rgba(66,81,130,0.07)]">
                 <CalendarDays className="h-5 w-5 text-violet-500" />
+
                 <div>
                   <p className="text-xs font-bold text-slate-700">{currentDate}</p>
+
                   <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                     Live platform overview
                   </p>
@@ -297,47 +300,58 @@ export default function PlatformDashboard() {
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
               <div>
                 <h2 className="text-[15px] font-extrabold text-slate-800">Platform growth</h2>
+
                 <p className="mt-1 text-xs font-medium text-slate-400">
                   Organizations and registered users
                 </p>
               </div>
+
               <div className="flex items-center gap-4 text-[11px] font-semibold text-slate-500">
                 <span className="flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-full bg-blue-500" />
                   Users
                 </span>
+
                 <span className="flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-full bg-fuchsia-500" />
                   Organizations
                 </span>
               </div>
             </div>
+
             <div className="mt-6 h-[245px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={dashboardData} margin={{ top: 5, right: 8, left: -22, bottom: 0 }}>
                   <defs>
                     <linearGradient id="platformUsersGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#4f8df7" stopOpacity={0.2} />
+
                       <stop offset="100%" stopColor="#4f8df7" stopOpacity={0} />
                     </linearGradient>
+
                     <linearGradient id="platformOrgsGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#cf45c4" stopOpacity={0.16} />
+
                       <stop offset="100%" stopColor="#cf45c4" stopOpacity={0} />
                     </linearGradient>
                   </defs>
+
                   <CartesianGrid stroke="#e9edf5" strokeDasharray="3 5" vertical={false} />
+
                   <XAxis
                     dataKey="name"
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: "#94a3b8", fontSize: 11, fontWeight: 600 }}
                   />
+
                   <YAxis
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: "#94a3b8", fontSize: 10 }}
                     allowDecimals={false}
                   />
+
                   <Tooltip
                     contentStyle={{
                       border: "1px solid #eef0f6",
@@ -346,6 +360,7 @@ export default function PlatformDashboard() {
                       fontSize: 12,
                     }}
                   />
+
                   <Area
                     type="monotone"
                     dataKey="users"
@@ -354,6 +369,7 @@ export default function PlatformDashboard() {
                     fill="url(#platformUsersGradient)"
                     dot={{ r: 3, fill: "#4f8df7", strokeWidth: 0 }}
                   />
+
                   <Area
                     type="monotone"
                     dataKey="organizations"
@@ -372,6 +388,7 @@ export default function PlatformDashboard() {
               title="Organizations by type"
               linkTo="/platform/organizations/staffing"
             />
+
             {loading ? (
               <div className="mx-auto mt-8 h-48 w-48 animate-pulse rounded-full bg-slate-100" />
             ) : organizationMix.length ? (
@@ -394,6 +411,7 @@ export default function PlatformDashboard() {
                           <Cell key={item.name} fill={chartColors[index % chartColors.length]} />
                         ))}
                       </Pie>
+
                       <Tooltip
                         contentStyle={{
                           border: "1px solid #eef0f6",
@@ -404,15 +422,18 @@ export default function PlatformDashboard() {
                       />
                     </PieChart>
                   </ResponsiveContainer>
+
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                     <strong className="text-2xl font-black text-slate-900">
                       {formatPlatformNumber(stats.orgs?.length)}
                     </strong>
+
                     <span className="mt-0.5 text-[11px] font-semibold text-slate-400">
                       organizations
                     </span>
                   </div>
                 </div>
+
                 <div className="w-full space-y-3">
                   {organizationMix.map((item, index) => {
                     const total = Math.max(stats.orgs?.length ?? 0, 1)
@@ -423,9 +444,11 @@ export default function PlatformDashboard() {
                           className="h-2.5 w-2.5 rounded-full"
                           style={{ backgroundColor: chartColors[index] }}
                         />
+
                         <span className="min-w-0 flex-1 truncate font-semibold text-slate-500">
                           {item.name}
                         </span>
+
                         <span className="font-black text-slate-800">
                           {Math.round((item.value / total) * 100)}%
                         </span>
@@ -448,6 +471,7 @@ export default function PlatformDashboard() {
               title="Recently added organizations"
               linkTo="/platform/organizations/staffing"
             />
+
             <div className="mt-4">
               {loading ? (
                 <div className="space-y-3">
@@ -470,21 +494,26 @@ export default function PlatformDashboard() {
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-100 to-blue-50 text-xs font-black text-violet-700">
                         {getInitials(organization.name)}
                       </div>
+
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[13px] font-bold text-slate-700 group-hover:text-violet-700">
                           {organization.name}
                         </p>
+
                         <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                           {organization.org_type === "staffing_agency"
                             ? "Staffing agency"
                             : "Company / Internal HR"}
                         </p>
                       </div>
+
                       <div className="text-right">
                         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-bold text-emerald-600">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+
                           {organization.status || "active"}
                         </span>
+
                         <p className="mt-1 text-[9px] text-slate-400">
                           {formatDate(organization.created_date || organization.created_at)}
                         </p>
@@ -503,6 +532,7 @@ export default function PlatformDashboard() {
               title="Recent platform activity"
               linkTo="/platform/security/audit"
             />
+
             <div className="mt-4">
               {loading ? (
                 <div className="space-y-3">
@@ -534,14 +564,17 @@ export default function PlatformDashboard() {
                           <Users className="h-4 w-4" />
                         )}
                       </div>
+
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[13px] font-bold text-slate-700">
                           {log.action || "Platform activity"}
                         </p>
+
                         <p className="mt-0.5 truncate text-[10px] font-medium text-slate-400">
                           {log.actor_email || "System automation"}
                         </p>
                       </div>
+
                       <span className="shrink-0 text-[9px] font-medium text-slate-400">
                         {formatDate(log.created_date || log.created_at)}
                       </span>
@@ -556,15 +589,19 @@ export default function PlatformDashboard() {
 
           <PlatformCard className="p-5">
             <PlatformWidgetHeader title="System health" />
+
             <div className="mt-4 divide-y divide-slate-100">
               {healthItems.map(({ icon: Icon, label, value }) => (
                 <div key={label} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
                   <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
                     <Icon className="h-4 w-4" strokeWidth={1.8} />
                   </div>
+
                   <span className="flex-1 text-xs font-bold text-slate-600">{label}</span>
+
                   <span className="flex items-center gap-2 text-[10px] font-semibold text-slate-400">
                     {value}
+
                     <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.11)]" />
                   </span>
                 </div>
@@ -617,10 +654,12 @@ export default function PlatformDashboard() {
                 <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${tone}`}>
                   <Icon className="h-5 w-5" strokeWidth={1.8} />
                 </div>
+
                 <div>
                   <p className="text-lg font-black text-slate-800">
                     {typeof value === "number" ? formatPlatformNumber(value) : value}
                   </p>
+
                   <p className="text-[10px] font-semibold text-slate-400">{label}</p>
                 </div>
               </div>
@@ -653,6 +692,7 @@ export default function PlatformDashboard() {
               >
                 Organization name
               </label>
+
               <input
                 id="platform-org-name"
                 type="text"
@@ -663,6 +703,7 @@ export default function PlatformDashboard() {
                 autoFocus
               />
             </div>
+
             <div>
               <label
                 htmlFor="platform-org-type"
@@ -670,6 +711,7 @@ export default function PlatformDashboard() {
               >
                 Organization type
               </label>
+
               <select
                 id="platform-org-type"
                 value={newOrgType}
@@ -677,9 +719,11 @@ export default function PlatformDashboard() {
                 className={platformFieldClassName}
               >
                 <option value="staffing_agency">Staffing agency</option>
+
                 <option value="organization">Company / Internal HR</option>
               </select>
             </div>
+
             <div className="flex gap-3 pt-2">
               <Button
                 variant="secondary"
@@ -690,6 +734,7 @@ export default function PlatformDashboard() {
               >
                 Cancel
               </Button>
+
               <Button
                 variant="primary"
                 size="sm"

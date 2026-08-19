@@ -310,6 +310,7 @@ export default function ImportDashboard() {
                 חדש
               </span>
             </button>
+
             <button
               onClick={() => setActiveTab("csv")}
               className={`flex items-center gap-2 px-6 py-4 font-bold text-sm transition-colors border-b-2 ${
@@ -330,6 +331,7 @@ export default function ImportDashboard() {
                 <p className="text-sm text-[#64748B] mb-4 font-semibold">
                   העלה קבצי PDF, DOC או DOCX — המערכת תמיר ל-DOCX, תנתח אוטומטית ותיצור מועמד ב-CRM
                 </p>
+
                 <ResumeFileImporter onImportComplete={() => refetch()} />
               </div>
             )}
@@ -340,17 +342,21 @@ export default function ImportDashboard() {
                 <p className="text-sm text-[#64748B] mb-4 font-semibold">
                   ייבא מועמדים מקובץ CSV עם עמודות מוגדרות
                 </p>
+
                 <div
                   className="border-2 border-dashed border-[#E4ECFF] rounded-xl p-8 text-center hover:border-[#7C3AED] transition-colors cursor-pointer"
                   onClick={() => document.getElementById("importFileInput").click()}
                 >
                   <Upload className="w-10 h-10 text-[#CBD5E1] mx-auto mb-3" />
+
                   <p className="font-bold text-[#374151]">
                     {file ? file.name : "גרור קובץ CSV כאן או לחץ להעלאה"}
                   </p>
+
                   <p className="text-xs text-[#94A3B8] mt-1">
                     CSV בלבד • עמודות: full_name, email, phone, role_name, skills...
                   </p>
+
                   <input
                     id="importFileInput"
                     type="file"
@@ -372,6 +378,7 @@ export default function ImportDashboard() {
                     ) : (
                       <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                     )}
+
                     {uploadMsg.text}
                   </div>
                 )}
@@ -406,10 +413,12 @@ export default function ImportDashboard() {
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h2 className="font-black text-[#0F172A]">בדיקת אימות</h2>
+
                 <p className="text-xs text-[#94A3B8] mt-0.5">
                   מריץ 3 מועמדי בדיקה: עם email+phone, ללא email, כפילות
                 </p>
               </div>
+
               <Button
                 size="sm"
                 onClick={runValidationTest}
@@ -421,6 +430,7 @@ export default function ImportDashboard() {
                 ) : (
                   <Play className="w-3.5 h-3.5" />
                 )}
+
                 {runningValidation ? "רץ..." : "הרץ בדיקה"}
               </Button>
             </div>
@@ -438,14 +448,17 @@ export default function ImportDashboard() {
                         ) : (
                           <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
                         )}
+
                         <span
                           className={`text-sm font-semibold ${c.pass ? "text-green-800" : "text-red-700"}`}
                         >
                           {c.label}
                         </span>
+
                         <span className="text-xs text-[#64748B] mr-auto">{c.note}</span>
                       </div>
                     ))}
+
                     <div className="text-xs text-[#64748B] pt-2 border-t border-green-200 mt-2">
                       Batch ID: {validationResult.batch_id}
                     </div>
@@ -464,6 +477,7 @@ export default function ImportDashboard() {
         <PlatformCard className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-black text-[#0F172A]">היסטוריית אצוות</h2>
+
             <Button
               size="sm"
               variant="outline"
@@ -477,6 +491,7 @@ export default function ImportDashboard() {
           {batches.length === 0 ? (
             <div className="text-center py-10 text-[#94A3B8]">
               <FileText className="w-8 h-8 mx-auto mb-2 opacity-40" />
+
               <p className="font-semibold text-sm">אין batches עדיין</p>
             </div>
           ) : (
@@ -509,10 +524,12 @@ export default function ImportDashboard() {
                                 : "#64748B",
                         }}
                       />
+
                       <div className="flex-1 min-w-0">
                         <div className="font-bold text-sm text-[#0F172A] truncate">
                           {batch.batch_name}
                         </div>
+
                         <div className="text-xs text-[#94A3B8]">
                           {batch.created_date
                             ? format(new Date(batch.created_date), "dd/MM/yyyy HH:mm", {
@@ -522,10 +539,12 @@ export default function ImportDashboard() {
                           • {batch.source_file}
                         </div>
                       </div>
+
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${cfg.color}`}>
                           {cfg.label}
                         </span>
+
                         {(batch.status === "failed" ||
                           (batch.status === "partial" && batch.failed_imports > 0)) && (
                           <button
@@ -538,6 +557,7 @@ export default function ImportDashboard() {
                             <RefreshCw className="w-3 h-3" /> retry
                           </button>
                         )}
+
                         {isExpanded ? (
                           <ChevronUp className="w-4 h-4 text-[#94A3B8]" />
                         ) : (
@@ -584,18 +604,22 @@ export default function ImportDashboard() {
                               <div className="text-xl font-black" style={{ color: stat.color }}>
                                 {stat.value}
                               </div>
+
                               <div className="text-xs text-[#94A3B8] font-semibold mt-0.5">
                                 {stat.label}
                               </div>
                             </div>
                           ))}
                         </div>
+
                         {Array.isArray(batch.error_log) && batch.error_log.length > 0 && (
                           <div className="mt-3 p-3 bg-red-50 rounded-xl border border-red-100">
                             <p className="text-xs font-bold text-red-700 mb-1">שגיאות:</p>
+
                             <pre className="text-xs text-red-600 whitespace-pre-wrap max-h-32 overflow-y-auto">
                               {JSON.stringify(batch.error_log, null, 2)}
                             </pre>
+
                             <button
                               onClick={() => downloadErrorReport(batch)}
                               className="mt-2 flex items-center gap-1 text-xs font-bold text-red-700 hover:underline"
@@ -604,6 +628,7 @@ export default function ImportDashboard() {
                             </button>
                           </div>
                         )}
+
                         <div className="mt-2 flex gap-2">
                           <button
                             onClick={() =>

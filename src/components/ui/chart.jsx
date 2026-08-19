@@ -39,6 +39,7 @@ const ChartContainer = React.forwardRef(({ id, className, children, config, ...p
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
+
         <RechartsPrimitive.ResponsiveContainer>{children}</RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
@@ -142,6 +143,7 @@ const ChartTooltipContent = React.forwardRef(
         )}
       >
         {!nestLabel ? tooltipLabel : null}
+
         <div className="grid gap-1.5">
           {payload.map((item, index) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`
@@ -184,6 +186,7 @@ const ChartTooltipContent = React.forwardRef(
                         />
                       )
                     )}
+
                     <div
                       className={cn(
                         "flex flex-1 justify-between leading-none",
@@ -192,10 +195,12 @@ const ChartTooltipContent = React.forwardRef(
                     >
                       <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
+
                         <span className="text-muted-foreground">
                           {itemConfig?.label || item.name}
                         </span>
                       </div>
+
                       {item.value && (
                         <span className="font-mono font-medium tabular-nums text-foreground">
                           {item.value.toLocaleString()}
@@ -256,6 +261,7 @@ const ChartLegendContent = React.forwardRef(
                   }}
                 />
               )}
+
               {itemConfig?.label}
             </div>
           )

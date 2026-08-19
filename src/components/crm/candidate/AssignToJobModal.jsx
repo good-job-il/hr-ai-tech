@@ -115,13 +115,16 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center">
               <Briefcase className="w-4 h-4 text-white" />
             </div>
+
             <div>
               <h2 className="text-lg font-black text-[#0F172A]">
                 {t("candidateCRM.assignToJob.title")}
               </h2>
+
               <p className="text-xs text-[#7C3AED] font-semibold">{candidate?.full_name}</p>
             </div>
           </div>
+
           <button
             onClick={onClose}
             disabled={assigning}
@@ -145,11 +148,13 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
             ) : (
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
             )}
+
             <p
               className={`text-sm font-bold ${result.success ? "text-green-700" : "text-red-600"}`}
             >
               {result.message}
             </p>
+
             {result.success && (
               <Button size="sm" variant="ghost" onClick={onClose} className="mr-auto text-xs">
                 {t("candidateCRM.assignToJob.close")}
@@ -165,6 +170,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
             <label className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2 block">
               {t("candidateCRM.assignToJob.searchJob")}
             </label>
+
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -177,6 +183,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
           {loading ? (
             <div className="flex items-center justify-center py-10">
               <Loader2 className="w-6 h-6 animate-spin text-[#7C3AED]" />
+
               <span className={`${isRTL ? "mr-2" : "ml-2"} text-sm text-[#94A3B8]`}>
                 {t("candidateCRM.assignToJob.loading")}
               </span>
@@ -184,7 +191,9 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
           ) : filteredJobs.length === 0 ? (
             <div className="text-center py-10 text-[#94A3B8]">
               <Briefcase className="w-8 h-8 mx-auto mb-2 opacity-40" />
+
               <p className="text-sm font-semibold">{t("candidateCRM.assignToJob.noJobs")}</p>
+
               <p className="text-xs mt-1">{t("candidateCRM.assignToJob.tryDifferentSearch")}</p>
             </div>
           ) : (
@@ -204,14 +213,20 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
                   >
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-bold text-[#0F172A] truncate">{job.title}</div>
+
                       <div className="text-xs text-[#94A3B8] flex items-center gap-2 mt-1">
                         <span>{job.company}</span>
+
                         {job.location && <span>•</span>}
+
                         {job.location && <span>{job.location}</span>}
+
                         {job.salary_min && <span>•</span>}
+
                         {job.salary_min && <span>{job.salary_min.toLocaleString()}₪</span>}
                       </div>
                     </div>
+
                     {isSelected && (
                       <CheckCircle2 className="w-5 h-5 text-[#7C3AED] flex-shrink-0" />
                     )}
@@ -233,6 +248,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
           >
             {t("candidateCRM.assignToJob.cancel")}
           </Button>
+
           <Button
             size="sm"
             onClick={handleAssign}

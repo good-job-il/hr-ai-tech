@@ -55,7 +55,9 @@ export default function ResetPassword() {
           <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg mx-auto mb-3">
             עב
           </div>
+
           <h1 className="text-xl font-bold text-gray-900">סיסמה חדשה</h1>
+
           <p className="text-sm text-gray-500 mt-1">הזן את הסיסמה החדשה שלך</p>
         </div>
 
@@ -64,6 +66,7 @@ export default function ResetPassword() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label className="text-sm text-gray-700">סיסמה חדשה</Label>
+
             <Input
               type="password"
               value={newPassword}
@@ -73,8 +76,10 @@ export default function ResetPassword() {
               dir="ltr"
             />
           </div>
+
           <div>
             <Label className="text-sm text-gray-700">אימות סיסמה</Label>
+
             <Input
               type="password"
               value={confirmPassword}
@@ -84,6 +89,7 @@ export default function ResetPassword() {
               dir="ltr"
             />
           </div>
+
           <Button
             type="submit"
             disabled={loading}
@@ -91,6 +97,7 @@ export default function ResetPassword() {
           >
             {loading ? "מאפס..." : "אפס סיסמה"}
           </Button>
+
           <p className="text-center">
             <Link to="/login" className="text-blue-600 text-sm hover:underline">
               חזרה להתחברות

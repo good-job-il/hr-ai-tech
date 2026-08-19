@@ -8,6 +8,7 @@ export function StatCard({ icon: Icon, label, value, change, trend }) {
           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#F3EFFF] to-[#EAF8FF] flex items-center justify-center">
             <Icon className="w-6 h-6 text-[#7C3AED]" />
           </div>
+
           {trend && (
             <span
               className={cn(
@@ -19,7 +20,9 @@ export function StatCard({ icon: Icon, label, value, change, trend }) {
             </span>
           )}
         </div>
+
         <p className="text-[#64748B] text-sm font-semibold mb-1">{label}</p>
+
         <p className="text-3xl font-black text-[#0F172A]">{value}</p>
       </CardContent>
     </Card>

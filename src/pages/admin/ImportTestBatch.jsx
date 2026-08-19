@@ -26,6 +26,7 @@ export default function ImportTestBatch() {
       <div className="p-6 space-y-6" dir="rtl">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">ייבוא מועמדים - בדיקה בשלבים</h1>
+
           <p className="text-gray-600 mt-2">בדוק את מערכת הייבוא בשלבים קטנים לפני ייבוא המוני</p>
         </div>
 
@@ -33,12 +34,17 @@ export default function ImportTestBatch() {
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
           <div className="flex items-start gap-3">
             <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+
             <div>
               <p className="font-semibold text-blue-900 mb-2">מדדי בדיקה מומלצים</p>
+
               <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
                 <li>התחל ב-10 קורות חיים לבדיקה בסיסית</li>
+
                 <li>אם הכל יציב → בדוק 30 קורות חיים</li>
+
                 <li>אם הכל יציב → בדוק 50 קורות חיים</li>
+
                 <li>רק אז התחל בייבוא גדול (אלפי)</li>
               </ol>
             </div>
@@ -48,6 +54,7 @@ export default function ImportTestBatch() {
         {/* Test Size Selection */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">בחר גודל בדיקה</h2>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {testSizes.map((size) => (
               <button
@@ -60,6 +67,7 @@ export default function ImportTestBatch() {
                 }`}
               >
                 <p className="font-semibold text-gray-900">{size.label}</p>
+
                 <p className="text-sm text-gray-600 mt-2">{size.description}</p>
               </button>
             ))}
@@ -69,6 +77,7 @@ export default function ImportTestBatch() {
         {/* Checklist */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">בדיקות חובה לפני upload</h2>
+
           <div className="space-y-2">
             {[
               "ZIP file עם קורות חיים בפורמטים: PDF, DOC, DOCX, TXT",
@@ -81,6 +90,7 @@ export default function ImportTestBatch() {
             ].map((item, idx) => (
               <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                 <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+
                 <p className="text-sm text-gray-700">{item}</p>
               </div>
             ))}
@@ -94,11 +104,14 @@ export default function ImportTestBatch() {
           <div className="bg-green-50 border border-green-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+
               <div>
                 <p className="font-semibold text-green-900 mb-2">ייבוא בדיקה הושלם בהצלחה!</p>
+
                 <p className="text-sm text-green-800 mb-4">
                   בדוק את עמוד "בדיקת איכות מועמדים" כדי לראות את התוצאות המלאות ו-resumption בדיקה.
                 </p>
+
                 <button
                   onClick={() => setImportComplete(false)}
                   className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all"
@@ -113,14 +126,22 @@ export default function ImportTestBatch() {
         {/* Test Results Info */}
         <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6">
           <h3 className="font-semibold text-gray-900 mb-3">מה לבדוק בתוצאות</h3>
+
           <ul className="space-y-2 text-sm text-gray-700">
             <li>✓ כל קורות החיים הועלו בהצלחה</li>
+
             <li>✓ כל קובץ הומר ל-DOCX</li>
+
             <li>✓ שדות נחלצו בדיוק (שם, טלפון, מייל)</li>
+
             <li>✓ לא יש כפילויות חשודות</li>
+
             <li>✓ preview עובד לכל resume</li>
+
             <li>✓ download עובד לכל resume</li>
+
             <li>✓ resumes נשמרו אחרי refresh</li>
+
             <li>✓ resumes זמינים אחרי logout/login</li>
           </ul>
         </div>

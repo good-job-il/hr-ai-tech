@@ -16,6 +16,7 @@ export function DataTable({ columns, data, onRowClick }) {
                 ))}
               </tr>
             </thead>
+
             <tbody>
               {data.map((row, idx) => (
                 <tr

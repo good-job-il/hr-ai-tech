@@ -105,6 +105,7 @@ export default function AdminDashboard() {
 
                 <div>
                   <div className="text-[#0F172A] font-black text-lg">AI System Status</div>
+
                   <div className="text-[#64748B]">כל המערכות פעילות ותקינות</div>
                 </div>
               </div>
@@ -136,6 +137,7 @@ export default function AdminDashboard() {
 
                       <div className="inline-flex items-center gap-1 text-[#12B981] font-black">
                         <ArrowUpRight className="w-4 h-4" />
+
                         {item.change}
                       </div>
                     </div>
@@ -162,6 +164,7 @@ export default function AdminDashboard() {
                   <h2 className="text-[34px] leading-none font-black text-[#0F172A] mb-2">
                     אנליטיקות מערכת
                   </h2>
+
                   <p className="text-[#64748B] text-lg">ביצועי המערכת ב־30 הימים האחרונים</p>
                 </div>
 
@@ -176,6 +179,7 @@ export default function AdminDashboard() {
                     <defs>
                       <linearGradient id="line1" x1="0" y1="0" x2="1" y2="1">
                         <stop offset="0%" stopColor="#8B5CF6" />
+
                         <stop offset="100%" stopColor="#2FB8FF" />
                       </linearGradient>
                     </defs>
@@ -201,10 +205,15 @@ export default function AdminDashboard() {
 
                 <div className="absolute bottom-6 right-6 left-6 flex justify-between text-sm font-bold text-[#64748B]">
                   <span>ינואר</span>
+
                   <span>פברואר</span>
+
                   <span>מרץ</span>
+
                   <span>אפריל</span>
+
                   <span>מאי</span>
+
                   <span>יוני</span>
                 </div>
               </div>
@@ -219,6 +228,7 @@ export default function AdminDashboard() {
 
                   <div>
                     <h3 className="text-2xl font-black text-[#0F172A]">פעילות אחרונה</h3>
+
                     <p className="text-[#64748B]">עדכונים בזמן אמת</p>
                   </div>
                 </div>
@@ -251,6 +261,7 @@ export default function AdminDashboard() {
 
                   <div>
                     <h3 className="text-2xl font-black text-[#0F172A]">התראות מערכת</h3>
+
                     <p className="text-[#64748B]">בעיות שדורשות טיפול</p>
                   </div>
                 </div>

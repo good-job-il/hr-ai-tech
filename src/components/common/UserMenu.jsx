@@ -15,7 +15,9 @@ export function UserMenu({ user }) {
         className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#E4ECFF] bg-white hover:bg-[#F3EFFF]"
       >
         <Avatar initials={user.full_name?.slice(0, 2).toUpperCase()} size="sm" />
+
         <span className="text-sm font-bold text-[#0F172A]">{user.full_name}</span>
+
         <ChevronDown
           className={`w-4 h-4 text-[#7C3AED] transition-transform ${open ? "rotate-180" : ""}`}
         />
@@ -30,6 +32,7 @@ export function UserMenu({ user }) {
             <Settings className="w-4 h-4" />
             הגדרות
           </Link>
+
           <button
             onClick={() => authService.logout("/")}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#EF4444] hover:bg-[#FEF2F2] transition-colors border-t border-[#E4ECFF]"

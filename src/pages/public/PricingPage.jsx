@@ -17,12 +17,15 @@ export default function PricingPage() {
             <Card key={plan.name} hoverable>
               <CardContent className="p-8 text-center">
                 <h3 className="text-2xl font-black text-[#0F172A] mb-2">{plan.name}</h3>
+
                 <p className="text-3xl font-black text-[#7C3AED] mb-6">{plan.price}</p>
+
                 <ul className="space-y-3 mb-6 text-left">
                   {plan.features.map((feature) => (
                     <li key={feature} className="text-sm text-[#64748B]">✓ {feature}</li>
                   ))}
                 </ul>
+
                 <button className="w-full h-10 rounded-lg bg-gradient-to-r from-[#8B5CF6] to-[#2F80FF] text-white font-bold">
                   בחר תוכנית
                 </button>

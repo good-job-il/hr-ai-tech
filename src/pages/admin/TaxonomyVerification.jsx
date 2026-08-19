@@ -119,14 +119,17 @@ export default function TaxonomyVerification() {
         <div className="flex justify-between items-start mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">בדיקת Taxonomy</h1>
+
             <p className="text-sm text-gray-500 mt-1">אימות הנתונים שנטענו מהקובץ</p>
           </div>
+
           <button
             onClick={handleLoadTaxonomy}
             disabled={loading}
             className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "📥"}
+
             {loading ? "טוען..." : "טען Taxonomy"}
           </button>
         </div>
@@ -140,6 +143,7 @@ export default function TaxonomyVerification() {
             >
               {loadResult.success ? "✅ " : "❌ "} {loadResult.message}
             </div>
+
             {loadResult.stats && (
               <div className="text-xs text-gray-600 mt-2 space-y-1">
                 {Object.entries(loadResult.stats).map(([key, val]) => (
@@ -150,6 +154,7 @@ export default function TaxonomyVerification() {
                 ))}
               </div>
             )}
+
             {loadResult.errors && (
               <div className="text-xs text-red-700 mt-2 space-y-1">
                 {loadResult.errors.map((e, i) => (
@@ -173,7 +178,9 @@ export default function TaxonomyVerification() {
               className="bg-white rounded-xl border border-gray-100 p-4 text-center shadow-sm"
             >
               <div className="text-2xl mb-1">{stat.icon}</div>
+
               <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+
               <div className="text-xs text-gray-500 mt-1">{stat.label}</div>
             </div>
           ))}
@@ -182,6 +189,7 @@ export default function TaxonomyVerification() {
         {/* Health Checks */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-8 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 mb-4">בדיקות תקינות</h2>
+
           <div className="space-y-2">
             {[
               {
@@ -215,9 +223,11 @@ export default function TaxonomyVerification() {
                 ) : (
                   <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
                 )}
+
                 <div className="flex-1">
                   <div className="text-sm font-medium text-gray-900">{check.label}</div>
                 </div>
+
                 <div
                   className={`text-sm font-semibold ${check.pass ? "text-green-600" : "text-red-600"}`}
                 >
@@ -234,9 +244,11 @@ export default function TaxonomyVerification() {
           unmatchedAliases.length > 0) && (
           <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8">
             <h2 className="text-lg font-bold text-red-900 mb-4">שגיאות בנתונים</h2>
+
             {rolesWithoutDomain.length > 0 && (
               <div className="mb-4">
                 <h3 className="font-semibold text-red-800 mb-2">תפקידים ללא תחום:</h3>
+
                 <div className="space-y-1 text-sm text-red-700">
                   {rolesWithoutDomain.map((r) => (
                     <div key={r.id}>• {r.name}</div>
@@ -244,9 +256,11 @@ export default function TaxonomyVerification() {
                 </div>
               </div>
             )}
+
             {unmatchedSpecializations.length > 0 && (
               <div className="mb-4">
                 <h3 className="font-semibold text-red-800 mb-2">התמחויות ללא תפקיד מתאים:</h3>
+
                 <div className="space-y-1 text-sm text-red-700">
                   {unmatchedSpecializations.map((s) => (
                     <div key={s.id}>
@@ -256,9 +270,11 @@ export default function TaxonomyVerification() {
                 </div>
               </div>
             )}
+
             {unmatchedAliases.length > 0 && (
               <div>
                 <h3 className="font-semibold text-red-800 mb-2">Aliases ללא תפקיד קיים:</h3>
+
                 <div className="space-y-1 text-sm text-red-700">
                   {unmatchedAliases.map((a) => (
                     <div key={a.id}>
@@ -276,6 +292,7 @@ export default function TaxonomyVerification() {
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-lg font-bold text-gray-900">תחומים ותפקידים</h2>
           </div>
+
           <div className="divide-y divide-gray-100">
             {domains.map((domain) => {
               const domainRoles = getRolesForDomain(domain.domain_id)
@@ -290,10 +307,12 @@ export default function TaxonomyVerification() {
                   >
                     <div className="flex items-center gap-3">
                       <div className={`text-sm font-semibold text-gray-900`}>{domain.name}</div>
+
                       <div className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
                         {domainRoles.length} תפקידים
                       </div>
                     </div>
+
                     {isExpanded ? (
                       <ChevronUp className="w-4 h-4 text-gray-400" />
                     ) : (
@@ -313,12 +332,14 @@ export default function TaxonomyVerification() {
                             <div key={role.id} className="text-sm">
                               <div className="font-medium text-gray-700">
                                 {role.name}
+
                                 {roleSpecs.length > 0 && (
                                   <span className="text-xs text-gray-400 ml-2">
                                     ({roleSpecs.length} התמחויות)
                                   </span>
                                 )}
                               </div>
+
                               {roleSpecs.length > 0 && (
                                 <div className="text-xs text-gray-500 mt-1 ml-2">
                                   {roleSpecs.map((s) => s.name).join(", ")}
@@ -341,13 +362,16 @@ export default function TaxonomyVerification() {
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-lg font-bold text-gray-900">Aliases ומיפוי לתפקידים</h2>
           </div>
+
           <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
             {aliases.map((alias) => (
               <div key={alias.id} className="p-4 flex items-center justify-between">
                 <div>
                   <div className="font-medium text-gray-900 text-sm">{alias.alias}</div>
+
                   <div className="text-xs text-gray-500 mt-0.5">→ {alias.canonical_role}</div>
                 </div>
+
                 <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
               </div>
             ))}
@@ -357,6 +381,7 @@ export default function TaxonomyVerification() {
         {/* Test Search */}
         <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-200 p-6 mt-8">
           <h2 className="text-lg font-bold text-blue-900 mb-4">בדיקת Alias Matching</h2>
+
           <div className="space-y-3">
             {["Fullstack Developer", "Backend Engineer", "SDR", "QA Engineer"].map((testAlias) => {
               const canonical = getCanonicalRole(testAlias)
@@ -369,6 +394,7 @@ export default function TaxonomyVerification() {
                   <div>
                     <div className="font-medium text-gray-900">{testAlias}</div>
                   </div>
+
                   <div
                     className={`text-sm font-semibold ${canonical ? "text-green-600" : "text-red-600"}`}
                   >

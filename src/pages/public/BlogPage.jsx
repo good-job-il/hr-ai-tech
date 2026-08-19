@@ -96,6 +96,7 @@ export default function BlogPage() {
             <span className="inline-block bg-purple-100 text-purple-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               {isRtl ? 'הבלוג של HeadHunter' : 'HeadHunter Blog'}
             </span>
+
             <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
               {isRtl ? (
                 <>תובנות, טיפים ומגמות<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">מעולם הקריירה</span></>
@@ -103,6 +104,7 @@ export default function BlogPage() {
                 <>Insights, tips and trends<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">from the world of careers</span></>
               )}
             </h1>
+
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               {isRtl
                 ? 'מאמרים מקצועיים, עצות שוות, ונתונים עדכניים על שוק העבודה הישראלי'
@@ -134,15 +136,21 @@ export default function BlogPage() {
             <div className={`bg-gradient-to-br ${POSTS[0].color} md:w-2/5 min-h-[200px] flex items-center justify-center`}>
               <span className="text-6xl">✍️</span>
             </div>
+
             <div className="p-8 flex flex-col justify-center md:w-3/5">
               <span className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-2">
                 {POSTS[0].category} · {isRtl ? 'מאמר מומלץ' : 'Featured Article'}
               </span>
+
               <h2 className="text-2xl font-black text-gray-900 mb-3">{POSTS[0].title}</h2>
+
               <p className="text-gray-600 mb-4 leading-relaxed">{POSTS[0].excerpt}</p>
+
               <div className="flex items-center gap-4 text-sm text-gray-400">
                 <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" />{POSTS[0].author}</span>
+
                 <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{POSTS[0].readTime}</span>
+
                 <span>{POSTS[0].date}</span>
               </div>
             </div>
@@ -155,12 +163,17 @@ export default function BlogPage() {
                 <div className={`bg-gradient-to-br ${post.color} h-36 flex items-center justify-center`}>
                   <span className="text-4xl opacity-80">📝</span>
                 </div>
+
                 <div className="p-5">
                   <span className="text-xs font-bold text-purple-600 uppercase tracking-wider">{post.category}</span>
+
                   <h3 className="text-lg font-bold text-gray-900 mt-1 mb-2 group-hover:text-purple-700 transition-colors leading-snug">{post.title}</h3>
+
                   <p className="text-sm text-gray-500 mb-4 leading-relaxed">{post.excerpt}</p>
+
                   <div className="flex items-center justify-between text-xs text-gray-400">
                     <span className="flex items-center gap-1"><User className="w-3 h-3" />{post.author}</span>
+
                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{post.readTime} · {post.date}</span>
                   </div>
                 </div>
@@ -173,11 +186,13 @@ export default function BlogPage() {
             <h3 className="text-2xl font-black mb-2">
               {isRtl ? 'קבל עדכונים ישירות למייל' : 'Get updates directly to your email'}
             </h3>
+
             <p className="text-purple-100 mb-6">
               {isRtl
                 ? 'הירשם לניוזלטר ותקבל מאמרים, נתוני שוק וטיפים פעם בשבוע'
                 : 'Subscribe to the newsletter and receive articles, market data and tips once a week'}
             </p>
+
             <div className="flex gap-3 max-w-md mx-auto">
               <input
                 type="email"
@@ -185,6 +200,7 @@ export default function BlogPage() {
                 className="flex-1 px-4 py-3 rounded-xl text-gray-900 text-sm focus:outline-none"
                 dir="ltr"
               />
+
               <button className="bg-white text-purple-700 font-bold px-6 py-3 rounded-xl hover:bg-purple-50 transition-colors text-sm">
                 {isRtl ? 'הירשם' : 'Subscribe'}
               </button>

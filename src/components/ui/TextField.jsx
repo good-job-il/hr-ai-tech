@@ -48,6 +48,7 @@ export function TextField({
       </div>
 
       {error && <p className="text-sm text-[#EF4444] font-semibold mt-2">{error}</p>}
+
       {helpText && !error && <p className="text-sm text-[#64748B] mt-2">{helpText}</p>}
     </div>
   )

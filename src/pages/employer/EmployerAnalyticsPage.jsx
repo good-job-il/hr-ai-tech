@@ -14,9 +14,12 @@ function StatCard({ icon: IconComp, label, value, color = "#7C3AED", sub }) {
       >
         <IconComp className="w-6 h-6" style={{ color }} />
       </div>
+
       <div>
         <div className="text-2xl font-black text-[#0F172A]">{value}</div>
+
         <div className="text-sm font-semibold text-[#64748B]">{label}</div>
+
         {sub && <div className="text-xs text-[#94A3B8] mt-0.5">{sub}</div>}
       </div>
     </div>
@@ -113,8 +116,10 @@ export default function EmployerAnalyticsPage() {
     <div dir="rtl" className="space-y-6">
       <div>
         <h1 className="text-3xl font-black text-[#0F172A]">אנליטיקה</h1>
+
         <p className="text-[#64748B] font-semibold mt-1">סיכום פעילות גיוס לחברתך</p>
       </div>
+
       {loadError && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
           {loadError}
@@ -140,7 +145,9 @@ export default function EmployerAnalyticsPage() {
 
       <div className="bg-white rounded-2xl border border-[#E4ECFF] p-8 text-center">
         <BarChart3 className="w-12 h-12 text-[#CBD5E1] mx-auto mb-3" />
+
         <p className="text-[#64748B] font-bold">גרפים מפורטים יהיו זמינים בקרוב</p>
+
         <p className="text-[#94A3B8] text-sm mt-1">נתוני הסטטיסטיקות מעודכנים בזמן אמת</p>
       </div>
     </div>

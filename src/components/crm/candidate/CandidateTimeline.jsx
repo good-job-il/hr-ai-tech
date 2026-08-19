@@ -106,12 +106,14 @@ export default function CandidateTimeline({ timeline, loading }) {
       {/* Filter */}
       <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
         <Filter className="w-4 h-4 text-[#94A3B8] flex-shrink-0" />
+
         <button
           onClick={() => setFilter("all")}
           className={`text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap transition-all ${filter === "all" ? "bg-[#7C3AED] text-white" : "bg-[#F0F1F5] text-[#64748B] hover:bg-[#E4ECFF]"}`}
         >
           {t("candidateCRM.timeline.all")} ({timeline.length})
         </button>
+
         {[
           "interview_scheduled",
           "status_changed",
@@ -144,11 +146,13 @@ export default function CandidateTimeline({ timeline, loading }) {
       {filtered.length === 0 ? (
         <div className="text-center py-10 text-[#94A3B8]">
           <FileText className="w-8 h-8 mx-auto mb-2 opacity-40" />
+
           <p className="text-sm font-semibold">{t("candidateCRM.timeline.noEvents")}</p>
         </div>
       ) : (
         <div className="relative">
           <div className="absolute right-5 top-0 bottom-0 w-0.5 bg-[#E4ECFF]" />
+
           <div className="space-y-1">
             {filtered.map((event, idx) => {
               const cfg = EVENT_CONFIG[event.event_type] || EVENT_CONFIG.note_added
@@ -166,14 +170,17 @@ export default function CandidateTimeline({ timeline, loading }) {
                   >
                     <Icon className="w-3 h-3" style={{ color: cfg.color }} />
                   </div>
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-bold text-[#0F172A]">{event.description}</span>
                     </div>
+
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       {event.performed_by_name && (
                         <span className="text-xs text-[#94A3B8]">{event.performed_by_name}</span>
                       )}
+
                       {event.created_date && (
                         <span className="text-xs text-[#CBD5E1]">
                           {new Date(event.created_date).toLocaleString("he-IL", {
@@ -187,6 +194,7 @@ export default function CandidateTimeline({ timeline, loading }) {
                           })}
                         </span>
                       )}
+
                       {event.is_visible_to_employer && (
                         <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-semibold">
                           {t("candidateCRM.timeline.visibleToEmployer")}

@@ -62,10 +62,12 @@ export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
       >
         <div className="flex items-center gap-2">
           <UserCheck className="w-4 h-4 text-[#7C3AED]" />
+
           <span className={currentRecruiterId ? "text-[#7C3AED]" : "text-[#94A3B8]"}>
             {currentRecruiterId || t("candidateCRM.recruiterDropdown.selectRecruiter")}
           </span>
         </div>
+
         <ChevronDown
           className={`w-4 h-4 text-[#94A3B8] transition-transform ${open ? "rotate-180" : ""}`}
         />
@@ -76,6 +78,7 @@ export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
           <div className="p-2 border-b border-[#F0F1F5]">
             <div className="flex items-center gap-2 px-2 py-1.5 bg-[#F7F8FC] rounded-lg">
               <Search className="w-3.5 h-3.5 text-[#94A3B8]" />
+
               <input
                 autoFocus
                 value={search}
@@ -85,6 +88,7 @@ export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
               />
             </div>
           </div>
+
           <div className="overflow-y-auto flex-1">
             {loading ? (
               <div className="py-4 text-center text-xs text-[#94A3B8]">
@@ -108,10 +112,13 @@ export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#2563EB] flex items-center justify-center text-white text-xs font-black flex-shrink-0">
                     {r.full_name?.slice(0, 1) || "?"}
                   </div>
+
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-bold text-[#0F172A] truncate">{r.full_name}</div>
+
                     <div className="text-xs text-[#94A3B8] truncate">{r.email}</div>
                   </div>
+
                   {r.id === currentRecruiterId && (
                     <div className="w-2 h-2 rounded-full bg-[#7C3AED]" />
                   )}

@@ -194,6 +194,7 @@ export default function OrganizationsPage() {
               }}
             >
               <Plus className="h-4 w-4" />
+
               {t("platform.orgs.newOrg")}
             </Button>
           }
@@ -214,6 +215,7 @@ export default function OrganizationsPage() {
                 }`}
               >
                 <Building2 className="h-4 w-4" />
+
                 {t(tab.labelKey)}
               </Link>
             )
@@ -229,6 +231,7 @@ export default function OrganizationsPage() {
             loading={isLoading}
             meta={t(activeTab.labelKey)}
           />
+
           <PlatformStatCard
             icon={CheckCircle}
             label={t("platform.orgs.active")}
@@ -237,6 +240,7 @@ export default function OrganizationsPage() {
             loading={isLoading}
             meta={t("platform.orgs.statusActive")}
           />
+
           <PlatformStatCard
             icon={XCircle}
             label={t("platform.orgs.suspended")}
@@ -245,6 +249,7 @@ export default function OrganizationsPage() {
             loading={isLoading}
             meta={t("platform.orgs.statusSuspended")}
           />
+
           <PlatformStatCard
             icon={Clock}
             label={t("platform.orgs.inactive")}
@@ -263,6 +268,7 @@ export default function OrganizationsPage() {
               action={
                 <div className="relative w-full sm:w-72">
                   <Search className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+
                   <input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -281,23 +287,29 @@ export default function OrganizationsPage() {
                   <th className="px-5 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                     {t("platform.orgs.colName")}
                   </th>
+
                   <th className="px-5 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                     {t("platform.orgs.colType")}
                   </th>
+
                   <th className="px-5 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                     {t("platform.orgs.colEmail")}
                   </th>
+
                   <th className="px-5 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                     {t("platform.orgs.plan")}
                   </th>
+
                   <th className="px-5 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                     {t("platform.orgs.status")}
                   </th>
+
                   <th className="px-5 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                     {t("platform.orgs.actions")}
                   </th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-slate-100">
                 {isLoading ? (
                   Array(5)
@@ -342,16 +354,19 @@ export default function OrganizationsPage() {
                             >
                               <Building2 className="h-5 w-5" strokeWidth={1.8} />
                             </div>
+
                             <div>
                               <p className="font-extrabold text-slate-800 transition group-hover:text-violet-700">
                                 {org.name}
                               </p>
+
                               <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                                 ID: {String(org.id).slice(0, 8)}
                               </p>
                             </div>
                           </div>
                         </td>
+
                         <td className="px-5 py-4">
                           <span className="text-xs font-semibold text-slate-600">
                             {org.org_type === "staffing_agency"
@@ -359,22 +374,27 @@ export default function OrganizationsPage() {
                               : t("platform.orgs.typeInternalHR")}
                           </span>
                         </td>
+
                         <td className="px-5 py-4 text-xs font-medium text-slate-500">
                           {org.contact_email || "—"}
                         </td>
+
                         <td className="px-5 py-4">
                           <span className="inline-flex rounded-full bg-violet-50 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-violet-700">
                             {org.plan || "trial"}
                           </span>
                         </td>
+
                         <td className="px-5 py-4">
                           <div
                             className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold ${st.bg} ${st.text}`}
                           >
                             <StIcon className="h-3 w-3" />
+
                             {st.label}
                           </div>
                         </td>
+
                         <td className="px-5 py-4">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -382,6 +402,7 @@ export default function OrganizationsPage() {
                                 <MoreVertical className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
+
                             <DropdownMenuContent
                               align="end"
                               className="min-w-[170px] rounded-xl border-slate-100 p-1.5 shadow-xl"
@@ -392,24 +413,29 @@ export default function OrganizationsPage() {
                                 className="flex cursor-pointer items-center gap-2 rounded-lg focus:bg-violet-50 focus:text-violet-700"
                               >
                                 <ExternalLink className="h-4 w-4 text-violet-500" />
+
                                 <span>
                                   {enteringOrgId === org.id
                                     ? t("platform.orgs.btnOpening", "Opening…")
                                     : t("platform.orgs.btnOpen")}
                                 </span>
                               </DropdownMenuItem>
+
                               <DropdownMenuItem
                                 onClick={() => handleEdit(org)}
                                 className="flex cursor-pointer items-center gap-2 rounded-lg focus:bg-blue-50 focus:text-blue-700"
                               >
                                 <Pencil className="h-4 w-4 text-blue-500" />
+
                                 <span>{t("platform.orgs.btnEdit")}</span>
                               </DropdownMenuItem>
+
                               <DropdownMenuItem
                                 onClick={() => setDeleteOrg(org)}
                                 className="flex cursor-pointer items-center gap-2 rounded-lg text-red-600 focus:bg-red-50 focus:text-red-600"
                               >
                                 <Trash2 className="h-4 w-4" />
+
                                 <span>{t("platform.orgs.delete")}</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -437,6 +463,7 @@ export default function OrganizationsPage() {
               <label className="mb-2 block text-sm font-bold text-slate-700">
                 {t("platform.orgs.labelOrgName")}
               </label>
+
               <input
                 type="text"
                 value={newOrg.name}
@@ -445,19 +472,24 @@ export default function OrganizationsPage() {
                 className={platformFieldClassName}
               />
             </div>
+
             <div>
               <label className="mb-2 block text-sm font-bold text-slate-700">
                 {t("platform.orgs.labelType")}
               </label>
+
               <div className="flex items-center gap-2 rounded-xl border border-violet-100 bg-violet-50/70 px-4 py-3 text-sm font-bold text-violet-700">
                 <Building2 className="h-4 w-4" />
+
                 {t(activeTab.labelKey)}
               </div>
             </div>
+
             <div>
               <label className="mb-2 block text-sm font-bold text-slate-700">
                 {t("platform.orgs.labelEmail")}
               </label>
+
               <input
                 type="email"
                 value={newOrg.contact_email}
@@ -466,6 +498,7 @@ export default function OrganizationsPage() {
                 className={platformFieldClassName}
               />
             </div>
+
             <div className="flex gap-3 pt-2">
               <Button
                 variant="secondary"
@@ -476,6 +509,7 @@ export default function OrganizationsPage() {
               >
                 {t("platform.orgs.btnCancel")}
               </Button>
+
               <Button
                 variant="primary"
                 size="sm"
@@ -503,6 +537,7 @@ export default function OrganizationsPage() {
               <label className="mb-2 block text-sm font-bold text-slate-700">
                 {t("platform.orgs.labelOrgName")}
               </label>
+
               <input
                 type="text"
                 value={editOrg.name}
@@ -510,10 +545,12 @@ export default function OrganizationsPage() {
                 className={platformFieldClassName}
               />
             </div>
+
             <div>
               <label className="mb-2 block text-sm font-bold text-slate-700">
                 {t("platform.orgs.labelEmail")}
               </label>
+
               <input
                 type="email"
                 value={editOrg.contact_email}
@@ -522,10 +559,12 @@ export default function OrganizationsPage() {
                 className={platformFieldClassName}
               />
             </div>
+
             <div>
               <label className="mb-2 block text-sm font-bold text-slate-700">
                 {t("platform.orgs.plan")}
               </label>
+
               <select
                 value={editOrg.plan}
                 onChange={(e) => setEditOrg((p) => ({ ...p, plan: e.target.value }))}
@@ -538,10 +577,12 @@ export default function OrganizationsPage() {
                 ))}
               </select>
             </div>
+
             <div>
               <label className="mb-2 block text-sm font-bold text-slate-700">
                 {t("platform.orgs.status")}
               </label>
+
               <div className="grid grid-cols-3 gap-2">
                 {["active", "suspended", "inactive"].map((s) => {
                   const cfg = STATUS_CONFIG[s]
@@ -560,12 +601,14 @@ export default function OrganizationsPage() {
                       }`}
                     >
                       <cfg.icon className="h-3.5 w-3.5" />
+
                       {cfg.label}
                     </button>
                   )
                 })}
               </div>
             </div>
+
             <div className="flex gap-3 pt-2">
               <Button
                 variant="secondary"
@@ -576,6 +619,7 @@ export default function OrganizationsPage() {
               >
                 {t("platform.orgs.btnCancel")}
               </Button>
+
               <Button
                 variant="primary"
                 size="sm"
@@ -602,6 +646,7 @@ export default function OrganizationsPage() {
           <p className="mb-6 text-sm leading-6 text-slate-600">
             {t("platform.orgs.confirmDeleteMsg", { name: deleteOrg.name })}
           </p>
+
           <div className="flex gap-3">
             <Button
               variant="secondary"
@@ -612,6 +657,7 @@ export default function OrganizationsPage() {
             >
               {t("platform.orgs.btnCancel")}
             </Button>
+
             <Button
               variant="danger"
               size="sm"

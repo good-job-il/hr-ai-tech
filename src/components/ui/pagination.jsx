@@ -50,6 +50,7 @@ const PaginationPrevious = ({ className, ...props }) => (
     {...props}
   >
     <ChevronLeft className="h-4 w-4" />
+
     <span>Previous</span>
   </PaginationLink>
 )
@@ -64,6 +65,7 @@ const PaginationNext = ({ className, ...props }) => (
     {...props}
   >
     <span>Next</span>
+
     <ChevronRight className="h-4 w-4" />
   </PaginationLink>
 )
@@ -77,6 +79,7 @@ const PaginationEllipsis = ({ className, ...props }) => (
     {...props}
   >
     <MoreHorizontal className="h-4 w-4" />
+
     <span className="sr-only">More pages</span>
   </span>
 )

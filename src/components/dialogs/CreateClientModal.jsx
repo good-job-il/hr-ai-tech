@@ -51,11 +51,13 @@ export default function CreateClientModal({ isOpen, onClose, onSuccess }) {
         <h3 className="text-xl font-black text-gray-900 mb-4">
           {t("agencyDashboard.clientModal.title")}
         </h3>
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">
               {t("agencyDashboard.clientModal.clientName")}
             </label>
+
             <input
               type="text"
               value={clientName}
@@ -65,7 +67,9 @@ export default function CreateClientModal({ isOpen, onClose, onSuccess }) {
               disabled={creating}
             />
           </div>
+
           {error && <p className="text-sm text-red-600 font-semibold">{error}</p>}
+
           <div className="flex gap-3 pt-2">
             <button
               onClick={onClose}
@@ -74,6 +78,7 @@ export default function CreateClientModal({ isOpen, onClose, onSuccess }) {
             >
               {t("common.cancel")}
             </button>
+
             <button
               onClick={handleCreate}
               className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 disabled:opacity-50"

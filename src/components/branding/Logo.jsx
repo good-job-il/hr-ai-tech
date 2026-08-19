@@ -59,6 +59,7 @@ export default function Logo({ size = "md", href, className = "" }) {
           className={className}
         />
       </div>
+
       {/*<span className="hidden md:block text-lg font-black bg-gradient-to-r from-[#7C3AED] to-[#2563EB] bg-clip-text text-transparent">*/}
       {/*  HeadHunter*/}
       {/*</span>*/}

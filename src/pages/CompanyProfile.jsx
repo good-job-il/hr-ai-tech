@@ -78,6 +78,7 @@ export default function CompanyProfile() {
     return (
       <div className="min-h-screen" style={{ backgroundColor: "#eaf7fb" }} dir="rtl">
         <Navbar />
+
         <div className="flex justify-center py-20">
           <div className="w-8 h-8 border-4 border-gray-200 border-t-hhblue rounded-full animate-spin" />
         </div>
@@ -93,7 +94,9 @@ export default function CompanyProfile() {
         keywords={`${company?.name}, ${company?.industry || ""}, משרות, דרושים, חברה`}
         canonical={`https://headhunter.co.il/companies/${company?.id}`}
       />
+
       <Navbar />
+
       <div className="max-w-[900px] mx-auto px-4 py-6">
         <Link
           to="/companies"
@@ -111,13 +114,18 @@ export default function CompanyProfile() {
             >
               {company.initials || company.name?.slice(0, 2)}
             </div>
+
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{company.name}</h1>
+
               <div className="text-gray-500 text-sm mt-0.5">{company.industry}</div>
+
               {avgRating && (
                 <div className="flex items-center gap-1 mt-1">
                   <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+
                   <span className="font-semibold text-sm">{avgRating}</span>
+
                   <span className="text-gray-400 text-xs">({reviews.length} ביקורות)</span>
                 </div>
               )}
@@ -128,13 +136,17 @@ export default function CompanyProfile() {
         {/* Company profile enriched with culture and benefits */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-4">
           <h2 className="font-semibold text-gray-900 mb-3">🌟 על החברה</h2>
+
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-1">תרבות החברה</h3>
+
               <p className="text-sm text-gray-600">סביבה יצירתית ותומכת, הערכת עובדים וחדשנות</p>
             </div>
+
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-1">הטבות</h3>
+
               <p className="text-sm text-gray-600">ביטוח בריאות, ימי עבודה גמישים, פיתוח מקצועי</p>
             </div>
           </div>
@@ -144,6 +156,7 @@ export default function CompanyProfile() {
         {jobs.length > 0 && (
           <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-4">
             <h2 className="font-semibold text-gray-900 mb-3">{jobs.length} משרות פתוחות</h2>
+
             <div className="space-y-2">
               {jobs.map((j) => (
                 <Link
@@ -155,8 +168,10 @@ export default function CompanyProfile() {
                     <div className="text-sm font-medium text-gray-900 group-hover:text-hhblue">
                       {j.title}
                     </div>
+
                     <div className="text-xs text-gray-400 mt-0.5">{j.location}</div>
                   </div>
+
                   {j.salary_min && (
                     <div className="text-xs text-green-600 font-medium">
                       ₪{j.salary_min.toLocaleString()}+
@@ -172,6 +187,7 @@ export default function CompanyProfile() {
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-semibold text-gray-900">ביקורות עובדים</h2>
+
             {user && !showReviewForm && (
               <button
                 onClick={() => setShowReviewForm(true)}
@@ -192,11 +208,13 @@ export default function CompanyProfile() {
             >
               <div>
                 <label className="text-xs font-medium text-gray-600 block mb-1">דירוג כללי</label>
+
                 <StarRating
                   value={reviewForm.rating_overall}
                   onChange={(v) => setReviewForm((f) => ({ ...f, rating_overall: v }))}
                 />
               </div>
+
               <div className="grid grid-cols-2 gap-3">
                 {[
                   ["rating_salary", "שכר ותגמולים"],
@@ -205,6 +223,7 @@ export default function CompanyProfile() {
                 ].map(([key, label]) => (
                   <div key={key}>
                     <label className="text-xs text-gray-500 block mb-1">{label}</label>
+
                     <StarRating
                       value={reviewForm[key]}
                       onChange={(v) => setReviewForm((f) => ({ ...f, [key]: v }))}
@@ -212,12 +231,14 @@ export default function CompanyProfile() {
                   </div>
                 ))}
               </div>
+
               <input
                 value={reviewForm.title}
                 onChange={(e) => setReviewForm((f) => ({ ...f, title: e.target.value }))}
                 placeholder="כותרת הביקורת"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
               />
+
               <textarea
                 value={reviewForm.pros}
                 onChange={(e) => setReviewForm((f) => ({ ...f, pros: e.target.value }))}
@@ -225,6 +246,7 @@ export default function CompanyProfile() {
                 rows={2}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none resize-none"
               />
+
               <textarea
                 value={reviewForm.cons}
                 onChange={(e) => setReviewForm((f) => ({ ...f, cons: e.target.value }))}
@@ -232,6 +254,7 @@ export default function CompanyProfile() {
                 rows={2}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none resize-none"
               />
+
               <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
                 <input
                   type="checkbox"
@@ -240,6 +263,7 @@ export default function CompanyProfile() {
                 />
                 פרסם בעילום שם
               </label>
+
               <div className="flex gap-3">
                 <button
                   type="button"
@@ -248,6 +272,7 @@ export default function CompanyProfile() {
                 >
                   ביטול
                 </button>
+
                 <button
                   type="submit"
                   disabled={!reviewForm.rating_overall || submitReview.isPending}
@@ -269,12 +294,16 @@ export default function CompanyProfile() {
                 <div key={r.id} className="border-b border-gray-50 pb-3 last:border-0">
                   <div className="flex items-center justify-between mb-1">
                     <div className="font-medium text-sm text-gray-900">{r.reviewer_name}</div>
+
                     <StarRating value={r.rating_overall} />
                   </div>
+
                   {r.title && (
                     <div className="text-sm font-medium text-gray-700 mb-1">{r.title}</div>
                   )}
+
                   {r.pros && <div className="text-xs text-green-700 mb-0.5">✓ {r.pros}</div>}
+
                   {r.cons && <div className="text-xs text-red-600">✗ {r.cons}</div>}
                 </div>
               ))}

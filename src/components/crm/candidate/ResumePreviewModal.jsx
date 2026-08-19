@@ -38,10 +38,12 @@ export default function ResumePreviewModal({ candidate, onClose }) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#E4ECFF]">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-[#7C3AED]" />
+
             <h2 className="text-base font-black text-[#0F172A]">
               {t("candidateCRM.resumeModal.title")} — {candidate.full_name}
             </h2>
           </div>
+
           <div className="flex items-center gap-2">
             {resumeUrl && (
               <>
@@ -53,6 +55,7 @@ export default function ResumePreviewModal({ candidate, onClose }) {
                 >
                   <ExternalLink className="w-3.5 h-3.5" /> {t("candidateCRM.resumeModal.open")}
                 </a>
+
                 {can("download_cv") && (
                   <a
                     href={resumeUrl}
@@ -64,6 +67,7 @@ export default function ResumePreviewModal({ candidate, onClose }) {
                 )}
               </>
             )}
+
             <button
               onClick={onClose}
               className="p-1.5 rounded-lg hover:bg-[#F0F1F5] text-[#64748B] transition-colors"
@@ -85,6 +89,7 @@ export default function ResumePreviewModal({ candidate, onClose }) {
                 <Download className="w-3.5 h-3.5" /> {t("candidateCRM.resumeModal.downloadDocx")}
               </a>
             )}
+
             {originalUrl && (
               <a
                 href={originalUrl}
@@ -128,6 +133,7 @@ export default function ResumePreviewModal({ candidate, onClose }) {
                       value={candidate.role_name}
                     />
                   )}
+
                   {candidate.domain_name && (
                     <InfoRow
                       icon={<Globe className="w-4 h-4" />}
@@ -135,6 +141,7 @@ export default function ResumePreviewModal({ candidate, onClose }) {
                       value={candidate.domain_name}
                     />
                   )}
+
                   {candidate.experience_years && (
                     <InfoRow
                       icon={<Briefcase className="w-4 h-4" />}
@@ -144,6 +151,7 @@ export default function ResumePreviewModal({ candidate, onClose }) {
                       })}
                     />
                   )}
+
                   {candidate.location && (
                     <InfoRow
                       icon={<MapPin className="w-4 h-4" />}
@@ -151,6 +159,7 @@ export default function ResumePreviewModal({ candidate, onClose }) {
                       value={candidate.location}
                     />
                   )}
+
                   {(candidate.desired_salary_min || candidate.desired_salary_max) && (
                     <InfoRow
                       icon={<Briefcase className="w-4 h-4" />}
@@ -184,6 +193,7 @@ export default function ResumePreviewModal({ candidate, onClose }) {
                     {candidate.previous_companies.map((c, i) => (
                       <div key={i} className="flex items-center gap-2 text-sm text-[#374151]">
                         <Building2 className="w-4 h-4 text-[#94A3B8] flex-shrink-0" />
+
                         {c}
                       </div>
                     ))}
@@ -219,7 +229,9 @@ export default function ResumePreviewModal({ candidate, onClose }) {
                 !candidate.previous_companies?.length && (
                   <div className="text-center py-10 text-[#94A3B8]">
                     <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
+
                     <p className="font-semibold">{t("candidateCRM.resumeModal.noParsedData")}</p>
+
                     <p className="text-xs mt-1">{t("candidateCRM.resumeModal.dataNotExtracted")}</p>
                   </div>
                 )}
@@ -235,6 +247,7 @@ function Section({ title, children }) {
   return (
     <div>
       <h3 className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">{title}</h3>
+
       {children}
     </div>
   )
@@ -244,8 +257,10 @@ function InfoRow({ icon, label, value }) {
   return (
     <div className="flex items-start gap-2">
       <span className="text-[#94A3B8] mt-0.5">{icon}</span>
+
       <div>
         <div className="text-xs text-[#94A3B8] font-semibold">{label}</div>
+
         <div className="text-sm font-bold text-[#1F2937]">{value}</div>
       </div>
     </div>

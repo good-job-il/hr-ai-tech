@@ -17,6 +17,7 @@ export default function PermissionRoute({
           className="h-8 w-8 animate-spin rounded-full border-4 border-[#E4ECFF] border-t-[#7C3AED]"
           aria-hidden="true"
         />
+
         <span className="sr-only">Loading permissions</span>
       </div>
     )

@@ -21,10 +21,13 @@ export default function PlaceholderPage({ title, description }) {
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F3EFFF] to-[#EAF8FF] flex items-center justify-center mx-auto mb-6">
           <Construction className="w-8 h-8 text-[#7C3AED]" />
         </div>
+
         <h1 className="text-2xl font-black text-[#0F172A] mb-2">{pageName}</h1>
+
         <p className="text-[#64748B] font-semibold mb-4">
           {description || "עמוד זה נמצא בפיתוח ויהיה זמין בקרוב."}
         </p>
+
         <div className="inline-block px-4 py-2 rounded-xl bg-[#F3EFFF] text-[#7C3AED] text-sm font-bold border border-[#E2D8FF]">
           {location.pathname}
         </div>

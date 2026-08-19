@@ -149,11 +149,13 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
           <label className="mb-2 block text-sm font-bold text-slate-700">
             {t("platform.usersManagement.modal.fullName")} *
           </label>
+
           <input
             value={form.full_name}
             onChange={(e) => set("full_name", e.target.value)}
             className={`${platformFieldClassName} ${errors.full_name ? "!border-red-400 !bg-red-50 !ring-red-50" : ""}`}
           />
+
           {errors.full_name && <p className="mt-1 text-xs text-red-500">{errors.full_name}</p>}
         </div>
 
@@ -162,6 +164,7 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
           <label className="mb-2 block text-sm font-bold text-slate-700">
             {t("platform.usersManagement.modal.email")} *
           </label>
+
           <input
             type="email"
             value={form.email}
@@ -169,6 +172,7 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
             disabled={isEdit}
             className={`${platformFieldClassName} disabled:bg-slate-50 disabled:text-slate-400 ${errors.email ? "!border-red-400 !bg-red-50 !ring-red-50" : ""}`}
           />
+
           {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
         </div>
 
@@ -178,12 +182,14 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
             <label className="mb-2 block text-sm font-bold text-slate-700">
               {t("platform.usersManagement.modal.password")} *
             </label>
+
             <input
               type="password"
               value={form.password}
               onChange={(e) => set("password", e.target.value)}
               className={`${platformFieldClassName} ${errors.password ? "!border-red-400 !bg-red-50 !ring-red-50" : ""}`}
             />
+
             <p
               className={`mt-1 text-xs ${errors.password ? "font-semibold text-red-500" : "text-slate-400"}`}
             >
@@ -197,6 +203,7 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
           <label className="mb-2 block text-sm font-bold text-slate-700">
             {t("platform.usersManagement.modal.phone")}
           </label>
+
           <input
             type="tel"
             value={form.phone}
@@ -210,6 +217,7 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
           <label className="mb-2 block text-sm font-bold text-slate-700">
             {t("platform.usersManagement.modal.role")}
           </label>
+
           <select
             value={form.role}
             onChange={(e) => set("role", e.target.value)}
@@ -228,12 +236,14 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
           <label className="mb-2 block text-sm font-bold text-slate-700">
             {t("platform.usersManagement.modal.organization")}
           </label>
+
           <select
             value={form.organization_id}
             onChange={(e) => set("organization_id", e.target.value)}
             className={platformFieldClassName}
           >
             <option value="">—</option>
+
             {orgs.map((o) => (
               <option key={o.id} value={o.id}>
                 {o.name}
@@ -247,6 +257,7 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
           <label className="text-sm font-bold text-slate-700">
             {t("platform.usersManagement.modal.status")}
           </label>
+
           <button
             type="button"
             onClick={() => set("is_active", !form.is_active)}
@@ -256,6 +267,7 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
               className={`inline-block h-[18px] w-[18px] transform rounded-full bg-white shadow-sm transition-transform ${form.is_active ? (isRTL ? "-translate-x-1" : "translate-x-[20px]") : isRTL ? "-translate-x-[20px]" : "translate-x-0.5"}`}
             />
           </button>
+
           <span className="text-sm font-medium text-slate-500">
             {form.is_active
               ? t("platform.usersManagement.modal.active")
@@ -280,6 +292,7 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
                 : t("platform.usersManagement.modal.creating")
               : t("platform.usersManagement.modal.save")}
           </Button>
+
           <Button
             variant="secondary"
             size="sm"
@@ -316,6 +329,7 @@ function DeleteConfirm({ open, onClose, user, onConfirm, isDeleting, t, isRTL })
           name: user.full_name || user.email,
         })}
       </p>
+
       <div className={`flex gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
         <Button
           variant="danger"
@@ -328,6 +342,7 @@ function DeleteConfirm({ open, onClose, user, onConfirm, isDeleting, t, isRTL })
             ? t("platform.usersManagement.deleteConfirm.deleting")
             : t("platform.usersManagement.deleteConfirm.confirm")}
         </Button>
+
         <Button
           variant="secondary"
           size="sm"
@@ -359,6 +374,7 @@ function Toast({ message, type, onClose }) {
       className={`fixed bottom-6 right-6 z-[60] flex items-center gap-2 rounded-2xl border border-white/20 px-5 py-3 text-sm font-bold text-white shadow-[0_16px_35px_rgba(30,41,59,0.2)] transition-all ${type === "error" ? "bg-rose-600" : "bg-emerald-600"}`}
     >
       {message}
+
       <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100">
         <X className="w-4 h-4" />
       </button>
@@ -518,6 +534,7 @@ export default function UsersManagementPage() {
         t={t}
         isRTL={isRTL}
       />
+
       <DeleteConfirm
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
@@ -527,6 +544,7 @@ export default function UsersManagementPage() {
         t={t}
         isRTL={isRTL}
       />
+
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <div className="space-y-5">
@@ -542,6 +560,7 @@ export default function UsersManagementPage() {
               onClick={openCreate}
             >
               <Plus className="h-4 w-4" />
+
               {t("platform.usersManagement.addUser")}
             </Button>
           }
@@ -557,6 +576,7 @@ export default function UsersManagementPage() {
             loading={isLoading}
             meta={t("platform.usersManagement.usersCount")}
           />
+
           <PlatformStatCard
             icon={ShieldCheck}
             label={t("platform.usersManagement.stats.admins")}
@@ -565,6 +585,7 @@ export default function UsersManagementPage() {
             loading={isLoading}
             meta={t("platform.usersManagement.roles.admin", "Admin")}
           />
+
           <PlatformStatCard
             icon={BriefcaseBusiness}
             label={t("platform.usersManagement.stats.recruiters")}
@@ -573,6 +594,7 @@ export default function UsersManagementPage() {
             loading={isLoading}
             meta={t("platform.usersManagement.roles.recruiter", "Recruiter")}
           />
+
           <PlatformStatCard
             icon={UserRound}
             label={t("platform.usersManagement.stats.candidates")}
@@ -594,9 +616,11 @@ export default function UsersManagementPage() {
               </div>
             }
           />
+
           <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-[minmax(260px,1fr)_240px]">
             <div className="relative">
               <Search className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -604,12 +628,14 @@ export default function UsersManagementPage() {
                 className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3 pe-4 ps-10 text-sm outline-none transition placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-50"
               />
             </div>
+
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
               className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-50"
             >
               <option value="all">{t("platform.usersManagement.filters.allRoles")}</option>
+
               {ALL_ROLES.map((r) => (
                 <option key={r} value={r}>
                   {getRoleLabel(r)}
@@ -632,6 +658,7 @@ export default function UsersManagementPage() {
               }
             />
           </div>
+
           <div className="overflow-x-auto">
             <table className="w-full min-w-[840px] text-sm">
               <thead>
@@ -652,6 +679,7 @@ export default function UsersManagementPage() {
                   ))}
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-slate-100">
                 {isLoading ? (
                   Array(6)
@@ -699,20 +727,24 @@ export default function UsersManagementPage() {
                               }`}
                             >
                               {(u.full_name || u.email || "?")[0].toUpperCase()}
+
                               <span
                                 className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${u.is_active === false ? "bg-slate-300" : "bg-emerald-500"}`}
                               />
                             </div>
+
                             <div>
                               <p className="font-extrabold text-slate-800 transition group-hover:text-violet-700">
                                 {u.full_name || "—"}
                               </p>
+
                               <p className="mt-0.5 text-[10px] font-medium text-slate-400">
                                 {u.email}
                               </p>
                             </div>
                           </div>
                         </td>
+
                         <td className="px-5 py-4">
                           <span
                             className={`inline-flex rounded-full px-3 py-1 text-[10px] font-extrabold ${role.bg} ${role.text}`}
@@ -720,14 +752,17 @@ export default function UsersManagementPage() {
                             {roleLabel}
                           </span>
                         </td>
+
                         <td className="px-5 py-4 text-xs font-semibold text-slate-600">
                           {orgName}
                         </td>
+
                         <td className="px-5 py-4 text-xs font-medium text-slate-400">
                           {u.created_date
                             ? new Date(u.created_date).toLocaleDateString(locale)
                             : "—"}
                         </td>
+
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
                             <button
@@ -738,6 +773,7 @@ export default function UsersManagementPage() {
                             >
                               <Pencil className="h-4 w-4" />
                             </button>
+
                             <button
                               type="button"
                               onClick={() => openDelete(u)}

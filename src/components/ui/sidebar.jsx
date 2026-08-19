@@ -197,6 +197,7 @@ const Sidebar = React.forwardRef(
               : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]",
           )}
         />
+
         <div
           className={cn(
             "fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex",
@@ -248,6 +249,7 @@ const SidebarTrigger = React.forwardRef(
         ) : (
           <>
             <PanelLeft />
+
             <span className="sr-only">Toggle Sidebar</span>
           </>
         )}
@@ -521,6 +523,7 @@ const SidebarMenuButton = React.forwardRef(
     return (
       <Tooltip>
         <TooltipTrigger asChild>{button}</TooltipTrigger>
+
         <TooltipContent
           side="right"
           align="center"
@@ -595,6 +598,7 @@ const SidebarMenuSkeleton = React.forwardRef(({ className, showIcon = false, ...
       {...props}
     >
       {showIcon && <Skeleton className="size-4 rounded-md" data-sidebar="menu-skeleton-icon" />}
+
       <Skeleton
         className="h-4 max-w-[--skeleton-width] flex-1"
         data-sidebar="menu-skeleton-text"

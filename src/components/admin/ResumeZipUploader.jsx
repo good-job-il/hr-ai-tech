@@ -147,18 +147,24 @@ export default function ResumeZipUploader({ onImportComplete }) {
           disabled={uploading}
           className="hidden"
         />
+
         <Upload className="w-8 h-8 mx-auto text-purple-500 mb-3" />
+
         <p className="text-base font-medium text-gray-900">בחר קובץ ZIP</p>
+
         <p className="text-sm text-gray-500 mt-1">תמוך ב: PDF, DOC, DOCX, TXT</p>
       </label>
 
       {zipFile && (
         <div className="flex items-center gap-3 p-4 bg-purple-50 border border-purple-200 rounded-xl mb-6">
           <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+
           <div className="flex-1">
             <p className="text-sm font-medium text-gray-900">{zipFile.name}</p>
+
             <p className="text-xs text-gray-500">{(zipFile.size / 1024 / 1024).toFixed(2)} MB</p>
           </div>
+
           <button onClick={() => setZipFile(null)} className="text-gray-500 hover:text-red-600">
             <X className="w-5 h-5" />
           </button>
@@ -168,6 +174,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
       {parseError && (
         <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl mb-6">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+
           <p className="text-sm text-red-700">{parseError}</p>
         </div>
       )}
@@ -176,6 +183,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">מקור</label>
+
           <select
             value={importSource}
             onChange={(e) => setImportSource(e.target.value)}
@@ -183,14 +191,20 @@ export default function ResumeZipUploader({ onImportComplete }) {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
           >
             <option value="linkedin">LinkedIn Campaign</option>
+
             <option value="email">אימייל</option>
+
             <option value="manual">ידנית</option>
+
             <option value="crawl">Crawl</option>
+
             <option value="other">אחר</option>
           </select>
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">סטטוס התחלתי</label>
+
           <select
             value={initialStatus}
             onChange={(e) => setInitialStatus(e.target.value)}
@@ -198,12 +212,16 @@ export default function ResumeZipUploader({ onImportComplete }) {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
           >
             <option value="new">מועמד חדש</option>
+
             <option value="contacted">יצור קשר</option>
+
             <option value="interview">ראיון</option>
           </select>
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">מגייס (אופציונלי)</label>
+
           <select
             value={recruiterId}
             onChange={(e) => setRecruiterId(e.target.value)}
@@ -211,6 +229,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
           >
             <option value="">לא נבחר</option>
+
             {staffMembers
               .filter((s) => s.role === "recruiter")
               .map((member) => (
@@ -220,8 +239,10 @@ export default function ResumeZipUploader({ onImportComplete }) {
               ))}
           </select>
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">מעסיק (אופציונלי)</label>
+
           <select
             value={employerId}
             onChange={(e) => setEmployerId(e.target.value)}
@@ -229,6 +250,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
           >
             <option value="">לא נבחר</option>
+
             {staffMembers
               .filter((s) => s.role === "hiring_manager")
               .map((member) => (

@@ -64,6 +64,7 @@ function Checkbox({ label, checked, onChange }) {
           </svg>
         )}
       </button>
+
       <span className="text-[14px] font-semibold text-[#475569]">{label}</span>
     </label>
   )
@@ -74,12 +75,14 @@ function FilterBlock({ title, open, onToggle, children }) {
     <div className="border-b border-[#E4ECFF] pb-5 mb-5">
       <button onClick={onToggle} className="w-full flex items-center justify-between mb-4">
         <span className="text-[14px] font-black text-[#0F172A]">{title}</span>
+
         {open ? (
           <ChevronUp className="w-4 h-4 text-[#7C3AED]" />
         ) : (
           <ChevronDown className="w-4 h-4 text-[#94A3B8]" />
         )}
       </button>
+
       {open && <div className="space-y-1">{children}</div>}
     </div>
   )
@@ -129,6 +132,7 @@ function JobCard({ job }) {
             <div>
               <div className="flex flex-wrap gap-2">
                 <MatchBadge score={matchScore} />
+
                 {isNew && (
                   <span className="px-3 py-1.5 rounded-full text-xs font-black bg-[#EEF6FF] text-[#2F80FF] border border-[#DDEBFF]">
                     {isRtl ? "חדש" : "New"}
@@ -149,6 +153,7 @@ function JobCard({ job }) {
           {job.location && (
             <span className="flex items-center gap-1.5">
               <MapPin className="w-4 h-4 text-[#60A5FA]" />
+
               {job.location}
             </span>
           )}
@@ -156,6 +161,7 @@ function JobCard({ job }) {
           {typeLabel && (
             <span className="flex items-center gap-1.5">
               <Briefcase className="w-4 h-4 text-[#8B5CF6]" />
+
               {typeLabel}
             </span>
           )}
@@ -180,6 +186,7 @@ function JobCard({ job }) {
               {job.category}
             </span>
           )}
+
           <span className="px-4 py-2 rounded-2xl bg-[#F7FBFF] text-[#64748B] border border-[#E4ECFF] text-xs font-bold">
             הנדסת תוכנה
           </span>
@@ -188,6 +195,7 @@ function JobCard({ job }) {
         <div className="flex items-center justify-between pt-5 border-t border-[#E4ECFF]">
           <span className="flex items-center gap-1.5 text-xs font-bold text-[#94A3B8]">
             <Calendar className="w-4 h-4" />
+
             {isRtl
               ? daysAgo === 0
                 ? "היום"
@@ -205,6 +213,7 @@ function JobCard({ job }) {
             <button className="w-8 h-8 rounded-lg bg-white border border-[#E4ECFF] flex items-center justify-center text-[#94A3B8] hover:text-[#7C3AED]">
               <Bookmark className="w-3.5 h-3.5" />
             </button>
+
             <button className="w-8 h-8 rounded-lg bg-white border border-[#E4ECFF] flex items-center justify-center text-[#94A3B8] hover:text-[#7C3AED]">
               <Share2 className="w-3.5 h-3.5" />
             </button>
@@ -218,6 +227,7 @@ function JobCard({ job }) {
               }}
             >
               {t("jobs.card.apply")}
+
               <ArrowLeft className="w-4 h-4" />
             </Link>
           </div>
@@ -326,7 +336,9 @@ export default function Jobs() {
       />
 
       <div className="fixed top-[-220px] right-[-140px] w-[620px] h-[620px] rounded-full bg-[#8B5CF6]/15 blur-3xl pointer-events-none" />
+
       <div className="fixed top-[220px] left-[-180px] w-[620px] h-[620px] rounded-full bg-[#2FB8FF]/14 blur-3xl pointer-events-none" />
+
       <div className="fixed bottom-[-180px] right-[28%] w-[520px] h-[520px] rounded-full bg-[#6C4DFF]/10 blur-3xl pointer-events-none" />
 
       <Navbar />
@@ -335,11 +347,13 @@ export default function Jobs() {
         <section className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/80 border border-[#DDEBFF] text-[#7C3AED] font-black shadow-[0_12px_30px_rgba(108,77,255,0.10)] mb-5">
             <Sparkles className="w-4 h-4" />
+
             {isRtl ? "פלטפורמת משרות מבוססת AI בישראל" : "AI-Powered Jobs Platform in Israel"}
           </div>
 
           <h1 className="text-[58px] leading-[1.05] font-black text-[#0F172A] mb-5">
             {isRtl ? "משרות שמותאמות" : "Jobs tailored"}
+
             <span className="block bg-gradient-to-l from-[#8B5CF6] via-[#6C4DFF] to-[#2FB8FF] bg-clip-text text-transparent">
               {isRtl ? "בדיוק אליך" : "just for you"}
             </span>
@@ -357,6 +371,7 @@ export default function Jobs() {
             <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr_0.8fr_auto] gap-4">
               <div className="h-16 rounded-2xl bg-white border border-[#DDEBFF] flex items-center gap-3 px-5">
                 <Search className="w-5 h-5 text-[#94A3B8]" />
+
                 <input
                   type="text"
                   placeholder={t("jobs.searchPlaceholder")}
@@ -369,6 +384,7 @@ export default function Jobs() {
 
               <div className="h-16 rounded-2xl bg-white border border-[#DDEBFF] flex items-center gap-3 px-5">
                 <MapPin className="w-5 h-5 text-[#94A3B8]" />
+
                 <input
                   type="text"
                   placeholder={t("jobs.locationPlaceholder")}
@@ -380,11 +396,13 @@ export default function Jobs() {
 
               <div className="h-16 rounded-2xl bg-white border border-[#DDEBFF] flex items-center gap-3 px-5">
                 <Tag className="w-5 h-5 text-[#94A3B8]" />
+
                 <select
                   className="w-full bg-transparent outline-none text-[15px] font-bold text-[#64748B]"
                   onChange={(e) => setJobTypes(e.target.value ? [e.target.value] : [])}
                 >
                   <option value="">{isRtl ? "כל הסוגים" : "All types"}</option>
+
                   {JOB_TYPES.map((jt) => (
                     <option key={jt.value} value={jt.value}>
                       {jt.label}
@@ -402,6 +420,7 @@ export default function Jobs() {
                 }}
               >
                 <Search className="w-5 h-5" />
+
                 {t("jobs.searchButton")}
               </button>
             </div>
@@ -447,11 +466,13 @@ export default function Jobs() {
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-black text-[#0F172A] flex items-center gap-2">
                   <SlidersHorizontal className="w-5 h-5 text-[#7C3AED]" />
+
                   {t("jobs.filters.title")}
                 </h3>
 
                 <button className="text-[#94A3B8] text-sm font-bold flex items-center gap-1">
                   <RotateCcw className="w-4 h-4" />
+
                   {t("jobs.filters.clearAll")}
                 </button>
               </div>
@@ -491,6 +512,7 @@ export default function Jobs() {
                     className="h-11 rounded-xl border border-[#DDEBFF] bg-white px-3 text-sm outline-none"
                     placeholder={isRtl ? "מינימום" : "Minimum"}
                   />
+
                   <input
                     className="h-11 rounded-xl border border-[#DDEBFF] bg-white px-3 text-sm outline-none"
                     placeholder={isRtl ? "מקסימום" : "Maximum"}
@@ -518,6 +540,7 @@ export default function Jobs() {
                 <h2 className="text-[26px] font-black text-[#0F172A]">
                   {isRtl ? `${jobs.length} משרות נמצאו` : `${jobs.length} jobs found`}
                 </h2>
+
                 <p className="text-[#64748B] font-semibold">
                   {isRtl ? "ממוינות לפי התאמה ורלוונטיות" : "Sorted by match and relevance"}
                 </p>
@@ -526,7 +549,9 @@ export default function Jobs() {
               <div className="flex items-center gap-3">
                 <select className="h-12 rounded-2xl bg-white border border-[#DDEBFF] px-4 text-sm font-bold text-[#64748B] outline-none">
                   <option>{isRtl ? "תאריך פרסום" : "Publish date"}</option>
+
                   <option>{isRtl ? "רלוונטיות" : "Relevance"}</option>
+
                   <option>{isRtl ? "שכר גבוה לנמוך" : "Salary: High to Low"}</option>
                 </select>
 
@@ -537,6 +562,7 @@ export default function Jobs() {
                   >
                     <List className="w-5 h-5" />
                   </button>
+
                   <button
                     onClick={() => setViewMode("grid")}
                     className={`w-12 flex items-center justify-center ${viewMode === "grid" ? "text-[#7C3AED] bg-[#F3EFFF]" : "text-[#94A3B8]"}`}
@@ -550,6 +576,7 @@ export default function Jobs() {
             {isLoading ? (
               <div className="h-[420px] flex flex-col items-center justify-center" style={glass}>
                 <div className="w-16 h-16 rounded-full border-4 border-[#E4ECFF] border-t-[#7C3AED] animate-spin mb-5" />
+
                 <p className="text-[#64748B] text-lg font-black">
                   {isRtl ? "AI מחפש משרות מתאימות..." : "AI is finding matching jobs..."}
                 </p>
@@ -560,7 +587,9 @@ export default function Jobs() {
                 style={glass}
               >
                 <Briefcase className="w-16 h-16 text-[#C4B5FD] mb-5" />
+
                 <h3 className="text-2xl font-black text-[#0F172A] mb-2">{t("jobs.noJobs")}</h3>
+
                 <p className="text-[#64748B] font-semibold">
                   {isRtl
                     ? "נסה לשנות את הסינון או מילת החיפוש"
@@ -582,6 +611,7 @@ export default function Jobs() {
             <div style={glass} className="p-6">
               <h3 className="text-xl font-black text-[#0F172A] mb-5 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-[#7C3AED]" />
+
                 {isRtl ? "משרות מומלצות עבורך" : "Recommended for you"}
               </h3>
 
@@ -597,9 +627,12 @@ export default function Jobs() {
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] text-white flex items-center justify-center text-sm font-black">
                     {init}
                   </div>
+
                   <div>
                     <div className="font-black text-[#0F172A] text-sm">{title}</div>
+
                     <div className="text-[#64748B] text-xs font-bold">{company}</div>
+
                     <div className="text-[#7C3AED] text-xs font-black">{salary}</div>
                   </div>
                 </div>
@@ -616,7 +649,9 @@ export default function Jobs() {
                 <div className="text-[42px] leading-none font-black bg-gradient-to-l from-[#8B5CF6] to-[#2F80FF] bg-clip-text text-transparent mb-2">
                   +24%
                 </div>
+
                 <p className="text-[#64748B] font-bold mb-4">עלייה בביקוש למשרות טכנולוגיה</p>
+
                 <div className="flex items-center gap-2 text-[#10B981] font-black text-sm">
                   <TrendingUp className="w-4 h-4" />
                   ביקוש גבוה בתחום פיתוח
@@ -635,7 +670,9 @@ export default function Jobs() {
               <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
 
               <Wand2 className="w-9 h-9 mb-4 relative" />
+
               <h3 className="text-2xl font-black mb-3 relative">לא יודע מה לחפש?</h3>
+
               <p className="text-white/80 font-semibold leading-7 mb-6 relative">
                 תן ל־AI למצוא עבורך את המשרות שהכי מתאימות לניסיון, לכישורים וליעדים שלך.
               </p>
@@ -661,7 +698,9 @@ export default function Jobs() {
               <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center mb-4">
                 <Icon className="w-7 h-7 text-white" />
               </div>
+
               <h3 className="text-lg font-black text-[#0F172A] mb-2">{title}</h3>
+
               <p className="text-sm font-semibold text-[#64748B] leading-6">{text}</p>
             </div>
           ))}

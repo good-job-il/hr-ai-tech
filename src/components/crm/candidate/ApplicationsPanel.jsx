@@ -56,6 +56,7 @@ export default function ApplicationsPanel({ applications }) {
     return (
       <div className="text-center py-10 text-[#94A3B8]">
         <Briefcase className="w-8 h-8 mx-auto mb-2 opacity-40" />
+
         <p className="text-sm font-semibold">
           {t("candidateCRM.applicationsPanel.noApplications")}
         </p>
@@ -81,23 +82,29 @@ export default function ApplicationsPanel({ applications }) {
                 <div className="w-10 h-10 rounded-xl bg-[#EEF4FF] flex items-center justify-center flex-shrink-0 text-sm font-black text-[#7C3AED]">
                   {app.company?.slice(0, 2).toUpperCase() || "JB"}
                 </div>
+
                 <div>
                   <div className="font-black text-sm text-[#0F172A]">
                     {app.job_title || t("candidateCRM.applicationsPanel.noName")}
                   </div>
+
                   <div className="text-xs text-[#64748B] font-semibold">{app.company}</div>
+
                   {app.created_date && (
                     <div className="flex items-center gap-1 mt-1 text-xs text-[#CBD5E1]">
                       <Calendar className="w-3 h-3" />
+
                       {format(new Date(app.created_date), "dd MMM yyyy", { locale: dateLocale })}
                     </div>
                   )}
                 </div>
               </div>
+
               <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${statusCfg.color}`}>
                 {statusCfg.label}
               </span>
             </div>
+
             {app.match_score && (
               <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#F0F1F5]">
                 <div
@@ -105,6 +112,7 @@ export default function ApplicationsPanel({ applications }) {
                 >
                   AI: {app.match_score}%
                 </div>
+
                 {app.match_reason && (
                   <span className="text-xs text-[#94A3B8] truncate">{app.match_reason}</span>
                 )}

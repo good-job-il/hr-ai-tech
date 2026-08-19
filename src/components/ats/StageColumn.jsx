@@ -40,6 +40,7 @@ export default function StageColumn({
       >
         <div className="flex items-center gap-2">
           <span className="font-black text-[#0F172A] text-sm">{stage.label}</span>
+
           {hasSlaBreaches && (
             <span
               className="w-2 h-2 rounded-full bg-red-500 animate-pulse"
@@ -47,6 +48,7 @@ export default function StageColumn({
             />
           )}
         </div>
+
         <div
           className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white"
           style={{ background: stage.color }}
@@ -72,6 +74,7 @@ export default function StageColumn({
             {applications.length === 0 && !snapshot.isDraggingOver && (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <Users className="w-8 h-8 text-[#CBD5E1] mb-2" />
+
                 <p className="text-xs text-[#CBD5E1] font-semibold">
                   {t("pipeline.stageColumn.dragHere")}
                 </p>
@@ -101,6 +104,7 @@ export default function StageColumn({
                 )}
               </Draggable>
             ))}
+
             {provided.placeholder}
           </div>
         )}

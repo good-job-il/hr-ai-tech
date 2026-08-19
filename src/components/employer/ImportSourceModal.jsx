@@ -39,13 +39,16 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h2 className="font-bold text-gray-900">{source ? "עריכת מקור" : "הוסף מקור ייבוא"}</h2>
+
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
+
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">שם המקור *</label>
+
             <input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -53,8 +56,10 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
             />
           </div>
+
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">URL לפיד *</label>
+
             <input
               type="url"
               value={form.url}
@@ -65,10 +70,12 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
             />
           </div>
+
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">
               תדירות סינכרון (שעות)
             </label>
+
             <input
               type="number"
               min="1"
@@ -78,6 +85,7 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
             />
           </div>
+
           <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
             <input
               type="checkbox"
@@ -87,6 +95,7 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
             />
             מקור פעיל
           </label>
+
           <div className="flex gap-3 pt-2">
             <button
               type="button"
@@ -95,6 +104,7 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
             >
               ביטול
             </button>
+
             <button
               type="submit"
               disabled={loading}

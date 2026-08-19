@@ -106,7 +106,9 @@ export default function CandidateCRMPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-[#94A3B8]">
         <AlertCircle className="w-12 h-12 mb-3 opacity-40" />
+
         <p className="font-bold text-lg">{t("candidateCRM.noCandidateSelected")}</p>
+
         <p className="text-sm mt-1">{t("candidateCRM.navigatePrompt")}</p>
       </div>
     )
@@ -116,7 +118,9 @@ export default function CandidateCRMPage() {
     return (
       <div className="space-y-4 animate-pulse p-4">
         <div className="h-40 bg-[#F0F1F5] rounded-2xl" />
+
         <div className="h-12 bg-[#F0F1F5] rounded-xl" />
+
         <div className="h-64 bg-[#F0F1F5] rounded-xl" />
       </div>
     )
@@ -126,8 +130,11 @@ export default function CandidateCRMPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-red-500">
         <AlertCircle className="w-12 h-12 mb-3" />
+
         <p className="font-bold">{t("candidateCRM.loadingError")}</p>
+
         <p className="text-sm mt-1 text-[#94A3B8]">{error}</p>
+
         <button
           onClick={reload}
           className="mt-4 flex items-center gap-2 text-sm font-bold text-[#7C3AED] hover:underline"
@@ -149,11 +156,15 @@ export default function CandidateCRMPage() {
               className="flex items-center gap-1.5 text-sm font-bold text-[#64748B] hover:text-[#7C3AED] transition-colors"
             >
               {isRTL ? <ArrowRight className="w-4 h-4" /> : null}
+
               {t("candidateCRM.back")}
+
               {!isRTL ? <ArrowRight className="w-4 h-4 rotate-180" /> : null}
             </button>
+
             <LanguageSwitcher variant="badge" />
           </div>
+
           {canDelete && (
             <button
               onClick={handleDelete}
@@ -186,6 +197,7 @@ export default function CandidateCRMPage() {
               className={`flex-1 min-w-fit text-sm font-bold px-3 py-2 rounded-lg transition-all whitespace-nowrap ${activeTab === tab.id ? "bg-[#7C3AED] text-white shadow-sm" : "text-[#64748B] hover:bg-[#F0F1F5]"}`}
             >
               {tab.label}
+
               {tab.id === "notes" && notes.length > 0 && (
                 <span
                   className={`mr-1.5 text-xs px-1.5 py-0.5 rounded-full ${activeTab === tab.id ? "bg-white/20" : "bg-[#E4ECFF] text-[#7C3AED]"}`}
@@ -193,6 +205,7 @@ export default function CandidateCRMPage() {
                   {notes.length}
                 </span>
               )}
+
               {tab.id === "interviews" && interviews.length > 0 && (
                 <span
                   className={`mr-1.5 text-xs px-1.5 py-0.5 rounded-full ${activeTab === tab.id ? "bg-white/20" : "bg-[#E4ECFF] text-[#7C3AED]"}`}
@@ -217,15 +230,18 @@ export default function CandidateCRMPage() {
                       <h3 className="text-sm font-black text-[#0F172A] mb-2">
                         {t("candidateCRM.overview.summary")}
                       </h3>
+
                       <p className="text-sm text-[#64748B] leading-relaxed">{candidate.summary}</p>
                     </div>
                   )}
+
                   {/* Previous Companies */}
                   {candidate?.previous_companies?.length > 0 && (
                     <div>
                       <h3 className="text-sm font-black text-[#0F172A] mb-2">
                         {t("candidateCRM.overview.previousCompanies")}
                       </h3>
+
                       <div className="flex flex-wrap gap-2">
                         {candidate.previous_companies.map((c, i) => (
                           <span
@@ -238,12 +254,14 @@ export default function CandidateCRMPage() {
                       </div>
                     </div>
                   )}
+
                   {/* Languages */}
                   {candidate?.languages?.length > 0 && (
                     <div>
                       <h3 className="text-sm font-black text-[#0F172A] mb-2">
                         {t("candidateCRM.overview.languages")}
                       </h3>
+
                       <div className="flex flex-wrap gap-2">
                         {candidate.languages.map((l, i) => (
                           <span
@@ -256,15 +274,18 @@ export default function CandidateCRMPage() {
                       </div>
                     </div>
                   )}
+
                   {/* Recent Timeline */}
                   <div>
                     <h3 className="text-sm font-black text-[#0F172A] mb-3">
                       {t("candidateCRM.overview.recentActivity")}
                     </h3>
+
                     <CandidateTimeline timeline={timeline.slice(0, 5)} loading={false} />
                   </div>
                 </div>
               )}
+
               {activeTab === "notes" && (
                 <CandidateNotesPanel
                   notes={notes}
@@ -274,6 +295,7 @@ export default function CandidateCRMPage() {
                   userRole={user?.role}
                 />
               )}
+
               {activeTab === "interviews" && (
                 <InterviewsPanel
                   interviews={interviews}
@@ -281,7 +303,9 @@ export default function CandidateCRMPage() {
                   onUpdate={updateInterview}
                 />
               )}
+
               {activeTab === "applications" && <ApplicationsPanel applications={applications} />}
+
               {activeTab === "documents" && (
                 <DocumentsPanel
                   documents={documents}
@@ -289,6 +313,7 @@ export default function CandidateCRMPage() {
                   onUpload={uploadDocument}
                 />
               )}
+
               {activeTab === "whatsapp" && (
                 <WhatsAppPanel
                   candidate={candidate}
@@ -297,6 +322,7 @@ export default function CandidateCRMPage() {
                   loading={commsLoading}
                 />
               )}
+
               {activeTab === "timeline" && (
                 <CandidateTimeline timeline={timeline} loading={timelineLoading} />
               )}
@@ -310,6 +336,7 @@ export default function CandidateCRMPage() {
                 <h3 className="text-sm font-black text-[#0F172A] mb-4">
                   {t("candidateCRM.recruiterActions")}
                 </h3>
+
                 <RecruiterWorkspacePanel
                   candidate={candidate}
                   documents={documents}
@@ -333,6 +360,7 @@ export default function CandidateCRMPage() {
               <h3 className="text-sm font-black text-[#0F172A] mb-3">
                 {t("candidateCRM.statistics")}
               </h3>
+
               <div className="space-y-2">
                 {[
                   { label: t("candidateCRM.stats.applications"), value: applications.length },
@@ -346,6 +374,7 @@ export default function CandidateCRMPage() {
                     className="flex items-center justify-between py-1.5 border-b border-[#F0F1F5] last:border-0"
                   >
                     <span className="text-xs font-semibold text-[#64748B]">{stat.label}</span>
+
                     <span className="text-sm font-black text-[#0F172A]">{stat.value}</span>
                   </div>
                 ))}

@@ -99,6 +99,7 @@ export default function MarketStats() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#eaf7fb" }} dir="rtl">
       <Navbar />
+
       <div className="max-w-[1100px] mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
           <TrendingUp className="w-6 h-6 text-hhblue" /> סטטיסטיקת שוק העבודה
@@ -108,12 +109,17 @@ export default function MarketStats() {
           {/* Jobs by category */}
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
             <h2 className="font-semibold text-gray-900 mb-4">משרות לפי תחום</h2>
+
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={categoryCounts} layout="vertical" margin={{ right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+
                 <XAxis type="number" tick={{ fontSize: 11 }} />
+
                 <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
+
                 <Tooltip formatter={(v) => [`${v} משרות`]} />
+
                 <Bar dataKey="count" fill="#3da8c8" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -122,6 +128,7 @@ export default function MarketStats() {
           {/* Jobs by location */}
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
             <h2 className="font-semibold text-gray-900 mb-4">משרות לפי אזור</h2>
+
             {locationData.length === 0 ? (
               <div className="flex items-center justify-center h-40 text-gray-400 text-sm">
                 אין נתונים עדיין
@@ -130,9 +137,13 @@ export default function MarketStats() {
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={locationData} layout="vertical" margin={{ right: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+
                   <XAxis type="number" tick={{ fontSize: 11 }} />
+
                   <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 11 }} />
+
                   <Tooltip formatter={(v) => [`${v} משרות`]} />
+
                   <Bar dataKey="count" fill="#e74c3c" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -143,6 +154,7 @@ export default function MarketStats() {
         {/* AI salary insights */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <h2 className="font-semibold text-gray-900 mb-4">נתוני שכר לפי תחום</h2>
+
           <div className="flex gap-2 mb-4 flex-wrap">
             {CATEGORIES.map((c) => (
               <button
@@ -165,6 +177,7 @@ export default function MarketStats() {
               className="bg-hhblue text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-hhblue/90 disabled:opacity-50 flex items-center gap-2"
             >
               {aiLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+
               {aiLoading ? "טוען נתונים..." : `טען נתוני שכר – ${selectedCategory}`}
             </button>
           )}
@@ -181,6 +194,7 @@ export default function MarketStats() {
                     <div className="text-lg font-bold text-hhblue">
                       ₪{Number(val).toLocaleString()}
                     </div>
+
                     <div className="text-xs text-gray-500">{label}</div>
                   </div>
                 ))}
@@ -190,9 +204,13 @@ export default function MarketStats() {
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={aiData.salary_by_experience}>
                     <CartesianGrid strokeDasharray="3 3" />
+
                     <XAxis dataKey="level" tick={{ fontSize: 11 }} />
+
                     <YAxis tick={{ fontSize: 11 }} />
+
                     <Tooltip formatter={(v) => [`₪${v.toLocaleString()}`]} />
+
                     <Bar dataKey="salary" fill="#3da8c8" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -201,6 +219,7 @@ export default function MarketStats() {
               {aiData.top_skills?.length > 0 && (
                 <div>
                   <div className="text-sm font-medium text-gray-700 mb-2">כישורים מבוקשים:</div>
+
                   <div className="flex flex-wrap gap-2">
                     {aiData.top_skills.map((s, i) => (
                       <span

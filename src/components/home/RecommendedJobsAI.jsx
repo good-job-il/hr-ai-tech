@@ -46,6 +46,7 @@ export default function RecommendedJobsAI() {
       <div className="max-w-[1200px] mx-auto px-4 py-8">
         <div className="flex items-center gap-2 mb-6">
           <Zap className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+
           <h2
             className="text-2xl font-bold"
             style={{
@@ -58,6 +59,7 @@ export default function RecommendedJobsAI() {
             משרות המומלצות עבורך
           </h2>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {jobs.map((job) => (
             <Link key={job.id} to={`/jobs/${job.id}`} className="group">
@@ -66,11 +68,14 @@ export default function RecommendedJobsAI() {
                   <h3 className="font-semibold text-white group-hover:text-cyan-300 transition-colors">
                     {job.title}
                   </h3>
+
                   <span className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
                     {job.match_score}% AI
                   </span>
                 </div>
+
                 <p className="text-sm text-gray-300 mb-2">{job.company}</p>
+
                 <p className="text-xs text-gray-400 line-clamp-2">{job.description}</p>
               </div>
             </Link>

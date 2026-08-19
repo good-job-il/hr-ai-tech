@@ -87,6 +87,7 @@ export default function AdminApplications() {
       <div className="p-6" dir="rtl">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">כל המועמדויות</h1>
+
           <p className="text-sm text-gray-500 mt-1">{filtered.length} מועמדויות</p>
         </div>
 
@@ -94,24 +95,31 @@ export default function AdminApplications() {
         <div className="flex gap-4 mb-5 flex-wrap">
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-gray-900">{applications.length}</div>
+
             <div className="text-xs text-gray-500">סה"כ</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-blue-600">
               {applications.filter((a) => a.status === "new").length}
             </div>
+
             <div className="text-xs text-gray-500">חדשות</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-emerald-600">
               {applications.filter((a) => a.status === "hired").length}
             </div>
+
             <div className="text-xs text-gray-500">התקבלו</div>
           </div>
+
           <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 shadow-sm text-center min-w-[100px]">
             <div className="text-xl font-bold text-red-500">
               {applications.filter((a) => a.status === "rejected").length}
             </div>
+
             <div className="text-xs text-gray-500">נדחו</div>
           </div>
         </div>
@@ -120,6 +128,7 @@ export default function AdminApplications() {
         <div className="flex gap-3 mb-4 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -127,42 +136,49 @@ export default function AdminApplications() {
               className="w-full border border-gray-200 rounded-lg pr-9 pl-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
             />
           </div>
+
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
           >
             <option value="">כל הסטטוסים</option>
+
             {Object.entries(statusLabels).map(([v, l]) => (
               <option key={v} value={v}>
                 {l}
               </option>
             ))}
           </select>
+
           <select
             value={filterSource}
             onChange={(e) => setFilterSource(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
           >
             <option value="">כל המקורות</option>
+
             {Object.entries(sourceLabels).map(([v, l]) => (
               <option key={v} value={v}>
                 {l}
               </option>
             ))}
           </select>
+
           <select
             value={filterEmployer}
             onChange={(e) => setFilterEmployer(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none max-w-[180px]"
           >
             <option value="">כל המעסיקים</option>
+
             {employers.map((e) => (
               <option key={e} value={e}>
                 {e}
               </option>
             ))}
           </select>
+
           <input
             type="date"
             value={dateFrom}
@@ -170,6 +186,7 @@ export default function AdminApplications() {
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none"
             placeholder="מתאריך"
           />
+
           <input
             type="date"
             value={dateTo}
@@ -192,29 +209,42 @@ export default function AdminApplications() {
               <thead>
                 <tr className="bg-gray-100 text-gray-600 text-right">
                   <th className="px-3 py-2 font-semibold rounded-r-lg">מועמד</th>
+
                   <th className="px-3 py-2 font-semibold">משרה</th>
+
                   <th className="px-3 py-2 font-semibold">מעסיק</th>
+
                   <th className="px-3 py-2 font-semibold">ציפיות שכר</th>
+
                   <th className="px-3 py-2 font-semibold">סטטוס</th>
+
                   <th className="px-3 py-2 font-semibold">מקור</th>
+
                   <th className="px-3 py-2 font-semibold">תאריך</th>
+
                   <th className="px-3 py-2 font-semibold rounded-l-lg">קו"ח</th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-gray-100">
                 {filtered.map((app) => (
                   <tr key={app.id} className="bg-white hover:bg-gray-50 transition-colors">
                     <td className="px-3 py-3">
                       <div className="font-semibold text-gray-900">{app.candidate_name}</div>
+
                       <div className="text-xs text-gray-500">{app.candidate_email}</div>
+
                       {app.candidate_phone && (
                         <div className="text-xs text-gray-400">{app.candidate_phone}</div>
                       )}
                     </td>
+
                     <td className="px-3 py-3">
                       <div className="font-medium text-gray-800">{app.job_title || "—"}</div>
+
                       <div className="text-xs text-gray-500">{app.company || "—"}</div>
                     </td>
+
                     <td className="px-3 py-3 text-xs text-gray-600">
                       {app.employer_id ? (
                         <span>{app.employer_id}</span>
@@ -222,6 +252,7 @@ export default function AdminApplications() {
                         <span className="text-orange-500 font-medium">ללא מעסיק משויך</span>
                       )}
                     </td>
+
                     <td className="px-3 py-3 text-xs text-gray-600">
                       {app.desired_salary_min || app.desired_salary_max ? (
                         <span>
@@ -232,6 +263,7 @@ export default function AdminApplications() {
                         "—"
                       )}
                     </td>
+
                     <td className="px-3 py-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[app.status] || "bg-gray-100 text-gray-600"}`}
@@ -239,12 +271,15 @@ export default function AdminApplications() {
                         {statusLabels[app.status] || app.status}
                       </span>
                     </td>
+
                     <td className="px-3 py-3 text-xs text-gray-500">
                       {sourceLabels[app.source] || app.source || "—"}
                     </td>
+
                     <td className="px-3 py-3 text-xs text-gray-500 whitespace-nowrap">
                       {new Date(app.created_date).toLocaleDateString("he-IL")}
                     </td>
+
                     <td className="px-3 py-3">
                       {app.resume_url ? (
                         <a

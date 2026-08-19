@@ -95,17 +95,21 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
                       strokeWidth={1.8}
                     />
                   )}
+
                   {getLabel(item)}
+
                   {item.badge && (
                     <span className="text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
                       {item.badge}
                     </span>
                   )}
                 </span>
+
                 <ChevronDown
                   className={`h-4 w-4 text-[#A0A8B9] transition-transform ${showChildren ? "rotate-180" : ""}`}
                 />
               </button>
+
               {showChildren && (
                 <div
                   className={`${isRtl ? "mr-7 border-r pr-2" : "ml-7 border-l pl-2"} mt-1 space-y-0.5 ${platformStyle ? "border-[#E7E1F7]" : THEME.childBorder}`}
@@ -145,7 +149,9 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
                   strokeWidth={1.8}
                 />
               )}
+
               <span className="flex-1">{getLabel(item)}</span>
+
               {item.badge && (
                 <span className="text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
                   {item.badge}
@@ -203,14 +209,17 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-white text-[#7C3AED] shadow-[0_4px_12px_rgba(105,78,190,0.08)]">
                     <Sparkles className="h-5 w-5" />
                   </div>
+
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-black text-[#6C4DFF]">
                       {isRtl ? "מרכז AI למנהלים" : "AI Center for Managers"}
                     </p>
+
                     <p className="mt-0.5 truncate text-[9px] font-semibold text-[#A19AB5]">
                       {isRtl ? "תובנות חכמות על המערכת" : "Smart platform insights"}
                     </p>
                   </div>
+
                   {isRtl ? (
                     <ChevronLeft className="h-4 w-4 text-[#7C3AED]" />
                   ) : (
@@ -222,10 +231,12 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#EEF4FF]">
                     <ShieldCheck className="h-4 w-4 text-[#6C4DFF]" />
                   </div>
+
                   <div className="min-w-0">
                     <p className="truncate text-xs font-semibold text-[#1F2937]">
                       {t("nav.platform.controlPanel")}
                     </p>
+
                     <p className="text-[10px] text-[#9CA3AF]">Super Admin</p>
                   </div>
                 </div>
@@ -235,18 +246,21 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
                 <div className="w-8 h-8 rounded-lg bg-[#EEF4FF] flex items-center justify-center shrink-0 mt-0.5">
                   <Building2 className="w-4 h-4 text-[#6C4DFF]" />
                 </div>
+
                 <div className="min-w-0">
                   {organization?.name && (
                     <p className="text-xs font-semibold text-[#1F2937] truncate">
                       {organization.name}
                     </p>
                   )}
+
                   <p className="text-[10px] text-[#9CA3AF] truncate">
                     {orgType === "staffing_agency"
                       ? t("platform.orgs.staffing")
                       : orgType === "organization"
                         ? t("platform.orgs.companies")
                         : orgType}
+
                     {user?.role &&
                       ` · ${
                         user.role === "org_admin"
@@ -293,6 +307,7 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
                 ? `אתה צופה בארגון "${organization?.name || ""}" כאדמין פלטפורמה`
                 : `You are viewing "${organization?.name || "this organization"}" as a platform admin`}
             </span>
+
             <button
               onClick={handleExitWorkspace}
               disabled={exiting}
@@ -308,6 +323,7 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
             </button>
           </div>
         )}
+
         <DashboardHeader
           user={user}
           roleTitle={roleTitle}
@@ -316,6 +332,7 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
           showMenuButton={true}
           platformStyle={platformStyle}
         />
+
         <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto">
           <div className="p-6 min-w-0">
             <Outlet />
@@ -329,6 +346,7 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
             className="fixed inset-0 z-30 bg-black/40 md:hidden"
             onClick={() => setMobileOpen(false)}
           />
+
           <button
             onClick={() => setMobileOpen(false)}
             className={`fixed top-4 ${isRtl ? "left-4" : "right-4"} z-50 md:hidden w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg`}

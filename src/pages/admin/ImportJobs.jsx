@@ -39,6 +39,7 @@ function ScanResultPanel({ result, onClose }) {
           )}
           תוצאות סריקה
         </span>
+
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xs">
           סגור
         </button>
@@ -61,6 +62,7 @@ function ScanResultPanel({ result, onClose }) {
         ].map((s) => (
           <div key={s.label} className="bg-white border border-gray-100 rounded-lg p-2 text-center">
             <div className={`text-lg font-bold ${s.color}`}>{s.value ?? 0}</div>
+
             <div className="text-xs text-gray-400">{s.label}</div>
           </div>
         ))}
@@ -76,6 +78,7 @@ function ScanResultPanel({ result, onClose }) {
             {result.errors.length} שגיאות{" "}
             {showErrors ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </button>
+
           {showErrors && (
             <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
               {result.errors.map((e, i) => (
@@ -84,6 +87,7 @@ function ScanResultPanel({ result, onClose }) {
                   className="text-xs bg-red-50 border border-red-100 rounded p-2 text-red-700"
                 >
                   <span className="font-medium">{e.error}</span>
+
                   {e.url && <span className="text-red-400 mr-2 truncate block">{e.url}</span>}
                 </div>
               ))}
@@ -102,6 +106,7 @@ function ScanResultPanel({ result, onClose }) {
             לוג מפורט{" "}
             {showLog ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </button>
+
           {showLog && (
             <pre className="mt-2 text-xs bg-gray-900 text-green-400 rounded-lg p-3 overflow-auto max-h-56 whitespace-pre-wrap font-mono">
               {result.log.join("\n")}
@@ -113,6 +118,7 @@ function ScanResultPanel({ result, onClose }) {
       {result.error && !result.success && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-xs">
           <AlertTriangle className="w-4 h-4 inline ml-1" />
+
           {result.error}
         </div>
       )}
@@ -164,6 +170,7 @@ function SourceFormModal({ source, onClose, onSaved }) {
 
         <div>
           <label className="text-xs font-medium text-gray-600 mb-1 block">שם מקור *</label>
+
           <input
             value={form.name}
             onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
@@ -171,10 +178,12 @@ function SourceFormModal({ source, onClose, onSaved }) {
             className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-purple-500/30 text-gray-900 bg-white"
           />
         </div>
+
         <div>
           <label className="text-xs font-medium text-gray-600 mb-1 block">
             כתובת עמוד הקריירה *
           </label>
+
           <input
             value={form.url}
             onChange={(e) => setForm((p) => ({ ...p, url: e.target.value }))}
@@ -182,14 +191,17 @@ function SourceFormModal({ source, onClose, onSaved }) {
             placeholder="https://careers.company.com/jobs"
             className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-purple-500/30 text-left text-gray-900 bg-white"
           />
+
           <p className="text-xs text-gray-400 mt-1">
             הכנס כתובת URL אחת בלבד — המערכת תסרוק אוטומטית את כל העמודים
           </p>
         </div>
+
         <div>
           <label className="text-xs font-medium text-gray-600 mb-1 block">
             שם חברה (פנימי, לא יוצג)
           </label>
+
           <input
             value={form.company_name}
             onChange={(e) => setForm((p) => ({ ...p, company_name: e.target.value }))}
@@ -197,9 +209,11 @@ function SourceFormModal({ source, onClose, onSaved }) {
             className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-purple-500/30 text-gray-900 bg-white"
           />
         </div>
+
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-medium text-gray-600 mb-1 block">סוג מקור</label>
+
             <select
               value={form.provider}
               onChange={(e) => setForm((p) => ({ ...p, provider: e.target.value }))}
@@ -212,8 +226,10 @@ function SourceFormModal({ source, onClose, onSaved }) {
               ))}
             </select>
           </div>
+
           <div>
             <label className="text-xs font-medium text-gray-600 mb-1 block">תדירות סנכרון</label>
+
             <select
               value={form.interval_hours}
               onChange={(e) => setForm((p) => ({ ...p, interval_hours: Number(e.target.value) }))}
@@ -227,6 +243,7 @@ function SourceFormModal({ source, onClose, onSaved }) {
             </select>
           </div>
         </div>
+
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -235,10 +252,12 @@ function SourceFormModal({ source, onClose, onSaved }) {
             onChange={(e) => setForm((p) => ({ ...p, is_active: e.target.checked }))}
             className="accent-purple-600"
           />
+
           <label htmlFor="isActive" className="text-sm text-gray-700">
             מקור פעיל
           </label>
         </div>
+
         <div className="flex gap-3 pt-2">
           <button
             onClick={onClose}
@@ -246,12 +265,14 @@ function SourceFormModal({ source, onClose, onSaved }) {
           >
             ביטול
           </button>
+
           <button
             onClick={save}
             disabled={saving || !form.name || !form.url}
             className="flex-1 bg-purple-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+
             {source ? "שמור" : "הוסף מקור"}
           </button>
         </div>
@@ -368,10 +389,12 @@ export default function ImportJobs() {
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <Layers className="w-6 h-6 text-purple-600" /> מנוע ייבוא משרות
             </h1>
+
             <p className="text-sm text-gray-500 mt-1">
               סריקה אוטומטית רב-עמודית — הזן URL אחד, המערכת מגלה את כל המשרות
             </p>
           </div>
+
           <button
             onClick={() => {
               setEditingSource(null)
@@ -401,6 +424,7 @@ export default function ImportJobs() {
               className="bg-white rounded-xl border border-gray-100 p-4 text-center shadow-sm"
             >
               <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+
               <div className="text-xs text-gray-500 mt-1">{s.label}</div>
             </div>
           ))}
@@ -411,7 +435,9 @@ export default function ImportJobs() {
           <h2 className="font-bold text-purple-800 mb-1 flex items-center gap-2">
             <Search className="w-4 h-4" /> סריקה מהירה — בלי להוסיף מקור
           </h2>
+
           <p className="text-xs text-purple-600 mb-4">הכנס URL לבדיקה חד-פעמית ללא שמירה</p>
+
           <div className="flex gap-2 flex-wrap">
             <input
               value={quickName}
@@ -419,6 +445,7 @@ export default function ImportJobs() {
               placeholder="שם חברה (פנימי)"
               className="border border-purple-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-purple-400/30 bg-white text-gray-900 w-44"
             />
+
             <input
               value={quickUrl}
               onChange={(e) => setQuickUrl(e.target.value)}
@@ -426,6 +453,7 @@ export default function ImportJobs() {
               dir="ltr"
               className="border border-purple-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-purple-400/30 bg-white text-gray-900 flex-1 min-w-56 text-left"
             />
+
             <button
               onClick={quickScan}
               disabled={!quickUrl || quickScanning}
@@ -436,20 +464,25 @@ export default function ImportJobs() {
               ) : (
                 <Play className="w-4 h-4" />
               )}
+
               {quickScanning ? "סורק..." : "סרוק עכשיו"}
             </button>
           </div>
+
           {quickScanning && (
             <div className="mt-4 bg-white/60 rounded-xl p-4 text-sm text-purple-700 flex items-center gap-3">
               <Loader2 className="w-5 h-5 animate-spin text-purple-500 shrink-0" />
+
               <div>
                 <div className="font-semibold">סורק את עמוד הקריירה...</div>
+
                 <div className="text-xs text-purple-500 mt-0.5">
                   המערכת מזהה משרות, עוברת בין עמודים ומחלצת תוכן מלא. זה עשוי לקחת מספר דקות.
                 </div>
               </div>
             </div>
           )}
+
           {quickResult && (
             <ScanResultPanel result={quickResult} onClose={() => setQuickResult(null)} />
           )}
@@ -463,8 +496,11 @@ export default function ImportJobs() {
         ) : sources.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm">
             <Globe className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+
             <p className="text-gray-500 font-medium mb-1">אין מקורות ייבוא</p>
+
             <p className="text-gray-400 text-sm mb-4">הוסף את מקור הייבוא הראשון שלך</p>
+
             <button
               onClick={() => {
                 setEditingSource(null)
@@ -492,24 +528,29 @@ export default function ImportJobs() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold text-gray-900 text-sm">{source.name}</span>
+
                       {source.provider && (
                         <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
                           {SOURCE_TYPES.find((t) => t.value === source.provider)?.label ||
                             source.provider}
                         </span>
                       )}
+
                       {!source.is_active && (
                         <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
                           כבוי
                         </span>
                       )}
                     </div>
+
                     <div className="text-xs text-gray-400 mt-0.5 truncate max-w-sm" dir="ltr">
                       {source.url}
                     </div>
+
                     <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                       <span className="flex items-center gap-1 text-xs text-gray-500">
                         {statusIcon(source)}
+
                         {scanning[source.id]
                           ? "סורק..."
                           : source.last_sync
@@ -521,19 +562,24 @@ export default function ImportJobs() {
                               })
                             : "לא סונכרן"}
                       </span>
+
                       <span className="text-xs font-medium text-green-600">
                         +{source.jobs_added || 0} חדשות
                       </span>
+
                       <span className="text-xs text-cyan-600">
                         ~{source.jobs_updated || 0} עודכנו
                       </span>
+
                       <span className="text-xs text-orange-500">
                         {source.jobs_closed || 0} נסגרו
                       </span>
+
                       {source.interval_hours > 0 && (
                         <span className="text-xs text-gray-400">כל {source.interval_hours}ש׳</span>
                       )}
                     </div>
+
                     {source.last_sync_status === "error" && source.last_error && (
                       <div className="flex items-center gap-1 text-xs text-red-500 mt-1">
                         <AlertTriangle className="w-3 h-3" /> {source.last_error}
@@ -554,6 +600,7 @@ export default function ImportJobs() {
                         <FileText className="w-4 h-4" />
                       </button>
                     )}
+
                     <a
                       href={source.url}
                       target="_blank"
@@ -563,6 +610,7 @@ export default function ImportJobs() {
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
+
                     <button
                       onClick={() => {
                         setEditingSource(source)
@@ -573,6 +621,7 @@ export default function ImportJobs() {
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
+
                     <button
                       onClick={() => scanSource(source)}
                       disabled={scanning[source.id]}
@@ -588,6 +637,7 @@ export default function ImportJobs() {
                         </>
                       )}
                     </button>
+
                     <button
                       onClick={() => deleteMutation.mutate(source.id)}
                       className="p-2 hover:bg-red-50 rounded-lg text-red-400 transition-colors"

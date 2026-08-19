@@ -45,6 +45,7 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
         <div className="space-y-3">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">תאריך</label>
+
             <input
               type="date"
               value={formData.date}
@@ -55,6 +56,7 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
 
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">שעה</label>
+
             <input
               type="time"
               value={formData.time}
@@ -65,6 +67,7 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
 
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">סוג ראיון</label>
+
             <div className="flex gap-2">
               {[
                 { value: "video", label: "וידאו", icon: Video },
@@ -81,6 +84,7 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
+
                   {label}
                 </button>
               ))}
@@ -90,6 +94,7 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
           {formData.type !== "in_person" && (
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">קישור</label>
+
               <input
                 type="text"
                 value={formData.location_or_link}
@@ -105,6 +110,7 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
           {formData.type === "in_person" && (
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">מקום</label>
+
               <input
                 type="text"
                 value={formData.location_or_link}
@@ -124,6 +130,7 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
             >
               ביטול
             </button>
+
             <button
               onClick={() => scheduleMutation.mutate(formData)}
               disabled={!formData.date || !formData.time || scheduleMutation.isPending}

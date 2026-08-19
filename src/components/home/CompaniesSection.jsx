@@ -21,11 +21,14 @@ function CompanyCard({ company }) {
           {company.initials || company.name?.slice(0, 2)}
         </div>
       )}
+
       <div className="flex-1 min-w-0">
         <div className="font-bold text-gray-900 text-base group-hover:text-blue-700 transition-colors truncate">
           {company.name}
         </div>
+
         <div className="text-sm text-gray-600 mt-1">{company.industry}</div>
+
         <div className="text-sm text-gray-500 mt-1">{company.job_count} משרות</div>
       </div>
     </Link>
@@ -44,6 +47,7 @@ export default function CompaniesSection() {
       <div className="max-w-[1200px] mx-auto px-4 py-12" dir="rtl">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">חברות מובילות מגייסות</h2>
+
           <Link
             to="/companies"
             className="text-blue-600 text-sm hover:text-blue-700 transition-colors font-medium inline-flex items-center gap-1"
@@ -52,6 +56,7 @@ export default function CompaniesSection() {
             <span>←</span>
           </Link>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {companies.map((company) => (
             <CompanyCard key={company.id} company={company} />

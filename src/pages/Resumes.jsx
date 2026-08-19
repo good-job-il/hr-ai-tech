@@ -112,9 +112,11 @@ export default function Resumes() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white" dir="rtl">
       <Navbar />
+
       <div className="max-w-[1000px] mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">קורות חיים</h1>
+
           <p className="text-gray-500 text-sm mt-2">נהל את קורות החיים שלך</p>
         </div>
 
@@ -132,6 +134,7 @@ export default function Resumes() {
               קורות חיים שהגיעו ({incomingResumes.length})
             </button>
           )}
+
           <button
             onClick={() => setFilter("mine")}
             className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
@@ -142,6 +145,7 @@ export default function Resumes() {
           >
             קורות חיים שלי ({myResumes.length})
           </button>
+
           <button
             onClick={() => setFilter("submitted")}
             className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
@@ -158,7 +162,9 @@ export default function Resumes() {
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-gray-500">
             {filter === "incoming" && "📄 אין קורות חיים שהגיעו"}
+
             {filter === "mine" && "📄 העלה קורות חיים בפרופיל שלך"}
+
             {filter === "submitted" && "📄 לא הגשת קורות חיים"}
           </div>
         ) : (
@@ -172,12 +178,16 @@ export default function Resumes() {
                   <div className="w-12 h-12 rounded-lg bg-hhblue/10 flex items-center justify-center flex-shrink-0">
                     <FileText className="w-6 h-6 text-hhblue" />
                   </div>
+
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-gray-900 truncate">{resume.name}</h3>
+
                     <p className="text-sm text-gray-600 truncate mt-0.5">{resume.job}</p>
+
                     <p className="text-xs text-gray-500 mt-1">{resume.email}</p>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <a
                     href={resume.url}

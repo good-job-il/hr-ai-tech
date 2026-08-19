@@ -84,6 +84,7 @@ function RoleRow({ record, canEdit, onSave, t }) {
                 }
               }}
             />
+
             <button
               onClick={handleSave}
               disabled={saving}
@@ -91,6 +92,7 @@ function RoleRow({ record, canEdit, onSave, t }) {
             >
               <Check className="w-3.5 h-3.5" />
             </button>
+
             <button
               onClick={handleCancel}
               className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition hover:bg-slate-200"
@@ -101,6 +103,7 @@ function RoleRow({ record, canEdit, onSave, t }) {
         ) : (
           <div className="flex items-center gap-2 group">
             <span className="font-semibold text-slate-900">{record.display_name}</span>
+
             {canEdit && record.is_editable_name && (
               <button
                 onClick={() => setEditing(true)}
@@ -263,6 +266,7 @@ export default function RoleSettingsPage() {
                   >
                     {t("roleSettings.staffingAgency")}
                   </button>
+
                   <button
                     onClick={() => setOrgType("organization")}
                     className={`rounded-lg px-4 py-2 font-semibold transition-all ${orgType === "organization" ? "bg-white text-violet-700 shadow-sm" : "text-slate-500"}`}
@@ -271,6 +275,7 @@ export default function RoleSettingsPage() {
                   </button>
                 </div>
               )}
+
               <button
                 onClick={load}
                 disabled={loading}
@@ -278,6 +283,7 @@ export default function RoleSettingsPage() {
               >
                 <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               </button>
+
               {savedMsg && (
                 <span className="flex items-center gap-1 rounded-xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-600">
                   <Check className="h-4 w-4" /> {savedMsg}
@@ -299,6 +305,7 @@ export default function RoleSettingsPage() {
                 : t("roleSettings.organization")
             }
           />
+
           <PlatformStatCard
             icon={Check}
             label={t("roleSettings.columns.active")}
@@ -306,6 +313,7 @@ export default function RoleSettingsPage() {
             tone="emerald"
             meta={t("roleSettings.columns.status")}
           />
+
           <PlatformStatCard
             icon={Pencil}
             label={t("roleSettings.columns.displayName")}
@@ -343,6 +351,7 @@ export default function RoleSettingsPage() {
                 subtitle={t("roleSettings.subtitle")}
               />
             </div>
+
             <div className="overflow-x-auto">
               <table className="w-full min-w-[820px] text-sm">
                 <thead>
@@ -350,23 +359,29 @@ export default function RoleSettingsPage() {
                     <th className="px-4 py-3.5 text-center text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                       {t("roleSettings.columns.level")}
                     </th>
+
                     <th className="px-4 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                       {t("roleSettings.columns.systemRoleKey")}
                     </th>
+
                     <th className="px-4 py-3.5 text-start text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                       {t("roleSettings.columns.displayName")}
                     </th>
+
                     <th className="px-4 py-3.5 text-center text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                       {t("roleSettings.columns.parentRole")}
                     </th>
+
                     <th className="px-4 py-3.5 text-center text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                       {t("roleSettings.columns.status")}
                     </th>
+
                     <th className="px-4 py-3.5 text-center text-[11px] font-extrabold uppercase tracking-[0.08em] text-slate-400">
                       {t("roleSettings.columns.active")}
                     </th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {displayRecords.map((record) => (
                     <RoleRow
@@ -377,6 +392,7 @@ export default function RoleSettingsPage() {
                       t={t}
                     />
                   ))}
+
                   {displayRecords.length === 0 && (
                     <tr>
                       <td colSpan={6} className="p-5">

@@ -16,6 +16,7 @@ export default function LoadingSpinner({ text = "טוען...", size = "md" }) {
       <div
         className={`${sizeClasses[size]} border-4 border-gray-200 border-t-hhblue rounded-full animate-spin`}
       />
+
       {text && <p className="mt-3 text-gray-500 text-sm">{text}</p>}
     </div>
   )

@@ -130,6 +130,7 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
           className="w-full flex items-center justify-between font-semibold text-gray-800 hover:text-gray-900 transition-colors"
         >
           <span>{title}</span>
+
           <ChevronDown
             className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
           />
@@ -140,6 +141,7 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
             {items.length > 8 && (
               <div className="relative">
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+
                 <input
                   type="text"
                   placeholder={`חפש ${title}...`}
@@ -176,6 +178,7 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
                       }}
                       className="w-4 h-4 rounded border-gray-300 cursor-pointer"
                     />
+
                     <span className="text-sm text-gray-700">{name}</span>
                   </label>
                 )
@@ -191,6 +194,7 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm" dir="rtl">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-bold text-gray-900">פילטרים</h2>
+
         {selectedDomains.length +
           selectedRoles.length +
           selectedSpecializations.length +

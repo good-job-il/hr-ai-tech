@@ -60,6 +60,7 @@ export default function JobsHeader() {
                 }}
               >
                 {link.label}
+
                 {active && (
                   <span
                     style={{
@@ -85,6 +86,7 @@ export default function JobsHeader() {
             className="hidden md:inline-flex items-center gap-2 h-12 px-6 rounded-lg font-black text-[#6C4DFF] bg-white border border-[#DDEBFF] shadow-[0_10px_30px_rgba(79,124,255,0.10)]"
           >
             <Search className="w-4 h-4" />
+
             {t("jobs.searchButton")}
           </Link>
 
@@ -106,6 +108,7 @@ export default function JobsHeader() {
                 }}
               >
                 <UserPlus className="w-4 h-4" />
+
                 {isRtl ? "הרשמה כמועמד חדש" : "Register as Candidate"}
               </Link>
             </>
@@ -113,6 +116,7 @@ export default function JobsHeader() {
             <>
               <button className="relative w-12 h-12 rounded-2xl bg-white border border-[#DDEBFF] flex items-center justify-center shadow-sm">
                 <Bell className="w-5 h-5 text-[#6C4DFF]" />
+
                 <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#7C3AED] border-2 border-white" />
               </button>
 
