@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Edit2, Trash2, Plus, Users, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import StaffFormModal from '@/components/employer/StaffFormModal';
+import React, { useState } from "react"
+import { Edit2, Trash2, Plus, Users, ChevronDown, ChevronUp } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import StaffFormModal from "@/components/employer/StaffFormModal"
 
 export default function HierarchyStaffSection({
   staff,
@@ -10,71 +10,73 @@ export default function HierarchyStaffSection({
   onAdd,
   onUpdate,
   onDelete,
-  loading
+  loading,
 }) {
-  const [showModal, setShowModal] = useState(false);
-  const [editingStaff, setEditingStaff] = useState(null);
-  const [expandedManagers, setExpandedManagers] = useState({});
+  const [showModal, setShowModal] = useState(false)
+  const [editingStaff, setEditingStaff] = useState(null)
+  const [expandedManagers, setExpandedManagers] = useState({})
 
   const handleSubmit = (data) => {
     if (editingStaff) {
-      onUpdate({ id: editingStaff.id, data });
+      onUpdate({ id: editingStaff.id, data })
     } else {
-      onAdd(data);
+      onAdd(data)
     }
-    setShowModal(false);
-    setEditingStaff(null);
-  };
+    setShowModal(false)
+    setEditingStaff(null)
+  }
 
   const handleOpenModal = (member = null) => {
-    setEditingStaff(member);
-    setShowModal(true);
-  };
+    setEditingStaff(member)
+    setShowModal(true)
+  }
 
   const toggleManager = (managerId) => {
-    setExpandedManagers(prev => ({
+    setExpandedManagers((prev) => ({
       ...prev,
-      [managerId]: !prev[managerId]
-    }));
-  };
+      [managerId]: !prev[managerId],
+    }))
+  }
 
   // Get hiring managers (בכירים)
-  const hiringManagers = staff.filter(s => s.role === 'hiring_manager');
+  const hiringManagers = staff.filter((s) => s.role === "hiring_manager")
   // Get team managers (מנהלי צוות)
-  const teamManagers = staff.filter(s => s.role === 'team_manager');
+  const teamManagers = staff.filter((s) => s.role === "team_manager")
   // Get recruiters (רכזי גיוס)
-  const recruiters = staff.filter(s => s.role === 'recruiter');
+  const recruiters = staff.filter((s) => s.role === "recruiter")
 
   const getSubordinates = (managerId) => {
-    return staff.filter(s => s.manager_email === staff.find(m => m.id === managerId)?.email);
-  };
+    return staff.filter((s) => s.manager_email === staff.find((m) => m.id === managerId)?.email)
+  }
 
   const StaffCard = ({ member, level = 0, isChild = false }) => (
-    <div className={`${isChild ? 'mr-8' : ''}`}>
-      <div className={`flex items-start justify-between p-4 rounded-lg border transition-all ${
-        isChild ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200 hover:border-gray-300'
-      }`}>
+    <div className={`${isChild ? "mr-8" : ""}`}>
+      <div
+        className={`flex items-start justify-between p-4 rounded-lg border transition-all ${
+          isChild ? "bg-blue-50 border-blue-200" : "bg-white border-gray-200 hover:border-gray-300"
+        }`}
+      >
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-gray-900">{member.full_name}</h3>
-            <span className={`inline-block px-2 py-1 text-xs rounded font-medium ${
-              member.role === 'hiring_manager' 
-                ? 'bg-purple-100 text-purple-700' 
-                : member.role === 'team_manager'
-                ? 'bg-blue-100 text-blue-700'
-                : 'bg-green-100 text-green-700'
-            }`}>
-              {member.role === 'hiring_manager' 
-                ? '👑 מנהל גיוס' 
-                : member.role === 'team_manager'
-                ? '👥 מנהל צוות'
-                : '👤 רכז גיוס'}
+            <span
+              className={`inline-block px-2 py-1 text-xs rounded font-medium ${
+                member.role === "hiring_manager"
+                  ? "bg-purple-100 text-purple-700"
+                  : member.role === "team_manager"
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-green-100 text-green-700"
+              }`}
+            >
+              {member.role === "hiring_manager"
+                ? "👑 מנהל גיוס"
+                : member.role === "team_manager"
+                  ? "👥 מנהל צוות"
+                  : "👤 רכז גיוס"}
             </span>
           </div>
           <p className="text-sm text-gray-600 mt-1">{member.email}</p>
-          {member.phone && (
-            <p className="text-xs text-gray-500 mt-1">📞 {member.phone}</p>
-          )}
+          {member.phone && <p className="text-xs text-gray-500 mt-1">📞 {member.phone}</p>}
         </div>
         <div className="flex gap-2 mr-4">
           <Button
@@ -97,7 +99,7 @@ export default function HierarchyStaffSection({
       </div>
 
       {/* Subordinates */}
-      {(member.role === 'hiring_manager' || member.role === 'team_manager') && (
+      {(member.role === "hiring_manager" || member.role === "team_manager") && (
         <div className="mt-3">
           {getSubordinates(member.id).length > 0 && (
             <div>
@@ -115,7 +117,7 @@ export default function HierarchyStaffSection({
 
               {expandedManagers[member.id] && (
                 <div className="space-y-3">
-                  {getSubordinates(member.id).map(subordinate => (
+                  {getSubordinates(member.id).map((subordinate) => (
                     <StaffCard
                       key={subordinate.id}
                       member={subordinate}
@@ -130,7 +132,7 @@ export default function HierarchyStaffSection({
         </div>
       )}
     </div>
-  );
+  )
 
   return (
     <div className="space-y-6">
@@ -147,7 +149,7 @@ export default function HierarchyStaffSection({
                 <p className="text-sm text-gray-500">{hiringManagers.length} בכירים בחברה</p>
               </div>
             </div>
-            {(isAdmin || hiringManagers.some(m => m.email === hiringManager?.email)) && (
+            {(isAdmin || hiringManagers.some((m) => m.email === hiringManager?.email)) && (
               <Button
                 onClick={() => handleOpenModal()}
                 className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2"
@@ -166,7 +168,7 @@ export default function HierarchyStaffSection({
             </div>
           ) : (
             <div className="space-y-4">
-              {hiringManagers.map(manager => (
+              {hiringManagers.map((manager) => (
                 <StaffCard key={manager.id} member={manager} />
               ))}
             </div>
@@ -198,7 +200,7 @@ export default function HierarchyStaffSection({
               </div>
             ) : (
               <div className="space-y-4">
-                {teamManagers.map(manager => (
+                {teamManagers.map((manager) => (
                   <StaffCard key={manager.id} member={manager} />
                 ))}
               </div>
@@ -217,13 +219,15 @@ export default function HierarchyStaffSection({
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">רכזי גיוס</h2>
-                <p className="text-sm text-gray-500">{recruiters.filter(r => !r.manager_email).length} רכזים בלתי תלויים</p>
+                <p className="text-sm text-gray-500">
+                  {recruiters.filter((r) => !r.manager_email).length} רכזים בלתי תלויים
+                </p>
               </div>
             </div>
           </div>
 
           <div className="p-6 space-y-3">
-            {recruiters.map(recruiter => (
+            {recruiters.map((recruiter) => (
               <StaffCard key={recruiter.id} member={recruiter} />
             ))}
           </div>
@@ -242,5 +246,5 @@ export default function HierarchyStaffSection({
         showHiringManagerOption={isAdmin}
       />
     </div>
-  );
+  )
 }

@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react"
 
 export const ModalContainer = () => {
-  return <div id="modal-container" />;
-};
+  return <div id="modal-container" />
+}
 
-export default ModalContainer;
+export default ModalContainer

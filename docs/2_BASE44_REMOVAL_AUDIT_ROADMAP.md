@@ -32,17 +32,17 @@ MySQL + application-owned file storage
 
 Обновлено: 16 августа 2026.
 
-| Фаза | Статус | Реализовано |
-|---|---|---|
-| 0 | Завершена для кода; runtime capture ожидает окружение | Автоматический inventory, замороженный per-file baseline вызовов и `.filter()` contracts, CI boundary с проверкой PR-base, route/DTO/permission/test matrix, владельцы import/migration процессов и запрет расширения `ENTITY_CONFIG`. Runtime traffic baseline требует запущенного тестового окружения и четырёх ролевых аккаунтов. |
-| 1 | Завершена для runtime-кода; требуется operational sign-off | Все внешние Base44 assets удалены, CSP использует явный network/image allowlist, неподдерживаемый OAuth отсутствует, `asServiceRole` удалён из shim. Универсальный email endpoint и browser-authored email payload удалены; письма Application/Interview формируются backend domain services. Migration tooling требует явный `--allow-legacy-network`. Локальные env исключены из Git. Владелец секретов должен подтвердить data reconciliation, отозвать credentials и выполнить network-blocked browser E2E. |
-| 2 | Завершена и защищена CI | `HttpClient` безопасно распаковывает envelopes и сохраняет pagination; `ResourceService<TEntity,TQuery,TCreate,TUpdate>` разделяет контракты; AgencyClient/Job/Candidate/Application имеют точные query/create/update types, централизованные list/detail keys и React Query hooks. Удалены unsafe `BaseRepository`, arbitrary filter map и guessed bulk routes. API-only TypeScript и service↔NestJS Zod DTO contract gate работают в CI. |
-| 3 | Завершена для кода; browser E2E ожидает окружение | AuthContext и auth UI, onboarding, Platform и Admin переведены на типизированные NestJS services. Удалены legacy token aliases и taxonomy compatibility RPC; audit identity и platform-only organization fields закреплены за backend. Из shim удалены `auth` и `organizationsApi`; CI запрещает shim/raw transport во всём Phase 3 scope. OAuth отключён явной policy. |
-| 4 | Завершена для кода; browser E2E ожидает окружение | Public jobs/companies и весь активный candidate кабинет используют typed domain services. Добавлены identity-free submit, matching/resume endpoints, canonical ID ownership с backfill migration, backend-owned message/review identity и явный polling. CI запрещает shim/raw transport в Phase 4 scope. |
-| 5 | Завершена для кода; role/browser E2E ожидает окружение | Активные Employer, Company HR, Agency, recruiter и CRM routes переведены на typed services. Team management использует organization users/invite, pipeline — backend transition action, AI Matching — canonical ID assignment, CRM identity/timeline/notifications принадлежат backend. CI запрещает shim/raw transport и masked errors в Phase 5 scope. |
-| 6 | Завершена для кода; worker/browser E2E ожидает окружение | `functions.invoke`, `integrations.Core`, generic Functions/LLM controllers удалены. Analytics, scoring, resume и imports используют domain endpoints. Долгие candidate/source imports сохраняются как idempotent background jobs с retry/backoff/recovery; crawler и file processing защищены от SSRF. CI закрепляет нулевой string-RPC surface. |
-| 7 | Завершена | Shim, Base44 tree, SDK artifacts, compatibility routes и неиспользуемые legacy-страницы физически удалены; terminal audit закреплён в CI. |
-| 8 | Завершена для автоматизированного QA; browser sign-off заблокирован окружением | Единый release gate, реальные backend lint/Jest, fresh/upgrade migrations, OpenAPI/auth/tenant/workflow/import/file/API E2E, health/request-id monitoring и production dependency audit. Встроенный QA-браузер недоступен в текущем окружении, поэтому ручной визуальный sign-off остаётся обязательным перед production deployment. |
+| Фаза | Статус                                                                         | Реализовано                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ---- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | Завершена для кода; runtime capture ожидает окружение                          | Автоматический inventory, замороженный per-file baseline вызовов и `.filter()` contracts, CI boundary с проверкой PR-base, route/DTO/permission/test matrix, владельцы import/migration процессов и запрет расширения `ENTITY_CONFIG`. Runtime traffic baseline требует запущенного тестового окружения и четырёх ролевых аккаунтов.                                                                                                                                                                            |
+| 1    | Завершена для runtime-кода; требуется operational sign-off                     | Все внешние Base44 assets удалены, CSP использует явный network/image allowlist, неподдерживаемый OAuth отсутствует, `asServiceRole` удалён из shim. Универсальный email endpoint и browser-authored email payload удалены; письма Application/Interview формируются backend domain services. Migration tooling требует явный `--allow-legacy-network`. Локальные env исключены из Git. Владелец секретов должен подтвердить data reconciliation, отозвать credentials и выполнить network-blocked browser E2E. |
+| 2    | Завершена и защищена CI                                                        | `HttpClient` безопасно распаковывает envelopes и сохраняет pagination; `ResourceService<TEntity,TQuery,TCreate,TUpdate>` разделяет контракты; AgencyClient/Job/Candidate/Application имеют точные query/create/update types, централизованные list/detail keys и React Query hooks. Удалены unsafe `BaseRepository`, arbitrary filter map и guessed bulk routes. API-only TypeScript и service↔NestJS Zod DTO contract gate работают в CI.                                                                      |
+| 3    | Завершена для кода; browser E2E ожидает окружение                              | AuthContext и auth UI, onboarding, Platform и Admin переведены на типизированные NestJS services. Удалены legacy token aliases и taxonomy compatibility RPC; audit identity и platform-only organization fields закреплены за backend. Из shim удалены `auth` и `organizationsApi`; CI запрещает shim/raw transport во всём Phase 3 scope. OAuth отключён явной policy.                                                                                                                                         |
+| 4    | Завершена для кода; browser E2E ожидает окружение                              | Public jobs/companies и весь активный candidate кабинет используют typed domain services. Добавлены identity-free submit, matching/resume endpoints, canonical ID ownership с backfill migration, backend-owned message/review identity и явный polling. CI запрещает shim/raw transport в Phase 4 scope.                                                                                                                                                                                                       |
+| 5    | Завершена для кода; role/browser E2E ожидает окружение                         | Активные Employer, Company HR, Agency, recruiter и CRM routes переведены на typed services. Team management использует organization users/invite, pipeline — backend transition action, AI Matching — canonical ID assignment, CRM identity/timeline/notifications принадлежат backend. CI запрещает shim/raw transport и masked errors в Phase 5 scope.                                                                                                                                                        |
+| 6    | Завершена для кода; worker/browser E2E ожидает окружение                       | `functions.invoke`, `integrations.Core`, generic Functions/LLM controllers удалены. Analytics, scoring, resume и imports используют domain endpoints. Долгие candidate/source imports сохраняются как idempotent background jobs с retry/backoff/recovery; crawler и file processing защищены от SSRF. CI закрепляет нулевой string-RPC surface.                                                                                                                                                                |
+| 7    | Завершена                                                                      | Shim, Base44 tree, SDK artifacts, compatibility routes и неиспользуемые legacy-страницы физически удалены; terminal audit закреплён в CI.                                                                                                                                                                                                                                                                                                                                                                       |
+| 8    | Завершена для автоматизированного QA; browser sign-off заблокирован окружением | Единый release gate, реальные backend lint/Jest, fresh/upgrade migrations, OpenAPI/auth/tenant/workflow/import/file/API E2E, health/request-id monitoring и production dependency audit. Встроенный QA-браузер недоступен в текущем окружении, поэтому ручной визуальный sign-off остаётся обязательным перед production deployment.                                                                                                                                                                            |
 
 Текущий остаток Base44: 0 runtime-imports, 0 entity/RPC calls, 0 shim contracts и отсутствующий legacy tree. После завершения миграции одноразовые Phase verification scripts удалены. Постоянный локальный gate `npm run release:verify` проверяет dependency audit, frontend lint/typecheck/build и backend lint/unit tests/build. Отчёты по завершённым фазам сохранены в `docs/PHASE_*` как история миграции.
 
@@ -67,26 +67,26 @@ MySQL + application-owned file storage
 
 На момент аудита:
 
-| Категория | Использование |
-|---|---:|
-| Файлы, импортирующие `@/api/base44Client` | 105 |
-| Файлы с `base44.entities.*` | 95 |
-| Файлы с `base44.functions.invoke()` | 19 |
-| Файлы с `base44.integrations.Core.*` | 12 |
-| Файлы с `base44.auth.*` | 16 |
+| Категория                                 | Использование |
+| ----------------------------------------- | ------------: |
+| Файлы, импортирующие `@/api/base44Client` |           105 |
+| Файлы с `base44.entities.*`               |            95 |
+| Файлы с `base44.functions.invoke()`       |            19 |
+| Файлы с `base44.integrations.Core.*`      |            12 |
+| Файлы с `base44.auth.*`                   |            16 |
 
 Наиболее затронутые области:
 
-| Область | Файлы с импортом shim |
-|---|---:|
-| Admin pages | 19 |
-| Platform pages | 9 |
-| Employer pages | 9 |
-| Candidate pages | 6 |
-| Dashboards | 5 |
-| Agency pages | 3 |
-| CRM pages | 3 |
-| Recruiter pages | 3 |
+| Область         | Файлы с импортом shim |
+| --------------- | --------------------: |
+| Admin pages     |                    19 |
+| Platform pages  |                     9 |
+| Employer pages  |                     9 |
+| Candidate pages |                     6 |
+| Dashboards      |                     5 |
+| Agency pages    |                     3 |
+| CRM pages       |                     3 |
+| Recruiter pages |                     3 |
 
 Основной shim: `src/api/base44Client.js`.
 
@@ -412,21 +412,21 @@ src/api/
 
 Предлагаемые NestJS API domains:
 
-| Legacy function | Целевой API |
-|---|---|
-| `smartSearch` | `POST /jobs/search` |
-| `getRecommendedJobs` | `GET /matching/jobs/recommended` |
-| `scoreApplication` | `POST /applications/:id/score` |
-| `getDashboardStats` | `GET /analytics/dashboard` |
-| `createAuditLog` | backend-generated audit event |
-| `createApplicationTimeline` | backend-generated application event |
-| `loadTaxonomy` | `POST /taxonomy/reload` или seed command |
-| `extractAndTranslateResume` | `POST /resumes/extract` |
-| import/parse/validate functions | `/candidate-imports/*` и `GET /background-jobs/:id` |
-| `crawlCareerPage` | `POST /import-sources/:id/runs` и `POST /import-sources/preview` |
-| vendor-specific imports | удалены; все источники запускаются по сохранённой конфигурации `ImportSource` |
-| `updateCompanyProfile` | `PATCH /companies/:id/profile` |
-| `getLocationFromIP` | `GET /location/current` |
+| Legacy function                 | Целевой API                                                                   |
+| ------------------------------- | ----------------------------------------------------------------------------- |
+| `smartSearch`                   | `POST /jobs/search`                                                           |
+| `getRecommendedJobs`            | `GET /matching/jobs/recommended`                                              |
+| `scoreApplication`              | `POST /applications/:id/score`                                                |
+| `getDashboardStats`             | `GET /analytics/dashboard`                                                    |
+| `createAuditLog`                | backend-generated audit event                                                 |
+| `createApplicationTimeline`     | backend-generated application event                                           |
+| `loadTaxonomy`                  | `POST /taxonomy/reload` или seed command                                      |
+| `extractAndTranslateResume`     | `POST /resumes/extract`                                                       |
+| import/parse/validate functions | `/candidate-imports/*` и `GET /background-jobs/:id`                           |
+| `crawlCareerPage`               | `POST /import-sources/:id/runs` и `POST /import-sources/preview`              |
+| vendor-specific imports         | удалены; все источники запускаются по сохранённой конфигурации `ImportSource` |
+| `updateCompanyProfile`          | `PATCH /companies/:id/profile`                                                |
+| `getLocationFromIP`             | `GET /location/current`                                                       |
 
 Работы:
 

@@ -1,58 +1,66 @@
-import React, { useState } from 'react';
-import { candidateImportService } from '@/api/services/candidateImportService';
-import { AlertCircle, CheckCircle2, Loader2, ArrowRight, Mail, Phone, Briefcase } from 'lucide-react';
-import DuplicateResolveModal from './DuplicateResolveModal';
+import React, { useState } from "react"
+import { candidateImportService } from "@/api/services/candidateImportService"
+import {
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  ArrowRight,
+  Mail,
+  Phone,
+  Briefcase,
+} from "lucide-react"
+import DuplicateResolveModal from "./DuplicateResolveModal"
 
 export default function ResumeImportReview({ results, onComplete, onBack }) {
-  const [importing, setImporting] = useState(false);
-  const [importError, setImportError] = useState(null);
-  const [resolvedDuplicates, setResolvedDuplicates] = useState({});
-  const [selectedDuplicate, setSelectedDuplicate] = useState(null);
+  const [importing, setImporting] = useState(false)
+  const [importError, setImportError] = useState(null)
+  const [resolvedDuplicates, setResolvedDuplicates] = useState({})
+  const [selectedDuplicate, setSelectedDuplicate] = useState(null)
 
   const handleResolveDuplicate = (duplicateIndex, action, mergeWithId) => {
-    setResolvedDuplicates(prev => ({
+    setResolvedDuplicates((prev) => ({
       ...prev,
-      [duplicateIndex]: { action, mergeWithId }
-    }));
-    setSelectedDuplicate(null);
-  };
+      [duplicateIndex]: { action, mergeWithId },
+    }))
+    setSelectedDuplicate(null)
+  }
 
   const handleCreateCandidates = async () => {
-    setImporting(true);
-    setImportError(null);
+    setImporting(true)
+    setImportError(null)
 
     try {
       // Filter out duplicates that weren't resolved for creation
       const candidatesToCreate = results.candidates.filter((_, idx) => {
-        const resolved = resolvedDuplicates[idx];
-        return !resolved || resolved.action === 'create_anyway';
-      });
+        const resolved = resolvedDuplicates[idx]
+        return !resolved || resolved.action === "create_anyway"
+      })
 
       if (candidatesToCreate.length === 0) {
-        setImportError('אין מועמדים ליצירה');
-        setImporting(false);
-        return;
+        setImportError("אין מועמדים ליצירה")
+        setImporting(false)
+        return
       }
 
       // Create bulk candidates
       const createResult = await candidateImportService.createBulk(
-        candidatesToCreate.map(c => c.data),
+        candidatesToCreate.map((c) => c.data),
         results.importBatchId,
-      );
+      )
 
-      onComplete?.();
+      onComplete?.()
     } catch (err) {
-      console.error('[ResumeImportReview] Error:', err);
-      setImportError(err.message || 'שגיאה ביצירת מועמדים');
+      console.error("[ResumeImportReview] Error:", err)
+      setImportError(err.message || "שגיאה ביצירת מועמדים")
     } finally {
-      setImporting(false);
+      setImporting(false)
     }
-  };
+  }
 
   const totalToCreate = results.candidates.filter((_, idx) => {
-    const resolved = resolvedDuplicates[idx];
-    return !resolved || resolved.action === 'create_anyway';
-  }).length;
+    const resolved = resolvedDuplicates[idx]
+    return !resolved || resolved.action === "create_anyway"
+  }).length
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -70,28 +78,28 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
       </div>
 
       {/* Stats */}
-       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-         <div className="bg-white rounded-xl border border-gray-200 p-4">
-           <p className="text-xs text-gray-600 font-medium mb-1">סה״כ resumes</p>
-           <p className="text-2xl font-bold text-gray-900">{results.total}</p>
-         </div>
-         <div className="bg-white rounded-xl border border-gray-200 p-4">
-           <p className="text-xs text-gray-600 font-medium mb-1">עובדו בהצלחה</p>
-           <p className="text-2xl font-bold text-green-600">{results.processed}</p>
-         </div>
-         <div className="bg-white rounded-xl border border-gray-200 p-4">
-           <p className="text-xs text-gray-600 font-medium mb-1">כפילויות</p>
-           <p className="text-2xl font-bold text-yellow-600">{results.duplicates.length}</p>
-         </div>
-         <div className="bg-white rounded-xl border border-gray-200 p-4">
-           <p className="text-xs text-gray-600 font-medium mb-1">נכשלו</p>
-           <p className="text-2xl font-bold text-red-600">{results.failed}</p>
-         </div>
-         <div className="bg-white rounded-xl border border-gray-200 p-4">
-           <p className="text-xs text-gray-600 font-medium mb-1">ליצירה</p>
-           <p className="text-2xl font-bold text-purple-600">{totalToCreate}</p>
-         </div>
-       </div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs text-gray-600 font-medium mb-1">סה״כ resumes</p>
+          <p className="text-2xl font-bold text-gray-900">{results.total}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs text-gray-600 font-medium mb-1">עובדו בהצלחה</p>
+          <p className="text-2xl font-bold text-green-600">{results.processed}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs text-gray-600 font-medium mb-1">כפילויות</p>
+          <p className="text-2xl font-bold text-yellow-600">{results.duplicates.length}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs text-gray-600 font-medium mb-1">נכשלו</p>
+          <p className="text-2xl font-bold text-red-600">{results.failed}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs text-gray-600 font-medium mb-1">ליצירה</p>
+          <p className="text-2xl font-bold text-purple-600">{totalToCreate}</p>
+        </div>
+      </div>
 
       {importError && (
         <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
@@ -155,7 +163,10 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
           </h3>
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {results.candidates.map((candidate, idx) => (
-              <div key={idx} className="border border-gray-200 rounded-lg p-3 flex items-start gap-3">
+              <div
+                key={idx}
+                className="border border-gray-200 rounded-lg p-3 flex items-start gap-3"
+              >
                 <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-900 truncate">{candidate.data.full_name}</p>
@@ -166,7 +177,9 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
                   <div className="flex flex-wrap gap-2 mt-1 text-xs text-gray-500">
                     <span>איכות: {candidate.data.data_quality_score}%</span>
                     <span>ביטחון: {candidate.data.parsing_confidence}%</span>
-                    {candidate.data.review_required && <span className="text-orange-600 font-medium">⚠️ דורש ביקורת</span>}
+                    {candidate.data.review_required && (
+                      <span className="text-orange-600 font-medium">⚠️ דורש ביקורת</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -183,7 +196,10 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
           </h3>
           <div className="space-y-2">
             {results.errors.map((err, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm">
+              <div
+                key={idx}
+                className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm"
+              >
                 <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-medium text-red-900">{err.filename}</p>
@@ -227,11 +243,11 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
         <DuplicateResolveModal
           duplicate={results.duplicates[selectedDuplicate]}
           onResolve={(action, mergeId) => {
-            handleResolveDuplicate(selectedDuplicate, action, mergeId);
+            handleResolveDuplicate(selectedDuplicate, action, mergeId)
           }}
           onClose={() => setSelectedDuplicate(null)}
         />
       )}
     </div>
-  );
+  )
 }

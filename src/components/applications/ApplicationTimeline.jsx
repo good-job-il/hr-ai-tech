@@ -1,7 +1,7 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { applicationService } from '@/api/services/applicationService';
-import { MessageCircle, CheckCircle2, Clock, AlertCircle, FileText, Award, Eye } from 'lucide-react';
+import React from "react"
+import { useQuery } from "@tanstack/react-query"
+import { applicationService } from "@/api/services/applicationService"
+import { MessageCircle, CheckCircle2, Clock, AlertCircle, FileText, Award, Eye } from "lucide-react"
 
 const eventIcons = {
   submitted: FileText,
@@ -12,41 +12,41 @@ const eventIcons = {
   offer_made: Award,
   rejected: AlertCircle,
   assigned: Clock,
-  resume_viewed: Eye
-};
+  resume_viewed: Eye,
+}
 
 const eventLabels = {
-  submitted: 'מועמדות הוגשה',
-  status_changed: 'סטטוס השתנה',
-  note_added: 'הוסיפו הערה',
-  interview_scheduled: 'ראיון תוזמן',
-  interview_completed: 'ראיון הסתיים',
-  offer_made: 'הצעה הוגשה',
-  rejected: 'דחויה',
-  assigned: 'הוקצתה',
-  resume_viewed: 'קורות חיים נצפו'
-};
+  submitted: "מועמדות הוגשה",
+  status_changed: "סטטוס השתנה",
+  note_added: "הוסיפו הערה",
+  interview_scheduled: "ראיון תוזמן",
+  interview_completed: "ראיון הסתיים",
+  offer_made: "הצעה הוגשה",
+  rejected: "דחויה",
+  assigned: "הוקצתה",
+  resume_viewed: "קורות חיים נצפו",
+}
 
 export default function ApplicationTimeline({ applicationId }) {
   const { data: timeline = [], isLoading } = useQuery({
-    queryKey: ['application-timeline', applicationId],
-    queryFn: () => applicationService.timeline(applicationId)
-  });
+    queryKey: ["application-timeline", applicationId],
+    queryFn: () => applicationService.timeline(applicationId),
+  })
 
   if (isLoading) {
-    return <div className="text-gray-400">טוען ציר זמן...</div>;
+    return <div className="text-gray-400">טוען ציר זמן...</div>
   }
 
   if (timeline.length === 0) {
-    return <div className="text-gray-500 text-sm">אין אירועים בציר הזמן</div>;
+    return <div className="text-gray-500 text-sm">אין אירועים בציר הזמן</div>
   }
 
   return (
     <div className="space-y-4">
       {timeline.map((event, index) => {
-        const IconComponent = eventIcons[event.event_type] || Clock;
-        const label = eventLabels[event.event_type] || event.event_type;
-        
+        const IconComponent = eventIcons[event.event_type] || Clock
+        const label = eventLabels[event.event_type] || event.event_type
+
         return (
           <div key={event.id} className="flex gap-4">
             {/* Timeline line */}
@@ -63,31 +63,38 @@ export default function ApplicationTimeline({ applicationId }) {
                 <div>
                   <p className="font-semibold text-white text-sm">{label}</p>
                   <p className="text-gray-400 text-xs mt-1">{event.description}</p>
-                  
+
                   {event.previous_value && event.new_value && (
                     <div className="mt-2 text-xs text-gray-500">
-                      מ: <span className="text-red-400">{event.previous_value}</span> → ל: <span className="text-green-400">{event.new_value}</span>
+                      מ: <span className="text-red-400">{event.previous_value}</span> → ל:{" "}
+                      <span className="text-green-400">{event.new_value}</span>
                     </div>
                   )}
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
                 <span>
-                  {new Date(event.created_date).toLocaleString('he-IL', {
-                    timeZone: 'Asia/Jerusalem',
-                    day: '2-digit', month: '2-digit', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit', hour12: false,
+                  {new Date(event.created_date).toLocaleString("he-IL", {
+                    timeZone: "Asia/Jerusalem",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
                   })}
                 </span>
                 {event.performed_by && (
-                  <span>• {event.performed_by} ({event.performed_by_role})</span>
+                  <span>
+                    • {event.performed_by} ({event.performed_by_role})
+                  </span>
                 )}
               </div>
             </div>
           </div>
-        );
+        )
       })}
     </div>
-  );
+  )
 }

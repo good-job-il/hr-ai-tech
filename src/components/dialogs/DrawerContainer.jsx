@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react"
 
 export const DrawerContainer = () => {
-  return <div id="drawer-container" />;
-};
+  return <div id="drawer-container" />
+}
 
-export default DrawerContainer;
+export default DrawerContainer

@@ -1160,10 +1160,31 @@
     "emptyInvites": "עדיין אין הזמנות",
     "errorTitle": "לא ניתן לטעון את צוותי הארגון",
     "tabs": { "members": "חברים", "teams": "צוותים", "invitations": "הזמנות" },
-    "stats": { "total": "סה״כ חברים", "active": "חברים פעילים", "teams": "צוותים פעילים", "pending": "הזמנות ממתינות" },
-    "fields": { "fullName": "שם מלא", "email": "אימייל", "phone": "טלפון", "role": "תפקיד", "team": "צוות" },
-    "roles": { "org_admin": "מנהל ארגון", "recruitment_manager": "מנהל גיוס", "team_manager": "מנהל צוות", "recruiter": "מגייס" },
-    "inviteStatus": { "pending": "ממתינה", "accepted": "התקבלה", "cancelled": "בוטלה", "expired": "פגה" },
+    "stats": {
+      "total": "סה״כ חברים",
+      "active": "חברים פעילים",
+      "teams": "צוותים פעילים",
+      "pending": "הזמנות ממתינות"
+    },
+    "fields": {
+      "fullName": "שם מלא",
+      "email": "אימייל",
+      "phone": "טלפון",
+      "role": "תפקיד",
+      "team": "צוות"
+    },
+    "roles": {
+      "org_admin": "מנהל ארגון",
+      "recruitment_manager": "מנהל גיוס",
+      "team_manager": "מנהל צוות",
+      "recruiter": "מגייס"
+    },
+    "inviteStatus": {
+      "pending": "ממתינה",
+      "accepted": "התקבלה",
+      "cancelled": "בוטלה",
+      "expired": "פגה"
+    },
     "invite": {
       "title": "הזמנת חבר ארגון",
       "hint": "ההזמנה תקפה ל-7 ימים. הקישור המאובטח מוצג פעם אחת ומועתק לאחר היצירה.",
@@ -1171,7 +1192,13 @@
       "copied": "קישור ההזמנה הועתק",
       "linkReady": "ההזמנה נוצרה"
     },
-    "teamModal": { "title": "יצירת צוות", "name": "שם הצוות", "description": "תיאור", "manager": "מנהל צוות", "created": "הצוות נוצר" },
+    "teamModal": {
+      "title": "יצירת צוות",
+      "name": "שם הצוות",
+      "description": "תיאור",
+      "manager": "מנהל צוות",
+      "created": "הצוות נוצר"
+    },
     "memberModal": { "title": "עריכת {{name}}", "saved": "חבר הצוות עודכן" }
   },
   "platform": {
@@ -2093,62 +2120,62 @@
     }
   },
   "agencyClients": {
-      "title": "לקוחות",
-      "subtitle": "חברות שאנחנו מגייסים עבורן",
-      "newClient": "לקוח חדש",
-      "createModal": {
-        "title": "לקוח חדש",
-        "clientName": "שם הלקוח",
-        "clientNameRequired": "שם לקוח הוא שדה חובה",
-        "namePlaceholder": "לדוגמה: TechCorp Israel",
-        "industry": "תעשייה",
-        "selectIndustry": "בחר תעשייה",
-        "contactEmail": "אימייל איש קשר",
-        "website": "אתר אינטרנט",
-        "color": "צבע",
-        "cancel": "ביטול",
-        "creating": "יוצר...",
-        "create": "צור לקוח",
-        "success": "הלקוח נוצר בהצלחה",
-        "errorCreating": "שגיאה ביצירת לקוח"
-      },
-      "industries": {
-        "hitech": "הייטק",
-        "finance": "פיננסים",
-        "manufacturing": "ייצור",
-        "retail": "קמעונאות",
-        "services": "שירותים",
-        "healthcare": "בריאות",
-        "education": "חינוך",
-        "realestate": "נדל״ן",
-        "logistics": "לוגיסטיקה",
-        "communications": "תקשורת",
-        "other": "אחר"
-      },
-      "stats": {
-        "jobs": "משרות",
-        "inProcess": "בתהליך",
-        "hired": "גויסו",
-        "totalClients": "סה״כ לקוחות",
-        "activeClients": "לקוחות פעילים",
-        "openJobs": "משרות פתוחות",
-        "candidatesInProcess": "מועמדים בתהליך"
-      },
-      "filters": {
-        "searchPlaceholder": "חיפוש לפי שם חברה...",
-        "allIndustries": "כל התעשיות",
-        "all": "הכל",
-        "active": "פעילים",
-        "inactive": "ללא פעילות"
-      },
-      "results": {
-        "count_one": "לקוח אחד",
-        "count_two": "שני לקוחות",
-        "count_other": "{{count}} לקוחות",
-        "noMatchingClients": "לא נמצאו לקוחות התואמים את החיפוש",
-        "noClients": "אין לקוחות עדיין",
-        "addFirstClient": "הוסף את הלקוח הראשון שלך ופרסם משרה עבורו"
-      },
-      "loadError": "לא ניתן לטעון את הלקוחות"
+    "title": "לקוחות",
+    "subtitle": "חברות שאנחנו מגייסים עבורן",
+    "newClient": "לקוח חדש",
+    "createModal": {
+      "title": "לקוח חדש",
+      "clientName": "שם הלקוח",
+      "clientNameRequired": "שם לקוח הוא שדה חובה",
+      "namePlaceholder": "לדוגמה: TechCorp Israel",
+      "industry": "תעשייה",
+      "selectIndustry": "בחר תעשייה",
+      "contactEmail": "אימייל איש קשר",
+      "website": "אתר אינטרנט",
+      "color": "צבע",
+      "cancel": "ביטול",
+      "creating": "יוצר...",
+      "create": "צור לקוח",
+      "success": "הלקוח נוצר בהצלחה",
+      "errorCreating": "שגיאה ביצירת לקוח"
+    },
+    "industries": {
+      "hitech": "הייטק",
+      "finance": "פיננסים",
+      "manufacturing": "ייצור",
+      "retail": "קמעונאות",
+      "services": "שירותים",
+      "healthcare": "בריאות",
+      "education": "חינוך",
+      "realestate": "נדל״ן",
+      "logistics": "לוגיסטיקה",
+      "communications": "תקשורת",
+      "other": "אחר"
+    },
+    "stats": {
+      "jobs": "משרות",
+      "inProcess": "בתהליך",
+      "hired": "גויסו",
+      "totalClients": "סה״כ לקוחות",
+      "activeClients": "לקוחות פעילים",
+      "openJobs": "משרות פתוחות",
+      "candidatesInProcess": "מועמדים בתהליך"
+    },
+    "filters": {
+      "searchPlaceholder": "חיפוש לפי שם חברה...",
+      "allIndustries": "כל התעשיות",
+      "all": "הכל",
+      "active": "פעילים",
+      "inactive": "ללא פעילות"
+    },
+    "results": {
+      "count_one": "לקוח אחד",
+      "count_two": "שני לקוחות",
+      "count_other": "{{count}} לקוחות",
+      "noMatchingClients": "לא נמצאו לקוחות התואמים את החיפוש",
+      "noClients": "אין לקוחות עדיין",
+      "addFirstClient": "הוסף את הלקוח הראשון שלך ופרסם משרה עבורו"
+    },
+    "loadError": "לא ניתן לטעון את הלקוחות"
   }
 }

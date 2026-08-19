@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react"
 import {
   Users,
   BriefcaseBusiness,
@@ -12,77 +12,77 @@ import {
   Clock3,
   UserCheck,
   AlertTriangle,
-  Sparkles
-} from 'lucide-react';
-import AdminLayout from '@/components/admin/AdminLayout';
+  Sparkles,
+} from "lucide-react"
+import AdminLayout from "@/components/admin/AdminLayout"
 
 const glass =
-  'bg-white/80 backdrop-blur-2xl border border-[#DDEBFF] rounded-lg shadow-[0_24px_80px_rgba(79,124,255,0.10)]';
+  "bg-white/80 backdrop-blur-2xl border border-[#DDEBFF] rounded-lg shadow-[0_24px_80px_rgba(79,124,255,0.10)]"
 
 const stats = [
   {
-    title: 'מועמדים פעילים',
-    value: '24,891',
-    change: '+12.4%',
+    title: "מועמדים פעילים",
+    value: "24,891",
+    change: "+12.4%",
     icon: Users,
-    color: 'from-[#8B5CF6] to-[#6C4DFF]'
+    color: "from-[#8B5CF6] to-[#6C4DFF]",
   },
   {
-    title: 'משרות פעילות',
-    value: '1,284',
-    change: '+6.1%',
+    title: "משרות פעילות",
+    value: "1,284",
+    change: "+6.1%",
     icon: BriefcaseBusiness,
-    color: 'from-[#2F80FF] to-[#38BDF8]'
+    color: "from-[#2F80FF] to-[#38BDF8]",
   },
   {
-    title: 'חברות פעילות',
-    value: '412',
-    change: '+18.2%',
+    title: "חברות פעילות",
+    value: "412",
+    change: "+18.2%",
     icon: Building2,
-    color: 'from-[#06B6D4] to-[#3B82F6]'
+    color: "from-[#06B6D4] to-[#3B82F6]",
   },
   {
-    title: 'יחס המרה',
-    value: '68%',
-    change: '+4.9%',
+    title: "יחס המרה",
+    value: "68%",
+    change: "+4.9%",
     icon: TrendingUp,
-    color: 'from-[#7C3AED] to-[#2563EB]'
-  }
-];
+    color: "from-[#7C3AED] to-[#2563EB]",
+  },
+]
 
 const activities = [
   {
-    title: 'חברת הייטק חדשה נרשמה למערכת',
-    time: 'לפני 8 דקות'
+    title: "חברת הייטק חדשה נרשמה למערכת",
+    time: "לפני 8 דקות",
   },
   {
-    title: '124 מועמדים יובאו אוטומטית',
-    time: 'לפני 22 דקות'
+    title: "124 מועמדים יובאו אוטומטית",
+    time: "לפני 22 דקות",
   },
   {
-    title: 'AI Matching השלים סריקה חדשה',
-    time: 'לפני שעה'
+    title: "AI Matching השלים סריקה חדשה",
+    time: "לפני שעה",
   },
   {
-    title: 'מנהל גיוס אישר 18 מועמדים',
-    time: 'לפני שעתיים'
-  }
-];
+    title: "מנהל גיוס אישר 18 מועמדים",
+    time: "לפני שעתיים",
+  },
+]
 
 const alerts = [
   {
-    title: '3 משרות ללא מועמדים',
-    type: 'warning'
+    title: "3 משרות ללא מועמדים",
+    type: "warning",
   },
   {
-    title: '2 חברות דורשות אישור',
-    type: 'info'
+    title: "2 חברות דורשות אישור",
+    type: "info",
   },
   {
-    title: 'AI Screening זיהה כפילויות',
-    type: 'danger'
-  }
-];
+    title: "AI Screening זיהה כפילויות",
+    type: "danger",
+  },
+]
 
 export default function AdminDashboard() {
   return (
@@ -102,12 +102,14 @@ export default function AdminDashboard() {
               <h1 className="text-[52px] leading-[1] font-black text-[#0F172A] mb-4">
                 דשבורד
                 <span className="bg-gradient-to-l from-[#6C4DFF] via-[#4F7CFF] to-[#2FB8FF] bg-clip-text text-transparent">
-                  {' '}אדמין
+                  {" "}
+                  אדמין
                 </span>
               </h1>
 
               <p className="text-[#64748B] text-xl max-w-[760px] leading-9">
-                ניהול מלא של פלטפורמת הגיוס, ניטור ביצועים, אנליטיקות AI, חברות, מועמדים ומשרות — בממשק אחד.
+                ניהול מלא של פלטפורמת הגיוס, ניטור ביצועים, אנליטיקות AI, חברות, מועמדים ומשרות —
+                בממשק אחד.
               </p>
             </div>
 
@@ -118,12 +120,8 @@ export default function AdminDashboard() {
                 </div>
 
                 <div>
-                  <div className="text-[#0F172A] font-black text-lg">
-                    AI System Status
-                  </div>
-                  <div className="text-[#64748B]">
-                    כל המערכות פעילות ותקינות
-                  </div>
+                  <div className="text-[#0F172A] font-black text-lg">AI System Status</div>
+                  <div className="text-[#64748B]">כל המערכות פעילות ותקינות</div>
                 </div>
               </div>
 
@@ -131,15 +129,13 @@ export default function AdminDashboard() {
                 <div className="h-full w-[92%] rounded-full bg-gradient-to-r from-[#8B5CF6] to-[#2FB8FF]" />
               </div>
 
-              <div className="mt-2 text-sm text-[#64748B] font-bold">
-                92% ביצועי מערכת
-              </div>
+              <div className="mt-2 text-sm text-[#64748B] font-bold">92% ביצועי מערכת</div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mb-12">
             {stats.map((item) => {
-              const Icon = item.icon;
+              const Icon = item.icon
 
               return (
                 <div
@@ -148,9 +144,7 @@ export default function AdminDashboard() {
                 >
                   <div className="flex items-start justify-between mb-6">
                     <div>
-                      <div className="text-[#64748B] font-bold mb-2">
-                        {item.title}
-                      </div>
+                      <div className="text-[#64748B] font-bold mb-2">{item.title}</div>
 
                       <div className="text-[44px] leading-none font-black text-[#0F172A] mb-3">
                         {item.value}
@@ -162,7 +156,9 @@ export default function AdminDashboard() {
                       </div>
                     </div>
 
-                    <div className={`w-16 h-16 rounded-3xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-[0_20px_45px_rgba(108,77,255,0.18)]`}>
+                    <div
+                      className={`w-16 h-16 rounded-3xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-[0_20px_45px_rgba(108,77,255,0.18)]`}
+                    >
                       <Icon className="w-8 h-8 text-white" />
                     </div>
                   </div>
@@ -171,7 +167,7 @@ export default function AdminDashboard() {
                     <div className={`h-full rounded-full bg-gradient-to-r ${item.color} w-[72%]`} />
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
 
@@ -182,9 +178,7 @@ export default function AdminDashboard() {
                   <h2 className="text-[34px] leading-none font-black text-[#0F172A] mb-2">
                     אנליטיקות מערכת
                   </h2>
-                  <p className="text-[#64748B] text-lg">
-                    ביצועי המערכת ב־30 הימים האחרונים
-                  </p>
+                  <p className="text-[#64748B] text-lg">ביצועי המערכת ב־30 הימים האחרונים</p>
                 </div>
 
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2FB8FF] flex items-center justify-center shadow-lg">
@@ -240,12 +234,8 @@ export default function AdminDashboard() {
                   </div>
 
                   <div>
-                    <h3 className="text-2xl font-black text-[#0F172A]">
-                      פעילות אחרונה
-                    </h3>
-                    <p className="text-[#64748B]">
-                      עדכונים בזמן אמת
-                    </p>
+                    <h3 className="text-2xl font-black text-[#0F172A]">פעילות אחרונה</h3>
+                    <p className="text-[#64748B]">עדכונים בזמן אמת</p>
                   </div>
                 </div>
 
@@ -260,13 +250,9 @@ export default function AdminDashboard() {
                       </div>
 
                       <div>
-                        <div className="font-black text-[#0F172A] mb-1">
-                          {item.title}
-                        </div>
+                        <div className="font-black text-[#0F172A] mb-1">{item.title}</div>
 
-                        <div className="text-sm text-[#64748B]">
-                          {item.time}
-                        </div>
+                        <div className="text-sm text-[#64748B]">{item.time}</div>
                       </div>
                     </div>
                   ))}
@@ -280,12 +266,8 @@ export default function AdminDashboard() {
                   </div>
 
                   <div>
-                    <h3 className="text-2xl font-black text-[#0F172A]">
-                      התראות מערכת
-                    </h3>
-                    <p className="text-[#64748B]">
-                      בעיות שדורשות טיפול
-                    </p>
+                    <h3 className="text-2xl font-black text-[#0F172A]">התראות מערכת</h3>
+                    <p className="text-[#64748B]">בעיות שדורשות טיפול</p>
                   </div>
                 </div>
 
@@ -299,9 +281,7 @@ export default function AdminDashboard() {
                         <ShieldCheck className="w-5 h-5 text-white" />
                       </div>
 
-                      <div className="font-black text-[#0F172A]">
-                        {alert.title}
-                      </div>
+                      <div className="font-black text-[#0F172A]">{alert.title}</div>
                     </div>
                   ))}
                 </div>
@@ -316,9 +296,7 @@ export default function AdminDashboard() {
                   פעילות גיוס אחרונה
                 </h2>
 
-                <p className="text-[#64748B] text-lg">
-                  סטטוס פעילות מכל המחלקות
-                </p>
+                <p className="text-[#64748B] text-lg">סטטוס פעילות מכל המחלקות</p>
               </div>
 
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#06B6D4] to-[#2563EB] flex items-center justify-center shadow-lg">
@@ -330,7 +308,7 @@ export default function AdminDashboard() {
               <table className="w-full">
                 <thead className="bg-[#F8FBFF]">
                   <tr className="text-right">
-                    {['שם', 'תפקיד', 'חברה', 'סטטוס', 'תאריך', 'AI Score'].map((h) => (
+                    {["שם", "תפקיד", "חברה", "סטטוס", "תאריך", "AI Score"].map((h) => (
                       <th key={h} className="px-6 py-5 text-sm font-black text-[#64748B]">
                         {h}
                       </th>
@@ -340,17 +318,14 @@ export default function AdminDashboard() {
 
                 <tbody className="divide-y divide-[#EEF3FF] bg-white">
                   {[
-                    ['דניאל כהן', 'Full Stack', 'Wix', 'ראיון מתקדם', 'היום', '94%'],
-                    ['נועה לוי', 'Product Manager', 'Monday', 'התקבל', 'היום', '97%'],
-                    ['יובל ישראלי', 'DevOps', 'Google', 'Screening', 'אתמול', '88%'],
-                    ['שחר אוחנה', 'UX/UI', 'Palo Alto', 'הצעה', 'אתמול', '91%']
+                    ["דניאל כהן", "Full Stack", "Wix", "ראיון מתקדם", "היום", "94%"],
+                    ["נועה לוי", "Product Manager", "Monday", "התקבל", "היום", "97%"],
+                    ["יובל ישראלי", "DevOps", "Google", "Screening", "אתמול", "88%"],
+                    ["שחר אוחנה", "UX/UI", "Palo Alto", "הצעה", "אתמול", "91%"],
                   ].map((row, i) => (
                     <tr key={i} className="hover:bg-[#FAFCFF] transition">
                       {row.map((cell, idx) => (
-                        <td
-                          key={idx}
-                          className="px-6 py-5 text-sm font-bold text-[#0F172A]"
-                        >
+                        <td key={idx} className="px-6 py-5 text-sm font-bold text-[#0F172A]">
                           {idx === 5 ? (
                             <span className="px-4 py-2 rounded-full bg-gradient-to-l from-[#8B5CF6] to-[#2FB8FF] text-white text-xs font-black">
                               {cell}
@@ -369,5 +344,5 @@ export default function AdminDashboard() {
         </div>
       </div>
     </AdminLayout>
-  );
+  )
 }

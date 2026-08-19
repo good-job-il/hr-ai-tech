@@ -1,8 +1,8 @@
-import globals from "globals";
-import pluginJs from "@eslint/js";
-import pluginReact from "eslint-plugin-react";
-import pluginReactHooks from "eslint-plugin-react-hooks";
-import pluginUnusedImports from "eslint-plugin-unused-imports";
+import globals from "globals"
+import pluginJs from "@eslint/js"
+import pluginReact from "eslint-plugin-react"
+import pluginReactHooks from "eslint-plugin-react-hooks"
+import pluginUnusedImports from "eslint-plugin-unused-imports"
 
 export default [
   {
@@ -50,11 +50,8 @@ export default [
       ],
       "react/prop-types": "off",
       "react/react-in-jsx-scope": "off",
-      "react/no-unknown-property": [
-        "error",
-        { ignore: ["cmdk-input-wrapper", "toast-close"] },
-      ],
+      "react/no-unknown-property": ["error", { ignore: ["cmdk-input-wrapper", "toast-close"] }],
       "react-hooks/rules-of-hooks": "error",
     },
   },
-];
+]

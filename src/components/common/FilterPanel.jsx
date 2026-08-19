@@ -1,9 +1,9 @@
-import { Card, CardContent } from '@/components/ui/Card';
-import { ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { Card, CardContent } from "@/components/ui/Card"
+import { ChevronDown } from "lucide-react"
+import { useState } from "react"
 
 export function FilterPanel({ title, filters, onFilterChange }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(true)
 
   return (
     <Card>
@@ -13,7 +13,9 @@ export function FilterPanel({ title, filters, onFilterChange }) {
           className="w-full flex items-center justify-between mb-4"
         >
           <h3 className="text-lg font-bold text-[#0F172A]">{title}</h3>
-          <ChevronDown className={`w-5 h-5 text-[#7C3AED] transition-transform ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            className={`w-5 h-5 text-[#7C3AED] transition-transform ${open ? "rotate-180" : ""}`}
+          />
         </button>
 
         {open && (
@@ -32,7 +34,7 @@ export function FilterPanel({ title, filters, onFilterChange }) {
         )}
       </CardContent>
     </Card>
-  );
+  )
 }
 
-export default FilterPanel;
+export default FilterPanel

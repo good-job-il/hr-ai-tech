@@ -1,49 +1,56 @@
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/lib/AuthContext';
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/lib/AuthContext"
 
-const LOGO_URL = "/logo.png";
+const LOGO_URL = "/logo.png"
 
 function getHomeRoute(role) {
   switch (role) {
-    case 'admin':        return '/admin/dashboard';
-    case 'recruitment_manager': return '/recruitment/jobs';
-    case 'team_manager': return '/recruitment/jobs';
-    case 'recruiter':    return '/recruiter/dashboard';
-    case 'employer':     return '/employer/dashboard';
-    case 'candidate':    return '/candidate/dashboard';
-    default:             return '/';
+    case "admin":
+      return "/admin/dashboard"
+    case "recruitment_manager":
+      return "/recruitment/jobs"
+    case "team_manager":
+      return "/recruitment/jobs"
+    case "recruiter":
+      return "/recruiter/dashboard"
+    case "employer":
+      return "/employer/dashboard"
+    case "candidate":
+      return "/candidate/dashboard"
+    default:
+      return "/"
   }
 }
 
-export default function Logo({ size = 'md', href, className = '' }) {
-  const navigate = useNavigate();
-  const { user } = useAuth();
+export default function Logo({ size = "md", href, className = "" }) {
+  const navigate = useNavigate()
+  const { user } = useAuth()
 
-  const destination = href !== undefined ? href : getHomeRoute(user?.role);
+  const destination = href !== undefined ? href : getHomeRoute(user?.role)
 
   const handleClick = (e) => {
-    e.preventDefault();
-    if (destination) navigate(destination);
-  };
+    e.preventDefault()
+    if (destination) navigate(destination)
+  }
 
   return (
     <a
-      href={destination || '/'}
+      href={destination || "/"}
       onClick={handleClick}
       className="inline-flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity"
-      style={{ textDecoration: 'none' }}
+      style={{ textDecoration: "none" }}
     >
       <div className="relative">
         <img
           src={LOGO_URL}
           alt="HeadHunter"
           style={{
-            height: '60px',
-            width: 'auto',
-            maxWidth: '100%',
-            objectFit: 'contain',
-            objectPosition: 'left center',
-            imageRendering: '-webkit-optimize-contrast',
+            height: "60px",
+            width: "auto",
+            maxWidth: "100%",
+            objectFit: "contain",
+            objectPosition: "left center",
+            imageRendering: "-webkit-optimize-contrast",
           }}
           className={className}
         />
@@ -52,5 +59,5 @@ export default function Logo({ size = 'md', href, className = '' }) {
       {/*  HeadHunter*/}
       {/*</span>*/}
     </a>
-  );
+  )
 }

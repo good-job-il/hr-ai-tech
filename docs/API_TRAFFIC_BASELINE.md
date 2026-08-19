@@ -4,12 +4,12 @@ Status: capture pending — no running test environment or role credentials were
 
 Phase 0 code boundaries are active, but runtime traffic cannot be truthfully claimed from static source analysis. Capture one browser HAR per role using the same seeded dataset and workflow.
 
-| Role | Required workflow | HAR artifact | Status |
-|---|---|---|---|
-| Candidate | login → jobs → job detail → profile → application → messages/notifications | `candidate.har` | pending |
-| Employer / company admin | login → dashboard → jobs → candidates → interview → settings | `employer.har` | pending |
-| Staffing agency admin | login → dashboard → clients → job → candidate → pipeline → import | `agency-admin.har` | pending |
-| Platform admin | login → organizations → users → permissions → taxonomy/audit | `platform-admin.har` | pending |
+| Role                     | Required workflow                                                          | HAR artifact         | Status  |
+| ------------------------ | -------------------------------------------------------------------------- | -------------------- | ------- |
+| Candidate                | login → jobs → job detail → profile → application → messages/notifications | `candidate.har`      | pending |
+| Employer / company admin | login → dashboard → jobs → candidates → interview → settings               | `employer.har`       | pending |
+| Staffing agency admin    | login → dashboard → clients → job → candidate → pipeline → import          | `agency-admin.har`   | pending |
+| Platform admin           | login → organizations → users → permissions → taxonomy/audit               | `platform-admin.har` | pending |
 
 ## Capture rules
 

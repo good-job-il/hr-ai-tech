@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Sparkles, Users, BarChart3, Zap, Filter, Brain } from 'lucide-react';
-import Header from '@/components/home/Header';
+import React from "react"
+import { Link } from "react-router-dom"
+import { Sparkles, Users, BarChart3, Zap, Filter, Brain } from "lucide-react"
+import Header from "@/components/home/Header"
 
 export default function EmployerLanding() {
   return (
@@ -12,7 +12,10 @@ export default function EmployerLanding() {
       <section className="relative min-h-screen flex items-center overflow-hidden pt-32 pb-20 bg-gradient-to-br from-blue-50 via-white to-blue-50">
         {/* Glows */}
         <div className="absolute top-40 right-20 w-96 h-96 bg-purple-400/8 blur-3xl rounded-full animate-pulse"></div>
-        <div className="absolute bottom-40 left-40 w-96 h-96 bg-blue-400/8 blur-3xl rounded-full" style={{ animation: 'pulse 4s ease-in-out infinite' }}></div>
+        <div
+          className="absolute bottom-40 left-40 w-96 h-96 bg-blue-400/8 blur-3xl rounded-full"
+          style={{ animation: "pulse 4s ease-in-out infinite" }}
+        ></div>
 
         <div className="max-w-7xl mx-auto px-4 w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
           {/* Left: CTA */}
@@ -31,7 +34,10 @@ export default function EmployerLanding() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Link to="/employer/dashboard" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-lg font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all active:scale-95">
+              <Link
+                to="/employer/dashboard"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-lg font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all active:scale-95"
+              >
                 פתיחת חשבון מעסיק
               </Link>
               <button className="bg-white border-2 border-purple-600 text-purple-600 hover:bg-purple-50 text-lg font-bold px-8 py-4 rounded-xl transition-all active:scale-95">
@@ -42,7 +48,10 @@ export default function EmployerLanding() {
 
           {/* Right: Dashboard Preview */}
           <div className="relative h-[500px] flex items-center justify-center lg:justify-end">
-            <div className="w-full max-w-md bg-white/80 backdrop-blur-2xl border border-blue-200/80 rounded-2xl p-6 shadow-2xl" style={{ animation: 'float 3s ease-in-out infinite' }}>
+            <div
+              className="w-full max-w-md bg-white/80 backdrop-blur-2xl border border-blue-200/80 rounded-2xl p-6 shadow-2xl"
+              style={{ animation: "float 3s ease-in-out infinite" }}
+            >
               <div className="space-y-4">
                 {/* Card 1: ATS */}
                 <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl p-4">
@@ -103,21 +112,36 @@ export default function EmployerLanding() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
-              { icon: Brain, title: 'AI Matching חכם', desc: 'אלגוריתם שלנו מוצא את 5 המועמדים הטובים ביותר לכל משרה.' },
-              { icon: Zap, title: 'מהיר', desc: 'מפתיחת משרה לראיון ראשון בתוך 48 שעות.' },
-              { icon: BarChart3, title: 'Analytics', desc: 'דוחות מלאים על כל שלב של תהליך הגיוס.' },
-              { icon: Users, title: 'מועמדים איכותיים', desc: 'כל מועמד עבר מסננים איכות קפדניים.' }
+              {
+                icon: Brain,
+                title: "AI Matching חכם",
+                desc: "אלגוריתם שלנו מוצא את 5 המועמדים הטובים ביותר לכל משרה.",
+              },
+              { icon: Zap, title: "מהיר", desc: "מפתיחת משרה לראיון ראשון בתוך 48 שעות." },
+              {
+                icon: BarChart3,
+                title: "Analytics",
+                desc: "דוחות מלאים על כל שלב של תהליך הגיוס.",
+              },
+              {
+                icon: Users,
+                title: "מועמדים איכותיים",
+                desc: "כל מועמד עבר מסננים איכות קפדניים.",
+              },
             ].map((item, idx) => {
-              const Icon = item.icon;
+              const Icon = item.icon
               return (
-                <div key={idx} className="bg-white border border-blue-200/80 rounded-2xl p-8 shadow-lg hover:shadow-xl hover:border-purple-400 transition-all group">
+                <div
+                  key={idx}
+                  className="bg-white border border-blue-200/80 rounded-2xl p-8 shadow-lg hover:shadow-xl hover:border-purple-400 transition-all group"
+                >
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <Icon className="w-7 h-7 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
                   <p className="text-gray-600">{item.desc}</p>
                 </div>
-              );
+              )
             })}
           </div>
         </div>
@@ -132,14 +156,17 @@ export default function EmployerLanding() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { title: 'ATS מתקדם', desc: 'ניהול מלא של משרות, מועמדים, ראיונות והצעות.' },
-              { title: 'ייבוא מועמדים', desc: 'העלאת קורות חיים באופן גורף וניתוח אוטומטי.' },
-              { title: 'AI Job Match', desc: 'תאימת מועמדים אוטומטית בהתאם לדרישות המשרה.' },
-              { title: 'Pipeline Editor', desc: 'בנייה של תהליך גיוס מותאם אישית לחברה שלכם.' },
-              { title: 'Analytics & Reporting', desc: 'דוחות מצטברים על כל שלב של הגיוס.' },
-              { title: 'Automation', desc: 'אוטומציה של משימות חוזרות להעלאת יעילות.' }
+              { title: "ATS מתקדם", desc: "ניהול מלא של משרות, מועמדים, ראיונות והצעות." },
+              { title: "ייבוא מועמדים", desc: "העלאת קורות חיים באופן גורף וניתוח אוטומטי." },
+              { title: "AI Job Match", desc: "תאימת מועמדים אוטומטית בהתאם לדרישות המשרה." },
+              { title: "Pipeline Editor", desc: "בנייה של תהליך גיוס מותאם אישית לחברה שלכם." },
+              { title: "Analytics & Reporting", desc: "דוחות מצטברים על כל שלב של הגיוס." },
+              { title: "Automation", desc: "אוטומציה של משימות חוזרות להעלאת יעילות." },
             ].map((feature, idx) => (
-              <div key={idx} className="bg-white border border-blue-200/80 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all">
+              <div
+                key={idx}
+                className="bg-white border border-blue-200/80 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all"
+              >
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.title}</h3>
                 <p className="text-gray-600 text-sm">{feature.desc}</p>
               </div>
@@ -151,15 +178,16 @@ export default function EmployerLanding() {
       {/* CTA */}
       <section className="py-24 bg-gradient-to-r from-purple-600 to-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6">
-            מוכנים להתחיל?
-          </h2>
+          <h2 className="text-5xl md:text-6xl font-bold mb-6">מוכנים להתחיל?</h2>
           <p className="text-xl mb-12 opacity-90">
             הצטרפו לחברות המובילות שכבר משתמשות ב־HeadHunter כדי לגייס בחכמה.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/employer/dashboard" className="bg-white text-purple-600 hover:bg-blue-50 text-lg font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all active:scale-95">
+            <Link
+              to="/employer/dashboard"
+              className="bg-white text-purple-600 hover:bg-blue-50 text-lg font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all active:scale-95"
+            >
               פתיחת חשבון מעסיק
             </Link>
             <button className="bg-white/20 border-2 border-white text-white hover:bg-white/30 text-lg font-bold px-8 py-4 rounded-xl transition-all active:scale-95">
@@ -169,5 +197,5 @@ export default function EmployerLanding() {
         </div>
       </section>
     </div>
-  );
+  )
 }

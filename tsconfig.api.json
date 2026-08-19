@@ -8,10 +8,6 @@
     "types": ["node"],
     "strict": true
   },
-  "include": [
-    "src/api/**/*.ts",
-    "src/types/**/*.ts",
-    "src/lib/errors/**/*.ts"
-  ],
+  "include": ["src/api/**/*.ts", "src/types/**/*.ts", "src/lib/errors/**/*.ts"],
   "exclude": ["node_modules", "dist", "backend"]
 }

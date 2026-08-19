@@ -1,58 +1,75 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const ROLE_LABELS = {
-  hiring_manager: 'מנהל גיוס',
-  team_manager: 'מנהל צוות',
-  recruiter: 'רכז גיוס'
-};
+  hiring_manager: "מנהל גיוס",
+  team_manager: "מנהל צוות",
+  recruiter: "רכז גיוס",
+}
 
-export default function StaffFormModal({ open, onOpenChange, staff, teamManagers, hiringManager, onSubmit, loading, showHiringManagerOption = false }) {
-  const [formData, setFormData] = useState(staff || {
-    full_name: '',
-    email: '',
-    phone: '',
-    role: 'recruiter',
-    manager_email: ''
-  });
+export default function StaffFormModal({
+  open,
+  onOpenChange,
+  staff,
+  teamManagers,
+  hiringManager,
+  onSubmit,
+  loading,
+  showHiringManagerOption = false,
+}) {
+  const [formData, setFormData] = useState(
+    staff || {
+      full_name: "",
+      email: "",
+      phone: "",
+      role: "recruiter",
+      manager_email: "",
+    },
+  )
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.manager_email && formData.role !== 'hiring_manager') {
-      alert('יש לבחור מנהל');
-      return;
+    e.preventDefault()
+    if (!formData.manager_email && formData.role !== "hiring_manager") {
+      alert("יש לבחור מנהל")
+      return
     }
-    onSubmit(formData);
-  };
+    onSubmit(formData)
+  }
 
   // Build list of available managers
-  let availableManagers = [];
-  
-  if (formData.role === 'team_manager') {
+  let availableManagers = []
+
+  if (formData.role === "team_manager") {
     // Team managers can report to other team managers or to hiring manager
-    availableManagers = teamManagers.filter(m => m.id !== staff?.id);
-  } else if (formData.role === 'recruiter') {
+    availableManagers = teamManagers.filter((m) => m.id !== staff?.id)
+  } else if (formData.role === "recruiter") {
     // Recruiters can report to team managers or hiring manager
-    availableManagers = teamManagers;
+    availableManagers = teamManagers
   }
-  
+
   // Add hiring manager to the list if they exist
   if (hiringManager) {
     availableManagers = [
       ...availableManagers,
-      { email: hiringManager.email, full_name: hiringManager.full_name || 'מנהל הגיוס' }
-    ];
+      { email: hiringManager.email, full_name: hiringManager.full_name || "מנהל הגיוס" },
+    ]
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md" dir="rtl">
         <DialogHeader>
-          <DialogTitle>{staff ? 'עדכן עובד' : 'הוסף עובד חדש'}</DialogTitle>
+          <DialogTitle>{staff ? "עדכן עובד" : "הוסף עובד חדש"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -92,7 +109,12 @@ export default function StaffFormModal({ open, onOpenChange, staff, teamManagers
 
           <div>
             <Label className="text-sm font-semibold">תפקיד *</Label>
-            <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value, manager_email: '' })}>
+            <Select
+              value={formData.role}
+              onValueChange={(value) =>
+                setFormData({ ...formData, role: value, manager_email: "" })
+              }
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -106,10 +128,13 @@ export default function StaffFormModal({ open, onOpenChange, staff, teamManagers
             </Select>
           </div>
 
-          {formData.role !== 'hiring_manager' && (
+          {formData.role !== "hiring_manager" && (
             <div>
               <Label className="text-sm font-semibold">מנהל *</Label>
-              <Select value={formData.manager_email} onValueChange={(value) => setFormData({ ...formData, manager_email: value })}>
+              <Select
+                value={formData.manager_email}
+                onValueChange={(value) => setFormData({ ...formData, manager_email: value })}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="בחר מנהל" />
                 </SelectTrigger>
@@ -129,11 +154,11 @@ export default function StaffFormModal({ open, onOpenChange, staff, teamManagers
               ביטול
             </Button>
             <Button type="submit" disabled={loading} className="bg-hhblue hover:bg-hhblue/90">
-              {loading ? '⏳ שומר...' : 'שמור'}
+              {loading ? "⏳ שומר..." : "שמור"}
             </Button>
           </div>
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

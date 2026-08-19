@@ -1,6 +1,6 @@
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from "@/components/ui/Card"
 
-export function LoadingState({ message = 'טוען...' }) {
+export function LoadingState({ message = "טוען..." }) {
   return (
     <Card>
       <CardContent className="py-20 text-center">
@@ -8,7 +8,7 @@ export function LoadingState({ message = 'טוען...' }) {
         <p className="text-[#64748B] font-semibold">{message}</p>
       </CardContent>
     </Card>
-  );
+  )
 }
 
-export default LoadingState;
+export default LoadingState

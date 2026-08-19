@@ -1,73 +1,73 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { taxonomyService } from '@/api/services/taxonomyService';
-import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, Search, X } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from "react"
+import { taxonomyService } from "@/api/services/taxonomyService"
+import { useQuery } from "@tanstack/react-query"
+import { ChevronDown, Search, X } from "lucide-react"
 
 export default function HierarchicalJobFilters({ onFiltersChange, enabled = true }) {
-  const [selectedDomains, setSelectedDomains] = useState([]);
-  const [selectedRoles, setSelectedRoles] = useState([]);
-  const [selectedSpecializations, setSelectedSpecializations] = useState([]);
-  const [selectedEmploymentTypes, setSelectedEmploymentTypes] = useState([]);
-  const [selectedWorkModes, setSelectedWorkModes] = useState([]);
-  const [selectedLevels, setSelectedLevels] = useState([]);
+  const [selectedDomains, setSelectedDomains] = useState([])
+  const [selectedRoles, setSelectedRoles] = useState([])
+  const [selectedSpecializations, setSelectedSpecializations] = useState([])
+  const [selectedEmploymentTypes, setSelectedEmploymentTypes] = useState([])
+  const [selectedWorkModes, setSelectedWorkModes] = useState([])
+  const [selectedLevels, setSelectedLevels] = useState([])
 
-  const [searchDomain, setSearchDomain] = useState('');
-  const [searchRole, setSearchRole] = useState('');
-  const [searchSpec, setSearchSpec] = useState('');
+  const [searchDomain, setSearchDomain] = useState("")
+  const [searchRole, setSearchRole] = useState("")
+  const [searchSpec, setSearchSpec] = useState("")
 
-  const [expandedSections, setExpandedSections] = useState({});
+  const [expandedSections, setExpandedSections] = useState({})
 
   // Fetch data
   const { data: domains = [] } = useQuery({
-    queryKey: ['domains'],
+    queryKey: ["domains"],
     queryFn: () => taxonomyService.domains(),
     enabled,
-  });
+  })
 
   const { data: roles = [] } = useQuery({
-    queryKey: ['roles'],
+    queryKey: ["roles"],
     queryFn: () => taxonomyService.roles(),
     enabled,
-  });
+  })
 
   const { data: specializations = [] } = useQuery({
-    queryKey: ['specializations'],
+    queryKey: ["specializations"],
     queryFn: () => taxonomyService.specializations(),
     enabled,
-  });
+  })
 
   const { data: employmentTypes = [] } = useQuery({
-    queryKey: ['employment-types'],
+    queryKey: ["employment-types"],
     queryFn: () => taxonomyService.employmentTypes(),
     enabled,
-  });
+  })
 
   const { data: workModes = [] } = useQuery({
-    queryKey: ['work-modes'],
+    queryKey: ["work-modes"],
     queryFn: () => taxonomyService.workModes(),
     enabled,
-  });
+  })
 
   const { data: levels = [] } = useQuery({
-    queryKey: ['experience-levels'],
+    queryKey: ["experience-levels"],
     queryFn: () => taxonomyService.experienceLevels(),
     enabled,
-  });
+  })
 
   // Filtered roles based on selected domains
   const filteredRoles = useMemo(() => {
-    if (selectedDomains.length === 0) return roles;
-    return roles.filter(r => selectedDomains.includes(r.domain_id));
-  }, [roles, selectedDomains]);
+    if (selectedDomains.length === 0) return roles
+    return roles.filter((r) => selectedDomains.includes(r.domain_id))
+  }, [roles, selectedDomains])
 
   // Filtered specializations based on selected roles
   const filteredSpecializations = useMemo(() => {
-    if (selectedRoles.length === 0) return specializations;
+    if (selectedRoles.length === 0) return specializations
     const selectedRoleNames = roles
-      .filter(r => selectedRoles.includes(r.role_id))
-      .map(r => r.name);
-    return specializations.filter(s => selectedRoleNames.includes(s.role_name));
-  }, [specializations, selectedRoles, roles]);
+      .filter((r) => selectedRoles.includes(r.role_id))
+      .map((r) => r.name)
+    return specializations.filter((s) => selectedRoleNames.includes(s.role_name))
+  }, [specializations, selectedRoles, roles])
 
   // Update parent when filters change
   useEffect(() => {
@@ -78,19 +78,35 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
       employmentTypes: selectedEmploymentTypes,
       workModes: selectedWorkModes,
       levels: selectedLevels,
-    });
-  }, [selectedDomains, selectedRoles, selectedSpecializations, selectedEmploymentTypes, selectedWorkModes, selectedLevels, onFiltersChange]);
+    })
+  }, [
+    selectedDomains,
+    selectedRoles,
+    selectedSpecializations,
+    selectedEmploymentTypes,
+    selectedWorkModes,
+    selectedLevels,
+    onFiltersChange,
+  ])
 
   const toggleSection = (section) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }))
+  }
 
-  const FilterSection = ({ title, items, selected, setSelected, searchValue, setSearchValue, itemKey = 'id' }) => {
-    const isExpanded = expandedSections[title] ?? true;
-    const filteredItems = items.filter(item => {
-      const text = item.name || item;
-      return text.toLowerCase().includes(searchValue.toLowerCase());
-    });
+  const FilterSection = ({
+    title,
+    items,
+    selected,
+    setSelected,
+    searchValue,
+    setSearchValue,
+    itemKey = "id",
+  }) => {
+    const isExpanded = expandedSections[title] ?? true
+    const filteredItems = items.filter((item) => {
+      const text = item.name || item
+      return text.toLowerCase().includes(searchValue.toLowerCase())
+    })
 
     return (
       <div className="border-b border-gray-200 py-4">
@@ -99,7 +115,9 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
           className="w-full flex items-center justify-between font-semibold text-gray-800 hover:text-gray-900 transition-colors"
         >
           <span>{title}</span>
-          <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+          />
         </button>
 
         {isExpanded && (
@@ -119,49 +137,58 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
             )}
 
             <div className="space-y-2 max-h-56 overflow-y-auto">
-              {filteredItems.map(item => {
-                const id = item[itemKey] || item.id;
-                const name = item.name || item;
-                const isSelected = selected.includes(id);
+              {filteredItems.map((item) => {
+                const id = item[itemKey] || item.id
+                const name = item.name || item
+                const isSelected = selected.includes(id)
 
                 return (
-                  <label key={id} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors">
+                  <label
+                    key={id}
+                    className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                  >
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setSelected([...selected, id]);
+                          setSelected([...selected, id])
                         } else {
-                          setSelected(selected.filter(s => s !== id));
+                          setSelected(selected.filter((s) => s !== id))
                         }
                       }}
                       className="w-4 h-4 rounded border-gray-300 cursor-pointer"
                     />
                     <span className="text-sm text-gray-700">{name}</span>
                   </label>
-                );
+                )
               })}
             </div>
           </div>
         )}
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm" dir="rtl">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-bold text-gray-900">פילטרים</h2>
-        {(selectedDomains.length + selectedRoles.length + selectedSpecializations.length + selectedEmploymentTypes.length + selectedWorkModes.length + selectedLevels.length) > 0 && (
+        {selectedDomains.length +
+          selectedRoles.length +
+          selectedSpecializations.length +
+          selectedEmploymentTypes.length +
+          selectedWorkModes.length +
+          selectedLevels.length >
+          0 && (
           <button
             onClick={() => {
-              setSelectedDomains([]);
-              setSelectedRoles([]);
-              setSelectedSpecializations([]);
-              setSelectedEmploymentTypes([]);
-              setSelectedWorkModes([]);
-              setSelectedLevels([]);
+              setSelectedDomains([])
+              setSelectedRoles([])
+              setSelectedSpecializations([])
+              setSelectedEmploymentTypes([])
+              setSelectedWorkModes([])
+              setSelectedLevels([])
             }}
             className="text-xs text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1"
           >
@@ -234,5 +261,5 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
         />
       </div>
     </div>
-  );
+  )
 }

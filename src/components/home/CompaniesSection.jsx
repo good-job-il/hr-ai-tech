@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { companyService } from '@/api/services/companyService';
-import { useQuery } from '@tanstack/react-query';
+import React from "react"
+import { Link } from "react-router-dom"
+import { companyService } from "@/api/services/companyService"
+import { useQuery } from "@tanstack/react-query"
 
 function CompanyCard({ company }) {
   return (
@@ -18,7 +18,7 @@ function CompanyCard({ company }) {
       ) : (
         <div
           className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-sm"
-          style={{ backgroundColor: company.color || '#6d28d9' }}
+          style={{ backgroundColor: company.color || "#6d28d9" }}
         >
           {company.initials || company.name?.slice(0, 2)}
         </div>
@@ -31,22 +31,25 @@ function CompanyCard({ company }) {
         <div className="text-sm text-gray-500 mt-1">{company.job_count} משרות</div>
       </div>
     </Link>
-  );
+  )
 }
 
 export default function CompaniesSection() {
   const { data: companies = [] } = useQuery({
-    queryKey: ['companies-home'],
-    queryFn: () => companyService.list({ sort: 'job_count', order: 'DESC', limit: 8 }),
+    queryKey: ["companies-home"],
+    queryFn: () => companyService.list({ sort: "job_count", order: "DESC", limit: 8 }),
     initialData: [],
-  });
+  })
 
   return (
     <div className="bg-blue-50/50 border-t border-blue-100">
       <div className="max-w-[1200px] mx-auto px-4 py-12" dir="rtl">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">חברות מובילות מגייסות</h2>
-          <Link to="/companies" className="text-blue-600 text-sm hover:text-blue-700 transition-colors font-medium inline-flex items-center gap-1">
+          <Link
+            to="/companies"
+            className="text-blue-600 text-sm hover:text-blue-700 transition-colors font-medium inline-flex items-center gap-1"
+          >
             לכל החברות
             <span>←</span>
           </Link>
@@ -58,5 +61,5 @@ export default function CompaniesSection() {
         </div>
       </div>
     </div>
-  );
+  )
 }

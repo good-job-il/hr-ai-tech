@@ -1,44 +1,44 @@
-import { useState, useEffect } from 'react';
-import { authService } from '@/api/services/authService';
-import { useAuth } from '@/lib/AuthContext';
-import { Building2, Mail, Phone, User, Save, Check } from 'lucide-react';
+import { useState, useEffect } from "react"
+import { authService } from "@/api/services/authService"
+import { useAuth } from "@/lib/AuthContext"
+import { Building2, Mail, Phone, User, Save, Check } from "lucide-react"
 
 export default function EmployerSettingsPage() {
-  const { user } = useAuth();
+  const { user } = useAuth()
   const [form, setForm] = useState({
-    company_name: '',
-    contact_name: '',
-    contact_email: '',
-    contact_phone: '',
-    notification_email: '',
-  });
-  const [saved, setSaved] = useState(false);
-  const [loading, setLoading] = useState(false);
+    company_name: "",
+    contact_name: "",
+    contact_email: "",
+    contact_phone: "",
+    notification_email: "",
+  })
+  const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!user) return;
-    setForm(f => ({
+    if (!user) return
+    setForm((f) => ({
       ...f,
-      contact_name: user.full_name || '',
-      contact_email: user.email || '',
-      notification_email: user.email || '',
-    }));
-  }, [user]);
+      contact_name: user.full_name || "",
+      contact_email: user.email || "",
+      notification_email: user.email || "",
+    }))
+  }, [user])
 
   const handleSave = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       await authService.updateMe({
         full_name: form.contact_name,
-      });
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const field = (label, icon, key, type = 'text', readOnly = false) => (
+  const field = (label, icon, key, type = "text", readOnly = false) => (
     <div>
       <label className="block text-sm font-bold text-[#374151] mb-1.5">{label}</label>
       <div className="relative">
@@ -46,17 +46,17 @@ export default function EmployerSettingsPage() {
         <input
           type={type}
           value={form[key]}
-          onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+          onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
           readOnly={readOnly}
           className={`w-full h-11 pr-10 pl-4 rounded-xl border text-sm outline-none transition-all ${
             readOnly
-              ? 'border-[#E4ECFF] bg-[#F7FBFF] text-[#94A3B8] cursor-not-allowed'
-              : 'border-[#E4ECFF] bg-white text-[#0F172A] focus:border-[#7C3AED]'
+              ? "border-[#E4ECFF] bg-[#F7FBFF] text-[#94A3B8] cursor-not-allowed"
+              : "border-[#E4ECFF] bg-white text-[#0F172A] focus:border-[#7C3AED]"
           }`}
         />
       </div>
     </div>
-  );
+  )
 
   return (
     <div dir="rtl" className="space-y-6 max-w-xl">
@@ -70,10 +70,15 @@ export default function EmployerSettingsPage() {
           <Building2 className="w-5 h-5 text-[#7C3AED]" /> פרטי חברה
         </h2>
 
-        {field('שם איש קשר', <User className="w-4 h-4" />, 'contact_name')}
-        {field('אימייל', <Mail className="w-4 h-4" />, 'contact_email', 'email', true)}
-        {field('טלפון', <Phone className="w-4 h-4" />, 'contact_phone', 'tel')}
-        {field('אימייל לקבלת עדכונים על מועמדים', <Mail className="w-4 h-4" />, 'notification_email', 'email')}
+        {field("שם איש קשר", <User className="w-4 h-4" />, "contact_name")}
+        {field("אימייל", <Mail className="w-4 h-4" />, "contact_email", "email", true)}
+        {field("טלפון", <Phone className="w-4 h-4" />, "contact_phone", "tel")}
+        {field(
+          "אימייל לקבלת עדכונים על מועמדים",
+          <Mail className="w-4 h-4" />,
+          "notification_email",
+          "email",
+        )}
 
         <div className="pt-2">
           <button
@@ -81,7 +86,15 @@ export default function EmployerSettingsPage() {
             disabled={loading}
             className="h-11 px-6 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center gap-2 shadow-md hover:opacity-90 transition-all disabled:opacity-50"
           >
-            {saved ? <><Check className="w-4 h-4" /> נשמר!</> : <><Save className="w-4 h-4" /> שמור שינויים</>}
+            {saved ? (
+              <>
+                <Check className="w-4 h-4" /> נשמר!
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" /> שמור שינויים
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -100,5 +113,5 @@ export default function EmployerSettingsPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

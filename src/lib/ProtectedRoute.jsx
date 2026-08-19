@@ -1,8 +1,8 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '@/lib/AuthContext';
+import { Navigate, Outlet } from "react-router-dom"
+import { useAuth } from "@/lib/AuthContext"
 
 // Roles that bypass all checks
-const SUPER_ROLES = ['admin'];
+const SUPER_ROLES = ["admin"]
 
 /**
  * ProtectedRoute
@@ -25,28 +25,30 @@ export default function ProtectedRoute({
   unauthenticatedElement = <Navigate to="/login" replace />,
   unauthorizedElement = <Navigate to="/unauthorized" replace />,
 }) {
-  const { user, isLoadingAuth, authError, orgType, organization } = useAuth();
+  const { user, isLoadingAuth, authError, orgType, organization } = useAuth()
 
   if (isLoadingAuth) {
-    return fallback || (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#F7FBFF]">
-        <div className="w-8 h-8 border-4 border-[#E4ECFF] border-t-[#7C3AED] rounded-full animate-spin" />
-      </div>
-    );
+    return (
+      fallback || (
+        <div className="fixed inset-0 flex items-center justify-center bg-[#F7FBFF]">
+          <div className="w-8 h-8 border-4 border-[#E4ECFF] border-t-[#7C3AED] rounded-full animate-spin" />
+        </div>
+      )
+    )
   }
 
-  if (authError || !user) return unauthenticatedElement;
+  if (authError || !user) return unauthenticatedElement
 
-  const rawRole = user.role || user.user_type;
-  const effectiveRole = rawRole === 'hiring_manager' ? 'employer' : rawRole;
-  const isSuperAdmin = SUPER_ROLES.includes(effectiveRole);
+  const rawRole = user.role || user.user_type
+  const effectiveRole = rawRole === "hiring_manager" ? "employer" : rawRole
+  const isSuperAdmin = SUPER_ROLES.includes(effectiveRole)
 
   // superAdminOnly routes
-  if (superAdminOnly && !isSuperAdmin) return unauthorizedElement;
+  if (superAdminOnly && !isSuperAdmin) return unauthorizedElement
 
   // Role check (super admins bypass)
   if (requiredRoles.length > 0 && !isSuperAdmin && !requiredRoles.includes(effectiveRole)) {
-    return unauthorizedElement;
+    return unauthorizedElement
   }
 
   // OrgType check is never bypassed. Platform admins need a future explicit
@@ -54,11 +56,11 @@ export default function ProtectedRoute({
   if (requiredOrgTypes.length > 0 && !requiredOrgTypes.includes(orgType)) {
     // An org_admin with no organization row yet isn't "unauthorized" —
     // they just haven't onboarded. Send them to create their org instead.
-    if (!organization && noOrgRedirect && effectiveRole === 'org_admin') {
-      return <Navigate to={noOrgRedirect} replace />;
+    if (!organization && noOrgRedirect && effectiveRole === "org_admin") {
+      return <Navigate to={noOrgRedirect} replace />
     }
-    return unauthorizedElement;
+    return unauthorizedElement
   }
 
-  return <Outlet />;
+  return <Outlet />
 }

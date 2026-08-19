@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Edit2, Trash2, Plus, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import StaffFormModal from '@/components/employer/StaffFormModal';
+import React, { useState } from "react"
+import { Edit2, Trash2, Plus, Users } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import StaffFormModal from "@/components/employer/StaffFormModal"
 
 export default function StaffSection({
   staff,
@@ -10,25 +10,25 @@ export default function StaffSection({
   onAdd,
   onUpdate,
   onDelete,
-  loading
+  loading,
 }) {
-  const [showModal, setShowModal] = useState(false);
-  const [editingStaff, setEditingStaff] = useState(null);
+  const [showModal, setShowModal] = useState(false)
+  const [editingStaff, setEditingStaff] = useState(null)
 
   const handleSubmit = (data) => {
     if (editingStaff) {
-      onUpdate({ id: editingStaff.id, data });
+      onUpdate({ id: editingStaff.id, data })
     } else {
-      onAdd(data);
+      onAdd(data)
     }
-    setShowModal(false);
-    setEditingStaff(null);
-  };
+    setShowModal(false)
+    setEditingStaff(null)
+  }
 
   const handleOpenModal = (member = null) => {
-    setEditingStaff(member);
-    setShowModal(true);
-  };
+    setEditingStaff(member)
+    setShowModal(true)
+  }
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -59,10 +59,7 @@ export default function StaffSection({
           <div className="text-center py-12">
             <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-600 mb-4">אין עובדים בצוות עדיין</p>
-            <Button
-              onClick={() => handleOpenModal()}
-              className="bg-hhblue hover:bg-hhblue/90"
-            >
+            <Button onClick={() => handleOpenModal()} className="bg-hhblue hover:bg-hhblue/90">
               הוסף עובד ראשון
             </Button>
           </div>
@@ -78,7 +75,7 @@ export default function StaffSection({
                   <p className="text-sm text-gray-600">{member.email}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="inline-block px-2 py-1 bg-hhblue/10 text-hhblue text-xs rounded font-medium">
-                      {member.role === 'team_manager' ? '👥 מנהל צוות' : '👤 רכז גיוס'}
+                      {member.role === "team_manager" ? "👥 מנהל צוות" : "👤 רכז גיוס"}
                     </span>
                     {member.manager_email && (
                       <span className="text-xs text-gray-500">תחת מנהל</span>
@@ -120,5 +117,5 @@ export default function StaffSection({
         loading={loading}
       />
     </div>
-  );
+  )
 }

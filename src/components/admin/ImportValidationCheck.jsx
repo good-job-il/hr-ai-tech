@@ -1,32 +1,28 @@
-import React from 'react';
-import { CheckCircle2, AlertTriangle, AlertCircle, ArrowRight } from 'lucide-react';
+import React from "react"
+import { CheckCircle2, AlertTriangle, AlertCircle, ArrowRight } from "lucide-react"
 
 export default function ImportValidationCheck({ results, onApprove, onBack }) {
-  const checks = results.checks || {};
-  const readinessScore = results.readiness_score || 0;
-  const isProduction = results.is_production_ready;
+  const checks = results.checks || {}
+  const readinessScore = results.readiness_score || 0
+  const isProduction = results.is_production_ready
 
   const CheckItem = ({ label, passed, detail }) => (
-    <div className={`flex items-start gap-3 p-4 rounded-lg border ${
-      passed 
-        ? 'border-green-200 bg-green-50' 
-        : 'border-orange-200 bg-orange-50'
-    }`}>
+    <div
+      className={`flex items-start gap-3 p-4 rounded-lg border ${
+        passed ? "border-green-200 bg-green-50" : "border-orange-200 bg-orange-50"
+      }`}
+    >
       {passed ? (
         <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
       ) : (
         <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
       )}
       <div className="flex-1 min-w-0">
-        <p className={`font-medium ${passed ? 'text-green-900' : 'text-orange-900'}`}>
-          {label}
-        </p>
-        <p className={`text-sm mt-1 ${passed ? 'text-green-700' : 'text-orange-700'}`}>
-          {detail}
-        </p>
+        <p className={`font-medium ${passed ? "text-green-900" : "text-orange-900"}`}>{label}</p>
+        <p className={`text-sm mt-1 ${passed ? "text-green-700" : "text-orange-700"}`}>{detail}</p>
       </div>
     </div>
-  );
+  )
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -50,12 +46,12 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
             <p className="text-gray-600 text-sm font-medium">ניקוד יכולת ייבוא</p>
             <p className="text-4xl font-bold text-purple-600 mt-2">{readinessScore}%</p>
           </div>
-          <div className={`px-4 py-2 rounded-lg font-semibold ${
-            isProduction
-              ? 'bg-green-100 text-green-700'
-              : 'bg-orange-100 text-orange-700'
-          }`}>
-            {isProduction ? '✓ מוכן לייבוא' : '⚠ טיפול נדרש'}
+          <div
+            className={`px-4 py-2 rounded-lg font-semibold ${
+              isProduction ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
+            }`}
+          >
+            {isProduction ? "✓ מוכן לייבוא" : "⚠ טיפול נדרש"}
           </div>
         </div>
       </div>
@@ -137,27 +133,39 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div>
             <p className="text-sm text-gray-600">סה״כ מועמדים</p>
-            <p className="text-2xl font-bold text-gray-900">{results.summary?.total_candidates || 0}</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {results.summary?.total_candidates || 0}
+            </p>
           </div>
           <div>
             <p className="text-sm text-gray-600">כפילויות חשודות</p>
-            <p className="text-2xl font-bold text-red-600">{results.summary?.duplicates_suspected || 0}</p>
+            <p className="text-2xl font-bold text-red-600">
+              {results.summary?.duplicates_suspected || 0}
+            </p>
           </div>
           <div>
             <p className="text-sm text-gray-600">בעיות parsing</p>
-            <p className="text-2xl font-bold text-orange-600">{results.summary?.parsing_issues || 0}</p>
+            <p className="text-2xl font-bold text-orange-600">
+              {results.summary?.parsing_issues || 0}
+            </p>
           </div>
           <div>
             <p className="text-sm text-gray-600">חסר אימייל</p>
-            <p className="text-2xl font-bold text-red-600">{results.summary?.missing_data?.email || 0}</p>
+            <p className="text-2xl font-bold text-red-600">
+              {results.summary?.missing_data?.email || 0}
+            </p>
           </div>
           <div>
             <p className="text-sm text-gray-600">חסר טלפון</p>
-            <p className="text-2xl font-bold text-red-600">{results.summary?.missing_data?.phone || 0}</p>
+            <p className="text-2xl font-bold text-red-600">
+              {results.summary?.missing_data?.phone || 0}
+            </p>
           </div>
           <div>
             <p className="text-sm text-gray-600">חסר תפקיד</p>
-            <p className="text-2xl font-bold text-orange-600">{results.summary?.missing_data?.role || 0}</p>
+            <p className="text-2xl font-bold text-orange-600">
+              {results.summary?.missing_data?.role || 0}
+            </p>
           </div>
         </div>
       </div>
@@ -175,14 +183,14 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
           disabled={!isProduction}
           className={`flex-1 px-6 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${
             isProduction
-              ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white'
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              ? "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
           }`}
         >
           <CheckCircle2 className="w-5 h-5" />
-          {isProduction ? 'אישור ייבוא' : 'בדיקות נכשלו'}
+          {isProduction ? "אישור ייבוא" : "בדיקות נכשלו"}
         </button>
       </div>
     </div>
-  );
+  )
 }

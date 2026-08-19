@@ -21,36 +21,36 @@ Agency-часть уже содержит основу продукта: tenant-
 
 ## 2. Текущее состояние маршрутов
 
-| Маршрут | Текущее состояние | Что требуется |
-|---|---|---|
-| `/agency/onboarding` | Частично реализован | Проверять тип существующей организации и корректно перенаправлять company org_admin |
-| `/agency/dashboard` | Частично реализован | Исправить клиентов, KPI, error states и локализацию |
-| `/agency/jobs` | Частично реализован | Tenant/client binding, permissions, локализация, обработка ошибок |
-| `/agency/jobs/open` | Использует общий экран | Применять фильтр `open` из маршрута |
-| `/agency/jobs/filled` | Фактически повторяет `/open` | Определить и применять семантику filled/closed/completed |
-| `/agency/jobs/hold` | Статус отсутствует | Добавить статус или убрать маршрут |
-| `/agency/crm` | Частично реализован | Исправить ownership, пагинацию, refresh, поиск и permissions |
-| `/agency/crm/candidate` | Частично реализован | Permissions, error handling, реальные действия и связи Application |
-| `/agency/pipeline` | Системно некорректен | Унифицировать статусы, убрать demo fallback, сохранять действия |
-| `/agency/ai-matching` | Частично реализован | Создавать полную Application и исключать дубликаты |
-| `/agency/compensation` | Частично реализован | Связать с client/job IDs и унифицировать permissions |
-| `/agency/import` | Частично реализован | Реальный retry, корректная навигация, убрать production test seeding |
-| `/agency/clients` | Системно некорректен | Единая модель клиента и tenant-связь |
-| `/agency/clients/:id` | Частично реализован | Привязанные вакансии/кандидаты, mutation states, error handling |
-| `/agency/teams` | Заглушка | Реализовать команды, пользователей, приглашения и назначения |
-| `/agency/reports` | Заглушка | Реализовать отчёты или убрать пункт до готовности |
-| `/agency/activity` | Заглушка | Реализовать журнал активности на основе AuditLog |
-| `/agency/settings/permissions` | Частично реализован | Применять матрицу во всём UI и ограничить текущим org type |
-| `/agency/settings/roles` | Частично реализован | Ограничить текущим org type и синхронизировать cache |
-| `/agency/settings/billing` | Статический mock | Подключить реальные plan/subscription/invoice данные |
-| `/agency/settings/integrations` | Статический mock | Реальные connection states и connect/disconnect flows |
-| `/agency/team/*` | Переиспользует общие страницы | Реальная team scope и корректные внутренние ссылки |
-| `/agency/recruiter/dashboard` | Заглушка | Реализовать персональный recruiter dashboard |
-| `/agency/recruiter/candidates/*` | Route-фильтры игнорируются | Реализовать all/active/pipeline filters |
-| `/agency/recruiter/jobs` | Открывает публичный Jobs | Заменить списком доступных/назначенных agency jobs |
-| `/agency/recruiter/crm/*` | Частично реализован | Ownership по `user.id`, permissions, действия |
-| `/agency/recruiter/pipeline` | Частично реализован | Персональная область рекрутера и единые статусы |
-| `/agency/recruiter/ai-matching` | Частично реализован | Персональная выборка и полная Application |
+| Маршрут                          | Текущее состояние             | Что требуется                                                                       |
+| -------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------- |
+| `/agency/onboarding`             | Частично реализован           | Проверять тип существующей организации и корректно перенаправлять company org_admin |
+| `/agency/dashboard`              | Частично реализован           | Исправить клиентов, KPI, error states и локализацию                                 |
+| `/agency/jobs`                   | Частично реализован           | Tenant/client binding, permissions, локализация, обработка ошибок                   |
+| `/agency/jobs/open`              | Использует общий экран        | Применять фильтр `open` из маршрута                                                 |
+| `/agency/jobs/filled`            | Фактически повторяет `/open`  | Определить и применять семантику filled/closed/completed                            |
+| `/agency/jobs/hold`              | Статус отсутствует            | Добавить статус или убрать маршрут                                                  |
+| `/agency/crm`                    | Частично реализован           | Исправить ownership, пагинацию, refresh, поиск и permissions                        |
+| `/agency/crm/candidate`          | Частично реализован           | Permissions, error handling, реальные действия и связи Application                  |
+| `/agency/pipeline`               | Системно некорректен          | Унифицировать статусы, убрать demo fallback, сохранять действия                     |
+| `/agency/ai-matching`            | Частично реализован           | Создавать полную Application и исключать дубликаты                                  |
+| `/agency/compensation`           | Частично реализован           | Связать с client/job IDs и унифицировать permissions                                |
+| `/agency/import`                 | Частично реализован           | Реальный retry, корректная навигация, убрать production test seeding                |
+| `/agency/clients`                | Системно некорректен          | Единая модель клиента и tenant-связь                                                |
+| `/agency/clients/:id`            | Частично реализован           | Привязанные вакансии/кандидаты, mutation states, error handling                     |
+| `/agency/teams`                  | Заглушка                      | Реализовать команды, пользователей, приглашения и назначения                        |
+| `/agency/reports`                | Заглушка                      | Реализовать отчёты или убрать пункт до готовности                                   |
+| `/agency/activity`               | Заглушка                      | Реализовать журнал активности на основе AuditLog                                    |
+| `/agency/settings/permissions`   | Частично реализован           | Применять матрицу во всём UI и ограничить текущим org type                          |
+| `/agency/settings/roles`         | Частично реализован           | Ограничить текущим org type и синхронизировать cache                                |
+| `/agency/settings/billing`       | Статический mock              | Подключить реальные plan/subscription/invoice данные                                |
+| `/agency/settings/integrations`  | Статический mock              | Реальные connection states и connect/disconnect flows                               |
+| `/agency/team/*`                 | Переиспользует общие страницы | Реальная team scope и корректные внутренние ссылки                                  |
+| `/agency/recruiter/dashboard`    | Заглушка                      | Реализовать персональный recruiter dashboard                                        |
+| `/agency/recruiter/candidates/*` | Route-фильтры игнорируются    | Реализовать all/active/pipeline filters                                             |
+| `/agency/recruiter/jobs`         | Открывает публичный Jobs      | Заменить списком доступных/назначенных agency jobs                                  |
+| `/agency/recruiter/crm/*`        | Частично реализован           | Ownership по `user.id`, permissions, действия                                       |
+| `/agency/recruiter/pipeline`     | Частично реализован           | Персональная область рекрутера и единые статусы                                     |
+| `/agency/recruiter/ai-matching`  | Частично реализован           | Персональная выборка и полная Application                                           |
 
 ## 3. Критические дефекты
 

@@ -1,17 +1,24 @@
-import React from 'react';
-import { Droppable, Draggable } from '@hello-pangea/dnd';
-import { useTranslation } from 'react-i18next';
-import CandidateCard from './CandidateCard';
-import { Users } from 'lucide-react';
+import React from "react"
+import { Droppable, Draggable } from "@hello-pangea/dnd"
+import { useTranslation } from "react-i18next"
+import CandidateCard from "./CandidateCard"
+import { Users } from "lucide-react"
 
-export default function StageColumn({ stage, applications, onCandidateClick, isDragging, colWidth, canMove = true }) {
-  const { t } = useTranslation();
+export default function StageColumn({
+  stage,
+  applications,
+  onCandidateClick,
+  isDragging,
+  colWidth,
+  canMove = true,
+}) {
+  const { t } = useTranslation()
 
-  const hasSlaBreaches = applications.some(a => {
-    if (!stage.slaHours || !a.stage_entered_at) return false;
-    const hours = (Date.now() - new Date(a.stage_entered_at)) / 3600000;
-    return hours > stage.slaHours;
-  });
+  const hasSlaBreaches = applications.some((a) => {
+    if (!stage.slaHours || !a.stage_entered_at) return false
+    const hours = (Date.now() - new Date(a.stage_entered_at)) / 3600000
+    return hours > stage.slaHours
+  })
 
   return (
     <div
@@ -20,7 +27,7 @@ export default function StageColumn({ stage, applications, onCandidateClick, isD
         width: `${colWidth}px`,
         minWidth: `${colWidth}px`,
         maxWidth: `${colWidth}px`,
-        flex: '0 0 auto',
+        flex: "0 0 auto",
       }}
     >
       <div
@@ -28,13 +35,16 @@ export default function StageColumn({ stage, applications, onCandidateClick, isD
         style={{
           background: `${stage.color}14`,
           borderTop: `3px solid ${stage.color}`,
-          position: 'sticky',
+          position: "sticky",
         }}
       >
         <div className="flex items-center gap-2">
           <span className="font-black text-[#0F172A] text-sm">{stage.label}</span>
           {hasSlaBreaches && (
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" title={t('pipeline.stageColumn.slaBreached')} />
+            <span
+              className="w-2 h-2 rounded-full bg-red-500 animate-pulse"
+              title={t("pipeline.stageColumn.slaBreached")}
+            />
           )}
         </div>
         <div
@@ -52,19 +62,19 @@ export default function StageColumn({ stage, applications, onCandidateClick, isD
             {...provided.droppableProps}
             className="min-h-[120px] rounded-b-2xl transition-all duration-200 space-y-3 p-2"
             style={{
-              background: snapshot.isDraggingOver
-                ? `${stage.color}10`
-                : 'rgba(255,255,255,0.6)',
+              background: snapshot.isDraggingOver ? `${stage.color}10` : "rgba(255,255,255,0.6)",
               border: snapshot.isDraggingOver
                 ? `2px dashed ${stage.color}`
-                : '2px solid transparent',
-              borderRadius: '0 0 16px 16px',
+                : "2px solid transparent",
+              borderRadius: "0 0 16px 16px",
             }}
           >
             {applications.length === 0 && !snapshot.isDraggingOver && (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <Users className="w-8 h-8 text-[#CBD5E1] mb-2" />
-                <p className="text-xs text-[#CBD5E1] font-semibold">{t('pipeline.stageColumn.dragHere')}</p>
+                <p className="text-xs text-[#CBD5E1] font-semibold">
+                  {t("pipeline.stageColumn.dragHere")}
+                </p>
               </div>
             )}
 
@@ -96,5 +106,5 @@ export default function StageColumn({ stage, applications, onCandidateClick, isD
         )}
       </Droppable>
     </div>
-  );
+  )
 }

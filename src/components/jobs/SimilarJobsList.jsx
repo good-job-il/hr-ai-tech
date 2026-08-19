@@ -1,28 +1,28 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { publicWorkflowService } from '@/api/services/publicWorkflowService';
-import { Link } from 'react-router-dom';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import React from "react"
+import { useQuery } from "@tanstack/react-query"
+import { publicWorkflowService } from "@/api/services/publicWorkflowService"
+import { Link } from "react-router-dom"
+import { Loader2, ArrowLeft } from "lucide-react"
 
 export default function SimilarJobsList({ jobId, title }) {
   const { data: recommendations = [], isLoading } = useQuery({
-    queryKey: ['similar-jobs', jobId],
+    queryKey: ["similar-jobs", jobId],
     queryFn: async () => {
-      const res = await publicWorkflowService.similarJobs(Number(jobId), 4);
-      return res.recommendations;
+      const res = await publicWorkflowService.similarJobs(Number(jobId), 4)
+      return res.recommendations
     },
-  });
+  })
 
   if (isLoading) {
     return (
       <div className="flex justify-center py-6">
         <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
       </div>
-    );
+    )
   }
 
   if (recommendations.length === 0) {
-    return null;
+    return null
   }
 
   return (
@@ -41,7 +41,7 @@ export default function SimilarJobsList({ jobId, title }) {
                 className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white font-semibold text-sm"
                 style={{ backgroundColor: job.company_color }}
               >
-                {job.company_initials || 'ח'}
+                {job.company_initials || "ח"}
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 group-hover:text-purple-600 transition">
@@ -57,7 +57,7 @@ export default function SimilarJobsList({ jobId, title }) {
                 <span>📍</span>
                 <span>{job.location}</span>
               </div>
-              
+
               {job.salary_min && job.salary_max && (
                 <div className="flex items-center gap-2 text-green-700 font-semibold">
                   <span>💰</span>
@@ -70,7 +70,7 @@ export default function SimilarJobsList({ jobId, title }) {
               <div className="flex items-center gap-2 text-gray-600">
                 <span>🏢</span>
                 <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-                  {job.category || 'כללי'}
+                  {job.category || "כללי"}
                 </span>
               </div>
             </div>
@@ -84,5 +84,5 @@ export default function SimilarJobsList({ jobId, title }) {
         ))}
       </div>
     </div>
-  );
+  )
 }

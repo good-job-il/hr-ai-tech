@@ -7,19 +7,23 @@ The **General Candidate Pool** flow allows the system to accept CVs without asso
 ## Email Addresses
 
 ### 1. Job-Specific Application Email
+
 **Format:** `headhunter.jobs+{job_code}@gmail.com`  
 **Example:** `headhunter.jobs+hhLADG4@gmail.com`
 
 **Flow:**
+
 - CV received → Creates **Candidate** + **Application** + **CandidateDocument** + **Timeline**
 - Automatically associated with specific job
 - Application status: `new`
 
 ### 2. General Pool Email
+
 **Format:** `headhunter.jobs+pool@gmail.com`  
 **Address:** `r.rodion2802+pool@gmail.com`
 
 **Flow:**
+
 - CV received → Creates **Candidate** + **CandidateDocument** + **Timeline**
 - **NO Application created**
 - Candidate marked with `source: 'pool'`
@@ -32,12 +36,14 @@ The **General Candidate Pool** flow allows the system to accept CVs without asso
 ### Backend Functions
 
 #### `emailIntakeHandler` (Existing)
+
 - Triggered by Gmail webhook on job-specific aliases
 - Extracts `job_code` from `+{job_code}` alias
 - Creates Application automatically
 - Path: `functions/emailIntakeHandler`
 
 #### `emailPoolIntakeHandler` (NEW)
+
 - Triggered by Gmail webhook on `+pool` alias
 - **No job_code** → General pool intake
 - Comprehensive CV parsing via LLM:
@@ -69,6 +75,7 @@ The automation triggers on all Gmail messages. The function filters internally b
 ### Frontend Components
 
 #### `GeneralPoolPage` (NEW)
+
 - **Route:** `/crm/pool`
 - Displays pool email address prominently
 - Copy-to-clipboard functionality
@@ -78,6 +85,7 @@ The automation triggers on all Gmail messages. The function filters internally b
 - **Access:** recruiter, team_manager, recruitment_manager, admin, employer
 
 #### `AssignToJobModal` (NEW)
+
 - Manual job assignment modal
 - Searchable job list
 - Creates Application on assignment
@@ -86,6 +94,7 @@ The automation triggers on all Gmail messages. The function filters internally b
 - **Usage:** Click "שייך מועמד למשרה" in RecruiterWorkspacePanel
 
 #### `RecruiterWorkspacePanel` (Updated)
+
 - New button: "שייך מועמד למשרה"
 - Opens `AssignToJobModal`
 - Available for all CRM users
@@ -93,6 +102,7 @@ The automation triggers on all Gmail messages. The function filters internally b
 ## Data Flow
 
 ### Job-Specific Flow
+
 ```
 Email → +{job_code}@gmail.com
   ↓
@@ -111,6 +121,7 @@ Mark email as read
 ```
 
 ### General Pool Flow
+
 ```
 Email → +pool@gmail.com
   ↓
@@ -136,6 +147,7 @@ Mark email as read
 ```
 
 ### Manual Assignment Flow
+
 ```
 Recruiter views candidate in General Pool
   ↓
@@ -154,9 +166,10 @@ Candidate now has application
 ## Candidate Entity Fields
 
 ### Pool-Specific Fields
+
 ```json
 {
-  "source": "pool",  // or "import" for CSV imports
+  "source": "pool", // or "import" for CSV imports
   "domain_name": "פיתוח תוכנה",
   "role_name": "מפתח Full Stack",
   "skills": ["React", "Node.js", "PostgreSQL"],
@@ -172,6 +185,7 @@ Candidate now has application
 ## Timeline Events
 
 ### Pool Intake
+
 ```json
 {
   "event_type": "imported",
@@ -190,6 +204,7 @@ Candidate now has application
 ```
 
 ### Manual Assignment
+
 ```json
 {
   "event_type": "application_submitted",
@@ -242,10 +257,12 @@ Candidate now has application
 ## Duplicate Detection
 
 The system checks for duplicates using:
+
 1. **Email match** (exact)
 2. **Phone match** (normalized, digits only)
 
 If duplicate found:
+
 - Updates existing candidate with new CV
 - Sets `is_duplicate_suspected: true`
 - Creates Timeline event (not new candidate)
@@ -254,6 +271,7 @@ If duplicate found:
 ## AI Parsing
 
 The LLM extracts the following from CVs:
+
 - **Personal:** name, email, phone, location
 - **Professional:** domain, role, skills, experience years
 - **Expectations:** salary min/max
@@ -266,11 +284,13 @@ Parsing confidence is stored in `parsing_confidence` (0-100).
 ## Security & Permissions
 
 ### Access Control
+
 - **General Pool:** recruiter, team_manager, recruitment_manager, admin, employer
 - **Assign to Job:** same roles
 - **Send to Employer:** recruiter, team_manager, recruitment_manager, admin
 
 ### Data Visibility
+
 - Employers see only their own candidates
 - Recruiters see assigned + unassigned (if permitted)
 - Managers see all candidates
@@ -278,11 +298,13 @@ Parsing confidence is stored in `parsing_confidence` (0-100).
 ## Monitoring
 
 ### Gmail Webhook
+
 - Check automation status: Dashboard → Code → Automations
 - View logs: Dashboard → Code → Functions → emailPoolIntakeHandler
 - Test: Use `test_backend_function` tool
 
 ### Metrics to Track
+
 - Candidates per day (source: 'pool')
 - Duplicate rate
 - Assignment rate (pool → job)
@@ -311,17 +333,20 @@ Parsing confidence is stored in `parsing_confidence` (0-100).
 ## Troubleshooting
 
 ### CV Not Appearing in Pool
+
 1. Check Gmail webhook is active
 2. Verify email alias is `+pool`
 3. Check function logs for errors
 4. Confirm attachment was detected
 
 ### Duplicate Not Detected
+
 1. Verify email/phone format
 2. Check normalization logic
 3. Review duplicate detection thresholds
 
 ### Assignment Fails
+
 1. Check if Application already exists
 2. Verify job is not closed
 3. Check user permissions
@@ -329,6 +354,7 @@ Parsing confidence is stored in `parsing_confidence` (0-100).
 ## Support
 
 For issues or questions:
+
 - Check logs: Dashboard → Code → Functions
 - Review automations: Dashboard → Code → Automations
 - Test function: Use backend function testing tool

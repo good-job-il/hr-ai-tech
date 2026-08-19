@@ -8,9 +8,11 @@
 ## ✅ Fixed
 
 ### 1. ProtectedRoute Enforcement
+
 **File**: `components/ProtectedRoute.jsx`
 
 **Changes**:
+
 - Added `requiredRoles` validation
 - Added `requiredOrgTypes` validation
 - Added `superAdminOnly` flag
@@ -18,6 +20,7 @@
 - Proper unauthorized redirects
 
 **Verification**:
+
 ```jsx
 // Platform routes — super_admin only
 <Route element={<ProtectedRoute superAdminOnly />}>
@@ -38,20 +41,23 @@
 ---
 
 ### 4. Super Admin Isolation
+
 **File**: `lib/rls-utils.js`
 
 **Changes**:
+
 - `super_admin` can ONLY access platform entities: `Organization`, `AuditLog`, `PermissionMatrix`, `RoleTemplate`
 - All tenant-sensitive data (Candidate, Application, Job, CompensationPlan) is BLOCKED for `super_admin` by default
 - To access tenant data, must use impersonation/support mode (Phase D)
 
 **Code**:
-```javascript
-const PLATFORM_ENTITIES = ['Organization', 'AuditLog', 'PermissionMatrix', 'RoleTemplate'];
 
-if (role === 'super_admin') {
-  if (PLATFORM_ENTITIES.includes(entityName)) return {};
-  return { id: '__BLOCKED__' }; // Tenant data blocked
+```javascript
+const PLATFORM_ENTITIES = ["Organization", "AuditLog", "PermissionMatrix", "RoleTemplate"]
+
+if (role === "super_admin") {
+  if (PLATFORM_ENTITIES.includes(entityName)) return {}
+  return { id: "__BLOCKED__" } // Tenant data blocked
 }
 ```
 
@@ -60,20 +66,23 @@ if (role === 'super_admin') {
 ---
 
 ### 5. CompensationPlan Isolation
+
 **File**: `lib/rls-utils.js`
 
 **Changes**:
+
 - `CompensationPlan` is NOW `staffing_agency` ONLY
 - Company HR (`organization` type) CANNOT see or create compensation plans
 - Enforced at RLS level + validation
 
 **Code**:
+
 ```javascript
-if (entityName === 'CompensationPlan') {
-  if (orgType !== 'staffing_agency') {
-    return { id: '__BLOCKED__' };
+if (entityName === "CompensationPlan") {
+  if (orgType !== "staffing_agency") {
+    return { id: "__BLOCKED__" }
   }
-  return { organization_id: orgId };
+  return { organization_id: orgId }
 }
 ```
 
@@ -84,17 +93,20 @@ if (entityName === 'CompensationPlan') {
 ## 🟡 In Progress
 
 ### 3. Backend Validation
+
 **File**: `lib/validateEntityOwnership.js`
 
 **Status**: Created validation utilities, need to integrate into create/update flows.
 
 **Next Steps**:
+
 - Add validation to `processCandidateImport` function
 - Add validation to `createApplicationTimeline` function
 - Add validation to `sendCandidateToEmployer` function
 - Ensure all create/update operations call `validateEntityData()`
 
 **Verification Needed**:
+
 - Test creating Candidate without `organization_id` → should FAIL
 - Test creating Application without `recruiter_id` (staffing_agency) → should FAIL
 - Test creating CompensationPlan with `organization` type → should FAIL
@@ -104,6 +116,7 @@ if (entityName === 'CompensationPlan') {
 ## 🔴 Not Started
 
 ### 2. Employer Legacy Removal
+
 **Status**: Still exists alongside new structure.
 
 **Options**:
@@ -113,6 +126,7 @@ B. **Full alias** — Redirect all `/employer/*` → `/company/*` with proper ro
 **Recommendation**: Option A (remove) — We're past migration period.
 
 **Files to audit**:
+
 - `pages/employer/*` (4 files)
 - `components/layouts/EmployerLayout`
 - `components/employer/*` (many components)
@@ -121,9 +135,11 @@ B. **Full alias** — Redirect all `/employer/*` → `/company/*` with proper ro
 ---
 
 ### 6. Team Structure Planning
+
 **Status**: Not started — acknowledged as future work.
 
 **Plan**:
+
 - Create `Team` entity
 - Create `TeamMembership` entity
 - Support nested teams (team → sub-team)
@@ -134,9 +150,11 @@ B. **Full alias** — Redirect all `/employer/*` → `/company/*` with proper ro
 ---
 
 ### 7. Navigation Cleanup
+
 **Status**: Partial — still has legacy terminology.
 
 **Audit needed**:
+
 - Remove "admin" from agency navigation (should be "org_admin" or "recruitment_manager")
 - Remove all "employer" references (replace with "company HR")
 - Ensure platform navigation uses "Platform" terminology consistently
@@ -144,9 +162,11 @@ B. **Full alias** — Redirect all `/employer/*` → `/company/*` with proper ro
 ---
 
 ### 8. Performance Optimization
+
 **Status**: CRITICAL — System is slow.
 
 **Immediate actions needed**:
+
 1. **Pagination** — Add to all `list()` calls (Candidate, Application, Job)
 2. **Query limits** — Never fetch >500 records without pagination
 3. **Memoization** — Add `React.memo()` to heavy components
@@ -155,30 +175,32 @@ B. **Full alias** — Redirect all `/employer/*` → `/company/*` with proper ro
 6. **Skeleton loaders** — Replace loading spinners with content placeholders
 
 **Files to optimize**:
+
 - `pages/crm/CandidateListCRMPage` — likely loading all candidates
 - `pages/agency/AgencyDashboard` — stats queries
 - `pages/admin/CompensationPage` — compensation plans + jobs
 - `components/ats/PipelineBoard` — pipeline data
 
 **Tools**:
+
 - React Query `useQuery` with proper `staleTime` + `cacheTime`
 - `useMemo` for expensive calculations
 - Virtual scrolling for long lists (if needed)
 
 ---
 
-##  Verification Checklist
+## Verification Checklist
 
 After all fixes:
 
-| Feature | Test | Expected | Status |
-|---------|------|----------|--------|
-| ProtectedRoute | `recruiter` tries `/platform/dashboard` | Redirect to `/unauthorized` | ⏳ |
-| ProtectedRoute | `org_admin` tries `/company/dashboard` | Redirect to `/unauthorized` (wrong org_type) | ⏳ |
-| Super Admin | Login as `super_admin`, view `/agency/crm` | See empty/blocked | ⏳ |
-| Compensation | Login as `hr_manager` (company), view `/agency/compensation` | Blocked | ⏳ |
-| Backend Validation | Create Candidate without `organization_id` | Error | ⏳ |
-| Performance | Load Candidate CRM with 100 records | <2s | ⏳ |
+| Feature            | Test                                                         | Expected                                     | Status |
+| ------------------ | ------------------------------------------------------------ | -------------------------------------------- | ------ |
+| ProtectedRoute     | `recruiter` tries `/platform/dashboard`                      | Redirect to `/unauthorized`                  | ⏳     |
+| ProtectedRoute     | `org_admin` tries `/company/dashboard`                       | Redirect to `/unauthorized` (wrong org_type) | ⏳     |
+| Super Admin        | Login as `super_admin`, view `/agency/crm`                   | See empty/blocked                            | ⏳     |
+| Compensation       | Login as `hr_manager` (company), view `/agency/compensation` | Blocked                                      | ⏳     |
+| Backend Validation | Create Candidate without `organization_id`                   | Error                                        | ⏳     |
+| Performance        | Load Candidate CRM with 100 records                          | <2s                                          | ⏳     |
 
 ---
 

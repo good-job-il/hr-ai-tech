@@ -3,28 +3,28 @@
  * Sends errors to backend for tracking and monitoring
  */
 
-import { useCallback } from 'react';
-import { AppError } from '@/lib/errors/AppError';
+import { useCallback } from "react"
+import { AppError } from "@/lib/errors/AppError"
 
 interface ErrorLogPayload {
-  error: AppError;
+  error: AppError
   context?: {
-    action?: string;
-    component?: string;
-    path?: string;
-    userId?: string;
-  };
-  userAgent?: string;
-  timestamp?: string;
+    action?: string
+    component?: string
+    path?: string
+    userId?: string
+  }
+  userAgent?: string
+  timestamp?: string
 }
 
 export function useErrorLog() {
   const logError = useCallback(async (payload: ErrorLogPayload) => {
     try {
       // Don't log in development for now
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[ErrorLog]', payload.error.toJSON());
-        return;
+      if (process.env.NODE_ENV === "development") {
+        console.error("[ErrorLog]", payload.error.toJSON())
+        return
       }
 
       // TODO: Send to logging service
@@ -36,9 +36,9 @@ export function useErrorLog() {
       // });
     } catch (err) {
       // Silently fail - don't let logging break the app
-      console.error('Failed to log error:', err);
+      console.error("Failed to log error:", err)
     }
-  }, []);
+  }, [])
 
-  return { logError };
+  return { logError }
 }

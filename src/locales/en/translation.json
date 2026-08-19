@@ -1160,10 +1160,31 @@
     "emptyInvites": "No invitations yet",
     "errorTitle": "Could not load organization teams",
     "tabs": { "members": "Members", "teams": "Teams", "invitations": "Invitations" },
-    "stats": { "total": "Total members", "active": "Active members", "teams": "Active teams", "pending": "Pending invites" },
-    "fields": { "fullName": "Full name", "email": "Email", "phone": "Phone", "role": "Role", "team": "Team" },
-    "roles": { "org_admin": "Organization Admin", "recruitment_manager": "Recruitment Manager", "team_manager": "Team Manager", "recruiter": "Recruiter" },
-    "inviteStatus": { "pending": "Pending", "accepted": "Accepted", "cancelled": "Cancelled", "expired": "Expired" },
+    "stats": {
+      "total": "Total members",
+      "active": "Active members",
+      "teams": "Active teams",
+      "pending": "Pending invites"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "team": "Team"
+    },
+    "roles": {
+      "org_admin": "Organization Admin",
+      "recruitment_manager": "Recruitment Manager",
+      "team_manager": "Team Manager",
+      "recruiter": "Recruiter"
+    },
+    "inviteStatus": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
     "invite": {
       "title": "Invite organization member",
       "hint": "The invitation expires after 7 days. Its secure link is shown once and copied after creation.",
@@ -1171,7 +1192,13 @@
       "copied": "Invitation link copied",
       "linkReady": "Invitation created"
     },
-    "teamModal": { "title": "Create team", "name": "Team name", "description": "Description", "manager": "Team manager", "created": "Team created" },
+    "teamModal": {
+      "title": "Create team",
+      "name": "Team name",
+      "description": "Description",
+      "manager": "Team manager",
+      "created": "Team created"
+    },
     "memberModal": { "title": "Edit {{name}}", "saved": "Member updated" }
   },
   "platform": {
@@ -2093,61 +2120,61 @@
     }
   },
   "agencyClients": {
-      "title": "Clients",
-      "subtitle": "Companies we recruit for",
-      "newClient": "New Client",
-      "createModal": {
-        "title": "New Client",
-        "clientName": "Client Name",
-        "clientNameRequired": "Client name is required",
-        "namePlaceholder": "e.g.: TechCorp Israel",
-        "industry": "Industry",
-        "selectIndustry": "Select Industry",
-        "contactEmail": "Contact Email",
-        "website": "Website",
-        "color": "Color",
-        "cancel": "Cancel",
-        "creating": "Creating...",
-        "create": "Create Client",
-        "success": "Client created successfully",
-        "errorCreating": "Could not create the client"
-      },
-      "industries": {
-        "hitech": "Hi-Tech",
-        "finance": "Finance",
-        "manufacturing": "Manufacturing",
-        "retail": "Retail",
-        "services": "Services",
-        "healthcare": "Healthcare",
-        "education": "Education",
-        "realestate": "Real Estate",
-        "logistics": "Logistics",
-        "communications": "Communications",
-        "other": "Other"
-      },
-      "stats": {
-        "jobs": "Jobs",
-        "inProcess": "In Process",
-        "hired": "Hired",
-        "totalClients": "Total Clients",
-        "activeClients": "Active Clients",
-        "openJobs": "Open Jobs",
-        "candidatesInProcess": "Candidates In Process"
-      },
-      "filters": {
-        "searchPlaceholder": "Search by company name...",
-        "allIndustries": "All Industries",
-        "all": "All",
-        "active": "Active",
-        "inactive": "Inactive"
-      },
-      "results": {
-        "count_one": "{{count}} client",
-        "count_other": "{{count}} clients",
-        "noMatchingClients": "No clients match the search",
-        "noClients": "No clients yet",
-        "addFirstClient": "Add your first client and publish a job for them"
-      },
-      "loadError": "Unable to load clients"
+    "title": "Clients",
+    "subtitle": "Companies we recruit for",
+    "newClient": "New Client",
+    "createModal": {
+      "title": "New Client",
+      "clientName": "Client Name",
+      "clientNameRequired": "Client name is required",
+      "namePlaceholder": "e.g.: TechCorp Israel",
+      "industry": "Industry",
+      "selectIndustry": "Select Industry",
+      "contactEmail": "Contact Email",
+      "website": "Website",
+      "color": "Color",
+      "cancel": "Cancel",
+      "creating": "Creating...",
+      "create": "Create Client",
+      "success": "Client created successfully",
+      "errorCreating": "Could not create the client"
+    },
+    "industries": {
+      "hitech": "Hi-Tech",
+      "finance": "Finance",
+      "manufacturing": "Manufacturing",
+      "retail": "Retail",
+      "services": "Services",
+      "healthcare": "Healthcare",
+      "education": "Education",
+      "realestate": "Real Estate",
+      "logistics": "Logistics",
+      "communications": "Communications",
+      "other": "Other"
+    },
+    "stats": {
+      "jobs": "Jobs",
+      "inProcess": "In Process",
+      "hired": "Hired",
+      "totalClients": "Total Clients",
+      "activeClients": "Active Clients",
+      "openJobs": "Open Jobs",
+      "candidatesInProcess": "Candidates In Process"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by company name...",
+      "allIndustries": "All Industries",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "results": {
+      "count_one": "{{count}} client",
+      "count_other": "{{count}} clients",
+      "noMatchingClients": "No clients match the search",
+      "noClients": "No clients yet",
+      "addFirstClient": "Add your first client and publish a job for them"
+    },
+    "loadError": "Unable to load clients"
   }
 }

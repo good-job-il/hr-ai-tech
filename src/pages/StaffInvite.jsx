@@ -1,65 +1,71 @@
-import React, { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState } from "react"
+import { useSearchParams } from "react-router-dom"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const ROLES = [
-  { id: 'recruiter', label: 'רכז גיוס' },
-  { id: 'team_manager', label: 'מנהל צוות' },
-  { id: 'recruitment_manager', label: 'מנהל גיוס' },
-];
+  { id: "recruiter", label: "רכז גיוס" },
+  { id: "team_manager", label: "מנהל צוות" },
+  { id: "recruitment_manager", label: "מנהל גיוס" },
+]
 
 export default function StaffInvite() {
-  const [searchParams] = useSearchParams();
-  const [email, setEmail] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [role, setRole] = useState('recruiter');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [searchParams] = useSearchParams()
+  const [email, setEmail] = useState("")
+  const [fullName, setFullName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [role, setRole] = useState("recruiter")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    e.preventDefault()
+    setError("")
+    setLoading(true)
 
     try {
-      const inviteToken = Math.random().toString(36).substring(2, 15);
-      const inviteLink = `${window.location.origin}/register?invite=${inviteToken}&email=${encodeURIComponent(email)}&role=${role}&phone=${encodeURIComponent(phone)}`;
+      const inviteToken = Math.random().toString(36).substring(2, 15)
+      const inviteLink = `${window.location.origin}/register?invite=${inviteToken}&email=${encodeURIComponent(email)}&role=${role}&phone=${encodeURIComponent(phone)}`
 
       // שמור הזמנה בדטאבייס אם יש כזה
 
       // בעתיד: שלח אימייל עם הקישור
-      console.log('Invite link:', inviteLink);
+      console.log("Invite link:", inviteLink)
 
-      setSuccess(true);
-      setEmail('');
-      setFullName('');
-      setPhone('');
-      
+      setSuccess(true)
+      setEmail("")
+      setFullName("")
+      setPhone("")
+
       // הצג הודעה עם הקישור לעיתוי עתידי
-      alert(`הזמנה שנוצרה. קישור:\n${inviteLink}`);
+      alert(`הזמנה שנוצרה. קישור:\n${inviteLink}`)
     } catch (err) {
-      setError(err.message || 'שגיאה בשליחת הזמנה');
+      setError(err.message || "שגיאה בשליחת הזמנה")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12" dir="rtl" style={{ background: 'linear-gradient(135deg, #eaf7fb 0%, #d4edfa 100%)' }}>
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-12"
+      dir="rtl"
+      style={{ background: "linear-gradient(135deg, #eaf7fb 0%, #d4edfa 100%)" }}
+    >
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
           <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              הזמן עובד לצוות
-            </h1>
-            <p className="text-sm text-gray-600">
-              הזמן עובדים חדשים כדי להצטרף לארגון שלך
-            </p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">הזמן עובד לצוות</h1>
+            <p className="text-sm text-gray-600">הזמן עובדים חדשים כדי להצטרף לארגון שלך</p>
           </div>
 
           {error && (
@@ -120,19 +126,25 @@ export default function StaffInvite() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {ROLES.map(r => (
-                    <SelectItem key={r.id} value={r.id}>{r.label}</SelectItem>
+                  {ROLES.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      {r.label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold text-base rounded-lg">
-              {loading ? 'שולח...' : 'שלח הזמנה'}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white h-12 font-bold text-base rounded-lg"
+            >
+              {loading ? "שולח..." : "שלח הזמנה"}
             </Button>
           </form>
         </div>
       </div>
     </div>
-  );
+  )
 }

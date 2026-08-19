@@ -1,15 +1,18 @@
 # End-to-End Verification Checklist - General Pool Flow
 
 ## Test Scenario
+
 Send CV to: `r.rodion2802+pool@gmail.com`
 
 ## Pre-Test State
+
 - Candidates from pool: 0
 - Last candidate ID: `6a0608e1a08583fb5b624803` (israel.israeliv@validtest.com)
 
 ## Post-Test Verification Steps
 
 ### 1. Check Candidate Created
+
 ```
 Query: { "source": "pool" }
 Expected: 1 new candidate
@@ -30,6 +33,7 @@ Check fields:
 ```
 
 ### 2. Check CandidateDocument Created
+
 ```
 Query: { "candidate_email": "<candidate_email>", "doc_type": "cv" }
 Expected: 1 document
@@ -42,6 +46,7 @@ Check fields:
 ```
 
 ### 3. Check Timeline Event Created
+
 ```
 Query: { "candidate_email": "<candidate_email>", "event_type": "imported" }
 Expected: 1 event with description containing "נכנס למאגר הכללי"
@@ -53,12 +58,14 @@ Check fields:
 ```
 
 ### 4. Verify NO Application Created
+
 ```
 Query: { "candidate_email": "<candidate_email>" }
 Expected: 0 applications
 ```
 
 ### 5. Check Candidate Appears in /crm/pool
+
 ```
 Navigate to: /crm/pool
 Expected: New candidate visible in list
@@ -66,6 +73,7 @@ Search by: name, email, skills
 ```
 
 ### 6. Test "Assign to Job" Button
+
 ```
 1. Click candidate from pool
 2. Click "שייך מועמד למשרה"
@@ -76,6 +84,7 @@ Search by: name, email, skills
 ```
 
 ### 7. Verify Both +job_code and +pool Work
+
 ```
 Send to +{job_code}@gmail.com → Creates Application
 Send to +pool@gmail.com → No Application, pool only
@@ -118,7 +127,7 @@ Timeline:
 
 Application:
 - Count: [0 expected] ✓/✗
-- ID: [N/A - pool] 
+- ID: [N/A - pool]
 
 Pool Page:
 - Visible: ✓/✗
@@ -135,23 +144,27 @@ Manual Assignment:
 ## Troubleshooting
 
 ### If Candidate Not Created:
+
 1. Check Gmail webhook: Dashboard → Code → Automations
 2. Check function logs: Dashboard → Code → Functions → emailPoolIntakeHandler
 3. Verify alias detection: `+pool` in To header
 4. Check attachment detection
 
 ### If Parsing Failed:
+
 1. Check LLM integration credits
 2. Verify CV format (PDF/DOC/DOCX)
 3. Check file size (<25MB)
 4. Review function logs for LLM errors
 
 ### If Document Not Created:
+
 1. Check UploadFile integration
 2. Verify attachment was detected
 3. Check binary conversion
 
 ### If Timeline Not Created:
+
 1. Check CandidateTimeline entity exists
 2. Verify candidate was created first
 3. Review function error logs

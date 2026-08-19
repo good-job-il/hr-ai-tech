@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from "@/components/ui/Card"
 
 export function DataTable({ columns, data, onRowClick }) {
   return (
@@ -9,7 +9,10 @@ export function DataTable({ columns, data, onRowClick }) {
             <thead>
               <tr className="border-b border-[#E4ECFF]">
                 {columns.map((col) => (
-                  <th key={col.key} className="px-6 py-3 text-left text-xs font-bold text-[#0F172A]">
+                  <th
+                    key={col.key}
+                    className="px-6 py-3 text-left text-xs font-bold text-[#0F172A]"
+                  >
                     {col.label}
                   </th>
                 ))}
@@ -34,7 +37,7 @@ export function DataTable({ columns, data, onRowClick }) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
 
-export default DataTable;
+export default DataTable

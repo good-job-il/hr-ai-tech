@@ -1,65 +1,65 @@
-import React, { useState } from 'react';
-import { candidateImportService } from '@/api/services/candidateImportService';
-import { fileService } from '@/api/services/fileService';
-import { staffService } from '@/api/services/staffService';
-import { Upload, AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import ResumeImportReview from './ResumeImportReview';
-import ImportValidationCheck from './ImportValidationCheck';
-import { useAuth } from '@/lib/AuthContext';
+import React, { useState } from "react"
+import { candidateImportService } from "@/api/services/candidateImportService"
+import { fileService } from "@/api/services/fileService"
+import { staffService } from "@/api/services/staffService"
+import { Upload, AlertCircle, CheckCircle2, Loader2, X } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
+import ResumeImportReview from "./ResumeImportReview"
+import ImportValidationCheck from "./ImportValidationCheck"
+import { useAuth } from "@/lib/AuthContext"
 
 export default function ResumeZipUploader({ onImportComplete }) {
-  const { user } = useAuth();
-  const [uploading, setUploading] = useState(false);
-  const [zipFile, setZipFile] = useState(null);
-  const [parseError, setParseError] = useState(null);
-  const [parseResults, setParseResults] = useState(null);
-  const [recruiterId, setRecruiterId] = useState('');
-  const [employerId, setEmployerId] = useState('');
-  const [importSource, setImportSource] = useState('linkedin');
-  const [initialStatus, setInitialStatus] = useState('new');
-  const [validationResults, setValidationResults] = useState(null);
+  const { user } = useAuth()
+  const [uploading, setUploading] = useState(false)
+  const [zipFile, setZipFile] = useState(null)
+  const [parseError, setParseError] = useState(null)
+  const [parseResults, setParseResults] = useState(null)
+  const [recruiterId, setRecruiterId] = useState("")
+  const [employerId, setEmployerId] = useState("")
+  const [importSource, setImportSource] = useState("linkedin")
+  const [initialStatus, setInitialStatus] = useState("new")
+  const [validationResults, setValidationResults] = useState(null)
 
   // Fetch staff members for dropdown
   const { data: staffMembers = [] } = useQuery({
-    queryKey: ['staff-members'],
+    queryKey: ["staff-members"],
     queryFn: async () => {
-      const result = await staffService.list({ sort: 'created_date', order: 'DESC', limit: 1000 });
-      return result || [];
-    }
-  });
+      const result = await staffService.list({ sort: "created_date", order: "DESC", limit: 1000 })
+      return result || []
+    },
+  })
 
   const handleZipSelect = (file) => {
-    if (file && file.name.endsWith('.zip')) {
-      setZipFile(file);
-      setParseError(null);
+    if (file && file.name.endsWith(".zip")) {
+      setZipFile(file)
+      setParseError(null)
     } else {
-      setParseError('נא בחר קובץ ZIP');
+      setParseError("נא בחר קובץ ZIP")
     }
-  };
+  }
 
   const handleUploadAndParse = async () => {
-    if (!zipFile) return;
+    if (!zipFile) return
 
-    setUploading(true);
-    setParseError(null);
+    setUploading(true)
+    setParseError(null)
 
     try {
       // 1. Upload ZIP file
-      const uploadResult = await fileService.upload(zipFile);
-      const zipUrl = uploadResult.file_url;
+      const uploadResult = await fileService.upload(zipFile)
+      const zipUrl = uploadResult.file_url
 
       // 2. Create import batch record
       const importBatch = await candidateImportService.create({
-        batch_name: zipFile.name.replace('.zip', ''),
+        batch_name: zipFile.name.replace(".zip", ""),
         source_file: zipUrl,
-        file_type: 'zip',
+        file_type: "zip",
         recruiter_id: recruiterId || user?.id,
-        team_manager_id: user?.role === 'team_manager' ? user.id : user?.team_manager_id,
+        team_manager_id: user?.role === "team_manager" ? user.id : user?.team_manager_id,
         recruitment_manager_id: user?.recruitment_manager_id,
         employer_id: employerId || null,
-        total_records: 0
-      });
+        total_records: 0,
+      })
 
       // 3. Parse resume batch
       const parseResult = await candidateImportService.parseBatch({
@@ -68,8 +68,8 @@ export default function ResumeZipUploader({ onImportComplete }) {
         employer_id: employerId || null,
         recruiter_id: recruiterId || null,
         source: importSource,
-        initial_status: initialStatus
-      });
+        initial_status: initialStatus,
+      })
 
       // 4. Show review screen
       setParseResults({
@@ -77,27 +77,27 @@ export default function ResumeZipUploader({ onImportComplete }) {
         importBatchId: importBatch.id,
         zipUrl,
         recruiterId,
-        employerId
-      });
+        employerId,
+      })
     } catch (err) {
-      console.error('[ResumeZipUploader] Error:', err);
-      setParseError(err.message || 'שגיאה בעיבוד ZIP');
+      console.error("[ResumeZipUploader] Error:", err)
+      setParseError(err.message || "שגיאה בעיבוד ZIP")
     } finally {
-      setUploading(false);
+      setUploading(false)
     }
-  };
+  }
 
   if (validationResults) {
     return (
       <ImportValidationCheck
         results={validationResults}
         onApprove={() => {
-          setValidationResults(null);
-          onImportComplete?.();
+          setValidationResults(null)
+          onImportComplete?.()
         }}
         onBack={() => setValidationResults(null)}
       />
-    );
+    )
   }
 
   if (parseResults) {
@@ -107,18 +107,20 @@ export default function ResumeZipUploader({ onImportComplete }) {
         onComplete={async () => {
           // Run validation after candidates created
           try {
-            const validation = await candidateImportService.validateBatch(parseResults.importBatchId);
-            setValidationResults(validation);
+            const validation = await candidateImportService.validateBatch(
+              parseResults.importBatchId,
+            )
+            setValidationResults(validation)
           } catch (err) {
-            console.error('Validation failed:', err);
-            setParseResults(null);
-            setZipFile(null);
-            onImportComplete?.();
+            console.error("Validation failed:", err)
+            setParseResults(null)
+            setZipFile(null)
+            onImportComplete?.()
           }
         }}
         onBack={() => setParseResults(null)}
       />
-    );
+    )
   }
 
   return (
@@ -146,10 +148,7 @@ export default function ResumeZipUploader({ onImportComplete }) {
             <p className="text-sm font-medium text-gray-900">{zipFile.name}</p>
             <p className="text-xs text-gray-500">{(zipFile.size / 1024 / 1024).toFixed(2)} MB</p>
           </div>
-          <button
-            onClick={() => setZipFile(null)}
-            className="text-gray-500 hover:text-red-600"
-          >
+          <button onClick={() => setZipFile(null)} className="text-gray-500 hover:text-red-600">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -202,8 +201,8 @@ export default function ResumeZipUploader({ onImportComplete }) {
           >
             <option value="">לא נבחר</option>
             {staffMembers
-              .filter(s => s.role === 'recruiter')
-              .map(member => (
+              .filter((s) => s.role === "recruiter")
+              .map((member) => (
                 <option key={member.id} value={member.email}>
                   {member.full_name} ({member.email})
                 </option>
@@ -220,8 +219,8 @@ export default function ResumeZipUploader({ onImportComplete }) {
           >
             <option value="">לא נבחר</option>
             {staffMembers
-              .filter(s => s.role === 'hiring_manager')
-              .map(member => (
+              .filter((s) => s.role === "hiring_manager")
+              .map((member) => (
                 <option key={member.id} value={member.email}>
                   {member.full_name} ({member.email})
                 </option>
@@ -253,5 +252,5 @@ export default function ResumeZipUploader({ onImportComplete }) {
         המערכת תחלץ נתונים, תבדוק כפילויות, ותציג סיכום לפני יצירת מועמדים
       </p>
     </div>
-  );
+  )
 }

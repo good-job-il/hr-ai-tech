@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
-import { Plus, Trash2, Edit2, Check, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import React, { useState } from "react"
+import { Plus, Trash2, Edit2, Check, X } from "lucide-react"
+import { Input } from "@/components/ui/input"
 
 export default function PipelineManager({ stages, onAdd, onDelete, onUpdate }) {
-  const [newName, setNewName] = useState('');
-  const [newColor, setNewColor] = useState('#3da8c8');
-  const [editingId, setEditingId] = useState(null);
-  const [editName, setEditName] = useState('');
+  const [newName, setNewName] = useState("")
+  const [newColor, setNewColor] = useState("#3da8c8")
+  const [editingId, setEditingId] = useState(null)
+  const [editName, setEditName] = useState("")
 
   const handleAdd = () => {
-    if (!newName.trim()) return;
-    onAdd({ name: newName, color: newColor, order: stages.length });
-    setNewName('');
-    setNewColor('#3da8c8');
-  };
+    if (!newName.trim()) return
+    onAdd({ name: newName, color: newColor, order: stages.length })
+    setNewName("")
+    setNewColor("#3da8c8")
+  }
 
   const handleStartEdit = (stage) => {
-    setEditingId(stage.id);
-    setEditName(stage.name);
-  };
+    setEditingId(stage.id)
+    setEditName(stage.name)
+  }
 
   const handleSaveEdit = (id) => {
-    if (!editName.trim()) return;
-    onUpdate(id, { name: editName });
-    setEditingId(null);
-  };
+    if (!editName.trim()) return
+    onUpdate(id, { name: editName })
+    setEditingId(null)
+  }
 
   return (
     <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-6">
@@ -112,5 +112,5 @@ export default function PipelineManager({ stages, onAdd, onDelete, onUpdate }) {
         </button>
       </div>
     </div>
-  );
+  )
 }

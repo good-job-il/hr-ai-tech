@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { candidateImportService } from '@/api/services/candidateImportService';
-import { Loader2, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect } from "react"
+import { candidateImportService } from "@/api/services/candidateImportService"
+import { Loader2, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react"
 
 export default function ImportProgressMonitor({ batchId }) {
-  const [progress, setProgress] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [progress, setProgress] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const checkProgress = async () => {
       try {
-        const batch = await candidateImportService.get(batchId);
+        const batch = await candidateImportService.get(batchId)
         if (batch) {
           setProgress({
             status: batch.status,
@@ -19,28 +19,28 @@ export default function ImportProgressMonitor({ batchId }) {
             successful: batch.successful_imports,
             failed: batch.failed_imports,
             duplicates: batch.duplicate_found,
-            review_required: batch.review_required
-          });
+            review_required: batch.review_required,
+          })
         }
-        setError(null);
-        setLoading(false);
+        setError(null)
+        setLoading(false)
       } catch (err) {
-        setError(err.message);
-        setLoading(false);
+        setError(err.message)
+        setLoading(false)
       }
-    };
+    }
 
-    checkProgress();
-    const interval = setInterval(checkProgress, 2000);
-    return () => clearInterval(interval);
-  }, [batchId]);
+    checkProgress()
+    const interval = setInterval(checkProgress, 2000)
+    return () => clearInterval(interval)
+  }, [batchId])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="w-6 h-6 text-purple-600 animate-spin" />
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -49,31 +49,33 @@ export default function ImportProgressMonitor({ batchId }) {
         <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
         <p className="text-sm text-red-700">{error}</p>
       </div>
-    );
+    )
   }
 
-  if (!progress) return null;
+  if (!progress) return null
 
-  const percentProcessed = progress.total > 0 ? Math.round((progress.processed / progress.total) * 100) : 0;
-  const percentSuccessful = progress.processed > 0 ? Math.round((progress.successful / progress.processed) * 100) : 0;
+  const percentProcessed =
+    progress.total > 0 ? Math.round((progress.processed / progress.total) * 100) : 0
+  const percentSuccessful =
+    progress.processed > 0 ? Math.round((progress.successful / progress.processed) * 100) : 0
 
   return (
     <div className="space-y-4">
       {/* Status */}
       <div className="flex items-center gap-3">
-        {progress.status === 'in_progress' && (
+        {progress.status === "in_progress" && (
           <>
             <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
             <span className="text-sm font-medium text-blue-700">בעיבוד...</span>
           </>
         )}
-        {progress.status === 'completed' && (
+        {progress.status === "completed" && (
           <>
             <CheckCircle2 className="w-5 h-5 text-green-600" />
             <span className="text-sm font-medium text-green-700">הושלם</span>
           </>
         )}
-        {progress.status === 'failed' && (
+        {progress.status === "failed" && (
           <>
             <AlertTriangle className="w-5 h-5 text-red-600" />
             <span className="text-sm font-medium text-red-700">נכשל</span>
@@ -85,7 +87,9 @@ export default function ImportProgressMonitor({ batchId }) {
       <div>
         <div className="flex justify-between items-center mb-2">
           <p className="text-sm font-medium text-gray-900">התקדמות</p>
-          <p className="text-sm text-gray-600">{progress.processed} / {progress.total}</p>
+          <p className="text-sm text-gray-600">
+            {progress.processed} / {progress.total}
+          </p>
         </div>
         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
           <div
@@ -115,5 +119,5 @@ export default function ImportProgressMonitor({ batchId }) {
         </div>
       </div>
     </div>
-  );
+  )
 }

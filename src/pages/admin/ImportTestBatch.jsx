@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
-import AdminLayout from '@/components/admin/AdminLayout';
-import { CheckCircle2, Info } from 'lucide-react';
-import ResumeZipUploader from '@/components/admin/ResumeZipUploader';
+import React, { useState } from "react"
+import AdminLayout from "@/components/admin/AdminLayout"
+import { CheckCircle2, Info } from "lucide-react"
+import ResumeZipUploader from "@/components/admin/ResumeZipUploader"
 
 export default function ImportTestBatch() {
-  const [testMode, setTestMode] = useState('disabled');
-  const [testSize, setTestSize] = useState('10');
-  const [importComplete, setImportComplete] = useState(false);
+  const [testMode, setTestMode] = useState("disabled")
+  const [testSize, setTestSize] = useState("10")
+  const [importComplete, setImportComplete] = useState(false)
 
   const testSizes = [
-    { value: '10', label: '10 קורות חיים - בדיקה בסיסית', description: 'בדיקה מהירה של כל מערכות' },
-    { value: '30', label: '30 קורות חיים - בדיקה בינונית', description: 'כולל duplicate detection' },
-    { value: '50', label: '50 קורות חיים - בדיקה מלאה', description: 'בדיקה מקיפה לפני ייבוא גדול' }
-  ];
+    { value: "10", label: "10 קורות חיים - בדיקה בסיסית", description: "בדיקה מהירה של כל מערכות" },
+    {
+      value: "30",
+      label: "30 קורות חיים - בדיקה בינונית",
+      description: "כולל duplicate detection",
+    },
+    {
+      value: "50",
+      label: "50 קורות חיים - בדיקה מלאה",
+      description: "בדיקה מקיפה לפני ייבוא גדול",
+    },
+  ]
 
   return (
     <AdminLayout>
@@ -48,8 +56,8 @@ export default function ImportTestBatch() {
                 onClick={() => setTestSize(size.value)}
                 className={`p-4 rounded-xl border-2 transition-all text-left ${
                   testSize === size.value
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? "border-purple-500 bg-purple-50"
+                    : "border-gray-200 hover:border-gray-300"
                 }`}
               >
                 <p className="font-semibold text-gray-900">{size.label}</p>
@@ -64,13 +72,13 @@ export default function ImportTestBatch() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">בדיקות חובה לפני upload</h2>
           <div className="space-y-2">
             {[
-              'ZIP file עם קורות חיים בפורמטים: PDF, DOC, DOCX, TXT',
-              'קובצים בעברית או אנגלית',
-              'תמיכה בזיהוי שדות: שם, טלפון, מייל, תפקיד',
-              'המרה אוטומטית ל-DOCX לכל קובץ',
-              'זיהוי כפילויות אוטומטי',
-              'הקצאה אוטומטית למגייס',
-              'preview ו-download של קורות חיים'
+              "ZIP file עם קורות חיים בפורמטים: PDF, DOC, DOCX, TXT",
+              "קובצים בעברית או אנגלית",
+              "תמיכה בזיהוי שדות: שם, טלפון, מייל, תפקיד",
+              "המרה אוטומטית ל-DOCX לכל קובץ",
+              "זיהוי כפילויות אוטומטי",
+              "הקצאה אוטומטית למגייס",
+              "preview ו-download של קורות חיים",
             ].map((item, idx) => (
               <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                 <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -82,9 +90,7 @@ export default function ImportTestBatch() {
 
         {/* Upload Section */}
         {!importComplete ? (
-          <ResumeZipUploader
-            onImportComplete={() => setImportComplete(true)}
-          />
+          <ResumeZipUploader onImportComplete={() => setImportComplete(true)} />
         ) : (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-start gap-3">
@@ -121,5 +127,5 @@ export default function ImportTestBatch() {
         </div>
       </div>
     </AdminLayout>
-  );
+  )
 }

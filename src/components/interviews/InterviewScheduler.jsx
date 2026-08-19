@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { interviewService } from '@/api/services/interviewService';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Video, Phone, Users as UsersIcon } from 'lucide-react';
+import React, { useState } from "react"
+import { interviewService } from "@/api/services/interviewService"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Video, Phone, Users as UsersIcon } from "lucide-react"
 
 export default function InterviewScheduler({ applicationId, candidateName }) {
-  const queryClient = useQueryClient();
-  const [showForm, setShowForm] = useState(false);
+  const queryClient = useQueryClient()
+  const [showForm, setShowForm] = useState(false)
   const [formData, setFormData] = useState({
-    date: '',
-    time: '',
-    type: 'video',
-    location_or_link: ''
-  });
+    date: "",
+    time: "",
+    type: "video",
+    location_or_link: "",
+  })
 
   const scheduleMutation = useMutation({
     mutationFn: async (data) => {
@@ -19,16 +19,16 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
         ...data,
         application_id: applicationId,
         candidate_name: candidateName,
-      });
+      })
 
-      return interview;
+      return interview
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['interviews'] });
-      setShowForm(false);
-      setFormData({ date: '', time: '', type: 'video', location_or_link: '' });
-    }
-  });
+      queryClient.invalidateQueries({ queryKey: ["interviews"] })
+      setShowForm(false)
+      setFormData({ date: "", time: "", type: "video", location_or_link: "" })
+    },
+  })
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4" dir="rtl">
@@ -46,7 +46,7 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
             <input
               type="date"
               value={formData.date}
-              onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+              onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
               className="w-full border border-gray-200 rounded-lg p-2 text-sm"
             />
           </div>
@@ -56,7 +56,7 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
             <input
               type="time"
               value={formData.time}
-              onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+              onChange={(e) => setFormData((prev) => ({ ...prev, time: e.target.value }))}
               className="w-full border border-gray-200 rounded-lg p-2 text-sm"
             />
           </div>
@@ -65,15 +65,17 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
             <label className="block text-xs font-medium text-gray-700 mb-1">סוג ראיון</label>
             <div className="flex gap-2">
               {[
-                { value: 'video', label: 'וידאו', icon: Video },
-                { value: 'phone', label: 'טלפון', icon: Phone },
-                { value: 'in_person', label: 'פנים אל פנים', icon: UsersIcon }
+                { value: "video", label: "וידאו", icon: Video },
+                { value: "phone", label: "טלפון", icon: Phone },
+                { value: "in_person", label: "פנים אל פנים", icon: UsersIcon },
               ].map(({ value, label, icon: Icon }) => (
                 <button
                   key={value}
-                  onClick={() => setFormData(prev => ({ ...prev, type: value }))}
+                  onClick={() => setFormData((prev) => ({ ...prev, type: value }))}
                   className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-sm transition-colors ${
-                    formData.type === value ? 'bg-hhblue text-white' : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
+                    formData.type === value
+                      ? "bg-hhblue text-white"
+                      : "border border-gray-200 text-gray-700 hover:bg-gray-50"
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -83,26 +85,30 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
             </div>
           </div>
 
-          {formData.type !== 'in_person' && (
+          {formData.type !== "in_person" && (
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">קישור</label>
               <input
                 type="text"
                 value={formData.location_or_link}
-                onChange={(e) => setFormData(prev => ({ ...prev, location_or_link: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, location_or_link: e.target.value }))
+                }
                 placeholder="https://zoom.us/..."
                 className="w-full border border-gray-200 rounded-lg p-2 text-sm"
               />
             </div>
           )}
 
-          {formData.type === 'in_person' && (
+          {formData.type === "in_person" && (
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">מקום</label>
               <input
                 type="text"
                 value={formData.location_or_link}
-                onChange={(e) => setFormData(prev => ({ ...prev, location_or_link: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, location_or_link: e.target.value }))
+                }
                 placeholder="כתובת הציאה"
                 className="w-full border border-gray-200 rounded-lg p-2 text-sm"
               />
@@ -121,11 +127,11 @@ export default function InterviewScheduler({ applicationId, candidateName }) {
               disabled={!formData.date || !formData.time || scheduleMutation.isPending}
               className="flex-1 bg-hhblue text-white py-2 rounded-lg text-sm font-semibold hover:bg-hhblue/90 disabled:opacity-50"
             >
-              {scheduleMutation.isPending ? 'שמירה...' : 'הזמן'}
+              {scheduleMutation.isPending ? "שמירה..." : "הזמן"}
             </button>
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }

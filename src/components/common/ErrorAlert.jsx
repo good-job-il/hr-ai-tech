@@ -1,20 +1,20 @@
-import React from 'react';
-import { AlertCircle, X, RefreshCw, HelpCircle } from 'lucide-react';
+import React from "react"
+import { AlertCircle, X, RefreshCw, HelpCircle } from "lucide-react"
 
-export default function ErrorAlert({ 
-  error, 
-  onDismiss, 
+export default function ErrorAlert({
+  error,
+  onDismiss,
   onRetry = null,
   details = null,
-  source = null 
+  source = null,
 }) {
-  if (!error) return null;
+  if (!error) return null
 
   // Parse error message if it's structured
-  const isStructured = typeof error === 'object';
-  const message = isStructured ? error.message : error;
-  const code = isStructured ? error.code : null;
-  const context = isStructured ? error.context : null;
+  const isStructured = typeof error === "object"
+  const message = isStructured ? error.message : error
+  const code = isStructured ? error.code : null
+  const context = isStructured ? error.context : null
 
   return (
     <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4" dir="rtl">
@@ -33,7 +33,9 @@ export default function ErrorAlert({
               <div className="mt-2 p-2 bg-red-100/50 rounded text-xs text-red-800 space-y-1 font-mono">
                 {code && <div>📌 קוד שגיאה: {code}</div>}
                 {source && <div>📍 מקור: {source}</div>}
-                {context?.timestamp && <div>⏰ זמן: {new Date(context.timestamp).toLocaleString('he-IL')}</div>}
+                {context?.timestamp && (
+                  <div>⏰ זמן: {new Date(context.timestamp).toLocaleString("he-IL")}</div>
+                )}
                 {context?.failed_count && <div>❌ פריטים שנכשלו: {context.failed_count}</div>}
               </div>
             </details>
@@ -57,10 +59,7 @@ export default function ErrorAlert({
               </button>
             )}
             {onDismiss && (
-              <button
-                onClick={onDismiss}
-                className="text-red-600 hover:text-red-800 ml-auto"
-              >
+              <button onClick={onDismiss} className="text-red-600 hover:text-red-800 ml-auto">
                 <X className="w-4 h-4" />
               </button>
             )}
@@ -68,5 +67,5 @@ export default function ErrorAlert({
         </div>
       </div>
     </div>
-  );
+  )
 }

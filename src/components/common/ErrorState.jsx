@@ -1,5 +1,5 @@
-import { Card, CardContent } from '@/components/ui/Card';
-import { AlertCircle } from 'lucide-react';
+import { Card, CardContent } from "@/components/ui/Card"
+import { AlertCircle } from "lucide-react"
 
 export function ErrorState({ title, message, action }) {
   return (
@@ -11,7 +11,7 @@ export function ErrorState({ title, message, action }) {
         {action && <div className="flex justify-center">{action}</div>}
       </CardContent>
     </Card>
-  );
+  )
 }
 
-export default ErrorState;
+export default ErrorState

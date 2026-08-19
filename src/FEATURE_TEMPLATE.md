@@ -56,10 +56,10 @@ interface {Component}Props {
   onAction?: () => void;
 }
 
-export default function {Component}({ 
-  title, 
-  disabled = false, 
-  onAction 
+export default function {Component}({
+  title,
+  disabled = false,
+  onAction
 }: {Component}Props): ReactNode {
   return (
     <div className="p-4 rounded-lg bg-white border border-[#E4ECFF]">
@@ -248,9 +248,11 @@ Create a `FEATURE.md` in the feature root:
 # {Feature} Feature
 
 ## Overview
+
 Brief description of what this feature does.
 
 ## Architecture
+
 - **Pages:** List smart components
 - **Components:** List presentational components
 - **State:** How state is managed
@@ -258,9 +260,11 @@ Brief description of what this feature does.
 
 ## Entity Relationships
 ```
+
 {Entity1} ←→ {Entity2}
-   ↓
- {Entity3}
+↓
+{Entity3}
+
 ```
 
 ## Permissions

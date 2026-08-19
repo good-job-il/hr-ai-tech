@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, AlertCircle, Users } from 'lucide-react';
+import React from "react"
+import { X, AlertCircle, Users } from "lucide-react"
 
 export default function DuplicateResolveModal({ duplicate, onResolve, onClose }) {
   return (
@@ -26,7 +26,9 @@ export default function DuplicateResolveModal({ duplicate, onResolve, onClose })
               <div className="space-y-2 text-sm">
                 <p>
                   <span className="text-gray-600">שם:</span>
-                  <span className="font-medium text-gray-900 block">{duplicate.extracted.full_name}</span>
+                  <span className="font-medium text-gray-900 block">
+                    {duplicate.extracted.full_name}
+                  </span>
                 </p>
                 {duplicate.extracted.email && (
                   <p>
@@ -55,7 +57,9 @@ export default function DuplicateResolveModal({ duplicate, onResolve, onClose })
               <div className="space-y-2 text-sm">
                 <p>
                   <span className="text-gray-600">שם:</span>
-                  <span className="font-medium text-gray-900 block">{duplicate.existingCandidate.full_name}</span>
+                  <span className="font-medium text-gray-900 block">
+                    {duplicate.existingCandidate.full_name}
+                  </span>
                 </p>
                 {duplicate.existingCandidate.email && (
                   <p>
@@ -72,7 +76,9 @@ export default function DuplicateResolveModal({ duplicate, onResolve, onClose })
                 {duplicate.existingCandidate.role_name && (
                   <p>
                     <span className="text-gray-600">תפקיד:</span>
-                    <span className="text-gray-900 block">{duplicate.existingCandidate.role_name}</span>
+                    <span className="text-gray-900 block">
+                      {duplicate.existingCandidate.role_name}
+                    </span>
                   </p>
                 )}
               </div>
@@ -83,9 +89,9 @@ export default function DuplicateResolveModal({ duplicate, onResolve, onClose })
           <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
             <p className="text-xs font-semibold text-gray-600 mb-2">סיבת החשד:</p>
             <p className="text-sm text-gray-900 font-medium capitalize">
-              {duplicate.reason === 'email_match' && 'התאמה של אימייל'}
-              {duplicate.reason === 'phone_match' && 'התאמה של טלפון'}
-              {duplicate.reason === 'name_match' && 'התאמה של שם'}
+              {duplicate.reason === "email_match" && "התאמה של אימייל"}
+              {duplicate.reason === "phone_match" && "התאמה של טלפון"}
+              {duplicate.reason === "name_match" && "התאמה של שם"}
             </p>
           </div>
 
@@ -94,7 +100,7 @@ export default function DuplicateResolveModal({ duplicate, onResolve, onClose })
             <p className="text-sm font-semibold text-gray-900">בחר פעולה:</p>
 
             <button
-              onClick={() => onResolve('skip')}
+              onClick={() => onResolve("skip")}
               className="w-full text-left p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <p className="font-semibold text-gray-900">⏭️ דלג</p>
@@ -102,7 +108,7 @@ export default function DuplicateResolveModal({ duplicate, onResolve, onClose })
             </button>
 
             <button
-              onClick={() => onResolve('create_anyway')}
+              onClick={() => onResolve("create_anyway")}
               className="w-full text-left p-4 border border-yellow-300 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors"
             >
               <p className="font-semibold text-gray-900">⚠️ יצור בכל זאת</p>
@@ -110,7 +116,7 @@ export default function DuplicateResolveModal({ duplicate, onResolve, onClose })
             </button>
 
             <button
-              onClick={() => onResolve('merge')}
+              onClick={() => onResolve("merge")}
               className="w-full text-left p-4 border border-blue-300 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
             >
               <div className="flex items-center gap-2">
@@ -133,5 +139,5 @@ export default function DuplicateResolveModal({ duplicate, onResolve, onClose })
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,6 +1,7 @@
 # PipelinePage Internationalization (i18n)
 
 ## Overview
+
 Added bilingual support (Hebrew and English) to the PipelinePage component with language switching functionality.
 
 ## Changes Made
@@ -8,6 +9,7 @@ Added bilingual support (Hebrew and English) to the PipelinePage component with 
 ### 1. Translation Keys Added
 
 #### English (`src/locales/en/translation.json`)
+
 ```json
 {
   "pipeline": {
@@ -25,6 +27,7 @@ Added bilingual support (Hebrew and English) to the PipelinePage component with 
 ```
 
 #### Hebrew (`src/locales/he/translation.json`)
+
 ```json
 {
   "pipeline": {
@@ -44,12 +47,14 @@ Added bilingual support (Hebrew and English) to the PipelinePage component with 
 ### 2. Component Updates
 
 #### PipelinePage.jsx
+
 - Added `useTranslation` hook for i18n support
 - Dynamic direction (RTL/LTR) based on current language
 - Replaced hardcoded Hebrew text with translation keys
 - All UI text now uses `t()` function for translations
 
 **Key Changes:**
+
 ```jsx
 // Import translation hook
 import { useTranslation } from 'react-i18next';
@@ -65,24 +70,31 @@ const isRTL = currentLang === 'he';
 ```
 
 #### GlobalHeader.jsx
+
 - Added `LanguageSwitcher` component
 - Dynamic navigation labels based on language
 - RTL/LTR direction support
 - All UI text now supports both languages
 
 **Key Changes:**
+
 ```jsx
 // Added language switcher in header
-<LanguageSwitcher variant="badge" />
+;<LanguageSwitcher variant="badge" />
 
 // Dynamic button labels
-{isRTL ? 'התחברות' : 'Login'}
-{isRTL ? 'הרשמה' : 'Sign Up'}
+{
+  isRTL ? "התחברות" : "Login"
+}
+{
+  isRTL ? "הרשמה" : "Sign Up"
+}
 ```
 
 ### 3. Language Switching
 
 Users can now switch between Hebrew and English using the `LanguageSwitcher` component in the header:
+
 - **Hebrew**: Right-to-left (RTL) layout
 - **English**: Left-to-right (LTR) layout
 
@@ -95,16 +107,19 @@ The language preference is automatically saved in localStorage and persists acro
 The `LanguageSwitcher` component supports three variants:
 
 1. **Badge** (used in GlobalHeader):
+
 ```jsx
 <LanguageSwitcher variant="badge" />
 ```
 
 2. **Minimal**:
+
 ```jsx
 <LanguageSwitcher variant="minimal" />
 ```
 
 3. **Default**:
+
 ```jsx
 <LanguageSwitcher />
 ```
@@ -133,6 +148,7 @@ To test the language switching:
 ## Future Improvements
 
 Consider adding translations for:
+
 - PipelineFilters component
 - PipelineBoard component
 - MobilePipelineView component

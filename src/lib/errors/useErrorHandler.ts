@@ -3,18 +3,18 @@
  * Provides error logging, retry logic, and user feedback
  */
 
-import { useCallback, useRef } from 'react';
-import { AppError } from './AppError';
-import { ErrorNormalizer } from './errorNormalizer';
-import { useErrorLog } from '@/hooks/useErrorLog';
+import { useCallback, useRef } from "react"
+import { AppError } from "./AppError"
+import { ErrorNormalizer } from "./errorNormalizer"
+import { useErrorLog } from "@/hooks/useErrorLog"
 
 export interface ErrorHandlerOptions {
-  onError?: (error: AppError) => void;
-  onRetry?: () => Promise<void>;
-  retryCount?: number;
-  retryDelay?: number;
-  logError?: boolean;
-  showNotification?: boolean;
+  onError?: (error: AppError) => void
+  onRetry?: () => Promise<void>
+  retryCount?: number
+  retryDelay?: number
+  logError?: boolean
+  showNotification?: boolean
 }
 
 export function useErrorHandler(options: ErrorHandlerOptions = {}) {
@@ -25,97 +25,97 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
     retryDelay = 1000,
     logError = true,
     showNotification = true,
-  } = options;
+  } = options
 
-  const { logError: logErrorToService } = useErrorLog();
-  const retries = useRef<number>(0);
+  const { logError: logErrorToService } = useErrorLog()
+  const retries = useRef<number>(0)
 
   const handle = useCallback(
     async (error: unknown, context?: { action?: string; component?: string }) => {
       // Normalize error
-      const normalizedError = ErrorNormalizer.normalize(error);
+      const normalizedError = ErrorNormalizer.normalize(error)
 
       // Log error
       if (logError) {
         logErrorToService({
           error: normalizedError,
           context,
-        });
+        })
       }
 
       // Call custom handler
       if (onError) {
-        onError(normalizedError);
+        onError(normalizedError)
       }
 
       // Check if should logout
       if (ErrorNormalizer.shouldLogout(normalizedError)) {
         // TODO: trigger logout
-        console.log('Should logout');
+        console.log("Should logout")
       }
 
       // Show notification if enabled
       if (showNotification) {
-        const message = ErrorNormalizer.getMessage(normalizedError);
+        const message = ErrorNormalizer.getMessage(normalizedError)
         // TODO: show toast
-        console.log('Error notification:', message);
+        console.log("Error notification:", message)
       }
 
-      return normalizedError;
+      return normalizedError
     },
-    [onError, logError, showNotification, logErrorToService]
-  );
+    [onError, logError, showNotification, logErrorToService],
+  )
 
   const retry = useCallback(
     async (fn: () => Promise<void>, errorToHandle?: unknown) => {
       if (!onRetry && !fn) {
-        throw new Error('Either onRetry or fn must be provided');
+        throw new Error("Either onRetry or fn must be provided")
       }
 
-      const maxRetries = retryCount;
-      retries.current = 0;
+      const maxRetries = retryCount
+      retries.current = 0
 
       const attemptRetry = async (): Promise<void> => {
         try {
           if (fn) {
-            await fn();
+            await fn()
           } else if (onRetry) {
-            await onRetry();
+            await onRetry()
           }
-          retries.current = 0; // Reset on success
+          retries.current = 0 // Reset on success
         } catch (error) {
-          retries.current++;
+          retries.current++
 
           if (retries.current < maxRetries) {
             // Wait before retrying
-            await new Promise((resolve) => setTimeout(resolve, retryDelay * retries.current));
-            return attemptRetry();
+            await new Promise((resolve) => setTimeout(resolve, retryDelay * retries.current))
+            return attemptRetry()
           } else {
             // Max retries reached
-            throw error;
+            throw error
           }
         }
-      };
+      }
 
       try {
-        await attemptRetry();
+        await attemptRetry()
       } catch (error) {
-        const normalizedError = await handle(error, { action: 'retry' });
-        throw normalizedError;
+        const normalizedError = await handle(error, { action: "retry" })
+        throw normalizedError
       }
     },
-    [onRetry, retryCount, retryDelay, handle]
-  );
+    [onRetry, retryCount, retryDelay, handle],
+  )
 
   const isRetryable = useCallback((error: unknown): boolean => {
-    const normalizedError = ErrorNormalizer.normalize(error);
-    return ErrorNormalizer.isRetryable(normalizedError);
-  }, []);
+    const normalizedError = ErrorNormalizer.normalize(error)
+    return ErrorNormalizer.isRetryable(normalizedError)
+  }, [])
 
   return {
     handle,
     retry,
     isRetryable,
     retries: retries.current,
-  };
+  }
 }

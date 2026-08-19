@@ -3,17 +3,17 @@
  * Converts API errors, network errors, validation errors, etc. to AppError
  */
 
-import { AppError, ErrorCode } from './AppError';
-import { AxiosError } from 'axios';
+import { AppError, ErrorCode } from "./AppError"
+import { AxiosError } from "axios"
 
 export interface NormalizedError {
-  code: ErrorCode;
-  message: string;
-  statusCode: number;
-  field?: string;
-  details?: Record<string, any>;
-  isRetryable: boolean;
-  shouldLogout?: boolean;
+  code: ErrorCode
+  message: string
+  statusCode: number
+  field?: string
+  details?: Record<string, any>
+  isRetryable: boolean
+  shouldLogout?: boolean
 }
 
 export class ErrorNormalizer {
@@ -23,54 +23,50 @@ export class ErrorNormalizer {
   static normalize(error: unknown, requestId?: string): AppError {
     // Already an AppError
     if (error instanceof AppError) {
-      return error;
+      return error
     }
 
     // Axios error (API response)
     if (this.isAxiosError(error)) {
-      return this.normalizeAxiosError(error, requestId);
+      return this.normalizeAxiosError(error, requestId)
     }
 
     // Network error
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      return AppError.offline('Network request failed', { requestId, originalError: error });
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      return AppError.offline("Network request failed", { requestId, originalError: error })
     }
 
     // Timeout
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      return AppError.timeout('Request timeout', { requestId, originalError: error });
+    if (error instanceof DOMException && error.name === "AbortError") {
+      return AppError.timeout("Request timeout", { requestId, originalError: error })
     }
 
     // Generic error
     if (error instanceof Error) {
-      return new AppError(
-        error.message,
-        ErrorCode.UNKNOWN,
-        500,
-        { originalError: error, requestId }
-      );
+      return new AppError(error.message, ErrorCode.UNKNOWN, 500, {
+        originalError: error,
+        requestId,
+      })
     }
 
     // Unknown error
-    return new AppError(
-      'An unexpected error occurred',
-      ErrorCode.UNKNOWN,
-      500,
-      { originalError: error, requestId }
-    );
+    return new AppError("An unexpected error occurred", ErrorCode.UNKNOWN, 500, {
+      originalError: error,
+      requestId,
+    })
   }
 
   /**
    * Normalize Axios/HTTP errors
    */
   private static normalizeAxiosError(error: any, requestId?: string): AppError {
-    const status = error.response?.status;
-    const data = error.response?.data;
+    const status = error.response?.status
+    const data = error.response?.data
 
     // Server returned error response
     if (data?.error) {
       return new AppError(
-        data.error.message || 'Server error',
+        data.error.message || "Server error",
         (data.error.code as ErrorCode) || ErrorCode.SERVER_ERROR,
         status || 500,
         {
@@ -78,71 +74,63 @@ export class ErrorNormalizer {
           details: data.error.details,
           originalError: error,
           requestId,
-        }
-      );
+        },
+      )
     }
 
     // Map HTTP status to error code
     switch (status) {
       case 400:
-        return new AppError(
-          data?.message || 'Invalid request',
-          ErrorCode.VALIDATION_ERROR,
-          400,
-          {
-            details: data?.details,
-            originalError: error,
-            requestId,
-          }
-        );
+        return new AppError(data?.message || "Invalid request", ErrorCode.VALIDATION_ERROR, 400, {
+          details: data?.details,
+          originalError: error,
+          requestId,
+        })
 
       case 401:
-        return AppError.unauthorized('Session expired or invalid', {
+        return AppError.unauthorized("Session expired or invalid", {
           originalError: error,
           requestId,
-        });
+        })
 
       case 403:
-        return AppError.forbidden('You do not have permission', {
+        return AppError.forbidden("You do not have permission", {
           originalError: error,
           requestId,
-        });
+        })
 
       case 404:
-        return AppError.notFound('Resource not found', {
+        return AppError.notFound("Resource not found", {
           originalError: error,
           requestId,
-        });
+        })
 
       case 409:
-        return AppError.conflict(data?.message || 'Resource already exists', {
+        return AppError.conflict(data?.message || "Resource already exists", {
           details: data?.details || data,
           originalError: error,
           requestId,
-        });
+        })
 
       case 429:
-        return AppError.rateLimited(
-          data?.message || 'Too many requests',
-          { originalError: error, requestId }
-        );
+        return AppError.rateLimited(data?.message || "Too many requests", {
+          originalError: error,
+          requestId,
+        })
 
       case 500:
       case 502:
       case 503:
       case 504:
-        return AppError.server(
-          data?.message || 'Server error',
-          { originalError: error, requestId }
-        );
+        return AppError.server(data?.message || "Server error", { originalError: error, requestId })
 
       default:
         return new AppError(
-          data?.message || error.message || 'Request failed',
+          data?.message || error.message || "Request failed",
           ErrorCode.UNKNOWN,
           status || 500,
-          { originalError: error, requestId }
-        );
+          { originalError: error, requestId },
+        )
     }
   }
 
@@ -157,10 +145,10 @@ export class ErrorNormalizer {
       ErrorCode.CONNECTION_LOST,
       ErrorCode.AI_UNAVAILABLE,
       ErrorCode.AI_RATE_LIMITED,
-    ];
+    ]
 
     // Also retry on 5xx server errors
-    return retryableCodes.includes(error.code) || error.statusCode >= 500;
+    return retryableCodes.includes(error.code) || error.statusCode >= 500
   }
 
   /**
@@ -171,7 +159,7 @@ export class ErrorNormalizer {
       error.code === ErrorCode.UNAUTHORIZED ||
       error.code === ErrorCode.SESSION_EXPIRED ||
       error.code === ErrorCode.INVALID_TOKEN
-    );
+    )
   }
 
   /**
@@ -179,40 +167,40 @@ export class ErrorNormalizer {
    */
   static getMessage(error: AppError): string {
     const messages: Record<ErrorCode, string> = {
-      [ErrorCode.UNAUTHORIZED]: 'Please log in again',
-      [ErrorCode.FORBIDDEN]: 'You do not have permission to do this',
-      [ErrorCode.SESSION_EXPIRED]: 'Your session has expired',
-      [ErrorCode.INVALID_TOKEN]: 'Invalid authentication token',
-      [ErrorCode.VALIDATION_ERROR]: 'Please check your input',
-      [ErrorCode.REQUIRED_FIELD]: 'This field is required',
-      [ErrorCode.INVALID_FORMAT]: 'Invalid format',
-      [ErrorCode.NOT_FOUND]: 'Resource not found',
-      [ErrorCode.RESOURCE_NOT_FOUND]: 'The requested resource does not exist',
-      [ErrorCode.CONFLICT]: 'Resource already exists',
-      [ErrorCode.DUPLICATE]: 'This resource already exists',
-      [ErrorCode.ALREADY_EXISTS]: 'Resource already exists',
-      [ErrorCode.INTERNAL_ERROR]: 'An error occurred. Please try again',
-      [ErrorCode.SERVER_ERROR]: 'Server error. Please try again later',
-      [ErrorCode.UNHANDLED_ERROR]: 'An unexpected error occurred',
-      [ErrorCode.NETWORK_ERROR]: 'Network connection failed',
-      [ErrorCode.TIMEOUT]: 'Request took too long. Please try again',
-      [ErrorCode.OFFLINE]: 'No internet connection',
-      [ErrorCode.CONNECTION_LOST]: 'Connection lost. Please check your internet',
-      [ErrorCode.RATE_LIMITED]: 'Too many requests. Please wait a moment',
-      [ErrorCode.TOO_MANY_REQUESTS]: 'Too many requests. Please try again later',
-      [ErrorCode.PAYMENT_FAILED]: 'Payment failed. Please try again',
-      [ErrorCode.INSUFFICIENT_CREDITS]: 'Insufficient credits. Please add more',
-      [ErrorCode.AI_ERROR]: 'AI service error. Please try again',
-      [ErrorCode.AI_UNAVAILABLE]: 'AI service is temporarily unavailable',
-      [ErrorCode.AI_RATE_LIMITED]: 'AI rate limited. Please try again later',
-      [ErrorCode.UNKNOWN]: 'An unexpected error occurred',
-    };
+      [ErrorCode.UNAUTHORIZED]: "Please log in again",
+      [ErrorCode.FORBIDDEN]: "You do not have permission to do this",
+      [ErrorCode.SESSION_EXPIRED]: "Your session has expired",
+      [ErrorCode.INVALID_TOKEN]: "Invalid authentication token",
+      [ErrorCode.VALIDATION_ERROR]: "Please check your input",
+      [ErrorCode.REQUIRED_FIELD]: "This field is required",
+      [ErrorCode.INVALID_FORMAT]: "Invalid format",
+      [ErrorCode.NOT_FOUND]: "Resource not found",
+      [ErrorCode.RESOURCE_NOT_FOUND]: "The requested resource does not exist",
+      [ErrorCode.CONFLICT]: "Resource already exists",
+      [ErrorCode.DUPLICATE]: "This resource already exists",
+      [ErrorCode.ALREADY_EXISTS]: "Resource already exists",
+      [ErrorCode.INTERNAL_ERROR]: "An error occurred. Please try again",
+      [ErrorCode.SERVER_ERROR]: "Server error. Please try again later",
+      [ErrorCode.UNHANDLED_ERROR]: "An unexpected error occurred",
+      [ErrorCode.NETWORK_ERROR]: "Network connection failed",
+      [ErrorCode.TIMEOUT]: "Request took too long. Please try again",
+      [ErrorCode.OFFLINE]: "No internet connection",
+      [ErrorCode.CONNECTION_LOST]: "Connection lost. Please check your internet",
+      [ErrorCode.RATE_LIMITED]: "Too many requests. Please wait a moment",
+      [ErrorCode.TOO_MANY_REQUESTS]: "Too many requests. Please try again later",
+      [ErrorCode.PAYMENT_FAILED]: "Payment failed. Please try again",
+      [ErrorCode.INSUFFICIENT_CREDITS]: "Insufficient credits. Please add more",
+      [ErrorCode.AI_ERROR]: "AI service error. Please try again",
+      [ErrorCode.AI_UNAVAILABLE]: "AI service is temporarily unavailable",
+      [ErrorCode.AI_RATE_LIMITED]: "AI rate limited. Please try again later",
+      [ErrorCode.UNKNOWN]: "An unexpected error occurred",
+    }
 
-    return error.message || messages[error.code] || 'An error occurred';
+    return error.message || messages[error.code] || "An error occurred"
   }
 
   private static isAxiosError(error: any): error is AxiosError {
-    return error && error.isAxiosError === true;
+    return error && error.isAxiosError === true
   }
 }
 
@@ -221,5 +209,5 @@ export class ErrorNormalizer {
  * `httpClient` and other consumers that just need a normalized `AppError`.
  */
 export function normalizeError(error: unknown, requestId?: string): AppError {
-  return ErrorNormalizer.normalize(error, requestId);
+  return ErrorNormalizer.normalize(error, requestId)
 }

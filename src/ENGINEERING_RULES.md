@@ -9,6 +9,7 @@
 ## 1. FOLDER STRUCTURE RULES
 
 ### Directory Organization
+
 ```
 src/
   features/           # Feature modules (isolated)
@@ -24,6 +25,7 @@ src/
 ```
 
 ### Feature Structure (MANDATORY)
+
 ```
 features/{feature}/
   pages/              # Page components (smart)
@@ -39,6 +41,7 @@ features/{feature}/
 ```
 
 ### Rules
+
 - ✅ Feature directories are **isolated units**
 - ❌ **NO cross-feature imports** (except through barrel exports)
 - ✅ Each feature exports through `index.ts` only
@@ -51,36 +54,39 @@ features/{feature}/
 ## 2. IMPORT RULES (STRICT)
 
 ### Absolute Imports Only
+
 ```javascript
 // ✅ GOOD
-import { useCandidateProfile } from '@/features/candidate/hooks';
-import { CandidateCard } from '@/features/candidate/components';
-import { getCandidateAPI } from '@/features/candidate/api';
+import { useCandidateProfile } from "@/features/candidate/hooks"
+import { CandidateCard } from "@/features/candidate/components"
+import { getCandidateAPI } from "@/features/candidate/api"
 
 // ❌ BAD
-import { useCandidateProfile } from '../../../features/candidate/hooks/useCandidateProfile';
-import { CandidateCard } from '@/features/candidate/components/CandidateCard';
+import { useCandidateProfile } from "../../../features/candidate/hooks/useCandidateProfile"
+import { CandidateCard } from "@/features/candidate/components/CandidateCard"
 ```
 
 ### Barrel Exports (MANDATORY)
+
 ```javascript
 // features/candidate/components/index.ts
-export { CandidateCard } from './CandidateCard';
-export { CandidateProfile } from './CandidateProfile';
-export * from './types';
+export { CandidateCard } from "./CandidateCard"
+export { CandidateProfile } from "./CandidateProfile"
+export * from "./types"
 
 // features/candidate/hooks/index.ts
-export { useCandidateProfile } from './useCandidateProfile';
-export { useCandidates } from './useCandidates';
+export { useCandidateProfile } from "./useCandidateProfile"
+export { useCandidates } from "./useCandidates"
 
 // features/candidate/index.ts (barrel of barrels)
-export * from './components';
-export * from './hooks';
-export * from './api';
-export * from './types';
+export * from "./components"
+export * from "./hooks"
+export * from "./api"
+export * from "./types"
 ```
 
 ### Import Order (enforced by ESLint)
+
 1. React + libraries
 2. Absolute imports from `@/`
 3. Relative imports (if needed)
@@ -91,6 +97,7 @@ export * from './types';
 ## 3. COMPONENT RULES
 
 ### Smart vs Dumb Components
+
 ```
 Smart Component (Page / Container):
 - Connected to API
@@ -108,26 +115,29 @@ Dumb Component (Presentational):
 ```
 
 ### Component Size Limits
+
 - **Max 300 lines** (page component)
 - **Max 150 lines** (presentational component)
 - If larger → split into smaller components
 
 ### Props Convention
+
 ```typescript
 interface ComponentProps {
   // Required first
-  requiredProp: string;
-  
+  requiredProp: string
+
   // Optional after
-  optionalProp?: boolean;
-  
+  optionalProp?: boolean
+
   // Callbacks last
-  onAction?: () => void;
-  onChange?: (value: string) => void;
+  onAction?: () => void
+  onChange?: (value: string) => void
 }
 ```
 
 ### Component Export
+
 ```javascript
 // ✅ GOOD
 export default function CandidateProfile({ candidateId }: Props) { }
@@ -141,30 +151,37 @@ export function CandidateProfile({ candidateId }: Props) { }
 ## 4. STATE MANAGEMENT RULES
 
 ### Decision Matrix
-| Scenario | Solution | Reason |
-|----------|----------|--------|
-| **Server state** (users, jobs, candidates) | React Query | Caching + sync |
-| **UI state** (modals, drawers, filters) | useState | Local, temporary |
-| **Form state** | react-hook-form + Zod | Validation + sync |
-| **Global state** (user profile, auth) | Context + useReducer | Single source of truth |
-| **Derived state** | useMemo / useCallback | Performance |
+
+| Scenario                                   | Solution              | Reason                 |
+| ------------------------------------------ | --------------------- | ---------------------- |
+| **Server state** (users, jobs, candidates) | React Query           | Caching + sync         |
+| **UI state** (modals, drawers, filters)    | useState              | Local, temporary       |
+| **Form state**                             | react-hook-form + Zod | Validation + sync      |
+| **Global state** (user profile, auth)      | Context + useReducer  | Single source of truth |
+| **Derived state**                          | useMemo / useCallback | Performance            |
 
 ### React Query Rules
+
 ```typescript
 // ✅ GOOD
-const { data: candidates, isLoading, error } = useQuery({
-  queryKey: ['candidates', filters],
+const {
+  data: candidates,
+  isLoading,
+  error,
+} = useQuery({
+  queryKey: ["candidates", filters],
   queryFn: () => getCandidates(filters),
-});
+})
 
 // ❌ BAD
-const [candidates, setCandidates] = useState([]);
+const [candidates, setCandidates] = useState([])
 useEffect(() => {
-  getCandidates().then(setCandidates);
-}, []);
+  getCandidates().then(setCandidates)
+}, [])
 ```
 
 ### Local State Rules
+
 - Use for **UI state only** (modal open, tab active, etc)
 - Use for **form state** (with react-hook-form)
 - **Never** for server data
@@ -175,6 +192,7 @@ useEffect(() => {
 ## 5. API LAYER RULES
 
 ### Structure
+
 ```
 api/
   client/             # Axios instance + config
@@ -187,18 +205,21 @@ api/
 ```
 
 ### No Direct API Calls in Components
+
 ```typescript
 // ❌ BAD
 function CandidateList() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([])
   useEffect(() => {
-    fetch('/api/candidates').then(r => r.json()).then(setData);
-  }, []);
+    fetch("/api/candidates")
+      .then((r) => r.json())
+      .then(setData)
+  }, [])
 }
 
 // ✅ GOOD
 function CandidateList() {
-  const { data } = useCandidatesList();
+  const { data } = useCandidatesList()
 }
 
 // Hook lives in: features/candidate/hooks/useCandidatesList.ts
@@ -206,6 +227,7 @@ function CandidateList() {
 ```
 
 ### API Response Normalization
+
 ```typescript
 // API returns inconsistent data
 // Mapper normalizes it
@@ -224,6 +246,7 @@ export const candidateMapper = {
 ## 6. STYLING RULES (NO INLINE STYLES)
 
 ### Token Usage Only
+
 ```typescript
 // ✅ GOOD
 <div className="px-6 py-4 rounded-lg bg-white border border-[#E4ECFF]">
@@ -237,6 +260,7 @@ export const candidateMapper = {
 ```
 
 ### Approved Values Only
+
 - **Colors:** `theme/tokens.js` only
 - **Spacing:** 4px scale only (1 = 4px)
 - **Shadows:** Predefined shadows only
@@ -294,34 +318,39 @@ import { Button } from '@/components/ui/Button';
 ```
 
 ### Available Variants
-| Variant | Use case | Style |
-|---|---|---|
-| `primary` | Main CTA, form submit, create | Gradient `#9136f0 → #575de8 → #5a8eee`, white text |
-| `secondary` | Cancel, back, secondary action | White bg, gray border |
-| `ghost` | Toolbar, icon actions, minimal | Transparent |
-| `outline` | Outlined CTA | Transparent + colored border |
-| `danger` | Delete, suspend, destructive | Red — semantic |
-| `success` | Approve, activate | Green — semantic |
+
+| Variant     | Use case                       | Style                                              |
+| ----------- | ------------------------------ | -------------------------------------------------- |
+| `primary`   | Main CTA, form submit, create  | Gradient `#9136f0 → #575de8 → #5a8eee`, white text |
+| `secondary` | Cancel, back, secondary action | White bg, gray border                              |
+| `ghost`     | Toolbar, icon actions, minimal | Transparent                                        |
+| `outline`   | Outlined CTA                   | Transparent + colored border                       |
+| `danger`    | Delete, suspend, destructive   | Red — semantic                                     |
+| `success`   | Approve, activate              | Green — semantic                                   |
 
 ### Available Sizes
-| Size | Height | Use case |
-|---|---|---|
-| `xs` | 32px | Table actions, tags |
-| `sm` | 40px | Modals, compact UI |
-| `md` | 48px | Default, forms |
-| `lg` | 56px | Hero CTA, landing |
+
+| Size | Height | Use case            |
+| ---- | ------ | ------------------- |
+| `xs` | 32px   | Table actions, tags |
+| `sm` | 40px   | Modals, compact UI  |
+| `md` | 48px   | Default, forms      |
+| `lg` | 56px   | Hero CTA, landing   |
 
 ### Primary Gradient (source of truth)
+
 ```css
 background: linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%);
 border-radius: 12px; /* md size */
 color: #ffffff;
 ```
+
 Defined once in: `src/components/ui/Button.jsx` → `buttonVariants.primary`  
 CSS class: `.btn-primary` in `src/index.css`  
 CSS variable: `--gradient-brand` in `src/index.css`
 
 ### Rules
+
 - ✅ Use `<Button variant="primary">` for all main action buttons
 - ✅ Use `<Button variant="secondary">` for Cancel/Back buttons
 - ✅ Use `<Button variant="danger">` for destructive actions (delete, suspend)
@@ -332,11 +361,12 @@ CSS variable: `--gradient-brand` in `src/index.css`
 - ❌ Never create a new button component — extend `Button.jsx` variants instead
 
 ### Variant System (for complex components)
+
 ```typescript
 interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger' | 'success';
-  size?: 'xs' | 'sm' | 'md' | 'lg';
-  disabled?: boolean;
+  variant?: "primary" | "secondary" | "ghost" | "outline" | "danger" | "success"
+  size?: "xs" | "sm" | "md" | "lg"
+  disabled?: boolean
 }
 ```
 
@@ -345,6 +375,7 @@ interface ButtonProps {
 ## 7. NAMING CONVENTIONS
 
 ### Files & Folders
+
 ```
 ✅ PascalCase for components: CandidateCard.jsx
 ✅ camelCase for utilities: getCandidate.ts
@@ -354,6 +385,7 @@ interface ButtonProps {
 ```
 
 ### Functions & Variables
+
 ```
 ✅ camelCase for variables: const candidateList = []
 ✅ camelCase for functions: const fetchCandidates = async () => {}
@@ -367,12 +399,14 @@ interface ButtonProps {
 ## 8. FEATURE BOUNDARIES (STRICT)
 
 ### What is a Feature?
+
 - **Isolated business domain**
 - **Own data, components, logic**
 - **Exported only through barrel**
 - **No shared state with other features**
 
 ### Examples
+
 ```
 candidate/      → candidate profiles, experience, skills
 recruitment/    → pipelines, stages, applications
@@ -383,13 +417,14 @@ ai/             → analysis, recommendations, scoring
 ```
 
 ### Cross-Feature Communication (FORBIDDEN)
+
 ```typescript
 // ❌ FORBIDDEN
 import { useCandidateState } from '@/features/candidate/state';
 // (from recruiter feature)
 
 // ✅ USE CALLBACKS INSTEAD
-<CandidateCard 
+<CandidateCard
   candidate={data}
   onSelect={(candidate) => handleCandidateSelected(candidate)}
 />
@@ -400,6 +435,7 @@ import { useCandidateState } from '@/features/candidate/state';
 ## 9. PERFORMANCE RULES
 
 ### Lazy Loading
+
 ```typescript
 // ✅ GOOD - Route splitting
 const AdminDashboard = lazy(() => import('@/features/admin/pages/Dashboard'));
@@ -410,15 +446,18 @@ const AdminDashboard = lazy(() => import('@/features/admin/pages/Dashboard'));
 ```
 
 ### Memoization Rules
+
 - Memo only if **actual performance issue**
 - Use **when:** frequently re-renders + expensive render
 - **NOT** when: rarely changes + simple component
 
 ### Virtual Scrolling
+
 - **Use for:** lists > 100 items
 - **Tool:** react-virtual or built-in virtualization
 
 ### Bundle Limits
+
 - **Max total:** 500KB (gzip)
 - **Max route:** 100KB (gzip)
 - **Max component:** 50KB
@@ -428,18 +467,21 @@ const AdminDashboard = lazy(() => import('@/features/admin/pages/Dashboard'));
 ## 10. ACCESSIBILITY RULES (WCAG 2.1)
 
 ### Keyboard Navigation
+
 - ✅ All interactive elements focusable (`tabIndex={0}` if needed)
 - ✅ Focus visible (never remove outline)
 - ✅ Logical tab order
 - ✅ Escape closes modals/drawers
 
 ### ARIA
+
 - ✅ Labels for form inputs (`<label htmlFor="">`)
 - ✅ aria-label for icon buttons
 - ✅ aria-live for dynamic content
 - ✅ role attributes when needed
 
 ### Color Contrast
+
 - ✅ Minimum 4.5:1 for text
 - ✅ 3:1 for UI components
 - ✅ Never rely on color alone
@@ -449,28 +491,34 @@ const AdminDashboard = lazy(() => import('@/features/admin/pages/Dashboard'));
 ## 11. DOCUMENTATION RULES
 
 ### Required for Every Feature
+
 ```markdown
 # Feature: Candidate System
 
 ## Architecture
+
 - What data flows where
 - What components interact
 - State management strategy
 
 ## Entity Relationships
+
 - Candidate → Applications → Jobs
 - Candidate → Interviews → Feedback
 
 ## Permissions
+
 - Who can view candidates?
 - Who can edit profiles?
 - Audit trail requirements
 
 ## Events & Analytics
+
 - What events trigger?
 - What metrics to track?
 
 ## Edge Cases
+
 - What if candidate has no experience?
 - What if resume upload fails?
 - What if job is deleted?
@@ -481,6 +529,7 @@ const AdminDashboard = lazy(() => import('@/features/admin/pages/Dashboard'));
 ## 12. CODE QUALITY ENFORCEMENT
 
 ### ESLint Rules (Non-Negotiable)
+
 ```javascript
 // enforced in .eslintrc.js
 - no-console (except warn/error)
@@ -492,11 +541,13 @@ const AdminDashboard = lazy(() => import('@/features/admin/pages/Dashboard'));
 ```
 
 ### Type Safety
+
 - ✅ Strict TypeScript mode
 - ✅ No `any` types (use `unknown` instead)
 - ✅ Exhaustive checks on enums
 
 ### Formatting
+
 - ✅ Prettier auto-formatting
 - ✅ 2-space indentation
 - ✅ Single quotes for strings
@@ -506,6 +557,7 @@ const AdminDashboard = lazy(() => import('@/features/admin/pages/Dashboard'));
 ## 13. COMMIT RULES
 
 ### Conventional Commits
+
 ```
 feat(candidate): add CV parsing
 fix(recruiter): resolve pipeline filtering

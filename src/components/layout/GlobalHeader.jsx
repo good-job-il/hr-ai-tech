@@ -2,51 +2,50 @@
  * Global Header - Unified across entire platform
  * Used on all pages (public, auth, dashboard, etc)
  */
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Menu, X } from 'lucide-react';
-import { SPACING, SHADOWS, COLORS } from '@/theme/tokens';
-import Logo from '@/components/branding/Logo';
-import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
+import React, { useState } from "react"
+import { Link, useLocation } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { Menu, X } from "lucide-react"
+import { SPACING, SHADOWS, COLORS } from "@/theme/tokens"
+import Logo from "@/components/branding/Logo"
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 
-const HEADER_HEIGHT = 88;
-const HEADER_PADDING = SPACING[6]; // 24px
+const HEADER_HEIGHT = 88
+const HEADER_PADDING = SPACING[6] // 24px
 
-export default function GlobalHeader({ user, variant = 'public' }) {
-  const { t, i18n } = useTranslation();
-  const location = useLocation();
-  const [mobileOpen, setMobileOpen] = useState(false);
+export default function GlobalHeader({ user, variant = "public" }) {
+  const { t, i18n } = useTranslation()
+  const location = useLocation()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   // Get current language direction
-  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'he';
-  const isRTL = currentLang === 'he';
+  const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
+  const isRTL = currentLang === "he"
 
   const navLinks = [
-    { label: isRTL ? 'משרות' : 'Jobs', href: '/jobs' },
-    { label: isRTL ? 'חברות' : 'Companies', href: '/companies' },
-    { label: isRTL ? 'AI לקריירה' : 'AI Career', href: '/#ai' },
-    { label: isRTL ? 'איך זה עובד?' : 'How it works?', href: '/#how' },
-    { label: isRTL ? 'אודות' : 'About', href: '/#about' },
-  ];
+    { label: isRTL ? "משרות" : "Jobs", href: "/jobs" },
+    { label: isRTL ? "חברות" : "Companies", href: "/companies" },
+    { label: isRTL ? "AI לקריירה" : "AI Career", href: "/#ai" },
+    { label: isRTL ? "איך זה עובד?" : "How it works?", href: "/#how" },
+    { label: isRTL ? "אודות" : "About", href: "/#about" },
+  ]
 
-  const isDarkBg = location.pathname.startsWith('/admin') ||
-                   location.pathname.startsWith('/employer') ||
-                   location.pathname.startsWith('/dashboard');
+  const isDarkBg =
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/employer") ||
+    location.pathname.startsWith("/dashboard")
 
   return (
     <header
-      dir={isRTL ? 'rtl' : 'ltr'}
+      dir={isRTL ? "rtl" : "ltr"}
       className="sticky top-0 z-50 transition-all duration-200"
       style={{
         height: `${HEADER_HEIGHT}px`,
-        background: isDarkBg
-          ? `${COLORS.neutral[0]}/70`
-          : `${COLORS.glass.bg}`,
-        backdropFilter: 'blur(26px)',
-        WebkitBackdropFilter: 'blur(26px)',
+        background: isDarkBg ? `${COLORS.neutral[0]}/70` : `${COLORS.glass.bg}`,
+        backdropFilter: "blur(26px)",
+        WebkitBackdropFilter: "blur(26px)",
         borderBottom: `1px solid ${COLORS.glass.border}`,
-        boxShadow: SHADOWS['glass'],
+        boxShadow: SHADOWS["glass"],
       }}
     >
       <div
@@ -59,34 +58,34 @@ export default function GlobalHeader({ user, variant = 'public' }) {
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-2">
           {navLinks.map((link) => {
-            const isActive = location.pathname === link.href;
+            const isActive = location.pathname === link.href
             return (
               <Link
                 key={link.href}
                 to={link.href}
                 className="relative px-4 py-2 text-[15px] font-black rounded-2xl transition-all"
                 style={{
-                  color: isActive ? '#7C3AED' : '#334155',
-                  background: isActive ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
+                  color: isActive ? "#7C3AED" : "#334155",
+                  background: isActive ? "rgba(124, 58, 237, 0.08)" : "transparent",
                 }}
               >
                 {link.label}
                 {isActive && (
                   <span
                     style={{
-                      position: 'absolute',
-                      bottom: '-14px',
-                      right: '50%',
-                      transform: 'translateX(50%)',
-                      width: '34px',
-                      height: '3px',
-                      borderRadius: '8px',
-                      background: 'linear-gradient(90deg, #7C4DFF, #4F7CFF)',
+                      position: "absolute",
+                      bottom: "-14px",
+                      right: "50%",
+                      transform: "translateX(50%)",
+                      width: "34px",
+                      height: "3px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(90deg, #7C4DFF, #4F7CFF)",
                     }}
                   />
                 )}
               </Link>
-            );
+            )
           })}
         </nav>
 
@@ -101,37 +100,43 @@ export default function GlobalHeader({ user, variant = 'public' }) {
                 to="/login"
                 className="hidden sm:inline-flex h-12 px-7 items-center justify-center rounded-lg border font-black text-[15px] transition-all"
                 style={{
-                  borderColor: '#DDEBFF',
-                  color: '#6C4DFF',
-                  background: '#FFFFFF',
-                  boxShadow: SHADOWS['glass-card'],
+                  borderColor: "#DDEBFF",
+                  color: "#6C4DFF",
+                  background: "#FFFFFF",
+                  boxShadow: SHADOWS["glass-card"],
                 }}
               >
-                {isRTL ? 'התחברות' : 'Login'}
+                {isRTL ? "התחברות" : "Login"}
               </Link>
 
               <Link
                 to="/register"
                 className="inline-flex h-12 px-7 items-center justify-center rounded-lg text-white font-black text-[15px] transition-all"
                 style={{
-                  background: 'linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)',
-                  boxShadow: '0 18px 42px rgba(108, 77, 255, 0.35)',
+                  background: "linear-gradient(135deg, #7C4DFF 0%, #4F7CFF 100%)",
+                  boxShadow: "0 18px 42px rgba(108, 77, 255, 0.35)",
                 }}
               >
-                {isRTL ? 'הרשמה' : 'Sign Up'}
+                {isRTL ? "הרשמה" : "Sign Up"}
               </Link>
             </>
           ) : (
             <>
               <Link
-                to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'candidate' ? '/candidate-dashboard' : '/employer/dashboard'}
+                to={
+                  user.role === "admin"
+                    ? "/admin/dashboard"
+                    : user.role === "candidate"
+                      ? "/candidate-dashboard"
+                      : "/employer/dashboard"
+                }
                 className="inline-flex h-12 px-7 items-center justify-center rounded-lg text-white font-black text-[15px] transition-all"
                 style={{
-                  background: 'linear-gradient(135deg, #7C4DFF, #4F7CFF)',
-                  boxShadow: '0 18px 42px rgba(108, 77, 255, 0.30)',
+                  background: "linear-gradient(135deg, #7C4DFF, #4F7CFF)",
+                  boxShadow: "0 18px 42px rgba(108, 77, 255, 0.30)",
                 }}
               >
-                {isRTL ? 'לוח בקרה' : 'Dashboard'}
+                {isRTL ? "לוח בקרה" : "Dashboard"}
               </Link>
             </>
           )}
@@ -161,7 +166,7 @@ export default function GlobalHeader({ user, variant = 'public' }) {
           style={{
             borderColor: COLORS.glass.border,
             background: `${COLORS.glass.hover}`,
-            backdropFilter: 'blur(26px)',
+            backdropFilter: "blur(26px)",
           }}
         >
           <nav className="max-w-[1600px] mx-auto px-7 py-3 space-y-1">
@@ -172,8 +177,9 @@ export default function GlobalHeader({ user, variant = 'public' }) {
                 onClick={() => setMobileOpen(false)}
                 className="block px-4 py-3 text-[15px] font-bold rounded-lg transition-all"
                 style={{
-                  color: location.pathname === link.href ? '#7C3AED' : '#334155',
-                  background: location.pathname === link.href ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
+                  color: location.pathname === link.href ? "#7C3AED" : "#334155",
+                  background:
+                    location.pathname === link.href ? "rgba(124, 58, 237, 0.08)" : "transparent",
                 }}
               >
                 {link.label}
@@ -183,5 +189,5 @@ export default function GlobalHeader({ user, variant = 'public' }) {
         </div>
       )}
     </header>
-  );
+  )
 }

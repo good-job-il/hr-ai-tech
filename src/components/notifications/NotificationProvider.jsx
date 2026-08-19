@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react"
 
 export const NotificationProvider = ({ children }) => {
-  return <>{children}</>;
-};
+  return <>{children}</>
+}
 
-export default NotificationProvider;
+export default NotificationProvider

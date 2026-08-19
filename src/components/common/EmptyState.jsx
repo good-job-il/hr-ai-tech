@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from "@/components/ui/Card"
 
 export function EmptyState({ icon: Icon, title, description, action }) {
   return (
@@ -10,7 +10,7 @@ export function EmptyState({ icon: Icon, title, description, action }) {
         {action && <div className="flex justify-center">{action}</div>}
       </CardContent>
     </Card>
-  );
+  )
 }
 
-export default EmptyState;
+export default EmptyState

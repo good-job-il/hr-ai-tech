@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from "@/components/ui/Card"
 
 export function PipelineBoard({ stages, items }) {
   return (
@@ -21,7 +21,7 @@ export function PipelineBoard({ stages, items }) {
         </div>
       ))}
     </div>
-  );
+  )
 }
 
-export default PipelineBoard;
+export default PipelineBoard

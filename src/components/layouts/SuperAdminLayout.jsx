@@ -1,6 +1,6 @@
-import { PLATFORM_NAV } from '@/config/navigation/platformNav';
-import SidebarLayout from './SidebarLayout';
+import { PLATFORM_NAV } from "@/config/navigation/platformNav"
+import SidebarLayout from "./SidebarLayout"
 
 export default function SuperAdminLayout() {
-  return <SidebarLayout navItems={PLATFORM_NAV} roleTitle="Platform Admin" platformStyle />;
+  return <SidebarLayout navItems={PLATFORM_NAV} roleTitle="Platform Admin" platformStyle />
 }

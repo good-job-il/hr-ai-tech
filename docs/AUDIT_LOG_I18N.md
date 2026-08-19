@@ -9,10 +9,12 @@
 ### 1. Добавлены переводы
 
 Переводы добавлены в файлы локализации:
+
 - `/src/locales/he/translation.json` - переводы на иврит
 - `/src/locales/en/translation.json` - переводы на английский
 
 Добавлена новая секция `auditLog` с переводами для:
+
 - Заголовков и описаний
 - Фильтров
 - Таблицы
@@ -22,6 +24,7 @@
 ### 2. Обновлен компонент
 
 В компоненте `AuditLogPage.jsx`:
+
 - Добавлен хук `useTranslation` из `react-i18next`
 - Все хардкод тексты заменены на вызовы `t()` функции перевода
 - Добавлена поддержка RTL/LTR направления текста
@@ -31,24 +34,27 @@
 ### 3. Основные изменения
 
 #### Динамическое направление текста
+
 ```jsx
 const isRTL = i18n.language === 'he';
 <div dir={isRTL ? 'rtl' : 'ltr'}>
 ```
 
 #### Локализация дат
+
 ```jsx
-const dateLocale = i18n.language === 'he' ? he : enUS;
-format(new Date(log.created_date), 'dd/MM/yyyy HH:mm', { locale: dateLocale })
+const dateLocale = i18n.language === "he" ? he : enUS
+format(new Date(log.created_date), "dd/MM/yyyy HH:mm", { locale: dateLocale })
 ```
 
 #### Динамические переводы действий
+
 ```jsx
 const getActionConfig = (t) => ({
-  view: { label: t('auditLog.actions.view'), icon: Eye, color: '#64748B' },
-  create: { label: t('auditLog.actions.create'), icon: CheckCircle2, color: '#10B981' },
+  view: { label: t("auditLog.actions.view"), icon: Eye, color: "#64748B" },
+  create: { label: t("auditLog.actions.create"), icon: CheckCircle2, color: "#10B981" },
   // ...
-});
+})
 ```
 
 ## Как использовать
@@ -56,6 +62,7 @@ const getActionConfig = (t) => ({
 ### Переключение языка
 
 На странице доступна кнопка переключения языка в правом верхнем углу. При клике:
+
 1. Интерфейс переключается на выбранный язык
 2. Направление текста меняется (RTL для иврита, LTR для английского)
 3. Форматирование дат адаптируется под выбранный язык
@@ -64,15 +71,22 @@ const getActionConfig = (t) => ({
 ### Структура переводов
 
 Пример использования переводов в коде:
+
 ```jsx
 // Простой перевод
-{t('auditLog.title')}
+{
+  t("auditLog.title")
+}
 
 // Перевод с вложенными ключами
-{t('auditLog.tableHeaders.date')}
+{
+  t("auditLog.tableHeaders.date")
+}
 
 // Перевод действий
-{t('auditLog.actions.view')}
+{
+  t("auditLog.actions.view")
+}
 ```
 
 ## Доступные языки
@@ -83,12 +97,14 @@ const getActionConfig = (t) => ({
 ## Переводы
 
 ### Основные секции
+
 - `auditLog.title` - Заголовок страницы
 - `auditLog.subtitle` - Подзаголовок
 - `auditLog.exportCSV` - Кнопка экспорта
 - `auditLog.filters` - Секция фильтров
 
 ### Фильтры
+
 - `auditLog.entity` - Ищет
 - `auditLog.allEntities` - Все ищете
 - `auditLog.action` - Действие
@@ -99,6 +115,7 @@ const getActionConfig = (t) => ({
 - `auditLog.clearFilters` - Очистить фильтры
 
 ### Таблица
+
 - `auditLog.tableHeaders.date` - Дата
 - `auditLog.tableHeaders.user` - Пользователь
 - `auditLog.tableHeaders.action` - Действие
@@ -106,6 +123,7 @@ const getActionConfig = (t) => ({
 - `auditLog.tableHeaders.description` - Описание
 
 ### Действия
+
 - `auditLog.actions.view` - Просмотр
 - `auditLog.actions.create` - Создание
 - `auditLog.actions.update` - Обновление
@@ -123,6 +141,7 @@ const getActionConfig = (t) => ({
 ## Примеры
 
 ### Иврит (RTL)
+
 ```
 יומן אודיט
 ניטור פעילויות משתמשים ושינויים במערכת
@@ -130,6 +149,7 @@ const getActionConfig = (t) => ({
 ```
 
 ### English (LTR)
+
 ```
 Audit Log
 Monitor user activities and system changes
@@ -150,11 +170,13 @@ Monitor user activities and system changes
 ## Технические детали
 
 ### Зависимости
+
 - `react-i18next` - для интернационализации
 - `date-fns` - для форматирования дат
 - `date-fns/locale` - локали для дат (he, enUS)
 
 ### Файлы
+
 - `/src/pages/admin/AuditLogPage.jsx` - главный компонент
 - `/src/locales/he/translation.json` - переводы на иврит
 - `/src/locales/en/translation.json` - переводы на английский
@@ -164,6 +186,7 @@ Monitor user activities and system changes
 ## Расширение
 
 Для добавления новых переводов:
+
 1. Добавьте ключ в `/src/locales/he/translation.json`
 2. Добавьте соответствующий перевод в `/src/locales/en/translation.json`
 3. Используйте `t('auditLog.yourNewKey')` в компоненте

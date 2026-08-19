@@ -1,9 +1,9 @@
-import React from 'react';
-import Button from '@/components/design/Button';
-import Card from '@/components/design/Card';
-import Input from '@/components/design/Input';
-import Badge from '@/components/design/Badge';
-import { H1, H2, H3, H4, Body1, Body2, Caption, Label } from '@/components/design/Typography';
+import React from "react"
+import Button from "@/components/design/Button"
+import Card from "@/components/design/Card"
+import Input from "@/components/design/Input"
+import Badge from "@/components/design/Badge"
+import { H1, H2, H3, H4, Body1, Body2, Caption, Label } from "@/components/design/Typography"
 
 export default function UIShowcase() {
   return (
@@ -13,14 +13,15 @@ export default function UIShowcase() {
         <div className="text-center">
           <H1>UI Kit & Design System</H1>
           <Body1 className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            בעיצוב מלא, עם כל הקומפוננטות, States, וSizeים שלך צריך כדי לבנות את האפליקציה בעיצוב Premium עקבי.
+            בעיצוב מלא, עם כל הקומפוננטות, States, וSizeים שלך צריך כדי לבנות את האפליקציה בעיצוב
+            Premium עקבי.
           </Body1>
         </div>
 
         {/* Buttons */}
         <section className="space-y-8">
           <H2>Buttons</H2>
-          
+
           {/* Primary Buttons */}
           <div className="space-y-4">
             <H4>Primary Variant</H4>
@@ -31,8 +32,12 @@ export default function UIShowcase() {
               <Button size="xl">Extra Large Button</Button>
             </div>
             <div className="flex flex-wrap gap-4">
-              <Button size="md" disabled>Disabled Button</Button>
-              <Button size="md" className="w-full">Full Width</Button>
+              <Button size="md" disabled>
+                Disabled Button
+              </Button>
+              <Button size="md" className="w-full">
+                Full Width
+              </Button>
             </div>
           </div>
 
@@ -40,9 +45,15 @@ export default function UIShowcase() {
           <div className="space-y-4">
             <H4>Secondary Variant</H4>
             <div className="flex flex-wrap gap-4">
-              <Button variant="secondary" size="sm">Small Button</Button>
-              <Button variant="secondary" size="md">Medium Button</Button>
-              <Button variant="secondary" size="lg">Large Button</Button>
+              <Button variant="secondary" size="sm">
+                Small Button
+              </Button>
+              <Button variant="secondary" size="md">
+                Medium Button
+              </Button>
+              <Button variant="secondary" size="lg">
+                Large Button
+              </Button>
             </div>
           </div>
 
@@ -50,10 +61,18 @@ export default function UIShowcase() {
           <div className="space-y-4">
             <H4>Other Variants</H4>
             <div className="flex flex-wrap gap-4">
-              <Button variant="outline" size="md">Outline</Button>
-              <Button variant="ghost" size="md">Ghost</Button>
-              <Button variant="error" size="md">Error</Button>
-              <Button variant="success" size="md">Success</Button>
+              <Button variant="outline" size="md">
+                Outline
+              </Button>
+              <Button variant="ghost" size="md">
+                Ghost
+              </Button>
+              <Button variant="error" size="md">
+                Error
+              </Button>
+              <Button variant="success" size="md">
+                Success
+              </Button>
             </div>
           </div>
         </section>
@@ -61,26 +80,35 @@ export default function UIShowcase() {
         {/* Cards */}
         <section className="space-y-8">
           <H2>Cards</H2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card variant="elevated">
               <H4 className="mb-3">Elevated Card</H4>
-              <Body2>זה הוא כרטיס עם background לבן חצי שקוף, גבול כחול עדין, shadow מעולה, וblur backdrop.</Body2>
+              <Body2>
+                זה הוא כרטיס עם background לבן חצי שקוף, גבול כחול עדין, shadow מעולה, וblur
+                backdrop.
+              </Body2>
             </Card>
 
             <Card variant="glass">
               <H4 className="mb-3">Glass Card</H4>
-              <Body2>כרטיס Glass עם gradient רך, שקיפות גבוהה, ו־Blur backdrop לעומק ויזואלי מקסימלי.</Body2>
+              <Body2>
+                כרטיס Glass עם gradient רך, שקיפות גבוהה, ו־Blur backdrop לעומק ויזואלי מקסימלי.
+              </Body2>
             </Card>
 
             <Card variant="minimal">
               <H4 className="mb-3">Minimal Card</H4>
-              <Body2>כרטיס מינימלי עם shadow דק וגבול עדין. מתאים ללפטים ודברים פחות חשמלניים.</Body2>
+              <Body2>
+                כרטיס מינימלי עם shadow דק וגבול עדין. מתאים ללפטים ודברים פחות חשמלניים.
+              </Body2>
             </Card>
 
             <Card variant="dark">
               <H4 className="mb-3 text-white">Dark Card</H4>
-              <Body2 className="text-gray-300">כרטיס אפור עם גבול כהה וshadow כבד. למצבים בהם צריך קונטרסט חזק.</Body2>
+              <Body2 className="text-gray-300">
+                כרטיס אפור עם גבול כהה וshadow כבד. למצבים בהם צריך קונטרסט חזק.
+              </Body2>
             </Card>
           </div>
         </section>
@@ -88,7 +116,7 @@ export default function UIShowcase() {
         {/* Inputs */}
         <section className="space-y-8">
           <H2>Inputs</H2>
-          
+
           <div className="space-y-6">
             <div className="space-y-2">
               <Label>Default Input</Label>
@@ -120,7 +148,7 @@ export default function UIShowcase() {
         {/* Badges */}
         <section className="space-y-8">
           <H2>Badges</H2>
-          
+
           <div className="space-y-6">
             <H4>Color Variants</H4>
             <div className="flex flex-wrap gap-3">
@@ -149,7 +177,7 @@ export default function UIShowcase() {
         {/* Typography */}
         <section className="space-y-8">
           <H2>Typography</H2>
-          
+
           <div className="space-y-6">
             <div>
               <Caption className="mb-2">H1 - 8xl, Black</Caption>
@@ -173,7 +201,10 @@ export default function UIShowcase() {
 
             <div>
               <Caption className="mb-2">Body1 - Base, Regular</Caption>
-              <Body1>זה הטקסט הראשי של הגוף. הוא אמור להיות קראה וברור. זה השטח שבו רוב ה־content נמצא ו־100 מילה לפחות הן רעיון טוב כדי לראות איך הטקסט נראה בפסקה ממשית.</Body1>
+              <Body1>
+                זה הטקסט הראשי של הגוף. הוא אמור להיות קראה וברור. זה השטח שבו רוב ה־content נמצא
+                ו־100 מילה לפחות הן רעיון טוב כדי לראות איך הטקסט נראה בפסקה ממשית.
+              </Body1>
             </div>
 
             <div>
@@ -190,21 +221,21 @@ export default function UIShowcase() {
         {/* Colors */}
         <section className="space-y-8">
           <H2>Color Palette</H2>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {[
-              { name: 'Purple 600', color: '#8B5CF6' },
-              { name: 'Blue 600', color: '#3B82F6' },
-              { name: 'Cyan 500', color: '#06B6D4' },
-              { name: 'Green 600', color: '#10B981' },
-              { name: 'Yellow 500', color: '#F59E0B' },
-              { name: 'Red 500', color: '#EF4444' },
-              { name: 'Gray 900', color: '#111827' },
-              { name: 'Gray 700', color: '#374151' },
-              { name: 'Gray 500', color: '#6B7280' },
-              { name: 'Gray 300', color: '#D1D5DB' },
-              { name: 'Gray 100', color: '#F3F4F6' },
-              { name: 'White', color: '#FFFFFF' },
+              { name: "Purple 600", color: "#8B5CF6" },
+              { name: "Blue 600", color: "#3B82F6" },
+              { name: "Cyan 500", color: "#06B6D4" },
+              { name: "Green 600", color: "#10B981" },
+              { name: "Yellow 500", color: "#F59E0B" },
+              { name: "Red 500", color: "#EF4444" },
+              { name: "Gray 900", color: "#111827" },
+              { name: "Gray 700", color: "#374151" },
+              { name: "Gray 500", color: "#6B7280" },
+              { name: "Gray 300", color: "#D1D5DB" },
+              { name: "Gray 100", color: "#F3F4F6" },
+              { name: "White", color: "#FFFFFF" },
             ].map((item) => (
               <div key={item.name} className="space-y-2">
                 <div
@@ -221,7 +252,7 @@ export default function UIShowcase() {
         {/* Component Combinations */}
         <section className="space-y-8">
           <H2>Component Combinations</H2>
-          
+
           <Card variant="elevated">
             <div className="space-y-6">
               <div>
@@ -245,7 +276,9 @@ export default function UIShowcase() {
               </div>
 
               <div className="flex gap-3 pt-6">
-                <Button variant="secondary" className="flex-1">Cancel</Button>
+                <Button variant="secondary" className="flex-1">
+                  Cancel
+                </Button>
                 <Button className="flex-1">Save</Button>
               </div>
             </div>
@@ -254,11 +287,9 @@ export default function UIShowcase() {
 
         {/* Footer */}
         <div className="text-center pt-12 border-t border-gray-200">
-          <Body2 className="text-gray-500">
-            Design System v1.0 | HeadHunter HR-Tech
-          </Body2>
+          <Body2 className="text-gray-500">Design System v1.0 | HeadHunter HR-Tech</Body2>
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import { Card, CardContent } from '@/components/ui/Card';
-import { cn } from '@/lib/utils';
+import { Card, CardContent } from "@/components/ui/Card"
+import { cn } from "@/lib/utils"
 
 export function StatCard({ icon: Icon, label, value, change, trend }) {
   return (
@@ -10,7 +10,12 @@ export function StatCard({ icon: Icon, label, value, change, trend }) {
             <Icon className="w-6 h-6 text-[#7C3AED]" />
           </div>
           {trend && (
-            <span className={cn('text-xs font-bold', trend === 'up' ? 'text-[#059669]' : 'text-[#DC2626]')}>
+            <span
+              className={cn(
+                "text-xs font-bold",
+                trend === "up" ? "text-[#059669]" : "text-[#DC2626]",
+              )}
+            >
               {change}
             </span>
           )}
@@ -19,7 +24,7 @@ export function StatCard({ icon: Icon, label, value, change, trend }) {
         <p className="text-3xl font-black text-[#0F172A]">{value}</p>
       </CardContent>
     </Card>
-  );
+  )
 }
 
-export default StatCard;
+export default StatCard

@@ -1,32 +1,33 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Shield, ArrowLeft } from 'lucide-react';
-import { useAuth } from '@/lib/AuthContext';
+import { Link, useNavigate } from "react-router-dom"
+import { Shield, ArrowLeft } from "lucide-react"
+import { useAuth } from "@/lib/AuthContext"
 
 const ROLE_HOME = {
-  admin: '/platform/dashboard',
-  org_admin: '/agency/dashboard',
-  recruitment_manager: '/agency/dashboard',
-  team_manager: '/agency/team/dashboard',
-  recruiter: '/agency/recruiter/dashboard',
-  hr_manager: '/company/dashboard',
-  internal_recruiter: '/company/recruiter/dashboard',
-  employer: '/employer/dashboard',
-  candidate: '/candidate/dashboard',
-};
+  admin: "/platform/dashboard",
+  org_admin: "/agency/dashboard",
+  recruitment_manager: "/agency/dashboard",
+  team_manager: "/agency/team/dashboard",
+  recruiter: "/agency/recruiter/dashboard",
+  hr_manager: "/company/dashboard",
+  internal_recruiter: "/company/recruiter/dashboard",
+  employer: "/employer/dashboard",
+  candidate: "/candidate/dashboard",
+}
 
 export default function Unauthorized() {
-  const navigate = useNavigate();
-  const { user, organization } = useAuth();
+  const navigate = useNavigate()
+  const { user, organization } = useAuth()
 
   // org_admin with no organization yet should go onboard, not bounce
   // between /agency/dashboard and /unauthorized.
-  const homeRoute = (user?.role === 'org_admin' && !organization)
-    ? '/agency/onboarding'
-    : (ROLE_HOME[user?.role] || '/');
+  const homeRoute =
+    user?.role === "org_admin" && !organization
+      ? "/agency/onboarding"
+      : ROLE_HOME[user?.role] || "/"
 
   const handleGoBack = () => {
-    navigate(homeRoute);
-  };
+    navigate(homeRoute)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F3EFFF] via-[#F7FBFF] to-[#FFFFFF] flex items-center justify-center px-4">
@@ -47,8 +48,8 @@ export default function Unauthorized() {
             onClick={handleGoBack}
             className="inline-flex items-center justify-center gap-2 px-7 h-12 rounded-2xl text-white font-black text-base transition-all w-full"
             style={{
-              background: 'linear-gradient(135deg, #A855F7 0%, #6C4DFF 48%, #2F80FF 100%)',
-              boxShadow: '0 18px 42px rgba(108, 77, 255, 0.35)',
+              background: "linear-gradient(135deg, #A855F7 0%, #6C4DFF 48%, #2F80FF 100%)",
+              boxShadow: "0 18px 42px rgba(108, 77, 255, 0.35)",
             }}
           >
             <ArrowLeft className="w-4 h-4" />
@@ -64,5 +65,5 @@ export default function Unauthorized() {
         </div>
       </div>
     </div>
-  );
+  )
 }

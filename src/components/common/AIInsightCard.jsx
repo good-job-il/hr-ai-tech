@@ -1,5 +1,5 @@
-import { Card, CardContent } from '@/components/ui/Card';
-import { Sparkles } from 'lucide-react';
+import { Card, CardContent } from "@/components/ui/Card"
+import { Sparkles } from "lucide-react"
 
 export function AIInsightCard({ title, insight, action }) {
   return (
@@ -18,7 +18,7 @@ export function AIInsightCard({ title, insight, action }) {
         {action && <div className="mt-4 pt-4 border-t border-[#DDEBFF]">{action}</div>}
       </CardContent>
     </Card>
-  );
+  )
 }
 
-export default AIInsightCard;
+export default AIInsightCard

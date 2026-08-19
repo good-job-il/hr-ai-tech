@@ -1,13 +1,13 @@
-import { Search, X } from 'lucide-react';
-import { useState } from 'react';
+import { Search, X } from "lucide-react"
+import { useState } from "react"
 
-export function SearchBar({ placeholder = 'חיפוש...', onSearch, className }) {
-  const [value, setValue] = useState('');
+export function SearchBar({ placeholder = "חיפוש...", onSearch, className }) {
+  const [value, setValue] = useState("")
 
   const handleClear = () => {
-    setValue('');
-    onSearch?.('');
-  };
+    setValue("")
+    onSearch?.("")
+  }
 
   return (
     <div className="relative w-full">
@@ -16,8 +16,8 @@ export function SearchBar({ placeholder = 'חיפוש...', onSearch, className }
         type="text"
         value={value}
         onChange={(e) => {
-          setValue(e.target.value);
-          onSearch?.(e.target.value);
+          setValue(e.target.value)
+          onSearch?.(e.target.value)
         }}
         placeholder={placeholder}
         className={`w-full h-12 rounded-2xl border border-[#E4ECFF] bg-white px-4 pr-12 outline-none placeholder:text-[#CBD5E1] focus:ring-2 focus:ring-[#7C3AED] focus:ring-opacity-50 ${className}`}
@@ -31,7 +31,7 @@ export function SearchBar({ placeholder = 'חיפוש...', onSearch, className }
         </button>
       )}
     </div>
-  );
+  )
 }
 
-export default SearchBar;
+export default SearchBar

@@ -1,9 +1,9 @@
-import { Bell } from 'lucide-react';
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Bell } from "lucide-react"
+import { useState } from "react"
+import { Card, CardContent } from "@/components/ui/Card"
 
 export function NotificationBell({ unread = 0, notifications = [] }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
   return (
     <div className="relative">
@@ -26,7 +26,10 @@ export function NotificationBell({ unread = 0, notifications = [] }) {
               </div>
             ) : (
               notifications.map((notif, i) => (
-                <div key={i} className="p-4 border-b border-[#E4ECFF] last:border-0 hover:bg-[#F9FBFF]">
+                <div
+                  key={i}
+                  className="p-4 border-b border-[#E4ECFF] last:border-0 hover:bg-[#F9FBFF]"
+                >
                   <p className="text-sm font-bold text-[#0F172A]">{notif.title}</p>
                   <p className="text-xs text-[#64748B] mt-1">{notif.message}</p>
                 </div>
@@ -36,7 +39,7 @@ export function NotificationBell({ unread = 0, notifications = [] }) {
         </Card>
       )}
     </div>
-  );
+  )
 }
 
-export default NotificationBell;
+export default NotificationBell

@@ -10,7 +10,7 @@ export function PageHeader({ title, description, children, action }) {
       </div>
       {children}
     </div>
-  );
+  )
 }
 
-export default PageHeader;
+export default PageHeader

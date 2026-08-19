@@ -1,5 +1,5 @@
-import React from 'react';
-import { Trash2 } from 'lucide-react';
+import React from "react"
+import { Trash2 } from "lucide-react"
 
 export default function ApplicationCard({ app, onDelete }) {
   return (
@@ -21,15 +21,12 @@ export default function ApplicationCard({ app, onDelete }) {
         <div className="mb-2 flex items-center gap-1">
           <span className="text-xs font-semibold text-hhblue">{app.match_score}% התאמה</span>
           <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-hhblue"
-              style={{ width: `${app.match_score}%` }}
-            />
+            <div className="h-full bg-hhblue" style={{ width: `${app.match_score}%` }} />
           </div>
         </div>
       )}
 
       <p className="text-xs text-gray-500 line-clamp-2">{app.match_reason}</p>
     </div>
-  );
+  )
 }

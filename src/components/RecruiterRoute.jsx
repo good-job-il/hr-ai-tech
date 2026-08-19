@@ -1,12 +1,12 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '@/lib/AuthContext';
+import { Navigate, Outlet } from "react-router-dom"
+import { useAuth } from "@/lib/AuthContext"
 
 export default function RecruiterRoute() {
-  const { user } = useAuth();
-  
-  if (!user || (user.role !== 'recruiter' && user.role !== 'admin')) {
-    return <Navigate to="/candidate-dashboard" replace />;
+  const { user } = useAuth()
+
+  if (!user || (user.role !== "recruiter" && user.role !== "admin")) {
+    return <Navigate to="/candidate-dashboard" replace />
   }
-  
-  return <Outlet />;
+
+  return <Outlet />
 }

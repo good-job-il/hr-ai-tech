@@ -6,12 +6,12 @@ Verified: 13 August 2026.
 
 The frontend now has a typed, explicit NestJS API path for the four reference domains:
 
-| Domain | Service | Query/Create/Update source | Backend contract |
-|---|---|---|---|
+| Domain         | Service                  | Query/Create/Update source                                                | Backend contract                     |
+| -------------- | ------------------------ | ------------------------------------------------------------------------- | ------------------------------------ |
 | Agency clients | `agencyClientService.ts` | `AgencyClientQuery`, `CreateAgencyClientInput`, `UpdateAgencyClientInput` | `Query/Create/UpdateAgencyClientDto` |
-| Jobs | `jobService.ts` | `JobQuery`, `CreateJobInput`, `UpdateJobInput` | `Query/Create/UpdateJobDto` |
-| Candidates | `candidateService.ts` | `CandidateQuery`, `CreateCandidateInput`, `UpdateCandidateInput` | `Query/Create/UpdateCandidateDto` |
-| Applications | `applicationService.ts` | `ApplicationQuery`, `CreateApplicationInput`, `UpdateApplicationInput` | `Query/Create/UpdateApplicationDto` |
+| Jobs           | `jobService.ts`          | `JobQuery`, `CreateJobInput`, `UpdateJobInput`                            | `Query/Create/UpdateJobDto`          |
+| Candidates     | `candidateService.ts`    | `CandidateQuery`, `CreateCandidateInput`, `UpdateCandidateInput`          | `Query/Create/UpdateCandidateDto`    |
+| Applications   | `applicationService.ts`  | `ApplicationQuery`, `CreateApplicationInput`, `UpdateApplicationInput`    | `Query/Create/UpdateApplicationDto`  |
 
 Every service declares a literal endpoint. There is no dynamic entity name, endpoint guessing, generic `.filter()` payload or legacy shim import in `src/api/services` and `src/api/hooks`.
 

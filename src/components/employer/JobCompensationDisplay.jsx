@@ -1,28 +1,28 @@
-import React from 'react';
-import { useAuth } from '@/lib/AuthContext';
-import { DollarSign, Percent, Edit2 } from 'lucide-react';
+import React from "react"
+import { useAuth } from "@/lib/AuthContext"
+import { DollarSign, Percent, Edit2 } from "lucide-react"
 
 const COMPENSATION_CONFIG = {
-  recruiter: { percent: 40, label: 'רכז גיוס' },
-  team_manager: { percent: 10, label: 'מנהל צוות' },
-  recruitment_manager: { percent: 5, label: 'מנהל גיוס' },
-};
+  recruiter: { percent: 40, label: "רכז גיוס" },
+  team_manager: { percent: 10, label: "מנהל צוות" },
+  recruitment_manager: { percent: 5, label: "מנהל גיוס" },
+}
 
 const VISIBILITY = {
-  admin: ['recruiter', 'team_manager', 'recruitment_manager'],
-  recruitment_manager: ['recruiter', 'team_manager', 'recruitment_manager'],
-  team_manager: ['recruiter', 'team_manager'],
-  recruiter: ['recruiter'],
-  employer: ['recruiter', 'team_manager', 'recruitment_manager'],
-};
+  admin: ["recruiter", "team_manager", "recruitment_manager"],
+  recruitment_manager: ["recruiter", "team_manager", "recruitment_manager"],
+  team_manager: ["recruiter", "team_manager"],
+  recruiter: ["recruiter"],
+  employer: ["recruiter", "team_manager", "recruitment_manager"],
+}
 
 export default function JobCompensationDisplay({ job, baseSalary = 0, onEdit }) {
-  const { user } = useAuth();
-  const userRole = user?.role || 'employer';
-  const visibleRoles = VISIBILITY[userRole] || [];
+  const { user } = useAuth()
+  const userRole = user?.role || "employer"
+  const visibleRoles = VISIBILITY[userRole] || []
 
   if (!baseSalary || baseSalary <= 0) {
-    return null;
+    return null
   }
 
   return (
@@ -33,18 +33,24 @@ export default function JobCompensationDisplay({ job, baseSalary = 0, onEdit }) 
           <h4 className="text-sm font-bold text-gray-900">משכורת ותגמולים (80% משכר בסיס)</h4>
         </div>
         {onEdit && (
-          <button onClick={onEdit} className="p-1.5 hover:bg-purple-100 rounded-lg transition-colors">
+          <button
+            onClick={onEdit}
+            className="p-1.5 hover:bg-purple-100 rounded-lg transition-colors"
+          >
             <Edit2 className="w-3.5 h-3.5 text-purple-600" />
           </button>
         )}
       </div>
 
       <div className="space-y-2">
-        {visibleRoles.map(role => {
-          const config = COMPENSATION_CONFIG[role];
-          const amount = (baseSalary * 0.8 * config.percent) / 100;
+        {visibleRoles.map((role) => {
+          const config = COMPENSATION_CONFIG[role]
+          const amount = (baseSalary * 0.8 * config.percent) / 100
           return (
-            <div key={role} className="flex items-center justify-between bg-white rounded-lg px-3 py-2.5">
+            <div
+              key={role}
+              className="flex items-center justify-between bg-white rounded-lg px-3 py-2.5"
+            >
               <div className="flex items-center gap-2">
                 <Percent className="w-3.5 h-3.5 text-purple-600" />
                 <span className="text-sm font-medium text-gray-900">{config.label}</span>
@@ -58,7 +64,7 @@ export default function JobCompensationDisplay({ job, baseSalary = 0, onEdit }) 
                 </span>
               </div>
             </div>
-          );
+          )
         })}
       </div>
 
@@ -66,5 +72,5 @@ export default function JobCompensationDisplay({ job, baseSalary = 0, onEdit }) 
         💡 תגמולים מחושבים ממשכר בסיס בסיום תקופת אחריות (30 ימים)
       </p>
     </div>
-  );
+  )
 }

@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react"
+import { X } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function LocationConfirmModal({ initialCity, onConfirm, onDismiss }) {
-  const [city, setCity] = useState(initialCity);
-  const [customCity, setCustomCity] = useState('');
-  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [city, setCity] = useState(initialCity)
+  const [customCity, setCustomCity] = useState("")
+  const [showCustomInput, setShowCustomInput] = useState(false)
 
   const handleConfirm = () => {
-    const finalCity = showCustomInput ? customCity : city;
+    const finalCity = showCustomInput ? customCity : city
     if (finalCity.trim()) {
-      onConfirm(finalCity);
+      onConfirm(finalCity)
     }
-  };
+  }
 
   const handleReject = () => {
-    setShowCustomInput(true);
-  };
+    setShowCustomInput(true)
+  }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir="rtl">
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      dir="rtl"
+    >
       <div className="bg-card border border-purple-500/30 rounded-2xl p-6 max-w-sm w-full shadow-xl">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">האם זה המיקום שלך?</h3>
@@ -30,18 +33,12 @@ export default function LocationConfirmModal({ initialCity, onConfirm, onDismiss
 
         {!showCustomInput ? (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              אנו זיהינו שאתה בעיר:
-            </p>
+            <p className="text-sm text-muted-foreground">אנו זיהינו שאתה בעיר:</p>
             <div className="bg-purple-500/20 border border-purple-500/30 rounded-lg p-4 text-center">
               <p className="text-xl font-bold text-cyan-300">{city}</p>
             </div>
             <div className="flex gap-3">
-              <Button
-                onClick={handleReject}
-                variant="outline"
-                className="flex-1"
-              >
+              <Button onClick={handleReject} variant="outline" className="flex-1">
                 לא, אחר
               </Button>
               <Button
@@ -54,9 +51,7 @@ export default function LocationConfirmModal({ initialCity, onConfirm, onDismiss
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              אנא בחר את העיר שלך:
-            </p>
+            <p className="text-sm text-muted-foreground">אנא בחר את העיר שלך:</p>
             <input
               type="text"
               value={customCity}
@@ -68,8 +63,8 @@ export default function LocationConfirmModal({ initialCity, onConfirm, onDismiss
             <div className="flex gap-3">
               <Button
                 onClick={() => {
-                  setShowCustomInput(false);
-                  setCustomCity('');
+                  setShowCustomInput(false)
+                  setCustomCity("")
                 }}
                 variant="outline"
                 className="flex-1"
@@ -88,5 +83,5 @@ export default function LocationConfirmModal({ initialCity, onConfirm, onDismiss
         )}
       </div>
     </div>
-  );
+  )
 }

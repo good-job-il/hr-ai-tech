@@ -20,13 +20,13 @@ Organization (staffing agency tenant)
 
 Основной ресурс: `/agency-clients`.
 
-| Operation | Endpoint | Поведение |
-|---|---|---|
-| List | `GET /agency-clients` | Только связи текущего agency tenant; фильтры `status`, `industry`, `search` |
-| Detail | `GET /agency-clients/:id` | Company profile, relation fields и tenant-scoped KPI |
-| Create | `POST /agency-clients` | Создаёт Company или связывает существующую, затем создаёт AgencyClient |
-| Update | `PATCH /agency-clients/:id` | Обновляет relation и разрешённые поля Company |
-| Archive | `DELETE /agency-clients/:id` | Архивирует связь, но не удаляет глобальную Company |
+| Operation | Endpoint                     | Поведение                                                                   |
+| --------- | ---------------------------- | --------------------------------------------------------------------------- |
+| List      | `GET /agency-clients`        | Только связи текущего agency tenant; фильтры `status`, `industry`, `search` |
+| Detail    | `GET /agency-clients/:id`    | Company profile, relation fields и tenant-scoped KPI                        |
+| Create    | `POST /agency-clients`       | Создаёт Company или связывает существующую, затем создаёт AgencyClient      |
+| Update    | `PATCH /agency-clients/:id`  | Обновляет relation и разрешённые поля Company                               |
+| Archive   | `DELETE /agency-clients/:id` | Архивирует связь, но не удаляет глобальную Company                          |
 
 Запись доступна Org Admin и Recruitment Manager; чтение — ролям текущего staffing agency в пределах их tenant. Backend дополнительно требует `org_type=staffing_agency` и `organization_id`.
 

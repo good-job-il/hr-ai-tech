@@ -1,13 +1,13 @@
-import { ChevronDown, LogOut, Settings } from 'lucide-react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { authService } from '@/api/services/authService';
-import Avatar from './Avatar';
+import { ChevronDown, LogOut, Settings } from "lucide-react"
+import { useState } from "react"
+import { Link } from "react-router-dom"
+import { authService } from "@/api/services/authService"
+import Avatar from "./Avatar"
 
 export function UserMenu({ user }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
-  if (!user) return null;
+  if (!user) return null
 
   return (
     <div className="relative">
@@ -17,7 +17,9 @@ export function UserMenu({ user }) {
       >
         <Avatar initials={user.full_name?.slice(0, 2).toUpperCase()} size="sm" />
         <span className="text-sm font-bold text-[#0F172A]">{user.full_name}</span>
-        <ChevronDown className={`w-4 h-4 text-[#7C3AED] transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          className={`w-4 h-4 text-[#7C3AED] transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {open && (
@@ -30,7 +32,7 @@ export function UserMenu({ user }) {
             הגדרות
           </Link>
           <button
-            onClick={() => authService.logout('/')}
+            onClick={() => authService.logout("/")}
             className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#EF4444] hover:bg-[#FEF2F2] transition-colors border-t border-[#E4ECFF]"
           >
             <LogOut className="w-4 h-4" />
@@ -39,7 +41,7 @@ export function UserMenu({ user }) {
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default UserMenu;
+export default UserMenu

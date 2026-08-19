@@ -16,19 +16,19 @@
 
 ## 2. Сущности и ownership
 
-| Сущность | Назначение | Владелец / tenant key | Обязательные связи | Состояние |
-|---|---|---|---|---|
-| `Organization` | Аккаунт staffing agency | `id` | `org_type=staffing_agency` | Есть |
-| `User` | Пользователь и роль | `organization_id` | manager links через `user.id` | Есть |
-| `Company` | Компания-работодатель | Не является tenant | `id` | Есть, schema неполная |
-| `AgencyClient` | Связь агентства с работодателем | `organization_id` | `company_id`, `account_manager_id` | Целевой контракт, реализация Фазы 2 |
-| `Job` | Вакансия клиента | `organization_id` | `employer_company_id`, `created_by_user_id`, опционально `recruiter_id` | Есть, binding требуется в Фазе 2 |
-| `Candidate` | Карточка кандидата агентства | `organization_id` | `recruiter_id`, `team_manager_id`, `recruitment_manager_id` | Есть |
-| `Application` | Кандидат в контексте вакансии | `organization_id` | `job_id`, `candidate_id`, `employer_company_id`, ownership IDs | Есть, UI унифицирован в Фазе 0 |
-| `CandidateImportBatch` | Пакет импорта | `organization_id` | ID инициатора, source и counters | Есть |
-| `CompensationPlan` | Правила вознаграждения | `organization_id` | client/job/user IDs по типу плана | Есть, связи уточняются в Фазе 2/6 |
-| `PermissionMatrix` | Разрешения ролей | `organization_id` + `org_type` | role, resource, action | Есть |
-| `AuditLog` | Неизменяемый журнал действий | `organization_id` | actor `user.id`, entity type/id | Есть |
+| Сущность               | Назначение                      | Владелец / tenant key          | Обязательные связи                                                      | Состояние                           |
+| ---------------------- | ------------------------------- | ------------------------------ | ----------------------------------------------------------------------- | ----------------------------------- |
+| `Organization`         | Аккаунт staffing agency         | `id`                           | `org_type=staffing_agency`                                              | Есть                                |
+| `User`                 | Пользователь и роль             | `organization_id`              | manager links через `user.id`                                           | Есть                                |
+| `Company`              | Компания-работодатель           | Не является tenant             | `id`                                                                    | Есть, schema неполная               |
+| `AgencyClient`         | Связь агентства с работодателем | `organization_id`              | `company_id`, `account_manager_id`                                      | Целевой контракт, реализация Фазы 2 |
+| `Job`                  | Вакансия клиента                | `organization_id`              | `employer_company_id`, `created_by_user_id`, опционально `recruiter_id` | Есть, binding требуется в Фазе 2    |
+| `Candidate`            | Карточка кандидата агентства    | `organization_id`              | `recruiter_id`, `team_manager_id`, `recruitment_manager_id`             | Есть                                |
+| `Application`          | Кандидат в контексте вакансии   | `organization_id`              | `job_id`, `candidate_id`, `employer_company_id`, ownership IDs          | Есть, UI унифицирован в Фазе 0      |
+| `CandidateImportBatch` | Пакет импорта                   | `organization_id`              | ID инициатора, source и counters                                        | Есть                                |
+| `CompensationPlan`     | Правила вознаграждения          | `organization_id`              | client/job/user IDs по типу плана                                       | Есть, связи уточняются в Фазе 2/6   |
+| `PermissionMatrix`     | Разрешения ролей                | `organization_id` + `org_type` | role, resource, action                                                  | Есть                                |
+| `AuditLog`             | Неизменяемый журнал действий    | `organization_id`              | actor `user.id`, entity type/id                                         | Есть                                |
 
 ### Каноническая модель клиента
 
@@ -43,11 +43,11 @@
 
 ## 3. Идентификаторы
 
-| Семантика | Поля | Формат |
-|---|---|---|
-| Entity/user ID | `id`, `organization_id`, `company_id`, `agency_client_id`, `job_id`, `candidate_id`, `employer_company_id`, `recruiter_id`, `assigned_to`, `team_manager_id`, `recruitment_manager_id`, `created_by_user_id`, `deleted_by` | UUID/opaque backend ID |
-| Контактный адрес | `email`, `candidate_email`, `contact_email`, `recipient_email` | Нормализованный email |
-| Display-only snapshot | `full_name`, `candidate_name`, `company`, `job_title`, `display_role_name` | Строка, не участвует в authorization |
+| Семантика             | Поля                                                                                                                                                                                                                       | Формат                               |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| Entity/user ID        | `id`, `organization_id`, `company_id`, `agency_client_id`, `job_id`, `candidate_id`, `employer_company_id`, `recruiter_id`, `assigned_to`, `team_manager_id`, `recruitment_manager_id`, `created_by_user_id`, `deleted_by` | UUID/opaque backend ID               |
+| Контактный адрес      | `email`, `candidate_email`, `contact_email`, `recipient_email`                                                                                                                                                             | Нормализованный email                |
+| Display-only snapshot | `full_name`, `candidate_name`, `company`, `job_title`, `display_role_name`                                                                                                                                                 | Строка, не участвует в authorization |
 
 Deprecated поля `agency_company_id`, `company_id` на `User` и email-based `employer_id` допускаются только для чтения во время миграции. Новые записи их не используют.
 
@@ -59,24 +59,24 @@ Deprecated поля `agency_company_id`, `company_id` на `User` и email-based
 
 `rejected` — терминальный исход из любого нетерминального этапа. Возврат из `rejected` разрешается только отдельной операцией reopen с audit reason. Терминальные статусы: `completed`, `rejected`.
 
-| Старое значение | Каноническое значение | Решение |
-|---|---|---|
-| `screening` | `reviewed` | Проверка агентством начата/выполнена |
-| `professional_interview` | `recommended` | Внутренняя оценка завершена, кандидат рекомендован |
-| `client_stage` | `employer_interview` | Кандидат перешёл к работодателю |
-| `interview_scheduled` | `employer_interview` | Старый application enum, не тип события |
-| `offer_made` | `offer` | Предложение сделано |
+| Старое значение          | Каноническое значение | Решение                                            |
+| ------------------------ | --------------------- | -------------------------------------------------- |
+| `screening`              | `reviewed`            | Проверка агентством начата/выполнена               |
+| `professional_interview` | `recommended`         | Внутренняя оценка завершена, кандидат рекомендован |
+| `client_stage`           | `employer_interview`  | Кандидат перешёл к работодателю                    |
+| `interview_scheduled`    | `employer_interview`  | Старый application enum, не тип события            |
+| `offer_made`             | `offer`               | Предложение сделано                                |
 
 Mapping предназначен для миграции и совместимого чтения. Все новые `POST/PATCH` принимают только канонические значения.
 
 ## 5. Роли и data scope
 
-| Роль | Scope | Правило выборки |
-|---|---|---|
-| `org_admin` | Organization-wide | `record.organization_id === user.organization_id` |
-| `recruitment_manager` | Organization-wide | То же tenant-ограничение; без platform/billing прав по умолчанию |
-| `team_manager` | Team-wide | Tenant + `record.team_manager_id === user.id`; для пользователя команды `user.team_manager_id === manager.id` |
-| `recruiter` | Own | Tenant + `record.recruiter_id === user.id` или `record.assigned_to === user.id` |
+| Роль                  | Scope             | Правило выборки                                                                                               |
+| --------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| `org_admin`           | Organization-wide | `record.organization_id === user.organization_id`                                                             |
+| `recruitment_manager` | Organization-wide | То же tenant-ограничение; без platform/billing прав по умолчанию                                              |
+| `team_manager`        | Team-wide         | Tenant + `record.team_manager_id === user.id`; для пользователя команды `user.team_manager_id === manager.id` |
+| `recruiter`           | Own               | Tenant + `record.recruiter_id === user.id` или `record.assigned_to === user.id`                               |
 
 В текущей модели команда определяется `team_manager_id`. Отдельный `team_id` нельзя вводить в UI до добавления сущности команды и миграции backend.
 
@@ -84,18 +84,18 @@ Mapping предназначен для миграции и совместимо
 
 `manage` включает create/update/archive/assign; delete по умолчанию означает soft delete.
 
-| Область | Org Admin | Recruitment Manager | Team Manager | Recruiter |
-|---|---|---|---|---|
-| Dashboard/reporting | org | org | team | own |
-| Clients | manage org | view/manage operational | view team-related | view assigned-related |
-| Jobs | manage org | manage org | manage team | view/operate assigned |
-| Candidates/applications | manage org | manage org | manage team | manage own |
-| Import | manage org | manage org | import to team | import to own |
-| Compensation | configure org | manage operational | view/manage team allocations | view own |
-| Teams/roles | manage | view/assign operational | view own team | none |
-| Permission Matrix | manage | view | none | none |
-| Billing/integrations | manage | view status | none | none |
-| Audit log | org | org operational | team | own actions |
+| Область                 | Org Admin     | Recruitment Manager     | Team Manager                 | Recruiter             |
+| ----------------------- | ------------- | ----------------------- | ---------------------------- | --------------------- |
+| Dashboard/reporting     | org           | org                     | team                         | own                   |
+| Clients                 | manage org    | view/manage operational | view team-related            | view assigned-related |
+| Jobs                    | manage org    | manage org              | manage team                  | view/operate assigned |
+| Candidates/applications | manage org    | manage org              | manage team                  | manage own            |
+| Import                  | manage org    | manage org              | import to team               | import to own         |
+| Compensation            | configure org | manage operational      | view/manage team allocations | view own              |
+| Teams/roles             | manage        | view/assign operational | view own team                | none                  |
+| Permission Matrix       | manage        | view                    | none                         | none                  |
+| Billing/integrations    | manage        | view status             | none                         | none                  |
+| Audit log               | org           | org operational         | team                         | own actions           |
 
 Backend authorization является окончательной границей. Route guard и скрытие кнопки обязаны повторять, но не заменять её.
 
