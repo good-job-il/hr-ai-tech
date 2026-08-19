@@ -4,6 +4,7 @@ import { ApplicationEntity } from "../applications/entities/application.entity"
 import { ApplicationTimelineEntity } from "../applications/entities/application-timeline.entity"
 import { CompensationPlanEntity } from "../compensation/compensation-plan.entity"
 import { AgencyTeamEntity } from "../agency-teams/agency-team.entity"
+import { JobEntity } from "../jobs/entities/job.entity"
 import { UserEntity } from "../users/user.entity"
 import { ReportsController } from "./reports.controller"
 import { ReportsService } from "./reports.service"
@@ -19,6 +20,7 @@ import { AuditModule } from "../audit/audit.module"
       ApplicationTimelineEntity,
       CompensationPlanEntity,
       AgencyTeamEntity,
+      JobEntity,
       UserEntity,
     ]),
   ],

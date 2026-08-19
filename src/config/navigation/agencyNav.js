@@ -194,7 +194,21 @@ export const AGENCY_TEAM_MANAGER_NAV = [
     route: "/agency/team/dashboard",
     icon: LayoutDashboard,
   },
-  { id: "tm-jobs", labelKey: "nav.teamManager.jobs", route: "/agency/team/jobs", icon: Briefcase },
+  {
+    id: "tm-jobs",
+    labelKey: "nav.teamManager.jobs",
+    route: "/agency/team/jobs",
+    icon: Briefcase,
+    children: [
+      { id: "tm-jobs-open", labelKey: "nav.agency.jobsOpen", route: "/agency/team/jobs/open" },
+      {
+        id: "tm-jobs-filled",
+        labelKey: "nav.agency.jobsFilled",
+        route: "/agency/team/jobs/filled",
+      },
+      { id: "tm-jobs-hold", labelKey: "nav.agency.jobsHold", route: "/agency/team/jobs/hold" },
+    ],
+  },
   {
     id: "tm-crm",
     labelKey: "nav.teamManager.crm",
@@ -221,6 +235,12 @@ export const AGENCY_TEAM_MANAGER_NAV = [
     icon: Kanban,
   },
   {
+    id: "tm-roster",
+    labelKey: "nav.teamManager.roster",
+    route: "/agency/team/roster",
+    icon: Users,
+  },
+  {
     id: "tm-compensation",
     labelKey: "nav.teamManager.compensation",
     route: "/agency/team/compensation",
@@ -243,5 +263,11 @@ export const AGENCY_TEAM_MANAGER_NAV = [
     labelKey: "nav.teamManager.reports",
     route: "/agency/team/reports",
     icon: PieChart,
+  },
+  {
+    id: "tm-activity",
+    labelKey: "nav.teamManager.activity",
+    route: "/agency/team/activity",
+    icon: Activity,
   },
 ]

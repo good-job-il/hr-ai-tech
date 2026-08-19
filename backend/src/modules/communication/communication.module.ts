@@ -6,6 +6,7 @@ import { CommunicationController, EmployerTimelineController } from "./communica
 import { CandidatesModule } from "../candidates/candidates.module"
 import { JobsModule } from "../jobs/jobs.module"
 import { IntegrationsModule } from "../integrations/integrations.module"
+import { PermissionsModule } from "../permissions/permissions.module"
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { IntegrationsModule } from "../integrations/integrations.module"
     CandidatesModule,
     JobsModule,
     IntegrationsModule,
+    PermissionsModule,
   ],
   controllers: [CommunicationController, EmployerTimelineController],
   providers: [CommunicationService],

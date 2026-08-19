@@ -125,6 +125,7 @@ export const AGENCY_IDENTIFIER_CONTRACT = Object.freeze({
     "employer_company_id",
     "recruiter_id",
     "assigned_to",
+    "team_id",
     "team_manager_id",
     "recruitment_manager_id",
     "created_by_user_id",

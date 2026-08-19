@@ -1,5 +1,8 @@
 export const REASSIGN_INVALIDATION_KEYS = Object.freeze([
   "recruitment-manager-dashboard",
+  "team-manager-dashboard",
+  "team-interviews",
+  "agency-teams",
   "management-report",
   "audit-logs",
   "agency-jobs",

@@ -258,9 +258,22 @@ const AuthenticatedApp = () => {
 
           {/* Team Manager cannot expand access through a direct organization URL. */}
           <Route element={<ProtectedRoute requiredRoles={["team_manager"]} />}>
-            <Route path="/agency/team/dashboard" element={<AgencyDashboard />} />
+            <Route path="/agency/team" element={<Navigate to="/agency/team/dashboard" replace />} />
+
+            <Route
+              path="/agency/team/dashboard"
+              element={<RecruitmentManagerDashboard teamMode />}
+            />
+
+            <Route path="/agency/team/roster" element={<TeamRosterPage />} />
 
             <Route path="/agency/team/jobs" element={<ManageJobsPage />} />
+
+            <Route path="/agency/team/jobs/open" element={<ManageJobsPage />} />
+
+            <Route path="/agency/team/jobs/filled" element={<ManageJobsPage />} />
+
+            <Route path="/agency/team/jobs/hold" element={<ManageJobsPage />} />
 
             <Route
               path="/agency/team/crm"
@@ -293,6 +306,8 @@ const AuthenticatedApp = () => {
             <Route path="/agency/team/import" element={<ImportDashboard />} />
 
             <Route path="/agency/team/reports" element={<AgencyReportsPage />} />
+
+            <Route path="/agency/team/activity" element={<AuditLogPage />} />
           </Route>
         </Route>
       </Route>

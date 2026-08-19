@@ -8,6 +8,7 @@ import { applicationService } from "@/api/services/applicationService"
 import { interviewService } from "@/api/services/interviewService"
 import { messageService } from "@/api/services/messageService"
 import { jobService } from "@/api/services/jobService"
+import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 
 const STAGE_VALUES = APPLICATION_STATUS_VALUES
 
@@ -35,6 +36,8 @@ export default function CandidateDrawer({
   canChangeStage = true,
 }) {
   const { t, i18n } = useTranslation()
+
+  const { base, paths } = useAgencyWorkspace()
 
   const [activeTab, setActiveTab] = useState("details")
 
@@ -234,6 +237,15 @@ export default function CandidateDrawer({
               <h2 className="text-xl font-black text-[#0F172A]">{application.candidate_name}</h2>
 
               <p className="text-[#7C3AED] font-bold">{application.job_title}</p>
+
+              {base && application.candidate_id ? (
+                <Link
+                  to={`${paths.candidate}?id=${application.candidate_id}`}
+                  className="mt-1 inline-block text-xs font-bold text-slate-500 hover:text-[#7C3AED]"
+                >
+                  CRM
+                </Link>
+              ) : null}
             </div>
           </div>
 

@@ -4,6 +4,7 @@
  * Role-filtered: recruiter sees own candidates, manager sees all team, etc.
  */
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { candidateService } from "@/api/services/candidateService"
 import { jobService } from "@/api/services/jobService"
@@ -11,6 +12,7 @@ import { applicationService } from "@/api/services/applicationService"
 import { useAuth } from "@/lib/AuthContext"
 import { Users, Briefcase } from "lucide-react"
 import { getAgencyScopeFilter, isAgencyUser } from "@/domain/agency/access"
+import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 
 function Toast({ message, type, onClose }) {
   useEffect(() => {
@@ -40,6 +42,10 @@ function Toast({ message, type, onClose }) {
 
 export default function AIMatchingPage() {
   const { user } = useAuth()
+
+  const { base, paths } = useAgencyWorkspace()
+
+  const navigate = useNavigate()
 
   const { t, i18n } = useTranslation()
 
@@ -81,7 +87,7 @@ export default function AIMatchingPage() {
     // VISIBILITY POLICY — AIMatchingPage (candidate list)
     //
     //  recruiter → only candidates assigned by recruiter_id === user.id
-    //  team_manager → only records with team_manager_id === user.id
+    //  team_manager → only records with canonical team_id === user.team_id
     //  org_admin / recruitment_manager → current organization
     //  employer  → only candidates where employer_id === user.email
     //  admin / recruitment_manager / team_manager → all candidates
@@ -98,7 +104,7 @@ export default function AIMatchingPage() {
       })
 
     const jobFilter = isAgencyUser(user)
-      ? { organization_id: user.organization_id, is_closed: false }
+      ? { ...getAgencyScopeFilter(user), is_closed: false }
       : { is_closed: false }
 
     Promise.all([
@@ -115,7 +121,7 @@ export default function AIMatchingPage() {
         setToast({ message: error?.message || "Unable to load matching data", type: "error" })
       })
       .finally(() => setLoading(false))
-  }, [user?.id, user?.role, user?.organization_id])
+  }, [user?.id, user?.role, user?.organization_id, user?.team_id])
 
   const filteredCandidates = candidates.filter(
     (c) =>
@@ -289,9 +295,20 @@ export default function AIMatchingPage() {
                 </div>
 
                 <div className="text-xs text-[#94A3B8]">
-                  {selectedCandidate.location} • {selectedCandidate.experience_years}{" "}
-                  {t("aiMatching.page.yearsExperience")}
+                  {selectedCandidate.location}
+                  {" • "}
+                  {selectedCandidate.experience_years} {t("aiMatching.page.yearsExperience")}
                 </div>
+
+                {base ? (
+                  <button
+                    type="button"
+                    onClick={() => navigate(`${paths.candidate}?id=${selectedCandidate.id}`)}
+                    className="mt-3 text-xs font-bold text-[#7C3AED] hover:underline"
+                  >
+                    {t("crm.candidatesCrm")}
+                  </button>
+                ) : null}
               </div>
 
               <CandidateRecommendationsPanel
@@ -321,6 +338,16 @@ export default function AIMatchingPage() {
                 <div className="text-sm text-[#64748B] font-semibold">{selectedJob.company}</div>
 
                 <div className="text-xs text-[#94A3B8]">{selectedJob.location}</div>
+
+                {base ? (
+                  <button
+                    type="button"
+                    onClick={() => navigate(paths.pipeline)}
+                    className="mt-3 text-xs font-bold text-[#7C3AED] hover:underline"
+                  >
+                    {t("nav.agency.pipeline")}
+                  </button>
+                ) : null}
               </div>
 
               <JobRecommendationsPanel

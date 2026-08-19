@@ -107,6 +107,20 @@ describe("PermissionsService OA-1 boundary", () => {
     expect(effective.permissions.manage_settings).toBe(false)
   })
 
+  it("never promotes a team manager into user or settings administration", async () => {
+    matrixRepo.findOne
+      .mockResolvedValueOnce({
+        permissions: { view: true, manage_users: true, manage_settings: true },
+      })
+      .mockResolvedValueOnce(null)
+
+    const effective = await service.getEffectivePermissions(user({ role: UserRole.TEAM_MANAGER }))
+
+    expect(effective.permissions.view).toBe(true)
+    expect(effective.permissions.manage_users).toBe(false)
+    expect(effective.permissions.manage_settings).toBe(false)
+  })
+
   it("rejects recruitment manager permission matrix mutations", async () => {
     const manager = user({ role: UserRole.RECRUITMENT_MANAGER })
 
@@ -157,5 +171,43 @@ describe("PermissionsService OA-1 boundary", () => {
       service.updateMatrix(45, { permissions: { manage_settings: false } } as any, user()),
     ).rejects.toBeInstanceOf(ForbiddenException)
     expect(matrixRepo.save).not.toHaveBeenCalled()
+  })
+
+  it("rejects Team Manager permission matrix list and export", async () => {
+    const manager = user({ role: UserRole.TEAM_MANAGER, team_id: 4 })
+
+    await expect(
+      service.findMatrices({ page: 1, limit: 50 } as any, manager),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+    await expect(
+      service.exportMatrices({ page: 1, limit: 50 } as any, manager),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+    expect(matrixRepo.findAndCount).not.toHaveBeenCalled()
+  })
+
+  it("journals a permission matrix export for organization administrators", async () => {
+    const audit = { log: jest.fn() }
+
+    matrixRepo.findAndCount.mockResolvedValue([[{ id: 11, role_key: UserRole.RECRUITER }], 1])
+    service = new PermissionsService(
+      matrixRepo as any,
+      repo() as any,
+      repo() as any,
+      repo() as any,
+      repo() as any,
+      audit as any,
+    )
+
+    const result = await service.exportMatrices({ page: 1, limit: 50 } as any, user())
+
+    expect(result.data).toHaveLength(1)
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: "export",
+        entity_type: "PermissionMatrix",
+        entity_label: "Permission matrix export",
+        metadata: expect.objectContaining({ exported_records: 1 }),
+      }),
+    )
   })
 })

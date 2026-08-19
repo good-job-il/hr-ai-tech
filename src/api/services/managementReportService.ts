@@ -32,6 +32,13 @@ export interface ManagementReport {
   time_in_stage: Array<{ status: string; average_days: number }>
   source_effectiveness: Array<PerformanceRow & { source: string }>
   recruiter_performance: Array<PerformanceRow & { recruiter_id: number; recruiter_name: string }>
+  recruiter_workload: Array<{
+    recruiter_id: number
+    recruiter_name: string
+    active_applications: number
+    open_jobs: number
+    overloaded: boolean
+  }>
   team_performance: Array<PerformanceRow & { team_manager_id: number; team_name: string }>
   client_conversion: Array<PerformanceRow & { client_id: number; client_name: string }>
   job_conversion: Array<PerformanceRow & { job_id: number; job_title: string }>

@@ -6,9 +6,13 @@ import { useState, useEffect } from "react"
 import { jobService } from "@/api/services/jobService"
 import { applicationService } from "@/api/services/applicationService"
 import { useTranslation } from "react-i18next"
+import { useAuth } from "@/lib/AuthContext"
+import { getAgencyScopeFilter, isAgencyUser } from "@/domain/agency/access"
 
 export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }) {
   const { t, i18n } = useTranslation()
+
+  const { user } = useAuth()
 
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
 
@@ -37,6 +41,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
           sort: "created_date",
           order: "DESC",
           limit: 100,
+          ...(isAgencyUser(user) ? getAgencyScopeFilter(user) : {}),
         })
 
         setJobs(openJobs)
@@ -49,7 +54,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
     }
 
     fetchJobs()
-  }, [])
+  }, [user?.id, user?.role, user?.team_id, user?.organization_id])
 
   // Filter jobs based on search
   useEffect(() => {
@@ -262,7 +267,9 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
               </>
             ) : (
               <>
-                <Briefcase className="w-3.5 h-3.5" /> {t("candidateCRM.assignToJob.assign")}
+                <Briefcase className="w-3.5 h-3.5" />
+
+                {t("candidateCRM.assignToJob.assign")}
               </>
             )}
           </Button>

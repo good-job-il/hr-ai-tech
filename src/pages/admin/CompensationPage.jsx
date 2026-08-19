@@ -107,7 +107,7 @@ export default function CompensationPage() {
   const orgId = user?.organization_id
 
   const { data: plans = [], isLoading } = useQuery({
-    queryKey: ["compensation-plans", orgId],
+    queryKey: ["compensation-plans", orgId, user?.team_id],
     queryFn: () =>
       compensationPlanService.list({ sort: "created_date", order: "DESC", limit: 100 }),
     enabled: !!orgId && canViewComp && !permissionsLoading,
@@ -115,7 +115,7 @@ export default function CompensationPage() {
   })
 
   const { data: jobs = [] } = useQuery({
-    queryKey: ["jobs-for-compensation", orgId],
+    queryKey: ["jobs-for-compensation", orgId, user?.team_id],
     queryFn: () =>
       jobService.list({
         organization_id: orgId,
@@ -135,7 +135,7 @@ export default function CompensationPage() {
   })
 
   const { data: members = [] } = useQuery({
-    queryKey: ["organization-members-for-compensation", orgId],
+    queryKey: ["organization-members-for-compensation", orgId, user?.team_id],
     queryFn: () => userService.list({ organization_id: orgId, is_active: true, limit: 500 }),
     enabled: !!orgId && canEditing && !permissionsLoading,
     staleTime: 5 * 60 * 1000,
@@ -584,31 +584,33 @@ export default function CompensationPage() {
                   </div>
 
                   <div className="space-y-1 text-xs">
-                    {["recruiter", "team_manager", "recruitment_manager"].map((key) => {
-                      const val = form[`${key}_compensation`]
+                    {["recruiter", "team_manager", "recruitment_manager"]
+                      .filter((key) => visibleFields.includes(key))
+                      .map((key) => {
+                        const val = form[`${key}_compensation`]
 
-                      const type = form[`${key}_compensation_type`]
+                        const type = form[`${key}_compensation_type`]
 
-                      if (!val) {
-                        return null
-                      }
+                        if (!val) {
+                          return null
+                        }
 
-                      const amount = calculateAmount(val, type)
+                        const amount = calculateAmount(val, type)
 
-                      return (
-                        <div key={key} className="flex justify-between">
-                          <span className="text-gray-600">{FIELD_LABELS[key]}:</span>
+                        return (
+                          <div key={key} className="flex justify-between">
+                            <span className="text-gray-600">{FIELD_LABELS[key]}:</span>
 
-                          <span className="font-bold text-green-700">
-                            {amount ? `${amount.toLocaleString()} ₪` : "—"}
+                            <span className="font-bold text-green-700">
+                              {amount ? `${amount.toLocaleString()} ₪` : "—"}
 
-                            {type === "percent" && (
-                              <span className="text-gray-400 mr-1">({val}%)</span>
-                            )}
-                          </span>
-                        </div>
-                      )
-                    })}
+                              {type === "percent" && (
+                                <span className="text-gray-400 mr-1">({val}%)</span>
+                              )}
+                            </span>
+                          </div>
+                        )
+                      })}
                   </div>
                 </div>
               )}
@@ -659,34 +661,36 @@ export default function CompensationPage() {
                   label: "מנהל גיוס",
                   roles: ["recruitment_manager"],
                 },
-              ].map(({ key, label, roles }) => (
-                <div key={key}>
-                  <Label>{label} (אופציונלי)</Label>
+              ]
+                .filter((item) => item.key !== "recruitment_manager_id" || role !== "team_manager")
+                .map(({ key, label, roles }) => (
+                  <div key={key}>
+                    <Label>{label} (אופציונלי)</Label>
 
-                  <Select
-                    value={String(form[key] || "all")}
-                    onValueChange={(value) =>
-                      setForm((current) => ({ ...current, [key]: value === "all" ? "" : value }))
-                    }
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
+                    <Select
+                      value={String(form[key] || "all")}
+                      onValueChange={(value) =>
+                        setForm((current) => ({ ...current, [key]: value === "all" ? "" : value }))
+                      }
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
 
-                    <SelectContent>
-                      <SelectItem value="all">ללא שיוך</SelectItem>
+                      <SelectContent>
+                        <SelectItem value="all">ללא שיוך</SelectItem>
 
-                      {members
-                        .filter((member) => roles.includes(member.role))
-                        .map((member) => (
-                          <SelectItem key={member.id} value={String(member.id)}>
-                            {member.full_name || member.email}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              ))}
+                        {members
+                          .filter((member) => roles.includes(member.role))
+                          .map((member) => (
+                            <SelectItem key={member.id} value={String(member.id)}>
+                              {member.full_name || member.email}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
 
               {mutationError && (
                 <p className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-700">
@@ -698,41 +702,43 @@ export default function CompensationPage() {
                 { key: "recruiter", label: "תגמול רכז גיוס" },
                 { key: "team_manager", label: "תגמול מנהל צוות" },
                 { key: "recruitment_manager", label: "תגמול מנהל גיוס" },
-              ].map(({ key, label }) => (
-                <div key={key}>
-                  <Label>{label}</Label>
+              ]
+                .filter(({ key }) => visibleFields.includes(key))
+                .map(({ key, label }) => (
+                  <div key={key}>
+                    <Label>{label}</Label>
 
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      type="number"
-                      value={form[`${key}_compensation`]}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, [`${key}_compensation`]: e.target.value }))
-                      }
-                      placeholder="סכום"
-                      className="flex-1"
-                      dir="ltr"
-                    />
+                    <div className="flex gap-2 mt-1">
+                      <Input
+                        type="number"
+                        value={form[`${key}_compensation`]}
+                        onChange={(e) =>
+                          setForm((f) => ({ ...f, [`${key}_compensation`]: e.target.value }))
+                        }
+                        placeholder="סכום"
+                        className="flex-1"
+                        dir="ltr"
+                      />
 
-                    <Select
-                      value={form[`${key}_compensation_type`]}
-                      onValueChange={(v) =>
-                        setForm((f) => ({ ...f, [`${key}_compensation_type`]: v }))
-                      }
-                    >
-                      <SelectTrigger className="w-28">
-                        <SelectValue />
-                      </SelectTrigger>
+                      <Select
+                        value={form[`${key}_compensation_type`]}
+                        onValueChange={(v) =>
+                          setForm((f) => ({ ...f, [`${key}_compensation_type`]: v }))
+                        }
+                      >
+                        <SelectTrigger className="w-28">
+                          <SelectValue />
+                        </SelectTrigger>
 
-                      <SelectContent>
-                        <SelectItem value="fixed">₪ קבוע</SelectItem>
+                        <SelectContent>
+                          <SelectItem value="fixed">₪ קבוע</SelectItem>
 
-                        <SelectItem value="percent">% אחוז</SelectItem>
-                      </SelectContent>
-                    </Select>
+                          <SelectItem value="percent">% אחוז</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
               <div>
                 <Label>הערות</Label>

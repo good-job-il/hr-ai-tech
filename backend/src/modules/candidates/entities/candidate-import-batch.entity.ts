@@ -3,6 +3,7 @@ import { BaseEntity } from "../../../common/entities/base.entity"
 
 @Entity("candidate_import_batches")
 @Index(["organization_id"])
+@Index(["team_id"])
 @Index(["imported_by"])
 @Index(["status"])
 export class CandidateImportBatchEntity extends BaseEntity {
@@ -26,6 +27,9 @@ export class CandidateImportBatchEntity extends BaseEntity {
 
   @Column({ name: "recruiter_id", type: "int", nullable: true })
   recruiter_id: number | null
+
+  @Column({ name: "team_id", type: "int", nullable: true })
+  team_id: number | null
 
   @Column({ name: "team_manager_id", type: "int", nullable: true })
   team_manager_id: number | null

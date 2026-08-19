@@ -106,4 +106,69 @@ describe("JobsService OA-2 state filters", () => {
     ).rejects.toBeInstanceOf(ForbiddenException)
     expect(jobs.save).not.toHaveBeenCalled()
   })
+
+  it("uses canonical team membership and rejects a recruiter from another team", async () => {
+    const jobs = { create: jest.fn(), save: jest.fn() }
+
+    const users = {
+      findOne: jest.fn().mockResolvedValue({
+        id: 31,
+        role: UserRole.RECRUITER,
+        organization_id: 12,
+        team_id: 99,
+        is_active: true,
+      }),
+    }
+
+    const service = new JobsService(
+      jobs as any,
+      {} as any,
+      {} as any,
+      { findOne: jest.fn().mockResolvedValue({ id: 3 }) } as any,
+      { findOne: jest.fn().mockResolvedValue({ id: 9, name: "Client" }) } as any,
+      users as any,
+      {} as any,
+    )
+
+    await expect(service.create(
+      { title: "Engineer", employer_company_id: 9, recruiter_id: 31 } as any,
+      {
+        id: 41,
+        email: "lead@test",
+        role: UserRole.TEAM_MANAGER,
+        organization_id: 12,
+        org_type: "staffing_agency",
+        team_id: 4,
+      } as any,
+    )).rejects.toBeInstanceOf(ForbiddenException)
+    expect(jobs.save).not.toHaveBeenCalled()
+  })
+
+  it("ignores query ownership and lists only the manager's canonical team", async () => {
+    const jobs = { findAndCount: jest.fn().mockResolvedValue([[], 0]) }
+
+    const service = new JobsService(
+      jobs as any, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any,
+    )
+
+    await service.findAll({
+      page: 1,
+      limit: 20,
+      sort: "created_date",
+      order: "DESC",
+      organization_id: 999,
+      recruiter_id: 777,
+      is_deleted: false,
+    } as any, {
+      id: 41,
+      email: "lead@test",
+      role: UserRole.TEAM_MANAGER,
+      organization_id: 12,
+      team_id: 4,
+    } as any)
+
+    expect(jobs.findAndCount).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ organization_id: 12, team_id: 4 }),
+    }))
+  })
 })

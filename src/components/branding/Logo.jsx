@@ -6,13 +6,14 @@ const LOGO_URL = "/logo.png"
 function getHomeRoute(role) {
   switch (role) {
     case "admin":
-      return "/admin/dashboard"
+      return "/platform/dashboard"
+    case "org_admin":
     case "recruitment_manager":
-      return "/recruitment/jobs"
+      return "/agency/dashboard"
     case "team_manager":
-      return "/recruitment/jobs"
+      return "/agency/team/dashboard"
     case "recruiter":
-      return "/recruiter/dashboard"
+      return "/agency/recruiter/dashboard"
     case "employer":
       return "/employer/dashboard"
     case "candidate":

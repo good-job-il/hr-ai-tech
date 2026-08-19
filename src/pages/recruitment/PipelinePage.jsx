@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "@/lib/AuthContext"
 import { usePipelineData } from "@/hooks/usePipelineData"
@@ -26,6 +27,8 @@ export default function PipelinePage() {
 
   const [drawerOpen, setDrawerOpen] = useState(false)
 
+  const [searchParams, setSearchParams] = useSearchParams()
+
   const [filters, setFilters] = useState({
     role: "",
     recruiter: "",
@@ -45,6 +48,19 @@ export default function PipelinePage() {
 
   const { stages, applications, loading, error, moveApplication, refresh, isMockData } =
     usePipelineData(user, filters, handleNotificationCreated)
+
+  useEffect(() => {
+    const applicationId = Number(searchParams.get("applicationId"))
+
+    if (!applicationId || !applications.length) {
+      return
+    }
+
+    if (applications.some((item) => item.id === applicationId)) {
+      setSelectedCandidate(applicationId)
+      setDrawerOpen(true)
+    }
+  }, [applications, searchParams])
 
   // Get current language direction
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
@@ -78,11 +94,31 @@ export default function PipelinePage() {
   const handleCandidateClick = (application) => {
     setSelectedCandidate(application.id)
     setDrawerOpen(true)
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current)
+
+        next.set("applicationId", String(application.id))
+
+        return next
+      },
+      { replace: true },
+    )
   }
 
   const handleClose = () => {
     setDrawerOpen(false)
     setSelectedCandidate(null)
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current)
+
+        next.delete("applicationId")
+
+        return next
+      },
+      { replace: true },
+    )
   }
 
   const liveSelectedApp = selectedCandidate

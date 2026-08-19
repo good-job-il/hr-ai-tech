@@ -369,4 +369,179 @@ describe("RecruitmentManagementService RM-2", () => {
     expect(manager.find).not.toHaveBeenCalled()
     expect(manager.save).not.toHaveBeenCalled()
   })
+
+  it("scopes Team Manager dashboard queries to canonical team_id", async () => {
+    const applications = { find: jest.fn().mockResolvedValue([]) }
+
+    const jobs = { find: jest.fn().mockResolvedValue([]) }
+
+    const users = { find: jest.fn().mockResolvedValue([]) }
+
+    const teams = { find: jest.fn().mockResolvedValue([{ id: 4, name: "Alpha", manager_id: 41 }]) }
+
+    const teamManager = {
+      id: 41,
+      email: "tm@agency.test",
+      role: UserRole.TEAM_MANAGER,
+      organization_id: 12,
+      org_type: "staffing_agency",
+      team_id: 4,
+    } as any
+
+    const service = new RecruitmentManagementService(
+      applications as any,
+      {} as any,
+      jobs as any,
+      users as any,
+      teams as any,
+      { createUnreadOnce: jest.fn() } as any,
+      {} as any,
+    )
+
+    await service.dashboard(teamManager)
+
+    expect(applications.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ organization_id: 12, team_id: 4 }),
+      }),
+    )
+    expect(jobs.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ organization_id: 12, team_id: 4 }),
+      }),
+    )
+    expect(users.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          organization_id: 12,
+          role: UserRole.RECRUITER,
+          team_id: 4,
+        }),
+      }),
+    )
+    expect(teams.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ organization_id: 12, id: 4 }),
+      }),
+    )
+  })
+
+  it("rejects a Team Manager dashboard query for another team", async () => {
+    const service = new RecruitmentManagementService(
+      { find: jest.fn() } as any,
+      {} as any,
+      { find: jest.fn() } as any,
+      { find: jest.fn() } as any,
+      { find: jest.fn() } as any,
+      {} as any,
+      {} as any,
+    )
+
+    await expect(
+      service.dashboard(
+        {
+          id: 41,
+          role: UserRole.TEAM_MANAGER,
+          organization_id: 12,
+          org_type: "staffing_agency",
+          team_id: 4,
+        } as any,
+        false,
+        { team_id: 5 },
+      ),
+    ).rejects.toBeInstanceOf(NotFoundException)
+  })
+
+  it("rejects a Team Manager assignment that targets another team", async () => {
+    const service = new RecruitmentManagementService(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      { transaction: jest.fn() } as any,
+    )
+
+    await expect(
+      service.assign(
+        {
+          job_ids: [],
+          candidate_ids: [],
+          application_ids: [3],
+          team_id: 5,
+          recruiter_id: 31,
+          reason: "Cross-team assign",
+        } as any,
+        {
+          id: 41,
+          role: UserRole.TEAM_MANAGER,
+          organization_id: 12,
+          org_type: "staffing_agency",
+          team_id: 4,
+        } as any,
+      ),
+    ).rejects.toBeInstanceOf(NotFoundException)
+  })
+
+  it("rejects a Team Manager assignment of a recruiter from another team", async () => {
+    const manager = {
+      findOne: jest.fn(async (entity, options) => {
+        if (entity === AgencyTeamEntity) {
+          return { id: 4, organization_id: 12, manager_id: 41, is_active: true }
+        }
+
+        if (entity === UserEntity) {
+          if (options?.where?.team_id && options.where.team_id !== 5) {
+            return null
+          }
+
+          return {
+            id: 32,
+            organization_id: 12,
+            role: UserRole.RECRUITER,
+            team_id: 5,
+            is_active: true,
+          }
+        }
+
+        return null
+      }),
+      find: jest.fn(),
+      save: jest.fn(),
+      create: jest.fn((_entity, value) => value),
+    }
+
+    const service = new RecruitmentManagementService(
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      { transaction: jest.fn(async (callback) => callback(manager)) } as any,
+    )
+
+    await expect(
+      service.assign(
+        {
+          job_ids: [],
+          candidate_ids: [],
+          application_ids: [3],
+          team_id: 4,
+          recruiter_id: 32,
+          reason: "Foreign recruiter",
+        } as any,
+        {
+          id: 41,
+          role: UserRole.TEAM_MANAGER,
+          organization_id: 12,
+          org_type: "staffing_agency",
+          team_id: 4,
+        } as any,
+      ),
+    ).rejects.toBeInstanceOf(NotFoundException)
+    expect(manager.find).not.toHaveBeenCalled()
+    expect(manager.save).not.toHaveBeenCalled()
+  })
 })

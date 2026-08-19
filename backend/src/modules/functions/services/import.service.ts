@@ -151,7 +151,12 @@ export class ImportService {
 
           if (email) {
             const existing = await this.candidateRepo.findOne({
-              where: { email, organization_id: user.organization_id, is_deleted: false },
+              where: {
+                email,
+                organization_id: user.organization_id,
+                ...(user.role === UserRole.TEAM_MANAGER ? { team_id: user.team_id } : {}),
+                is_deleted: false,
+              },
             })
 
             if (existing) {
@@ -173,6 +178,7 @@ export class ImportService {
                   .map((s: string) => s.trim())
               : [],
             source: "import" as any,
+            team_id: batch.team_id,
             recruiter_id: batch.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
             team_manager_id:
               batch.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
@@ -242,13 +248,13 @@ export class ImportService {
 
     const failed: any[] = []
 
-    if (dto.import_batch_id) {
-      await this.requireBatch(dto.import_batch_id, user)
-    }
+    const importBatch = dto.import_batch_id
+      ? await this.requireBatch(dto.import_batch_id, user)
+      : null
 
     for (const data of dto.candidates_data) {
       try {
-        await this.candidatesService.assertOrganizationUsers(
+        const assignees = await this.candidatesService.assertOrganizationUsers(
           [data.recruiter_id, data.team_manager_id, data.recruitment_manager_id],
           user,
         )
@@ -256,6 +262,13 @@ export class ImportService {
         const candidate = this.candidateRepo.create({
           ...data,
           organization_id: user.organization_id,
+          team_id:
+            importBatch?.team_id
+            ?? (user.role === UserRole.TEAM_MANAGER ? user.team_id : null)
+            ?? assignees.find(member => member.team_id)?.team_id
+            ?? null,
+          team_manager_id:
+            user.role === UserRole.TEAM_MANAGER ? user.id : data.team_manager_id,
           import_batch_id: dto.import_batch_id ?? null,
           imported_at: new Date(),
           imported_by: user.email,
@@ -395,9 +408,7 @@ export class ImportService {
 
   // ─── importResumeFiles — bulk resume upload + extraction ────────────────
   async importResumeFiles(dto: ImportResumeFilesDto, user: UserEntity) {
-    if (dto.batchId) {
-      await this.requireBatch(dto.batchId, user)
-    }
+    const batch = dto.batchId ? await this.requireBatch(dto.batchId, user) : null
 
     await this.candidatesService.assertOrganizationUsers([dto.recruiter_id], user)
 
@@ -411,12 +422,19 @@ export class ImportService {
 
     for (const file of dto.files) {
       try {
-        const existingDoc = await this.documentRepo.findOne({
-          where: { file_url: file.file_url, organization_id: user.organization_id },
-        })
+        const existingDoc =
+          user.role === UserRole.TEAM_MANAGER
+            ? null
+            : await this.documentRepo.findOne({
+                where: { file_url: file.file_url, organization_id: user.organization_id },
+              })
 
         const existingCandidate = await this.candidateRepo.findOne({
-          where: { resume_url: file.file_url, organization_id: user.organization_id },
+          where: {
+            resume_url: file.file_url,
+            organization_id: user.organization_id,
+            ...(user.role === UserRole.TEAM_MANAGER ? { team_id: user.team_id } : {}),
+          },
         })
 
         if (existingDoc || existingCandidate) {
@@ -443,7 +461,10 @@ export class ImportService {
           resume_upload_source: "import_zip",
           source: "upload" as any,
           organization_id: user.organization_id,
+          team_id: batch?.team_id ?? (user.role === UserRole.TEAM_MANAGER ? user.team_id : null),
           recruiter_id: dto.recruiter_id || user.id,
+          team_manager_id:
+            batch?.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
           import_batch_id: dto.batchId ?? null,
           parsing_status: "success" as any,
           imported_at: new Date(),
@@ -481,7 +502,7 @@ export class ImportService {
 
   // ─── parseResumeBatch — parse a ZIP of resumes (metadata pass) ───────────
   async parseResumeBatch(dto: ParseResumeBatchDto, user: UserEntity) {
-    await this.candidatesService.assertOrganizationUsers([dto.recruiter_id], user)
+    const assignees = await this.candidatesService.assertOrganizationUsers([dto.recruiter_id], user)
 
     // NOTE: Actual ZIP extraction requires unzip on the server (e.g. `unzipper`
     // or `adm-zip`). This implementation validates the batch shell and
@@ -496,11 +517,17 @@ export class ImportService {
 
     if (!batch) {
       batch = this.batchRepo.create({
+        organization_id: user.organization_id,
+        team_id:
+          user.role === UserRole.TEAM_MANAGER
+            ? user.team_id
+            : assignees.find(member => member.team_id)?.team_id ?? null,
         batch_name: `ZIP Import ${new Date().toISOString()}`,
         source_file: dto.zip_file_url,
         file_type: "zip",
         imported_by: user.email,
         recruiter_id: dto.recruiter_id ?? user.id,
+        team_manager_id: user.role === UserRole.TEAM_MANAGER ? user.id : null,
         employer_id: dto.employer_id ?? null,
         status: "pending",
       } as any) as unknown as CandidateImportBatchEntity
@@ -530,6 +557,10 @@ export class ImportService {
 
     if (user.role !== UserRole.ADMIN && batch.organization_id !== user.organization_id) {
       throw new ForbiddenException("Import batch belongs to another organization")
+    }
+
+    if (user.role === UserRole.TEAM_MANAGER && (!user.team_id || batch.team_id !== user.team_id)) {
+      throw new NotFoundException("Import batch not found")
     }
 
     return batch

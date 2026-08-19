@@ -51,6 +51,7 @@ const FULL_PERMISSIONS = Object.fromEntries(
  */
 const ROLE_PERMISSION_CEILINGS: Partial<Record<UserRole, Partial<typeof EMPTY_PERMISSIONS>>> = {
   [UserRole.RECRUITMENT_MANAGER]: { manage_settings: false },
+  [UserRole.TEAM_MANAGER]: { manage_users: false, manage_settings: false },
 }
 
 @Injectable()
@@ -160,6 +161,10 @@ export class PermissionsService {
 
   // ─── Permission Matrix ────────────────────────────────────────────────────
   async findMatrices(query: QueryPermissionMatricesDto, user: UserEntity) {
+    if (user.role === UserRole.TEAM_MANAGER) {
+      throw new ForbiddenException("Permission matrix is not available for team managers")
+    }
+
     const { page, limit, organization_id, org_type, role_key, is_template } = query
 
     let where: Record<string, any> | Record<string, any>[] = {}
@@ -202,6 +207,39 @@ export class PermissionsService {
     const [data, total] = await this.matrixRepo.findAndCount({ where, skip, take })
 
     return buildPaginatedResponse(data, total, { page, limit })
+  }
+
+  async exportMatrices(query: QueryPermissionMatricesDto, user: UserEntity) {
+    if (user.role === UserRole.TEAM_MANAGER) {
+      throw new ForbiddenException("Permission matrix export is not available for team managers")
+    }
+
+    const result = await this.findMatrices(
+      { ...query, page: 1, limit: 500 } as QueryPermissionMatricesDto,
+      user,
+    )
+
+    await this.audit.log({
+      organization_id: user.organization_id == null ? null : String(user.organization_id),
+      actor_user_id: String(user.id),
+      actor_email: user.email,
+      actor_role: user.role,
+      entity_type: "PermissionMatrix",
+      entity_id: user.organization_id ?? 0,
+      entity_label: "Permission matrix export",
+      action: "export",
+      metadata: {
+        filters: {
+          organization_id: query.organization_id,
+          org_type: query.org_type,
+          role_key: query.role_key,
+          is_template: query.is_template,
+        },
+        exported_records: result.data.length,
+      },
+    })
+
+    return result
   }
 
   async createMatrix(

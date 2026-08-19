@@ -76,6 +76,7 @@ describe("RM-4 dashboard/report KPI parity", () => {
       emptyRepo as any,
       emptyRepo as any,
       users as any,
+      emptyRepo as any,
       {
         getEffectivePermissions: jest
           .fn()

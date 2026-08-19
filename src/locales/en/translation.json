@@ -150,10 +150,12 @@
       "jobs": "Job Management",
       "crm": "Candidates CRM",
       "pipeline": "Recruitment Pipeline",
+      "roster": "Team Roster",
       "compensation": "Compensation",
       "aiMatching": "AI Matching",
       "importCandidates": "Import Candidates",
-      "reports": "Reports"
+      "reports": "Reports",
+      "activity": "Team Activity"
     },
     "company": {
       "dashboard": "Dashboard",
@@ -943,6 +945,8 @@
     "saving": "Saving...",
     "saved": "✓ Saved",
     "saveChanges": "Save Changes",
+    "exportCSV": "Export CSV",
+    "exportFailed": "Unable to export the permission matrix",
     "loading": "Loading permissions...",
     "roleColumn": "Role",
     "save": "Save",
@@ -1652,6 +1656,8 @@
   "auditLog": {
     "title": "Audit Log",
     "subtitle": "Monitor user activities and system changes",
+    "teamTitle": "Team Activity",
+    "teamSubtitle": "Events from members of your team",
     "exportCSV": "Export CSV",
     "exportFailed": "Unable to export activity",
     "accessDenied": "You do not have permission to view operational activity",
@@ -1734,6 +1740,7 @@
     "applicationsPanel": {
       "noApplications": "No applications",
       "noName": "No name",
+      "openInPipeline": "Open in pipeline",
       "statuses": {
         "new": "New",
         "reviewed": "Reviewed",

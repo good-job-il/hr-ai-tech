@@ -4,9 +4,10 @@ import { MessageEntity } from "./message.entity"
 import { MessagesService } from "./messages.service"
 import { MessagesController } from "./messages.controller"
 import { ApplicationsModule } from "../applications/applications.module"
+import { PermissionsModule } from "../permissions/permissions.module"
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MessageEntity]), ApplicationsModule],
+  imports: [TypeOrmModule.forFeature([MessageEntity]), ApplicationsModule, PermissionsModule],
   controllers: [MessagesController],
   providers: [MessagesService],
   exports: [MessagesService, TypeOrmModule],

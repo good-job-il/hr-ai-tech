@@ -39,11 +39,12 @@ export class ReportsController {
       actor_user_id: String(user.id),
       actor_email: user.email,
       actor_role: user.role,
-      entity_type: "Organization",
-      entity_id: user.organization_id!,
-      entity_label: "Management report",
+      entity_type: user.role === UserRole.TEAM_MANAGER ? "AgencyTeam" : "Organization",
+      entity_id: user.role === UserRole.TEAM_MANAGER ? (user.team_id ?? 0) : user.organization_id!,
+      entity_label:
+        user.role === UserRole.TEAM_MANAGER ? "Team management report" : "Management report",
       action: "export",
-      metadata: { filters: query },
+      metadata: { filters: query, team_id: user.team_id ?? null },
     })
 
     return report

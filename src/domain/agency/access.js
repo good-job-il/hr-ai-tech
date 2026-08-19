@@ -24,6 +24,7 @@ export function getAgencyDataScope(user) {
 
 /**
  * Query filters reduce payload size. Backend RLS remains the security boundary.
+ * Team Manager scope is canonical `team_id`, not compatibility `team_manager_id`.
  */
 export function getAgencyScopeFilter(user) {
   const scope = getAgencyDataScope(user)
@@ -35,7 +36,11 @@ export function getAgencyScopeFilter(user) {
   const filter = { organization_id: user.organization_id }
 
   if (scope === AGENCY_DATA_SCOPES.TEAM) {
-    filter.team_manager_id = user.id
+    if (!user.team_id) {
+      return { organization_id: user.organization_id, id: -1 }
+    }
+
+    filter.team_id = user.team_id
   }
 
   if (scope === AGENCY_DATA_SCOPES.OWN) {
@@ -61,7 +66,7 @@ export function canAccessAgencyRecord(user, record) {
   }
 
   if (scope === AGENCY_DATA_SCOPES.TEAM) {
-    return record.team_manager_id === user.id
+    return Boolean(user.team_id) && record.team_id === user.team_id
   }
 
   if (scope === AGENCY_DATA_SCOPES.OWN) {

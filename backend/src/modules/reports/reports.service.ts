@@ -11,10 +11,14 @@ import { ApplicationEntity } from "../applications/entities/application.entity"
 import { ApplicationTimelineEntity } from "../applications/entities/application-timeline.entity"
 import { CompensationPlanEntity } from "../compensation/compensation-plan.entity"
 import { AgencyTeamEntity } from "../agency-teams/agency-team.entity"
+import { JobEntity } from "../jobs/entities/job.entity"
 import { UserEntity } from "../users/user.entity"
 import { ManagementReportQueryDto } from "./dto/reports.dto"
 import {
+  ACTIVE_APPLICATION_STATUSES,
+  APPLICATION_OVERLOAD,
   APPLICATION_PIPELINE_STATUSES,
+  JOB_OVERLOAD,
   PLACEMENT_APPLICATION_STATUSES,
 } from "../../common/utils/recruitment-kpis"
 import { PermissionsService } from "../permissions/permissions.service"
@@ -30,6 +34,7 @@ export class ReportsService {
     private readonly compensation: Repository<CompensationPlanEntity>,
     @InjectRepository(AgencyTeamEntity) private readonly teams: Repository<AgencyTeamEntity>,
     @InjectRepository(UserEntity) private readonly users: Repository<UserEntity>,
+    @InjectRepository(JobEntity) private readonly jobs: Repository<JobEntity>,
     private readonly permissions: PermissionsService,
   ) {}
 
@@ -50,10 +55,18 @@ export class ReportsService {
       throw new BadRequestException("date_from must be before date_to")
     }
 
-    let teamManagerId: number | undefined
+    let teamId: number | undefined
 
     if (user.role === UserRole.TEAM_MANAGER) {
-      teamManagerId = user.id
+      if (!user.team_id) {
+        throw new ForbiddenException("Active team membership required")
+      }
+
+      if (query.team_id && query.team_id !== user.team_id) {
+        throw new NotFoundException(`Team ${query.team_id} not found`)
+      }
+
+      teamId = user.team_id
     } else if (query.team_id) {
       const team = await this.teams.findOne({
         where: { id: query.team_id, organization_id: organizationId, is_active: true },
@@ -63,11 +76,7 @@ export class ReportsService {
         throw new NotFoundException(`Team ${query.team_id} not found`)
       }
 
-      teamManagerId = team.manager_id ?? undefined
-
-      if (!teamManagerId) {
-        return { applications: [], from, to }
-      }
+      teamId = team.id
     }
 
     const where: Record<string, any> = {
@@ -88,8 +97,8 @@ export class ReportsService {
       where.recruiter_id = query.recruiter_id
     }
 
-    if (teamManagerId) {
-      where.team_manager_id = teamManagerId
+    if (teamId) {
+      where.team_id = teamId
     }
 
     const applications = await this.applications.find({ where, order: { created_date: "ASC" } })
@@ -112,18 +121,48 @@ export class ReportsService {
 
     const appIds = apps.map((item) => item.id)
 
-    const [events, members, teams, plans] = await Promise.all([
+    const teamManagerScope = user.role === UserRole.TEAM_MANAGER
+
+    const teamScope = teamManagerScope ? { team_id: user.team_id ?? -1 } : {}
+
+    const [events, members, teams, plans, jobRecords] = await Promise.all([
       appIds.length
         ? this.timelines.find({
             where: { application_id: In(appIds) },
             order: { created_date: "ASC" },
           })
         : [],
-      this.users.find({ where: { organization_id: organizationId } }),
-      this.teams.find({ where: { organization_id: organizationId, is_active: true } }),
+      this.users.find({
+        where: {
+          organization_id: organizationId,
+          ...teamScope,
+        },
+      }),
+      this.teams.find({
+        where: {
+          organization_id: organizationId,
+          is_active: true,
+          ...(teamManagerScope ? { id: user.team_id ?? -1 } : {}),
+        },
+      }),
       canViewCompensation
-        ? this.compensation.find({ where: { organization_id: organizationId } })
+        ? this.compensation.find({
+            where: {
+              organization_id: organizationId,
+              ...teamScope,
+            },
+          })
         : [],
+      this.jobs.find({
+        where: {
+          organization_id: organizationId,
+          is_deleted: false,
+          ...teamScope,
+          ...(query.job_id ? { id: query.job_id } : {}),
+          ...(query.client_id ? { employer_company_id: query.client_id } : {}),
+          ...(query.recruiter_id ? { recruiter_id: query.recruiter_id } : {}),
+        },
+      }),
     ])
 
     const userNames = new Map(
@@ -208,6 +247,32 @@ export class ReportsService {
       "job_title",
     )
 
+    const recruiters = members.filter((member) => member.role === UserRole.RECRUITER)
+
+    const recruiterWorkload = recruiters
+      .filter((member) => !query.recruiter_id || member.id === query.recruiter_id)
+      .map((recruiter) => {
+        const activeApplications = apps.filter(
+          (app) => app.recruiter_id === recruiter.id && ACTIVE_APPLICATION_STATUSES.has(app.status),
+        ).length
+
+        const openJobs = jobRecords.filter(
+          (job) => job.recruiter_id === recruiter.id && !job.is_closed,
+        ).length
+
+        return {
+          recruiter_id: recruiter.id,
+          recruiter_name: recruiter.full_name || recruiter.email,
+          active_applications: activeApplications,
+          open_jobs: openJobs,
+          overloaded: activeApplications >= APPLICATION_OVERLOAD || openJobs >= JOB_OVERLOAD,
+        }
+      })
+      .sort(
+        (left, right) =>
+          right.active_applications - left.active_applications || right.open_jobs - left.open_jobs,
+      )
+
     const stageDurations = new Map<string, number[]>()
 
     for (const app of apps) {
@@ -285,15 +350,17 @@ export class ReportsService {
         average_days: this.average(stageDurations.get(status) || []),
       })),
       source_effectiveness: source.sort((a, b) => b.applications - a.applications),
+      recruiter_workload: recruiterWorkload,
       recruiter_performance: recruiter,
-      team_performance: team,
+      team_performance: teamManagerScope ? [] : team,
       client_conversion: clients,
       job_conversion: jobs,
       dimensions: {
-        recruiters: members
-          .filter((member) => member.role === UserRole.RECRUITER)
-          .map((member) => ({ id: member.id, name: userNames.get(member.id) })),
-        teams: teams.map((item) => ({ id: item.id, name: item.name })),
+        recruiters: recruiters.map((member) => ({
+          id: member.id,
+          name: userNames.get(member.id),
+        })),
+        teams: teamManagerScope ? [] : teams.map((item) => ({ id: item.id, name: item.name })),
         clients: clients.map((item) => ({ id: item.client_id, name: item.client_name })),
         jobs: jobs.map((item) => ({ id: item.job_id, name: item.job_title })),
       },

@@ -15,6 +15,9 @@
     "typecheck:api": "tsc -p ./tsconfig.api.json",
     "test:agency": "npm --prefix backend test -- --runInBand",
     "test:rm4:frontend": "node --test src/domain/agency/rmAcceptance.test.mjs",
+    "test:tm2:frontend": "node --test src/domain/agency/workspace.test.mjs src/domain/agency/access.test.mjs",
+    "test:tm3:frontend": "node --test src/domain/agency/workspace.test.mjs src/domain/agency/access.test.mjs",
+    "test:tm4:frontend": "node --test src/domain/agency/workspace.test.mjs src/domain/agency/access.test.mjs src/domain/agency/tmAcceptance.test.mjs",
     "audit:production": "npm audit --omit=dev --audit-level=high && npm --prefix backend audit --omit=dev --audit-level=high",
     "release:verify": "npm run audit:production && npm run lint && npm run typecheck && npm run build && npm --prefix backend run lint && npm run test:agency && npm --prefix backend run build",
     "preview": "vite preview"

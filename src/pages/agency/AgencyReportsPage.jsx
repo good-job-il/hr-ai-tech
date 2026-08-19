@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next"
 import { managementReportService } from "@/api/services/managementReportService"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { platformFieldClassName } from "@/components/platform/PlatformUI"
+import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 
 const isoDate = (date) => date.toISOString().slice(0, 10)
 
@@ -26,6 +27,8 @@ const money = (value) =>
 
 export default function AgencyReportsPage() {
   const { i18n } = useTranslation()
+
+  const { isTeam } = useAgencyWorkspace()
 
   const isRTL = !i18n.language?.startsWith("en")
 
@@ -53,15 +56,17 @@ export default function AgencyReportsPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["management-report", query],
+    queryKey: ["management-report", query, isTeam],
     queryFn: () => managementReportService.get(query),
     staleTime: 60_000,
   })
 
   const text = isRTL
     ? {
-        title: "דוחות ותובנות",
-        subtitle: "ביצועי גיוס אמיתיים לפי טווח, לקוח, צוות ומשרה",
+        title: isTeam ? "דוחות צוות" : "דוחות ותובנות",
+        subtitle: isTeam
+          ? "עומס מגייסים, משפך, מקורות והשמות של הצוות"
+          : "ביצועי גיוס אמיתיים לפי טווח, לקוח, צוות ומשרה",
         applications: "מועמדויות",
         placements: "השמות",
         rate: "שיעור השמה",
@@ -74,6 +79,12 @@ export default function AgencyReportsPage() {
         stageTime: "זמן בשלב",
         sources: "אפקטיביות מקורות",
         recruiters: "ביצועי מגייסים",
+        workload: "עומס מגייסים",
+        active: "פעילות",
+        openJobs: "משרות פתוחות",
+        overloaded: "עומס יתר",
+        ok: "תקין",
+        load: "עומס",
         teams: "ביצועי צוותים",
         clients: "המרת לקוחות",
         jobs: "המרת משרות",
@@ -92,8 +103,10 @@ export default function AgencyReportsPage() {
         to: "עד תאריך",
       }
     : {
-        title: "Reports & Insights",
-        subtitle: "Real recruitment performance by period, client, team and job",
+        title: isTeam ? "Team reports" : "Reports & Insights",
+        subtitle: isTeam
+          ? "Recruiter workload, funnel, sources and placements for your team"
+          : "Real recruitment performance by period, client, team and job",
         applications: "Applications",
         placements: "Placements",
         rate: "Placement rate",
@@ -106,6 +119,12 @@ export default function AgencyReportsPage() {
         stageTime: "Time in stage",
         sources: "Source effectiveness",
         recruiters: "Recruiter performance",
+        workload: "Recruiter workload",
+        active: "Active",
+        openJobs: "Open jobs",
+        overloaded: "Overloaded",
+        ok: "Healthy",
+        load: "Load",
         teams: "Team performance",
         clients: "Client conversion",
         jobs: "Job conversion",
@@ -143,16 +162,28 @@ export default function AgencyReportsPage() {
 
     const rows = [["dimension", "name", "applications", "placements", "conversion_rate"]]
 
-    ;[
+    const dimensionsToExport = [
       ["source", exportedReport.source_effectiveness, "source"],
       ["recruiter", exportedReport.recruiter_performance, "recruiter_name"],
-      ["team", exportedReport.team_performance, "team_name"],
+      ...(isTeam ? [] : [["team", exportedReport.team_performance, "team_name"]]),
       ["client", exportedReport.client_conversion, "client_name"],
       ["job", exportedReport.job_conversion, "job_title"],
-    ].forEach(([dimension, values, nameKey]) => {
+    ]
+
+    dimensionsToExport.forEach(([dimension, values, nameKey]) => {
       values.forEach((row) =>
         rows.push([dimension, row[nameKey], row.applications, row.placements, row.conversion_rate]),
       )
+    })
+
+    ;(exportedReport.recruiter_workload || []).forEach((row) => {
+      rows.push([
+        "workload",
+        row.recruiter_name,
+        row.active_applications,
+        row.open_jobs,
+        row.overloaded ? "overloaded" : "ok",
+      ])
     })
 
     const escape = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`
@@ -166,7 +197,7 @@ export default function AgencyReportsPage() {
     const link = document.createElement("a")
 
     link.href = url
-    link.download = `agency-report-${filters.date_from}-${filters.date_to}.csv`
+    link.download = `${isTeam ? "team" : "agency"}-report-${filters.date_from}-${filters.date_to}.csv`
     link.click()
     URL.revokeObjectURL(url)
   }
@@ -240,13 +271,15 @@ export default function AgencyReportsPage() {
               onChange={(value) => update("recruiter_id", value)}
             />
 
-            <FilterField
-              label={text.team}
-              value={filters.team_id}
-              options={dimensions.teams}
-              all={text.all}
-              onChange={(value) => update("team_id", value)}
-            />
+            {!isTeam && (
+              <FilterField
+                label={text.team}
+                value={filters.team_id}
+                options={dimensions.teams}
+                all={text.all}
+                onChange={(value) => update("team_id", value)}
+              />
+            )}
           </div>
         </PlatformCard>
 
@@ -332,6 +365,12 @@ export default function AgencyReportsPage() {
                   suffix={` ${text.days}`}
                 />
 
+                <WorkloadTable
+                  title={text.workload}
+                  rows={report?.recruiter_workload || []}
+                  text={text}
+                />
+
                 <PerformanceTable
                   title={text.sources}
                   rows={report?.source_effectiveness || []}
@@ -346,12 +385,14 @@ export default function AgencyReportsPage() {
                   text={text}
                 />
 
-                <PerformanceTable
-                  title={text.teams}
-                  rows={report?.team_performance || []}
-                  nameKey="team_name"
-                  text={text}
-                />
+                {!isTeam && (
+                  <PerformanceTable
+                    title={text.teams}
+                    rows={report?.team_performance || []}
+                    nameKey="team_name"
+                    text={text}
+                  />
+                )}
 
                 <PerformanceTable
                   title={text.clients}
@@ -376,7 +417,11 @@ export default function AgencyReportsPage() {
                     </div>
 
                     <div className="mt-2 text-sm font-semibold text-slate-500">
-                      {text.compensation}: {money(report?.summary.allocated_compensation)}
+                      {text.compensation}
+
+                      {": "}
+
+                      {money(report?.summary.allocated_compensation)}
                     </div>
                   </PlatformCard>
                 )}
@@ -448,6 +493,50 @@ function MetricBars({ title, rows, labelKey, valueKey, suffix }) {
             </div>
           </div>
         ))}
+      </div>
+    </PlatformCard>
+  )
+}
+
+function WorkloadTable({ title, rows, text }) {
+  return (
+    <PlatformCard className="overflow-hidden">
+      <div className="p-5">
+        <PlatformWidgetHeader title={title} />
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[480px] text-sm">
+          <thead className="bg-slate-50 text-xs text-slate-400">
+            <tr>
+              <th className="p-3 text-start">{text.name}</th>
+
+              <th>{text.active}</th>
+
+              <th>{text.openJobs}</th>
+
+              <th>{text.load}</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.recruiter_id} className="border-t border-slate-100">
+                <td className="p-3 font-bold text-slate-700">{row.recruiter_name}</td>
+
+                <td className="text-center">{row.active_applications}</td>
+
+                <td className="text-center">{row.open_jobs}</td>
+
+                <td
+                  className={`text-center font-bold ${row.overloaded ? "text-rose-600" : "text-emerald-600"}`}
+                >
+                  {row.overloaded ? text.overloaded : text.ok}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </PlatformCard>
   )

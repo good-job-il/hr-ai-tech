@@ -6,7 +6,7 @@
  * היררכיה בתוך ארגון (staffing_agency):
  *   org_admin           → כל הארגון
  *   recruitment_manager → כל הארגון (agency-wide)
- *   team_manager        → כל הצוות שלו (team_manager_id = userId)
+ *   team_manager        → כל הצוות שלו (team_id = user.team_id)
  *   recruiter           → רק שלו (recruiter_id = userId)
  *
  * employer → entity חיצוני (employer_company_id בלבד)
@@ -26,7 +26,7 @@
  * @param {object} userMeta    - { organizationId, employerCompanyId, email, orgType }
  */
 export const getRLSFilter = (role, entityName, userId, userMeta = {}) => {
-  const { organizationId, employerCompanyId, email, orgType } = userMeta
+  const { organizationId, employerCompanyId, email, orgType, teamId } = userMeta
 
   // ─── Admin (platform operator) — גלובלי ────────────────────
   if (role === "admin") {
@@ -54,11 +54,21 @@ export const getRLSFilter = (role, entityName, userId, userMeta = {}) => {
 
     // ─── Team Manager — הצוות שלו בתוך הארגון ────────────────
     case "team_manager": {
-      if (!organizationId) {
+      if (!organizationId || !teamId) {
         return { id: "__BLOCKED__" }
       }
 
-      return getOrgFilter(entityName, organizationId, null, userId, null, null, email)
+      return getOrgFilter(
+        entityName,
+        organizationId,
+        null,
+        null,
+        null,
+        null,
+        email,
+        orgType,
+        teamId,
+      )
     }
 
     // ─── Recruiter — רק שלו בתוך הארגון ──────────────────────
@@ -141,6 +151,7 @@ function getOrgFilter(
   employerCompanyId,
   email,
   orgType = null,
+  teamId = null,
 ) {
   // CompensationPlan — staffing_agency בלבד! חסום ל-company HR
   if (entityName === "CompensationPlan") {
@@ -182,6 +193,10 @@ function getOrgFilter(
 
   if (recruiterId) {
     return { ...base, recruiter_id: recruiterId }
+  }
+
+  if (teamId) {
+    return { ...base, team_id: teamId }
   }
 
   if (teamManagerId) {

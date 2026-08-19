@@ -1,12 +1,21 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
-import { AlertTriangle, Briefcase, CheckCircle2, Clock3, Kanban, Users } from "lucide-react"
+import {
+  AlertTriangle,
+  Briefcase,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  Kanban,
+  Users,
+} from "lucide-react"
 import { recruitmentManagementService } from "@/api/services/recruitmentManagementService"
 import { agencyTeamsService } from "@/api/services/agencyTeamsService"
-
+import { interviewService } from "@/api/services/interviewService"
 import { platformFieldClassName } from "@/components/platform/PlatformUI"
 import { REASSIGN_INVALIDATION_KEYS } from "@/domain/agency/rmAcceptance"
+import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 
 const STAGES = [
   "new",
@@ -32,7 +41,7 @@ const parseIds = (value) => [
 
 const isoDate = (date) => date.toISOString().slice(0, 10)
 
-export default function RecruitmentManagerDashboard() {
+export default function RecruitmentManagerDashboard({ teamMode = false }) {
   const { i18n } = useTranslation()
 
   const isRtl = !i18n.language?.startsWith("en")
@@ -109,6 +118,19 @@ export default function RecruitmentManagerDashboard() {
         all: "All",
       }
 
+  if (teamMode) {
+    text.title = isRtl ? "ניהול הצוות" : "Team Management"
+    text.subtitle = isRtl
+      ? "עומסים, SLA, משפך, ראיונות, השמות וחלוקת עבודה בצוות"
+      : "Team workload, SLA, funnel, interviews, placements and assignments"
+    text.interviews = isRtl ? "ראיונות קרובים" : "Upcoming interviews"
+    text.roster = isRtl ? "חברי הצוות" : "Team roster"
+  }
+
+  const { paths } = useAgencyWorkspace()
+
+  const agencyBase = teamMode ? paths.base : "/agency"
+
   const queryClient = useQueryClient()
 
   const [filters, setFilters] = useState({
@@ -127,12 +149,18 @@ export default function RecruitmentManagerDashboard() {
   )
 
   const dashboard = useQuery({
-    queryKey: ["recruitment-manager-dashboard", reportQuery],
+    queryKey: [teamMode ? "team-manager-dashboard" : "recruitment-manager-dashboard", reportQuery],
     queryFn: () => recruitmentManagementService.dashboard(reportQuery),
     refetchInterval: 5 * 60_000,
   })
 
   const teamsQuery = useQuery({ queryKey: ["agency-teams"], queryFn: agencyTeamsService.overview })
+
+  const interviewsQuery = useQuery({
+    queryKey: ["team-interviews"],
+    queryFn: () => interviewService.list({ sort: "date", order: "ASC", limit: 100 }),
+    enabled: teamMode,
+  })
 
   const [form, setForm] = useState({
     job_ids: "",
@@ -151,6 +179,8 @@ export default function RecruitmentManagerDashboard() {
 
   const dimensions = data?.dimensions || { clients: [], jobs: [], recruiters: [], teams: [] }
 
+  const managedTeamId = teamsQuery.data?.teams?.[0]?.id
+
   const teams = teamsQuery.data?.teams || []
 
   const recruiters = useMemo(
@@ -163,6 +193,18 @@ export default function RecruitmentManagerDashboard() {
       ),
     [form.team_id, teamsQuery.data],
   )
+
+  useEffect(() => {
+    if (!teamMode || !managedTeamId) {
+      return
+    }
+
+    setForm((current) =>
+      current.team_id === String(managedTeamId)
+        ? current
+        : { ...current, team_id: String(managedTeamId) },
+    )
+  }, [teamMode, managedTeamId])
 
   const assignment = useMutation({
     mutationFn: recruitmentManagementService.assign,
@@ -191,7 +233,11 @@ export default function RecruitmentManagerDashboard() {
       job_ids: parseIds(form.job_ids),
       candidate_ids: parseIds(form.candidate_ids),
       application_ids: parseIds(form.application_ids),
-      team_id: form.team_id === "none" ? null : Number(form.team_id),
+      team_id: teamMode
+        ? Number(form.team_id) || managedTeamId || null
+        : form.team_id === "none"
+          ? null
+          : Number(form.team_id),
       recruiter_id: form.recruiter_id === "none" ? null : Number(form.recruiter_id),
       reason: form.reason.trim(),
     }
@@ -234,15 +280,27 @@ export default function RecruitmentManagerDashboard() {
           subtitle={text.subtitle}
           icon={Kanban}
           actions={
-            <Button
-              variant="outline"
-              disabled={dashboard.isFetching}
-              onClick={() => dashboard.refetch()}
-            >
-              <RefreshCw className={`h-4 w-4 ${dashboard.isFetching ? "animate-spin" : ""}`} />
+            <div className="flex flex-wrap items-center gap-2">
+              {teamMode && (
+                <Link to={paths.roster}>
+                  <Button variant="outline" type="button">
+                    <Users className="h-4 w-4" />
 
-              {text.refresh}
-            </Button>
+                    {text.roster}
+                  </Button>
+                </Link>
+              )}
+
+              <Button
+                variant="outline"
+                disabled={dashboard.isFetching}
+                onClick={() => dashboard.refetch()}
+              >
+                <RefreshCw className={`h-4 w-4 ${dashboard.isFetching ? "animate-spin" : ""}`} />
+
+                {text.refresh}
+              </Button>
+            </div>
           }
         />
 
@@ -283,13 +341,15 @@ export default function RecruitmentManagerDashboard() {
               onChange={(value) => setFilters((current) => ({ ...current, job_id: value }))}
             />
 
-            <DashboardFilter
-              label={text.team}
-              value={filters.team_id}
-              options={dimensions.teams}
-              all={text.all}
-              onChange={(value) => setFilters((current) => ({ ...current, team_id: value }))}
-            />
+            {!teamMode && (
+              <DashboardFilter
+                label={text.team}
+                value={filters.team_id}
+                options={dimensions.teams}
+                all={text.all}
+                onChange={(value) => setFilters((current) => ({ ...current, team_id: value }))}
+              />
+            )}
 
             <DashboardFilter
               label={text.recruiter}
@@ -301,14 +361,16 @@ export default function RecruitmentManagerDashboard() {
           </div>
         </PlatformCard>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+        <div
+          className={`grid gap-4 sm:grid-cols-2 ${teamMode ? "xl:grid-cols-7" : "xl:grid-cols-6"}`}
+        >
           <PlatformStatCard
             icon={Briefcase}
             label={text.openJobs}
             value={data?.summary.open_jobs}
             loading={dashboard.isLoading}
             tone="violet"
-            to="/agency/jobs/open"
+            to={`${agencyBase}/jobs/open`}
           />
 
           <PlatformStatCard
@@ -317,7 +379,7 @@ export default function RecruitmentManagerDashboard() {
             value={data?.summary.applications}
             loading={dashboard.isLoading}
             tone="cyan"
-            to="/agency/pipeline"
+            to={`${agencyBase}/pipeline`}
           />
 
           <PlatformStatCard
@@ -326,7 +388,7 @@ export default function RecruitmentManagerDashboard() {
             value={data?.summary.active_applications}
             loading={dashboard.isLoading}
             tone="blue"
-            to="/agency/pipeline"
+            to={`${agencyBase}/pipeline`}
           />
 
           <PlatformStatCard
@@ -352,6 +414,21 @@ export default function RecruitmentManagerDashboard() {
             loading={dashboard.isLoading}
             tone="rose"
           />
+
+          {teamMode && (
+            <PlatformStatCard
+              icon={CalendarDays}
+              label={text.interviews}
+              value={
+                (interviewsQuery.data || []).filter(
+                  (item) => !["cancelled", "completed"].includes(item.status),
+                ).length
+              }
+              loading={interviewsQuery.isLoading}
+              tone="cyan"
+              to={`${agencyBase}/pipeline`}
+            />
+          )}
         </div>
 
         <div className="grid gap-5 xl:grid-cols-2">
@@ -447,30 +524,32 @@ export default function RecruitmentManagerDashboard() {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-3">
-              <div>
-                <Label>{text.team}</Label>
+              {!teamMode && (
+                <div>
+                  <Label>{text.team}</Label>
 
-                <Select
-                  value={form.team_id}
-                  onValueChange={(team_id) => setForm({ ...form, team_id, recruiter_id: "none" })}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <Select
+                    value={form.team_id}
+                    onValueChange={(team_id) => setForm({ ...form, team_id, recruiter_id: "none" })}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
 
-                  <SelectContent>
-                    <SelectItem value="none">{text.unassigned}</SelectItem>
+                    <SelectContent>
+                      <SelectItem value="none">{text.unassigned}</SelectItem>
 
-                    {teams
-                      .filter((team) => team.is_active)
-                      .map((team) => (
-                        <SelectItem key={team.id} value={String(team.id)}>
-                          {team.name}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                      {teams
+                        .filter((team) => team.is_active)
+                        .map((team) => (
+                          <SelectItem key={team.id} value={String(team.id)}>
+                            {team.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div>
                 <Label>{text.recruiter}</Label>
@@ -531,21 +610,25 @@ export default function RecruitmentManagerDashboard() {
           </form>
         </PlatformCard>
 
-        <div className="grid gap-5 xl:grid-cols-2">
+        <div className={`grid gap-5 ${teamMode ? "xl:grid-cols-3" : "xl:grid-cols-2"}`}>
           <ListCard
             title={text.overdueTitle}
             rows={data?.overdue || []}
             empty={text.none}
             render={(item) => (
               <Link
-                to={`/agency/pipeline?applicationId=${item.id}`}
+                to={`${agencyBase}/pipeline?applicationId=${item.id}`}
                 className="flex items-center justify-between p-4 hover:bg-amber-50"
               >
                 <div>
                   <p className="font-bold text-slate-800">{item.candidate_name}</p>
 
                   <p className="text-xs text-slate-400">
-                    {item.job_title} · {item.status}
+                    {item.job_title}
+
+                    {" · "}
+
+                    {item.status}
                   </p>
                 </div>
 
@@ -561,19 +644,60 @@ export default function RecruitmentManagerDashboard() {
             rows={data?.placements || []}
             empty={text.none}
             render={(item) => (
-              <div className="flex items-center justify-between p-4">
+              <Link
+                to={`${agencyBase}/pipeline?applicationId=${item.application_id || item.id}`}
+                className="flex items-center justify-between p-4 hover:bg-emerald-50"
+              >
                 <div>
                   <p className="font-bold text-slate-800">{item.candidate_name}</p>
 
                   <p className="text-xs text-slate-400">
-                    {item.job_title} · {item.company}
+                    {item.job_title}
+
+                    {" · "}
+
+                    {item.company}
                   </p>
                 </div>
 
                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-              </div>
+              </Link>
             )}
           />
+
+          {teamMode && (
+            <ListCard
+              title={text.interviews}
+              rows={(interviewsQuery.data || [])
+                .filter((item) => !["cancelled", "completed"].includes(item.status))
+                .slice(0, 20)}
+              empty={text.none}
+              render={(item) => (
+                <Link
+                  to={
+                    item.application_id
+                      ? `${agencyBase}/pipeline?applicationId=${item.application_id}`
+                      : item.candidate_id
+                        ? `${agencyBase}/crm/candidate?id=${item.candidate_id}`
+                        : `${agencyBase}/pipeline`
+                  }
+                  className="flex items-center justify-between p-4 hover:bg-cyan-50"
+                >
+                  <div>
+                    <p className="font-bold text-slate-800">{item.candidate_name}</p>
+
+                    <p className="text-xs text-slate-400">
+                      {item.job_title || "—"}
+                      {" · "}
+                      {item.date} {item.time}
+                    </p>
+                  </div>
+
+                  <CalendarDays className="h-5 w-5 text-cyan-600" />
+                </Link>
+              )}
+            />
+          )}
         </div>
       </div>
     </PlatformPageShell>

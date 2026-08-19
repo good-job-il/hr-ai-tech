@@ -4,8 +4,9 @@ import { compensationPlanService } from "@/api/services/compensationPlanService"
 import { Briefcase, CheckCircle, XCircle, AlertCircle } from "lucide-react"
 
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
-import { useLocation, useSearchParams } from "react-router-dom"
+import { useLocation, useSearchParams, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
+import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 
 function CopyButton({ text }) {
   const [copied, setCopied] = useState(false)
@@ -43,6 +44,10 @@ const ROUTE_STATES = { open: "open", filled: "filled", hold: "on_hold" }
 
 export default function ManageJobsPage() {
   const { can, loading: permissionsLoading } = usePermissionMatrix()
+
+  const { base, paths } = useAgencyWorkspace()
+
+  const navigate = useNavigate()
 
   const canCreate = can("create")
 
@@ -508,6 +513,17 @@ export default function ManageJobsPage() {
                       <td className="px-5 py-4">
                         {canUpdate && (
                           <div className="flex items-center gap-2 justify-end">
+                            {base ? (
+                              <button
+                                type="button"
+                                onClick={() => navigate(paths.pipeline)}
+                                className="h-8 w-8 rounded-lg border border-[#E4ECFF] flex items-center justify-center text-[#64748B] hover:border-[#7C3AED] hover:text-[#7C3AED] transition-all"
+                                title="Pipeline"
+                              >
+                                <Briefcase className="w-3.5 h-3.5" />
+                              </button>
+                            ) : null}
+
                             <button
                               onClick={() => handleEdit(job)}
                               className="h-8 w-8 rounded-lg border border-[#E4ECFF] flex items-center justify-center text-[#64748B] hover:border-[#7C3AED] hover:text-[#7C3AED] transition-all"

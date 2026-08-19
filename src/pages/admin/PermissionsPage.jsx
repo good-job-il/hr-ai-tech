@@ -69,7 +69,11 @@ export default function PermissionsPage() {
 
   const [dirty, setDirty] = useState({}) // { role_key: boolean }
 
+  const [exportError, setExportError] = useState("")
+
   const canEdit = EDITABLE_ROLES.includes(user?.role) && can("manage_settings")
+
+  const canExportMatrix = user?.role !== "team_manager" && can("export")
 
   const canSwitchOrgType = user?.role === "admin"
 
@@ -176,6 +180,58 @@ export default function PermissionsPage() {
     }
   }
 
+  const exportMatrix = async () => {
+    setExportError("")
+
+    let records
+
+    try {
+      records = await permissionMatrixService.export({
+        org_type: orgType,
+        limit: 200,
+      })
+    } catch (requestError) {
+      setExportError(requestError?.message || t("permissionsMatrix.exportFailed"))
+
+      return
+    }
+
+    const headers = ["role_key", "source", "organization_id", ...PERM_KEYS]
+
+    const rows = roleKeys.map((roleKey) => {
+      const override = records.find(
+        (record) =>
+          record.organization_id === orgId && record.role_key === roleKey && !record.is_template,
+      )
+
+      const template = records.find((record) => record.is_template && record.role_key === roleKey)
+
+      const perms = matrix[roleKey] || emptyPerms()
+
+      return [
+        roleKey,
+        override ? "organization" : template ? "template" : "none",
+        override?.organization_id ?? "",
+        ...PERM_KEYS.map((key) => (perms[key] ? "true" : "false")),
+      ]
+    })
+
+    const escape = (value) => `"${String(value ?? "").replaceAll('"', '""')}"`
+
+    const url = URL.createObjectURL(
+      new Blob([[headers, ...rows].map((row) => row.map(escape).join(",")).join("\n")], {
+        type: "text/csv;charset=utf-8",
+      }),
+    )
+
+    const link = document.createElement("a")
+
+    link.href = url
+    link.download = `permission-matrix-${orgType}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   const hasDirty = Object.keys(dirty).some((k) => dirty[k])
 
   const stickyColClass = isRtl ? "sticky right-0" : "sticky left-0"
@@ -223,6 +279,19 @@ export default function PermissionsPage() {
                 <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               </button>
 
+              {canExportMatrix && (
+                <Button
+                  variant="outline"
+                  onClick={exportMatrix}
+                  disabled={loading}
+                  className="gap-2"
+                >
+                  <Download className="w-4 h-4" />
+
+                  {t("permissionsMatrix.exportCSV")}
+                </Button>
+              )}
+
               {canEdit && (
                 <Button onClick={handleSaveAll} disabled={saving || !hasDirty} className="gap-2">
                   <Save className="w-4 h-4" />
@@ -267,6 +336,12 @@ export default function PermissionsPage() {
             meta={saved ? t("permissionsMatrix.saved") : t("permissionsMatrix.saveChanges")}
           />
         </div>
+
+        {exportError && (
+          <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm font-bold text-rose-700">
+            {exportError}
+          </p>
+        )}
 
         {saveError && (
           <div

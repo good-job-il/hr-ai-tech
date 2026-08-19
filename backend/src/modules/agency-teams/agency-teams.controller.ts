@@ -27,7 +27,12 @@ import {
 import { RequiresPermission } from "../../common/decorators/requires-permission.decorator"
 import { EffectivePermissionsGuard } from "../permissions/effective-permissions.guard"
 
-const READ_ROLES = [UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, UserRole.ADMIN]
+const READ_ROLES = [
+  UserRole.ORG_ADMIN,
+  UserRole.RECRUITMENT_MANAGER,
+  UserRole.TEAM_MANAGER,
+  UserRole.ADMIN,
+]
 
 @ApiTags("Agency Teams")
 @ApiBearerAuth()

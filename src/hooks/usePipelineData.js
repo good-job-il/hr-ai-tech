@@ -149,7 +149,7 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
 // VISIBILITY POLICY — single source of truth for pipeline data access
 //
 //  org_admin / recruitment_manager → organization scope
-//  team_manager → records with team_manager_id === user.id
+//  team_manager → records with canonical team_id === user.team_id
 //  employer   → ONLY applications where employer_id === user.email
 //  recruiter  → assigned_to/recruiter_id === user.id
 // ─────────────────────────────────────────────────────────────────────────────

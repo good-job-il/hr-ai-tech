@@ -60,7 +60,11 @@ export class CompensationService {
       }
 
       if (user.role === UserRole.TEAM_MANAGER) {
-        where.team_manager_id = user.id
+        if (!user.team_id) {
+return buildPaginatedResponse([], 0, { page, limit })
+}
+
+        where.team_id = user.team_id
       }
     }
 
@@ -99,6 +103,10 @@ export class CompensationService {
 
     if (!this.isPlatformAdmin(user) && plan.organization_id !== user.organization_id) {
       throw new ForbiddenException("Access denied")
+    }
+
+    if (user.role === UserRole.TEAM_MANAGER && (!user.team_id || plan.team_id !== user.team_id)) {
+      throw new NotFoundException(`Compensation plan ${id} not found`)
     }
 
     return plan
@@ -200,18 +208,45 @@ export class CompensationService {
       (id): id is number => id != null,
     )
 
+    const assignees: OrganizationUserEntity[] = []
+
     for (const id of assigneeIds) {
       const member = await this.users.findOne({ where: { id, organization_id: organizationId } })
 
       if (!member) {
         throw new ForbiddenException(`User ${id} belongs to another organization`)
       }
+
+      if (user.role === UserRole.TEAM_MANAGER && (!user.team_id || member.team_id !== user.team_id)) {
+        throw new ForbiddenException(`User ${id} belongs to another team`)
+      }
+
+      assignees.push(member)
+    }
+
+    const teamIds = new Set(
+      [job?.team_id, ...assignees.map(member => member.team_id)].filter(
+        (id): id is number => id != null,
+      ),
+    )
+
+    if (teamIds.size > 1) {
+throw new ForbiddenException("Job and assignees must belong to one team")
+}
+
+    const teamId = user.role === UserRole.TEAM_MANAGER ? user.team_id : [...teamIds][0] ?? null
+
+    if (user.role === UserRole.TEAM_MANAGER && job?.team_id !== user.team_id) {
+      throw new ForbiddenException("Job belongs to another team")
     }
 
     return {
       employer_company_id: companyId,
       agency_client_id: client?.id ?? dto.agency_client_id ?? null,
       client_name: company.name,
+      team_id: teamId,
+      team_manager_id:
+        user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id ?? null,
     }
   }
 

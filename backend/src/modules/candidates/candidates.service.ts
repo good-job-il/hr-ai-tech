@@ -80,6 +80,7 @@ export class CandidatesService {
       id: user.id,
       role: user.role,
       organization_id: user.organization_id,
+      team_id: user.team_id,
       employer_company_id: user.employer_company_id,
       email: user.email,
       impersonating: user.impersonating,
@@ -140,6 +141,7 @@ export class CandidatesService {
         id: user.id,
         role: user.role,
         organization_id: user.organization_id,
+        team_id: user.team_id,
         employer_company_id: user.employer_company_id,
         email: user.email,
         impersonating: user.impersonating,
@@ -195,6 +197,7 @@ export class CandidatesService {
       id: user.id,
       role: user.role,
       organization_id: user.organization_id,
+      team_id: user.team_id,
       employer_company_id: user.employer_company_id,
       email: user.email,
       impersonating: user.impersonating,
@@ -214,25 +217,34 @@ export class CandidatesService {
   }
 
   async create(dto: CreateCandidateDto, user: UserEntity): Promise<CandidateEntity> {
-    await this.assertAgencyAssignments(dto, user)
+    const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
     const candidate = this.candidateRepo.create({
       ...dto,
       organization_id: user.organization_id,
+      team_id: assignmentTeamId,
       recruiter_id: dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
       team_manager_id:
-        dto.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
+        user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id,
     } as any)
 
     return this.candidateRepo.save(candidate) as unknown as Promise<CandidateEntity>
   }
 
   async update(id: number, dto: UpdateCandidateDto, user: UserEntity): Promise<CandidateEntity> {
-    await this.assertAgencyAssignments(dto, user)
+    const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
     const candidate = await this.findById(id, user)
 
     Object.assign(candidate, dto)
+
+    if (assignmentTeamId != null) {
+      candidate.team_id = assignmentTeamId
+
+      if (user.role === UserRole.TEAM_MANAGER) {
+candidate.team_manager_id = user.id
+}
+    }
 
     if (dto.is_deleted && !candidate.deleted_at) {
       candidate.deleted_at = new Date()
@@ -248,7 +260,7 @@ export class CandidatesService {
 
   private async assertAgencyAssignments(dto: Partial<CreateCandidateDto>, user: UserEntity) {
     if (user.org_type !== "staffing_agency") {
-      return
+      return null
     }
 
     if (!user.organization_id) {
@@ -260,6 +272,8 @@ export class CandidatesService {
       ["team_manager_id", UserRole.TEAM_MANAGER],
       ["recruitment_manager_id", UserRole.RECRUITMENT_MANAGER],
     ]
+
+    const teamIds = new Set<number>()
 
     for (const [field, role] of fields) {
       const id = dto[field]
@@ -275,7 +289,35 @@ export class CandidatesService {
       if (!assignee) {
         throw new ForbiddenException(`Invalid ${String(field)} assignment`)
       }
+
+      if (user.role === UserRole.TEAM_MANAGER) {
+        if (!user.team_id || assignee.team_id !== user.team_id) {
+          throw new ForbiddenException("Assignee must belong to the Team Manager's team")
+        }
+
+        if (field === "team_manager_id" && assignee.id !== user.id) {
+          throw new ForbiddenException("Team Manager cannot assign another team manager")
+        }
+      }
+
+      if (assignee.team_id) {
+teamIds.add(assignee.team_id)
+}
     }
+
+    if (teamIds.size > 1) {
+throw new BadRequestException("All assignees must belong to the same team")
+}
+
+    if (user.role === UserRole.TEAM_MANAGER) {
+      if (!user.team_id) {
+throw new ForbiddenException("Active team membership required")
+}
+
+      return user.team_id
+    }
+
+    return [...teamIds][0] ?? null
   }
 
   // ─── Notes ──────────────────────────────────────────────────────────────
@@ -412,6 +454,7 @@ export class CandidatesService {
       id: user.id,
       role: user.role,
       organization_id: user.organization_id,
+      team_id: user.team_id,
       employer_company_id: user.employer_company_id,
       email: user.email,
       impersonating: user.impersonating,
@@ -429,6 +472,7 @@ export class CandidatesService {
       id: user.id,
       role: user.role,
       organization_id: user.organization_id,
+      team_id: user.team_id,
       employer_company_id: user.employer_company_id,
       email: user.email,
       impersonating: user.impersonating,
@@ -448,7 +492,7 @@ export class CandidatesService {
   }
 
   async createBatch(data: Partial<CandidateImportBatchEntity>, user: UserEntity) {
-    await this.assertOrganizationUsers(
+    const assignees = await this.assertOrganizationUsers(
       [data.recruiter_id, data.team_manager_id, data.recruitment_manager_id],
       user,
     )
@@ -456,9 +500,13 @@ export class CandidatesService {
     const batch = this.batchRepo.create({
       ...data,
       organization_id: user.organization_id,
+      team_id:
+        user.role === UserRole.TEAM_MANAGER
+          ? user.team_id
+          : assignees.find(member => member.team_id)?.team_id ?? null,
       recruiter_id: data.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
       team_manager_id:
-        data.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
+        user.role === UserRole.TEAM_MANAGER ? user.id : data.team_manager_id,
       recruitment_manager_id:
         data.recruitment_manager_id ??
         (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
@@ -471,8 +519,10 @@ export class CandidatesService {
 
   async assertOrganizationUsers(ids: Array<number | null | undefined>, user: UserEntity) {
     if (user.role === UserRole.ADMIN) {
-      return
+      return []
     }
+
+    const members: UserEntity[] = []
 
     for (const id of [...new Set(ids.filter((value): value is number => Boolean(value)))]) {
       const member = await this.userRepo.findOne({
@@ -482,7 +532,15 @@ export class CandidatesService {
       if (!member) {
         throw new ForbiddenException(`User ${id} belongs to another organization`)
       }
+
+      if (user.role === UserRole.TEAM_MANAGER && (!user.team_id || member.team_id !== user.team_id)) {
+        throw new ForbiddenException(`User ${id} belongs to another team`)
+      }
+
+      members.push(member)
     }
+
+    return members
   }
 
   async updateBatch(id: number, data: Partial<CandidateImportBatchEntity>, user: UserEntity) {
@@ -491,6 +549,10 @@ export class CandidatesService {
     const updates = { ...data }
 
     delete updates.organization_id
+    delete updates.team_id
+    delete updates.team_manager_id
+    delete updates.recruiter_id
+    delete updates.recruitment_manager_id
     Object.assign(batch, updates)
 
     return this.batchRepo.save(batch)
@@ -500,6 +562,32 @@ export class CandidatesService {
   async getProfile(userEmail: string, user: UserEntity) {
     if (user.role === UserRole.CANDIDATE && userEmail !== user.email) {
       throw new ForbiddenException("Access denied")
+    }
+
+    if ([
+      UserRole.ORG_ADMIN,
+      UserRole.RECRUITMENT_MANAGER,
+      UserRole.TEAM_MANAGER,
+      UserRole.RECRUITER,
+      UserRole.INTERNAL_RECRUITER,
+    ].includes(user.role)) {
+      const scope = getRlsWhere("Candidate", {
+        id: user.id,
+        role: user.role,
+        organization_id: user.organization_id,
+        team_id: user.team_id,
+        employer_company_id: user.employer_company_id,
+        email: user.email,
+        impersonating: user.impersonating,
+      })
+
+      const candidate = isBlocked(scope)
+        ? null
+        : await this.candidateRepo.findOne({ where: { ...scope, email: userEmail } as any })
+
+      if (!candidate) {
+throw new NotFoundException("Candidate profile not found")
+}
     }
 
     return this.profileRepo.findOne({
@@ -515,6 +603,41 @@ export class CandidatesService {
       where.user_id = user.id
     } else if (filters.user_email) {
       where.user_email = filters.user_email
+    }
+
+    if ([
+      UserRole.ORG_ADMIN,
+      UserRole.RECRUITMENT_MANAGER,
+      UserRole.TEAM_MANAGER,
+      UserRole.RECRUITER,
+      UserRole.INTERNAL_RECRUITER,
+    ].includes(user.role)) {
+      const scope = getRlsWhere("Candidate", {
+        id: user.id,
+        role: user.role,
+        organization_id: user.organization_id,
+        team_id: user.team_id,
+        employer_company_id: user.employer_company_id,
+        email: user.email,
+        impersonating: user.impersonating,
+      })
+
+      if (isBlocked(scope)) {
+return []
+}
+
+      const candidates = await this.candidateRepo.find({
+        where: filters.user_email ? { ...scope, email: filters.user_email } as any : scope,
+        select: { email: true },
+      })
+
+      const emails = candidates.map(candidate => candidate.email).filter((email): email is string => Boolean(email))
+
+      if (!emails.length) {
+return []
+}
+
+      where.user_email = In(emails)
     }
 
     if (filters.is_public !== undefined) {
@@ -616,6 +739,43 @@ export class CandidatesService {
 
     if (!isGlobalAdmin && !user.organization_id) {
       return []
+    }
+
+    if ([UserRole.TEAM_MANAGER, UserRole.RECRUITER, UserRole.INTERNAL_RECRUITER].includes(user.role)) {
+      let candidateIds: number[]
+
+      if (filters.candidate_id) {
+        const candidate = await this.findById(Number(filters.candidate_id), user)
+
+        candidateIds = [candidate.id]
+      } else {
+        const scope = getRlsWhere("Candidate", {
+          id: user.id,
+          role: user.role,
+          organization_id: user.organization_id,
+          team_id: user.team_id,
+          employer_company_id: user.employer_company_id,
+          email: user.email,
+          impersonating: user.impersonating,
+        })
+
+        if (isBlocked(scope)) {
+return []
+}
+
+        const candidates = await this.candidateRepo.find({ where: scope, select: { id: true } })
+
+        candidateIds = candidates.map(candidate => candidate.id)
+      }
+
+      if (!candidateIds.length) {
+return []
+}
+
+      return this.accessRepo.find({
+        where: { candidate_id: In(candidateIds), owner_organization_id: user.organization_id },
+        order: { created_date: "DESC" } as any,
+      })
     }
 
     const base = filters.candidate_id ? { candidate_id: filters.candidate_id } : {}

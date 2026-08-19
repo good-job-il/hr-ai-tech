@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common"
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
 import { InterviewEntity } from "./interview.entity"
@@ -16,6 +16,8 @@ export class InterviewsService {
   constructor(
     @InjectRepository(InterviewEntity)
     private readonly repo: Repository<InterviewEntity>,
+    @InjectRepository(UserEntity)
+    private readonly users: Repository<UserEntity>,
     private readonly emailService: EmailService,
     private readonly applicationsService: ApplicationsService,
     private readonly dataSource: DataSource,
@@ -28,6 +30,7 @@ export class InterviewsService {
       id: user.id,
       role: user.role,
       organization_id: user.organization_id,
+      team_id: user.team_id,
       employer_company_id: user.employer_company_id,
       email: user.email,
       impersonating: user.impersonating,
@@ -72,6 +75,7 @@ export class InterviewsService {
       id: user.id,
       role: user.role,
       organization_id: user.organization_id,
+      team_id: user.team_id,
       employer_company_id: user.employer_company_id,
       email: user.email,
       impersonating: user.impersonating,
@@ -91,9 +95,35 @@ export class InterviewsService {
   }
 
   async create(dto: CreateInterviewDto, user: UserEntity): Promise<InterviewEntity> {
+    if (user.role === UserRole.TEAM_MANAGER && !dto.application_id) {
+      throw new ForbiddenException("Team Manager interviews require a scoped application")
+    }
+
     const application = dto.application_id
       ? await this.applicationsService.findById(dto.application_id, user)
       : null
+
+    if (user.role === UserRole.TEAM_MANAGER) {
+      if (!user.team_id) {
+throw new NotFoundException("Active team membership required")
+}
+
+      if (dto.recruiter_id) {
+        const recruiter = await this.users.findOne({
+          where: {
+            id: dto.recruiter_id,
+            organization_id: user.organization_id,
+            team_id: user.team_id,
+            role: UserRole.RECRUITER,
+            is_active: true,
+          },
+        })
+
+        if (!recruiter) {
+throw new NotFoundException(`Recruiter ${dto.recruiter_id} not found`)
+}
+      }
+    }
 
     const item = this.repo.create({
       ...dto,
@@ -104,9 +134,14 @@ export class InterviewsService {
       candidate_name: application?.candidate_name ?? dto.candidate_name,
       job_id: application?.job_id ?? dto.job_id,
       job_title: application?.job_title ?? dto.job_title,
-      recruiter_id: dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
+      recruiter_id:
+        application?.recruiter_id
+        ?? dto.recruiter_id
+        ?? (user.role === UserRole.RECRUITER ? user.id : null),
+      team_id: application?.team_id ?? (user.role === UserRole.TEAM_MANAGER ? user.team_id : null),
       team_manager_id:
-        dto.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
+        application?.team_manager_id
+        ?? (user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id),
       recruitment_manager_id:
         dto.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
     } as any)
@@ -151,7 +186,32 @@ export class InterviewsService {
   async update(id: number, dto: UpdateInterviewDto, user: UserEntity): Promise<InterviewEntity> {
     const item = await this.findById(id, user)
 
-    Object.assign(item, dto)
+    const updates: Record<string, any> = { ...dto }
+
+    if (user.role === UserRole.TEAM_MANAGER) {
+      if (updates.recruiter_id) {
+        const recruiter = await this.users.findOne({
+          where: {
+            id: updates.recruiter_id,
+            organization_id: user.organization_id,
+            team_id: user.team_id,
+            role: UserRole.RECRUITER,
+            is_active: true,
+          },
+        })
+
+        if (!recruiter) {
+throw new NotFoundException(`Recruiter ${updates.recruiter_id} not found`)
+}
+      }
+
+      updates.team_id = user.team_id
+      updates.team_manager_id = user.id
+      delete updates.organization_id
+      delete updates.recruitment_manager_id
+    }
+
+    Object.assign(item, updates)
 
     return this.repo.save(item) as unknown as Promise<InterviewEntity>
   }

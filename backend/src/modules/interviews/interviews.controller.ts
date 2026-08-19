@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from "@nestjs/common"
 import { ApiTags, ApiBearerAuth } from "@nestjs/swagger"
 import { InterviewsService } from "./interviews.service"
@@ -18,6 +19,8 @@ import { CurrentUser } from "../../common/decorators/current-user.decorator"
 import { Roles } from "../../common/decorators/roles.decorator"
 import { UserRole, ORG_ROLES } from "../../common/enums/user-role.enum"
 import { UserEntity } from "../users/user.entity"
+import { AgencyActionPolicyGuard } from "../permissions/agency-action-policy.guard"
+import { RequiresPermission } from "../../common/decorators/requires-permission.decorator"
 
 /** Only agency staff / employer / admin schedule & manage interviews */
 const INTERVIEW_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN]
@@ -25,6 +28,7 @@ const INTERVIEW_WRITE_ROLES = [UserRole.EMPLOYER, ...ORG_ROLES, UserRole.ADMIN]
 @ApiTags("Interviews")
 @ApiBearerAuth()
 @Controller("interviews")
+@UseGuards(AgencyActionPolicyGuard)
 export class InterviewsController {
   constructor(private readonly svc: InterviewsService) {}
 
@@ -34,20 +38,20 @@ export class InterviewsController {
   @Get(":id") findOne(@Param("id", ParseIntPipe) id: number, @CurrentUser() u: UserEntity) {
     return this.svc.findById(id, u)
   }
-  @Post() @Roles(...INTERVIEW_WRITE_ROLES) @HttpCode(HttpStatus.CREATED) create(
+  @Post() @Roles(...INTERVIEW_WRITE_ROLES) @RequiresPermission("create") @HttpCode(HttpStatus.CREATED) create(
     @Body() dto: CreateInterviewDto,
     @CurrentUser() u: UserEntity,
   ) {
     return this.svc.create(dto, u)
   }
-  @Patch(":id") @Roles(...INTERVIEW_WRITE_ROLES) update(
+  @Patch(":id") @Roles(...INTERVIEW_WRITE_ROLES) @RequiresPermission("update") update(
     @Param("id", ParseIntPipe) id: number,
     @Body() dto: UpdateInterviewDto,
     @CurrentUser() u: UserEntity,
   ) {
     return this.svc.update(id, dto, u)
   }
-  @Delete(":id") @Roles(...INTERVIEW_WRITE_ROLES) @HttpCode(HttpStatus.NO_CONTENT) remove(
+  @Delete(":id") @Roles(...INTERVIEW_WRITE_ROLES) @RequiresPermission("delete") @HttpCode(HttpStatus.NO_CONTENT) remove(
     @Param("id", ParseIntPipe) id: number,
     @CurrentUser() u: UserEntity,
   ) {

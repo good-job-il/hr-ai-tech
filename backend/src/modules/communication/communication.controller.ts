@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Query, HttpCode, HttpStatus } from "@nestjs/common"
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from "@nestjs/common"
 import { ApiTags, ApiBearerAuth } from "@nestjs/swagger"
 import { CommunicationService } from "./communication.service"
 import {
@@ -12,6 +21,8 @@ import { CurrentUser } from "../../common/decorators/current-user.decorator"
 import { Roles } from "../../common/decorators/roles.decorator"
 import { UserRole, ORG_ROLES } from "../../common/enums/user-role.enum"
 import { UserEntity } from "../users/user.entity"
+import { AgencyActionPolicyGuard } from "../permissions/agency-action-policy.guard"
+import { RequiresPermission } from "../../common/decorators/requires-permission.decorator"
 
 /** Internal agency/employer notes — only org staff & admins may write */
 const COMMUNICATION_WRITE_ROLES = [...ORG_ROLES, UserRole.ADMIN]
@@ -19,6 +30,7 @@ const COMMUNICATION_WRITE_ROLES = [...ORG_ROLES, UserRole.ADMIN]
 @ApiTags("Communication")
 @ApiBearerAuth()
 @Controller("communication-logs")
+@UseGuards(AgencyActionPolicyGuard)
 export class CommunicationController {
   constructor(private readonly svc: CommunicationService) {}
 
@@ -29,6 +41,7 @@ export class CommunicationController {
 
   @Post()
   @Roles(...COMMUNICATION_WRITE_ROLES)
+  @RequiresPermission("update")
   @HttpCode(HttpStatus.CREATED)
   create(@Body() dto: CreateCommunicationLogDto, @CurrentUser() u: UserEntity) {
     return this.svc.create(dto, u)
@@ -36,6 +49,7 @@ export class CommunicationController {
 
   @Post("present-candidate")
   @Roles(...COMMUNICATION_WRITE_ROLES)
+  @RequiresPermission("update")
   @HttpCode(HttpStatus.CREATED)
   presentCandidate(@Body() dto: PresentCandidateDto, @CurrentUser() u: UserEntity) {
     return this.svc.presentCandidate(dto, u)

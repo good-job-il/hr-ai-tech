@@ -261,27 +261,25 @@ Team Manager — руководитель конкретной команды р
 
 - отдельный namespace `/agency/team/*` и отдельная навигация;
 - прямые organization-wide routes закрыты route guard;
-- backend RLS фильтрует основные сущности по `team_manager_id=user.id`;
-- team-aware routes существуют для dashboard, jobs, CRM, pipeline, compensation, AI Matching и import.
+- backend RLS фильтрует основные сущности по canonical `team_id`;
+- team cabinet: dashboard, roster, jobs, CRM, pipeline, compensation, AI Matching, import, reports и activity;
+- внутренние ссылки и breadcrumbs остаются в `/agency/team/*` после refresh/deep link;
+- TM-4 contract: два Team Manager одного tenant, nested/URL/API isolation, import → hire.
 
 **Реализовано частично:**
 
-- многие team routes переиспользуют общие страницы без доказанной корректности всех внутренних ссылок и агрегатов;
-- dashboard не гарантирует team-only KPI для каждого показателя;
-- jobs/API позволяют широкие role-based mutations и требуют action-level permission checks;
-- импорт доступен, но ownership, retry и idempotency должны быть подтверждены E2E;
-- compensation специально возвращается organization-wide в общем RLS utility, поэтому scope должен проверяться отдельной policy.
+- импорт доступен; ownership, retry и duplicate prevention закрыты TM-4
+  contract-тестами, browser smoke остаётся staging gate.
 
 **Не реализовано:**
 
-- `/agency/team/reports` является заглушкой;
-- отдельный team Activity UI;
-- полноценный экран управления только участниками своей команды;
-- полный Team Manager E2E-набор.
+- visual/browser E2E на staging (вне CI окружения).
 
 ### 6.4. Поэтапный план для Team Manager
 
 #### Фаза TM-1. Закрыть team boundary
+
+Реализация и security-контракты: [`AGENCY_TM1_TEAM_BOUNDARY.md`](./AGENCY_TM1_TEAM_BOUNDARY.md).
 
 - сделать `team_id` и membership канонической связью команды, сохранив совместимый `team_manager_id` на период миграции;
 - вычислять team scope на backend по membership, а не доверять query/body IDs;
@@ -293,6 +291,8 @@ Team Manager — руководитель конкретной команды р
 
 #### Фаза TM-2. Завершить командный кабинет
 
+Реализация кабинета: [`AGENCY_TM2_TEAM_CABINET.md`](./AGENCY_TM2_TEAM_CABINET.md).
+
 - создать team dashboard с workload, SLA, funnel, interviews и placements;
 - добавить read-only roster своей команды;
 - реализовать assign/reassign между рекрутерами команды;
@@ -303,6 +303,8 @@ Team Manager — руководитель конкретной команды р
 
 #### Фаза TM-3. Командная аналитика
 
+Реализация: [`AGENCY_TM3_TEAM_ANALYTICS.md`](./AGENCY_TM3_TEAM_ANALYTICS.md).
+
 - заменить placeholder Team Reports;
 - добавить recruiter workload, funnel, time-in-stage, source и placement metrics;
 - добавить team Activity или фильтр AuditLog только по событиям команды;
@@ -311,6 +313,8 @@ Team Manager — руководитель конкретной команды р
 Критерий готовности: Team Manager получает командные показатели без organization-wide утечки.
 
 #### Фаза TM-4. Финальная приёмка
+
+Реализация: [`AGENCY_TM4_FINAL_ACCEPTANCE.md`](./AGENCY_TM4_FINAL_ACCEPTANCE.md).
 
 - E2E для manager двух разных команд одного tenant;
 - cross-team negative tests для URL, API и nested resources;

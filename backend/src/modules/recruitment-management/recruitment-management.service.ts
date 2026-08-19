@@ -21,13 +21,12 @@ import { AssignRecruitmentWorkDto } from "./dto/recruitment-management.dto"
 import { ManagementReportQueryDto } from "../reports/dto/reports.dto"
 import {
   ACTIVE_APPLICATION_STATUSES,
+  APPLICATION_OVERLOAD,
   APPLICATION_PIPELINE_STATUSES,
   APPLICATION_SLA_HOURS,
+  JOB_OVERLOAD,
   PLACEMENT_APPLICATION_STATUSES,
 } from "../../common/utils/recruitment-kpis"
-const APPLICATION_OVERLOAD = 20
-
-const JOB_OVERLOAD = 5
 
 @Injectable()
 export class RecruitmentManagementService {
@@ -53,13 +52,40 @@ export class RecruitmentManagementService {
   async dashboard(user: UserEntity, sendAlerts = false, query: ManagementReportQueryDto = {}) {
     const organizationId = this.organizationId(user)
 
+    const isTeamManager = user.role === UserRole.TEAM_MANAGER
+
+    if (isTeamManager && !user.team_id) {
+      throw new ForbiddenException("Active team membership required")
+    }
+
+    if (isTeamManager && query.team_id && query.team_id !== user.team_id) {
+      throw new NotFoundException(`Team ${query.team_id} not found`)
+    }
+
+    const teamScope = isTeamManager ? { team_id: user.team_id! } : {}
+
     const [organizationApplications, organizationJobs, recruiters, teams] = await Promise.all([
-      this.applications.find({ where: { organization_id: organizationId, is_deleted: false } }),
-      this.jobs.find({ where: { organization_id: organizationId, is_deleted: false } }),
-      this.users.find({
-        where: { organization_id: organizationId, role: UserRole.RECRUITER, is_active: true },
+      this.applications.find({
+        where: { organization_id: organizationId, is_deleted: false, ...teamScope },
       }),
-      this.teams.find({ where: { organization_id: organizationId, is_active: true } }),
+      this.jobs.find({
+        where: { organization_id: organizationId, is_deleted: false, ...teamScope },
+      }),
+      this.users.find({
+        where: {
+          organization_id: organizationId,
+          role: UserRole.RECRUITER,
+          is_active: true,
+          ...teamScope,
+        },
+      }),
+      this.teams.find({
+        where: {
+          organization_id: organizationId,
+          is_active: true,
+          ...(isTeamManager ? { id: user.team_id! } : {}),
+        },
+      }),
     ])
 
     const from = query.date_from
@@ -72,7 +98,11 @@ export class RecruitmentManagementService {
       throw new BadRequestException("date_from must be before date_to")
     }
 
-    const selectedTeam = query.team_id ? teams.find((team) => team.id === query.team_id) : null
+    const selectedTeam = isTeamManager
+      ? (teams.find((team) => team.id === user.team_id) ?? null)
+      : query.team_id
+        ? teams.find((team) => team.id === query.team_id)
+        : null
 
     if (query.team_id && !selectedTeam) {
       throw new NotFoundException(`Team ${query.team_id} not found`)
@@ -85,7 +115,7 @@ export class RecruitmentManagementService {
         (!query.client_id || application.employer_company_id === query.client_id) &&
         (!query.job_id || application.job_id === query.job_id) &&
         (!query.recruiter_id || application.recruiter_id === query.recruiter_id) &&
-        (!selectedTeam || application.team_manager_id === selectedTeam.manager_id),
+        (!selectedTeam || application.team_id === selectedTeam.id),
     )
 
     const jobs = organizationJobs.filter(
@@ -93,7 +123,7 @@ export class RecruitmentManagementService {
         (!query.client_id || job.employer_company_id === query.client_id) &&
         (!query.job_id || job.id === query.job_id) &&
         (!query.recruiter_id || job.recruiter_id === query.recruiter_id) &&
-        (!selectedTeam || job.team_manager_id === selectedTeam.manager_id),
+        (!selectedTeam || job.team_id === selectedTeam.id),
     )
 
     const now = Date.now()
@@ -120,9 +150,7 @@ export class RecruitmentManagementService {
       .filter((application) => application.overdue_hours > 0)
       .sort((a, b) => b.overdue_hours - a.overdue_hours)
 
-    const teamByManager = new Map(
-      teams.filter((team) => team.manager_id).map((team) => [team.manager_id, team]),
-    )
+    const teamById = new Map(teams.map((team) => [team.id, team]))
 
     const workload = recruiters
       .map((recruiter) => {
@@ -140,7 +168,7 @@ export class RecruitmentManagementService {
           recruiter_id: recruiter.id,
           recruiter_name: recruiter.full_name || recruiter.email,
           team_id: recruiter.team_id,
-          team_name: teamByManager.get(recruiter.team_manager_id)?.name ?? null,
+          team_name: teamById.get(recruiter.team_id)?.name ?? null,
           active_applications: activeApplications,
           open_jobs: openJobs,
           overloaded: activeApplications >= APPLICATION_OVERLOAD || openJobs >= JOB_OVERLOAD,
@@ -177,7 +205,9 @@ export class RecruitmentManagementService {
         .sort((a, b) => new Date(b.updated_date).getTime() - new Date(a.updated_date).getTime())
         .slice(0, 20)
         .map((application) => ({
+          id: application.id,
           application_id: application.id,
+          candidate_id: application.candidate_id,
           candidate_name: application.candidate_name,
           job_title: application.job_title,
           company: application.company,
@@ -220,6 +250,16 @@ export class RecruitmentManagementService {
   async assign(dto: AssignRecruitmentWorkDto, user: UserEntity) {
     const organizationId = this.organizationId(user)
 
+    const isTeamManager = user.role === UserRole.TEAM_MANAGER
+
+    if (isTeamManager && !user.team_id) {
+      throw new ForbiddenException("Active team membership required")
+    }
+
+    if (isTeamManager && dto.team_id != null && dto.team_id !== user.team_id) {
+      throw new NotFoundException(`Team ${dto.team_id} not found`)
+    }
+
     const jobIds = [...new Set(dto.job_ids)]
 
     const candidateIds = [...new Set(dto.candidate_ids)]
@@ -231,7 +271,20 @@ export class RecruitmentManagementService {
 
       let recruiter: UserEntity | null = null
 
-      if (dto.team_id != null) {
+      if (isTeamManager) {
+        team = await manager.findOne(AgencyTeamEntity, {
+          where: {
+            id: user.team_id!,
+            organization_id: organizationId,
+            manager_id: user.id,
+            is_active: true,
+          },
+        })
+
+        if (!team) {
+          throw new ForbiddenException("Active managed team required")
+        }
+      } else if (dto.team_id != null) {
         team = await manager.findOne(AgencyTeamEntity, {
           where: { id: dto.team_id, organization_id: organizationId, is_active: true },
         })
@@ -248,6 +301,7 @@ export class RecruitmentManagementService {
             organization_id: organizationId,
             role: UserRole.RECRUITER,
             is_active: true,
+            ...(isTeamManager ? { team_id: user.team_id! } : {}),
           },
         })
 
@@ -269,17 +323,32 @@ export class RecruitmentManagementService {
       const [jobs, candidates, applications] = await Promise.all([
         jobIds.length
           ? manager.find(JobEntity, {
-              where: { id: In(jobIds), organization_id: organizationId, is_deleted: false },
+              where: {
+                id: In(jobIds),
+                organization_id: organizationId,
+                is_deleted: false,
+                ...(isTeamManager ? { team_id: user.team_id! } : {}),
+              },
             })
           : [],
         candidateIds.length
           ? manager.find(CandidateEntity, {
-              where: { id: In(candidateIds), organization_id: organizationId, is_deleted: false },
+              where: {
+                id: In(candidateIds),
+                organization_id: organizationId,
+                is_deleted: false,
+                ...(isTeamManager ? { team_id: user.team_id! } : {}),
+              },
             })
           : [],
         applicationIds.length
           ? manager.find(ApplicationEntity, {
-              where: { id: In(applicationIds), organization_id: organizationId, is_deleted: false },
+              where: {
+                id: In(applicationIds),
+                organization_id: organizationId,
+                is_deleted: false,
+                ...(isTeamManager ? { team_id: user.team_id! } : {}),
+              },
             })
           : [],
       ])
@@ -298,6 +367,7 @@ export class RecruitmentManagementService {
 
       const target = {
         recruiter_id: recruiter?.id ?? null,
+        team_id: team?.id ?? null,
         team_manager_id: team?.manager_id ?? null,
         ...(user.role === UserRole.RECRUITMENT_MANAGER ? { recruitment_manager_id: user.id } : {}),
       }
@@ -337,9 +407,9 @@ export class RecruitmentManagementService {
           actor_user_id: String(user.id),
           actor_email: user.email,
           actor_role: user.role,
-          entity_type: "Organization",
-          entity_id: organizationId,
-          entity_label: "Recruitment work assignment",
+          entity_type: isTeamManager ? "AgencyTeam" : "Organization",
+          entity_id: isTeamManager ? (team?.id ?? user.team_id ?? 0) : organizationId,
+          entity_label: isTeamManager ? "Team work assignment" : "Recruitment work assignment",
           action: "update",
           metadata: {
             operation: "bulk_reassign",

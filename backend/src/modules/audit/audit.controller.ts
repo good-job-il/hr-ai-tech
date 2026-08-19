@@ -9,7 +9,12 @@ import { RequiresPermission } from "../../common/decorators/requires-permission.
 import { UserRole } from "../../common/enums/user-role.enum"
 import { EffectivePermissionsGuard } from "../permissions/effective-permissions.guard"
 
-const ACTIVITY_ROLES = [UserRole.ADMIN, UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER]
+const ACTIVITY_ROLES = [
+  UserRole.ADMIN,
+  UserRole.ORG_ADMIN,
+  UserRole.RECRUITMENT_MANAGER,
+  UserRole.TEAM_MANAGER,
+]
 
 @ApiTags("Audit Log")
 @ApiBearerAuth()

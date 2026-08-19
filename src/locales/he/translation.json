@@ -150,10 +150,12 @@
       "jobs": "ניהול משרות",
       "crm": "CRM מועמדים",
       "pipeline": "תהליך גיוס",
+      "roster": "חברי הצוות",
       "compensation": "תגמולים",
       "aiMatching": "AI התאמה",
       "importCandidates": "ייבוא מועמדים",
-      "reports": "דוחות"
+      "reports": "דוחות",
+      "activity": "פעילות הצוות"
     },
     "company": {
       "dashboard": "דשבורד",
@@ -943,6 +945,8 @@
     "saving": "שומר...",
     "saved": "✓ נשמר",
     "saveChanges": "שמור שינויים",
+    "exportCSV": "ייצוא CSV",
+    "exportFailed": "לא ניתן לייצא את מטריצת ההרשאות",
     "loading": "טוען הרשאות...",
     "roleColumn": "תפקיד",
     "save": "שמור",
@@ -1652,6 +1656,8 @@
   "auditLog": {
     "title": "יומן אודיט",
     "subtitle": "ניטור פעילויות משתמשים ושינויים במערכת",
+    "teamTitle": "פעילות הצוות",
+    "teamSubtitle": "אירועים של חברי הצוות שלך",
     "exportCSV": "יצוא CSV",
     "exportFailed": "לא ניתן לייצא את הפעילות",
     "accessDenied": "אין לך הרשאה לצפות בפעילות התפעולית",
@@ -1734,6 +1740,7 @@
     "applicationsPanel": {
       "noApplications": "אין מועמדויות",
       "noName": "ללא שם",
+      "openInPipeline": "פתח במשפך",
       "statuses": {
         "new": "חדש",
         "reviewed": "נסקר",

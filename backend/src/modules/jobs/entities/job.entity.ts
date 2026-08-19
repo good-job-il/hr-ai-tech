@@ -4,6 +4,7 @@ import { BaseEntity } from "../../../common/entities/base.entity"
 @Entity("jobs")
 @Index(["organization_id"])
 @Index(["recruiter_id"])
+@Index(["team_id"])
 @Index(["is_closed"])
 @Index(["state"])
 @Index(["is_deleted"])
@@ -66,6 +67,9 @@ export class JobEntity extends BaseEntity {
 
   @Column({ name: "recruiter_id", type: "int", nullable: true })
   recruiter_id: number | null
+
+  @Column({ name: "team_id", type: "int", nullable: true })
+  team_id: number | null
 
   @Column({ name: "team_manager_id", type: "int", nullable: true })
   team_manager_id: number | null

@@ -13,6 +13,7 @@ export interface UserContext {
   role: UserRole
   organization_id: number | null
   employer_company_id?: number | null
+  team_id?: number | null
   email: string
   org_type?: string | null
   /** True when an ADMIN has entered a specific organization's workspace
@@ -47,6 +48,15 @@ const ORG_WIDE_ENTITIES = [
   "Position",
 ]
 
+const TEAM_SCOPED_ENTITIES = [
+  "Job",
+  "Application",
+  "Candidate",
+  "Interview",
+  "CandidateImportBatch",
+  "CompensationPlan",
+]
+
 /**
  * Returns a TypeORM-compatible WHERE filter object based on user role.
  * Returns BLOCKED_FILTER if the user has no access.
@@ -56,7 +66,7 @@ export function getRlsWhere(
   user: UserContext,
   extraFilters: Record<string, any> = {},
 ): Record<string, any> {
-  const { role, id: userId, organization_id, employer_company_id, impersonating } = user
+  const { role, id: userId, organization_id, employer_company_id, team_id, impersonating } = user
 
   // ─── Admin acting inside an organization's workspace ──────────────────
   // Scoped exactly like that org's ORG_ADMIN — never the unrestricted
@@ -91,7 +101,11 @@ export function getRlsWhere(
         return BLOCKED_FILTER
       }
 
-      const base = getOrgFilter(entityName, organization_id, null, userId)
+      if (!team_id) {
+        return BLOCKED_FILTER
+      }
+
+      const base = getOrgFilter(entityName, organization_id, null, team_id)
 
       return base === BLOCKED_FILTER ? BLOCKED_FILTER : buildFinal(entityName, base, extraFilters)
     }
@@ -148,13 +162,9 @@ function getOrgFilter(
   entityName: string,
   orgId: number,
   recruiterId: number | null,
-  teamManagerId: number | null,
+  teamId: number | null,
 ): Record<string, any> {
-  if (entityName === "CompensationPlan") {
-    return { organization_id: orgId }
-  }
-
-  if (!ORG_WIDE_ENTITIES.includes(entityName)) {
+  if (!ORG_WIDE_ENTITIES.includes(entityName) && entityName !== "CompensationPlan") {
     return BLOCKED_FILTER
   }
 
@@ -168,8 +178,8 @@ function getOrgFilter(
     return { ...base, recruiter_id: recruiterId }
   }
 
-  if (teamManagerId) {
-    return { ...base, team_manager_id: teamManagerId }
+  if (teamId) {
+    return TEAM_SCOPED_ENTITIES.includes(entityName) ? { ...base, team_id: teamId } : BLOCKED_FILTER
   }
 
   return base

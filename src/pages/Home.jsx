@@ -441,7 +441,7 @@ function HeroSection() {
 
     const map = {
       recruiter: "/agency/recruiter/dashboard",
-      team_manager: "/agency/dashboard",
+      team_manager: "/agency/team/dashboard",
       recruitment_manager: "/agency/dashboard",
       org_admin: "/agency/dashboard",
       employer: "/employer/dashboard",

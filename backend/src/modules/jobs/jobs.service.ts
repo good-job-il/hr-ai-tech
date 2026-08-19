@@ -61,6 +61,7 @@ export class JobsService {
           id: user.id,
           role: user.role,
           organization_id: user.organization_id,
+          team_id: user.team_id,
           employer_company_id: user.employer_company_id,
           email: user.email,
           impersonating: user.impersonating,
@@ -132,6 +133,7 @@ export class JobsService {
           id: user.id,
           role: user.role,
           organization_id: user.organization_id,
+          team_id: user.team_id,
           employer_company_id: user.employer_company_id,
           email: user.email,
           impersonating: user.impersonating,
@@ -156,7 +158,7 @@ export class JobsService {
 
     const clientCompany = await this.resolveAgencyClientCompany(dto.employer_company_id, user)
 
-    await this.assertAgencyAssignments(dto, user)
+    const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
     const job = this.jobRepo.create({
       ...dto,
@@ -171,8 +173,9 @@ export class JobsService {
       organization_id: user.organization_id,
       created_by_user_id: user.id,
       recruiter_id: dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
+      team_id: assignmentTeamId,
       team_manager_id:
-        dto.team_manager_id ?? (user.role === UserRole.TEAM_MANAGER ? user.id : null),
+        user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id,
       recruitment_manager_id:
         dto.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
       state: dto.state ?? (dto.is_closed ? "closed" : "open"),
@@ -185,7 +188,7 @@ export class JobsService {
   async update(id: number, dto: UpdateJobDto, user: UserEntity): Promise<JobEntity> {
     const job = await this.findById(id, user)
 
-    await this.assertAgencyAssignments(dto, user)
+    const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
     const clientCompany = await this.resolveAgencyClientCompany(
       dto.employer_company_id ?? job.employer_company_id,
@@ -193,6 +196,14 @@ export class JobsService {
     )
 
     Object.assign(job, dto)
+
+    if (assignmentTeamId != null) {
+      job.team_id = assignmentTeamId
+
+      if (user.role === UserRole.TEAM_MANAGER) {
+job.team_manager_id = user.id
+}
+    }
 
     if (dto.state) {
       job.is_closed = ["filled", "closed"].includes(dto.state)
@@ -256,7 +267,7 @@ export class JobsService {
 
   private async assertAgencyAssignments(dto: Partial<CreateJobDto>, user: UserEntity) {
     if (user.org_type !== OrgType.STAFFING_AGENCY) {
-      return
+      return null
     }
 
     if (!user.organization_id) {
@@ -268,6 +279,8 @@ export class JobsService {
       ["team_manager_id", UserRole.TEAM_MANAGER],
       ["recruitment_manager_id", UserRole.RECRUITMENT_MANAGER],
     ]
+
+    const teamIds = new Set<number>()
 
     for (const [field, role] of assignments) {
       const id = dto[field]
@@ -283,7 +296,35 @@ export class JobsService {
       if (!assignee) {
         throw new ForbiddenException(`Invalid ${String(field)} assignment`)
       }
+
+      if (user.role === UserRole.TEAM_MANAGER) {
+        if (!user.team_id || assignee.team_id !== user.team_id) {
+          throw new ForbiddenException("Assignee must belong to the Team Manager's team")
+        }
+
+        if (field === "team_manager_id" && assignee.id !== user.id) {
+          throw new ForbiddenException("Team Manager cannot assign another team manager")
+        }
+      }
+
+      if (assignee.team_id) {
+teamIds.add(assignee.team_id)
+}
     }
+
+    if (teamIds.size > 1) {
+throw new BadRequestException("All assignees must belong to the same team")
+}
+
+    if (user.role === UserRole.TEAM_MANAGER) {
+      if (!user.team_id) {
+throw new ForbiddenException("Active team membership required")
+}
+
+      return user.team_id
+    }
+
+    return [...teamIds][0] ?? null
   }
 
   async softDelete(id: number, user: UserEntity): Promise<void> {

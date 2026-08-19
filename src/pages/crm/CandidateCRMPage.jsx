@@ -5,6 +5,7 @@ import { useCandidateCRM } from "@/hooks/useCandidateCRM"
 import { useAuth } from "@/lib/AuthContext"
 import { candidateService } from "@/api/services/candidateService"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
+import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 
 export default function CandidateCRMPage() {
   const { t, i18n } = useTranslation()
@@ -31,6 +32,10 @@ export default function CandidateCRMPage() {
 
   const { can } = usePermissionMatrix()
 
+  const { base, paths } = useAgencyWorkspace()
+
+  const goToCrmList = () => navigate(base ? paths.crm : -1)
+
   const canUpdate = can("update")
 
   const canDelete = can("delete")
@@ -51,7 +56,7 @@ export default function CandidateCRMPage() {
 
     setDeleting(true)
     await candidateService.remove(candidateId)
-    navigate(-1)
+    goToCrmList()
   }
 
   const crm = useCandidateCRM(candidateId)
@@ -139,7 +144,9 @@ export default function CandidateCRMPage() {
           onClick={reload}
           className="mt-4 flex items-center gap-2 text-sm font-bold text-[#7C3AED] hover:underline"
         >
-          <RefreshCw className="w-4 h-4" /> {t("candidateCRM.tryAgain")}
+          <RefreshCw className="w-4 h-4" />
+
+          {t("candidateCRM.tryAgain")}
         </button>
       </div>
     )
@@ -152,7 +159,7 @@ export default function CandidateCRMPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate(-1)}
+              onClick={goToCrmList}
               className="flex items-center gap-1.5 text-sm font-bold text-[#64748B] hover:text-[#7C3AED] transition-colors"
             >
               {isRTL ? <ArrowRight className="w-4 h-4" /> : null}
@@ -161,6 +168,24 @@ export default function CandidateCRMPage() {
 
               {!isRTL ? <ArrowRight className="w-4 h-4 rotate-180" /> : null}
             </button>
+
+            {base ? (
+              <nav className="flex items-center gap-2 text-sm font-bold text-[#94A3B8]">
+                <button
+                  type="button"
+                  onClick={goToCrmList}
+                  className="hover:text-[#7C3AED] transition-colors"
+                >
+                  {t("crm.candidatesCrm")}
+                </button>
+
+                <span>/</span>
+
+                <span className="truncate text-[#0F172A]">
+                  {candidate?.full_name || t("candidateCRM.noCandidateSelected")}
+                </span>
+              </nav>
+            ) : null}
 
             <LanguageSwitcher variant="badge" />
           </div>

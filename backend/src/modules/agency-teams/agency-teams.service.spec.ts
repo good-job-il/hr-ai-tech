@@ -156,4 +156,32 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
       service.updateMember(actor.id, { is_active: false } as any, actor),
     ).rejects.toBeInstanceOf(BadRequestException)
   })
+
+  it("returns only the canonical team membership to a Team Manager", async () => {
+    const lead = {
+      id: 41,
+      email: "lead@acceptance.test",
+      full_name: "Team Lead",
+      role: UserRole.TEAM_MANAGER,
+      organization_id: organizationId,
+      team_id: 101,
+    }
+
+    storedUsers.push(
+      lead,
+      { id: 31, email: "own@test", role: UserRole.RECRUITER, organization_id: organizationId, team_id: 101 },
+      { id: 32, email: "other@test", role: UserRole.RECRUITER, organization_id: organizationId, team_id: 102 },
+    )
+    storedTeams.push(
+      { id: 101, organization_id: organizationId, manager_id: 41, name: "Own", is_active: true },
+      { id: 102, organization_id: organizationId, manager_id: 42, name: "Other", is_active: true },
+    )
+
+    const overview = await service.overview(lead as any)
+
+    expect(overview.teams).toEqual([expect.objectContaining({ id: 101 })])
+    expect(overview.members.map(member => member.id)).toEqual(expect.arrayContaining([41, 31]))
+    expect(overview.members.map(member => member.id)).not.toContain(32)
+    expect(overview.invitations).toEqual([])
+  })
 })

@@ -1,17 +1,27 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Between, LessThanOrEqual, Like, MoreThanOrEqual, Repository } from "typeorm"
+import { Between, In, LessThanOrEqual, Like, MoreThanOrEqual, Not, Repository } from "typeorm"
 import { AuditLogEntity } from "./audit-log.entity"
 import { CreateAuditLogDto, QueryAuditLogsDto } from "./dto/audit-log.dto"
 import { UserEntity } from "../users/user.entity"
 import { UserRole } from "../../common/enums/user-role.enum"
 import { buildPaginatedResponse, getSkipTake } from "../../common/utils/pagination.utils"
 
+const ORGANIZATION_WIDE_AUDIT_ENTITY_TYPES = [
+  "Organization",
+  "PermissionMatrix",
+  "RoleTemplate",
+  "Billing",
+  "Integration",
+]
+
 @Injectable()
 export class AuditService {
   constructor(
     @InjectRepository(AuditLogEntity)
     private readonly repo: Repository<AuditLogEntity>,
+    @InjectRepository(UserEntity)
+    private readonly users: Repository<UserEntity>,
   ) {}
 
   async findAll(query: QueryAuditLogsDto, user: UserEntity) {
@@ -36,8 +46,40 @@ export class AuditService {
       where.organization_id = user.organization_id
     }
 
-    if (entity_type) {
-      where.entity_type = entity_type
+    if (user.role === UserRole.TEAM_MANAGER) {
+      if (!user.team_id || !user.organization_id) {
+        return buildPaginatedResponse([], 0, { page, limit })
+      }
+
+      const members = await this.users.find({
+        where: { organization_id: user.organization_id, team_id: user.team_id },
+        select: ["id"],
+      })
+
+      const memberIds = members.map((member) => String(member.id))
+
+      if (actor_user_id && !memberIds.includes(String(actor_user_id))) {
+        return buildPaginatedResponse([], 0, { page, limit })
+      }
+
+      if (entity_type && ORGANIZATION_WIDE_AUDIT_ENTITY_TYPES.includes(entity_type)) {
+        return buildPaginatedResponse([], 0, { page, limit })
+      }
+
+      if (!memberIds.length) {
+        return buildPaginatedResponse([], 0, { page, limit })
+      }
+
+      where.actor_user_id = actor_user_id ? String(actor_user_id) : In(memberIds)
+      where.entity_type = entity_type ? entity_type : Not(In(ORGANIZATION_WIDE_AUDIT_ENTITY_TYPES))
+    } else {
+      if (entity_type) {
+        where.entity_type = entity_type
+      }
+
+      if (actor_user_id) {
+        where.actor_user_id = actor_user_id
+      }
     }
 
     if (entity_id) {
@@ -46,10 +88,6 @@ export class AuditService {
 
     if (action) {
       where.action = action
-    }
-
-    if (actor_user_id) {
-      where.actor_user_id = actor_user_id
     }
 
     if (actor_email) {
@@ -84,9 +122,13 @@ export class AuditService {
       actor_user_id: String(user.id),
       actor_email: user.email,
       actor_role: user.role,
-      entity_type: "Organization",
-      entity_id: user.organization_id ?? 0,
-      entity_label: "Operational activity export",
+      entity_type: user.role === UserRole.TEAM_MANAGER ? "AgencyTeam" : "Organization",
+      entity_id:
+        user.role === UserRole.TEAM_MANAGER ? (user.team_id ?? 0) : (user.organization_id ?? 0),
+      entity_label:
+        user.role === UserRole.TEAM_MANAGER
+          ? "Team activity export"
+          : "Operational activity export",
       action: "export",
       metadata: {
         filters: {
@@ -98,6 +140,7 @@ export class AuditService {
           date_to: query.date_to,
         },
         exported_records: result.data.length,
+        team_id: user.team_id ?? null,
       },
     })
 

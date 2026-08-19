@@ -27,6 +27,22 @@ describe("getRlsWhere", () => {
     ).toEqual({ is_deleted: false, organization_id: 10, recruiter_id: 7 })
   })
 
+  it("derives team-manager scope from canonical membership and ignores query ownership", () => {
+    expect(
+      getRlsWhere(
+        "Application",
+        user({ role: UserRole.TEAM_MANAGER, organization_id: 10, team_id: 44 }),
+        { organization_id: 99, team_id: 88, team_manager_id: 123 },
+      ),
+    ).toEqual({ is_deleted: false, organization_id: 10, team_id: 44, team_manager_id: 123 })
+  })
+
+  it("blocks a team manager without canonical team membership", () => {
+    expect(
+      getRlsWhere("Candidate", user({ role: UserRole.TEAM_MANAGER, organization_id: 10 })),
+    ).toBe(BLOCKED_FILTER)
+  })
+
   it("confines an impersonating platform admin to the entered tenant", () => {
     expect(
       getRlsWhere(

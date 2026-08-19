@@ -1,9 +1,12 @@
 import { format } from "date-fns"
 import { he, enUS } from "date-fns/locale"
 import { useTranslation } from "react-i18next"
+import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 
 export default function ApplicationsPanel({ applications }) {
   const { t, i18n } = useTranslation()
+
+  const { base, paths } = useAgencyWorkspace()
 
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
 
@@ -104,6 +107,15 @@ export default function ApplicationsPanel({ applications }) {
                 {statusCfg.label}
               </span>
             </div>
+
+            {base ? (
+              <Link
+                to={`${paths.pipeline}?applicationId=${app.id}`}
+                className="mt-3 inline-flex text-xs font-bold text-[#7C3AED] hover:underline"
+              >
+                {t("candidateCRM.applicationsPanel.openInPipeline")}
+              </Link>
+            ) : null}
 
             {app.match_score && (
               <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#F0F1F5]">

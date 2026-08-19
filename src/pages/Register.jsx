@@ -167,8 +167,8 @@ export default function Register() {
         candidate: "/candidate/dashboard",
         employer: "/employer/dashboard",
         recruiter: "/recruiter/dashboard",
-        team_manager: "/recruitment/jobs",
-        recruitment_manager: "/recruitment/jobs",
+        team_manager: "/agency/team/dashboard",
+        recruitment_manager: "/agency/dashboard",
         // org_admin never has an organization yet at this point — send
         // straight to onboarding for the org type they picked. Staffing
         // agencies self-onboard immediately; company org_admins land on

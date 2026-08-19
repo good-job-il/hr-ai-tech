@@ -57,6 +57,12 @@ export class AgencyClientsService {
   async findAll(query: QueryAgencyClientsDto, user: UserEntity) {
     const organizationId = this.requireOrganization(user)
 
+    const teamId = user.role === UserRole.TEAM_MANAGER ? user.team_id : null
+
+    if (user.role === UserRole.TEAM_MANAGER && !teamId) {
+      return { data: [], total: 0, page: query.page, limit: query.limit, totalPages: 0 }
+    }
+
     const qb = this.clientRepo
       .createQueryBuilder("client")
       .innerJoin(CompanyEntity, "company", "company.id = client.company_id")
@@ -66,6 +72,25 @@ export class AgencyClientsService {
       .addSelect("company.name", "company_name")
       .where("client.organization_id = :organizationId", { organizationId })
       .andWhere("company.is_deleted = false")
+
+    if (teamId) {
+      qb.andWhere(
+        `(EXISTS (
+          SELECT 1 FROM jobs team_job
+          WHERE team_job.organization_id = client.organization_id
+            AND team_job.employer_company_id = client.company_id
+            AND team_job.team_id = :teamId
+            AND team_job.is_deleted = false
+        ) OR EXISTS (
+          SELECT 1 FROM applications team_application
+          WHERE team_application.organization_id = client.organization_id
+            AND team_application.employer_company_id = client.company_id
+            AND team_application.team_id = :teamId
+            AND team_application.is_deleted = false
+        ))`,
+        { teamId },
+      )
+    }
 
     if (query.status) {
       qb.andWhere("client.status = :status", { status: query.status })
@@ -92,7 +117,7 @@ export class AgencyClientsService {
       .take(query.limit)
       .getMany()
 
-    const data = await this.hydrate(clients, organizationId)
+    const data = await this.hydrate(clients, organizationId, teamId)
 
     return {
       data,
@@ -114,7 +139,38 @@ export class AgencyClientsService {
       throw new NotFoundException(`Agency client ${id} not found`)
     }
 
-    const [result] = await this.hydrate([client], organizationId)
+    const teamId = user.role === UserRole.TEAM_MANAGER ? user.team_id : null
+
+    if (user.role === UserRole.TEAM_MANAGER) {
+      if (!teamId) {
+throw new NotFoundException(`Agency client ${id} not found`)
+}
+
+      const [teamJob, teamApplication] = await Promise.all([
+        this.jobRepo.findOne({
+          where: {
+            organization_id: organizationId,
+            employer_company_id: client.company_id,
+            team_id: teamId,
+            is_deleted: false,
+          },
+        }),
+        this.applicationRepo.findOne({
+          where: {
+            organization_id: organizationId,
+            employer_company_id: client.company_id,
+            team_id: teamId,
+            is_deleted: false,
+          },
+        }),
+      ])
+
+      if (!teamJob && !teamApplication) {
+        throw new NotFoundException(`Agency client ${id} not found`)
+      }
+    }
+
+    const [result] = await this.hydrate([client], organizationId, teamId)
 
     return result
   }
@@ -302,7 +358,11 @@ export class AgencyClientsService {
     return { success: true }
   }
 
-  private async hydrate(clients: AgencyClientEntity[], organizationId: number) {
+  private async hydrate(
+    clients: AgencyClientEntity[],
+    organizationId: number,
+    teamId: number | null = null,
+  ) {
     if (!clients.length) {
       return []
     }
@@ -315,7 +375,7 @@ export class AgencyClientsService {
 
     const companyMap = new Map(companies.map((company) => [company.id, company]))
 
-    const jobRows = await this.jobRepo
+    const jobQuery = this.jobRepo
       .createQueryBuilder("job")
       .select("job.employer_company_id", "company_id")
       .addSelect("COUNT(*)", "total_jobs")
@@ -323,12 +383,16 @@ export class AgencyClientsService {
       .where("job.organization_id = :organizationId", { organizationId })
       .andWhere("job.employer_company_id IN (:...companyIds)", { companyIds })
       .andWhere("job.is_deleted = false")
-      .groupBy("job.employer_company_id")
-      .getRawMany()
+
+    if (teamId) {
+      jobQuery.andWhere("job.team_id = :teamId", { teamId })
+    }
+
+    const jobRows = await jobQuery.groupBy("job.employer_company_id").getRawMany()
 
     const jobStats = new Map(jobRows.map((row) => [Number(row.company_id), row]))
 
-    const appRows = await this.applicationRepo
+    const applicationQuery = this.applicationRepo
       .createQueryBuilder("application")
       .select("application.employer_company_id", "company_id")
       .addSelect("COUNT(*)", "total_applications")
@@ -343,6 +407,12 @@ export class AgencyClientsService {
       .where("application.organization_id = :organizationId", { organizationId })
       .andWhere("application.employer_company_id IN (:...companyIds)", { companyIds })
       .andWhere("application.is_deleted = false")
+
+    if (teamId) {
+      applicationQuery.andWhere("application.team_id = :teamId", { teamId })
+    }
+
+    const appRows = await applicationQuery
       .groupBy("application.employer_company_id")
       .getRawMany()
 

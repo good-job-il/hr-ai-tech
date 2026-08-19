@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/AuthContext"
 import { User, UsersRound, UserCheck, Clock3, ShieldAlert } from "lucide-react"
 
 import { getAgencyScopeFilter, isAgencyUser } from "@/domain/agency/access"
+import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 
 const STATUS_COLORS = {
   new: "bg-blue-100 text-blue-700",
@@ -19,7 +20,11 @@ const STATUS_COLORS = {
 
 const PAGE_SIZE = 50 // Performance: Load only 50 candidates at a time
 
-export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate" }) {
+export default function CandidateListCRMPage({ candidateRoute }) {
+  const { base, paths } = useAgencyWorkspace()
+
+  const resolvedCandidateRoute = candidateRoute || (base ? paths.candidate : "/crm/candidate")
+
   const navigate = useNavigate()
 
   const location = useLocation()
@@ -282,7 +287,7 @@ export default function CandidateListCRMPage({ candidateRoute = "/crm/candidate"
                 <CandidateRowMemo
                   key={candidate.id}
                   candidate={candidate}
-                  onClick={() => navigate(`${candidateRoute}?id=${candidate.id}`)}
+                  onClick={() => navigate(`${resolvedCandidateRoute}?id=${candidate.id}`)}
                   t={t}
                   isRTL={isRTL}
                 />

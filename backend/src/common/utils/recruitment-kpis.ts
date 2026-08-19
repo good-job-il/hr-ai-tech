@@ -33,3 +33,7 @@ export const APPLICATION_SLA_HOURS: Record<string, number> = {
   employer_interview: 120,
   offer: 72,
 }
+
+export const APPLICATION_OVERLOAD = 20
+
+export const JOB_OVERLOAD = 5

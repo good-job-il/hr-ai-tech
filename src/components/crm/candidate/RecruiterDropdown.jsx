@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from "react"
 import { userService } from "@/api/services/userService"
 import { useTranslation } from "react-i18next"
+import { useAuth } from "@/lib/AuthContext"
 
 export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
   const { t } = useTranslation()
+
+  const { user } = useAuth()
 
   const [open, setOpen] = useState(false)
 
@@ -21,9 +24,22 @@ export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
     }
 
     setLoading(true)
+
+    const teamOnly = user?.role === "team_manager"
+
     userService
-      .list({ limit: 200, is_active: true })
+      .list({
+        limit: 200,
+        is_active: true,
+        ...(teamOnly ? { role: "recruiter" } : {}),
+      })
       .then((users) => {
+        if (teamOnly) {
+          setRecruiters(users)
+
+          return
+        }
+
         const RECRUITER_ROLES = ["recruiter", "team_manager", "recruitment_manager", "admin"]
 
         const filtered = users.filter(
@@ -33,7 +49,7 @@ export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
         setRecruiters(filtered)
       })
       .finally(() => setLoading(false))
-  }, [open])
+  }, [open, user?.role])
 
   useEffect(() => {
     const handleClick = (e) => {

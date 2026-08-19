@@ -163,6 +163,7 @@ export class CandidatesController {
   // ─── Notes (static prefix routes) ─────────────────────────────────────────
   @Patch("notes/:noteId")
   @Roles(...CANDIDATE_WRITE_ROLES)
+  @RequiresPermission("update")
   updateNote(
     @Param("noteId", ParseIntPipe) noteId: number,
     @Body() dto: UpdateCandidateNoteDto,
@@ -173,6 +174,7 @@ export class CandidatesController {
 
   @Delete("notes/:noteId")
   @Roles(...CANDIDATE_WRITE_ROLES)
+  @RequiresPermission("delete")
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteNote(@Param("noteId", ParseIntPipe) noteId: number, @CurrentUser() user: UserEntity) {
     return this.svc.deleteNote(noteId, user)
@@ -181,6 +183,7 @@ export class CandidatesController {
   // ─── Tags (static prefix routes) ──────────────────────────────────────────
   @Delete("tags/:tagId")
   @Roles(...CANDIDATE_WRITE_ROLES)
+  @RequiresPermission("delete")
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteTag(@Param("tagId", ParseIntPipe) tagId: number, @CurrentUser() user: UserEntity) {
     return this.svc.deleteTag(tagId, user)
@@ -237,6 +240,7 @@ export class CandidatesController {
 
   @Post(":id/notes")
   @Roles(...CANDIDATE_WRITE_ROLES)
+  @RequiresPermission("update")
   @HttpCode(HttpStatus.CREATED)
   createNote(
     @Param("id", ParseIntPipe) id: number,
@@ -254,6 +258,7 @@ export class CandidatesController {
 
   @Post(":id/tags")
   @Roles(...CANDIDATE_WRITE_ROLES)
+  @RequiresPermission("update")
   @HttpCode(HttpStatus.CREATED)
   createTag(
     @Param("id", ParseIntPipe) id: number,
@@ -271,6 +276,7 @@ export class CandidatesController {
 
   @Post(":id/timeline")
   @Roles(...CANDIDATE_WRITE_ROLES)
+  @RequiresPermission("update")
   @HttpCode(HttpStatus.CREATED)
   createTimelineEvent(
     @Param("id", ParseIntPipe) id: number,
@@ -288,6 +294,7 @@ export class CandidatesController {
 
   @Post(":id/documents")
   @Roles(...CANDIDATE_WRITE_ROLES)
+  @RequiresPermission("update")
   @HttpCode(HttpStatus.CREATED)
   createDocument(
     @Param("id", ParseIntPipe) id: number,

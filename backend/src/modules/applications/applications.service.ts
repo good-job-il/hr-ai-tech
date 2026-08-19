@@ -60,6 +60,7 @@ export class ApplicationsService {
       id: user.id,
       role: user.role,
       organization_id: user.organization_id,
+      team_id: user.team_id,
       employer_company_id: user.employer_company_id,
       email: user.email,
       impersonating: user.impersonating,
@@ -143,6 +144,7 @@ export class ApplicationsService {
       id: user.id,
       role: user.role,
       organization_id: user.organization_id,
+      team_id: user.team_id,
       employer_company_id: user.employer_company_id,
       email: user.email,
       impersonating: user.impersonating,
@@ -175,12 +177,13 @@ export class ApplicationsService {
     user: UserEntity,
     candidateUserId: number | null = null,
   ): Promise<ApplicationEntity> {
-    await this.assertAgencyAssignments(dto, user)
+    const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
     const jobScope = getRlsWhere("Job", {
       id: user.id,
       role: user.role,
       organization_id: user.organization_id,
+      team_id: user.team_id,
       employer_company_id: user.employer_company_id,
       email: user.email,
       impersonating: user.impersonating,
@@ -194,6 +197,10 @@ export class ApplicationsService {
 
     if (!job?.organization_id) {
       throw new NotFoundException(`Job ${dto.job_id} not found`)
+    }
+
+    if (assignmentTeamId && job.team_id && assignmentTeamId !== job.team_id) {
+      throw new BadRequestException("Application assignee must belong to the job's team")
     }
 
     if (dto.candidate_id != null) {
@@ -222,6 +229,10 @@ export class ApplicationsService {
       candidate_email: isCandidate ? user.email : dto.candidate_email,
       candidate_user_id: isCandidate ? user.id : candidateUserId,
       candidate_id: isCandidate ? null : dto.candidate_id,
+      team_id: assignmentTeamId ?? job.team_id,
+      team_manager_id: isCandidate
+        ? job.team_manager_id
+        : (user.role === UserRole.TEAM_MANAGER ? user.id : (dto.team_manager_id ?? job.team_manager_id)),
       recruiter_id: isCandidate
         ? null
         : (dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null)),
@@ -290,6 +301,7 @@ export class ApplicationsService {
       id: user.id,
       role: user.role,
       organization_id: user.organization_id,
+      team_id: user.team_id,
       employer_company_id: user.employer_company_id,
       email: user.email,
       impersonating: user.impersonating,
@@ -343,7 +355,7 @@ export class ApplicationsService {
     user: UserEntity,
     reason?: string,
   ): Promise<ApplicationEntity> {
-    await this.assertAgencyAssignments(dto, user)
+    const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
     const app = await this.findById(id, user)
 
@@ -354,6 +366,14 @@ export class ApplicationsService {
     }
 
     Object.assign(app, dto)
+
+    if (assignmentTeamId != null) {
+      app.team_id = assignmentTeamId
+
+      if (user.role === UserRole.TEAM_MANAGER) {
+app.team_manager_id = user.id
+}
+    }
 
     if (dto.is_deleted && !app.deleted_at) {
       app.deleted_at = new Date()
@@ -510,7 +530,7 @@ export class ApplicationsService {
 
   private async assertAgencyAssignments(dto: Partial<CreateApplicationDto>, user: UserEntity) {
     if (user.org_type !== "staffing_agency") {
-      return
+      return null
     }
 
     if (!user.organization_id) {
@@ -523,6 +543,8 @@ export class ApplicationsService {
       ["team_manager_id", UserRole.TEAM_MANAGER],
       ["recruitment_manager_id", UserRole.RECRUITMENT_MANAGER],
     ]
+
+    const teamIds = new Set<number>()
 
     for (const [field, role] of fields) {
       const id = dto[field]
@@ -538,7 +560,35 @@ export class ApplicationsService {
       if (!assignee) {
         throw new BadRequestException(`Invalid ${String(field)} assignment`)
       }
+
+      if (user.role === UserRole.TEAM_MANAGER) {
+        if (!user.team_id || assignee.team_id !== user.team_id) {
+          throw new BadRequestException("Assignee must belong to the Team Manager's team")
+        }
+
+        if (field === "team_manager_id" && assignee.id !== user.id) {
+          throw new BadRequestException("Team Manager cannot assign another team manager")
+        }
+      }
+
+      if (assignee.team_id) {
+teamIds.add(assignee.team_id)
+}
     }
+
+    if (teamIds.size > 1) {
+throw new BadRequestException("All assignees must belong to the same team")
+}
+
+    if (user.role === UserRole.TEAM_MANAGER) {
+      if (!user.team_id) {
+throw new BadRequestException("Active team membership required")
+}
+
+      return user.team_id
+    }
+
+    return [...teamIds][0] ?? null
   }
 
   async addNote(id: number, content: string, user: UserEntity) {

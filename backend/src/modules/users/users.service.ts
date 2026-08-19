@@ -58,6 +58,14 @@ export class UsersService {
       where.organization_id = requestingUser.organization_id
     }
 
+    if (requestingUser.role === UserRole.TEAM_MANAGER) {
+      if (!requestingUser.team_id) {
+        return buildPaginatedResponse([], 0, { page, limit, sort, order })
+      }
+
+      where.team_id = requestingUser.team_id
+    }
+
     if (role) {
       where.role = role
     }
@@ -108,6 +116,14 @@ export class UsersService {
       user.organization_id !== requestingUser.organization_id
     ) {
       throw new ForbiddenException("Access denied")
+    }
+
+    if (
+      requestingUser.role === UserRole.TEAM_MANAGER &&
+      user.id !== requestingUser.id &&
+      (!requestingUser.team_id || user.team_id !== requestingUser.team_id)
+    ) {
+      throw new NotFoundException(`User ${id} not found`)
     }
 
     return user

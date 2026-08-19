@@ -21,6 +21,7 @@ import { format } from "date-fns"
 import { he, enUS } from "date-fns/locale"
 import { useTranslation } from "react-i18next"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
+import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 import { useLocation, useNavigate } from "react-router-dom"
 import { platformFieldClassName } from "@/components/platform/PlatformUI"
 import { directionForLanguage } from "@/domain/agency/rmAcceptance"
@@ -53,6 +54,14 @@ const getActionConfig = (t) => ({
   resend: { label: "Resend", icon: Activity, color: "#3B82F6" },
   cancel: { label: "Cancel", icon: XCircle, color: "#F97316" },
 })
+
+const ORGANIZATION_WIDE_ENTITY_TYPES = [
+  "Organization",
+  "PermissionMatrix",
+  "RoleTemplate",
+  "Billing",
+  "Integration",
+]
 
 const ENTITY_TYPES = [
   "Candidate",
@@ -111,6 +120,12 @@ export default function AuditLogPage() {
 
   const location = useLocation()
 
+  const { paths, isTeam, base } = useAgencyWorkspace()
+
+  const entityTypes = isTeam
+    ? ENTITY_TYPES.filter((type) => !ORGANIZATION_WIDE_ENTITY_TYPES.includes(type))
+    : ENTITY_TYPES
+
   const [filters, setFilters] = useState({
     entity_type: "",
     action: "",
@@ -166,6 +181,7 @@ export default function AuditLogPage() {
   } = useQuery({
     queryKey: [
       "audit-logs",
+      isTeam,
       filters.entity_type,
       filters.action,
       filters.actor_email,
@@ -242,7 +258,7 @@ export default function AuditLogPage() {
     const link = document.createElement("a")
 
     link.href = url
-    link.download = `audit_log_${format(new Date(), "yyyy-MM-dd")}.csv`
+    link.download = `${isTeam ? "team_activity" : "audit_log"}_${format(new Date(), "yyyy-MM-dd")}.csv`
     link.click()
   }
 
@@ -262,20 +278,22 @@ export default function AuditLogPage() {
       return null
     }
 
+    const root = base || "/agency"
+
     const routes = {
-      Candidate: `/agency/crm/candidate?id=${log.entity_id}`,
-      Application: `/agency/pipeline?applicationId=${log.entity_id}`,
-      Job: `/agency/jobs?jobId=${log.entity_id}`,
-      Company: `/agency/clients/${log.entity_id}`,
-      User: "/agency/teams",
-      AgencyTeam: "/agency/teams",
-      AgencyInvitation: "/agency/teams",
-      CompensationPlan: "/agency/compensation",
+      Candidate: `${paths.candidate}?id=${log.entity_id}`,
+      Application: `${paths.pipeline}?applicationId=${log.entity_id}`,
+      Job: `${paths.jobs}?jobId=${log.entity_id}`,
+      Company: isTeam ? null : `${root}/clients/${log.entity_id}`,
+      User: isTeam ? paths.roster : `${root}/teams`,
+      AgencyTeam: isTeam ? paths.roster : `${root}/teams`,
+      AgencyInvitation: isTeam ? paths.roster : `${root}/teams`,
+      CompensationPlan: paths.compensation,
       Interview: log.metadata?.application_id
-        ? `/agency/pipeline?applicationId=${log.metadata.application_id}`
-        : "/agency/pipeline",
-      Billing: "/agency/settings/billing",
-      Integration: "/agency/settings/integrations",
+        ? `${paths.pipeline}?applicationId=${log.metadata.application_id}`
+        : paths.pipeline,
+      Billing: isTeam ? null : `${root}/settings/billing`,
+      Integration: isTeam ? null : `${root}/settings/integrations`,
     }
 
     return routes[log.entity_type] || null
@@ -286,8 +304,8 @@ export default function AuditLogPage() {
       <div className="space-y-5">
         {/* Header */}
         <PlatformPageHeader
-          title={t("auditLog.title")}
-          subtitle={t("auditLog.subtitle")}
+          title={isTeam ? t("auditLog.teamTitle") : t("auditLog.title")}
+          subtitle={isTeam ? t("auditLog.teamSubtitle") : t("auditLog.subtitle")}
           icon={ShieldCheck}
           actions={
             <Button
@@ -363,7 +381,7 @@ export default function AuditLogPage() {
               >
                 <option value="">{t("auditLog.allEntities")}</option>
 
-                {ENTITY_TYPES.map((type) => (
+                {entityTypes.map((type) => (
                   <option key={type} value={type}>
                     {type}
                   </option>
@@ -483,7 +501,10 @@ export default function AuditLogPage() {
         ) : (
           <PlatformCard className="overflow-hidden">
             <div className="border-b border-slate-100 p-5">
-              <PlatformWidgetHeader title={t("auditLog.title")} subtitle={t("auditLog.subtitle")} />
+              <PlatformWidgetHeader
+                title={isTeam ? t("auditLog.teamTitle") : t("auditLog.title")}
+                subtitle={isTeam ? t("auditLog.teamSubtitle") : t("auditLog.subtitle")}
+              />
             </div>
 
             <div className="overflow-x-auto">

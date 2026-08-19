@@ -84,6 +84,43 @@ export class AgencyTeamsService {
   async overview(actor: UserEntity) {
     const organization_id = this.orgId(actor)
 
+    if (actor.role === UserRole.TEAM_MANAGER) {
+      if (!actor.team_id) {
+throw new ForbiddenException("Active team membership required")
+}
+
+      const [members, team] = await Promise.all([
+        this.users.find({
+          where: { organization_id, team_id: actor.team_id },
+          order: { full_name: "ASC" },
+        }),
+        this.teams.findOne({
+          where: {
+            id: actor.team_id,
+            organization_id,
+            manager_id: actor.id,
+            is_active: true,
+          },
+        }),
+      ])
+
+      if (!team) {
+throw new ForbiddenException("Active managed team required")
+}
+
+      return {
+        members: members
+          .filter(member => member.team_id === actor.team_id)
+          .filter(member => [UserRole.TEAM_MANAGER, UserRole.RECRUITER].includes(member.role))
+          .map(
+            ({ password_hash, refresh_token_hash, reset_token_hash, reset_token_expires, ...member }) =>
+              member,
+          ),
+        teams: [team],
+        invitations: [],
+      }
+    }
+
     await this.invitations
       .createQueryBuilder()
       .update()

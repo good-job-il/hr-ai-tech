@@ -10,7 +10,12 @@ import { AssignRecruitmentWorkDto } from "./dto/recruitment-management.dto"
 import { RecruitmentManagementService } from "./recruitment-management.service"
 import { ManagementReportQueryDto } from "../reports/dto/reports.dto"
 
-const MANAGER_ROLES = [UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, UserRole.ADMIN]
+const MANAGER_ROLES = [
+  UserRole.ORG_ADMIN,
+  UserRole.RECRUITMENT_MANAGER,
+  UserRole.TEAM_MANAGER,
+  UserRole.ADMIN,
+]
 
 @ApiTags("Recruitment Management")
 @ApiBearerAuth()

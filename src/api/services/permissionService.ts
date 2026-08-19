@@ -111,12 +111,21 @@ function mutableCollection<TEntity, TQuery extends object, TCreate, TUpdate>(
   }
 }
 
-export const permissionMatrixService = mutableCollection<
-  PermissionMatrixRecord,
-  PermissionMatrixQuery,
-  CreatePermissionMatrixInput,
-  UpdatePermissionMatrixInput
->("/permission-matrices")
+export const permissionMatrixService = {
+  ...mutableCollection<
+    PermissionMatrixRecord,
+    PermissionMatrixQuery,
+    CreatePermissionMatrixInput,
+    UpdatePermissionMatrixInput
+  >("/permission-matrices"),
+  export: async (query: PermissionMatrixQuery = {}) =>
+    asList(
+      await httpClient.get<PaginatedResponse<PermissionMatrixRecord> | PermissionMatrixRecord[]>(
+        `/permission-matrices/export${buildQuery(query)}`,
+        { cache: false },
+      ),
+    ),
+}
 
 export const effectivePermissionService = {
   get: () =>

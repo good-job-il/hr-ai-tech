@@ -60,6 +60,13 @@ export class PermissionMatrixController {
   ) {
     return this.svc.findMatrices(q, u)
   }
+  @Get("export")
+  @Roles(UserRole.ADMIN, UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER)
+  @UseGuards(EffectivePermissionsGuard)
+  @RequiresPermission("export")
+  export(@Query() q: QueryPermissionMatricesDto, @CurrentUser() u: UserEntity) {
+    return this.svc.exportMatrices(q, u)
+  }
   @Post()
   @Roles(UserRole.ADMIN, UserRole.ORG_ADMIN)
   @UseGuards(EffectivePermissionsGuard)

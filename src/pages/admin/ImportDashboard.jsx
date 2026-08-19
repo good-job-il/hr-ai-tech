@@ -4,10 +4,11 @@
  * Includes: batch history, per-batch stats, retry, validation test
  */
 import { useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { candidateImportService } from "@/api/services/candidateImportService"
 import { fileService } from "@/api/services/fileService"
 import { useAuth } from "@/lib/AuthContext"
+import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   Upload,
@@ -42,9 +43,9 @@ const STATUS_CONFIG = {
 export default function ImportDashboard() {
   const { user } = useAuth()
 
-  const navigate = useNavigate()
+  const { paths } = useAgencyWorkspace()
 
-  const location = useLocation()
+  const navigate = useNavigate()
 
   const qc = useQueryClient()
 
@@ -65,7 +66,7 @@ export default function ImportDashboard() {
   const showValidationTools = import.meta.env.DEV && user?.role === "admin"
 
   const { data: batches = [], refetch } = useQuery({
-    queryKey: ["import-batches"],
+    queryKey: ["import-batches", user?.team_id || user?.organization_id],
     queryFn: () => candidateImportService.list({ sort: "created_date", order: "DESC", limit: 50 }),
     refetchInterval: (query) => {
       const data = query.state?.data
@@ -631,11 +632,7 @@ export default function ImportDashboard() {
 
                         <div className="mt-2 flex gap-2">
                           <button
-                            onClick={() =>
-                              navigate(
-                                `${location.pathname.startsWith("/agency/team/") ? "/agency/team/crm" : "/agency/crm"}?importBatchId=${batch.id}`,
-                              )
-                            }
+                            onClick={() => navigate(`${paths.crm}?importBatchId=${batch.id}`)}
                             className="text-xs font-bold text-[#7C3AED] hover:underline flex items-center gap-1"
                           >
                             <Eye className="w-3.5 h-3.5" /> צפה במועמדים ב-CRM
