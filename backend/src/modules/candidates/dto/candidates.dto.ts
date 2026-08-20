@@ -87,6 +87,11 @@ export const QueryCandidatesSchema = z.object({
 })
 export class QueryCandidatesDto extends createZodDto(QueryCandidatesSchema) {}
 
+export const ClaimCandidateSchema = z.object({
+  reason: z.string().trim().min(1).max(1000),
+})
+export class ClaimCandidateDto extends createZodDto(ClaimCandidateSchema) {}
+
 export const CreateCandidateImportBatchSchema = z.object({
   batch_name: z.string().min(1).max(255),
   source_file: z.string().max(500).optional().nullable(),

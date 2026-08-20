@@ -7,6 +7,7 @@ import {
   getAgencyScopeFilter,
   isAgencyUser,
 } from "@/domain/agency/access"
+import { canRecruiterTransition } from "@/domain/agency/recruiterWorkspace"
 
 function getDefaultStages(t) {
   return APPLICATION_PIPELINE_STAGES.map((stage) => ({
@@ -75,6 +76,16 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
 
       const currentApplication = applications.find((a) => a.id === appId)
 
+      if (
+        user?.role === "recruiter" &&
+        currentApplication &&
+        !canRecruiterTransition(currentApplication.status, newStage)
+      ) {
+        setError({ status: 403, message: "This pipeline transition is not available to Recruiter" })
+
+        return
+      }
+
       const reopenReason =
         currentApplication?.status === "rejected" && newStage !== "rejected"
           ? window.prompt(
@@ -131,7 +142,7 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
         })
       }
     },
-    [applications, onNotificationCreated, t],
+    [applications, onNotificationCreated, t, user?.role],
   )
 
   return {

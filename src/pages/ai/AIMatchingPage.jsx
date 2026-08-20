@@ -315,13 +315,22 @@ export default function AIMatchingPage() {
                 candidate={selectedCandidate}
                 onAssignToJob={async (job) => {
                   try {
-                    await applicationService.assignCandidate(job.id, selectedCandidate.id)
+                    const application = await applicationService.assignCandidate(
+                      job.id,
+                      selectedCandidate.id,
+                    )
+
+                    await applicationService.score(application.id)
                     showToast(
                       t("aiMatching.page.assignedSuccess", {
                         candidateName: selectedCandidate.full_name,
                         jobTitle: job.title,
                       }),
                     )
+
+                    if (base) {
+                      navigate(`${paths.pipeline}?applicationId=${application.id}`)
+                    }
                   } catch (e) {
                     showToast(t("aiMatching.page.error", { message: e.message }), "error")
                   }
@@ -354,13 +363,22 @@ export default function AIMatchingPage() {
                 job={selectedJob}
                 onAddToPipeline={async (candidate) => {
                   try {
-                    await applicationService.assignCandidate(selectedJob.id, candidate.id)
+                    const application = await applicationService.assignCandidate(
+                      selectedJob.id,
+                      candidate.id,
+                    )
+
+                    await applicationService.score(application.id)
                     showToast(
                       t("aiMatching.page.addedToPipeline", {
                         candidateName: candidate.full_name,
                         jobTitle: selectedJob.title,
                       }),
                     )
+
+                    if (base) {
+                      navigate(`${paths.pipeline}?applicationId=${application.id}`)
+                    }
                   } catch (e) {
                     showToast(t("aiMatching.page.error", { message: e.message }), "error")
                   }

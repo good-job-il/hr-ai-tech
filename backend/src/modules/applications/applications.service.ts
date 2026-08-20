@@ -1,8 +1,10 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
+  Optional,
 } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository, Like } from "typeorm"
@@ -24,6 +26,8 @@ import { EmailService } from "../integrations/services/email.service"
 import { NotificationsService } from "../notifications/notifications.service"
 import { CandidateEntity } from "../candidates/entities/candidate.entity"
 import { AuditLogEntity } from "../audit/audit-log.entity"
+import { OrgType } from "../../common/enums/org-type.enum"
+import { PermissionsService } from "../permissions/permissions.service"
 
 @Injectable()
 export class ApplicationsService {
@@ -37,6 +41,7 @@ export class ApplicationsService {
     private readonly emailService: EmailService,
     private readonly notificationsService: NotificationsService,
     private readonly dataSource: DataSource,
+    @Optional() private readonly permissions?: PermissionsService,
   ) {}
 
   async findAll(query: QueryApplicationsDto, user: UserEntity) {
@@ -136,10 +141,21 @@ export class ApplicationsService {
       take,
     })
 
-    return buildPaginatedResponse(data, total, { page, limit, sort, order })
+    return buildPaginatedResponse(await this.applyCvPolicy(data, user), total, {
+      page,
+      limit,
+      sort,
+      order,
+    })
   }
 
   async findById(id: number, user: UserEntity): Promise<ApplicationEntity> {
+    const app = await this.findByIdRaw(id, user)
+
+    return this.applyCvPolicyToApplication(app, user)
+  }
+
+  private async findByIdRaw(id: number, user: UserEntity): Promise<ApplicationEntity> {
     const rlsWhere = getRlsWhere("Application", {
       id: user.id,
       role: user.role,
@@ -172,11 +188,39 @@ export class ApplicationsService {
     return app
   }
 
+  private async applyCvPolicy(applications: ApplicationEntity[], user: UserEntity) {
+    if (user.org_type !== OrgType.STAFFING_AGENCY || !this.permissions) {
+      return applications
+    }
+
+    const effective = await this.permissions.getEffectivePermissions(user)
+
+    return effective.permissions.download_cv
+      ? applications
+      : applications.map(
+          (application) =>
+            ({ ...application, resume_url: null, resume_filename: null }) as ApplicationEntity,
+        )
+  }
+
+  private async applyCvPolicyToApplication(application: ApplicationEntity, user: UserEntity) {
+    const [result] = await this.applyCvPolicy([application], user)
+
+    return result
+  }
+
   async create(
     dto: CreateApplicationDto,
     user: UserEntity,
     candidateUserId: number | null = null,
+    idempotent = false,
   ): Promise<ApplicationEntity> {
+    this.assertRecruiterOwnership(dto, user)
+
+    if (user.role === UserRole.RECRUITER && dto.status && dto.status !== "new") {
+      throw new ForbiddenException("Recruiter-created applications must start in new status")
+    }
+
     const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
     const jobScope = getRlsWhere("Job", {
@@ -204,6 +248,26 @@ export class ApplicationsService {
     }
 
     if (dto.candidate_id != null) {
+      if (user.role === UserRole.RECRUITER) {
+        const candidateScope = getRlsWhere("Candidate", {
+          id: user.id,
+          role: user.role,
+          organization_id: user.organization_id,
+          team_id: user.team_id,
+          employer_company_id: user.employer_company_id,
+          email: user.email,
+          impersonating: user.impersonating,
+        })
+
+        const ownedCandidate = await this.candidateRepo.findOne({
+          where: { ...candidateScope, id: dto.candidate_id } as any,
+        })
+
+        if (!ownedCandidate) {
+          throw new NotFoundException(`Candidate ${dto.candidate_id} not found`)
+        }
+      }
+
       const duplicate = await this.appRepo.findOne({
         where: {
           organization_id: job.organization_id,
@@ -214,6 +278,10 @@ export class ApplicationsService {
       })
 
       if (duplicate) {
+        if (idempotent) {
+          return this.applyCvPolicyToApplication(duplicate, user)
+        }
+
         throw new ConflictException("This candidate is already in the pipeline for this job")
       }
     }
@@ -229,16 +297,32 @@ export class ApplicationsService {
       candidate_email: isCandidate ? user.email : dto.candidate_email,
       candidate_user_id: isCandidate ? user.id : candidateUserId,
       candidate_id: isCandidate ? null : dto.candidate_id,
-      team_id: assignmentTeamId ?? job.team_id,
+      team_id:
+        user.role === UserRole.RECRUITER
+          ? (user.team_id ?? job.team_id)
+          : (assignmentTeamId ?? job.team_id),
       team_manager_id: isCandidate
         ? job.team_manager_id
-        : user.role === UserRole.TEAM_MANAGER
-          ? user.id
-          : (dto.team_manager_id ?? job.team_manager_id),
+        : user.role === UserRole.RECRUITER
+          ? (user.team_manager_id ?? job.team_manager_id)
+          : user.role === UserRole.TEAM_MANAGER
+            ? user.id
+            : (dto.team_manager_id ?? job.team_manager_id),
+      recruitment_manager_id: isCandidate
+        ? job.recruitment_manager_id
+        : user.role === UserRole.RECRUITER
+          ? (user.recruitment_manager_id ?? job.recruitment_manager_id)
+          : dto.recruitment_manager_id,
       recruiter_id: isCandidate
         ? null
-        : (dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null)),
-      assigned_to: isCandidate ? null : dto.assigned_to,
+        : user.role === UserRole.RECRUITER
+          ? user.id
+          : dto.recruiter_id,
+      assigned_to: isCandidate
+        ? null
+        : user.role === UserRole.RECRUITER
+          ? user.id
+          : dto.assigned_to,
       status: isCandidate ? "new" : dto.status,
       source: isCandidate ? "app" : dto.source,
     } as any)
@@ -267,6 +351,21 @@ export class ApplicationsService {
       })
     } catch (error: any) {
       if (error?.code === "ER_DUP_ENTRY") {
+        if (idempotent && dto.candidate_id != null) {
+          const existing = await this.appRepo.findOne({
+            where: {
+              organization_id: job.organization_id,
+              job_id: job.id,
+              candidate_id: dto.candidate_id,
+              is_deleted: false,
+            },
+          })
+
+          if (existing) {
+            return this.applyCvPolicyToApplication(existing, user)
+          }
+        }
+
         throw new ConflictException("This candidate is already in the pipeline for this job")
       }
 
@@ -282,7 +381,7 @@ export class ApplicationsService {
       })
       .catch(() => undefined)
 
-    return saved
+    return this.applyCvPolicyToApplication(saved, user)
   }
 
   async submit(dto: SubmitApplicationDto, user: UserEntity): Promise<ApplicationEntity> {
@@ -348,6 +447,7 @@ export class ApplicationsService {
       },
       user,
       candidateUser?.id ?? null,
+      true,
     )
   }
 
@@ -357,17 +457,36 @@ export class ApplicationsService {
     user: UserEntity,
     reason?: string,
   ): Promise<ApplicationEntity> {
+    this.assertRecruiterOwnership(dto, user)
+
     const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
-    const app = await this.findById(id, user)
+    const app = await this.findByIdRaw(id, user)
+
+    if (user.role === UserRole.RECRUITER) {
+      for (const field of ["job_id", "candidate_id", "employer_company_id"] as const) {
+        if (field in dto && dto[field] !== app[field]) {
+          throw new ForbiddenException(`${field} cannot be changed by a recruiter`)
+        }
+      }
+    }
 
     const prev = app.status
 
     if (dto.status && dto.status !== prev) {
-      this.assertStatusTransition(prev, dto.status)
+      this.assertStatusTransition(prev, dto.status, user)
     }
 
-    Object.assign(app, dto)
+    const updates: Record<string, any> = { ...dto }
+
+    if (user.role === UserRole.RECRUITER) {
+      delete updates.recruiter_id
+      delete updates.assigned_to
+      delete updates.team_manager_id
+      delete updates.recruitment_manager_id
+    }
+
+    Object.assign(app, updates)
 
     if (assignmentTeamId != null) {
       app.team_id = assignmentTeamId
@@ -445,7 +564,7 @@ export class ApplicationsService {
         .catch(() => undefined)
     }
 
-    return saved
+    return this.applyCvPolicyToApplication(saved, user)
   }
 
   changeStatus(
@@ -463,11 +582,15 @@ export class ApplicationsService {
     reason: string,
     user: UserEntity,
   ) {
+    if (user.role === UserRole.RECRUITER) {
+      throw new ForbiddenException("Recruiters cannot reopen rejected applications")
+    }
+
     if (!reason?.trim()) {
       throw new BadRequestException("A reason is required to reopen a rejected application")
     }
 
-    const app = await this.findById(id, user)
+    const app = await this.findByIdRaw(id, user)
 
     if (app.status !== "rejected") {
       throw new BadRequestException("Only rejected applications can be reopened")
@@ -477,7 +600,7 @@ export class ApplicationsService {
 
     app.status = status!
 
-    return this.dataSource.transaction(async (manager) => {
+    const saved = await this.dataSource.transaction(async (manager) => {
       const saved = await manager.save(ApplicationEntity, app)
 
       await manager.save(
@@ -518,15 +641,55 @@ export class ApplicationsService {
 
       return saved
     })
+
+    return this.applyCvPolicyToApplication(saved, user)
   }
 
-  private assertStatusTransition(previous: string, next: string) {
+  private assertStatusTransition(previous: string, next: string, user: UserEntity) {
     if (previous === "completed") {
       throw new BadRequestException("Completed applications cannot be reopened")
     }
 
     if (previous === "rejected" && next !== "rejected") {
       throw new BadRequestException("Use the reopen operation for rejected applications")
+    }
+
+    if (user.role === UserRole.RECRUITER) {
+      const allowed: Record<string, string[]> = {
+        new: ["reviewed", "rejected"],
+        reviewed: ["phone_interview", "recommended", "rejected"],
+        phone_interview: ["recommended", "rejected"],
+        recommended: ["employer_interview", "rejected"],
+        employer_interview: ["offer", "rejected"],
+        offer: ["hired", "rejected"],
+        hired: ["probation"],
+        probation: ["completed", "rejected"],
+      }
+
+      if (!allowed[previous]?.includes(next)) {
+        throw new ForbiddenException(
+          `Recruiter transition from ${previous} to ${next} is not allowed`,
+        )
+      }
+    }
+  }
+
+  private assertRecruiterOwnership(dto: Partial<CreateApplicationDto>, user: UserEntity) {
+    if (user.role !== UserRole.RECRUITER) {
+      return
+    }
+
+    const expected: Record<string, number | null> = {
+      recruiter_id: user.id,
+      assigned_to: user.id,
+      team_manager_id: user.team_manager_id ?? null,
+      recruitment_manager_id: user.recruitment_manager_id ?? null,
+    }
+
+    for (const [field, canonical] of Object.entries(expected)) {
+      if (field in dto && (dto as Record<string, any>)[field] !== canonical) {
+        throw new ForbiddenException(`${field} is derived from recruiter membership`)
+      }
     }
   }
 
@@ -594,13 +757,13 @@ export class ApplicationsService {
   }
 
   async addNote(id: number, content: string, user: UserEntity) {
-    const app = await this.findById(id, user)
+    const app = await this.findByIdRaw(id, user)
 
     const timestamp = new Date().toISOString()
 
     const line = `[${timestamp}] ${user.full_name || user.email}: ${content.trim()}`
 
-    return this.dataSource.transaction(async (manager) => {
+    const saved = await this.dataSource.transaction(async (manager) => {
       app.notes = app.notes ? `${app.notes}\n${line}` : line
 
       const saved = await manager.save(ApplicationEntity, app)
@@ -619,6 +782,8 @@ export class ApplicationsService {
 
       return saved
     })
+
+    return this.applyCvPolicyToApplication(saved, user)
   }
 
   async softDelete(id: number, user: UserEntity): Promise<void> {

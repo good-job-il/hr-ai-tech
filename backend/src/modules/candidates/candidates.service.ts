@@ -3,10 +3,11 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Optional,
 } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, In, Like, Not } from "typeorm"
-import { CandidateEntity } from "./entities/candidate.entity"
+import { DataSource, Repository, In, IsNull, Like, Not } from "typeorm"
+import { CandidateEntity, CandidateSource } from "./entities/candidate.entity"
 import { CandidateNoteEntity } from "./entities/candidate-note.entity"
 import { CandidateTagEntity } from "./entities/candidate-tag.entity"
 import { CandidateTimelineEntity } from "./entities/candidate-timeline.entity"
@@ -26,9 +27,12 @@ import {
 } from "./dto/candidates.dto"
 import { UserEntity } from "../users/user.entity"
 import { ApplicationEntity } from "../applications/entities/application.entity"
+import { AuditLogEntity } from "../audit/audit-log.entity"
 import { UserRole } from "../../common/enums/user-role.enum"
+import { OrgType } from "../../common/enums/org-type.enum"
 import { getRlsWhere, isBlocked } from "../../common/utils/rls.utils"
 import { buildPaginatedResponse, getSkipTake } from "../../common/utils/pagination.utils"
+import { PermissionsService } from "../permissions/permissions.service"
 
 @Injectable()
 export class CandidatesService {
@@ -53,6 +57,8 @@ export class CandidatesService {
     private readonly userRepo: Repository<UserEntity>,
     @InjectRepository(ApplicationEntity)
     private readonly applicationRepo: Repository<ApplicationEntity>,
+    @Optional() private readonly dataSource?: DataSource,
+    @Optional() private readonly permissions?: PermissionsService,
   ) {}
 
   // ─── Candidates ──────────────────────────────────────────────────────────
@@ -189,10 +195,21 @@ export class CandidatesService {
       take,
     })
 
-    return buildPaginatedResponse(data, total, { page, limit, sort, order })
+    return buildPaginatedResponse(await this.applyCvPolicy(data, user), total, {
+      page,
+      limit,
+      sort,
+      order,
+    })
   }
 
   async findById(id: number, user: UserEntity): Promise<CandidateEntity> {
+    const candidate = await this.findByIdRaw(id, user)
+
+    return this.applyCvPolicyToCandidate(candidate, user)
+  }
+
+  private async findByIdRaw(id: number, user: UserEntity): Promise<CandidateEntity> {
     const rlsWhere = getRlsWhere("Candidate", {
       id: user.id,
       role: user.role,
@@ -216,26 +233,237 @@ export class CandidatesService {
     return candidate
   }
 
+  async findUnassignedPool(query: QueryCandidatesDto, user: UserEntity) {
+    if (user.role !== UserRole.RECRUITER || !user.organization_id) {
+      throw new ForbiddenException("Unassigned candidate pool is available to agency recruiters")
+    }
+
+    const { page, limit, sort, order, search, status, domain_id, role_id } = query
+
+    const where: Record<string, any> = {
+      organization_id: user.organization_id,
+      recruiter_id: IsNull(),
+      source: CandidateSource.POOL,
+      is_deleted: false,
+    }
+
+    if (status) {
+      where.status = status
+    }
+
+    if (domain_id) {
+      where.domain_id = domain_id
+    }
+
+    if (role_id) {
+      where.role_id = role_id
+    }
+
+    const findWhere = search
+      ? [
+          { ...where, full_name: Like(`%${search}%`) },
+          { ...where, role_name: Like(`%${search}%`) },
+          { ...where, domain_name: Like(`%${search}%`) },
+        ]
+      : where
+
+    const { skip, take } = getSkipTake(page, limit)
+
+    const [data, total] = await this.candidateRepo.findAndCount({
+      where: findWhere as any,
+      order: { [sort]: order },
+      skip,
+      take,
+    })
+
+    return buildPaginatedResponse(await this.applyCvPolicy(data, user), total, {
+      page,
+      limit,
+      sort,
+      order,
+    })
+  }
+
+  async claim(id: number, reason: string, user: UserEntity): Promise<CandidateEntity> {
+    if (user.role !== UserRole.RECRUITER || !user.organization_id) {
+      throw new ForbiddenException("Only an agency recruiter can claim a pool candidate")
+    }
+
+    if (!this.dataSource) {
+      throw new Error("DataSource is required for an atomic candidate claim")
+    }
+
+    return this.dataSource.transaction(async (manager) => {
+      const result = await manager
+        .getRepository(CandidateEntity)
+        .createQueryBuilder()
+        .update(CandidateEntity)
+        .set({
+          recruiter_id: user.id,
+          team_id: user.team_id ?? null,
+          team_manager_id: user.team_manager_id ?? null,
+          recruitment_manager_id: user.recruitment_manager_id ?? null,
+        })
+        .where("id = :id", { id })
+        .andWhere("organization_id = :organizationId", { organizationId: user.organization_id })
+        .andWhere("source = :source", { source: CandidateSource.POOL })
+        .andWhere("recruiter_id IS NULL")
+        .andWhere("is_deleted = :isDeleted", { isDeleted: false })
+        .execute()
+
+      if (result.affected !== 1) {
+        throw new NotFoundException(`Claimable candidate ${id} not found`)
+      }
+
+      const candidate = await manager.getRepository(CandidateEntity).findOne({
+        where: {
+          id,
+          organization_id: user.organization_id,
+          recruiter_id: user.id,
+          is_deleted: false,
+        },
+      })
+
+      if (!candidate) {
+        throw new NotFoundException(`Claimable candidate ${id} not found`)
+      }
+
+      await manager.save(
+        CandidateTimelineEntity,
+        manager.create(CandidateTimelineEntity, {
+          candidate_id: candidate.id,
+          organization_id: candidate.organization_id,
+          candidate_email: candidate.email,
+          event_type: "assigned",
+          description: `Candidate claimed from the unassigned pool: ${reason.trim()}`,
+          performed_by: user.email,
+          performed_by_name: user.full_name,
+          performed_by_role: user.role,
+          metadata: { recruiter_id: user.id, claim_reason: reason.trim() },
+        } as any),
+      )
+      await manager.save(
+        AuditLogEntity,
+        manager.create(AuditLogEntity, {
+          organization_id: String(candidate.organization_id),
+          actor_user_id: String(user.id),
+          actor_email: user.email,
+          actor_role: user.role,
+          entity_type: "Candidate",
+          entity_id: candidate.id,
+          entity_label: candidate.full_name,
+          action: "update",
+          metadata: { operation: "claim", reason: reason.trim(), recruiter_id: user.id },
+        }),
+      )
+
+      return this.applyCvPolicyToCandidate(candidate, user)
+    })
+  }
+
+  private async applyCvPolicy(candidates: CandidateEntity[], user: UserEntity) {
+    if (user.org_type !== OrgType.STAFFING_AGENCY || !this.permissions) {
+      return candidates
+    }
+
+    const effective = await this.permissions.getEffectivePermissions(user)
+
+    return effective.permissions.download_cv
+      ? candidates
+      : candidates.map((candidate) => this.redactCv(candidate))
+  }
+
+  private async applyCvPolicyToCandidate(candidate: CandidateEntity, user: UserEntity) {
+    const [result] = await this.applyCvPolicy([candidate], user)
+
+    return result
+  }
+
+  private redactCv(candidate: CandidateEntity): CandidateEntity {
+    return {
+      ...candidate,
+      resume_url: null,
+      original_resume_url: null,
+      converted_resume_url: null,
+      resume_filename: null,
+      original_resume_filename: null,
+      converted_resume_filename: null,
+    } as CandidateEntity
+  }
+
+  async getCv(id: number, user: UserEntity) {
+    const candidate = await this.findById(id, user)
+
+    const fileUrl =
+      candidate.converted_resume_url ?? candidate.resume_url ?? candidate.original_resume_url
+
+    if (!fileUrl) {
+      throw new NotFoundException(`CV for candidate ${id} not found`)
+    }
+
+    if (this.dataSource) {
+      await this.dataSource.getRepository(AuditLogEntity).save(
+        this.dataSource.getRepository(AuditLogEntity).create({
+          organization_id:
+            candidate.organization_id == null ? null : String(candidate.organization_id),
+          actor_user_id: String(user.id),
+          actor_email: user.email,
+          actor_role: user.role,
+          entity_type: "CandidateDocument",
+          entity_id: candidate.id,
+          entity_label: candidate.resume_filename ?? candidate.full_name,
+          action: "cv_download",
+          metadata: { candidate_id: candidate.id },
+        }),
+      )
+    }
+
+    return { candidate_id: candidate.id, filename: candidate.resume_filename, file_url: fileUrl }
+  }
+
   async create(dto: CreateCandidateDto, user: UserEntity): Promise<CandidateEntity> {
+    this.assertRecruiterOwnership(dto, user)
+
     const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
     const candidate = this.candidateRepo.create({
       ...dto,
       organization_id: user.organization_id,
-      team_id: assignmentTeamId,
+      team_id: user.role === UserRole.RECRUITER ? (user.team_id ?? null) : assignmentTeamId,
       recruiter_id: dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
-      team_manager_id: user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id,
-    } as any)
+      team_manager_id:
+        user.role === UserRole.RECRUITER
+          ? (user.team_manager_id ?? null)
+          : user.role === UserRole.TEAM_MANAGER
+            ? user.id
+            : dto.team_manager_id,
+      recruitment_manager_id:
+        user.role === UserRole.RECRUITER
+          ? (user.recruitment_manager_id ?? null)
+          : dto.recruitment_manager_id,
+    } as any) as unknown as CandidateEntity
 
-    return this.candidateRepo.save(candidate) as unknown as Promise<CandidateEntity>
+    const saved = await this.candidateRepo.save(candidate)
+
+    return this.applyCvPolicyToCandidate(saved as CandidateEntity, user)
   }
 
   async update(id: number, dto: UpdateCandidateDto, user: UserEntity): Promise<CandidateEntity> {
+    this.assertRecruiterOwnership(dto, user)
+
     const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
-    const candidate = await this.findById(id, user)
+    const candidate = await this.findByIdRaw(id, user)
 
-    Object.assign(candidate, dto)
+    const updates: Record<string, any> = { ...dto }
+
+    if (user.role === UserRole.RECRUITER) {
+      delete updates.recruiter_id
+      delete updates.team_manager_id
+      delete updates.recruitment_manager_id
+    }
+
+    Object.assign(candidate, updates)
 
     if (assignmentTeamId != null) {
       candidate.team_id = assignmentTeamId
@@ -250,11 +478,31 @@ export class CandidatesService {
       candidate.deleted_by = user.id
     }
 
-    return this.candidateRepo.save(candidate) as unknown as Promise<CandidateEntity>
+    const saved = await this.candidateRepo.save(candidate)
+
+    return this.applyCvPolicyToCandidate(saved as CandidateEntity, user)
   }
 
   async softDelete(id: number, user: UserEntity): Promise<void> {
     await this.update(id, { is_deleted: true } as any, user)
+  }
+
+  private assertRecruiterOwnership(dto: Partial<CreateCandidateDto>, user: UserEntity) {
+    if (user.role !== UserRole.RECRUITER) {
+      return
+    }
+
+    const expected: Record<string, number | null> = {
+      recruiter_id: user.id,
+      team_manager_id: user.team_manager_id ?? null,
+      recruitment_manager_id: user.recruitment_manager_id ?? null,
+    }
+
+    for (const [field, canonical] of Object.entries(expected)) {
+      if (field in dto && (dto as Record<string, any>)[field] !== canonical) {
+        throw new ForbiddenException(`${field} is derived from recruiter membership`)
+      }
+    }
   }
 
   private async assertAgencyAssignments(dto: Partial<CreateCandidateDto>, user: UserEntity) {
@@ -428,10 +676,22 @@ export class CandidatesService {
   async getDocuments(candidateId: number, user: UserEntity) {
     await this.findById(candidateId, user)
 
-    return this.documentRepo.find({
+    const documents = await this.documentRepo.find({
       where: { candidate_id: candidateId },
       order: { uploaded_at: "DESC" },
     })
+
+    if (user.org_type !== OrgType.STAFFING_AGENCY || !this.permissions) {
+      return documents
+    }
+
+    const effective = await this.permissions.getEffectivePermissions(user)
+
+    return effective.permissions.download_cv
+      ? documents
+      : documents.map((document) =>
+          document.doc_type === "cv" ? { ...document, file_url: null } : document,
+        )
   }
 
   async createDocument(data: Partial<CandidateDocumentEntity>, user: UserEntity) {
@@ -442,9 +702,17 @@ export class CandidatesService {
       organization_id: user.organization_id,
       candidate_email: candidate.email,
       uploaded_by: user.email,
-    } as any)
+    } as any) as unknown as CandidateDocumentEntity
 
-    return this.documentRepo.save(doc)
+    const saved = await this.documentRepo.save(doc)
+
+    if (saved.doc_type !== "cv" || user.org_type !== OrgType.STAFFING_AGENCY || !this.permissions) {
+      return saved
+    }
+
+    const effective = await this.permissions.getEffectivePermissions(user)
+
+    return effective.permissions.download_cv ? saved : { ...saved, file_url: null }
   }
 
   // ─── Import Batches ──────────────────────────────────────────────────────

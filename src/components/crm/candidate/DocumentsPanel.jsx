@@ -218,13 +218,15 @@ function DocRow({ doc, color, badge, canDownload }) {
       </div>
 
       <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-        <a href={doc.file_url} target="_blank" rel="noreferrer">
-          <button className="p-1.5 rounded-lg hover:bg-[#EEF4FF] text-[#94A3B8] hover:text-[#7C3AED] transition-colors">
-            <Eye className="w-4 h-4" />
-          </button>
-        </a>
+        {canDownload && doc.file_url && (
+          <a href={doc.file_url} target="_blank" rel="noreferrer">
+            <button className="p-1.5 rounded-lg hover:bg-[#EEF4FF] text-[#94A3B8] hover:text-[#7C3AED] transition-colors">
+              <Eye className="w-4 h-4" />
+            </button>
+          </a>
+        )}
 
-        {canDownload && (
+        {canDownload && doc.file_url && (
           <a href={doc.file_url} download>
             <button className="p-1.5 rounded-lg hover:bg-[#EEF4FF] text-[#94A3B8] hover:text-[#7C3AED] transition-colors">
               <Download className="w-4 h-4" />

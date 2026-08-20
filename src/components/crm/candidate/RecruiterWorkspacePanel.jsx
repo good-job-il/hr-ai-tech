@@ -188,17 +188,19 @@ export default function RecruiterWorkspacePanel({
         </div>
       </div>
 
-      {/* Assign Recruiter — Dropdown */}
-      <div>
-        <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
-          {t("candidateCRM.workspace.responsibleRecruiter")}
-        </div>
+      {/* Assignment is a manager action. Recruiter ownership is server-derived. */}
+      {userRole !== "recruiter" && (
+        <div>
+          <div className="text-xs font-black text-[#94A3B8] uppercase tracking-wide mb-2">
+            {t("candidateCRM.workspace.responsibleRecruiter")}
+          </div>
 
-        <RecruiterDropdown
-          currentRecruiterId={candidate?.recruiter_id}
-          onSelect={(id, name, email) => onAssignRecruiter(id, name, email)}
-        />
-      </div>
+          <RecruiterDropdown
+            currentRecruiterId={candidate?.recruiter_id}
+            onSelect={(id, name, email) => onAssignRecruiter(id, name, email)}
+          />
+        </div>
+      )}
 
       {/* Request Documents */}
       <div>

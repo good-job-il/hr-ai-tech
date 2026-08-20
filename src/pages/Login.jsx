@@ -30,7 +30,7 @@ export default function Login() {
       const redirects = {
         candidate: "/candidate/dashboard",
         employer: "/employer/dashboard",
-        recruiter: "/recruiter/dashboard",
+        recruiter: "/agency/recruiter/dashboard",
         team_manager: "/agency/team/dashboard",
         recruitment_manager: "/agency/dashboard",
         admin: "/admin/dashboard",

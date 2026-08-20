@@ -95,9 +95,11 @@ export class InterviewsService {
   }
 
   async create(dto: CreateInterviewDto, user: UserEntity): Promise<InterviewEntity> {
-    if (user.role === UserRole.TEAM_MANAGER && !dto.application_id) {
-      throw new ForbiddenException("Team Manager interviews require a scoped application")
+    if ([UserRole.TEAM_MANAGER, UserRole.RECRUITER].includes(user.role) && !dto.application_id) {
+      throw new ForbiddenException("Operational interviews require a scoped application")
     }
+
+    this.assertRecruiterOwnership(dto, user)
 
     const application = dto.application_id
       ? await this.applicationsService.findById(dto.application_id, user)
@@ -136,14 +138,23 @@ export class InterviewsService {
       job_title: application?.job_title ?? dto.job_title,
       recruiter_id:
         application?.recruiter_id ??
-        dto.recruiter_id ??
-        (user.role === UserRole.RECRUITER ? user.id : null),
-      team_id: application?.team_id ?? (user.role === UserRole.TEAM_MANAGER ? user.team_id : null),
+        (user.role === UserRole.RECRUITER ? user.id : dto.recruiter_id),
+      team_id:
+        application?.team_id ??
+        ([UserRole.TEAM_MANAGER, UserRole.RECRUITER].includes(user.role) ? user.team_id : null),
       team_manager_id:
         application?.team_manager_id ??
-        (user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id),
+        (user.role === UserRole.RECRUITER
+          ? user.team_manager_id
+          : user.role === UserRole.TEAM_MANAGER
+            ? user.id
+            : dto.team_manager_id),
       recruitment_manager_id:
-        dto.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
+        application?.recruitment_manager_id ??
+        (user.role === UserRole.RECRUITER
+          ? user.recruitment_manager_id
+          : (dto.recruitment_manager_id ??
+            (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null))),
     } as any)
 
     const saved = await this.dataSource.transaction(async (manager) => {
@@ -186,7 +197,31 @@ export class InterviewsService {
   async update(id: number, dto: UpdateInterviewDto, user: UserEntity): Promise<InterviewEntity> {
     const item = await this.findById(id, user)
 
+    this.assertRecruiterOwnership(dto, user)
+
     const updates: Record<string, any> = { ...dto }
+
+    if (user.role === UserRole.RECRUITER) {
+      const immutableFields = [
+        "application_id",
+        "candidate_id",
+        "candidate_email",
+        "candidate_name",
+        "job_id",
+        "job_title",
+        "recruiter_id",
+        "team_manager_id",
+        "recruitment_manager_id",
+      ]
+
+      for (const field of immutableFields) {
+        if (field in updates && updates[field] !== (item as any)[field]) {
+          throw new ForbiddenException(`${field} cannot be changed by a recruiter`)
+        }
+
+        delete updates[field]
+      }
+    }
 
     if (user.role === UserRole.TEAM_MANAGER) {
       if (updates.recruiter_id) {
@@ -214,6 +249,24 @@ export class InterviewsService {
     Object.assign(item, updates)
 
     return this.repo.save(item) as unknown as Promise<InterviewEntity>
+  }
+
+  private assertRecruiterOwnership(dto: Partial<CreateInterviewDto>, user: UserEntity) {
+    if (user.role !== UserRole.RECRUITER) {
+      return
+    }
+
+    const expected: Record<string, number | null> = {
+      recruiter_id: user.id,
+      team_manager_id: user.team_manager_id ?? null,
+      recruitment_manager_id: user.recruitment_manager_id ?? null,
+    }
+
+    for (const [field, canonical] of Object.entries(expected)) {
+      if (field in dto && (dto as Record<string, any>)[field] !== canonical) {
+        throw new ForbiddenException(`${field} is derived from recruiter membership`)
+      }
+    }
   }
 
   async remove(id: number, user: UserEntity): Promise<void> {

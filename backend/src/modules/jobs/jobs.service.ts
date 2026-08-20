@@ -155,6 +155,7 @@ export class JobsService {
 
   async create(dto: CreateJobDto, user: UserEntity): Promise<JobEntity> {
     this.assertValidJob(dto)
+    this.assertRecruiterOwnership(dto, user)
 
     const clientCompany = await this.resolveAgencyClientCompany(dto.employer_company_id, user)
 
@@ -173,10 +174,18 @@ export class JobsService {
       organization_id: user.organization_id,
       created_by_user_id: user.id,
       recruiter_id: dto.recruiter_id ?? (user.role === UserRole.RECRUITER ? user.id : null),
-      team_id: assignmentTeamId,
-      team_manager_id: user.role === UserRole.TEAM_MANAGER ? user.id : dto.team_manager_id,
+      team_id: user.role === UserRole.RECRUITER ? (user.team_id ?? null) : assignmentTeamId,
+      team_manager_id:
+        user.role === UserRole.RECRUITER
+          ? (user.team_manager_id ?? null)
+          : user.role === UserRole.TEAM_MANAGER
+            ? user.id
+            : dto.team_manager_id,
       recruitment_manager_id:
-        dto.recruitment_manager_id ?? (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null),
+        user.role === UserRole.RECRUITER
+          ? (user.recruitment_manager_id ?? null)
+          : (dto.recruitment_manager_id ??
+            (user.role === UserRole.RECRUITMENT_MANAGER ? user.id : null)),
       state: dto.state ?? (dto.is_closed ? "closed" : "open"),
       is_closed: dto.state ? ["filled", "closed"].includes(dto.state) : dto.is_closed,
     } as any)
@@ -187,6 +196,8 @@ export class JobsService {
   async update(id: number, dto: UpdateJobDto, user: UserEntity): Promise<JobEntity> {
     const job = await this.findById(id, user)
 
+    this.assertRecruiterOwnership(dto, user)
+
     const assignmentTeamId = await this.assertAgencyAssignments(dto, user)
 
     const clientCompany = await this.resolveAgencyClientCompany(
@@ -194,7 +205,15 @@ export class JobsService {
       user,
     )
 
-    Object.assign(job, dto)
+    const updates: Record<string, any> = { ...dto }
+
+    if (user.role === UserRole.RECRUITER) {
+      delete updates.recruiter_id
+      delete updates.team_manager_id
+      delete updates.recruitment_manager_id
+    }
+
+    Object.assign(job, updates)
 
     if (assignmentTeamId != null) {
       job.team_id = assignmentTeamId
@@ -261,6 +280,24 @@ export class JobsService {
       throw new BadRequestException(
         "Contact email or phone is required when contact details are visible",
       )
+    }
+  }
+
+  private assertRecruiterOwnership(dto: Partial<CreateJobDto>, user: UserEntity) {
+    if (user.role !== UserRole.RECRUITER) {
+      return
+    }
+
+    const expected: Record<string, number | null> = {
+      recruiter_id: user.id,
+      team_manager_id: user.team_manager_id ?? null,
+      recruitment_manager_id: user.recruitment_manager_id ?? null,
+    }
+
+    for (const [field, canonical] of Object.entries(expected)) {
+      if (field in dto && (dto as Record<string, any>)[field] !== canonical) {
+        throw new ForbiddenException(`${field} is derived from recruiter membership`)
+      }
     }
   }
 

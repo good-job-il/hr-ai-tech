@@ -7,6 +7,7 @@ import { User, UsersRound, UserCheck, Clock3, ShieldAlert } from "lucide-react"
 
 import { getAgencyScopeFilter, isAgencyUser } from "@/domain/agency/access"
 import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
+import { recruiterCandidateRouteFilter } from "@/domain/agency/recruiterWorkspace"
 
 const STATUS_COLORS = {
   new: "bg-blue-100 text-blue-700",
@@ -81,15 +82,7 @@ export default function CandidateListCRMPage({ candidateRoute }) {
         filter.status = statusFilter
       }
 
-      const routeMode = location.pathname.split("/").pop()
-
-      if (routeMode === "active") {
-        filter.active = true
-      }
-
-      if (routeMode === "pipeline") {
-        filter.in_pipeline = true
-      }
+      Object.assign(filter, recruiterCandidateRouteFilter(location.pathname))
 
       if (isAgencyUser(user)) {
         Object.assign(filter, getAgencyScopeFilter(user))

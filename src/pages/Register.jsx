@@ -166,7 +166,7 @@ export default function Register() {
       const redirects = {
         candidate: "/candidate/dashboard",
         employer: "/employer/dashboard",
-        recruiter: "/recruiter/dashboard",
+        recruiter: "/agency/recruiter/dashboard",
         team_manager: "/agency/team/dashboard",
         recruitment_manager: "/agency/dashboard",
         // org_admin never has an organization yet at this point — send

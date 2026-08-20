@@ -38,6 +38,8 @@ export default function CandidateCRMPage() {
 
   const canUpdate = can("update")
 
+  const canCreate = can("create")
+
   const canDelete = can("delete")
 
   const [activeTab, setActiveTab] = useState("overview")
@@ -318,12 +320,16 @@ export default function CandidateCRMPage() {
                   onUpdateNote={updateNote}
                   onDeleteNote={deleteNote}
                   userRole={user?.role}
+                  canUpdate={canUpdate}
                 />
               )}
 
               {activeTab === "interviews" && (
                 <InterviewsPanel
                   interviews={interviews}
+                  applications={applications}
+                  canCreate={canCreate}
+                  canUpdate={canUpdate}
                   onSchedule={scheduleInterview}
                   onUpdate={updateInterview}
                 />

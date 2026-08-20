@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { jobService } from "@/api/services/jobService"
 import { compensationPlanService } from "@/api/services/compensationPlanService"
-import { Briefcase, CheckCircle, XCircle, AlertCircle } from "lucide-react"
+import { AlertCircle, Briefcase, CheckCircle, XCircle } from "lucide-react"
 
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom"
@@ -62,6 +62,8 @@ export default function ManageJobsPage() {
   const routeState = ROUTE_STATES[location.pathname.split("/").pop()] || null
 
   const preselectedClientId = searchParams.get("clientId")
+
+  const preselectedJobId = Number(searchParams.get("jobId")) || null
 
   const [jobs, setJobs] = useState([])
 
@@ -135,6 +137,19 @@ export default function ManageJobsPage() {
     }
   }, [preselectedClientId, canCreate])
 
+  useEffect(() => {
+    if (!preselectedJobId || !jobs.length) {
+      return
+    }
+
+    const selectedJob = jobs.find((job) => job.id === preselectedJobId)
+
+    if (selectedJob && canUpdate) {
+      setEditingJob(selectedJob)
+      setModalOpen(true)
+    }
+  }, [canUpdate, jobs, preselectedJobId])
+
   const filtered = jobs.filter((j) => {
     if (
       !routeState &&
@@ -203,6 +218,10 @@ export default function ManageJobsPage() {
     ["filled", "closed"].includes(j.state || (j.is_closed ? "closed" : "open")),
   ).length
 
+  const selectedJob = preselectedJobId
+    ? jobs.find((job) => job.id === preselectedJobId) || null
+    : null
+
   return (
     <PlatformPageShell dir="ltr">
       <div className="space-y-6">
@@ -262,6 +281,36 @@ export default function ManageJobsPage() {
             meta="Completed or paused"
           />
         </div>
+
+        {selectedJob && !canUpdate && (
+          <PlatformCard className="border-violet-200 bg-violet-50/40 p-5">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="text-xs font-black uppercase tracking-wide text-violet-500">
+                  Assigned job
+                </div>
+
+                <h2 className="mt-1 text-xl font-black text-slate-900">{selectedJob.title}</h2>
+
+                <p className="mt-1 text-sm font-semibold text-slate-500">
+                  {selectedJob.company} · {selectedJob.location || "—"}
+                </p>
+              </div>
+
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-bold ${STATUS_COLORS[selectedJob.state || (selectedJob.is_closed ? "closed" : "open")]}`}
+              >
+                {selectedJob.state || (selectedJob.is_closed ? "closed" : "open")}
+              </span>
+            </div>
+
+            {selectedJob.description && (
+              <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-slate-600">
+                {selectedJob.description}
+              </p>
+            )}
+          </PlatformCard>
+        )}
 
         {/* Filters */}
         <PlatformCard className="flex flex-wrap items-center gap-3 p-4">

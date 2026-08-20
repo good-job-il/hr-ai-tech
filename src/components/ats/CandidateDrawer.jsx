@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react"
-import { User, Phone, Mail, MapPin, Briefcase, Sparkles, Clock, MessageSquare } from "lucide-react"
+import { Briefcase, Clock, Mail, MapPin, MessageSquare, Phone, Sparkles, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { scoreMatch } from "@/lib/aiMatching"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -9,6 +9,9 @@ import { interviewService } from "@/api/services/interviewService"
 import { messageService } from "@/api/services/messageService"
 import { jobService } from "@/api/services/jobService"
 import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
+import { useAuth } from "@/lib/AuthContext"
+import { RECRUITER_PIPELINE_TRANSITIONS } from "@/domain/agency/recruiterWorkspace"
+import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 
 const STAGE_VALUES = APPLICATION_STATUS_VALUES
 
@@ -38,6 +41,14 @@ export default function CandidateDrawer({
   const { t, i18n } = useTranslation()
 
   const { base, paths } = useAgencyWorkspace()
+
+  const { user } = useAuth()
+
+  const { can } = usePermissionMatrix()
+
+  const canCreate = can("create")
+
+  const canUpdate = can("update")
 
   const [activeTab, setActiveTab] = useState("details")
 
@@ -103,6 +114,14 @@ export default function CandidateDrawer({
     label: t(`pipeline.drawer.tabs.${id}`),
     icon: { details: User, ai: Sparkles, timeline: Clock, notes: MessageSquare }[id],
   }))
+
+  const stageValues =
+    user?.role === "recruiter"
+      ? [
+          application?.status,
+          ...(RECRUITER_PIPELINE_TRANSITIONS[application?.status] || []),
+        ].filter(Boolean)
+      : STAGE_VALUES
 
   const aiMatch = useMemo(() => {
     if (!application) {
@@ -267,7 +286,7 @@ export default function CandidateDrawer({
               disabled={!canChangeStage}
               className="flex-1 h-9 px-3 rounded-xl border border-[#E4ECFF] bg-white text-sm font-bold text-[#0F172A] outline-none"
             >
-              {STAGE_VALUES.map((value) => (
+              {stageValues.map((value) => (
                 <option key={value} value={value}>
                   {t(`pipeline.stages.${value}`)}
                 </option>
@@ -399,23 +418,25 @@ export default function CandidateDrawer({
 
           {activeTab === "notes" && (
             <div className="space-y-4">
-              <div className="flex gap-3">
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder={t("pipeline.drawer.addNotePlaceholder")}
-                  rows={3}
-                  className="flex-1 p-3 rounded-xl border border-[#E4ECFF] text-sm font-semibold text-[#0F172A] outline-none resize-none focus:border-[#C4B5FD]"
-                />
+              {canUpdate && (
+                <div className="flex gap-3">
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder={t("pipeline.drawer.addNotePlaceholder")}
+                    rows={3}
+                    className="flex-1 p-3 rounded-xl border border-[#E4ECFF] text-sm font-semibold text-[#0F172A] outline-none resize-none focus:border-[#C4B5FD]"
+                  />
 
-                <button
-                  onClick={addNote}
-                  disabled={savingNote}
-                  className="self-end h-10 px-4 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm"
-                >
-                  {savingNote ? "…" : t("pipeline.drawer.save")}
-                </button>
-              </div>
+                  <button
+                    onClick={addNote}
+                    disabled={savingNote}
+                    className="self-end h-10 px-4 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm"
+                  >
+                    {savingNote ? "…" : t("pipeline.drawer.save")}
+                  </button>
+                </div>
+              )}
 
               {application.notes && (
                 <div className="p-4 rounded-xl bg-[#F7FBFF] border border-[#E4ECFF]">
@@ -429,23 +450,27 @@ export default function CandidateDrawer({
         </div>
 
         <div className="p-4 border-t border-[#E4ECFF] flex gap-3">
-          <button
-            onClick={() => setMessageOpen(true)}
-            className="flex-1 h-11 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center justify-center gap-2"
-          >
-            <Send className="w-4 h-4" />
+          {canUpdate && (
+            <button
+              onClick={() => setMessageOpen(true)}
+              className="flex-1 h-11 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold text-sm flex items-center justify-center gap-2"
+            >
+              <Send className="w-4 h-4" />
 
-            {t("pipeline.drawer.sendMessage")}
-          </button>
+              {t("pipeline.drawer.sendMessage")}
+            </button>
+          )}
 
-          <button
-            onClick={() => setInterviewOpen(true)}
-            className="flex-1 h-11 rounded-xl border border-[#E4ECFF] bg-white text-[#64748B] font-bold text-sm flex items-center justify-center gap-2 hover:border-[#C4B5FD]"
-          >
-            <Calendar className="w-4 h-4" />
+          {canCreate && (
+            <button
+              onClick={() => setInterviewOpen(true)}
+              className="flex-1 h-11 rounded-xl border border-[#E4ECFF] bg-white text-[#64748B] font-bold text-sm flex items-center justify-center gap-2 hover:border-[#C4B5FD]"
+            >
+              <Calendar className="w-4 h-4" />
 
-            {t("pipeline.drawer.scheduleInterview")}
-          </button>
+              {t("pipeline.drawer.scheduleInterview")}
+            </button>
+          )}
         </div>
       </div>
 

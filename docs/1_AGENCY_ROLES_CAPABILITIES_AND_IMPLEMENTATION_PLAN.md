@@ -370,6 +370,8 @@ Recruiter — исполнитель ежедневного recruitment workflow
 
 #### Фаза R-1. Закрыть own boundary
 
+Реализация и security-контракт: [`AGENCY_R1_OWN_BOUNDARY.md`](./AGENCY_R1_OWN_BOUNDARY.md).
+
 - унифицировать own scope для Candidate, Application, Job, Interview, Note, Document, Message и Timeline;
 - отдельно определить доступ к unassigned candidate pool и операцию claim;
 - запретить подмену `recruiter_id`, `assigned_to`, `team_id` и `organization_id` в request body;
@@ -379,6 +381,8 @@ Recruiter — исполнитель ежедневного recruitment workflow
 Критерий готовности: Recruiter не может прочитать, назначить себе или изменить чужую запись без явной разрешённой операции claim/assign.
 
 #### Фаза R-2. Реализовать персональный workspace
+
+Реализация и acceptance-контракт: [`AGENCY_R2_PERSONAL_WORKSPACE.md`](./AGENCY_R2_PERSONAL_WORKSPACE.md).
 
 - заменить placeholder dashboard на личные KPI, задачи, интервью и overdue stages;
 - заменить публичный Jobs на список назначенных/доступных agency jobs;
@@ -390,6 +394,8 @@ Recruiter — исполнитель ежедневного recruitment workflow
 
 #### Фаза R-3. Matching, import и личные данные
 
+Реализация и security-контракт: [`AGENCY_R3_MATCHING_IMPORT_PERSONAL_DATA.md`](./AGENCY_R3_MATCHING_IMPORT_PERSONAL_DATA.md).
+
 - создавать из AI Matching полную Application с server-derived tenant/client/job ownership;
 - добавить unique constraint и idempotency для candidate + job;
 - реализовать import-to-own или явно исключить импорт для Recruiter из продуктовой политики;
@@ -399,6 +405,8 @@ Recruiter — исполнитель ежедневного recruitment workflow
 Критерий готовности: matching и import не создают дубликаты, а все новые записи сразу видны в личной CRM и pipeline.
 
 #### Фаза R-4. Финальная приёмка
+
+Результат финальной приёмки: [`AGENCY_R4_FINAL_ACCEPTANCE.md`](./AGENCY_R4_FINAL_ACCEPTANCE.md).
 
 - E2E dashboard → job → candidate → Application → interview → status transition;
 - negative E2E на чужого рекрутера, другую команду и tenant;

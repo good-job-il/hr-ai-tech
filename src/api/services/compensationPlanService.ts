@@ -12,6 +12,7 @@ export interface CompensationPlanRecord {
   recruiter_id: number | null
   recruiter_compensation: number | null
   recruiter_compensation_type: "fixed" | "percent"
+  own_compensation_amount?: number | null
   [key: string]: unknown
 }
 export interface CompensationPlanQuery extends ResourceQuery {

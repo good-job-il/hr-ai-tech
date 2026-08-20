@@ -18,6 +18,7 @@ import {
   CreateCandidateDto,
   UpdateCandidateDto,
   QueryCandidatesDto,
+  ClaimCandidateDto,
   CreateCandidateNoteDto,
   UpdateCandidateNoteDto,
   CreateCandidateTagDto,
@@ -194,6 +195,32 @@ export class CandidatesController {
   @ApiOperation({ summary: "List candidates (RLS scoped)" })
   findAll(@Query() query: QueryCandidatesDto, @CurrentUser() user: UserEntity) {
     return this.svc.findAll(query, user)
+  }
+
+  @Get("unassigned-pool")
+  @Roles(UserRole.RECRUITER)
+  @ApiOperation({ summary: "List claimable unassigned candidates from the agency pool" })
+  findUnassignedPool(@Query() query: QueryCandidatesDto, @CurrentUser() user: UserEntity) {
+    return this.svc.findUnassignedPool(query, user)
+  }
+
+  @Post(":id/claim")
+  @Roles(UserRole.RECRUITER)
+  @RequiresPermission("update")
+  @ApiOperation({ summary: "Atomically claim an unassigned agency-pool candidate" })
+  claim(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() dto: ClaimCandidateDto,
+    @CurrentUser() user: UserEntity,
+  ) {
+    return this.svc.claim(id, dto.reason, user)
+  }
+
+  @Get(":id/cv")
+  @RequiresPermission("download_cv")
+  @ApiOperation({ summary: "Resolve a scoped candidate CV after Permission Matrix validation" })
+  getCv(@Param("id", ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
+    return this.svc.getCv(id, user)
   }
 
   @Post()

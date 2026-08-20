@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { interviewService } from "@/api/services/interviewService"
 import { useAuth } from "@/lib/AuthContext"
-import { Calendar, CheckCircle2, XCircle, AlertCircle, RotateCcw, UserX } from "lucide-react"
+import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
+import { AlertCircle, Calendar, CheckCircle2, RotateCcw, UserX, XCircle } from "lucide-react"
 
 // ─── Status config ─────────────────────────────────────────────────────────────
 
@@ -195,8 +196,10 @@ function InterviewCard({ interview, isSelected, onSelect }) {
 
 // ─── Detail Panel ──────────────────────────────────────────────────────────────
 
-function DetailPanel({ interview, onClose, onUpdate }) {
+function DetailPanel({ interview, onClose, onUpdate, candidateRoute, jobsRoute }) {
   const { t } = useTranslation()
+
+  const { can } = usePermissionMatrix()
 
   const [isEditing, setIsEditing] = useState(false)
 
@@ -228,7 +231,8 @@ function DetailPanel({ interview, onClose, onUpdate }) {
     updateMutation.mutate({ feedback, rating })
   }
 
-  const canEdit = interview.status !== "cancelled" && interview.status !== "completed"
+  const canEdit =
+    can("update") && interview.status !== "cancelled" && interview.status !== "completed"
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 h-full flex flex-col overflow-hidden shadow-sm">
@@ -575,7 +579,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
       <div className="p-4 border-t border-gray-100 flex gap-2">
         {interview.candidate_id && (
           <Link
-            to={`/company/candidates/${interview.candidate_id}`}
+            to={`${candidateRoute}?id=${interview.candidate_id}`}
             className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 hover:border-purple-300 hover:text-purple-600 transition-colors"
           >
             <User className="w-4 h-4" />
@@ -586,7 +590,7 @@ function DetailPanel({ interview, onClose, onUpdate }) {
 
         {interview.job_id && (
           <Link
-            to={`/company/jobs/${interview.job_id}`}
+            to={`${jobsRoute}?jobId=${interview.job_id}`}
             className="flex-1 flex items-center justify-center gap-2 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 hover:border-purple-300 hover:text-purple-600 transition-colors"
           >
             <Briefcase className="w-4 h-4" />
@@ -601,10 +605,18 @@ function DetailPanel({ interview, onClose, onUpdate }) {
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
-export default function CompanyInterviews() {
+export default function CompanyInterviews({
+  candidateRoute = "/company/crm/candidate",
+  candidateListRoute = "/company/candidates",
+  jobsRoute = "/company/jobs",
+}) {
   const { t } = useTranslation()
 
   const { user } = useAuth()
+
+  const { can } = usePermissionMatrix()
+
+  const canCreate = can("create")
 
   const [filterTab, setFilterTab] = useState("upcoming")
 
@@ -671,6 +683,18 @@ export default function CompanyInterviews() {
     })
   }, [interviews, filterTab])
 
+  useEffect(() => {
+    if (!selected) {
+      return
+    }
+
+    const refreshed = interviews.find((interview) => interview.id === selected.id)
+
+    if (refreshed && refreshed !== selected) {
+      setSelected(refreshed)
+    }
+  }, [interviews, selected])
+
   return (
     <div dir="rtl" className="space-y-6 max-w-7xl mx-auto">
       {/* Page header */}
@@ -690,15 +714,19 @@ export default function CompanyInterviews() {
             <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
           </button>
 
-          <Link
-            to="/company/candidates"
-            className="flex items-center gap-2 h-9 px-4 text-white rounded-xl text-sm font-bold transition-all hover:opacity-90 hover:-translate-y-px"
-            style={{ background: "linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%)" }}
-          >
-            <Plus className="w-4 h-4" />
+          {canCreate && (
+            <Link
+              to={candidateListRoute}
+              className="flex items-center gap-2 h-9 px-4 text-white rounded-xl text-sm font-bold transition-all hover:opacity-90 hover:-translate-y-px"
+              style={{
+                background: "linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%)",
+              }}
+            >
+              <Plus className="w-4 h-4" />
 
-            {t("company.interviews.scheduleNew")}
-          </Link>
+              {t("company.interviews.scheduleNew")}
+            </Link>
+          )}
         </div>
       </div>
 
@@ -800,17 +828,19 @@ export default function CompanyInterviews() {
                     {t("company.interviews.noInterviewsHint")}
                   </p>
 
-                  <Link
-                    to="/company/candidates"
-                    className="flex items-center gap-2 px-4 py-2 text-white rounded-xl text-sm font-bold transition-all hover:opacity-90 hover:-translate-y-px"
-                    style={{
-                      background: "linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%)",
-                    }}
-                  >
-                    <Plus className="w-4 h-4" />
+                  {canCreate && (
+                    <Link
+                      to={candidateListRoute}
+                      className="flex items-center gap-2 px-4 py-2 text-white rounded-xl text-sm font-bold transition-all hover:opacity-90 hover:-translate-y-px"
+                      style={{
+                        background: "linear-gradient(90deg, #9136f0 0%, #575de8 50%, #5a8eee 100%)",
+                      }}
+                    >
+                      <Plus className="w-4 h-4" />
 
-                    {t("company.interviews.scheduleFirst")}
-                  </Link>
+                      {t("company.interviews.scheduleFirst")}
+                    </Link>
+                  )}
                 </>
               ) : (
                 <>
@@ -852,15 +882,10 @@ export default function CompanyInterviews() {
           <div className="lg:sticky lg:top-6 lg:max-h-[calc(100vh-7rem)]">
             <DetailPanel
               interview={selected}
+              candidateRoute={candidateRoute}
+              jobsRoute={jobsRoute}
               onClose={() => setSelected(null)}
-              onUpdate={() => {
-                // Update the selected interview with fresh data
-                const updated = interviews.find((i) => i.id === selected.id)
-
-                if (updated) {
-                  setSelected(updated)
-                }
-              }}
+              onUpdate={refetch}
             />
           </div>
         )}

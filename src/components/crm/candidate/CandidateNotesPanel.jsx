@@ -10,6 +10,7 @@ export default function CandidateNotesPanel({
   onUpdateNote,
   onDeleteNote,
   userRole,
+  canUpdate = true,
 }) {
   const { t, i18n } = useTranslation()
 
@@ -82,7 +83,7 @@ export default function CandidateNotesPanel({
   return (
     <div>
       {/* Add Note Button */}
-      {!showForm && (
+      {!showForm && canUpdate && (
         <button
           onClick={() => setShowForm(true)}
           className="w-full flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-[#E4ECFF] text-[#94A3B8] hover:border-[#7C3AED] hover:text-[#7C3AED] transition-all text-sm font-semibold mb-4"
@@ -184,6 +185,7 @@ export default function CandidateNotesPanel({
                 note={note}
                 onDelete={onDeleteNote}
                 onUpdate={onUpdateNote}
+                canUpdate={canUpdate}
                 visibilityConfig={VISIBILITY_CONFIG}
                 typeLabels={TYPE_LABELS}
                 dateLocale={dateLocale}
@@ -209,6 +211,7 @@ export default function CandidateNotesPanel({
             note={note}
             onDelete={onDeleteNote}
             onUpdate={onUpdateNote}
+            canUpdate={canUpdate}
             visibilityConfig={VISIBILITY_CONFIG}
             typeLabels={TYPE_LABELS}
             dateLocale={dateLocale}
@@ -219,7 +222,15 @@ export default function CandidateNotesPanel({
   )
 }
 
-function NoteCard({ note, onDelete, onUpdate, visibilityConfig, typeLabels, dateLocale }) {
+function NoteCard({
+  note,
+  onDelete,
+  onUpdate,
+  canUpdate,
+  visibilityConfig,
+  typeLabels,
+  dateLocale,
+}) {
   const cfg = visibilityConfig[note.visibility] || visibilityConfig.internal
 
   const Ico = cfg.icon
@@ -233,21 +244,23 @@ function NoteCard({ note, onDelete, onUpdate, visibilityConfig, typeLabels, date
           {note.content}
         </p>
 
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-          <button
-            onClick={() => onUpdate?.(note.id, { is_pinned: !note.is_pinned })}
-            className={`p-1.5 rounded-lg hover:bg-yellow-100 transition-colors ${note.is_pinned ? "text-yellow-600" : "text-[#94A3B8]"}`}
-          >
-            <Pin className="w-3.5 h-3.5" />
-          </button>
+        {canUpdate && (
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+            <button
+              onClick={() => onUpdate?.(note.id, { is_pinned: !note.is_pinned })}
+              className={`p-1.5 rounded-lg hover:bg-yellow-100 transition-colors ${note.is_pinned ? "text-yellow-600" : "text-[#94A3B8]"}`}
+            >
+              <Pin className="w-3.5 h-3.5" />
+            </button>
 
-          <button
-            onClick={() => onDelete?.(note.id)}
-            className="p-1.5 rounded-lg hover:bg-red-50 text-[#94A3B8] hover:text-red-500 transition-colors"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
+            <button
+              onClick={() => onDelete?.(note.id)}
+              className="p-1.5 rounded-lg hover:bg-red-50 text-[#94A3B8] hover:text-red-500 transition-colors"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2 mt-2 flex-wrap">

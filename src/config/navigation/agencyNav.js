@@ -11,6 +11,7 @@ import {
   Activity,
   Settings,
   Building2,
+  CalendarClock,
 } from "lucide-react"
 
 // Staffing Agency Admin / Recruitment Manager Navigation
@@ -179,10 +180,28 @@ export const AGENCY_RECRUITER_NAV = [
     icon: Kanban,
   },
   {
+    id: "rec-interviews",
+    labelKey: "nav.recruiter.interviews",
+    route: "/agency/recruiter/interviews",
+    icon: CalendarClock,
+  },
+  {
     id: "rec-ai",
     labelKey: "nav.recruiter.aiMatching",
     route: "/agency/recruiter/ai-matching",
     icon: Sparkles,
+  },
+  {
+    id: "rec-compensation",
+    labelKey: "nav.recruiter.compensation",
+    route: "/agency/recruiter/compensation",
+    icon: DollarSign,
+  },
+  {
+    id: "rec-activity",
+    labelKey: "nav.recruiter.activity",
+    route: "/agency/recruiter/activity",
+    icon: Activity,
   },
 ]
 

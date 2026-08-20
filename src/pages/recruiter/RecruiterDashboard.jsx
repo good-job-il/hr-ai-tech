@@ -1,350 +1,482 @@
-import { useState, useEffect } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
+import {
+  AlertTriangle,
+  BriefcaseBusiness,
+  CalendarClock,
+  Kanban,
+  UserRoundCheck,
+  UsersRound,
+} from "lucide-react"
 import { candidateService } from "@/api/services/candidateService"
 import { applicationService } from "@/api/services/applicationService"
 import { interviewService } from "@/api/services/interviewService"
-import { compensationPlanService } from "@/api/services/compensationPlanService"
+import { jobService } from "@/api/services/jobService"
 import { useAuth } from "@/lib/AuthContext"
-import { Users, Briefcase, Calendar, DollarSign } from "lucide-react"
 
-function StatCard({ icon: Icon, label, value, color, href, loading }) {
+const ACTIVE_STATUSES = new Set([
+  "new",
+  "reviewed",
+  "phone_interview",
+  "recommended",
+  "employer_interview",
+  "offer",
+  "probation",
+])
+
+const SLA_HOURS = {
+  new: 24,
+  reviewed: 48,
+  phone_interview: 72,
+  recommended: 48,
+  employer_interview: 120,
+  offer: 72,
+  probation: 168,
+}
+
+const COPY = {
+  he: {
+    hello: "שלום",
+    subtitle: "מרחב העבודה האישי שלך — משימות, ראיונות ותהליך הגיוס",
+    refresh: "רענון",
+    candidates: "המועמדים שלי",
+    jobs: "משרות פעילות",
+    applications: "תהליכים פעילים",
+    interviews: "ראיונות קרובים",
+    tasks: "המשימות שלי",
+    overdue: "שלבים באיחור",
+    newApplications: "מועמדים חדשים לבדיקה",
+    weekInterviews: "ראיונות בשבעת הימים הקרובים",
+    noTasks: "אין משימות דחופות כרגע",
+    upcoming: "ראיונות קרובים",
+    noInterviews: "לא נקבעו ראיונות קרובים",
+    assignedJobs: "משרות שהוקצו לי",
+    noJobs: "אין משרות פעילות שהוקצו לך",
+    recentCandidates: "מועמדים אחרונים",
+    noCandidates: "אין מועמדים משויכים",
+    viewAll: "הצג הכל",
+    openPipeline: "פתח תהליך",
+    loadError: "לא ניתן לטעון את מרחב העבודה",
+  },
+  en: {
+    hello: "Hello",
+    subtitle: "Your personal workspace for tasks, interviews and recruitment progress",
+    refresh: "Refresh",
+    candidates: "My candidates",
+    jobs: "Active jobs",
+    applications: "Active applications",
+    interviews: "Upcoming interviews",
+    tasks: "My tasks",
+    overdue: "Overdue stages",
+    newApplications: "New candidates to review",
+    weekInterviews: "Interviews in the next seven days",
+    noTasks: "No urgent tasks right now",
+    upcoming: "Upcoming interviews",
+    noInterviews: "No upcoming interviews",
+    assignedJobs: "Assigned jobs",
+    noJobs: "No active jobs are assigned to you",
+    recentCandidates: "Recent candidates",
+    noCandidates: "No assigned candidates",
+    viewAll: "View all",
+    openPipeline: "Open pipeline",
+    loadError: "Unable to load the recruiter workspace",
+  },
+}
+
+function StatCard({ icon: Icon, label, value, tone, href, loading }) {
+  const tones = {
+    violet: "bg-violet-50 text-violet-600",
+    blue: "bg-blue-50 text-blue-600",
+    amber: "bg-amber-50 text-amber-600",
+    emerald: "bg-emerald-50 text-emerald-600",
+  }
+
   const content = (
-    <div className="bg-white rounded-2xl border border-[#E4ECFF] p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-      <div
-        className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-        style={{ background: color + "18" }}
-      >
-        <Icon className="w-6 h-6" style={{ color }} />
+    <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-md">
+      <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${tones[tone]}`}>
+        <Icon className="h-6 w-6" />
       </div>
 
-      <div className="flex-1 min-w-0">
-        <div className="text-2xl font-black text-[#0F172A]">
+      <div>
+        <div className="text-2xl font-black text-slate-900">
           {loading ? (
-            <span className="inline-block w-10 h-6 bg-gray-100 rounded animate-pulse" />
+            <span className="inline-block h-6 w-10 animate-pulse rounded bg-slate-100" />
           ) : (
             value
           )}
         </div>
 
-        <div className="text-sm font-semibold text-[#64748B]">{label}</div>
+        <div className="text-sm font-semibold text-slate-500">{label}</div>
       </div>
-
-      {href && <ChevronLeft className="w-4 h-4 text-[#CBD5E1]" />}
     </div>
   )
 
   return href ? <Link to={href}>{content}</Link> : content
 }
 
+function Panel({ title, action, children }) {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-lg font-black text-slate-900">{title}</h2>
+
+        {action}
+      </div>
+
+      {children}
+    </section>
+  )
+}
+
 export default function RecruiterDashboard() {
   const { user } = useAuth()
 
-  const [stats, setStats] = useState(null)
+  const { i18n } = useTranslation()
 
-  const [recentCandidates, setRecentCandidates] = useState([])
+  const language = i18n.language?.startsWith("en") ? "en" : "he"
 
-  const [recentApplications, setRecentApplications] = useState([])
+  const text = COPY[language]
 
-  const [compensation, setCompensation] = useState(null)
+  const isRtl = language === "he"
+
+  const [data, setData] = useState({ candidates: [], applications: [], jobs: [], interviews: [] })
 
   const [loading, setLoading] = useState(true)
 
-  const [loadError, setLoadError] = useState("")
+  const [error, setError] = useState("")
 
-  const load = async () => {
-    if (!user) {
+  const load = useCallback(async () => {
+    if (!user?.id) {
       return
     }
 
     setLoading(true)
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // VISIBILITY POLICY — RecruiterDashboard
-    //
-    //  Recruiter sees ONLY records explicitly assigned to them.
-    //  No fallback-to-all. Empty result → empty state in the UI.
-    //  To grant access to unassigned records: set user.can_view_unassigned = true.
-    // ─────────────────────────────────────────────────────────────────────────
-    setLoadError("")
+    setError("")
 
     try {
-      const [candidates, applications, interviews, plans] = await Promise.all([
-        candidateService.list({
-          organization_id: user.organization_id,
-          recruiter_id: user.id,
-          sort: "created_date",
-          order: "DESC",
-          limit: 100,
-        }),
-        applicationService.list({
-          organization_id: user.organization_id,
-          recruiter_id: user.id,
-          sort: "created_date",
-          order: "DESC",
-          limit: 100,
-        }),
-        interviewService.list({
-          organization_id: user.organization_id,
-          recruiter_id: user.id,
-          status: "scheduled",
-          sort: "date",
-          order: "DESC",
-          limit: 50,
-        }),
-        compensationPlanService.list({ recruiter_id: user.id, limit: 100 }),
+      // No client-side fallback: every endpoint applies the Recruiter RLS from R-1.
+      const [candidates, applications, jobs, interviews] = await Promise.all([
+        candidateService.list({ sort: "created_date", order: "DESC", limit: 200 }),
+        applicationService.list({ sort: "updated_date", order: "DESC", limit: 500 }),
+        jobService.list({ sort: "updated_date", order: "DESC", limit: 200 }),
+        interviewService.list({ sort: "date", order: "DESC", limit: 200 }),
       ])
 
-      // Calculate total compensation for this recruiter
-      const totalComp = plans.reduce((sum, plan) => {
-        if (plan.recruiter_compensation) {
-          return (
-            sum +
-            (plan.recruiter_compensation_type === "percent"
-              ? ((plan.total_fee || 0) * plan.recruiter_compensation) / 100
-              : plan.recruiter_compensation)
-          )
-        }
-
-        return sum
-      }, 0)
-
-      setStats({
-        candidates: candidates.length,
-        applications: applications.length,
-        interviews: interviews.length,
-        newApplications: applications.filter((a) => a.status === "new").length,
-      })
-      setCompensation({ total: totalComp, plans: plans.filter((p) => p.recruiter_compensation) })
-      setRecentCandidates(candidates.slice(0, 5))
-      setRecentApplications(applications.slice(0, 5))
-    } catch (error) {
-      setStats(null)
-      setRecentCandidates([])
-      setRecentApplications([])
-      setCompensation(null)
-      setLoadError(error?.message || "Unable to load recruiter dashboard")
+      setData({ candidates, applications, jobs, interviews })
+    } catch (requestError) {
+      setData({ candidates: [], applications: [], jobs: [], interviews: [] })
+      setError(requestError?.message || text.loadError)
     } finally {
       setLoading(false)
     }
-  }
+  }, [text.loadError, user?.id])
 
   useEffect(() => {
     load()
-  }, [user?.id])
+  }, [load])
+
+  const workspace = useMemo(() => {
+    const now = Date.now()
+
+    const weekEnd = now + 7 * 86400000
+
+    const activeApplications = data.applications.filter((item) => ACTIVE_STATUSES.has(item.status))
+
+    const overdue = activeApplications
+      .filter((item) => SLA_HOURS[item.status])
+      .map((item) => ({
+        ...item,
+        overdueHours: Math.max(
+          0,
+          Math.floor((now - new Date(item.updated_date).getTime()) / 3600000) -
+            SLA_HOURS[item.status],
+        ),
+      }))
+      .filter((item) => item.overdueHours > 0)
+      .sort((a, b) => b.overdueHours - a.overdueHours)
+
+    const upcomingInterviews = data.interviews
+      .filter((item) => {
+        const timestamp = new Date(`${item.date}T${item.time || "00:00"}`).getTime()
+
+        return timestamp >= now && !["cancelled", "completed", "no_show"].includes(item.status)
+      })
+      .sort(
+        (a, b) =>
+          new Date(`${a.date}T${a.time || "00:00"}`).getTime() -
+          new Date(`${b.date}T${b.time || "00:00"}`).getTime(),
+      )
+
+    return {
+      activeApplications,
+      activeJobs: data.jobs.filter(
+        (item) => !item.is_closed && !["filled", "closed"].includes(item.state),
+      ),
+      overdue,
+      upcomingInterviews,
+      weekInterviews: upcomingInterviews.filter(
+        (item) => new Date(`${item.date}T${item.time || "00:00"}`).getTime() <= weekEnd,
+      ),
+      newApplications: data.applications.filter((item) => item.status === "new"),
+    }
+  }, [data])
+
+  const firstName = user?.full_name?.trim().split(/\s+/)[0] || user?.email || ""
+
+  const shortDate = (value) =>
+    new Intl.DateTimeFormat(language === "he" ? "he-IL" : "en-US", {
+      day: "2-digit",
+      month: "short",
+    }).format(new Date(value))
+
+  const panelAction = (href, label = text.viewAll) => (
+    <Link className="text-sm font-bold text-violet-600" to={href}>
+      {label}
+    </Link>
+  )
 
   return (
-    <div dir="rtl" className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div dir={isRtl ? "rtl" : "ltr"} className="space-y-6">
+      <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-[#0F172A]">
-            שלום, {user?.full_name?.split(" ")[0]} 👋
+          <h1 className="text-3xl font-black text-slate-900">
+            {text.hello}, {firstName}
           </h1>
 
-          <p className="text-[#64748B] font-semibold mt-1">דשבורד מגייס — נתונים עדכניים</p>
+          <p className="mt-1 font-semibold text-slate-500">{text.subtitle}</p>
         </div>
 
         <button
+          type="button"
           onClick={load}
           disabled={loading}
-          className="flex items-center gap-2 text-sm font-bold text-[#7C3AED] hover:underline disabled:opacity-50"
+          className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-violet-600 disabled:opacity-50"
         >
-          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> רענן
+          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+
+          {text.refresh}
         </button>
-      </div>
+      </header>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={Users}
-          label="המועמדים שלי"
-          value={stats?.candidates ?? "—"}
-          color="#7C3AED"
-          href="/recruiter/candidates"
-          loading={loading}
-        />
-
-        <StatCard
-          icon={Briefcase}
-          label="הגשות פתוחות"
-          value={stats?.applications ?? "—"}
-          color="#2563EB"
-          href="/recruiter/pipeline"
-          loading={loading}
-        />
-
-        <StatCard
-          icon={Calendar}
-          label="ראיונות קרובים"
-          value={stats?.interviews ?? "—"}
-          color="#059669"
-          href="/recruiter/interviews"
-          loading={loading}
-        />
-
-        <StatCard
-          icon={DollarSign}
-          label="התגמול שלי"
-          value={compensation ? `${compensation.total.toLocaleString()} ₪` : "—"}
-          color="#059669"
-          href="/recruitment/compensation"
-          loading={loading}
-        />
-      </div>
-
-      {loadError && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
-          {loadError}
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700">
+          {error}
         </div>
       )}
 
-      {/* Compensation Summary */}
-      {compensation && compensation.plans.length > 0 && (
-        <div className="bg-gradient-to-l from-green-50 to-emerald-50 rounded-2xl border border-green-200 p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <DollarSign className="w-5 h-5 text-green-600" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          icon={UsersRound}
+          label={text.candidates}
+          value={data.candidates.length}
+          tone="violet"
+          href="/agency/recruiter/candidates/all"
+          loading={loading}
+        />
 
-            <h3 className="text-lg font-black text-green-800">התגמולים שלי</h3>
-          </div>
+        <StatCard
+          icon={BriefcaseBusiness}
+          label={text.jobs}
+          value={workspace.activeJobs.length}
+          tone="blue"
+          href="/agency/recruiter/jobs"
+          loading={loading}
+        />
 
+        <StatCard
+          icon={Kanban}
+          label={text.applications}
+          value={workspace.activeApplications.length}
+          tone="amber"
+          href="/agency/recruiter/pipeline"
+          loading={loading}
+        />
+
+        <StatCard
+          icon={CalendarClock}
+          label={text.interviews}
+          value={workspace.upcomingInterviews.length}
+          tone="emerald"
+          href="/agency/recruiter/interviews"
+          loading={loading}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <Panel
+          title={text.tasks}
+          action={panelAction("/agency/recruiter/pipeline", text.openPipeline)}
+        >
           <div className="space-y-3">
-            {compensation.plans.slice(0, 5).map((plan) => (
-              <div
-                key={plan.id}
-                className="flex items-center justify-between p-3 bg-white rounded-xl border border-green-200"
+            {[
+              {
+                icon: AlertTriangle,
+                label: text.overdue,
+                count: workspace.overdue.length,
+                tone: "text-red-600 bg-red-50",
+                href: workspace.overdue[0]
+                  ? `/agency/recruiter/pipeline?applicationId=${workspace.overdue[0].id}`
+                  : "/agency/recruiter/pipeline",
+              },
+              {
+                icon: UserRoundCheck,
+                label: text.newApplications,
+                count: workspace.newApplications.length,
+                tone: "text-blue-600 bg-blue-50",
+                href: workspace.newApplications[0]
+                  ? `/agency/recruiter/pipeline?applicationId=${workspace.newApplications[0].id}`
+                  : "/agency/recruiter/pipeline",
+              },
+              {
+                icon: CalendarClock,
+                label: text.weekInterviews,
+                count: workspace.weekInterviews.length,
+                tone: "text-emerald-600 bg-emerald-50",
+                href: "/agency/recruiter/interviews",
+              },
+            ].map((task) => (
+              <Link
+                key={task.label}
+                to={task.href}
+                className="flex items-center gap-3 rounded-xl border border-slate-100 p-3 transition hover:bg-slate-50"
               >
-                <div>
-                  <div className="text-sm font-bold text-green-900">{plan.client_name}</div>
+                <span
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg ${task.tone}`}
+                >
+                  <task.icon className="h-4 w-4" />
+                </span>
 
-                  {plan.job_id && <div className="text-xs text-green-600">משרה ספציפית</div>}
-                </div>
+                <span className="flex-1 text-sm font-bold text-slate-700">{task.label}</span>
 
-                <div className="text-left">
-                  <div className="text-sm font-black text-green-700">
-                    {plan.recruiter_compensation.toLocaleString()}{" "}
-                    {plan.recruiter_compensation_type === "percent" ? "%" : "₪"}
-                  </div>
-
-                  {plan.recruiter_compensation_type === "percent" && plan.total_fee && (
-                    <div className="text-xs text-green-600 font-bold">
-                      {((plan.total_fee * plan.recruiter_compensation) / 100).toLocaleString()} ₪
-                    </div>
-                  )}
-                </div>
-              </div>
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-black text-slate-700">
+                  {task.count}
+                </span>
+              </Link>
             ))}
-          </div>
-        </div>
-      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Recent Candidates */}
-        <div className="bg-white rounded-2xl border border-[#E4ECFF] p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-black text-[#0F172A]">מועמדים אחרונים שלי</h3>
+            {!loading &&
+              !workspace.overdue.length &&
+              !workspace.newApplications.length &&
+              !workspace.weekInterviews.length && (
+                <div className="flex items-center gap-2 py-6 text-sm font-semibold text-slate-400">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
 
-            <Link
-              to="/recruiter/candidates"
-              className="text-sm font-bold text-[#7C3AED] hover:underline"
-            >
-              הכל
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-12 bg-gray-50 rounded-xl animate-pulse" />
-              ))}
-            </div>
-          ) : recentCandidates.length === 0 ? (
-            <p className="text-sm text-[#94A3B8] text-center py-6">
-              אין מועמדים משויכים אליך עדיין
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {recentCandidates.map((c) => (
-                <Link
-                  key={c.id}
-                  to={`/recruiter/crm/candidate?id=${c.id}`}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#F7F8FC] transition-colors group"
-                >
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#2563EB] flex items-center justify-center text-white text-xs font-black flex-shrink-0">
-                    {c.full_name
-                      ?.split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toUpperCase()}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold text-[#0F172A] truncate">{c.full_name}</div>
-
-                    <div className="text-xs text-[#94A3B8] truncate">
-                      {c.role_name || c.domain_name || "—"}
-                    </div>
-                  </div>
-
-                  <ChevronLeft className="w-4 h-4 text-[#CBD5E1] group-hover:text-[#7C3AED]" />
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Recent Applications */}
-        <div className="bg-white rounded-2xl border border-[#E4ECFF] p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-black text-[#0F172A]">הגשות אחרונות</h3>
-
-            <Link
-              to="/recruiter/pipeline"
-              className="text-sm font-bold text-[#7C3AED] hover:underline"
-            >
-              Pipeline
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-12 bg-gray-50 rounded-xl animate-pulse" />
-              ))}
-            </div>
-          ) : recentApplications.length === 0 ? (
-            <p className="text-sm text-[#94A3B8] text-center py-6">אין הגשות משויכות אליך עדיין</p>
-          ) : (
-            <div className="space-y-2">
-              {recentApplications.map((a) => (
-                <div
-                  key={a.id}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#F7F8FC] transition-colors"
-                >
-                  <div className="w-9 h-9 rounded-xl bg-[#F0F4FF] flex items-center justify-center text-[#6C4DFF] text-xs font-black flex-shrink-0">
-                    {a.company?.charAt(0) || "?"}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold text-[#0F172A] truncate">
-                      {a.candidate_name}
-                    </div>
-
-                    <div className="text-xs text-[#94A3B8] truncate">
-                      {a.job_title} · {a.company}
-                    </div>
-                  </div>
-
-                  {a.match_score && (
-                    <span
-                      className={`text-xs font-black px-2 py-1 rounded-full ${a.match_score >= 70 ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}
-                    >
-                      {a.match_score}%
-                    </span>
-                  )}
+                  {text.noTasks}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              )}
+          </div>
+        </Panel>
+
+        <Panel title={text.upcoming} action={panelAction("/agency/recruiter/interviews")}>
+          <div className="space-y-2">
+            {workspace.upcomingInterviews.slice(0, 5).map((item) => (
+              <Link
+                key={item.id}
+                to={
+                  item.application_id
+                    ? `/agency/recruiter/pipeline?applicationId=${item.application_id}`
+                    : "/agency/recruiter/interviews"
+                }
+                className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                  <CalendarClock className="h-5 w-5" />
+                </span>
+
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-bold text-slate-800">
+                    {item.candidate_name}
+                  </span>
+
+                  <span className="block truncate text-xs font-semibold text-slate-400">
+                    {item.job_title}
+                  </span>
+                </span>
+
+                <span className="text-xs font-bold text-slate-500">
+                  {shortDate(item.date)} {item.time}
+                </span>
+              </Link>
+            ))}
+
+            {!loading && !workspace.upcomingInterviews.length && (
+              <p className="py-8 text-center text-sm font-semibold text-slate-400">
+                {text.noInterviews}
+              </p>
+            )}
+          </div>
+        </Panel>
+
+        <Panel title={text.assignedJobs} action={panelAction("/agency/recruiter/jobs")}>
+          <div className="space-y-2">
+            {workspace.activeJobs.slice(0, 5).map((item) => (
+              <Link
+                key={item.id}
+                to={`/agency/recruiter/jobs?jobId=${item.id}`}
+                className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                  <BriefcaseBusiness className="h-5 w-5" />
+                </span>
+
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-bold text-slate-800">
+                    {item.title}
+                  </span>
+
+                  <span className="block truncate text-xs font-semibold text-slate-400">
+                    {item.company}
+                  </span>
+                </span>
+
+                <span className="text-xs font-bold text-slate-500">
+                  {item.applications_count || 0}
+                </span>
+              </Link>
+            ))}
+
+            {!loading && !workspace.activeJobs.length && (
+              <p className="py-8 text-center text-sm font-semibold text-slate-400">{text.noJobs}</p>
+            )}
+          </div>
+        </Panel>
+
+        <Panel
+          title={text.recentCandidates}
+          action={panelAction("/agency/recruiter/candidates/all")}
+        >
+          <div className="space-y-2">
+            {data.candidates.slice(0, 5).map((item) => (
+              <Link
+                key={item.id}
+                to={`/agency/recruiter/crm/candidate?id=${item.id}`}
+                className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+                  <UsersRound className="h-5 w-5" />
+                </span>
+
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-bold text-slate-800">
+                    {item.full_name}
+                  </span>
+
+                  <span className="block truncate text-xs font-semibold text-slate-400">
+                    {item.role_name || item.email}
+                  </span>
+                </span>
+
+                <Clock3 className="h-4 w-4 text-slate-300" />
+              </Link>
+            ))}
+
+            {!loading && !data.candidates.length && (
+              <p className="py-8 text-center text-sm font-semibold text-slate-400">
+                {text.noCandidates}
+              </p>
+            )}
+          </div>
+        </Panel>
       </div>
     </div>
   )

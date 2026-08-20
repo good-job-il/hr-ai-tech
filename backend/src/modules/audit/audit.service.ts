@@ -46,7 +46,22 @@ export class AuditService {
       where.organization_id = user.organization_id
     }
 
-    if (user.role === UserRole.TEAM_MANAGER) {
+    if (user.role === UserRole.RECRUITER) {
+      if (!user.organization_id) {
+        return buildPaginatedResponse([], 0, { page, limit })
+      }
+
+      if (actor_user_id && String(actor_user_id) !== String(user.id)) {
+        return buildPaginatedResponse([], 0, { page, limit })
+      }
+
+      if (entity_type && ORGANIZATION_WIDE_AUDIT_ENTITY_TYPES.includes(entity_type)) {
+        return buildPaginatedResponse([], 0, { page, limit })
+      }
+
+      where.actor_user_id = String(user.id)
+      where.entity_type = entity_type ? entity_type : Not(In(ORGANIZATION_WIDE_AUDIT_ENTITY_TYPES))
+    } else if (user.role === UserRole.TEAM_MANAGER) {
       if (!user.team_id || !user.organization_id) {
         return buildPaginatedResponse([], 0, { page, limit })
       }

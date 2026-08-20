@@ -76,7 +76,7 @@ export class CompensationService {
       where.employer_company_id = employer_company_id
     }
 
-    if (recruiter_id) {
+    if (recruiter_id && user.role !== UserRole.RECRUITER) {
       where.recruiter_id = recruiter_id
     }
 
@@ -89,7 +89,11 @@ export class CompensationService {
       take,
     })
 
-    return buildPaginatedResponse(data, total, { page, limit })
+    return buildPaginatedResponse(
+      data.map((plan) => this.toVisiblePlan(plan, user)),
+      total,
+      { page, limit },
+    )
   }
 
   async findById(id: number, user: UserEntity): Promise<CompensationPlanEntity> {
@@ -109,11 +113,16 @@ export class CompensationService {
       throw new NotFoundException(`Compensation plan ${id} not found`)
     }
 
-    return plan
+    if (user.role === UserRole.RECRUITER && plan.recruiter_id !== user.id) {
+      throw new NotFoundException(`Compensation plan ${id} not found`)
+    }
+
+    return this.toVisiblePlan(plan, user) as CompensationPlanEntity
   }
 
   async create(dto: CreateCompensationPlanDto, user: UserEntity): Promise<CompensationPlanEntity> {
     this.assertAgencyAccess(user)
+    this.assertMutableBy(user)
 
     const relations = await this.resolveRelations(dto, user)
 
@@ -136,6 +145,8 @@ export class CompensationService {
     dto: UpdateCompensationPlanDto,
     user: UserEntity,
   ): Promise<CompensationPlanEntity> {
+    this.assertMutableBy(user)
+
     const plan = await this.findById(id, user)
 
     const before = { ...plan }
@@ -153,6 +164,8 @@ export class CompensationService {
   }
 
   async remove(id: number, user: UserEntity): Promise<void> {
+    this.assertMutableBy(user)
+
     const plan = await this.findById(id, user)
 
     await this.logChange(plan, user, { ...plan }, "delete")
@@ -253,6 +266,12 @@ export class CompensationService {
     }
   }
 
+  private assertMutableBy(user: UserEntity) {
+    if (user.role === UserRole.RECRUITER) {
+      throw new ForbiddenException("Recruiter compensation is read-only")
+    }
+  }
+
   private async logChange(
     plan: CompensationPlanEntity,
     user: UserEntity,
@@ -270,5 +289,33 @@ export class CompensationService {
       action,
       metadata: { before, after: action === "delete" ? null : plan },
     })
+  }
+
+  private toVisiblePlan(plan: CompensationPlanEntity, user: UserEntity) {
+    if (user.role !== UserRole.RECRUITER) {
+      return plan
+    }
+
+    const ownRate = plan.recruiter_compensation == null ? null : Number(plan.recruiter_compensation)
+
+    const totalFee = plan.total_fee == null ? null : Number(plan.total_fee)
+
+    const ownCompensationAmount =
+      ownRate == null
+        ? null
+        : plan.recruiter_compensation_type === "percent" && totalFee != null
+          ? (totalFee * ownRate) / 100
+          : ownRate
+
+    return {
+      id: plan.id,
+      job_id: plan.job_id,
+      client_name: plan.client_name,
+      recruiter_compensation: ownRate,
+      recruiter_compensation_type: plan.recruiter_compensation_type,
+      own_compensation_amount: ownCompensationAmount,
+      created_date: plan.created_date,
+      updated_date: plan.updated_date,
+    }
   }
 }

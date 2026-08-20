@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Video, Phone, MapPin, Star } from "lucide-react"
+import { MapPin, Phone, Star, Video } from "lucide-react"
 import { he, enUS } from "date-fns/locale"
 import { useTranslation } from "react-i18next"
 
@@ -13,6 +13,7 @@ const TYPE_ICONS = {
 }
 
 const EMPTY_FORM = {
+  application_id: "",
   date: "",
   time: "",
   type: "video",
@@ -25,7 +26,14 @@ const EMPTY_FORM = {
   duration_minutes: 45,
 }
 
-export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
+export default function InterviewsPanel({
+  interviews,
+  applications = [],
+  canCreate = true,
+  canUpdate = true,
+  onSchedule,
+  onUpdate,
+}) {
   const { t, i18n } = useTranslation()
 
   const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
@@ -86,15 +94,22 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
   const [saving, setSaving] = useState(false)
 
   const handleSubmit = async () => {
-    if (!form.date || !form.time) {
+    if (!form.application_id || !form.date || !form.time) {
       return
     }
 
     setSaving(true)
-    await onSchedule(form)
-    setForm(EMPTY_FORM)
-    setShowForm(false)
-    setSaving(false)
+
+    try {
+      await onSchedule({
+        ...form,
+        application_id: Number(form.application_id),
+      })
+      setForm(EMPTY_FORM)
+      setShowForm(false)
+    } finally {
+      setSaving(false)
+    }
   }
 
   const upcoming = interviews.filter((i) => ["scheduled", "confirmed"].includes(i.status))
@@ -103,7 +118,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
 
   return (
     <div>
-      {!showForm && (
+      {!showForm && canCreate && applications.length > 0 && (
         <button
           onClick={() => setShowForm(true)}
           className="w-full flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-[#E4ECFF] text-[#94A3B8] hover:border-[#7C3AED] hover:text-[#7C3AED] transition-all text-sm font-semibold mb-4"
@@ -119,6 +134,36 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
           </h4>
 
           <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="col-span-2">
+              <label className="text-xs font-bold text-[#64748B] mb-1 block">
+                {t("candidateCRM.tabs.applications")} *
+              </label>
+
+              <select
+                value={form.application_id}
+                onChange={(event) => {
+                  const application = applications.find(
+                    (item) => item.id === Number(event.target.value),
+                  )
+
+                  setForm((previous) => ({
+                    ...previous,
+                    application_id: event.target.value,
+                    job_title: application?.job_title || previous.job_title,
+                  }))
+                }}
+                className="w-full rounded-lg border border-[#E4ECFF] bg-white px-3 py-2 text-sm text-[#1F2937]"
+              >
+                <option value="">—</option>
+
+                {applications.map((application) => (
+                  <option key={application.id} value={application.id}>
+                    {application.job_title || `#${application.id}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div>
               <label className="text-xs font-bold text-[#64748B] mb-1 block">
                 {t("candidateCRM.interviews.form.date")} *
@@ -223,7 +268,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
             <Button
               size="sm"
               onClick={handleSubmit}
-              disabled={!form.date || !form.time || saving}
+              disabled={!form.application_id || !form.date || !form.time || saving}
               className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs"
             >
               {saving
@@ -256,6 +301,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
                 key={i.id}
                 interview={i}
                 onUpdate={onUpdate}
+                canUpdate={canUpdate}
                 typeLabels={TYPE_LABELS}
                 stageLabels={STAGE_LABELS}
                 statusCfg={STATUS_CFG}
@@ -278,6 +324,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
                 key={i.id}
                 interview={i}
                 onUpdate={onUpdate}
+                canUpdate={canUpdate}
                 typeLabels={TYPE_LABELS}
                 stageLabels={STAGE_LABELS}
                 statusCfg={STATUS_CFG}
@@ -298,7 +345,7 @@ export default function InterviewsPanel({ interviews, onSchedule, onUpdate }) {
   )
 }
 
-function InterviewCard({ interview, onUpdate, typeLabels, stageLabels, statusCfg }) {
+function InterviewCard({ interview, onUpdate, canUpdate, typeLabels, stageLabels, statusCfg }) {
   const { t } = useTranslation()
 
   const [showFeedback, setShowFeedback] = useState(false)
@@ -355,7 +402,7 @@ function InterviewCard({ interview, onUpdate, typeLabels, stageLabels, statusCfg
           </div>
         </div>
 
-        {interview.status === "scheduled" && (
+        {canUpdate && interview.status === "scheduled" && (
           <div className="flex gap-1">
             <Button
               size="sm"

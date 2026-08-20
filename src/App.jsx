@@ -319,10 +319,7 @@ const AuthenticatedApp = () => {
         }
       >
         <Route element={<AgencyRecruiterLayout />}>
-          <Route
-            path="/agency/recruiter/dashboard"
-            element={<PlaceholderPage title="דשבורד מגייס" />}
-          />
+          <Route path="/agency/recruiter/dashboard" element={<RecruiterDashboard />} />
 
           <Route
             path="/agency/recruiter/candidates"
@@ -344,7 +341,18 @@ const AuthenticatedApp = () => {
             element={<CandidateListCRMPage candidateRoute="/agency/recruiter/crm/candidate" />}
           />
 
-          <Route path="/agency/recruiter/jobs" element={<Jobs />} />
+          <Route path="/agency/recruiter/jobs" element={<ManageJobsPage />} />
+
+          <Route
+            path="/agency/recruiter/interviews"
+            element={
+              <CompanyInterviews
+                candidateRoute="/agency/recruiter/crm/candidate"
+                candidateListRoute="/agency/recruiter/candidates/all"
+                jobsRoute="/agency/recruiter/jobs"
+              />
+            }
+          />
 
           <Route
             path="/agency/recruiter/crm"
@@ -356,6 +364,10 @@ const AuthenticatedApp = () => {
           <Route path="/agency/recruiter/pipeline" element={<PipelinePage />} />
 
           <Route path="/agency/recruiter/ai-matching" element={<AIMatchingPage />} />
+
+          <Route path="/agency/recruiter/compensation" element={<RecruiterCompensationPage />} />
+
+          <Route path="/agency/recruiter/activity" element={<RecruiterActivityPage />} />
 
           {/* Legacy redirects */}
           <Route

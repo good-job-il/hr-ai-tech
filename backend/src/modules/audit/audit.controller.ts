@@ -14,7 +14,10 @@ const ACTIVITY_ROLES = [
   UserRole.ORG_ADMIN,
   UserRole.RECRUITMENT_MANAGER,
   UserRole.TEAM_MANAGER,
+  UserRole.RECRUITER,
 ]
+
+const ACTIVITY_EXPORT_ROLES = ACTIVITY_ROLES.filter((role) => role !== UserRole.RECRUITER)
 
 @ApiTags("Audit Log")
 @ApiBearerAuth()
@@ -31,7 +34,7 @@ export class AuditController {
   }
 
   @Get("export")
-  @Roles(...ACTIVITY_ROLES)
+  @Roles(...ACTIVITY_EXPORT_ROLES)
   @UseGuards(EffectivePermissionsGuard)
   @RequiresPermission("export")
   export(@Query() q: QueryAuditLogsDto, @CurrentUser() u: UserEntity) {
