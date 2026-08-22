@@ -204,3 +204,5 @@ export default function AdminManageCompanies() {
     </AdminLayout>
   )
 }
+import { Trash2, Search, Edit2 } from "lucide-react"
+import AdminLayout from "@/components/admin/AdminLayout"

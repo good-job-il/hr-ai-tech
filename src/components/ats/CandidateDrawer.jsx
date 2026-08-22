@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react"
+import { Link } from "react-router-dom"
 import { Briefcase, Clock, Mail, MapPin, MessageSquare, Phone, Sparkles, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { scoreMatch } from "@/lib/aiMatching"
@@ -582,3 +583,9 @@ function InfoRow({ icon: Icon, label, value }) {
     </div>
   )
 }
+import { X, Calendar, Send, AlertTriangle } from "lucide-react"
+import ActivityTimeline from "./ActivityTimeline"
+import MatchExplanationCard from "@/components/ai/MatchExplanationCard"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"

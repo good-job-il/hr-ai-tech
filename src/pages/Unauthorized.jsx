@@ -68,3 +68,5 @@ export default function Unauthorized() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { Shield, ArrowLeft } from "lucide-react"

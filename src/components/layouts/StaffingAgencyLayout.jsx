@@ -28,3 +28,4 @@ export default function StaffingAgencyLayout() {
 
   return <SidebarLayout navItems={nav} roleTitle={title} />
 }
+import SidebarLayout from "./SidebarLayout"

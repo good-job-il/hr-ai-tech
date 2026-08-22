@@ -413,3 +413,13 @@ export default function RoleSettingsPage() {
     </PlatformPageShell>
   )
 }
+import { Input } from "@/components/ui/input"
+import { RefreshCw, X } from "lucide-react"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"

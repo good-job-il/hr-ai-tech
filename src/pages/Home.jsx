@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "@/lib/AuthContext"
 import {
@@ -19,7 +19,13 @@ import {
   MessageSquare,
   Target,
   Users,
+  ChevronDown,
+  Search,
+  Sparkles,
 } from "lucide-react"
+import Navbar from "@/components/home/Navbar"
+import SEOHead from "@/components/SEOHead"
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 
 const gradientText =
   "bg-gradient-to-l from-[#6C4DFF] via-[#5B7CFF] to-[#2FB8FF] bg-clip-text text-transparent"

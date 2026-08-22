@@ -149,3 +149,6 @@ export default function ImportTestBatch() {
     </AdminLayout>
   )
 }
+import AdminLayout from "@/components/admin/AdminLayout"
+import { CheckCircle2, Info } from "lucide-react"
+import ResumeZipUploader from "@/components/admin/ResumeZipUploader"

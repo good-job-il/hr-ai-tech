@@ -1030,3 +1030,16 @@ export default function AgencyClientDetail() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import {
+  ArrowRight,
+  Edit2,
+  Trash2,
+  X,
+  Save,
+  TrendingUp,
+  Kanban,
+  AlertCircle,
+  Plus,
+  ExternalLink,
+} from "lucide-react"

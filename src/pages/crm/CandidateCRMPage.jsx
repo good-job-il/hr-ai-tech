@@ -417,3 +417,13 @@ export default function CandidateCRMPage() {
     </div>
   )
 }
+import CandidateProfileHeader from "@/components/crm/candidate/CandidateProfileHeader"
+import CandidateTimeline from "@/components/crm/candidate/CandidateTimeline"
+import CandidateNotesPanel from "@/components/crm/candidate/CandidateNotesPanel"
+import InterviewsPanel from "@/components/crm/candidate/InterviewsPanel"
+import RecruiterWorkspacePanel from "@/components/crm/candidate/RecruiterWorkspacePanel"
+import DocumentsPanel from "@/components/crm/candidate/DocumentsPanel"
+import ApplicationsPanel from "@/components/crm/candidate/ApplicationsPanel"
+import WhatsAppPanel from "@/components/crm/candidate/WhatsAppPanel"
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
+import { ArrowRight, RefreshCw, AlertCircle, Trash2 } from "lucide-react"

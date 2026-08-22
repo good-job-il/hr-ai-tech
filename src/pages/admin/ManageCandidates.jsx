@@ -228,3 +228,5 @@ export default function AdminManageCandidates() {
     </AdminLayout>
   )
 }
+import { Search, Trash2, Eye } from "lucide-react"
+import AdminLayout from "@/components/admin/AdminLayout"

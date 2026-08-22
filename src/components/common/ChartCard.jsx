@@ -13,3 +13,4 @@ export function ChartCard({ title, description, children }) {
 }
 
 export default ChartCard
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"

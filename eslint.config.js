@@ -44,6 +44,10 @@ export default [
 
       "unused-imports/no-unused-imports": "error",
 
+      // JSX identifiers are real variable references. Without this rule,
+      // unused-imports can delete component and icon imports used in JSX.
+      "react/jsx-uses-vars": "error",
+
       "unused-imports/no-unused-vars": [
         "warn",
         {
@@ -54,12 +58,9 @@ export default [
         },
       ],
 
-      "react/jsx-newline": [
-        "error",
-        {
-          prevent: false,
-        },
-      ],
+      // Prettier owns JSX line wrapping. Enabling this fixer together with
+      // Prettier causes circular fixes on inline translated text.
+      "react/jsx-newline": "off",
 
       "react/jsx-one-expression-per-line": "off",
 

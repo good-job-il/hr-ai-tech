@@ -43,3 +43,5 @@ export function NotificationBell({ unread = 0, notifications = [] }) {
 }
 
 export default NotificationBell
+import { Bell } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/Card"

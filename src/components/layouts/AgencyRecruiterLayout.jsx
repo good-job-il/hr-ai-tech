@@ -10,3 +10,4 @@ export default function AgencyRecruiterLayout() {
     <SidebarLayout navItems={AGENCY_RECRUITER_NAV} roleTitle={isRtl ? "רכז גיוס" : "Recruiter"} />
   )
 }
+import SidebarLayout from "./SidebarLayout"

@@ -5,7 +5,7 @@
 import { useState, useEffect } from "react"
 import { permissionMatrixService } from "@/api/services/permissionService"
 import { useAuth } from "@/lib/AuthContext"
-import { Save, ShieldCheck, Lock, ShieldAlert } from "lucide-react"
+import { Download, Save, ShieldCheck, Lock, ShieldAlert } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { invalidatePermissionMatrixCache, usePermissionMatrix } from "@/hooks/usePermissionMatrix"
@@ -468,3 +468,13 @@ export default function PermissionsPage() {
     </PlatformPageShell>
   )
 }
+import { Button } from "@/components/ui/button"
+import { RefreshCw } from "lucide-react"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"

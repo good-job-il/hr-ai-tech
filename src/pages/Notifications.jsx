@@ -257,3 +257,5 @@ export default function Notifications() {
     </div>
   )
 }
+import { Bell, CheckCheck, Trash2, X } from "lucide-react"
+import Navbar from "@/components/home/Navbar"

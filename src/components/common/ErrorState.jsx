@@ -15,3 +15,5 @@ export function ErrorState({ title, message, action }) {
 }
 
 export default ErrorState
+import { Card, CardContent } from "@/components/ui/Card"
+import { AlertCircle } from "lucide-react"

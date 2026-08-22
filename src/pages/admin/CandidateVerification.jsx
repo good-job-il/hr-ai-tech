@@ -285,3 +285,5 @@ const CandidateVerification = () => {
 }
 
 export default CandidateVerification
+import AdminLayout from "@/components/admin/AdminLayout"
+import { AlertTriangle, CheckCircle2 } from "lucide-react"

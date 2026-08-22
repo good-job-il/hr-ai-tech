@@ -134,3 +134,6 @@ export {
   FormMessage,
   FormField,
 }
+import { Slot } from "@radix-ui/react-slot"
+import { Controller } from "react-hook-form"
+import { Label } from "@/components/ui/label"

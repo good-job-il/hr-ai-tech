@@ -81,3 +81,4 @@ export default function JobCompensationDisplay({ job, baseSalary = 0, onEdit }) 
     </div>
   )
 }
+import { DollarSign, Percent, Edit2 } from "lucide-react"

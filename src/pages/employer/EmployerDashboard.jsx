@@ -190,3 +190,6 @@ export default function EmployerDashboard() {
     </div>
   )
 }
+import { Plus, RefreshCw, Users2, Target } from "lucide-react"
+import JobFormModal from "@/components/employer/JobFormModal"
+import { Link } from "react-router-dom"

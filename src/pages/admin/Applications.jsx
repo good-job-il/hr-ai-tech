@@ -305,3 +305,5 @@ export default function AdminApplications() {
     </AdminLayout>
   )
 }
+import AdminLayout from "@/components/admin/AdminLayout"
+import { Search, FileText, ExternalLink } from "lucide-react"

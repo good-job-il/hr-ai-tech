@@ -44,3 +44,5 @@ export default function UnauthorizedAccess({ userType, requiredType }) {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { Lock } from "lucide-react"

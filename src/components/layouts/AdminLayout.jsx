@@ -7,3 +7,4 @@
 export default function AdminLayout() {
   return <Navigate to="/platform/dashboard" replace />
 }
+import { Navigate } from "react-router-dom"

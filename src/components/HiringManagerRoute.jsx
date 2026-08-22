@@ -16,3 +16,4 @@ export default function HiringManagerRoute() {
 
   return <Outlet />
 }
+import { Navigate, Outlet } from "react-router-dom"

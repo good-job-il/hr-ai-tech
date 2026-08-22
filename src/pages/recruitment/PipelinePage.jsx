@@ -284,3 +284,16 @@ export default function PipelinePage() {
     </PlatformPageShell>
   )
 }
+import PipelineBoard from "@/components/ats/PipelineBoard"
+import MobilePipelineView from "@/components/ats/MobilePipelineView"
+import PipelineFilters from "@/components/ats/PipelineFilters"
+import CandidateDrawer from "@/components/ats/CandidateDrawer"
+import { SlidersHorizontal, RefreshCw, FlaskConical } from "lucide-react"
+import NotificationCenter from "@/components/ats/NotificationCenter"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+} from "@/components/platform/PlatformUI"

@@ -327,3 +327,12 @@ export default function InvoicesPage() {
     </PlatformPageShell>
   )
 }
+import { Download, Search, SlidersHorizontal, TrendingUp } from "lucide-react"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"

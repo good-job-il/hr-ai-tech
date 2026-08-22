@@ -264,3 +264,5 @@ export default function CandidateSavedJobs() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { Search, X, Briefcase, RefreshCw, Trash2, ExternalLink, BookmarkX } from "lucide-react"

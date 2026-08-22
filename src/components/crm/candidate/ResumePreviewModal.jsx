@@ -266,3 +266,13 @@ function InfoRow({ icon, label, value }) {
     </div>
   )
 }
+import {
+  X,
+  FileText,
+  MapPin,
+  Briefcase,
+  Building2,
+  Globe,
+  Download,
+  ExternalLink,
+} from "lucide-react"

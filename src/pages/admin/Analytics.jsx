@@ -17,3 +17,5 @@ export default function AdminAnalytics() {
     </AdminLayout>
   )
 }
+import AdminLayout from "@/components/admin/AdminLayout"
+import { BarChart2 } from "lucide-react"

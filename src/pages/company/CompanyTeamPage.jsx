@@ -666,3 +666,15 @@ export default function CompanyTeamPage() {
     </div>
   )
 }
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { UserPlus, Search, Edit2, Trash2, Mail, Phone, Plus, AlertCircle } from "lucide-react"

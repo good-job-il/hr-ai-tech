@@ -66,3 +66,4 @@ export default function CompaniesSection() {
     </div>
   )
 }
+import { Link } from "react-router-dom"

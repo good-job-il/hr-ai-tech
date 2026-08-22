@@ -167,3 +167,6 @@ export default function AIWorkspaceLayout() {
     </div>
   )
 }
+import { Link, Outlet } from "react-router-dom"
+import { Menu, X, LogOut, ChevronDown, Sparkles } from "lucide-react"
+import GlobalHeader from "@/components/layout/GlobalHeader"

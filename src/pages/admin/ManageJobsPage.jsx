@@ -621,3 +621,12 @@ export default function ManageJobsPage() {
     </PlatformPageShell>
   )
 }
+import { Plus, Search, Building2, MapPin, RefreshCw, Edit2, Mail, Copy, Check } from "lucide-react"
+import JobFormModal from "@/components/employer/JobFormModal"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+} from "@/components/platform/PlatformUI"

@@ -493,3 +493,20 @@ export default function MarketplaceExposurePage() {
     </PlatformPageShell>
   )
 }
+import {
+  Building2,
+  TrendingUp,
+  Search,
+  RefreshCw,
+  Info,
+  BarChart2,
+  SlidersHorizontal,
+} from "lucide-react"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"

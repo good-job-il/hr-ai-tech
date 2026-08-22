@@ -172,3 +172,4 @@ export default function HowItWorks() {
     </section>
   )
 }
+import React from "react"

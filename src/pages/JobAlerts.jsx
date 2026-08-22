@@ -232,3 +232,5 @@ export default function JobAlerts() {
     </div>
   )
 }
+import Navbar from "@/components/home/Navbar"
+import { Bell, Plus, Trash2, BellOff } from "lucide-react"

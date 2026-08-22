@@ -18,3 +18,4 @@ export default function Logo({ className = "" }) {
     </Link>
   )
 }
+import { Link } from "react-router-dom"

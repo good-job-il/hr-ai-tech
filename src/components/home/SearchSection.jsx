@@ -340,3 +340,4 @@ export default function SearchSection() {
     </section>
   )
 }
+import { Search, MapPin, ChevronDown } from "lucide-react"

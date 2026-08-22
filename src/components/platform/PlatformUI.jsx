@@ -289,3 +289,5 @@ export function PlatformModal({
 
 export const platformFieldClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-300 focus:border-violet-400 focus:ring-4 focus:ring-violet-50"
+import { ArrowUpRight, ChevronRight, X } from "lucide-react"
+import { Link } from "react-router-dom"

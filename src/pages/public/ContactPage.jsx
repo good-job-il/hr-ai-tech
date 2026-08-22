@@ -57,3 +57,6 @@ export default function ContactPage() {
     </PublicLayout>
   );
 }
+import { PageHeader } from "@/components/common"
+import { Card, CardContent } from "@/components/ui/Card"
+import PublicLayout from "@/components/layouts/PublicLayout"

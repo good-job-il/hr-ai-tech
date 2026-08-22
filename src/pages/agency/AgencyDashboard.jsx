@@ -443,3 +443,13 @@ export default function AgencyDashboard() {
     </PlatformPageShell>
   )
 }
+import { Link } from "react-router-dom"
+import CreateClientModal from "@/components/dialogs/CreateClientModal"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"

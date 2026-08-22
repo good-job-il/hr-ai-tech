@@ -84,3 +84,5 @@ export default function RoleFallback() {
 
   return <PageNotFound />
 }
+import { Navigate } from "react-router-dom"
+import PageNotFound from "@/lib/PageNotFound"

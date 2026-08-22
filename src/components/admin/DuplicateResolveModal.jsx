@@ -163,3 +163,4 @@ export default function DuplicateResolveModal({ duplicate, onResolve, onClose })
     </div>
   )
 }
+import { X, AlertCircle, Users } from "lucide-react"

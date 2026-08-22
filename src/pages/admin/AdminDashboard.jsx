@@ -576,3 +576,17 @@ export default function AdminDashboard() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { RefreshCw, ArrowDownRight, BarChart3, PieChart } from "lucide-react"
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart as RePieChart,
+  Pie,
+  Cell,
+} from "recharts"

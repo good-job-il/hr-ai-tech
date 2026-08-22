@@ -194,3 +194,7 @@ export default function GlobalHeader({ user, variant = "public" }) {
     </header>
   )
 }
+import { Link } from "react-router-dom"
+import { Menu, X } from "lucide-react"
+import Logo from "@/components/branding/Logo"
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher"

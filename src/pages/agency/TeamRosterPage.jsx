@@ -1,8 +1,16 @@
 import { useQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
-import { Users } from "lucide-react"
+import { Link } from "react-router-dom"
+import { Briefcase, Kanban, Mail, ShieldCheck, Users } from "lucide-react"
 import { agencyTeamsService } from "@/api/services/agencyTeamsService"
 import { recruitmentManagementService } from "@/api/services/recruitmentManagementService"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+} from "@/components/platform/PlatformUI"
+import { Button } from "@/components/ui/button"
 import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 
 export default function TeamRosterPage() {

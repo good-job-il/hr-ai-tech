@@ -184,3 +184,4 @@ export default function HeroSection() {
     </div>
   )
 }
+import { Sparkles } from "lucide-react"

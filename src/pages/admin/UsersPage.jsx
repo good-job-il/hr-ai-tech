@@ -180,3 +180,7 @@ export default function AdminUsersPage() {
     </div>
   )
 }
+import { Pencil, User, Mail } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"

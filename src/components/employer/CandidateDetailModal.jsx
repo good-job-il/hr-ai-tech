@@ -188,3 +188,4 @@ export default function CandidateDetailModal({ application: app, onClose, onStat
     </div>
   )
 }
+import { X, FileText, Mail, Phone, ExternalLink, MessageSquare } from "lucide-react"

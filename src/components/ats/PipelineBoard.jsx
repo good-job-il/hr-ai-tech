@@ -91,3 +91,5 @@ export default function PipelineBoard({
     </DragDropContext>
   )
 }
+import { DragDropContext } from "@hello-pangea/dnd"
+import StageColumn from "./StageColumn"

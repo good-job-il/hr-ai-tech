@@ -30,3 +30,4 @@ export default function ApplicationCard({ app, onDelete }) {
     </div>
   )
 }
+import { Trash2 } from "lucide-react"

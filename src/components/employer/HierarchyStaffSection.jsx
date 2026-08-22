@@ -263,3 +263,6 @@ export default function HierarchyStaffSection({
     </div>
   )
 }
+import { Edit2, Trash2, Plus, Users, ChevronDown, ChevronUp } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import StaffFormModal from "@/components/employer/StaffFormModal"

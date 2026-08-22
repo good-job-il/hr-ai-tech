@@ -654,3 +654,4 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
     </div>
   )
 }
+import { X, Eye, Copy, Check } from "lucide-react"

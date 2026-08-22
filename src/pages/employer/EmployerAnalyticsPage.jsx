@@ -153,3 +153,4 @@ export default function EmployerAnalyticsPage() {
     </div>
   )
 }
+import { BarChart3 } from "lucide-react"

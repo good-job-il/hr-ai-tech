@@ -389,3 +389,4 @@ export default function CandidateMessages() {
     </div>
   )
 }
+import { Send, RefreshCw, X, Briefcase, MessagesSquare } from "lucide-react"

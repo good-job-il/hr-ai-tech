@@ -786,3 +786,20 @@ export default function CompensationPage() {
     </PlatformPageShell>
   )
 }
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Plus, Pencil, Trash2, Percent, Calculator, Settings } from "lucide-react"
+import {
+  PlatformCard,
+  PlatformPageHeader,
+  PlatformPageShell,
+} from "@/components/platform/PlatformUI"

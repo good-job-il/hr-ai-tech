@@ -120,3 +120,5 @@ export default function RejectModal({ candidateName, onConfirm, onClose }) {
     </div>
   )
 }
+import { Button } from "@/components/ui/button"
+import { AlertTriangle, X } from "lucide-react"

@@ -38,3 +38,5 @@ export function FilterPanel({ title, filters, onFilterChange }) {
 }
 
 export default FilterPanel
+import { Card, CardContent } from "@/components/ui/Card"
+import { ChevronDown } from "lucide-react"

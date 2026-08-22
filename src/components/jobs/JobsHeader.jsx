@@ -165,3 +165,5 @@ export default function JobsHeader() {
     </header>
   )
 }
+import { Link } from "react-router-dom"
+import { Menu, X, UserPlus, Search, Bell } from "lucide-react"

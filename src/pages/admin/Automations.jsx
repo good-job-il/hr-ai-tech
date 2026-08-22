@@ -17,3 +17,5 @@ export default function AdminAutomations() {
     </AdminLayout>
   )
 }
+import AdminLayout from "@/components/admin/AdminLayout"
+import { Bot } from "lucide-react"

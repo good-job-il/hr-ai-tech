@@ -332,3 +332,10 @@ export default function RecruiterWorkspacePanel({
     </div>
   )
 }
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Send, Tag, X, AlertTriangle, FileText, UserCheck } from "lucide-react"
+import RecruiterDropdown from "./RecruiterDropdown"
+import RejectModal from "./RejectModal"
+import SendToEmployerModal from "./SendToEmployerModal"
+import AssignToJobModal from "./AssignToJobModal"

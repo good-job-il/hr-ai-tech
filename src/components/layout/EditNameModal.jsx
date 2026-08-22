@@ -91,3 +91,4 @@ export default function EditNameModal({ user, onUpdated }) {
     </>
   )
 }
+import { Pencil, X, Check } from "lucide-react"

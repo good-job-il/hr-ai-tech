@@ -358,3 +358,15 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
     </div>
   )
 }
+import { Link, Outlet } from "react-router-dom"
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Building2,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react"
+import DashboardHeader from "@/components/layout/DashboardHeader"
+import Logo from "@/components/branding/Logo"

@@ -336,3 +336,8 @@ export default function UIShowcase() {
     </div>
   )
 }
+import Button from "@/components/design/Button"
+import Card from "@/components/design/Card"
+import Input from "@/components/design/Input"
+import Badge from "@/components/design/Badge"
+import { H1, H2, H3, H4, Body1, Body2, Caption, Label } from "@/components/design/Typography"

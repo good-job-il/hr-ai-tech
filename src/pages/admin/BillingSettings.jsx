@@ -1,7 +1,23 @@
 import { useQuery } from "@tanstack/react-query"
-import { AlertCircle, Briefcase, CreditCard, Receipt, Users } from "lucide-react"
+import {
+  AlertCircle,
+  Briefcase,
+  CreditCard,
+  Download,
+  Receipt,
+  Sparkles,
+  Users,
+} from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { billingService } from "@/api/services/billingService"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"
 
 const PLAN_NAMES = {
   trial: "Trial",

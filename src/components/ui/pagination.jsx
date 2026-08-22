@@ -95,3 +95,4 @@ export {
   PaginationNext,
   PaginationEllipsis,
 }
+import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"

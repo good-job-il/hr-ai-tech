@@ -13,3 +13,4 @@ export default function EmployerSettingsRoute() {
 
   return <Outlet />
 }
+import { Navigate, Outlet } from "react-router-dom"

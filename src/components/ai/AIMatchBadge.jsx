@@ -32,3 +32,4 @@ export default function AIMatchBadge({ score, missingRequired = false, size = "s
     </div>
   )
 }
+import { Sparkles, AlertTriangle } from "lucide-react"

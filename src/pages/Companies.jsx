@@ -74,3 +74,6 @@ export default function Companies() {
     </PublicLayout>
   )
 }
+import { Link } from "react-router-dom"
+import { ArrowRight } from "lucide-react"
+import PublicLayout from "@/components/layouts/PublicLayout"

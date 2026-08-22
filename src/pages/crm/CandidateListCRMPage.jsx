@@ -396,3 +396,13 @@ const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick, 
     </div>
   )
 })
+
+import { Search, RefreshCw, ChevronLeft } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+} from "@/components/platform/PlatformUI"

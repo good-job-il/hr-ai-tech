@@ -40,3 +40,4 @@ export function DataTable({ columns, data, onRowClick }) {
 }
 
 export default DataTable
+import { Card, CardContent } from "@/components/ui/Card"

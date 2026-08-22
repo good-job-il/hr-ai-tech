@@ -209,3 +209,5 @@ export default function AdminLayout({ children }) {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { Home, LogOut, Menu, X, ChevronRight, Search, Sparkles } from "lucide-react"

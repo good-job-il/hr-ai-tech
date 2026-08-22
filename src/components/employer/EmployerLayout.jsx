@@ -292,3 +292,5 @@ export default function EmployerLayout({ children }) {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { Menu, X, LogOut, Search, ChevronDown, ChevronUp, Sparkles, Home } from "lucide-react"

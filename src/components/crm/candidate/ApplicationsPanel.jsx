@@ -1,4 +1,5 @@
 import { format } from "date-fns"
+import { Link } from "react-router-dom"
 import { he, enUS } from "date-fns/locale"
 import { useTranslation } from "react-i18next"
 import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
@@ -136,3 +137,4 @@ export default function ApplicationsPanel({ applications }) {
     </div>
   )
 }
+import { Briefcase, Calendar } from "lucide-react"

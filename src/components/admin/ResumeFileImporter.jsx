@@ -384,3 +384,15 @@ export default function ResumeFileImporter({ onImportComplete }) {
     </div>
   )
 }
+import {
+  Upload,
+  FileText,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  FileCheck2,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"

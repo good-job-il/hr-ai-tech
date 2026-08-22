@@ -213,3 +213,6 @@ export default function EmployerLanding() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { Sparkles, Filter } from "lucide-react"
+import Header from "@/components/home/Header"

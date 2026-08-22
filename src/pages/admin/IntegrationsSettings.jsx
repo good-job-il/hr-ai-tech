@@ -1,7 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { AlertCircle, Calendar, CheckCircle2, Globe, Mail, Plug, Shield } from "lucide-react"
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle2,
+  Globe,
+  Mail,
+  Plug,
+  RefreshCw,
+  Shield,
+  Unplug,
+} from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { integrationConnectionService } from "@/api/services/integrationConnectionService"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"
+import { Button } from "@/components/ui/button"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 
 const ICONS = { gmail: Mail, google_calendar: Calendar, linkedin: Globe }

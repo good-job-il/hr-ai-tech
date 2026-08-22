@@ -185,3 +185,6 @@ export default function EmployerLayout() {
     </div>
   )
 }
+import { Link, Outlet } from "react-router-dom"
+import { ChevronDown, LogOut, Menu, X } from "lucide-react"
+import Logo from "@/components/branding/Logo"

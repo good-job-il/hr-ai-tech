@@ -239,3 +239,6 @@ export default function ResourcesPage() {
     </PublicLayout>
   );
 }
+import PublicLayout from "@/components/layouts/PublicLayout"
+import { Link } from "react-router-dom"
+import { Download, Sparkles, Video } from "lucide-react"

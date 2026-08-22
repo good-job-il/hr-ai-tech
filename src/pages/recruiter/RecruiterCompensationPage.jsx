@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { BadgeDollarSign, BriefcaseBusiness, LockKeyhole } from "lucide-react"
 import { compensationPlanService } from "@/api/services/compensationPlanService"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { useTranslation } from "react-i18next"

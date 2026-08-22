@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next"
+import { Globe } from "lucide-react"
 
 export default function LanguageSwitcher({ className = "", variant = "default" }) {
   const { i18n } = useTranslation()

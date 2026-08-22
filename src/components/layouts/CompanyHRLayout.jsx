@@ -24,3 +24,4 @@ export default function CompanyHRLayout() {
 
   return <SidebarLayout navItems={nav} roleTitle={title} />
 }
+import SidebarLayout from "./SidebarLayout"

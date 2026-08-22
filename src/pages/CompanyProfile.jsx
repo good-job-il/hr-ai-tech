@@ -314,3 +314,7 @@ export default function CompanyProfile() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import Navbar from "@/components/home/Navbar"
+import { Star, Plus, ArrowRight } from "lucide-react"
+import SEOHead from "@/components/SEOHead"

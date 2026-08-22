@@ -287,3 +287,6 @@ export default function ResumeZipUploader({ onImportComplete }) {
     </div>
   )
 }
+import { Upload, AlertCircle, CheckCircle2, Loader2, X } from "lucide-react"
+import ResumeImportReview from "./ResumeImportReview"
+import ImportValidationCheck from "./ImportValidationCheck"

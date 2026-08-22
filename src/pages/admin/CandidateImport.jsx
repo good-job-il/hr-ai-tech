@@ -271,3 +271,6 @@ const CandidateImport = () => {
 }
 
 export default CandidateImport
+import AdminLayout from "@/components/admin/AdminLayout"
+import { Upload, AlertTriangle, CheckCircle2, Clock } from "lucide-react"
+import ResumeZipUploader from "@/components/admin/ResumeZipUploader"

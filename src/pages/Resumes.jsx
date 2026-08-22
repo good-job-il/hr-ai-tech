@@ -207,3 +207,5 @@ export default function Resumes() {
     </div>
   )
 }
+import { FileText, Download } from "lucide-react"
+import Navbar from "@/components/home/Navbar"

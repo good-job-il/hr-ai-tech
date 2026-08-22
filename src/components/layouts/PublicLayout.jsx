@@ -15,3 +15,5 @@ export default function PublicLayout({ children }) {
     </div>
   )
 }
+import Navbar from "@/components/home/Navbar"
+import Footer from "@/components/home/Footer"

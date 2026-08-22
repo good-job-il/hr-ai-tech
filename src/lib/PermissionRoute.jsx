@@ -29,3 +29,4 @@ export default function PermissionRoute({
 
   return <Outlet />
 }
+import { Navigate, Outlet } from "react-router-dom"

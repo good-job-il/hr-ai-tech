@@ -47,3 +47,6 @@ export function UserMenu({ user }) {
 }
 
 export default UserMenu
+import { ChevronDown, LogOut, Settings } from "lucide-react"
+import { Link } from "react-router-dom"
+import Avatar from "./Avatar"

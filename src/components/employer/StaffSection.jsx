@@ -128,3 +128,6 @@ export default function StaffSection({
     </div>
   )
 }
+import { Edit2, Trash2, Plus, Users } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import StaffFormModal from "@/components/employer/StaffFormModal"

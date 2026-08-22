@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { Activity, CalendarCheck2, CheckCircle2, Trophy } from "lucide-react"
+import { Activity, CalendarCheck2, CheckCircle2, RefreshCw, Trophy } from "lucide-react"
 import { applicationService } from "@/api/services/applicationService"
 import { auditService } from "@/api/services/auditService"
 import { interviewService } from "@/api/services/interviewService"

@@ -9,3 +9,4 @@ export default function CandidateRoute() {
 
   return <Outlet />
 }
+import { Navigate, Outlet } from "react-router-dom"

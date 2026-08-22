@@ -436,3 +436,6 @@ export default function MyProfile() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { ArrowRight, Download } from "lucide-react"
+import Navbar from "@/components/home/Navbar"

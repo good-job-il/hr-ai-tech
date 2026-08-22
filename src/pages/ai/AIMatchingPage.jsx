@@ -403,3 +403,6 @@ function EmptyState({ text, icon: Icon }) {
     </div>
   )
 }
+import CandidateRecommendationsPanel from "@/components/ai/CandidateRecommendationsPanel"
+import JobRecommendationsPanel from "@/components/ai/JobRecommendationsPanel"
+import { Sparkles, Search, SlidersHorizontal, CheckCircle2, AlertTriangle, X } from "lucide-react"

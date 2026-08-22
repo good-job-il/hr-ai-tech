@@ -17,3 +17,5 @@ export default function AdminSystemSettings() {
     </AdminLayout>
   )
 }
+import AdminLayout from "@/components/admin/AdminLayout"
+import { Settings } from "lucide-react"

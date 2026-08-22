@@ -85,3 +85,5 @@ export default function RecommendedJobsAI() {
     </section>
   )
 }
+import { Link } from "react-router-dom"
+import { Zap } from "lucide-react"

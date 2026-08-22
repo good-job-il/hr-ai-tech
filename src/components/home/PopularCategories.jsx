@@ -168,3 +168,5 @@ export default function PopularCategories() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { Zap } from "lucide-react"

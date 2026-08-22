@@ -1,8 +1,19 @@
 import { useState, useRef } from "react"
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
 import { authService } from "@/api/services/authService"
 import { agencyTeamsService } from "@/api/services/agencyTeamsService"
-
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { toast } from "@/components/ui/use-toast"
 
 export default function Register() {

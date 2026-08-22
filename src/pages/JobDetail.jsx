@@ -1003,3 +1003,20 @@ export default function JobDetail() {
     </div>
   )
 }
+import SaveJobButton from "@/components/jobs/SaveJobButton"
+import ShareButtons from "@/components/jobs/ShareButtons"
+import { Link } from "react-router-dom"
+import {
+  ArrowLeft,
+  MapPin,
+  Briefcase,
+  Eye,
+  Clock,
+  Send,
+  Upload,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react"
+import Navbar from "@/components/home/Navbar"
+import SEOHead from "@/components/SEOHead"
+import SimilarJobsList from "@/components/jobs/SimilarJobsList"

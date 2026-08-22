@@ -245,3 +245,5 @@ function CompactCard({
     </div>
   )
 }
+import { ArrowRightLeft } from "lucide-react"
+import AIMatchBadge from "@/components/ai/AIMatchBadge"

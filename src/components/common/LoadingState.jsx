@@ -11,3 +11,4 @@ export function LoadingState({ message = "טוען..." }) {
 }
 
 export default LoadingState
+import { Card, CardContent } from "@/components/ui/Card"

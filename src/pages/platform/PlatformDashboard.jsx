@@ -758,3 +758,27 @@ export default function PlatformDashboard() {
     </PlatformPageShell>
   )
 }
+import { Link } from "react-router-dom"
+import { CalendarDays, Check, Workflow } from "lucide-react"
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
+import { Button } from "@/components/ui/Button"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformModal,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"

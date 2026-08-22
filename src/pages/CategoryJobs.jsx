@@ -212,3 +212,7 @@ export default function CategoryJobs() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { Briefcase } from "lucide-react"
+import Navbar from "@/components/home/Navbar"
+import SEOHead from "@/components/SEOHead"

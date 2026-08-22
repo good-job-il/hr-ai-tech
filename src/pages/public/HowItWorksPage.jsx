@@ -283,3 +283,5 @@ export default function HowItWorksPage() {
     </PublicLayout>
   );
 }
+import PublicLayout from "@/components/layouts/PublicLayout"
+import { Link } from "react-router-dom"

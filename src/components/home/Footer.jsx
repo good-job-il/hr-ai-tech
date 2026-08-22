@@ -201,3 +201,5 @@ export default function Footer() {
     </footer>
   )
 }
+import { Link } from "react-router-dom"
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher"

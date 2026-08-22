@@ -167,3 +167,9 @@ export default function PositionFormModal({ open, onOpenChange, position, onSubm
     </Dialog>
   )
 }
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { X, Plus } from "lucide-react"

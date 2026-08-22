@@ -284,3 +284,4 @@ export default function HierarchicalJobFilters({ onFiltersChange, enabled = true
     </div>
   )
 }
+import { ChevronDown, Search, X } from "lucide-react"

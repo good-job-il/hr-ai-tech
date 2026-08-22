@@ -15,3 +15,4 @@ export function EmptyState({ icon: Icon, title, description, action }) {
 }
 
 export default EmptyState
+import { Card, CardContent } from "@/components/ui/Card"

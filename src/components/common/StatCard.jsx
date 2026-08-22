@@ -30,3 +30,4 @@ export function StatCard({ icon: Icon, label, value, change, trend }) {
 }
 
 export default StatCard
+import { Card, CardContent } from "@/components/ui/Card"

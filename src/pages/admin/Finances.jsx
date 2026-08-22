@@ -17,3 +17,5 @@ export default function AdminFinances() {
     </AdminLayout>
   )
 }
+import AdminLayout from "@/components/admin/AdminLayout"
+import { CreditCard } from "lucide-react"

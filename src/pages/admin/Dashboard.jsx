@@ -341,3 +341,15 @@ export default function AdminDashboard() {
     </AdminLayout>
   )
 }
+import {
+  Bell,
+  Activity,
+  Brain,
+  ShieldCheck,
+  ArrowUpRight,
+  Clock3,
+  UserCheck,
+  AlertTriangle,
+  Sparkles,
+} from "lucide-react"
+import AdminLayout from "@/components/admin/AdminLayout"

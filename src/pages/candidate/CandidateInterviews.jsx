@@ -497,3 +497,5 @@ export default function CandidateInterviews() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { RefreshCw, Clock, Video, Phone, MapPin, X, Briefcase, ChevronLeft } from "lucide-react"

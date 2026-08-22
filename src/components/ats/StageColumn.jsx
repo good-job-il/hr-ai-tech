@@ -112,3 +112,6 @@ export default function StageColumn({
     </div>
   )
 }
+import { Droppable, Draggable } from "@hello-pangea/dnd"
+import CandidateCard from "./CandidateCard"
+import { Users } from "lucide-react"

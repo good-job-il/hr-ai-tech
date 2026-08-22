@@ -3,7 +3,7 @@
  * Filters: date, user, action, entity
  * CSV export
  */
-import { useState } from "react"
+import { Fragment, useState } from "react"
 import { auditService } from "@/api/services/auditService"
 import { useQuery } from "@tanstack/react-query"
 import {
@@ -15,6 +15,9 @@ import {
   XCircle,
   CheckCircle2,
   AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  Filter,
   Users,
 } from "lucide-react"
 import { format } from "date-fns"
@@ -23,7 +26,16 @@ import { useTranslation } from "react-i18next"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 import { useLocation, useNavigate } from "react-router-dom"
-import { platformFieldClassName } from "@/components/platform/PlatformUI"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+  platformFieldClassName,
+} from "@/components/platform/PlatformUI"
+import { Button } from "@/components/ui/button"
 import { directionForLanguage } from "@/domain/agency/rmAcceptance"
 
 const getActionConfig = (t) => ({

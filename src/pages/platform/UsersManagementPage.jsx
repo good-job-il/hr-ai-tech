@@ -796,3 +796,14 @@ export default function UsersManagementPage() {
     </PlatformPageShell>
   )
 }
+import { Plus, SlidersHorizontal, X } from "lucide-react"
+import { Button } from "@/components/ui/Button"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformModal,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"

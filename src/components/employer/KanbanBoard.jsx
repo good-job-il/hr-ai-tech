@@ -55,3 +55,5 @@ export default function KanbanBoard({ stages, applications, onDragEnd, onDeleteA
     </DragDropContext>
   )
 }
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
+import ApplicationCard from "./ApplicationCard"

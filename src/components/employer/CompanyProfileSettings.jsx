@@ -132,3 +132,4 @@ export default function CompanyProfileSettings() {
     </div>
   )
 }
+import { Video, Image as ImageIcon } from "lucide-react"

@@ -170,3 +170,5 @@ export default function JobRecommendationsPanel({ job, onAddToPipeline }) {
     </div>
   )
 }
+import AIMatchBadge from "./AIMatchBadge"
+import { UserPlus, MapPin, ChevronRight, Loader2, AlertTriangle } from "lucide-react"

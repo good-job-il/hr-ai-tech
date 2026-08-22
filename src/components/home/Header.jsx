@@ -309,3 +309,6 @@ export default function Header() {
     </header>
   )
 }
+import { Link } from "react-router-dom"
+import { Menu, X, UserPlus } from "lucide-react"
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher"

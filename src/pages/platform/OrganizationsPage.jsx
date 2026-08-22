@@ -673,3 +673,21 @@ export default function OrganizationsPage() {
     </PlatformPageShell>
   )
 }
+import { Link } from "react-router-dom"
+import { Plus, MoreVertical, ExternalLink } from "lucide-react"
+import { Button } from "@/components/ui/Button"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformModal,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"

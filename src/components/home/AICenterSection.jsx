@@ -222,3 +222,4 @@ export default function AICenterSection() {
     </section>
   )
 }
+import { Sparkles, ArrowLeft } from "lucide-react"

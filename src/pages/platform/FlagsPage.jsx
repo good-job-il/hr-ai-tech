@@ -848,3 +848,12 @@ export default function FlagsPage() {
     </PlatformPageShell>
   )
 }
+import { ChevronDown, ChevronUp, Save, RotateCcw, Info, SlidersHorizontal } from "lucide-react"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"

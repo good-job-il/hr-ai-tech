@@ -126,3 +126,5 @@ export default function PipelineManager({ stages, onAdd, onDelete, onUpdate }) {
     </div>
   )
 }
+import { Plus, Trash2, Edit2, Check, X } from "lucide-react"
+import { Input } from "@/components/ui/input"

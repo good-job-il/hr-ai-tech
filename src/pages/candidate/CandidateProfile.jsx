@@ -675,3 +675,4 @@ export default function CandidateProfile() {
     </div>
   )
 }
+import { Plus, Trash2, Upload, Save, CheckCircle2, Eye, EyeOff, Zap } from "lucide-react"

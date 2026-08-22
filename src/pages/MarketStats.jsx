@@ -249,3 +249,6 @@ export default function MarketStats() {
     </div>
   )
 }
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
+import { TrendingUp, Loader2 } from "lucide-react"
+import Navbar from "@/components/home/Navbar"

@@ -70,3 +70,4 @@ export default function ProtectedRoute({
 
   return <Outlet />
 }
+import { Navigate, Outlet } from "react-router-dom"

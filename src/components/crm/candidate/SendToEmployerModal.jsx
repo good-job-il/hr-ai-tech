@@ -426,3 +426,16 @@ export default function SendToEmployerModal({ candidate, documents, job, onClose
     </div>
   )
 }
+import {
+  X,
+  Send,
+  Eye,
+  Paperclip,
+  CheckSquare,
+  Square,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"

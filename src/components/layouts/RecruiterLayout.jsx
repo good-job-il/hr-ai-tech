@@ -7,3 +7,4 @@
 export default function RecruiterLayout() {
   return <Navigate to="/agency/recruiter/dashboard" replace />
 }
+import { Navigate } from "react-router-dom"

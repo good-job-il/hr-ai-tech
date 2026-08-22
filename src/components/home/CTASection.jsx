@@ -173,3 +173,5 @@ export default function CTASection() {
     </section>
   )
 }
+import { Link } from "react-router-dom"
+import { UserPlus, Sparkles } from "lucide-react"

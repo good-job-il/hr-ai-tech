@@ -212,3 +212,5 @@ export default function BlogPage() {
     </PublicLayout>
   );
 }
+import PublicLayout from "@/components/layouts/PublicLayout"
+import { Clock, User } from "lucide-react"

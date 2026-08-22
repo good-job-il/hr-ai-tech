@@ -25,3 +25,4 @@ export function PipelineBoard({ stages, items }) {
 }
 
 export default PipelineBoard
+import { Card, CardContent } from "@/components/ui/Card"

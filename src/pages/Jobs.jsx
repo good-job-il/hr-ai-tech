@@ -709,3 +709,26 @@ export default function Jobs() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import {
+  Search,
+  MapPin,
+  Bookmark,
+  Share2,
+  Calendar,
+  Briefcase,
+  Sparkles,
+  SlidersHorizontal,
+  LayoutGrid,
+  List,
+  BarChart2,
+  TrendingUp,
+  ChevronDown,
+  ChevronUp,
+  RotateCcw,
+  Tag,
+  ArrowLeft,
+  Wand2,
+} from "lucide-react"
+import SEOHead from "@/components/SEOHead"
+import Navbar from "@/components/home/Navbar"

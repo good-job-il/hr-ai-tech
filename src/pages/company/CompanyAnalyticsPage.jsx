@@ -700,3 +700,19 @@ export default function CompanyAnalyticsPage() {
     </div>
   )
 }
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts"
+import { TrendingUp, TrendingDown, Minus } from "lucide-react"

@@ -25,3 +25,11 @@ export function Toaster() {
     </ToastProvider>
   )
 }
+import {
+  Toast,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
+} from "@/components/ui/toast"

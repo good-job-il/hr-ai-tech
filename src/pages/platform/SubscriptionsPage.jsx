@@ -352,3 +352,12 @@ export default function SubscriptionsPage() {
     </PlatformPageShell>
   )
 }
+import { SlidersHorizontal } from "lucide-react"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"

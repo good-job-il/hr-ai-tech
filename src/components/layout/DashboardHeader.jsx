@@ -211,3 +211,6 @@ export default function DashboardHeader({
     </header>
   )
 }
+import { Menu, LogOut, Search, Bell, ChevronDown, Zap } from "lucide-react"
+import EditNameModal from "./EditNameModal"
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher"

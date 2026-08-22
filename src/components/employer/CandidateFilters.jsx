@@ -137,3 +137,5 @@ export default function CandidateFilters({ isOpen, onClose, filters, onFilterCha
     </>
   )
 }
+import { X, ChevronDown } from "lucide-react"
+import { Button } from "@/components/ui/button"

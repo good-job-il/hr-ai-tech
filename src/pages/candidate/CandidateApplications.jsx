@@ -574,3 +574,18 @@ export default function CandidateApplications() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import {
+  Search,
+  X,
+  Briefcase,
+  ChevronLeft,
+  RefreshCw,
+  Clock,
+  Video,
+  Phone,
+  MapPin,
+  CheckCircle2,
+  Award,
+} from "lucide-react"
+import ApplicationTimeline from "@/components/applications/ApplicationTimeline"

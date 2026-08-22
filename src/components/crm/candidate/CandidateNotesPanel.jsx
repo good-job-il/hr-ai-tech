@@ -291,3 +291,6 @@ function NoteCard({
     </div>
   )
 }
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { MessageSquare, Pin, Trash2, Plus } from "lucide-react"

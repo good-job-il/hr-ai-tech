@@ -36,3 +36,4 @@ export function SearchBar({ placeholder = "חיפוש...", onSearch, className }
 }
 
 export default SearchBar
+import { Search, X } from "lucide-react"

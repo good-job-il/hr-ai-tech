@@ -174,3 +174,4 @@ export default function PipelineFilters({ filters, onChange }) {
     </div>
   )
 }
+import { Search, X, ChevronDown, ChevronUp } from "lucide-react"

@@ -399,3 +399,5 @@ export default function CandidateProfilePage() {
     </div>
   )
 }
+import Navbar from "@/components/home/Navbar"
+import { Plus, Trash2, Upload, Save } from "lucide-react"

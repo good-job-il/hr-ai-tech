@@ -147,3 +147,4 @@ export default function RecruiterDropdown({ currentRecruiterId, onSelect }) {
     </div>
   )
 }
+import { ChevronDown, UserCheck, Search } from "lucide-react"

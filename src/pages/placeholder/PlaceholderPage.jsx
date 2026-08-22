@@ -35,3 +35,4 @@ export default function PlaceholderPage({ title, description }) {
     </div>
   )
 }
+import { Construction } from "lucide-react"

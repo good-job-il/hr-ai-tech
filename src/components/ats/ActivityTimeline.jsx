@@ -234,3 +234,4 @@ export default function ActivityTimeline({ application }) {
     </div>
   )
 }
+import { Clock } from "lucide-react"

@@ -22,3 +22,5 @@ export function AIInsightCard({ title, insight, action }) {
 }
 
 export default AIInsightCard
+import { Card, CardContent } from "@/components/ui/Card"
+import { Sparkles } from "lucide-react"

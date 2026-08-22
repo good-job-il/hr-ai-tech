@@ -1,19 +1,41 @@
 import { useEffect, useMemo, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
 import {
   AlertTriangle,
   Briefcase,
   CalendarDays,
   CheckCircle2,
   Clock3,
+  Filter,
   Kanban,
+  RefreshCw,
+  Send,
   Users,
 } from "lucide-react"
 import { recruitmentManagementService } from "@/api/services/recruitmentManagementService"
 import { agencyTeamsService } from "@/api/services/agencyTeamsService"
 import { interviewService } from "@/api/services/interviewService"
-import { platformFieldClassName } from "@/components/platform/PlatformUI"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+  platformFieldClassName,
+} from "@/components/platform/PlatformUI"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { REASSIGN_INVALIDATION_KEYS } from "@/domain/agency/rmAcceptance"
 import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 

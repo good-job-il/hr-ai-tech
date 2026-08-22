@@ -279,3 +279,13 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
     </div>
   )
 }
+import {
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  ArrowRight,
+  Mail,
+  Phone,
+  Briefcase,
+} from "lucide-react"
+import DuplicateResolveModal from "./DuplicateResolveModal"

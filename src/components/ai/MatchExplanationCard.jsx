@@ -197,3 +197,5 @@ export default function MatchExplanationCard({
     </div>
   )
 }
+import { MessageSquare, Zap, ChevronDown, ChevronUp } from "lucide-react"
+import AIMatchBadge from "./AIMatchBadge"

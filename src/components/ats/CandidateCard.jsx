@@ -166,3 +166,5 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
     </div>
   )
 }
+import { Clock, MapPin, User, AlertTriangle } from "lucide-react"
+import AIMatchBadge from "@/components/ai/AIMatchBadge"

@@ -224,3 +224,4 @@ export default function ImportValidationCheck({ results, onApprove, onBack }) {
     </div>
   )
 }
+import { CheckCircle2, AlertTriangle, AlertCircle, ArrowRight } from "lucide-react"

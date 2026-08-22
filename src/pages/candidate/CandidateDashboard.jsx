@@ -185,3 +185,5 @@ export default function CandidateDashboard() {
     </div>
   )
 }
+import { Link } from "react-router-dom"
+import { Sparkles, Briefcase, RefreshCw } from "lucide-react"

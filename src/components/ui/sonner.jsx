@@ -23,3 +23,4 @@ const Toaster = ({ ...props }) => {
 }
 
 export { Toaster }
+import { Toaster as Sonner } from "sonner"

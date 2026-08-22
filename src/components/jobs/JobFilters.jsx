@@ -203,3 +203,5 @@ export default function JobFilters({ isOpen, onClose, filters, onFilterChange, o
     </>
   )
 }
+import { X, ChevronDown } from "lucide-react"
+import { Button } from "@/components/ui/button"

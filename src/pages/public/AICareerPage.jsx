@@ -268,3 +268,5 @@ export default function AICareerPage() {
     </PublicLayout>
   );
 }
+import PublicLayout from "@/components/layouts/PublicLayout"
+import { Link } from "react-router-dom"

@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react"
-import { useLocation } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
+import { MapPin, Menu, Shield, UserPlus, X } from "lucide-react"
 import { useAuth } from "@/lib/AuthContext"
 import { useTranslation } from "react-i18next"
 import { publicWorkflowService } from "@/api/services/publicWorkflowService"
 import { authService } from "@/api/services/authService"
+import LocationConfirmModal from "@/components/home/LocationConfirmModal"
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 
 const LOGO_URL = "/logo.png"
 

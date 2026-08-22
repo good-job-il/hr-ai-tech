@@ -237,3 +237,5 @@ function DocRow({ doc, color, badge, canDownload }) {
     </div>
   )
 }
+import { Button } from "@/components/ui/button"
+import { FileText, Upload, Download, Eye, File } from "lucide-react"

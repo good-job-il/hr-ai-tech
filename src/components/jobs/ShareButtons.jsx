@@ -96,3 +96,4 @@ export default function ShareButtons({ job }) {
     </div>
   )
 }
+import { Copy, Check } from "lucide-react"

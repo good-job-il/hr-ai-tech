@@ -292,3 +292,18 @@ export default function CandidateProfileHeader({
     </div>
   )
 }
+import { Button } from "@/components/ui/button"
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Briefcase,
+  Star,
+  Calendar,
+  UserCheck,
+  FileText,
+  Edit2,
+  Plus,
+} from "lucide-react"
+import ResumePreviewModal from "./ResumePreviewModal"
+import AssignToJobModal from "./AssignToJobModal"

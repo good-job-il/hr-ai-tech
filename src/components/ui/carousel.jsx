@@ -208,3 +208,5 @@ const CarouselNext = React.forwardRef(
 CarouselNext.displayName = "CarouselNext"
 
 export { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext }
+import { ArrowLeft, ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"

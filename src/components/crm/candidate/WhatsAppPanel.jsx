@@ -281,3 +281,5 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
     </div>
   )
 }
+import { MessageCircle, Plus, Clock, CheckCircle2, Phone } from "lucide-react"
+import { Button } from "@/components/ui/button"

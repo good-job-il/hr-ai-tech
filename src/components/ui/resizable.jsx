@@ -30,3 +30,4 @@ const ResizableHandle = ({ withHandle, className, ...props }) => (
 )
 
 export { ResizablePanelGroup, ResizablePanel, ResizableHandle }
+import { GripVertical } from "lucide-react"

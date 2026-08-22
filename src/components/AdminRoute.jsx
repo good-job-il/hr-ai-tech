@@ -24,3 +24,5 @@ export default function AdminRoute() {
 
   return <Outlet />
 }
+import { Navigate, Outlet } from "react-router-dom"
+import UnauthorizedAccess from "./UnauthorizedAccess"

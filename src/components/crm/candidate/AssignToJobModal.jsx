@@ -278,3 +278,6 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
     </div>
   )
 }
+import { X, Briefcase, CheckCircle2, Loader2, AlertCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"

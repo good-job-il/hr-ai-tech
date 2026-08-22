@@ -118,3 +118,4 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
     </div>
   )
 }
+import { X } from "lucide-react"

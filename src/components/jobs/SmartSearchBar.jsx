@@ -34,3 +34,4 @@ export default function SmartSearchBar() {
     </div>
   )
 }
+import { Search } from "lucide-react"

@@ -31,3 +31,5 @@ export default function EmployerRoute() {
 
   return <Outlet />
 }
+import { Navigate, Outlet } from "react-router-dom"
+import UnauthorizedAccess from "./UnauthorizedAccess"

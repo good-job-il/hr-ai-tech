@@ -698,3 +698,4 @@ export default function HeroNew() {
     </section>
   )
 }
+import { Search, UserPlus, MapPin, Sparkles, Star, CheckCircle } from "lucide-react"

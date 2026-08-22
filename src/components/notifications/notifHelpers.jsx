@@ -53,3 +53,17 @@ export const NOTIF_TYPE_LABELS = {
   new_employer: "מעסיק חדש",
   import_error: "שגיאת ייבוא",
 }
+import {
+  Send,
+  Eye,
+  Star,
+  Calendar,
+  UserCheck,
+  XCircle,
+  Briefcase,
+  Bell,
+  AlertTriangle,
+  UserPlus,
+  Building,
+  MessageCircle,
+} from "lucide-react"

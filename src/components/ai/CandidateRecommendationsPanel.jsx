@@ -148,3 +148,5 @@ export default function CandidateRecommendationsPanel({ candidate, onAssignToJob
     </div>
   )
 }
+import AIMatchBadge from "./AIMatchBadge"
+import { Briefcase, MapPin, ChevronRight, Loader2 } from "lucide-react"

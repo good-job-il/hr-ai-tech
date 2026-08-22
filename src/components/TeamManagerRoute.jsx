@@ -9,3 +9,4 @@ export default function TeamManagerRoute() {
 
   return <Outlet />
 }
+import { Navigate, Outlet } from "react-router-dom"
