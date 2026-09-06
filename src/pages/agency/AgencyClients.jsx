@@ -1,3 +1,12 @@
+import { Button } from "@/components/ui/button"
+import {
+  PlatformPageShell,
+  PlatformPageHeader,
+  PlatformCard,
+  PlatformStatCard,
+  PlatformModal,
+  platformFieldClassName,
+} from "@/components/platform/PlatformUI"
 import { useState, useMemo } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
@@ -161,137 +170,126 @@ function CreateClientModal({ isOpen, onClose, onSuccess }) {
   const dir = i18n.language?.startsWith("he") ? "rtl" : "ltr"
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl" dir={dir}>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-black text-gray-900">
-            {t("agencyClients.createModal.title")}
-          </h3>
+    <PlatformModal
+      title={t("agencyClients.createModal.title")}
+      icon={Building2}
+      onClose={onClose}
+      dir={dir}
+    >
+      <div className="space-y-4">
+        {/* Name */}
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-1.5">
+            {t("agencyClients.createModal.clientName")} *
+          </label>
 
+          <input
+            type="text"
+            value={form.name}
+            onChange={(e) => set("name", e.target.value)}
+            onKeyDown={handleKey}
+            placeholder={t("agencyClients.createModal.namePlaceholder")}
+            className={platformFieldClassName}
+            autoFocus
+          />
+        </div>
+
+        {/* Industry */}
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-1.5">
+            {t("agencyClients.createModal.industry")}
+          </label>
+
+          <select
+            value={form.industry}
+            onChange={(e) => set("industry", e.target.value)}
+            className={platformFieldClassName}
+          >
+            <option value="">{t("agencyClients.createModal.selectIndustry")}</option>
+
+            {INDUSTRY_KEYS.map((key) => (
+              <option key={key} value={key}>
+                {t(`agencyClients.industries.${key}`)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Contact email */}
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-1.5">
+            {t("agencyClients.createModal.contactEmail")}
+          </label>
+
+          <input
+            type="email"
+            value={form.contact_email}
+            onChange={(e) => set("contact_email", e.target.value)}
+            placeholder="hr@company.com"
+            className={platformFieldClassName}
+          />
+        </div>
+
+        {/* Website */}
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-1.5">
+            {t("agencyClients.createModal.website")}
+          </label>
+
+          <input
+            type="url"
+            value={form.website}
+            onChange={(e) => set("website", e.target.value)}
+            placeholder="https://company.com"
+            className={platformFieldClassName}
+          />
+        </div>
+
+        {/* Color picker */}
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">
+            {t("agencyClients.createModal.color")}
+          </label>
+
+          <div className="flex gap-2 flex-wrap">
+            {PALETTE.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => set("color", c)}
+                className={`w-7 h-7 rounded-lg transition-transform ${
+                  form.color === c
+                    ? "scale-125 ring-2 ring-offset-1 ring-gray-400"
+                    : "hover:scale-110"
+                }`}
+                style={{ backgroundColor: c }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {error && <p className="text-sm text-red-600 font-semibold">{error}</p>}
+
+        <div className="flex gap-3 pt-2">
           <button
             onClick={onClose}
-            aria-label={t("common.close")}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="flex-1 px-4 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 text-sm transition-colors"
           >
-            <X className="w-5 h-5" />
+            {t("agencyClients.createModal.cancel")}
+          </button>
+
+          <button
+            onClick={handleSubmit}
+            disabled={saving || !form.name.trim()}
+            className="flex-1 px-4 py-2.5 gradient-brand text-white rounded-xl font-bold hover:opacity-90 disabled:opacity-50 text-sm transition-colors"
+          >
+            {saving
+              ? t("agencyClients.createModal.creating")
+              : t("agencyClients.createModal.create")}
           </button>
         </div>
-
-        <div className="space-y-4">
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">
-              {t("agencyClients.createModal.clientName")} *
-            </label>
-
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => set("name", e.target.value)}
-              onKeyDown={handleKey}
-              placeholder={t("agencyClients.createModal.namePlaceholder")}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
-              autoFocus
-            />
-          </div>
-
-          {/* Industry */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">
-              {t("agencyClients.createModal.industry")}
-            </label>
-
-            <select
-              value={form.industry}
-              onChange={(e) => set("industry", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm bg-white"
-            >
-              <option value="">{t("agencyClients.createModal.selectIndustry")}</option>
-
-              {INDUSTRY_KEYS.map((key) => (
-                <option key={key} value={key}>
-                  {t(`agencyClients.industries.${key}`)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Contact email */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">
-              {t("agencyClients.createModal.contactEmail")}
-            </label>
-
-            <input
-              type="email"
-              value={form.contact_email}
-              onChange={(e) => set("contact_email", e.target.value)}
-              placeholder="hr@company.com"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
-            />
-          </div>
-
-          {/* Website */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">
-              {t("agencyClients.createModal.website")}
-            </label>
-
-            <input
-              type="url"
-              value={form.website}
-              onChange={(e) => set("website", e.target.value)}
-              placeholder="https://company.com"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
-            />
-          </div>
-
-          {/* Color picker */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              {t("agencyClients.createModal.color")}
-            </label>
-
-            <div className="flex gap-2 flex-wrap">
-              {PALETTE.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => set("color", c)}
-                  className={`w-7 h-7 rounded-lg transition-transform ${
-                    form.color === c
-                      ? "scale-125 ring-2 ring-offset-1 ring-gray-400"
-                      : "hover:scale-110"
-                  }`}
-                  style={{ backgroundColor: c }}
-                />
-              ))}
-            </div>
-          </div>
-
-          {error && <p className="text-sm text-red-600 font-semibold">{error}</p>}
-
-          <div className="flex gap-3 pt-2">
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 text-sm transition-colors"
-            >
-              {t("agencyClients.createModal.cancel")}
-            </button>
-
-            <button
-              onClick={handleSubmit}
-              disabled={saving || !form.name.trim()}
-              className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 disabled:opacity-50 text-sm transition-colors"
-            >
-              {saving
-                ? t("agencyClients.createModal.creating")
-                : t("agencyClients.createModal.create")}
-            </button>
-          </div>
-        </div>
       </div>
-    </div>
+    </PlatformModal>
   )
 }
 
@@ -307,32 +305,32 @@ function ClientCard({ company }) {
   return (
     <Link
       to={`/agency/clients/${company.id}`}
-      className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-purple-100 transition-all block group"
+      className="rounded-[22px] border border-white/80 bg-white/90 p-5 shadow-[0_12px_38px_rgba(54,74,138,0.08)] backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(77,70,170,0.13)] hover:border-violet-200 block group"
     >
       <div className="flex items-start gap-4 mb-4">
         <CompanyAvatar company={company} />
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-black text-gray-900 text-base leading-tight truncate group-hover:text-purple-700 transition-colors">
+          <h3 className="font-black text-slate-900 text-base leading-tight truncate group-hover:text-violet-700 transition-colors">
             {company.name}
           </h3>
 
           {company.industry && (
-            <span className="inline-block mt-1 text-xs font-bold px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
+            <span className="inline-block mt-1 text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
               {getIndustryLabel(company.industry, t)}
             </span>
           )}
         </div>
 
-        <DirectionIcon className="w-4 h-4 text-gray-300 flex-shrink-0 mt-1 group-hover:text-purple-400 transition-colors" />
+        <DirectionIcon className="w-4 h-4 text-slate-300 flex-shrink-0 mt-1 group-hover:text-violet-400 transition-colors" />
       </div>
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-2 text-center">
-        <div className="bg-gray-50 rounded-xl p-2.5">
-          <p className="text-xl font-black text-gray-900">{company.openJobs}</p>
+        <div className="bg-slate-50 rounded-xl p-2.5">
+          <p className="text-xl font-black text-slate-900">{company.openJobs}</p>
 
-          <p className="text-xs text-gray-500 font-semibold mt-0.5">
+          <p className="text-xs text-slate-500 font-semibold mt-0.5">
             {t("agencyClients.stats.jobs")}
           </p>
         </div>
@@ -355,44 +353,13 @@ function ClientCard({ company }) {
       </div>
 
       {company.contact_email && (
-        <div className="mt-3 flex items-center gap-1.5 text-xs text-gray-400">
+        <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-400">
           <Mail className="w-3.5 h-3.5" />
 
           <span className="truncate">{company.contact_email}</span>
         </div>
       )}
     </Link>
-  )
-}
-
-// ─── Stat Card ───────────────────────────────────────────────────────────────
-
-function StatCard({ icon: Icon, label, value, color, loading }) {
-  const colors = {
-    purple: { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-100" },
-    blue: { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100" },
-    amber: { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-100" },
-    green: { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-100" },
-  }
-
-  const c = colors[color] || colors.purple
-
-  return (
-    <div className={`bg-white border ${c.border} rounded-2xl p-5 shadow-sm`}>
-      <div className="flex items-center gap-3 mb-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${c.bg}`}>
-          <Icon className={`w-5 h-5 ${c.text}`} />
-        </div>
-
-        <span className="text-sm font-semibold text-gray-500">{label}</span>
-      </div>
-
-      {loading ? (
-        <div className="h-8 w-20 bg-gray-100 rounded animate-pulse" />
-      ) : (
-        <p className="text-3xl font-black text-gray-900">{value ?? 0}</p>
-      )}
-    </div>
   )
 }
 
@@ -500,207 +467,213 @@ export default function AgencyClients() {
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div dir={dir} className="space-y-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-gray-900">{t("agencyClients.title")}</h1>
-
-          <p className="text-gray-500 mt-1 font-semibold">{t("agencyClients.subtitle")}</p>
-        </div>
-
-        {canManageClients && (
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-
-            {t("agencyClients.newClient")}
-          </button>
-        )}
-      </div>
-
-      {/* KPI row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
+    <PlatformPageShell dir={dir}>
+      <div className="space-y-5">
+        <PlatformPageHeader
+          title={t("agencyClients.title")}
+          subtitle={t("agencyClients.subtitle")}
           icon={Building2}
-          label={t("agencyClients.stats.totalClients")}
-          value={totals.total}
-          color="purple"
-          loading={loading}
+          actions={
+            canManageClients && (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setShowCreate(true)}
+                className="shadow-[0_12px_28px_rgba(99,72,210,0.25)]"
+              >
+                <Plus className="w-4 h-4" />
+                {t("agencyClients.newClient")}
+              </Button>
+            )
+          }
         />
 
-        <StatCard
-          icon={TrendingUp}
-          label={t("agencyClients.stats.activeClients")}
-          value={totals.active}
-          color="blue"
-          loading={loading}
-        />
-
-        <StatCard
-          icon={Briefcase}
-          label={t("agencyClients.stats.openJobs")}
-          value={totals.openJobs}
-          color="amber"
-          loading={loading}
-        />
-
-        <StatCard
-          icon={Users}
-          label={t("agencyClients.stats.candidatesInProcess")}
-          value={totals.inProcess}
-          color="green"
-          loading={loading}
-        />
-      </div>
-
-      {/* Filters bar */}
-      <div className="flex flex-wrap gap-3 items-center">
-        {/* Search */}
-        <div className="relative flex-1 min-w-56">
-          <Search
-            className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400`}
+        {/* KPI row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <PlatformStatCard
+            icon={Building2}
+            label={t("agencyClients.stats.totalClients")}
+            value={totals.total}
+            tone="violet"
+            loading={loading}
           />
 
-          <input
-            type="text"
-            placeholder={t("agencyClients.filters.searchPlaceholder")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className={`w-full ${dir === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"} py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm`}
+          <PlatformStatCard
+            icon={TrendingUp}
+            label={t("agencyClients.stats.activeClients")}
+            value={totals.active}
+            tone="blue"
+            loading={loading}
+          />
+
+          <PlatformStatCard
+            icon={Briefcase}
+            label={t("agencyClients.stats.openJobs")}
+            value={totals.openJobs}
+            tone="amber"
+            loading={loading}
+          />
+
+          <PlatformStatCard
+            icon={Users}
+            label={t("agencyClients.stats.candidatesInProcess")}
+            value={totals.inProcess}
+            tone="emerald"
+            loading={loading}
           />
         </div>
 
-        {/* Industry */}
-        {industries.length > 0 && (
-          <select
-            value={filterIndustry}
-            onChange={(e) => setFilterIndustry(e.target.value)}
-            className="px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm bg-white"
-          >
-            <option value="">{t("agencyClients.filters.allIndustries")}</option>
+        {/* Filters bar */}
+        <PlatformCard className="p-5">
+          <div className="flex flex-wrap gap-3 items-center">
+            {/* Search */}
+            <div className="relative w-full min-w-0 sm:min-w-56 sm:flex-1">
+              <Search
+                className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400`}
+              />
 
-            {industries.map((i) => (
-              <option key={i} value={i}>
-                {getIndustryLabel(i, t)}
-              </option>
-            ))}
-          </select>
-        )}
+              <input
+                type="text"
+                aria-label={t("agencyClients.filters.searchPlaceholder")}
+                placeholder={t("agencyClients.filters.searchPlaceholder")}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className={`w-full ${dir === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"} py-2.5 border border-slate-200 bg-slate-50/70 rounded-xl outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-50 text-sm`}
+              />
+            </div>
 
-        {/* Active filter */}
-        <div className="flex rounded-xl border border-gray-200 overflow-hidden text-sm font-bold">
-          {[
-            { val: "all", label: t("agencyClients.filters.all") },
-            { val: "active", label: t("agencyClients.filters.active") },
-            { val: "inactive", label: t("agencyClients.filters.inactive") },
-          ].map((opt) => (
+            {/* Industry */}
+            {industries.length > 0 && (
+              <select
+                aria-label={t("agencyClients.filters.allIndustries")}
+                value={filterIndustry}
+                onChange={(e) => setFilterIndustry(e.target.value)}
+                className="px-4 py-2.5 border border-slate-200 bg-slate-50/70 rounded-xl outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-50 text-sm"
+              >
+                <option value="">{t("agencyClients.filters.allIndustries")}</option>
+
+                {industries.map((i) => (
+                  <option key={i} value={i}>
+                    {getIndustryLabel(i, t)}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* Active filter */}
+            <div className="flex max-w-full gap-1 overflow-x-auto rounded-2xl bg-slate-100/70 p-1 text-sm font-bold">
+              {[
+                { val: "all", label: t("agencyClients.filters.all") },
+                { val: "active", label: t("agencyClients.filters.active") },
+                { val: "inactive", label: t("agencyClients.filters.inactive") },
+              ].map((opt) => (
+                <button
+                  key={opt.val}
+                  onClick={() => setFilterActive(opt.val)}
+                  aria-pressed={filterActive === opt.val}
+                  className={`rounded-xl px-4 py-2 transition-all ${
+                    filterActive === opt.val
+                      ? "gradient-brand text-white shadow-[0_8px_20px_rgba(103,78,218,0.25)]"
+                      : "text-slate-500 hover:bg-white hover:text-violet-700"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Results count */}
+          {!loading && (
+            <p className="mt-3 text-xs text-slate-400 font-medium">
+              {t("agencyClients.results.count", { count: filtered.length })}
+            </p>
+          )}
+        </PlatformCard>
+
+        {/* Grid */}
+        {clientsError ? (
+          <div className="rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
+            <p className="font-bold text-red-700">{t("agencyClients.loadError")}</p>
+
             <button
-              key={opt.val}
-              onClick={() => setFilterActive(opt.val)}
-              className={`px-4 py-2.5 transition-colors ${
-                filterActive === opt.val
-                  ? "bg-purple-600 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-50"
-              }`}
+              onClick={() => refetch()}
+              className="mt-3 text-sm font-bold text-violet-700 hover:underline"
             >
-              {opt.label}
+              {t("common.retry")}
             </button>
-          ))}
-        </div>
-      </div>
+          </div>
+        ) : loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-[22px] border border-white/80 bg-white/90 p-5 shadow-[0_12px_38px_rgba(54,74,138,0.08)] animate-pulse"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 bg-slate-100 rounded-xl flex-shrink-0" />
 
-      {/* Results count */}
-      {!loading && (
-        <p className="text-sm text-gray-400 font-semibold -mt-2">
-          {t("agencyClients.results.count", { count: filtered.length })}
-        </p>
-      )}
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-slate-100 rounded w-32" />
 
-      {/* Grid */}
-      {clientsError ? (
-        <div className="rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
-          <p className="font-bold text-red-700">{t("agencyClients.loadError")}</p>
+                    <div className="h-3 bg-slate-100 rounded w-20" />
+                  </div>
+                </div>
 
-          <button
-            onClick={() => refetch()}
-            className="mt-3 text-sm font-bold text-purple-700 hover:underline"
-          >
-            {t("common.retry")}
-          </button>
-        </div>
-      ) : loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm animate-pulse"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex-shrink-0" />
-
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-100 rounded w-32" />
-
-                  <div className="h-3 bg-gray-100 rounded w-20" />
+                <div className="grid grid-cols-3 gap-2">
+                  {[1, 2, 3].map((j) => (
+                    <div key={j} className="h-14 bg-slate-50 rounded-xl" />
+                  ))}
                 </div>
               </div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 bg-white/90 rounded-[22px] border border-white/80 shadow-[0_12px_38px_rgba(54,74,138,0.08)]">
+            <Building2 className="w-14 h-14 text-slate-200 mx-auto mb-4" />
 
-              <div className="grid grid-cols-3 gap-2">
-                {[1, 2, 3].map((j) => (
-                  <div key={j} className="h-14 bg-gray-50 rounded-xl" />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
-          <Building2 className="w-14 h-14 text-gray-200 mx-auto mb-4" />
+            <p className="text-slate-600 font-black text-lg">
+              {search || filterIndustry || filterActive !== "all"
+                ? t("agencyClients.results.noMatchingClients")
+                : t("agencyClients.results.noClients")}
+            </p>
 
-          <p className="text-gray-600 font-black text-lg">
-            {search || filterIndustry || filterActive !== "all"
-              ? t("agencyClients.results.noMatchingClients")
-              : t("agencyClients.results.noClients")}
-          </p>
+            {!search && !filterIndustry && filterActive === "all" && canManageClients && (
+              <>
+                <p className="text-slate-400 text-sm mt-1 mb-4">
+                  {t("agencyClients.results.addFirstClient")}
+                </p>
 
-          {!search && !filterIndustry && filterActive === "all" && canManageClients && (
-            <>
-              <p className="text-gray-400 text-sm mt-1 mb-4">
-                {t("agencyClients.results.addFirstClient")}
-              </p>
+                <button
+                  onClick={() => setShowCreate(true)}
+                  className="px-5 py-2.5 gradient-brand text-white rounded-xl text-sm font-bold hover:opacity-90 transition-colors"
+                >
+                  + {t("agencyClients.newClient")}
+                </button>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.map((company) => (
+              <ClientCard key={company.id} company={company} />
+            ))}
+          </div>
+        )}
 
-              <button
-                onClick={() => setShowCreate(true)}
-                className="px-5 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors"
-              >
-                + {t("agencyClients.newClient")}
-              </button>
-            </>
-          )}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((company) => (
-            <ClientCard key={company.id} company={company} />
-          ))}
-        </div>
-      )}
-
-      {canManageClients && (
-        <CreateClientModal
-          isOpen={showCreate}
-          onClose={() => setShowCreate(false)}
-          onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: ["agency-clients-list", orgId] })
-            queryClient.invalidateQueries({ queryKey: ["agency-clients", orgId] })
-          }}
-        />
-      )}
-    </div>
+        {canManageClients && (
+          <CreateClientModal
+            isOpen={showCreate}
+            onClose={() => setShowCreate(false)}
+            onSuccess={() => {
+              queryClient.invalidateQueries({ queryKey: ["agency-clients-list", orgId] })
+              queryClient.invalidateQueries({ queryKey: ["agency-clients", orgId] })
+            }}
+          />
+        )}
+      </div>
+    </PlatformPageShell>
   )
 }
 import { Link } from "react-router-dom"
-import { Plus, Search, X, Mail } from "lucide-react"
+import { Plus, Search, Mail } from "lucide-react"

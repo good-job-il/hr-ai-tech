@@ -1,3 +1,11 @@
+import { MoreVertical, Trash2 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 import { useMemo, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
@@ -5,8 +13,17 @@ import { agencyTeamsService } from "@/api/services/agencyTeamsService"
 import { useAuth } from "@/lib/AuthContext"
 import { useToast } from "@/components/ui/use-toast"
 
-import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { Building2, Clock3, Mail, ShieldCheck, Users, XCircle } from "lucide-react"
+
+const dialogClassName =
+  "max-h-[90dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-[24px] border-white/80 bg-white p-6 shadow-2xl sm:rounded-[24px] [&>button]:start-auto [&>button]:end-4 [&>button]:rounded-xl [&>button]:p-2"
+
+const tabClassName =
+  "gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold text-slate-500 transition-all hover:bg-violet-50 hover:text-violet-700 data-[state=active]:bg-[image:var(--gradient-brand)] data-[state=active]:text-white data-[state=active]:shadow-[0_8px_20px_rgba(103,78,218,0.25)]"
+
+const activeBadgeClassName = "border-emerald-100 bg-emerald-50 text-emerald-700 hover:bg-emerald-50"
+
+const inactiveBadgeClassName = "border-slate-100 bg-slate-100 text-slate-500 hover:bg-slate-100"
 
 const ROLES = ["org_admin", "recruitment_manager", "team_manager", "recruiter"]
 
@@ -19,7 +36,7 @@ const ROLE_COLORS = {
 
 const EMPTY_INVITE = { full_name: "", email: "", phone: "", role: "recruiter", team_id: "none" }
 
-function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
+function InviteDialog({ open, setOpen, teams, roles, onSubmit, pending, t, isRtl }) {
   const [form, setForm] = useState(EMPTY_INVITE)
 
   const submit = (e) => {
@@ -32,9 +49,18 @@ function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent dir={isRtl ? "rtl" : "ltr"} className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{t("agencyTeams.invite.title")}</DialogTitle>
+      <DialogContent
+        dir={isRtl ? "rtl" : "ltr"}
+        className={dialogClassName}
+        overlayClassName="bg-slate-950/40 backdrop-blur-sm"
+      >
+        <DialogHeader className="mb-1 pe-8 text-start sm:text-start">
+          <DialogTitle className="flex items-center gap-3 text-xl font-black text-slate-900">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-50 text-violet-600">
+              <Mail className="h-5 w-5" />
+            </span>
+            {t("agencyTeams.invite.title")}
+          </DialogTitle>
         </DialogHeader>
 
         <form className="space-y-4" onSubmit={submit}>
@@ -43,7 +69,7 @@ function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
 
             <Input
               id="invite-full-name"
-              className="mt-1"
+              className={`${platformFieldClassName} mt-1 h-auto`}
               required
               value={form.full_name}
               onChange={(e) => setForm({ ...form, full_name: e.target.value })}
@@ -55,7 +81,7 @@ function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
 
             <Input
               id="invite-email"
-              className="mt-1"
+              className={`${platformFieldClassName} mt-1 h-auto`}
               type="email"
               dir="ltr"
               required
@@ -69,7 +95,7 @@ function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
 
             <Input
               id="invite-phone"
-              className="mt-1"
+              className={`${platformFieldClassName} mt-1 h-auto`}
               dir="ltr"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -81,12 +107,15 @@ function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
               <Label id="invite-role-label">{t("agencyTeams.fields.role")}</Label>
 
               <Select value={form.role} onValueChange={(role) => setForm({ ...form, role })}>
-                <SelectTrigger className="mt-1" aria-labelledby="invite-role-label">
+                <SelectTrigger
+                  className={`${platformFieldClassName} mt-1 h-auto`}
+                  aria-labelledby="invite-role-label"
+                >
                   <SelectValue />
                 </SelectTrigger>
 
                 <SelectContent>
-                  {ROLES.map((role) => (
+                  {roles?.map((role) => (
                     <SelectItem key={role} value={role}>
                       {t(`agencyTeams.roles.${role}`)}
                     </SelectItem>
@@ -102,7 +131,10 @@ function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
                 value={form.team_id}
                 onValueChange={(team_id) => setForm({ ...form, team_id })}
               >
-                <SelectTrigger className="mt-1" aria-labelledby="invite-team-label">
+                <SelectTrigger
+                  className={`${platformFieldClassName} mt-1 h-auto`}
+                  aria-labelledby="invite-team-label"
+                >
                   <SelectValue />
                 </SelectTrigger>
 
@@ -121,7 +153,7 @@ function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
             </div>
           </div>
 
-          <Alert>
+          <Alert className="rounded-2xl border-violet-100 bg-violet-50/60 text-violet-700">
             <Mail className="h-4 w-4" />
 
             <AlertDescription>{t("agencyTeams.invite.hint")}</AlertDescription>
@@ -142,15 +174,18 @@ function InviteDialog({ open, setOpen, teams, onSubmit, pending, t, isRtl }) {
   )
 }
 
-function TeamDialog({ open, setOpen, managers, onSubmit, pending, t, isRtl }) {
-  const [form, setForm] = useState({ name: "", description: "", manager_id: "none" })
+function TeamDialog({ open, setOpen, team, managers, onSubmit, pending, t, isRtl }) {
+  const [form, setForm] = useState({
+    name: team?.name || "",
+    description: team?.description || "",
+    manager_id: team?.manager_id ? String(team.manager_id) : "none",
+  })
 
   const submit = (e) => {
     e.preventDefault()
     onSubmit(
       { ...form, manager_id: form.manager_id === "none" ? null : Number(form.manager_id) },
       () => {
-        setForm({ name: "", description: "", manager_id: "none" })
         setOpen(false)
       },
     )
@@ -158,9 +193,18 @@ function TeamDialog({ open, setOpen, managers, onSubmit, pending, t, isRtl }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent dir={isRtl ? "rtl" : "ltr"}>
-        <DialogHeader>
-          <DialogTitle>{t("agencyTeams.teamModal.title")}</DialogTitle>
+      <DialogContent
+        dir={isRtl ? "rtl" : "ltr"}
+        className={dialogClassName}
+        overlayClassName="bg-slate-950/40 backdrop-blur-sm"
+      >
+        <DialogHeader className="mb-1 pe-8 text-start sm:text-start">
+          <DialogTitle className="flex items-center gap-3 text-xl font-black text-slate-900">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-50 text-blue-600">
+              <Users className="h-5 w-5" />
+            </span>
+            {t(team ? "agencyTeams.teamModal.editTitle" : "agencyTeams.teamModal.title")}
+          </DialogTitle>
         </DialogHeader>
 
         <form className="space-y-4" onSubmit={submit}>
@@ -169,7 +213,7 @@ function TeamDialog({ open, setOpen, managers, onSubmit, pending, t, isRtl }) {
 
             <Input
               id="team-name"
-              className="mt-1"
+              className={`${platformFieldClassName} mt-1 h-auto`}
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -181,7 +225,7 @@ function TeamDialog({ open, setOpen, managers, onSubmit, pending, t, isRtl }) {
 
             <Input
               id="team-description"
-              className="mt-1"
+              className={`${platformFieldClassName} mt-1 h-auto`}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
             />
@@ -194,7 +238,10 @@ function TeamDialog({ open, setOpen, managers, onSubmit, pending, t, isRtl }) {
               value={form.manager_id}
               onValueChange={(manager_id) => setForm({ ...form, manager_id })}
             >
-              <SelectTrigger className="mt-1" aria-labelledby="team-manager-label">
+              <SelectTrigger
+                className={`${platformFieldClassName} mt-1 h-auto`}
+                aria-labelledby="team-manager-label"
+              >
                 <SelectValue />
               </SelectTrigger>
 
@@ -215,7 +262,9 @@ function TeamDialog({ open, setOpen, managers, onSubmit, pending, t, isRtl }) {
               {t("common.cancel")}
             </Button>
 
-            <Button disabled={pending}>{t("common.create")}</Button>
+            <Button disabled={pending}>
+              {pending ? t("common.loading") : t(team ? "common.save" : "common.create")}
+            </Button>
           </div>
         </form>
       </DialogContent>
@@ -223,7 +272,7 @@ function TeamDialog({ open, setOpen, managers, onSubmit, pending, t, isRtl }) {
   )
 }
 
-function MemberDialog({ member, setMember, teams, onSubmit, pending, t, isRtl }) {
+function MemberDialog({ member, setMember, teams, roles, onSubmit, pending, t, isRtl }) {
   const [role, setRole] = useState(member?.role || "recruiter")
 
   const [teamId, setTeamId] = useState(member?.team_id ? String(member.team_id) : "none")
@@ -234,9 +283,16 @@ function MemberDialog({ member, setMember, teams, onSubmit, pending, t, isRtl })
 
   return (
     <Dialog open onOpenChange={(open) => !open && setMember(null)}>
-      <DialogContent dir={isRtl ? "rtl" : "ltr"}>
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent
+        dir={isRtl ? "rtl" : "ltr"}
+        className={dialogClassName}
+        overlayClassName="bg-slate-950/40 backdrop-blur-sm"
+      >
+        <DialogHeader className="mb-1 pe-8 text-start sm:text-start">
+          <DialogTitle className="flex items-center gap-3 text-xl font-black text-slate-900">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-50 text-violet-600">
+              <UserCog className="h-5 w-5" />
+            </span>
             {t("agencyTeams.memberModal.title", { name: member.full_name })}
           </DialogTitle>
         </DialogHeader>
@@ -246,12 +302,15 @@ function MemberDialog({ member, setMember, teams, onSubmit, pending, t, isRtl })
             <Label id="member-role-label">{t("agencyTeams.fields.role")}</Label>
 
             <Select value={role} onValueChange={setRole}>
-              <SelectTrigger className="mt-1" aria-labelledby="member-role-label">
+              <SelectTrigger
+                className={`${platformFieldClassName} mt-1 h-auto`}
+                aria-labelledby="member-role-label"
+              >
                 <SelectValue />
               </SelectTrigger>
 
               <SelectContent>
-                {ROLES.map((item) => (
+                {roles.map((item) => (
                   <SelectItem key={item} value={item}>
                     {t(`agencyTeams.roles.${item}`)}
                   </SelectItem>
@@ -264,7 +323,10 @@ function MemberDialog({ member, setMember, teams, onSubmit, pending, t, isRtl })
             <Label id="member-team-label">{t("agencyTeams.fields.team")}</Label>
 
             <Select value={teamId} onValueChange={setTeamId}>
-              <SelectTrigger className="mt-1" aria-labelledby="member-team-label">
+              <SelectTrigger
+                className={`${platformFieldClassName} mt-1 h-auto`}
+                aria-labelledby="member-team-label"
+              >
                 <SelectValue />
               </SelectTrigger>
 
@@ -309,13 +371,18 @@ export default function AgencyTeamsPage() {
 
   const { user } = useAuth()
 
-  const { can } = usePermissionMatrix()
+  const canManageTeams = ["org_admin", "recruitment_manager", "admin"].includes(user?.role)
 
-  const canManageTeams = can("manage_users")
+  const canManageMembers = ["org_admin", "recruitment_manager", "team_manager", "admin"].includes(
+    user?.role,
+  )
 
-  const canManageMembers = ["org_admin", "admin"].includes(user?.role) && canManageTeams
-
-  const canAdmin = canManageMembers
+  const visibleRoles =
+    user?.role === "team_manager"
+      ? ["recruiter"]
+      : user?.role === "recruitment_manager"
+        ? ["team_manager", "recruiter"]
+        : ROLES
 
   const { toast } = useToast()
 
@@ -329,7 +396,13 @@ export default function AgencyTeamsPage() {
 
   const [teamOpen, setTeamOpen] = useState(false)
 
+  const [editingTeam, setEditingTeam] = useState(null)
+
+  const [deletingTeam, setDeletingTeam] = useState(null)
+
   const [editingMember, setEditingMember] = useState(null)
+
+  const [deletingMember, setDeletingMember] = useState(null)
 
   const [lastLink, setLastLink] = useState("")
 
@@ -344,7 +417,37 @@ export default function AgencyTeamsPage() {
 
   const invite = useMutation({ mutationFn: agencyTeamsService.invite, onError: fail })
 
+  const removeMember = useMutation({
+    mutationFn: agencyTeamsService.removeMember,
+    onSuccess: () => {
+      invalidate()
+      setDeletingMember(null)
+      toast({ title: t("agencyTeams.memberActions.deleted") })
+    },
+    onError: fail,
+  })
+
   const createTeam = useMutation({ mutationFn: agencyTeamsService.createTeam, onError: fail })
+
+  const updateTeam = useMutation({
+    mutationFn: ({ id, payload }) => agencyTeamsService.updateTeam(id, payload),
+    onSuccess: () => {
+      invalidate()
+      setEditingTeam(null)
+      toast({ title: t("agencyTeams.teamModal.saved") })
+    },
+    onError: fail,
+  })
+
+  const removeTeam = useMutation({
+    mutationFn: agencyTeamsService.removeTeam,
+    onSuccess: () => {
+      invalidate()
+      setDeletingTeam(null)
+      toast({ title: t("agencyTeams.teamModal.deleted") })
+    },
+    onError: fail,
+  })
 
   const updateMember = useMutation({
     mutationFn: ({ id, payload }) => agencyTeamsService.updateMember(id, payload),
@@ -408,6 +511,14 @@ export default function AgencyTeamsPage() {
       },
     })
 
+  const submitTeamEdit = (payload, done) =>
+    updateTeam.mutate(
+      { id: editingTeam.id, payload },
+      {
+        onSuccess: () => done(),
+      },
+    )
+
   const toggleMember = (member) =>
     updateMember.mutate({ id: member.id, payload: { is_active: !member.is_active } })
 
@@ -442,14 +553,19 @@ export default function AgencyTeamsPage() {
 
   return (
     <PlatformPageShell dir={isRtl ? "rtl" : "ltr"}>
-      <div className="mx-auto max-w-7xl space-y-6">
+      <div className="space-y-5">
         <PlatformPageHeader
           title={t("agencyTeams.title")}
           subtitle={t("agencyTeams.subtitle")}
           icon={Users}
           actions={
             canManageMembers && (
-              <Button onClick={() => setInviteOpen(true)}>
+              <Button
+                variant="primary"
+                size="sm"
+                className="shadow-[0_12px_28px_rgba(99,72,210,0.25)]"
+                onClick={() => setInviteOpen(true)}
+              >
                 <Plus className="me-2 h-4 w-4" />
 
                 {t("agencyTeams.inviteMember")}
@@ -482,12 +598,13 @@ export default function AgencyTeamsPage() {
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <PlatformStatCard
             icon={Users}
             label={t("agencyTeams.stats.total")}
             value={data.members.length}
             tone="violet"
+            loading={query.isLoading}
           />
 
           <PlatformStatCard
@@ -495,6 +612,7 @@ export default function AgencyTeamsPage() {
             label={t("agencyTeams.stats.active")}
             value={data.members.filter((x) => x.is_active).length}
             tone="emerald"
+            loading={query.isLoading}
           />
 
           <PlatformStatCard
@@ -502,6 +620,7 @@ export default function AgencyTeamsPage() {
             label={t("agencyTeams.stats.teams")}
             value={data.teams.filter((x) => x.is_active).length}
             tone="blue"
+            loading={query.isLoading}
           />
 
           <PlatformStatCard
@@ -509,28 +628,41 @@ export default function AgencyTeamsPage() {
             label={t("agencyTeams.stats.pending")}
             value={pendingInvites.length}
             tone="amber"
+            loading={query.isLoading}
           />
         </div>
 
-        <Tabs defaultValue="members">
-          <TabsList className="h-auto flex-wrap">
-            <TabsTrigger value="members">{t("agencyTeams.tabs.members")}</TabsTrigger>
+        <Tabs defaultValue="members" dir={isRtl ? "rtl" : "ltr"} className="space-y-5">
+          <TabsList className="h-auto max-w-full justify-start gap-1 overflow-x-auto rounded-[22px] border border-white/80 bg-white/90 p-1.5 shadow-[0_12px_38px_rgba(54,74,138,0.08)]">
+            <TabsTrigger value="members" className={tabClassName}>
+              <Users className="h-4 w-4" />
+              {t("agencyTeams.tabs.members")}
+            </TabsTrigger>
 
-            <TabsTrigger value="teams">{t("agencyTeams.tabs.teams")}</TabsTrigger>
+            <TabsTrigger value="teams" className={tabClassName}>
+              <Building2 className="h-4 w-4" />
+              {t("agencyTeams.tabs.teams")}
+            </TabsTrigger>
 
-            <TabsTrigger value="invitations">
+            <TabsTrigger value="invitations" className={tabClassName}>
+              <Mail className="h-4 w-4" />
               {t("agencyTeams.tabs.invitations")}{" "}
-              {pendingInvites.length > 0 && <Badge className="ms-2">{pendingInvites.length}</Badge>}
+              {pendingInvites.length > 0 && (
+                <Badge className="ms-1 border-0 bg-violet-100 text-violet-700 hover:bg-violet-100">
+                  {pendingInvites.length}
+                </Badge>
+              )}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="members" className="space-y-4">
-            <div className="flex flex-wrap gap-3">
-              <div className="relative flex-1 min-w-56">
-                <Search className="absolute start-3 top-3 w-4 h-4 text-gray-400" />
+            <PlatformCard className="flex flex-wrap gap-3 p-5">
+              <div className="relative w-full min-w-0 sm:min-w-56 sm:flex-1">
+                <Search className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
 
                 <Input
-                  className="ps-9"
+                  aria-label={t("agencyTeams.search")}
+                  className={`${platformFieldClassName} h-auto bg-slate-50/70 py-2.5 ps-10`}
                   placeholder={t("agencyTeams.search")}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -538,7 +670,10 @@ export default function AgencyTeamsPage() {
               </div>
 
               <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="w-56">
+                <SelectTrigger
+                  aria-label={t("agencyTeams.allRoles")}
+                  className={`${platformFieldClassName} h-auto w-full py-2.5 sm:w-56`}
+                >
                   <SelectValue />
                 </SelectTrigger>
 
@@ -552,7 +687,7 @@ export default function AgencyTeamsPage() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </PlatformCard>
 
             <PlatformCard className="overflow-hidden">
               {query.isLoading ? (
@@ -564,59 +699,127 @@ export default function AgencyTeamsPage() {
                   {t("agencyTeams.emptyMembers")}
                 </PlatformEmptyState>
               ) : (
-                <div className="divide-y divide-slate-100">
-                  {members.map((member) => (
-                    <div key={member.id} className="flex flex-wrap items-center gap-4 p-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 font-bold text-violet-700">
-                        {(member.full_name || member.email).slice(0, 2).toUpperCase()}
-                      </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[760px] text-start text-sm">
+                    <thead className="border-b border-slate-100 bg-slate-50/70 text-xs font-bold uppercase tracking-wider text-slate-400">
+                      <tr>
+                        <th className="p-5 text-start">{t("agencyTeams.fields.fullName")}</th>
+                        <th className="p-5 text-start">{t("agencyTeams.fields.role")}</th>
+                        <th className="p-5 text-start">{t("agencyTeams.fields.team")}</th>
+                        <th className="p-5 text-start">{t("agencyTeams.memberActions.status")}</th>
+                        {canManageMembers && (
+                          <th className="p-5 text-center">
+                            {t("agencyTeams.memberActions.actions")}
+                          </th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {members.map((member) => (
+                        <tr key={member.id} className="transition-colors hover:bg-violet-50/30">
+                          <td className="p-5">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-100 to-fuchsia-50 text-sm font-black text-violet-700">
+                                {(member.full_name || member.email).slice(0, 2).toUpperCase()}
+                              </div>
 
-                      <div className="min-w-48 flex-1">
-                        <div className="font-bold">{member.full_name}</div>
+                              <div className="min-w-0 basis-40 flex-1">
+                                <div className="break-words text-sm font-extrabold text-slate-800">
+                                  {member.full_name}
+                                </div>
 
-                        <div className="text-sm text-slate-500" dir="ltr">
-                          {member.email}
-                        </div>
-                      </div>
-
-                      <Badge variant="outline" className={ROLE_COLORS[member.role]}>
-                        {t(`agencyTeams.roles.${member.role}`)}
-                      </Badge>
-
-                      <div className="min-w-28 text-sm text-slate-500">
-                        {teamById[member.team_id]?.name || t("agencyTeams.noTeam")}
-                      </div>
-
-                      <Badge variant={member.is_active ? "default" : "secondary"}>
-                        {t(member.is_active ? "agencyTeams.active" : "agencyTeams.inactive")}
-                      </Badge>
-
-                      {canAdmin && (
-                        <Button size="sm" variant="ghost" onClick={() => setEditingMember(member)}>
-                          <UserCog className="me-1 h-4 w-4" />
-
-                          {t("common.edit")}
-                        </Button>
-                      )}
-
-                      {canAdmin && member.id !== user.id && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => toggleMember(member)}
-                          disabled={updateMember.isPending}
-                        >
-                          {member.is_active ? (
-                            <UserX className="me-1 h-4 w-4" />
-                          ) : (
-                            <UserCog className="me-1 h-4 w-4" />
+                                <div
+                                  className="mt-0.5 break-all text-xs font-medium text-slate-400"
+                                  dir="ltr"
+                                >
+                                  {member.email}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-5">
+                            <Badge
+                              variant="outline"
+                              className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${ROLE_COLORS[member.role]}`}
+                            >
+                              {t(`agencyTeams.roles.${member.role}`)}
+                            </Badge>
+                          </td>
+                          <td className="p-5">
+                            <div className="min-w-28 text-sm text-slate-500">
+                              {teamById[member.team_id]?.name || t("agencyTeams.noTeam")}
+                            </div>
+                          </td>
+                          <td className="p-5">
+                            <Badge
+                              className={`rounded-lg ${member.is_active ? activeBadgeClassName : inactiveBadgeClassName}`}
+                            >
+                              {t(member.is_active ? "agencyTeams.active" : "agencyTeams.inactive")}
+                            </Badge>
+                          </td>
+                          {canManageMembers && (
+                            <td className="p-5 text-center">
+                              {(["org_admin", "admin"].includes(user?.role) ||
+                                String(member.id) !== String(user.id)) && (
+                                <DropdownMenu dir={isRtl ? "rtl" : "ltr"}>
+                                  <DropdownMenuTrigger asChild>
+                                    <button
+                                      type="button"
+                                      aria-label={t("agencyTeams.memberActions.actionsFor", {
+                                        name: member.full_name || member.email,
+                                      })}
+                                      className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-violet-50 hover:text-violet-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+                                    >
+                                      <MoreVertical className="h-5 w-5" />
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent
+                                    align="end"
+                                    className="w-52 rounded-2xl border-slate-100 bg-white p-2 shadow-xl"
+                                  >
+                                    <DropdownMenuItem
+                                      className="gap-3 rounded-xl p-3"
+                                      onSelect={() => setEditingMember(member)}
+                                    >
+                                      <UserCog className="h-4 w-4 text-blue-500" />
+                                      {t("common.edit")}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      className="gap-3 rounded-xl p-3"
+                                      disabled={
+                                        String(member.id) === String(user.id) ||
+                                        updateMember.isPending
+                                      }
+                                      onSelect={() => toggleMember(member)}
+                                    >
+                                      <UserX className="h-4 w-4" />
+                                      {t(
+                                        member.is_active
+                                          ? "agencyTeams.deactivate"
+                                          : "agencyTeams.activate",
+                                      )}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                      className="gap-3 rounded-xl p-3 text-red-600 focus:bg-red-50 focus:text-red-700"
+                                      disabled={
+                                        String(member.id) === String(user.id) ||
+                                        removeMember.isPending
+                                      }
+                                      onSelect={() => setDeletingMember(member)}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                      {t("agencyTeams.memberActions.delete")}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
+                            </td>
                           )}
-
-                          {t(member.is_active ? "agencyTeams.deactivate" : "agencyTeams.activate")}
-                        </Button>
-                      )}
-                    </div>
-                  ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </PlatformCard>
@@ -625,7 +828,12 @@ export default function AgencyTeamsPage() {
           <TabsContent value="teams" className="space-y-4">
             {canManageTeams && (
               <div className="flex justify-end">
-                <Button variant="outline" onClick={() => setTeamOpen(true)}>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="shadow-[0_12px_28px_rgba(99,72,210,0.25)]"
+                  onClick={() => setTeamOpen(true)}
+                >
                   <Plus className="me-2 h-4 w-4" />
 
                   {t("agencyTeams.createTeam")}
@@ -647,20 +855,67 @@ export default function AgencyTeamsPage() {
                   const count = data.members.filter((m) => m.team_id === team.id).length
 
                   return (
-                    <PlatformCard key={team.id} className="p-5">
+                    <PlatformCard
+                      key={team.id}
+                      className="p-5 transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(77,70,170,0.13)]"
+                    >
                       <div className="flex justify-between">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-50 text-blue-600">
                           <Users className="h-5 w-5" />
                         </div>
 
-                        <Badge variant={team.is_active ? "default" : "secondary"}>
-                          {t(team.is_active ? "agencyTeams.active" : "agencyTeams.inactive")}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            className={`rounded-lg ${team.is_active ? activeBadgeClassName : inactiveBadgeClassName}`}
+                          >
+                            {t(team.is_active ? "agencyTeams.active" : "agencyTeams.inactive")}
+                          </Badge>
+
+                          {canManageTeams && (
+                            <DropdownMenu dir={isRtl ? "rtl" : "ltr"}>
+                              <DropdownMenuTrigger asChild>
+                                <button
+                                  type="button"
+                                  aria-label={t("agencyTeams.teamModal.actionsFor", {
+                                    name: team.name,
+                                  })}
+                                  className="inline-flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 hover:bg-violet-50 hover:text-violet-600"
+                                >
+                                  <MoreVertical className="h-5 w-5" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="w-48 rounded-2xl border-slate-100 bg-white p-2 shadow-xl"
+                              >
+                                <DropdownMenuItem
+                                  className="gap-3 rounded-xl p-3"
+                                  onSelect={() => setEditingTeam(team)}
+                                >
+                                  <UserCog className="h-4 w-4 text-blue-500" />
+                                  {t("common.edit")}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  className="gap-3 rounded-xl p-3 text-red-600 focus:bg-red-50 focus:text-red-700"
+                                  onSelect={() => setDeletingTeam(team)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  {t("agencyTeams.memberActions.delete")}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
                       </div>
 
-                      <h3 className="mt-4 text-lg font-black">{team.name}</h3>
+                      <h3 className="mt-4 break-words text-lg font-black text-slate-900">
+                        {team.name}
+                      </h3>
 
-                      <p className="min-h-10 text-sm text-slate-500">{team.description || "—"}</p>
+                      <p className="mt-1 min-h-10 break-words text-sm text-slate-500">
+                        {team.description || "—"}
+                      </p>
 
                       <div className="mt-4 border-t border-slate-100 pt-4 text-sm">
                         <div>
@@ -687,26 +942,40 @@ export default function AgencyTeamsPage() {
                 </PlatformEmptyState>
               ) : (
                 data.invitations.map((inv) => (
-                  <div key={inv.id} className="flex flex-wrap items-center gap-4 p-4">
+                  <div
+                    key={inv.id}
+                    className="flex flex-wrap items-center gap-4 p-5 transition-colors hover:bg-violet-50/30"
+                  >
                     <Mail className="h-5 w-5 text-slate-400" />
 
-                    <div className="min-w-52 flex-1">
-                      <div className="font-bold">{inv.full_name}</div>
+                    <div className="min-w-0 basis-40 flex-1">
+                      <div className="break-words text-sm font-extrabold text-slate-800">
+                        {inv.full_name}
+                      </div>
 
-                      <div className="text-sm text-slate-500" dir="ltr">
+                      <div
+                        className="mt-0.5 break-all text-xs font-medium text-slate-400"
+                        dir="ltr"
+                      >
                         {inv.email}
                       </div>
                     </div>
 
-                    <Badge variant="outline" className={ROLE_COLORS[inv.role]}>
+                    <Badge
+                      variant="outline"
+                      className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${ROLE_COLORS[inv.role]}`}
+                    >
                       {t(`agencyTeams.roles.${inv.role}`)}
                     </Badge>
 
-                    <Badge variant={inv.status === "pending" ? "secondary" : "outline"}>
+                    <Badge
+                      variant="outline"
+                      className={`rounded-lg px-2.5 py-1 ${inv.status === "pending" ? "border-amber-100 bg-amber-50 text-amber-700" : inactiveBadgeClassName}`}
+                    >
                       {t(`agencyTeams.inviteStatus.${inv.status}`)}
                     </Badge>
 
-                    {canAdmin && inv.status === "pending" && (
+                    {canManageMembers && inv.status === "pending" && (
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline" onClick={() => resend.mutate(inv.id)}>
                           <RefreshCw className="me-1 h-3.5 w-3.5" />
@@ -727,6 +996,42 @@ export default function AgencyTeamsPage() {
             </PlatformCard>
           </TabsContent>
         </Tabs>
+
+        <Dialog
+          open={!!deletingMember}
+          onOpenChange={(open) => !open && !removeMember.isPending && setDeletingMember(null)}
+        >
+          <DialogContent
+            className={dialogClassName}
+            dir={isRtl ? "rtl" : "ltr"}
+            overlayClassName="bg-slate-950/40 backdrop-blur-sm"
+          >
+            <DialogHeader>
+              <DialogTitle>{t("agencyTeams.memberActions.deleteTitle")}</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm leading-relaxed text-slate-500">
+              {t("agencyTeams.memberActions.confirm", {
+                name: deletingMember?.full_name || deletingMember?.email,
+              })}
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                disabled={removeMember.isPending}
+                onClick={() => setDeletingMember(null)}
+              >
+                {t("common.cancel")}
+              </Button>
+              <Button
+                variant="danger"
+                disabled={removeMember.isPending}
+                onClick={() => removeMember.mutate(deletingMember.id)}
+              >
+                {t(removeMember.isPending ? "common.loading" : "agencyTeams.memberActions.delete")}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <InviteDialog
           open={inviteOpen}
@@ -749,6 +1054,7 @@ export default function AgencyTeamsPage() {
         />
 
         <MemberDialog
+          key={editingMember?.id || "none"}
           member={editingMember}
           setMember={setEditingMember}
           teams={data.teams}
@@ -776,6 +1082,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
+  platformFieldClassName,
   PlatformCard,
   PlatformEmptyState,
   PlatformPageHeader,

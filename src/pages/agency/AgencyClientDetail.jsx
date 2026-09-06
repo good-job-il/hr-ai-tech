@@ -1,3 +1,4 @@
+import { useTranslation, Trans } from "react-i18next"
 import { useState, useMemo } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useParams, useNavigate } from "react-router-dom"
@@ -12,17 +13,17 @@ import { Building2, Briefcase, Users, Mail, Globe, Phone, MapPin } from "lucide-
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const INDUSTRY_OPTIONS = [
-  "הייטק",
-  "פיננסים",
-  "ייצור",
-  "קמעונאות",
-  "שירותים",
-  "בריאות",
-  "חינוך",
-  "נדל״ן",
-  "לוגיסטיקה",
-  "תקשורת",
-  "אחר",
+  "hitech",
+  "finance",
+  "manufacturing",
+  "retail",
+  "services",
+  "healthcare",
+  "education",
+  "realestate",
+  "logistics",
+  "communications",
+  "other",
 ]
 
 const PALETTE = [
@@ -41,19 +42,63 @@ const PALETTE = [
 const STALE_TIME = 3 * 60 * 1000
 
 const APPLICATION_STATUS = {
-  new: { label: "חדש", bg: "bg-blue-50", text: "text-blue-700" },
-  reviewed: { label: "נבדק", bg: "bg-purple-50", text: "text-purple-700" },
-  phone_interview: { label: "ראיון טלפוני", bg: "bg-amber-50", text: "text-amber-700" },
-  recommended: { label: "הומלץ ללקוח", bg: "bg-orange-50", text: "text-orange-700" },
-  employer_interview: { label: "ראיון מעסיק", bg: "bg-violet-50", text: "text-violet-700" },
-  offer: { label: "הצעה", bg: "bg-sky-50", text: "text-sky-700" },
-  hired: { label: "גויס", bg: "bg-emerald-50", text: "text-emerald-700" },
-  probation: { label: "תקופת ניסיון", bg: "bg-teal-50", text: "text-teal-700" },
-  completed: { label: "הושלם", bg: "bg-green-50", text: "text-green-700" },
-  rejected: { label: "נדחה", bg: "bg-red-50", text: "text-red-700" },
+  new: { label: "agencyClientDetail.status_new", bg: "bg-blue-50", text: "text-blue-700" },
+  reviewed: {
+    label: "agencyClientDetail.status_reviewed",
+    bg: "bg-purple-50",
+    text: "text-purple-700",
+  },
+  phone_interview: {
+    label: "agencyClientDetail.status_phone_interview",
+    bg: "bg-amber-50",
+    text: "text-amber-700",
+  },
+  recommended: {
+    label: "agencyClientDetail.status_recommended",
+    bg: "bg-orange-50",
+    text: "text-orange-700",
+  },
+  employer_interview: {
+    label: "agencyClientDetail.status_employer_interview",
+    bg: "bg-violet-50",
+    text: "text-violet-700",
+  },
+  offer: { label: "agencyClientDetail.status_offer", bg: "bg-sky-50", text: "text-sky-700" },
+  hired: {
+    label: "agencyClientDetail.status_hired",
+    bg: "bg-emerald-50",
+    text: "text-emerald-700",
+  },
+  probation: {
+    label: "agencyClientDetail.status_probation",
+    bg: "bg-teal-50",
+    text: "text-teal-700",
+  },
+  completed: {
+    label: "agencyClientDetail.status_completed",
+    bg: "bg-green-50",
+    text: "text-green-700",
+  },
+  rejected: { label: "agencyClientDetail.status_rejected", bg: "bg-red-50", text: "text-red-700" },
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function getIndustryKey(value, t) {
+  return (
+    INDUSTRY_OPTIONS.find(
+      (key) =>
+        key === value ||
+        ["he", "en"].some((lng) => t(`agencyClients.industries.${key}`, { lng }) === value),
+    ) || value
+  )
+}
+
+function getIndustryLabel(value, t) {
+  const key = getIndustryKey(value, t)
+
+  return INDUSTRY_OPTIONS.includes(key) ? t(`agencyClients.industries.${key}`) : value
+}
 
 function getInitials(name = "") {
   return (
@@ -94,6 +139,8 @@ function CompanyAvatar({ company, size = "lg" }) {
 }
 
 function StatusBadge({ status }) {
+  const { t } = useTranslation()
+
   const cfg = APPLICATION_STATUS[status] || {
     label: status,
     bg: "bg-gray-50",
@@ -102,17 +149,17 @@ function StatusBadge({ status }) {
 
   return (
     <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${cfg.bg} ${cfg.text}`}>
-      {cfg.label}
+      {t(cfg.label, { defaultValue: status })}
     </span>
   )
 }
 
-function formatDate(str) {
+function formatDate(str, language) {
   if (!str) {
     return "—"
   }
 
-  return new Date(str).toLocaleDateString("he-IL", {
+  return new Date(str).toLocaleDateString(language, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -122,9 +169,11 @@ function formatDate(str) {
 // ─── Edit Modal ───────────────────────────────────────────────────────────────
 
 function EditClientModal({ company, isOpen, onClose, onSaved }) {
+  const { t, i18n } = useTranslation()
+
   const [form, setForm] = useState({
     name: company.name || "",
-    industry: company.industry || "",
+    industry: getIndustryKey(company.industry, t) || "",
     contact_email: company.contact_email || "",
     contact_phone: company.contact_phone || "",
     website: company.website || "",
@@ -140,7 +189,7 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      setError("שם לקוח הוא שדה חובה")
+      setError(t("agencyClientDetail.nameRequired"))
 
       return
     }
@@ -159,11 +208,11 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
         color: form.color,
         initials: getInitials(form.name),
       })
-      toast.success("פרטי הלקוח נשמרו")
+      toast.success(t("agencyClientDetail.saved"))
       onSaved?.()
       onClose()
     } catch (err) {
-      setError(err.message || "שגיאה בשמירה")
+      setError(err.message || t("agencyClientDetail.saveError"))
     } finally {
       setSaving(false)
     }
@@ -177,19 +226,25 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div
         className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl max-h-[90vh] overflow-y-auto"
-        dir="rtl"
+        dir={i18n.dir()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-black text-gray-900">עריכת לקוח</h3>
+          <h3 className="text-xl font-black text-gray-900">{t("agencyClientDetail.editClient")}</h3>
 
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            aria-label={t("common.close")}
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">שם החברה *</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1.5">
+              {t("agencyClientDetail.companyName")}
+            </label>
 
             <input
               type="text"
@@ -200,25 +255,32 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">תעשייה</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1.5">
+              {t("agencyClientDetail.industry")}
+            </label>
 
             <select
               value={form.industry}
               onChange={(e) => set("industry", e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm bg-white"
             >
-              <option value="">בחר תעשייה</option>
+              <option value="">{t("agencyClientDetail.selectIndustry")}</option>
 
+              {form.industry && !INDUSTRY_OPTIONS.includes(form.industry) && (
+                <option value={form.industry}>{form.industry}</option>
+              )}
               {INDUSTRY_OPTIONS.map((i) => (
                 <option key={i} value={i}>
-                  {i}
+                  {t(`agencyClients.industries.${i}`)}
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">אימייל</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1.5">
+              {t("agencyClientDetail.email")}
+            </label>
 
             <input
               type="email"
@@ -230,7 +292,9 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">טלפון</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1.5">
+              {t("agencyClientDetail.phone")}
+            </label>
 
             <input
               type="tel"
@@ -242,7 +306,9 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">אתר אינטרנט</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1.5">
+              {t("agencyClientDetail.website")}
+            </label>
 
             <input
               type="url"
@@ -254,19 +320,23 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1.5">כתובת</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1.5">
+              {t("agencyClientDetail.address")}
+            </label>
 
             <input
               type="text"
               value={form.address}
               onChange={(e) => set("address", e.target.value)}
-              placeholder="תל אביב"
+              placeholder={t("agencyClientDetail.addressPlaceholder")}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-purple-400 text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">צבע</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">
+              {t("agencyClientDetail.color")}
+            </label>
 
             <div className="flex gap-2 flex-wrap">
               {PALETTE.map((c) => (
@@ -288,7 +358,7 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
               onClick={onClose}
               className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 text-sm transition-colors"
             >
-              ביטול
+              {t("agencyClientDetail.cancel")}
             </button>
 
             <button
@@ -298,7 +368,7 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
             >
               <Save className="w-4 h-4" />
 
-              {saving ? "שומר..." : "שמור"}
+              {saving ? t("agencyClientDetail.saving") : t("agencyClientDetail.save")}
             </button>
           </div>
         </div>
@@ -310,6 +380,8 @@ function EditClientModal({ company, isOpen, onClose, onSaved }) {
 // ─── Tab: Jobs ────────────────────────────────────────────────────────────────
 
 function JobsTab({ jobs, clientId }) {
+  const { t, i18n } = useTranslation()
+
   const open = jobs.filter((j) => !j.is_closed)
 
   const closed = jobs.filter((j) => j.is_closed)
@@ -319,13 +391,13 @@ function JobsTab({ jobs, clientId }) {
       <div className="text-center py-12 bg-gray-50 rounded-2xl">
         <Briefcase className="w-10 h-10 text-gray-200 mx-auto mb-3" />
 
-        <p className="text-gray-500 font-bold">אין משרות ללקוח זה עדיין</p>
+        <p className="text-gray-500 font-bold">{t("agencyClientDetail.noJobs")}</p>
 
         <Link
           to={`/agency/jobs?clientId=${clientId}`}
           className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-bold hover:bg-purple-700 transition-colors"
         >
-          <Plus className="w-4 h-4" /> פרסם משרה
+          <Plus className="w-4 h-4" /> {t("agencyClientDetail.postJob")}
         </Link>
       </div>
     )
@@ -345,22 +417,24 @@ function JobsTab({ jobs, clientId }) {
             </span>
           )}
 
-          <span className="text-xs text-gray-400">{formatDate(job.created_date)}</span>
+          <span className="text-xs text-gray-400">
+            {formatDate(job.created_date, i18n.language)}
+          </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 mr-4 flex-shrink-0">
+      <div className="flex items-center gap-3 ms-4 flex-shrink-0">
         <span className="text-xs bg-purple-50 text-purple-700 font-bold px-2.5 py-1 rounded-full">
-          {job.applications_count || 0} מגישים
+          {t("agencyClientDetail.applicants", { count: job.applications_count || 0 })}
         </span>
 
         {job.is_closed ? (
           <span className="text-xs bg-gray-100 text-gray-500 font-bold px-2.5 py-1 rounded-full">
-            סגורה
+            {t("agencyClientDetail.closed")}
           </span>
         ) : (
           <span className="text-xs bg-emerald-100 text-emerald-700 font-bold px-2.5 py-1 rounded-full">
-            פתוחה
+            {t("agencyClientDetail.open")}
           </span>
         )}
       </div>
@@ -372,7 +446,7 @@ function JobsTab({ jobs, clientId }) {
       {open.length > 0 && (
         <div>
           <h3 className="text-sm font-black text-gray-500 uppercase tracking-wider mb-3">
-            משרות פתוחות ({open.length})
+            {t("agencyClientDetail.openJobsCount", { count: open.length })}
           </h3>
 
           <div className="space-y-2">
@@ -386,7 +460,7 @@ function JobsTab({ jobs, clientId }) {
       {closed.length > 0 && (
         <div>
           <h3 className="text-sm font-black text-gray-500 uppercase tracking-wider mb-3">
-            משרות סגורות ({closed.length})
+            {t("agencyClientDetail.closedJobsCount", { count: closed.length })}
           </h3>
 
           <div className="space-y-2 opacity-70">
@@ -403,6 +477,8 @@ function JobsTab({ jobs, clientId }) {
 // ─── Tab: Candidates ──────────────────────────────────────────────────────────
 
 function CandidatesTab({ applications, jobs }) {
+  const { t } = useTranslation()
+
   const jobMap = useMemo(() => {
     const m = {}
 
@@ -438,7 +514,7 @@ function CandidatesTab({ applications, jobs }) {
       <div className="text-center py-12 bg-gray-50 rounded-2xl">
         <Users className="w-10 h-10 text-gray-200 mx-auto mb-3" />
 
-        <p className="text-gray-500 font-bold">אין מועמדים בתהליך ללקוח זה</p>
+        <p className="text-gray-500 font-bold">{t("agencyClientDetail.noCandidates")}</p>
       </div>
     )
   }
@@ -457,7 +533,7 @@ function CandidatesTab({ applications, jobs }) {
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
           }`}
         >
-          הכל ({applications.length})
+          {t("agencyClientDetail.allCount", { count: applications.length })}
         </button>
 
         {activeStatuses.map((s) => {
@@ -473,7 +549,7 @@ function CandidatesTab({ applications, jobs }) {
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
-              {cfg.label} ({statusCounts[s]})
+              {t(cfg.label)} ({statusCounts[s]})
             </button>
           )
         })}
@@ -491,15 +567,19 @@ function CandidatesTab({ applications, jobs }) {
             >
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-gray-900 text-sm">
-                  {app.candidate_name || app.candidate_email || `מועמד #${app.id?.slice(-4)}`}
+                  {app.candidate_name ||
+                    app.candidate_email ||
+                    t("agencyClientDetail.candidate", { id: String(app.id ?? "").slice(-4) })}
                 </p>
 
                 {job && <p className="text-xs text-gray-400 mt-0.5 truncate">{job.title}</p>}
               </div>
 
-              <div className="flex items-center gap-3 mr-4 flex-shrink-0">
+              <div className="flex items-center gap-3 ms-4 flex-shrink-0">
                 {app.match_score != null && (
-                  <span className="text-xs text-gray-500 font-bold">{app.match_score}% התאמה</span>
+                  <span className="text-xs text-gray-500 font-bold">
+                    {t("agencyClientDetail.match", { score: app.match_score })}
+                  </span>
                 )}
 
                 <StatusBadge status={app.status} />
@@ -515,50 +595,61 @@ function CandidatesTab({ applications, jobs }) {
 // ─── Tab: About ───────────────────────────────────────────────────────────────
 
 function AboutTab({ company, onEdit }) {
+  const { t } = useTranslation()
+
   const fields = [
     {
       icon: Mail,
-      label: "אימייל",
+      label: t("agencyClientDetail.email"),
       value: company.contact_email,
       href: `mailto:${company.contact_email}`,
     },
     {
       icon: Phone,
-      label: "טלפון",
+      label: t("agencyClientDetail.phone"),
       value: company.contact_phone,
       href: `tel:${company.contact_phone}`,
     },
-    { icon: Globe, label: "אתר", value: company.website, href: company.website },
-    { icon: MapPin, label: "כתובת", value: company.address },
-    { icon: Building2, label: "תעשייה", value: company.industry },
+    {
+      icon: Globe,
+      label: t("agencyClientDetail.site"),
+      value: company.website,
+      href: company.website,
+    },
+    { icon: MapPin, label: t("agencyClientDetail.address"), value: company.address },
+    {
+      icon: Building2,
+      label: t("agencyClientDetail.industry"),
+      value: getIndustryLabel(company.industry, t),
+    },
   ].filter((f) => f.value)
 
   return (
     <div className="space-y-4">
       <div className="bg-white border border-gray-100 rounded-2xl p-6">
         <div className="flex items-center justify-between mb-5">
-          <h3 className="font-black text-gray-900 text-base">פרטי לקוח</h3>
+          <h3 className="font-black text-gray-900 text-base">{t("agencyClientDetail.details")}</h3>
 
           {onEdit && (
             <button
               onClick={onEdit}
               className="flex items-center gap-2 text-sm font-bold text-purple-600 hover:text-purple-800 transition-colors"
             >
-              <Edit2 className="w-4 h-4" /> עריכה
+              <Edit2 className="w-4 h-4" /> {t("agencyClientDetail.edit")}
             </button>
           )}
         </div>
 
         {fields.length === 0 ? (
           <div className="text-center py-6 text-gray-400">
-            <p className="text-sm font-semibold">לא הוזנו פרטי קשר</p>
+            <p className="text-sm font-semibold">{t("agencyClientDetail.noContact")}</p>
 
             {onEdit && (
               <button
                 onClick={onEdit}
                 className="mt-2 text-sm text-purple-600 font-bold hover:underline"
               >
-                הוסף פרטים
+                {t("agencyClientDetail.addDetails")}
               </button>
             )}
           </div>
@@ -596,14 +687,16 @@ function AboutTab({ company, onEdit }) {
 
       {/* Quick actions */}
       <div className="bg-white border border-gray-100 rounded-2xl p-6">
-        <h3 className="font-black text-gray-900 text-base mb-4">פעולות מהירות</h3>
+        <h3 className="font-black text-gray-900 text-base mb-4">
+          {t("agencyClientDetail.quickActions")}
+        </h3>
 
         <div className="grid grid-cols-2 gap-3">
           <Link
             to={`/agency/jobs?clientId=${company.id}`}
             className="flex items-center gap-2 p-3 bg-purple-50 text-purple-700 rounded-xl text-sm font-bold hover:bg-purple-100 transition-colors"
           >
-            <Briefcase className="w-4 h-4" /> פרסם משרה
+            <Briefcase className="w-4 h-4" /> {t("agencyClientDetail.postJob")}
           </Link>
 
           <Link
@@ -617,14 +710,14 @@ function AboutTab({ company, onEdit }) {
             to="/agency/crm"
             className="flex items-center gap-2 p-3 bg-blue-50 text-blue-700 rounded-xl text-sm font-bold hover:bg-blue-100 transition-colors"
           >
-            <Users className="w-4 h-4" /> CRM מועמדים
+            <Users className="w-4 h-4" /> {t("agencyClientDetail.crm")}
           </Link>
 
           <Link
             to="/agency/ai-matching"
             className="flex items-center gap-2 p-3 bg-violet-50 text-violet-700 rounded-xl text-sm font-bold hover:bg-violet-100 transition-colors"
           >
-            <TrendingUp className="w-4 h-4" /> AI התאמה
+            <TrendingUp className="w-4 h-4" /> {t("agencyClientDetail.aiMatching")}
           </Link>
         </div>
       </div>
@@ -635,12 +728,14 @@ function AboutTab({ company, onEdit }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: "about", label: "פרטים", icon: Building2 },
-  { id: "jobs", label: "משרות", icon: Briefcase },
-  { id: "candidates", label: "מועמדים", icon: Users },
+  { id: "about", label: "agencyClientDetail.tab_about", icon: Building2 },
+  { id: "jobs", label: "agencyClientDetail.tab_jobs", icon: Briefcase },
+  { id: "candidates", label: "agencyClientDetail.tab_candidates", icon: Users },
 ]
 
 export default function AgencyClientDetail() {
+  const { t, i18n } = useTranslation()
+
   const { id } = useParams()
 
   const { user } = useAuth()
@@ -741,15 +836,13 @@ export default function AgencyClientDetail() {
   const { mutate: deleteClient, isPending: deleting } = useMutation({
     mutationFn: () => agencyClientService.archive(id),
     onSuccess: () => {
-      toast.success("הלקוח הועבר לארכיון")
+      toast.success(t("agencyClientDetail.archived"))
       queryClient.invalidateQueries({ queryKey: ["agency-clients-list", orgId] })
       queryClient.invalidateQueries({ queryKey: ["agency-clients", orgId] })
       navigate("/agency/clients")
     },
     onError: (error) => {
-      setArchiveError(
-        error?.message || "לא ניתן להעביר את הלקוח לארכיון כל עוד קיימת פעילות גיוס פתוחה.",
-      )
+      setArchiveError(error?.message || t("agencyClientDetail.archiveError"))
     },
   })
 
@@ -757,7 +850,7 @@ export default function AgencyClientDetail() {
 
   if (loading) {
     return (
-      <div dir="rtl" className="max-w-5xl mx-auto space-y-6">
+      <div dir={i18n.dir()} className="max-w-5xl mx-auto space-y-6">
         <div className="h-6 w-32 bg-gray-100 rounded animate-pulse" />
 
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm animate-pulse">
@@ -783,16 +876,16 @@ export default function AgencyClientDetail() {
 
   if (companyError) {
     return (
-      <div dir="rtl" className="max-w-5xl mx-auto text-center py-16">
+      <div dir={i18n.dir()} className="max-w-5xl mx-auto text-center py-16">
         <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-3" />
 
-        <p className="text-gray-600 font-black text-lg">שגיאה בטעינת הלקוח</p>
+        <p className="text-gray-600 font-black text-lg">{t("agencyClientDetail.loadError")}</p>
 
         <button
           onClick={() => refetchCompany()}
           className="mt-4 text-purple-600 font-bold hover:underline"
         >
-          נסה שוב
+          {t("agencyClientDetail.retry")}
         </button>
       </div>
     )
@@ -800,30 +893,30 @@ export default function AgencyClientDetail() {
 
   if (!company && !companyLoading) {
     return (
-      <div dir="rtl" className="max-w-5xl mx-auto text-center py-16">
+      <div dir={i18n.dir()} className="max-w-5xl mx-auto text-center py-16">
         <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
 
-        <p className="text-gray-600 font-black text-lg">לקוח לא נמצא</p>
+        <p className="text-gray-600 font-black text-lg">{t("agencyClientDetail.notFound")}</p>
 
         <Link
           to="/agency/clients"
           className="mt-4 inline-block text-purple-600 font-bold hover:underline"
         >
-          חזרה לרשימת הלקוחות
+          {t("agencyClientDetail.back")}
         </Link>
       </div>
     )
   }
 
   return (
-    <div dir="rtl" className="max-w-5xl mx-auto space-y-6">
+    <div dir={i18n.dir()} className="max-w-5xl mx-auto space-y-6">
       {/* Breadcrumb */}
       <Link
         to="/agency/clients"
         className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 hover:text-purple-600 transition-colors"
       >
-        <ArrowRight className="w-4 h-4" />
-        לקוחות
+        <ArrowRight className={`w-4 h-4 ${i18n.dir() === "ltr" ? "rotate-180" : ""}`} />
+        {t("agencyClientDetail.clients")}
       </Link>
 
       {/* Client header card */}
@@ -838,14 +931,14 @@ export default function AgencyClientDetail() {
               <div className="flex items-center gap-3 mt-1">
                 {company.industry && (
                   <span className="text-xs font-bold px-2.5 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                    {company.industry}
+                    {getIndustryLabel(company.industry, t)}
                   </span>
                 )}
 
                 {company.status === "active" && (
                   <span className="text-xs font-bold px-2.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full flex items-center gap-1">
                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                    לקוח פעיל
+                    {t("agencyClientDetail.active")}
                   </span>
                 )}
               </div>
@@ -859,12 +952,13 @@ export default function AgencyClientDetail() {
                   onClick={() => setShowEdit(true)}
                   className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:border-purple-300 transition-colors"
                 >
-                  <Edit2 className="w-4 h-4" /> עריכה
+                  <Edit2 className="w-4 h-4" /> {t("agencyClientDetail.edit")}
                 </button>
               )}
 
               {canArchiveClient && (
                 <button
+                  aria-label={t("agencyClientDetail.archive")}
                   onClick={() => setConfirmDelete(true)}
                   className="flex items-center gap-2 px-4 py-2 bg-white border border-red-100 text-red-600 rounded-xl text-sm font-bold hover:bg-red-50 transition-colors"
                 >
@@ -879,24 +973,29 @@ export default function AgencyClientDetail() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 pt-6 border-t border-gray-100">
           {[
             {
-              label: "משרות פתוחות",
+              label: t("agencyClientDetail.openJobs"),
               value: stats.openJobs,
               color: "text-purple-700",
               bg: "bg-purple-50",
             },
             {
-              label: "סה״כ הגשות",
+              label: t("agencyClientDetail.totalApplications"),
               value: stats.totalApps,
               color: "text-blue-700",
               bg: "bg-blue-50",
             },
             {
-              label: "בתהליך גיוס",
+              label: t("agencyClientDetail.inProcess"),
               value: stats.inProcess,
               color: "text-amber-700",
               bg: "bg-amber-50",
             },
-            { label: "גויסו", value: stats.hired, color: "text-emerald-700", bg: "bg-emerald-50" },
+            {
+              label: t("agencyClientDetail.hired"),
+              value: stats.hired,
+              color: "text-emerald-700",
+              bg: "bg-emerald-50",
+            },
           ].map((s) => (
             <div key={s.label} className={`${s.bg} rounded-xl p-4 text-center`}>
               <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
@@ -909,7 +1008,7 @@ export default function AgencyClientDetail() {
 
       {(jobsError || appsError) && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-red-700">
-          <span className="font-bold">לא ניתן לטעון את כל המשרות או המועמדים של הלקוח.</span>
+          <span className="font-bold">{t("agencyClientDetail.activityError")}</span>
 
           <button
             onClick={() => {
@@ -918,7 +1017,7 @@ export default function AgencyClientDetail() {
             }}
             className="font-black text-purple-700 hover:underline"
           >
-            נסה שוב
+            {t("agencyClientDetail.retry")}
           </button>
         </div>
       )}
@@ -939,7 +1038,7 @@ export default function AgencyClientDetail() {
             >
               <tab.icon className="w-4 h-4" />
 
-              {tab.label}
+              {t(tab.label)}
 
               {tab.id === "jobs" && jobs.length > 0 && (
                 <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full font-black">
@@ -985,18 +1084,23 @@ export default function AgencyClientDetail() {
       {/* Delete confirm */}
       {confirmDelete && canArchiveClient && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl" dir="rtl">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl" dir={i18n.dir()}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
                 <Trash2 className="w-5 h-5 text-red-600" />
               </div>
 
-              <h3 className="font-black text-gray-900 text-lg">מחיקת לקוח</h3>
+              <h3 className="font-black text-gray-900 text-lg">
+                {t("agencyClientDetail.archiveTitle")}
+              </h3>
             </div>
 
             <p className="text-gray-600 text-sm mb-6">
-              להעביר את <strong>{company.name}</strong> לארכיון? ניתן לבצע זאת רק כאשר אין משרות או
-              מועמדים בתהליך.
+              <Trans
+                i18nKey="agencyClientDetail.archiveConfirm"
+                values={{ name: company.name }}
+                components={{ strong: <strong /> }}
+              />
             </p>
 
             {archiveError && (
@@ -1010,7 +1114,7 @@ export default function AgencyClientDetail() {
                 onClick={() => setConfirmDelete(false)}
                 className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 text-sm"
               >
-                ביטול
+                {t("agencyClientDetail.cancel")}
               </button>
 
               <button
@@ -1021,7 +1125,7 @@ export default function AgencyClientDetail() {
                 disabled={deleting}
                 className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 disabled:opacity-50 text-sm"
               >
-                {deleting ? "מעביר..." : "העבר לארכיון"}
+                {deleting ? t("agencyClientDetail.archiving") : t("agencyClientDetail.archive")}
               </button>
             </div>
           </div>

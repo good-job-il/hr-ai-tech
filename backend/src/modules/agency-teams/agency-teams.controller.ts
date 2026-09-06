@@ -1,5 +1,6 @@
 import {
   Body,
+  Delete,
   Controller,
   Get,
   HttpCode,
@@ -8,7 +9,6 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  UseGuards,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger"
 import { CurrentUser } from "../../common/decorators/current-user.decorator"
@@ -24,8 +24,6 @@ import {
   UpdateAgencyMemberDto,
   UpdateAgencyTeamDto,
 } from "./dto/agency-teams.dto"
-import { RequiresPermission } from "../../common/decorators/requires-permission.decorator"
-import { EffectivePermissionsGuard } from "../permissions/effective-permissions.guard"
 
 const READ_ROLES = [
   UserRole.ORG_ADMIN,
@@ -47,18 +45,14 @@ export class AgencyTeamsController {
   }
 
   @Post("teams")
-  @Roles(...READ_ROLES)
-  @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission("manage_users")
+  @Roles(UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   createTeam(@Body() dto: CreateAgencyTeamDto, @CurrentUser() user: UserEntity) {
     return this.service.createTeam(dto, user)
   }
 
   @Patch("teams/:id")
-  @Roles(...READ_ROLES)
-  @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission("manage_users")
+  @Roles(UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, UserRole.ADMIN)
   updateTeam(
     @Param("id", ParseIntPipe) id: number,
     @Body() dto: UpdateAgencyTeamDto,
@@ -67,27 +61,28 @@ export class AgencyTeamsController {
     return this.service.updateTeam(id, dto, user)
   }
 
+  @Delete("teams/:id")
+  @Roles(UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER, UserRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeTeam(@Param("id", ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
+    return this.service.removeTeam(id, user)
+  }
+
   @Post("invitations")
-  @Roles(UserRole.ORG_ADMIN, UserRole.ADMIN)
-  @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission("manage_users")
+  @Roles(...READ_ROLES)
   @HttpCode(HttpStatus.CREATED)
   invite(@Body() dto: InviteAgencyMemberDto, @CurrentUser() user: UserEntity) {
     return this.service.invite(dto, user)
   }
 
   @Post("invitations/:id/resend")
-  @Roles(UserRole.ORG_ADMIN, UserRole.ADMIN)
-  @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission("manage_users")
+  @Roles(...READ_ROLES)
   resend(@Param("id", ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.service.resendInvitation(id, user)
   }
 
   @Post("invitations/:id/cancel")
-  @Roles(UserRole.ORG_ADMIN, UserRole.ADMIN)
-  @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission("manage_users")
+  @Roles(...READ_ROLES)
   cancel(@Param("id", ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
     return this.service.cancelInvitation(id, user)
   }
@@ -98,10 +93,15 @@ export class AgencyTeamsController {
     return this.service.accept(dto.token, dto.password)
   }
 
+  @Delete("members/:id")
+  @Roles(...READ_ROLES)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeMember(@Param("id", ParseIntPipe) id: number, @CurrentUser() user: UserEntity) {
+    return this.service.removeMember(id, user)
+  }
+
   @Patch("members/:id")
-  @Roles(UserRole.ORG_ADMIN, UserRole.ADMIN)
-  @UseGuards(EffectivePermissionsGuard)
-  @RequiresPermission("manage_users")
+  @Roles(...READ_ROLES)
   updateMember(
     @Param("id", ParseIntPipe) id: number,
     @Body() dto: UpdateAgencyMemberDto,

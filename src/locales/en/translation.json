@@ -1109,14 +1109,38 @@
       "message": "Some dashboard data could not be loaded. The information shown may be incomplete."
     },
     "stats": {
-      "openJobs": { "label": "Open Jobs", "meta": "Currently active" },
-      "totalCandidates": { "label": "Total Candidates", "meta": "In the candidate database" },
-      "inProcess": { "label": "In Recruitment", "meta": "In active stages" },
-      "hired": { "label": "Hired", "meta": "Completed placements" },
-      "newCandidates": { "label": "New Candidates", "meta": "Awaiting review" },
-      "totalApplications": { "label": "Total Applications", "meta": "Across all jobs" },
-      "activeClients": { "label": "Active Clients", "meta": "Hiring companies" },
-      "compensationPlans": { "label": "Compensation Plans", "meta": "Active plans" }
+      "openJobs": {
+        "label": "Open Jobs",
+        "meta": "Currently active"
+      },
+      "totalCandidates": {
+        "label": "Total Candidates",
+        "meta": "In the candidate database"
+      },
+      "inProcess": {
+        "label": "In Recruitment",
+        "meta": "In active stages"
+      },
+      "hired": {
+        "label": "Hired",
+        "meta": "Completed placements"
+      },
+      "newCandidates": {
+        "label": "New Candidates",
+        "meta": "Awaiting review"
+      },
+      "totalApplications": {
+        "label": "Total Applications",
+        "meta": "Across all jobs"
+      },
+      "activeClients": {
+        "label": "Active Clients",
+        "meta": "Hiring companies"
+      },
+      "compensationPlans": {
+        "label": "Compensation Plans",
+        "meta": "Active plans"
+      }
     },
     "recentJobs": {
       "title": "Recent Open Jobs",
@@ -1166,7 +1190,11 @@
     "emptyTeams": "No teams yet. Create the first team to assign managers and recruiters.",
     "emptyInvites": "No invitations yet",
     "errorTitle": "Could not load organization teams",
-    "tabs": { "members": "Members", "teams": "Teams", "invitations": "Invitations" },
+    "tabs": {
+      "members": "Members",
+      "teams": "Teams",
+      "invitations": "Invitations"
+    },
     "stats": {
       "total": "Total members",
       "active": "Active members",
@@ -1206,7 +1234,19 @@
       "manager": "Team manager",
       "created": "Team created"
     },
-    "memberModal": { "title": "Edit {{name}}", "saved": "Member updated" }
+    "memberModal": {
+      "title": "Edit {{name}}",
+      "saved": "Member updated"
+    },
+    "memberActions": {
+      "actions": "Actions",
+      "status": "Status",
+      "actionsFor": "Actions for {{name}}",
+      "delete": "Delete",
+      "deleteTitle": "Delete member",
+      "confirm": "Delete {{name}} from the organization? Their access will be revoked. Their work history will be retained.",
+      "deleted": "Member deleted"
+    }
   },
   "platform": {
     "dashboard": {
@@ -2186,5 +2226,72 @@
       "addFirstClient": "Add your first client and publish a job for them"
     },
     "loadError": "Unable to load clients"
+  },
+  "agencyClientDetail": {
+    "archiveError": "The client cannot be archived while recruitment activity is ongoing.",
+    "activityError": "Unable to load all jobs or candidates for this client.",
+    "noCandidates": "No candidates in process for this client",
+    "noJobs": "No jobs for this client yet",
+    "nameRequired": "Client name is required",
+    "archived": "Client archived",
+    "back": "Back to Clients",
+    "loadError": "Unable to load client",
+    "noContact": "No contact details added",
+    "saved": "Client details saved",
+    "quickActions": "Quick Actions",
+    "saveError": "Could not save client details",
+    "notFound": "Client not found",
+    "openJobs": "Open Jobs",
+    "archive": "Archive",
+    "website": "Website",
+    "crm": "Candidate CRM",
+    "inProcess": "In Recruitment",
+    "editClient": "Edit Client",
+    "companyName": "Company Name *",
+    "selectIndustry": "Select Industry",
+    "addDetails": "Add Details",
+    "totalApplications": "Total Applications",
+    "archiveTitle": "Archive Client",
+    "postJob": "Post a Job",
+    "details": "Client Details",
+    "active": "Active Client",
+    "aiMatching": "AI Matching",
+    "archiving": "Archiving...",
+    "addressPlaceholder": "Tel Aviv",
+    "saving": "Saving...",
+    "retry": "Try Again",
+    "industry": "Industry",
+    "email": "Email",
+    "clients": "Clients",
+    "phone": "Phone",
+    "address": "Address",
+    "cancel": "Cancel",
+    "closed": "Closed",
+    "open": "Open",
+    "edit": "Edit",
+    "hired": "Hired",
+    "save": "Save",
+    "site": "Website",
+    "color": "Color",
+    "status_new": "New",
+    "status_reviewed": "Reviewed",
+    "status_phone_interview": "Phone Interview",
+    "status_recommended": "Recommended to Client",
+    "status_employer_interview": "Employer Interview",
+    "status_offer": "Offer",
+    "status_hired": "Hired",
+    "status_probation": "Probation",
+    "status_completed": "Completed",
+    "status_rejected": "Rejected",
+    "tab_about": "Details",
+    "tab_jobs": "Jobs",
+    "tab_candidates": "Candidates",
+    "applicants": "{{count}} applicants",
+    "openJobsCount": "Open Jobs ({{count}})",
+    "closedJobsCount": "Closed Jobs ({{count}})",
+    "allCount": "All ({{count}})",
+    "match": "{{score}}% match",
+    "candidate": "Candidate #{{id}}",
+    "archiveConfirm": "Archive <strong>{{name}}</strong>? This is only possible when there are no open jobs or candidates in process."
   }
 }

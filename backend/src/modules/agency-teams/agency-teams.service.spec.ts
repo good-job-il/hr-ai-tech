@@ -196,4 +196,55 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
     expect(overview.members.map((member) => member.id)).not.toContain(32)
     expect(overview.invitations).toEqual([])
   })
+  it("removes membership and revokes access without erasing user history", async () => {
+    storedUsers.push({
+      id: 81,
+      role: UserRole.RECRUITER,
+      organization_id: organizationId,
+      is_active: true,
+      team_id: 101,
+      refresh_token_hash: "token",
+    })
+    await service.removeMember(81, actor)
+    expect(storedUsers.find((member) => member.id === 81)).toMatchObject({
+      organization_id: null,
+      is_active: false,
+      team_id: null,
+      refresh_token_hash: null,
+    })
+    await expect(service.removeMember(81, actor)).rejects.toThrow(NotFoundException)
+  })
+
+  it("rejects self deletion, foreign members and non-admin actors", async () => {
+    await expect(service.removeMember(actor.id, actor)).rejects.toThrow("own account")
+    storedUsers.push({ id: 82, role: UserRole.RECRUITER, organization_id: 99 })
+    await expect(service.removeMember(82, actor)).rejects.toThrow(NotFoundException)
+    await expect(service.removeMember(82, { ...actor, role: UserRole.RECRUITER })).rejects.toThrow(
+      "Only organization admins",
+    )
+  })
+
+  it("requires reassignment before removing an active team's manager", async () => {
+    storedUsers.push({
+      id: 83,
+      role: UserRole.TEAM_MANAGER,
+      organization_id: organizationId,
+      is_active: true,
+    })
+    storedTeams.push({ id: 101, organization_id: organizationId, manager_id: 83, is_active: true })
+    await expect(service.removeMember(83, actor)).rejects.toThrow("Reassign")
+    expect(storedUsers.find((member) => member.id === 83).is_active).toBe(true)
+  })
+
+  it("preserves the last active organization admin", async () => {
+    storedUsers.push({
+      id: 84,
+      role: UserRole.ORG_ADMIN,
+      organization_id: organizationId,
+      is_active: true,
+    })
+    await expect(service.removeMember(84, { ...actor, role: UserRole.ADMIN })).rejects.toThrow(
+      "at least one active admin",
+    )
+  })
 })

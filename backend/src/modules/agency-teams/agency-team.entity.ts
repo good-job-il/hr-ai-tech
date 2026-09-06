@@ -16,6 +16,9 @@ export class AgencyTeamEntity extends BaseEntity {
   @Column({ name: "manager_id", type: "int", nullable: true })
   manager_id: number | null
 
+  @Column({ name: "recruitment_manager_id", type: "int", nullable: true })
+  recruitment_manager_id: number | null
+
   @Column({ name: "is_active", type: "boolean", default: true })
   is_active: boolean
 }

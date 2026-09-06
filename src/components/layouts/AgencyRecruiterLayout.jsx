@@ -7,7 +7,11 @@ export default function AgencyRecruiterLayout() {
   const isRtl = !i18n.language?.startsWith("en")
 
   return (
-    <SidebarLayout navItems={AGENCY_RECRUITER_NAV} roleTitle={isRtl ? "רכז גיוס" : "Recruiter"} />
+    <SidebarLayout
+      navItems={AGENCY_RECRUITER_NAV}
+      roleTitle={isRtl ? "רכז גיוס" : "Recruiter"}
+      platformStyle
+    />
   )
 }
 import SidebarLayout from "./SidebarLayout"

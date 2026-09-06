@@ -260,6 +260,12 @@ export const AGENCY_TEAM_MANAGER_NAV = [
     icon: Users,
   },
   {
+    id: "tm-teams",
+    labelKey: "nav.agency.teams",
+    route: "/agency/teams",
+    icon: Users,
+  },
+  {
     id: "tm-compensation",
     labelKey: "nav.teamManager.compensation",
     route: "/agency/team/compensation",

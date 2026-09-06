@@ -1109,14 +1109,38 @@
       "message": "לא ניתן לטעון את כל נתוני הדשבורד. הנתונים המוצגים עשויים להיות חלקיים."
     },
     "stats": {
-      "openJobs": { "label": "משרות פתוחות", "meta": "פעילות כעת" },
-      "totalCandidates": { "label": "סה״כ מועמדים", "meta": "במאגר המועמדים" },
-      "inProcess": { "label": "בתהליך גיוס", "meta": "בשלבים פעילים" },
-      "hired": { "label": "גויסו", "meta": "השמות שהושלמו" },
-      "newCandidates": { "label": "מועמדים חדשים", "meta": "ממתינים לטיפול" },
-      "totalApplications": { "label": "סה״כ הגשות", "meta": "לכל המשרות" },
-      "activeClients": { "label": "לקוחות פעילים", "meta": "חברות מגייסות" },
-      "compensationPlans": { "label": "תוכניות תגמול", "meta": "תוכניות פעילות" }
+      "openJobs": {
+        "label": "משרות פתוחות",
+        "meta": "פעילות כעת"
+      },
+      "totalCandidates": {
+        "label": "סה״כ מועמדים",
+        "meta": "במאגר המועמדים"
+      },
+      "inProcess": {
+        "label": "בתהליך גיוס",
+        "meta": "בשלבים פעילים"
+      },
+      "hired": {
+        "label": "גויסו",
+        "meta": "השמות שהושלמו"
+      },
+      "newCandidates": {
+        "label": "מועמדים חדשים",
+        "meta": "ממתינים לטיפול"
+      },
+      "totalApplications": {
+        "label": "סה״כ הגשות",
+        "meta": "לכל המשרות"
+      },
+      "activeClients": {
+        "label": "לקוחות פעילים",
+        "meta": "חברות מגייסות"
+      },
+      "compensationPlans": {
+        "label": "תוכניות תגמול",
+        "meta": "תוכניות פעילות"
+      }
     },
     "recentJobs": {
       "title": "משרות פתוחות אחרונות",
@@ -1166,7 +1190,11 @@
     "emptyTeams": "עדיין אין צוותים. צרו צוות ראשון כדי לשייך מנהלים ומגייסים.",
     "emptyInvites": "עדיין אין הזמנות",
     "errorTitle": "לא ניתן לטעון את צוותי הארגון",
-    "tabs": { "members": "חברים", "teams": "צוותים", "invitations": "הזמנות" },
+    "tabs": {
+      "members": "חברים",
+      "teams": "צוותים",
+      "invitations": "הזמנות"
+    },
     "stats": {
       "total": "סה״כ חברים",
       "active": "חברים פעילים",
@@ -1206,7 +1234,19 @@
       "manager": "מנהל צוות",
       "created": "הצוות נוצר"
     },
-    "memberModal": { "title": "עריכת {{name}}", "saved": "חבר הצוות עודכן" }
+    "memberModal": {
+      "title": "עריכת {{name}}",
+      "saved": "חבר הצוות עודכן"
+    },
+    "memberActions": {
+      "actions": "פעולות",
+      "status": "סטטוס",
+      "actionsFor": "פעולות עבור {{name}}",
+      "delete": "מחיקה",
+      "deleteTitle": "מחיקת משתמש",
+      "confirm": "למחוק את {{name}} מהארגון? הגישה תבוטל והיסטוריית העבודה תישמר.",
+      "deleted": "המשתמש נמחק"
+    }
   },
   "platform": {
     "dashboard": {
@@ -2187,5 +2227,72 @@
       "addFirstClient": "הוסף את הלקוח הראשון שלך ופרסם משרה עבורו"
     },
     "loadError": "לא ניתן לטעון את הלקוחות"
+  },
+  "agencyClientDetail": {
+    "archiveError": "לא ניתן להעביר את הלקוח לארכיון כל עוד קיימת פעילות גיוס פתוחה.",
+    "activityError": "לא ניתן לטעון את כל המשרות או המועמדים של הלקוח.",
+    "noCandidates": "אין מועמדים בתהליך ללקוח זה",
+    "noJobs": "אין משרות ללקוח זה עדיין",
+    "nameRequired": "שם לקוח הוא שדה חובה",
+    "archived": "הלקוח הועבר לארכיון",
+    "back": "חזרה לרשימת הלקוחות",
+    "loadError": "שגיאה בטעינת הלקוח",
+    "noContact": "לא הוזנו פרטי קשר",
+    "saved": "פרטי הלקוח נשמרו",
+    "quickActions": "פעולות מהירות",
+    "saveError": "שגיאה בשמירה",
+    "notFound": "לקוח לא נמצא",
+    "openJobs": "משרות פתוחות",
+    "archive": "העבר לארכיון",
+    "website": "אתר אינטרנט",
+    "crm": "CRM מועמדים",
+    "inProcess": "בתהליך גיוס",
+    "editClient": "עריכת לקוח",
+    "companyName": "שם החברה *",
+    "selectIndustry": "בחר תעשייה",
+    "addDetails": "הוסף פרטים",
+    "totalApplications": "סה״כ הגשות",
+    "archiveTitle": "מחיקת לקוח",
+    "postJob": "פרסם משרה",
+    "details": "פרטי לקוח",
+    "active": "לקוח פעיל",
+    "aiMatching": "AI התאמה",
+    "archiving": "מעביר...",
+    "addressPlaceholder": "תל אביב",
+    "saving": "שומר...",
+    "retry": "נסה שוב",
+    "industry": "תעשייה",
+    "email": "אימייל",
+    "clients": "לקוחות",
+    "phone": "טלפון",
+    "address": "כתובת",
+    "cancel": "ביטול",
+    "closed": "סגורה",
+    "open": "פתוחה",
+    "edit": "עריכה",
+    "hired": "גויסו",
+    "save": "שמור",
+    "site": "אתר",
+    "color": "צבע",
+    "status_new": "חדש",
+    "status_reviewed": "נבדק",
+    "status_phone_interview": "ראיון טלפוני",
+    "status_recommended": "הומלץ ללקוח",
+    "status_employer_interview": "ראיון מעסיק",
+    "status_offer": "הצעה",
+    "status_hired": "גויס",
+    "status_probation": "תקופת ניסיון",
+    "status_completed": "הושלם",
+    "status_rejected": "נדחה",
+    "tab_about": "פרטים",
+    "tab_jobs": "משרות",
+    "tab_candidates": "מועמדים",
+    "applicants": "{{count}} מגישים",
+    "openJobsCount": "משרות פתוחות ({{count}})",
+    "closedJobsCount": "משרות סגורות ({{count}})",
+    "allCount": "הכל ({{count}})",
+    "match": "{{score}}% התאמה",
+    "candidate": "מועמד #{{id}}",
+    "archiveConfirm": "להעביר את <strong>{{name}}</strong> לארכיון? ניתן לבצע זאת רק כאשר אין משרות או מועמדים בתהליך."
   }
 }

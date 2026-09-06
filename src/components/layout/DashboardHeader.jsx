@@ -152,7 +152,7 @@ export default function DashboardHeader({
                 {(() => {
                   const name = user?.full_name?.trim()
 
-                  const greeting = isRtl ? "שלום" : "Hello"
+                  const greeting = isRtl ? "שלום" : "Hello 333"
 
                   if (name && name.length > 1) {
                     return `${greeting}, ${name}`
@@ -165,7 +165,7 @@ export default function DashboardHeader({
               <EditNameModal user={user} />
             </div>
 
-            <div className="text-xs font-semibold text-[#94A3B8]">{roleTitle}</div>
+            <div className="text-xs font-semibold text-[#94A3B8]">{roleTitle} 2</div>
           </div>
         </div>
       </div>

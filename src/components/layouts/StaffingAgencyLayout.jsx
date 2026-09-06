@@ -26,6 +26,6 @@ export default function StaffingAgencyLayout() {
           ? "מנהל גיוס"
           : "Recruitment Manager"
 
-  return <SidebarLayout navItems={nav} roleTitle={title} />
+  return <SidebarLayout navItems={nav} roleTitle={title} platformStyle />
 }
 import SidebarLayout from "./SidebarLayout"

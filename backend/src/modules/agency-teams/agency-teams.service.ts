@@ -46,9 +46,17 @@ export class AgencyTeamsService {
     return actor.organization_id
   }
 
-  private requireAdmin(actor: UserEntity) {
-    if (actor.role !== UserRole.ORG_ADMIN && actor.role !== UserRole.ADMIN) {
-      throw new ForbiddenException("Only organization admins can manage members and invitations")
+  private isOrganizationAdmin(actor: UserEntity) {
+    return actor.role === UserRole.ORG_ADMIN || actor.role === UserRole.ADMIN
+  }
+
+  private requireTeamAdministration(actor: UserEntity) {
+    if (
+      !this.isOrganizationAdmin(actor) &&
+      actor.role !== UserRole.RECRUITMENT_MANAGER &&
+      actor.role !== UserRole.TEAM_MANAGER
+    ) {
+      throw new ForbiddenException("This role cannot manage agency teams")
     }
   }
 
@@ -56,6 +64,14 @@ export class AgencyTeamsService {
     const team = await this.teams.findOne({ where: { id, organization_id: this.orgId(actor) } })
 
     if (!team) {
+      throw new NotFoundException(`Team ${id} not found`)
+    }
+
+    if (
+      (actor.role === UserRole.RECRUITMENT_MANAGER && team.recruitment_manager_id !== actor.id) ||
+      (actor.role === UserRole.TEAM_MANAGER &&
+        (team.id !== actor.team_id || team.manager_id !== actor.id))
+    ) {
       throw new NotFoundException(`Team ${id} not found`)
     }
 
@@ -122,7 +138,7 @@ export class AgencyTeamsService {
             }) => member,
           ),
         teams: [team],
-        invitations: [],
+        invitations: await this.visibleInvitations(actor),
       }
     }
 
@@ -145,7 +161,25 @@ export class AgencyTeamsService {
       }),
     ])
 
-    const safeMembers = members
+    const visibleTeams =
+      actor.role === UserRole.RECRUITMENT_MANAGER
+        ? teams.filter((team) => team.recruitment_manager_id === actor.id)
+        : teams
+
+    const visibleTeamIds = new Set(visibleTeams.map((team) => team.id))
+
+    const visibleMembers =
+      actor.role === UserRole.RECRUITMENT_MANAGER
+        ? members.filter(
+            (member) =>
+              member.id === actor.id ||
+              (member.recruitment_manager_id === actor.id &&
+                [UserRole.TEAM_MANAGER, UserRole.RECRUITER].includes(member.role) &&
+                (!member.team_id || visibleTeamIds.has(member.team_id))),
+          )
+        : members
+
+    const safeMembers = visibleMembers
       .filter((m) => AGENCY_ROLES.includes(m.role))
       .map(
         ({ password_hash, refresh_token_hash, reset_token_hash, reset_token_expires, ...member }) =>
@@ -154,23 +188,45 @@ export class AgencyTeamsService {
 
     return {
       members: safeMembers,
-      teams,
-      invitations: invitations.map(({ token_hash, ...invite }) => invite),
+      teams: visibleTeams,
+      invitations: invitations
+        .filter(
+          (invitation) => this.isOrganizationAdmin(actor) || invitation.invited_by === actor.id,
+        )
+        .map(({ token_hash, ...invite }) => invite),
     }
   }
 
   async createTeam(dto: CreateAgencyTeamDto, actor: UserEntity) {
+    if (!this.isOrganizationAdmin(actor) && actor.role !== UserRole.RECRUITMENT_MANAGER) {
+      throw new ForbiddenException(
+        "Only organization admins and recruitment managers can create teams",
+      )
+    }
+
     const organization_id = this.orgId(actor)
 
     if (dto.manager_id) {
-      await this.assertMember(dto.manager_id, actor, [UserRole.TEAM_MANAGER])
+      await this.assertAssignableManager(dto.manager_id, actor)
     }
 
+    const recruitment_manager_id =
+      actor.role === UserRole.RECRUITMENT_MANAGER
+        ? actor.id
+        : dto.manager_id
+          ? (await this.assertMember(dto.manager_id, actor)).recruitment_manager_id
+          : null
+
     try {
-      const team = await this.teams.save(this.teams.create({ ...dto, organization_id }))
+      const team = await this.teams.save(
+        this.teams.create({ ...dto, organization_id, recruitment_manager_id }),
+      )
 
       if (team.manager_id) {
-        await this.users.update(team.manager_id, { team_id: team.id })
+        await this.users.update(team.manager_id, {
+          team_id: team.id,
+          recruitment_manager_id: team.recruitment_manager_id,
+        })
       }
 
       await this.log(actor, "AgencyTeam", team.id, "create", { name: team.name })
@@ -186,15 +242,27 @@ export class AgencyTeamsService {
   }
 
   async updateTeam(id: number, dto: UpdateAgencyTeamDto, actor: UserEntity) {
+    if (!this.isOrganizationAdmin(actor) && actor.role !== UserRole.RECRUITMENT_MANAGER) {
+      throw new ForbiddenException(
+        "Only organization admins and recruitment managers can update teams",
+      )
+    }
+
     const team = await this.scopedTeam(id, actor)
 
+    const previousManagerId = team.manager_id
+
     if (dto.manager_id) {
-      await this.assertMember(dto.manager_id, actor, [UserRole.TEAM_MANAGER])
+      await this.assertAssignableManager(dto.manager_id, actor)
     }
 
     Object.assign(team, dto)
 
     const saved = await this.teams.save(team)
+
+    if (previousManagerId && previousManagerId !== saved.manager_id) {
+      await this.users.update(previousManagerId, { team_id: null })
+    }
 
     if (saved.manager_id) {
       await this.users.update(saved.manager_id, { team_id: saved.id })
@@ -214,8 +282,27 @@ export class AgencyTeamsService {
     return saved
   }
 
+  async removeTeam(id: number, actor: UserEntity) {
+    if (!this.isOrganizationAdmin(actor) && actor.role !== UserRole.RECRUITMENT_MANAGER) {
+      throw new ForbiddenException(
+        "Only organization admins and recruitment managers can delete teams",
+      )
+    }
+
+    const team = await this.scopedTeam(id, actor)
+
+    await this.users.update(
+      { organization_id: team.organization_id, team_id: team.id },
+      { team_id: null, team_manager_id: null },
+    )
+    team.manager_id = null
+    team.is_active = false
+    await this.teams.save(team)
+    await this.log(actor, "AgencyTeam", team.id, "delete", { name: team.name })
+  }
+
   async invite(dto: InviteAgencyMemberDto, actor: UserEntity) {
-    this.requireAdmin(actor)
+    this.requireTeamAdministration(actor)
 
     const organization_id = this.orgId(actor)
 
@@ -233,16 +320,14 @@ export class AgencyTeamsService {
       throw new ConflictException("A pending invitation already exists for this email")
     }
 
-    if (dto.team_id) {
-      await this.scopedTeam(dto.team_id, actor)
-    }
+    const payload = await this.normalizeInvitation(dto, actor)
 
     const token = crypto.randomBytes(32).toString("hex")
 
     const record = this.invitations.create()
 
-    Object.assign(record, dto, {
-      role: dto.role as UserRole,
+    Object.assign(record, payload, {
+      role: payload.role as UserRole,
       email,
       organization_id,
       invited_by: actor.id,
@@ -255,8 +340,8 @@ export class AgencyTeamsService {
 
     await this.log(actor, "AgencyInvitation", invitation.id, "create", {
       email,
-      role: dto.role,
-      team_id: dto.team_id,
+      role: payload.role,
+      team_id: payload.team_id,
     })
 
     const { token_hash, ...safe } = invitation
@@ -265,11 +350,9 @@ export class AgencyTeamsService {
   }
 
   async resendInvitation(id: number, actor: UserEntity) {
-    this.requireAdmin(actor)
+    this.requireTeamAdministration(actor)
 
-    const invitation = await this.invitations.findOne({
-      where: { id, organization_id: this.orgId(actor) },
-    })
+    const invitation = await this.scopedInvitation(id, actor)
 
     if (!invitation || invitation.status !== "pending") {
       throw new NotFoundException("Pending invitation not found")
@@ -286,11 +369,9 @@ export class AgencyTeamsService {
   }
 
   async cancelInvitation(id: number, actor: UserEntity) {
-    this.requireAdmin(actor)
+    this.requireTeamAdministration(actor)
 
-    const invitation = await this.invitations.findOne({
-      where: { id, organization_id: this.orgId(actor) },
-    })
+    const invitation = await this.scopedInvitation(id, actor)
 
     if (!invitation || invitation.status !== "pending") {
       throw new NotFoundException("Pending invitation not found")
@@ -326,6 +407,7 @@ export class AgencyTeamsService {
         team_id: invitation.team_id,
         password_hash: await bcrypt.hash(password, 12),
         is_active: true,
+        recruitment_manager_id: await this.invitationRecruitmentManagerId(invitation),
         team_manager_id:
           invitation.role === UserRole.RECRUITER ? await this.managerId(invitation.team_id) : null,
       }),
@@ -339,9 +421,18 @@ export class AgencyTeamsService {
   }
 
   async updateMember(id: number, dto: UpdateAgencyMemberDto, actor: UserEntity) {
-    this.requireAdmin(actor)
+    this.requireTeamAdministration(actor)
 
-    const member = await this.assertMember(id, actor)
+    const member = await this.assertManageableMember(id, actor)
+
+    if (
+      member.id === actor.id &&
+      (dto.role !== undefined || dto.team_id !== undefined || dto.is_active !== undefined)
+    ) {
+      throw new BadRequestException("You cannot change your own role, team or status")
+    }
+
+    this.validateMemberUpdate(member, dto, actor)
 
     if (member.id === actor.id && dto.is_active === false) {
       throw new BadRequestException("You cannot deactivate your own account")
@@ -402,6 +493,50 @@ export class AgencyTeamsService {
     return safe
   }
 
+  async removeMember(id: number, actor: UserEntity) {
+    this.requireTeamAdministration(actor)
+
+    const member = await this.assertManageableMember(id, actor)
+
+    if (member.id === actor.id) {
+      throw new BadRequestException("You cannot delete your own account")
+    }
+
+    if (member.role === UserRole.ORG_ADMIN && member.is_active) {
+      const admins = await this.users.count({
+        where: { organization_id: this.orgId(actor), role: UserRole.ORG_ADMIN, is_active: true },
+      })
+
+      if (admins <= 1) {
+        throw new BadRequestException("The organization must keep at least one active admin")
+      }
+    }
+
+    const managedTeams = await this.teams.count({
+      where: { organization_id: this.orgId(actor), manager_id: id, is_active: true },
+    })
+
+    if (managedTeams > 0) {
+      throw new BadRequestException("Reassign this member's active teams before deleting them")
+    }
+
+    // Remove membership and access while retaining historical user references.
+    Object.assign(member, {
+      is_active: false,
+      organization_id: null,
+      company_id: null,
+      org_type: null,
+      team_id: null,
+      team_manager_id: null,
+      recruitment_manager_id: null,
+      refresh_token_hash: null,
+      reset_token_hash: null,
+      reset_token_expires: null,
+    })
+    await this.users.save(member)
+    await this.log(actor, "User", id, "delete", { membership_removed: true })
+  }
+
   private async assertMember(id: number, actor: UserEntity, roles?: UserRole[]) {
     const member = await this.users.findOne({ where: { id, organization_id: this.orgId(actor) } })
 
@@ -414,6 +549,133 @@ export class AgencyTeamsService {
     }
 
     return member
+  }
+
+  private async assertManageableMember(id: number, actor: UserEntity) {
+    const member = await this.assertMember(id, actor)
+
+    if (this.isOrganizationAdmin(actor)) {
+      return member
+    }
+
+    const recruitmentManagerCanManage =
+      actor.role === UserRole.RECRUITMENT_MANAGER &&
+      (member.id === actor.id ||
+        (member.recruitment_manager_id === actor.id &&
+          [UserRole.TEAM_MANAGER, UserRole.RECRUITER].includes(member.role)))
+
+    const teamManagerCanManage =
+      actor.role === UserRole.TEAM_MANAGER &&
+      member.role === UserRole.RECRUITER &&
+      member.team_id === actor.team_id
+
+    if (!recruitmentManagerCanManage && !teamManagerCanManage) {
+      throw new NotFoundException(`Organization member ${id} not found`)
+    }
+
+    return member
+  }
+
+  private validateMemberUpdate(member: UserEntity, dto: UpdateAgencyMemberDto, actor: UserEntity) {
+    if (actor.role === UserRole.TEAM_MANAGER) {
+      if (dto.role && dto.role !== UserRole.RECRUITER) {
+        throw new ForbiddenException("Team managers can only manage recruiters")
+      }
+
+      if (dto.team_id !== undefined && dto.team_id !== actor.team_id) {
+        throw new ForbiddenException("Recruiters can only be assigned to your team")
+      }
+    }
+
+    if (
+      actor.role === UserRole.RECRUITMENT_MANAGER &&
+      dto.role &&
+      ![UserRole.TEAM_MANAGER, UserRole.RECRUITER].includes(dto.role as UserRole)
+    ) {
+      throw new ForbiddenException(
+        "Recruitment managers can only manage team managers and recruiters",
+      )
+    }
+
+    if (member.role === UserRole.ORG_ADMIN && !this.isOrganizationAdmin(actor)) {
+      throw new ForbiddenException("Organization admins cannot be changed")
+    }
+  }
+
+  private async assertAssignableManager(id: number, actor: UserEntity) {
+    const manager = await this.assertMember(id, actor, [UserRole.TEAM_MANAGER])
+
+    if (
+      actor.role === UserRole.RECRUITMENT_MANAGER &&
+      manager.recruitment_manager_id !== actor.id
+    ) {
+      throw new NotFoundException(`Organization member ${id} not found`)
+    }
+
+    return manager
+  }
+
+  private async normalizeInvitation(dto: InviteAgencyMemberDto, actor: UserEntity) {
+    if (actor.role === UserRole.TEAM_MANAGER) {
+      if (dto.role !== UserRole.RECRUITER || !actor.team_id) {
+        throw new ForbiddenException("Team managers can only invite recruiters to their own team")
+      }
+
+      await this.scopedTeam(actor.team_id, actor)
+
+      return { ...dto, role: UserRole.RECRUITER, team_id: actor.team_id }
+    }
+
+    if (
+      actor.role === UserRole.RECRUITMENT_MANAGER &&
+      ![UserRole.TEAM_MANAGER, UserRole.RECRUITER].includes(dto.role as UserRole)
+    ) {
+      throw new ForbiddenException(
+        "Recruitment managers can only invite team managers and recruiters",
+      )
+    }
+
+    if (dto.team_id) {
+      await this.scopedTeam(dto.team_id, actor)
+    }
+
+    return dto
+  }
+
+  private async scopedInvitation(id: number, actor: UserEntity) {
+    const invitation = await this.invitations.findOne({
+      where: { id, organization_id: this.orgId(actor) },
+    })
+
+    if (
+      !invitation ||
+      invitation.status !== "pending" ||
+      (!this.isOrganizationAdmin(actor) && invitation.invited_by !== actor.id)
+    ) {
+      throw new NotFoundException("Pending invitation not found")
+    }
+
+    return invitation
+  }
+
+  private async visibleInvitations(actor: UserEntity) {
+    const invitations = await this.invitations.find({
+      where: { organization_id: this.orgId(actor), invited_by: actor.id },
+      order: { created_date: "DESC" },
+      take: 100,
+    })
+
+    return invitations.map(({ token_hash, ...invitation }) => invitation)
+  }
+
+  private async invitationRecruitmentManagerId(invitation: AgencyInvitationEntity) {
+    const inviter = await this.users.findOne({ where: { id: invitation.invited_by } })
+
+    if (inviter?.role === UserRole.RECRUITMENT_MANAGER) {
+      return inviter.id
+    }
+
+    return inviter?.recruitment_manager_id ?? null
   }
 
   private async managerId(teamId?: number | null) {

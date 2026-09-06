@@ -176,7 +176,7 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
           className={`flex h-[82px] shrink-0 items-center ${platformStyle ? "justify-center border-b border-[#EEF1F6] px-7" : "border-b border-[#EDE9FE] px-5"}`}
         >
           <Logo
-            href={platformStyle ? "/platform/dashboard" : undefined}
+            href={platformStyle ? navItems[0]?.route : undefined}
             className={platformStyle ? "max-h-[54px]" : ""}
           />
         </div>
@@ -242,19 +242,43 @@ export default function SidebarLayout({ navItems = [], roleTitle = "", platformS
                 </div>
               )
             ) : (
-              <div className="flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#EEF4FF] flex items-center justify-center shrink-0 mt-0.5">
+              <div
+                className={
+                  platformStyle
+                    ? "flex items-center gap-3 rounded-[17px] border border-[#E8E1FA] bg-[linear-gradient(135deg,#FBF9FF,#F4F1FF)] p-3"
+                    : "flex items-start gap-2.5"
+                }
+              >
+                <div
+                  className={
+                    platformStyle
+                      ? "flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-white text-[#7C3AED] shadow-[0_4px_12px_rgba(105,78,190,0.08)]"
+                      : "w-8 h-8 rounded-lg bg-[#EEF4FF] flex items-center justify-center shrink-0 mt-0.5"
+                  }
+                >
                   <Building2 className="w-4 h-4 text-[#6C4DFF]" />
                 </div>
 
                 <div className="min-w-0">
                   {organization?.name && (
-                    <p className="text-xs font-semibold text-[#1F2937] truncate">
+                    <p
+                      className={
+                        platformStyle
+                          ? "truncate text-xs font-black text-[#6C4DFF]"
+                          : "text-xs font-semibold text-[#1F2937] truncate"
+                      }
+                    >
                       {organization.name}
                     </p>
                   )}
 
-                  <p className="text-[10px] text-[#9CA3AF] truncate">
+                  <p
+                    className={
+                      platformStyle
+                        ? "mt-0.5 text-[10px] font-semibold text-[#A19AB5]"
+                        : "text-[10px] text-[#9CA3AF] truncate"
+                    }
+                  >
                     {orgType === "staffing_agency"
                       ? t("platform.orgs.staffing")
                       : orgType === "organization"

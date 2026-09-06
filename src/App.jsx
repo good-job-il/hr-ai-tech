@@ -275,6 +275,8 @@ const AuthenticatedApp = () => {
         }
       >
         <Route element={<StaffingAgencyLayout />}>
+          <Route path="/agency/teams" element={<AgencyTeamsPage />} />
+
           {/* Organization-wide operational routes. */}
           <Route element={<ProtectedRoute requiredRoles={["org_admin", "recruitment_manager"]} />}>
             <Route path="/agency/dashboard" element={<AgencyDashboardRoute />} />
@@ -320,8 +322,6 @@ const AuthenticatedApp = () => {
             <Route path="/agency/clients" element={<AgencyClients />} />
 
             <Route path="/agency/clients/:id" element={<AgencyClientDetail />} />
-
-            <Route path="/agency/teams" element={<AgencyTeamsPage />} />
 
             <Route path="/agency/reports" element={<AgencyReportsPage />} />
 
