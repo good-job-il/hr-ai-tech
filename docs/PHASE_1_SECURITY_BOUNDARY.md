@@ -6,7 +6,7 @@ Verified: 13 August 2026.
 
 - Runtime source contains no request or asset URL under `*.base44.com`.
 - Application branding uses repository-owned files under `public/`; `public/logo.png` is required by the CI gate.
-- CSP restricts `connect-src` to the application origin and local development WebSockets. Images are limited to the application origin, `data:`, `blob:` and the explicitly retained `images.unsplash.com` host.
+- CSP restricts `connect-src` to the application origin, the origin configured by `VITE_API_BASE_URL`, and local development HTTP/WebSocket endpoints. Images are limited to the application origin, `data:`, `blob:` and the explicitly retained `images.unsplash.com` host.
 - Unsupported provider login controls and `loginWithProvider` are absent.
 - The compatibility shim no longer exports `asServiceRole`.
 - The browser cannot submit arbitrary email recipient/subject/body data. `/integrations/send-email`, `SendEmailDto` and `integrations.Core.SendEmail` have been removed.
