@@ -124,6 +124,8 @@ const AgencyDashboardRoute = () => {
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth()
 
+  console.log("AuthenticatedApp")
+
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div
