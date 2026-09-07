@@ -8,6 +8,7 @@ import {
 } from "@nestjs/common"
 import { Request, Response } from "express"
 import { ZodValidationException } from "nestjs-zod"
+import { isUniqueConstraintViolation } from "../utils/user-email-conflict.utils"
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -55,6 +56,28 @@ export class HttpExceptionFilter implements ExceptionFilter {
         errors = (res as any).errors
         code = (res as any).code || `HTTP_${status}`
       }
+    } else if (
+      isUniqueConstraintViolation(exception, [
+        "UQ_users_staffing_org_admin",
+        "UQ_invitation_pending_org_admin",
+      ])
+    ) {
+      status = HttpStatus.CONFLICT
+      code = "STAFFING_ORG_ADMIN_LIMIT"
+      message = "A staffing agency can only have one organization admin"
+    } else if (
+      isUniqueConstraintViolation(exception, [
+        "UQ_users_staffing_recruitment_manager",
+        "UQ_invitation_pending_recruitment_manager",
+      ])
+    ) {
+      status = HttpStatus.CONFLICT
+      code = "STAFFING_RECRUITMENT_MANAGER_LIMIT"
+      message = "A staffing agency can only have one recruitment manager"
+    } else if (isUniqueConstraintViolation(exception, ["UQ_agency_team_manager"])) {
+      status = HttpStatus.CONFLICT
+      code = "TEAM_MANAGER_ALREADY_ASSIGNED"
+      message = "A team manager can only be assigned to one team"
     } else if (exception instanceof Error) {
       this.logger.error(`Unhandled error: ${exception.message}`, exception.stack)
       message = exception.message

@@ -22,6 +22,7 @@ export const OnboardAgencySchema = z.object({
   name: z.string().min(1),
   contact_email: z.string().email().optional(),
   logo_url: z.string().url().optional(),
+  settings: z.record(z.any()).optional(),
 })
 export class OnboardAgencyDto extends createZodDto(OnboardAgencySchema) {}
 

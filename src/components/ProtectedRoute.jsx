@@ -15,11 +15,14 @@ export default function ProtectedRoute({
   requiredRoles = [],
   requiredOrgTypes = [],
   superAdminOnly = false,
+  noOrgRedirect = null,
+  requiredProfileCompleted = false,
+  incompleteProfileRedirect = "/candidate/onboarding",
   fallback = null,
   unauthenticatedElement = <Navigate to="/login" replace />,
   unauthorizedElement = <Navigate to="/unauthorized" replace />,
 }) {
-  const { user, isLoadingAuth, authError, orgType } = useAuth()
+  const { user, isLoadingAuth, authError, orgType, organization } = useAuth()
 
   if (isLoadingAuth) {
     return (
@@ -51,8 +54,16 @@ export default function ProtectedRoute({
     return unauthorizedElement
   }
 
+  if (requiredProfileCompleted && !user.profile_completed) {
+    return <Navigate to={incompleteProfileRedirect} replace />
+  }
+
   // OrgType check (never bypassed — even admin must be explicit)
   if (requiredOrgTypes.length > 0 && !requiredOrgTypes.includes(orgType)) {
+    if (!organization && noOrgRedirect && effectiveRole === "org_admin") {
+      return <Navigate to={noOrgRedirect} replace />
+    }
+
     // Super admin has no org, allow them through org-type gates
     if (!isSuperAdmin) {
       console.warn("Blocked by orgType:", { user, orgType, requiredOrgTypes })

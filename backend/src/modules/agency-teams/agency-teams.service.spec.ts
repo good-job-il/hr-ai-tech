@@ -1,4 +1,9 @@
-import { BadRequestException, NotFoundException } from "@nestjs/common"
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from "@nestjs/common"
 import { UserRole } from "../../common/enums/user-role.enum"
 import { AgencyTeamsService } from "./agency-teams.service"
 
@@ -147,6 +152,89 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
     expect((deactivated as any).password_hash).toBeUndefined()
   })
 
+  it("allows only one organization admin and one recruitment manager", async () => {
+    await expect(
+      service.invite(
+        {
+          full_name: "Second Admin",
+          email: "admin.two@acceptance.test",
+          role: UserRole.ORG_ADMIN,
+        } as any,
+        actor,
+      ),
+    ).rejects.toMatchObject({
+      response: expect.objectContaining({ code: "STAFFING_ORG_ADMIN_LIMIT" }),
+    })
+
+    await service.invite(
+      {
+        full_name: "Recruitment Manager",
+        email: "rm.one@acceptance.test",
+        role: UserRole.RECRUITMENT_MANAGER,
+      } as any,
+      actor,
+    )
+
+    await expect(
+      service.invite(
+        {
+          full_name: "Second Recruitment Manager",
+          email: "rm.two@acceptance.test",
+          role: UserRole.RECRUITMENT_MANAGER,
+        } as any,
+        actor,
+      ),
+    ).rejects.toMatchObject({
+      response: expect.objectContaining({ code: "STAFFING_RECRUITMENT_MANAGER_LIMIT" }),
+    })
+  })
+
+  it("creates a dedicated team when a team manager accepts an invitation", async () => {
+    const invitation = await service.invite(
+      {
+        full_name: "New Team Manager",
+        email: "team.manager@acceptance.test",
+        role: UserRole.TEAM_MANAGER,
+        team_id: 999,
+      } as any,
+      actor,
+    )
+
+    expect(invitation.team_id).toBeNull()
+
+    const accepted = await service.accept(invitation.invite_token, "StrongPass123!")
+
+    const manager = storedUsers.find((item) => item.id === accepted.id)
+
+    const team = storedTeams.find((item) => item.manager_id === accepted.id)
+
+    expect(team).toMatchObject({
+      organization_id: organizationId,
+      manager_id: accepted.id,
+      is_active: true,
+    })
+    expect(manager.team_id).toBe(team.id)
+  })
+
+  it("does not assign a team manager to a second team", async () => {
+    const manager = {
+      id: 91,
+      email: "single.team@acceptance.test",
+      full_name: "Single Team Manager",
+      role: UserRole.TEAM_MANAGER,
+      organization_id: organizationId,
+      is_active: true,
+    }
+
+    storedUsers.push(manager)
+
+    await service.createTeam({ name: "First", manager_id: manager.id } as any, actor)
+
+    await expect(
+      service.createTeam({ name: "Second", manager_id: manager.id } as any, actor),
+    ).rejects.toBeInstanceOf(ConflictException)
+  })
+
   it("does not expose a cross-tenant team or allow the last admin to be deactivated", async () => {
     storedTeams.push({ id: 999, organization_id: 999, name: "Other tenant" })
     await expect(
@@ -220,7 +308,7 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
     storedUsers.push({ id: 82, role: UserRole.RECRUITER, organization_id: 99 })
     await expect(service.removeMember(82, actor)).rejects.toThrow(NotFoundException)
     await expect(service.removeMember(82, { ...actor, role: UserRole.RECRUITER })).rejects.toThrow(
-      "Only organization admins",
+      "cannot manage agency teams",
     )
   })
 
@@ -246,5 +334,123 @@ describe("AgencyTeamsService OA-4 team lifecycle acceptance", () => {
     await expect(service.removeMember(84, { ...actor, role: UserRole.ADMIN })).rejects.toThrow(
       "at least one active admin",
     )
+  })
+
+  it("scopes a recruitment manager to their own members and teams", async () => {
+    const manager = { ...actor, id: 51, role: UserRole.RECRUITMENT_MANAGER }
+
+    storedUsers.push(
+      manager,
+      { id: 2, role: UserRole.ORG_ADMIN, organization_id: organizationId },
+      { id: 52, role: UserRole.RECRUITMENT_MANAGER, organization_id: organizationId },
+      {
+        id: 41,
+        role: UserRole.TEAM_MANAGER,
+        organization_id: organizationId,
+        recruitment_manager_id: 51,
+        team_id: 101,
+      },
+      {
+        id: 31,
+        role: UserRole.RECRUITER,
+        organization_id: organizationId,
+        recruitment_manager_id: 51,
+        team_id: 101,
+      },
+      {
+        id: 42,
+        role: UserRole.TEAM_MANAGER,
+        organization_id: organizationId,
+        recruitment_manager_id: 52,
+        team_id: 102,
+      },
+    )
+    storedTeams.push(
+      {
+        id: 101,
+        organization_id: organizationId,
+        recruitment_manager_id: 51,
+        manager_id: 41,
+        is_active: true,
+      },
+      {
+        id: 102,
+        organization_id: organizationId,
+        recruitment_manager_id: 52,
+        manager_id: 42,
+        is_active: true,
+      },
+    )
+
+    const overview = await service.overview(manager as any)
+
+    expect(overview.members.map((member) => member.id).sort()).toEqual([31, 41, 51])
+    expect(overview.teams.map((team) => team.id)).toEqual([101])
+    await expect(service.removeMember(2, manager as any)).rejects.toBeInstanceOf(NotFoundException)
+    await expect(service.removeMember(52, manager as any)).rejects.toBeInstanceOf(NotFoundException)
+    await expect(service.removeMember(51, manager as any)).rejects.toBeInstanceOf(
+      BadRequestException,
+    )
+  })
+
+  it("lets a recruitment manager manage owned teams and their team managers", async () => {
+    const manager = { ...actor, id: 51, role: UserRole.RECRUITMENT_MANAGER }
+
+    storedUsers.push(
+      manager,
+      {
+        id: 41,
+        role: UserRole.TEAM_MANAGER,
+        organization_id: organizationId,
+        recruitment_manager_id: 51,
+      },
+      {
+        id: 42,
+        role: UserRole.TEAM_MANAGER,
+        organization_id: organizationId,
+        recruitment_manager_id: 52,
+      },
+    )
+
+    const team = await service.createTeam({ name: "Owned", manager_id: 41 } as any, manager as any)
+
+    expect(team).toMatchObject({ recruitment_manager_id: 51, manager_id: 41 })
+    await expect(
+      service.createTeam({ name: "Foreign", manager_id: 42 } as any, manager as any),
+    ).rejects.toBeInstanceOf(NotFoundException)
+    await service.updateTeam(team.id, { name: "Updated" } as any, manager as any)
+    await service.removeTeam(team.id, manager as any)
+    expect(storedTeams.find((item) => item.id === team.id)).toMatchObject({ is_active: false })
+  })
+
+  it("lets a team manager manage only recruiters in their own team", async () => {
+    const lead = { ...actor, id: 41, role: UserRole.TEAM_MANAGER, team_id: 101 }
+
+    storedUsers.push(
+      lead,
+      { id: 31, role: UserRole.RECRUITER, organization_id: organizationId, team_id: 101 },
+      { id: 32, role: UserRole.RECRUITER, organization_id: organizationId, team_id: 102 },
+    )
+    storedTeams.push({
+      id: 101,
+      organization_id: organizationId,
+      manager_id: 41,
+      is_active: true,
+    })
+
+    await service.updateMember(31, { is_active: false } as any, lead as any)
+    expect(storedUsers.find((member) => member.id === 31).is_active).toBe(false)
+    await expect(
+      service.updateMember(32, { is_active: false } as any, lead as any),
+    ).rejects.toBeInstanceOf(NotFoundException)
+    await expect(
+      service.updateMember(31, { role: UserRole.TEAM_MANAGER } as any, lead as any),
+    ).rejects.toBeInstanceOf(ForbiddenException)
+  })
+
+  it("blocks recruiters from the teams service", async () => {
+    await expect(
+      service.overview({ ...actor, role: UserRole.RECRUITER } as any),
+    ).rejects.toBeInstanceOf(ForbiddenException)
   })
 })

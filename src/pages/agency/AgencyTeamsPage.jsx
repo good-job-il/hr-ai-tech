@@ -106,7 +106,16 @@ function InviteDialog({ open, setOpen, teams, roles, onSubmit, pending, t, isRtl
             <div>
               <Label id="invite-role-label">{t("agencyTeams.fields.role")}</Label>
 
-              <Select value={form.role} onValueChange={(role) => setForm({ ...form, role })}>
+              <Select
+                value={form.role}
+                onValueChange={(role) =>
+                  setForm({
+                    ...form,
+                    role,
+                    team_id: role === "team_manager" ? "none" : form.team_id,
+                  })
+                }
+              >
                 <SelectTrigger
                   className={`${platformFieldClassName} mt-1 h-auto`}
                   aria-labelledby="invite-role-label"
@@ -124,33 +133,39 @@ function InviteDialog({ open, setOpen, teams, roles, onSubmit, pending, t, isRtl
               </Select>
             </div>
 
-            <div>
-              <Label id="invite-team-label">{t("agencyTeams.fields.team")}</Label>
+            {form.role === "team_manager" ? (
+              <div className="rounded-xl border border-cyan-100 bg-cyan-50 p-3 text-sm text-cyan-800">
+                {t("agencyTeams.invite.teamManagerTeamHint")}
+              </div>
+            ) : (
+              <div>
+                <Label id="invite-team-label">{t("agencyTeams.fields.team")}</Label>
 
-              <Select
-                value={form.team_id}
-                onValueChange={(team_id) => setForm({ ...form, team_id })}
-              >
-                <SelectTrigger
-                  className={`${platformFieldClassName} mt-1 h-auto`}
-                  aria-labelledby="invite-team-label"
+                <Select
+                  value={form.team_id}
+                  onValueChange={(team_id) => setForm({ ...form, team_id })}
                 >
-                  <SelectValue />
-                </SelectTrigger>
+                  <SelectTrigger
+                    className={`${platformFieldClassName} mt-1 h-auto`}
+                    aria-labelledby="invite-team-label"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
 
-                <SelectContent>
-                  <SelectItem value="none">{t("agencyTeams.noTeam")}</SelectItem>
+                  <SelectContent>
+                    <SelectItem value="none">{t("agencyTeams.noTeam")}</SelectItem>
 
-                  {teams
-                    .filter((x) => x.is_active)
-                    .map((team) => (
-                      <SelectItem key={team.id} value={String(team.id)}>
-                        {team.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
+                    {teams
+                      .filter((x) => x.is_active)
+                      .map((team) => (
+                        <SelectItem key={team.id} value={String(team.id)}>
+                          {team.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <Alert className="rounded-2xl border-violet-100 bg-violet-50/60 text-violet-700">
@@ -319,30 +334,36 @@ function MemberDialog({ member, setMember, teams, roles, onSubmit, pending, t, i
             </Select>
           </div>
 
-          <div>
-            <Label id="member-team-label">{t("agencyTeams.fields.team")}</Label>
+          {role === "team_manager" ? (
+            <div className="rounded-xl border border-cyan-100 bg-cyan-50 p-3 text-sm text-cyan-800">
+              {t("agencyTeams.memberModal.teamManagerTeamHint")}
+            </div>
+          ) : (
+            <div>
+              <Label id="member-team-label">{t("agencyTeams.fields.team")}</Label>
 
-            <Select value={teamId} onValueChange={setTeamId}>
-              <SelectTrigger
-                className={`${platformFieldClassName} mt-1 h-auto`}
-                aria-labelledby="member-team-label"
-              >
-                <SelectValue />
-              </SelectTrigger>
+              <Select value={teamId} onValueChange={setTeamId}>
+                <SelectTrigger
+                  className={`${platformFieldClassName} mt-1 h-auto`}
+                  aria-labelledby="member-team-label"
+                >
+                  <SelectValue />
+                </SelectTrigger>
 
-              <SelectContent>
-                <SelectItem value="none">{t("agencyTeams.noTeam")}</SelectItem>
+                <SelectContent>
+                  <SelectItem value="none">{t("agencyTeams.noTeam")}</SelectItem>
 
-                {teams
-                  .filter((x) => x.is_active)
-                  .map((team) => (
-                    <SelectItem key={team.id} value={String(team.id)}>
-                      {team.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          </div>
+                  {teams
+                    .filter((x) => x.is_active)
+                    .map((team) => (
+                      <SelectItem key={team.id} value={String(team.id)}>
+                        {team.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setMember(null)}>
@@ -352,7 +373,12 @@ function MemberDialog({ member, setMember, teams, roles, onSubmit, pending, t, i
             <Button
               disabled={pending}
               onClick={() =>
-                onSubmit(member.id, { role, team_id: teamId === "none" ? null : Number(teamId) })
+                onSubmit(member.id, {
+                  role,
+                  ...(role === "team_manager"
+                    ? {}
+                    : { team_id: teamId === "none" ? null : Number(teamId) }),
+                })
               }
             >
               {t("common.save")}
@@ -413,7 +439,19 @@ export default function AgencyTeamsPage() {
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["agency-teams"] })
 
   const fail = (error) =>
-    toast({ title: error?.message || t("common.error"), variant: "destructive" })
+    toast({
+      title:
+        error?.code === "EMAIL_ALREADY_EXISTS"
+          ? t("errors.emailAlreadyExists")
+          : error?.code === "STAFFING_ORG_ADMIN_LIMIT"
+            ? t("agencyTeams.errors.orgAdminLimit")
+            : error?.code === "STAFFING_RECRUITMENT_MANAGER_LIMIT"
+              ? t("agencyTeams.errors.recruitmentManagerLimit")
+              : error?.code === "TEAM_MANAGER_ALREADY_ASSIGNED"
+                ? t("agencyTeams.errors.teamManagerAlreadyAssigned")
+                : error?.message || t("common.error"),
+      variant: "destructive",
+    })
 
   const invite = useMutation({ mutationFn: agencyTeamsService.invite, onError: fail })
 
@@ -484,6 +522,14 @@ export default function AgencyTeamsPage() {
   )
 
   const pendingInvites = data.invitations.filter((x) => x.status === "pending")
+
+  const hasRecruitmentManager =
+    data.members.some((member) => member.role === "recruitment_manager") ||
+    pendingInvites.some((invitation) => invitation.role === "recruitment_manager")
+
+  const inviteRoles = visibleRoles.filter(
+    (role) => role !== "org_admin" && !(role === "recruitment_manager" && hasRecruitmentManager),
+  )
 
   const showInviteLink = (token) => {
     const link = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`
@@ -680,7 +726,7 @@ export default function AgencyTeamsPage() {
                 <SelectContent>
                   <SelectItem value="all">{t("agencyTeams.allRoles")}</SelectItem>
 
-                  {ROLES.map((role) => (
+                  {visibleRoles.map((role) => (
                     <SelectItem key={role} value={role}>
                       {t(`agencyTeams.roles.${role}`)}
                     </SelectItem>
@@ -936,12 +982,12 @@ export default function AgencyTeamsPage() {
 
           <TabsContent value="invitations">
             <PlatformCard className="divide-y divide-slate-100 overflow-hidden">
-              {data.invitations.length === 0 ? (
+              {pendingInvites.length === 0 ? (
                 <PlatformEmptyState icon={Mail} className="m-5">
                   {t("agencyTeams.emptyInvites")}
                 </PlatformEmptyState>
               ) : (
-                data.invitations.map((inv) => (
+                pendingInvites.map((inv) => (
                   <div
                     key={inv.id}
                     className="flex flex-wrap items-center gap-4 p-5 transition-colors hover:bg-violet-50/30"
@@ -1033,10 +1079,45 @@ export default function AgencyTeamsPage() {
           </DialogContent>
         </Dialog>
 
+        <Dialog
+          open={!!deletingTeam}
+          onOpenChange={(open) => !open && !removeTeam.isPending && setDeletingTeam(null)}
+        >
+          <DialogContent
+            className={dialogClassName}
+            dir={isRtl ? "rtl" : "ltr"}
+            overlayClassName="bg-slate-950/40 backdrop-blur-sm"
+          >
+            <DialogHeader>
+              <DialogTitle>{t("agencyTeams.teamModal.deleteTitle")}</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm leading-relaxed text-slate-500">
+              {t("agencyTeams.teamModal.deleteConfirm", { name: deletingTeam?.name })}
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                disabled={removeTeam.isPending}
+                onClick={() => setDeletingTeam(null)}
+              >
+                {t("common.cancel")}
+              </Button>
+              <Button
+                variant="danger"
+                disabled={removeTeam.isPending}
+                onClick={() => removeTeam.mutate(deletingTeam.id)}
+              >
+                {t(removeTeam.isPending ? "common.loading" : "agencyTeams.memberActions.delete")}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         <InviteDialog
           open={inviteOpen}
           setOpen={setInviteOpen}
           teams={data.teams}
+          roles={inviteRoles}
           onSubmit={submitInvite}
           pending={invite.isPending}
           t={t}
@@ -1044,9 +1125,28 @@ export default function AgencyTeamsPage() {
         />
 
         <TeamDialog
+          key={`team-${editingTeam?.id ?? "none"}`}
+          open={!!editingTeam}
+          setOpen={(open) => !open && setEditingTeam(null)}
+          team={editingTeam}
+          managers={data.members.filter(
+            (x) =>
+              x.role === "team_manager" &&
+              x.is_active &&
+              (!x.team_id || x.id === editingTeam?.manager_id),
+          )}
+          onSubmit={submitTeamEdit}
+          pending={updateTeam.isPending}
+          t={t}
+          isRtl={isRtl}
+        />
+
+        <TeamDialog
           open={teamOpen}
           setOpen={setTeamOpen}
-          managers={data.members.filter((x) => x.role === "team_manager" && x.is_active)}
+          managers={data.members.filter(
+            (x) => x.role === "team_manager" && x.is_active && !x.team_id,
+          )}
           onSubmit={submitTeam}
           pending={createTeam.isPending}
           t={t}
@@ -1054,10 +1154,11 @@ export default function AgencyTeamsPage() {
         />
 
         <MemberDialog
-          key={editingMember?.id || "none"}
+          key={`member-${editingMember?.id ?? "none"}`}
           member={editingMember}
           setMember={setEditingMember}
           teams={data.teams}
+          roles={visibleRoles}
           onSubmit={saveMember}
           pending={updateMember.isPending}
           t={t}

@@ -427,7 +427,13 @@ export default function UsersManagementPage() {
       setModalOpen(false)
       showToast(t("platform.usersManagement.toast.created"))
     },
-    onError: () => showToast(t("platform.usersManagement.toast.error"), "error"),
+    onError: (error) =>
+      showToast(
+        error?.code === "EMAIL_ALREADY_EXISTS"
+          ? t("errors.emailAlreadyExists")
+          : t("platform.usersManagement.toast.error"),
+        "error",
+      ),
   })
 
   const updateMutation = useMutation({

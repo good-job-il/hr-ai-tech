@@ -19,15 +19,101 @@ import { EmailService } from "../integrations/services/email.service"
 import { UserRole } from "../../common/enums/user-role.enum"
 import { buildPaginatedResponse, getSkipTake } from "../../common/utils/pagination.utils"
 import { AuditService } from "../audit/audit.service"
+import { OrganizationEntity } from "../organizations/organization.entity"
+import { AgencyTeamEntity } from "../agency-teams/agency-team.entity"
+import { OrgType } from "../../common/enums/org-type.enum"
+import {
+  emailAlreadyExistsException,
+  isUniqueConstraintViolation,
+} from "../../common/utils/user-email-conflict.utils"
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly repo: Repository<UserEntity>,
+    @InjectRepository(OrganizationEntity)
+    private readonly organizations: Repository<OrganizationEntity>,
+    @InjectRepository(AgencyTeamEntity)
+    private readonly teams: Repository<AgencyTeamEntity>,
     private readonly emailService: EmailService,
     private readonly audit: AuditService,
   ) {}
+
+  private leadershipLimitException(role: UserRole): ConflictException {
+    if (role === UserRole.ORG_ADMIN) {
+      return new ConflictException({
+        code: "STAFFING_ORG_ADMIN_LIMIT",
+        message: "A staffing agency can only have one organization admin",
+      })
+    }
+
+    return new ConflictException({
+      code: "STAFFING_RECRUITMENT_MANAGER_LIMIT",
+      message: "A staffing agency can only have one recruitment manager",
+    })
+  }
+
+  private async assertStaffingLeadershipRoleAvailable(
+    role: UserRole,
+    organizationId: number | null,
+    orgType: OrgType | null,
+    currentUserId?: number,
+  ): Promise<void> {
+    if (
+      !organizationId ||
+      orgType !== OrgType.STAFFING_AGENCY ||
+      ![UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER].includes(role)
+    ) {
+      return
+    }
+
+    const existing = await this.repo.findOne({ where: { organization_id: organizationId, role } })
+
+    if (existing && existing.id !== currentUserId) {
+      throw this.leadershipLimitException(role)
+    }
+  }
+
+  private throwStaffingLeadershipConstraint(error: unknown): void {
+    if (isUniqueConstraintViolation(error, ["UQ_users_staffing_org_admin"])) {
+      throw this.leadershipLimitException(UserRole.ORG_ADMIN)
+    }
+
+    if (isUniqueConstraintViolation(error, ["UQ_users_staffing_recruitment_manager"])) {
+      throw this.leadershipLimitException(UserRole.RECRUITMENT_MANAGER)
+    }
+  }
+
+  private async createManagerTeam(manager: UserEntity): Promise<void> {
+    if (
+      manager.role !== UserRole.TEAM_MANAGER ||
+      manager.org_type !== OrgType.STAFFING_AGENCY ||
+      !manager.organization_id
+    ) {
+      return
+    }
+
+    const suffix = ` (${manager.id})`
+
+    const base = `${manager.full_name?.trim() || manager.email} Team`
+
+    const name = `${base.slice(0, 120 - suffix.length)}${suffix}`
+
+    const team = await this.teams.save(
+      this.teams.create({
+        organization_id: manager.organization_id,
+        name,
+        description: null,
+        manager_id: manager.id,
+        recruitment_manager_id: manager.recruitment_manager_id ?? null,
+        is_active: true,
+      }),
+    )
+
+    manager.team_id = team.id
+    await this.repo.save(manager)
+  }
 
   private async logUserAdminChange(
     actor: UserEntity,
@@ -132,6 +218,8 @@ export class UsersService {
   async update(id: number, dto: UpdateUserDto, requestingUser: UserEntity): Promise<UserEntity> {
     const user = await this.findById(id, requestingUser)
 
+    const previousRole = user.role
+
     // Platform admins and organization admins may change roles. Organization
     // admins remain confined to their own tenant and non-platform roles.
     if (dto.role && ![UserRole.ADMIN, UserRole.ORG_ADMIN].includes(requestingUser.role)) {
@@ -172,9 +260,40 @@ export class UsersService {
       is_active: user.is_active,
     }
 
-    Object.assign(user, dto)
+    const targetOrganizationId =
+      dto.organization_id !== undefined ? dto.organization_id : user.organization_id
 
-    const saved = await this.repo.save(user)
+    const targetOrganization = targetOrganizationId
+      ? await this.organizations.findOne({ where: { id: targetOrganizationId } })
+      : null
+
+    const targetOrgType = (targetOrganization?.org_type ??
+      dto.org_type ??
+      user.org_type) as OrgType | null
+
+    const targetRole = (dto.role ?? user.role) as UserRole
+
+    await this.assertStaffingLeadershipRoleAvailable(
+      targetRole,
+      targetOrganizationId,
+      targetOrgType,
+      user.id,
+    )
+
+    Object.assign(user, dto, { org_type: targetOrganizationId ? targetOrgType : null })
+
+    let saved: UserEntity
+
+    try {
+      saved = await this.repo.save(user)
+    } catch (error) {
+      this.throwStaffingLeadershipConstraint(error)
+      throw error
+    }
+
+    if (previousRole !== UserRole.TEAM_MANAGER && saved.role === UserRole.TEAM_MANAGER) {
+      await this.createManagerTeam(saved)
+    }
 
     await this.logUserAdminChange(requestingUser, saved, "update", {
       before,
@@ -198,8 +317,14 @@ export class UsersService {
     const email = dto.email.toLowerCase().trim()
 
     if (await this.repo.findOne({ where: { email } })) {
-      throw new ConflictException("A user with this email already exists")
+      throw emailAlreadyExistsException()
     }
+
+    await this.assertStaffingLeadershipRoleAvailable(
+      dto.role as UserRole,
+      organizationId,
+      requestingUser.org_type,
+    )
 
     const token = randomBytes(32).toString("hex")
 
@@ -216,7 +341,21 @@ export class UsersService {
       reset_token_expires: new Date(Date.now() + 48 * 60 * 60 * 1000),
     })
 
-    const saved = await this.repo.save(user)
+    let saved: UserEntity
+
+    try {
+      saved = await this.repo.save(user)
+    } catch (error) {
+      if (isUniqueConstraintViolation(error, ["IDX_user_email", "UQ_users_email"])) {
+        throw emailAlreadyExistsException()
+      }
+
+      this.throwStaffingLeadershipConstraint(error)
+
+      throw error
+    }
+
+    await this.createManagerTeam(saved)
 
     await this.emailService.sendStaffInvite({ email, fullName: saved.full_name, token })
     await this.logUserAdminChange(requestingUser, saved, "create", { role: saved.role })
@@ -234,8 +373,18 @@ export class UsersService {
     })
 
     if (existing) {
-      throw new ConflictException("A user with this email already exists")
+      throw emailAlreadyExistsException()
     }
+
+    const organization = dto.organization_id
+      ? await this.organizations.findOne({ where: { id: dto.organization_id } })
+      : null
+
+    await this.assertStaffingLeadershipRoleAvailable(
+      dto.role as UserRole,
+      dto.organization_id ?? null,
+      organization?.org_type ?? null,
+    )
 
     const password_hash = await bcrypt.hash(dto.password, 10)
 
@@ -246,10 +395,25 @@ export class UsersService {
       phone: dto.phone ?? null,
       role: dto.role as any,
       organization_id: dto.organization_id ?? null,
+      org_type: organization?.org_type ?? null,
       is_active: dto.is_active ?? true,
     })
 
-    const saved = await this.repo.save(user)
+    let saved: UserEntity
+
+    try {
+      saved = await this.repo.save(user)
+    } catch (error) {
+      if (isUniqueConstraintViolation(error, ["IDX_user_email", "UQ_users_email"])) {
+        throw emailAlreadyExistsException()
+      }
+
+      this.throwStaffingLeadershipConstraint(error)
+
+      throw error
+    }
+
+    await this.createManagerTeam(saved)
 
     return this.sanitize(saved)
   }

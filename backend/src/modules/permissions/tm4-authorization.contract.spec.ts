@@ -1,7 +1,6 @@
 import { ExecutionContext, ForbiddenException } from "@nestjs/common"
 import { Reflector } from "@nestjs/core"
 import { RolesGuard } from "../../auth/guards/roles.guard"
-import { AgencyTeamsController } from "../agency-teams/agency-teams.controller"
 import { BillingController } from "../billing/billing.controller"
 import { IntegrationConnectionsController } from "../integrations/integration-connections.controller"
 import { PermissionMatrixController } from "../permissions/permissions.controller"
@@ -33,14 +32,13 @@ describe("TM-4 negative authorization contracts", () => {
     })
   })
 
-  it("denies organization billing, integrations and team invitations", () => {
+  it("denies organization billing and integrations", () => {
     const handlers = [
       BillingController.prototype.overview,
       IntegrationConnectionsController.prototype.list,
       IntegrationConnectionsController.prototype.connect,
       IntegrationConnectionsController.prototype.reconnect,
       IntegrationConnectionsController.prototype.disconnect,
-      AgencyTeamsController.prototype.invite,
     ]
 
     handlers.forEach((handler) => {

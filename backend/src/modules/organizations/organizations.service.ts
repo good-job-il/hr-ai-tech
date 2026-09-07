@@ -119,6 +119,7 @@ export class OrganizationsService {
       plan: OrgPlan.TRIAL,
       contact_email: dto.contact_email ?? null,
       logo_url: dto.logo_url ?? null,
+      settings: dto.settings ?? null,
     })
 
     const saved = (await this.repo.save(org)) as unknown as OrganizationEntity

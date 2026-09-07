@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { MapPin, Menu, Shield, UserPlus, X } from "lucide-react"
+import { Building2, MapPin, Menu, Shield, UserPlus, X } from "lucide-react"
 import { useAuth } from "@/lib/AuthContext"
 import { useTranslation } from "react-i18next"
 import { publicWorkflowService } from "@/api/services/publicWorkflowService"
@@ -27,8 +27,6 @@ export default function Navbar() {
 
   const location = useLocation()
 
-  const isHomePage = location.pathname === "/"
-
   useEffect(() => {
     const loadLocation = async () => {
       const today = new Date().toISOString().split("T")[0]
@@ -52,11 +50,7 @@ export default function Navbar() {
 
         const savedCity = localStorage.getItem("selectedCity")
 
-        if (!savedCity && isHomePage) {
-          setShowLocationModal(true)
-        } else {
-          setSelectedCity(savedCity || detectedCity)
-        }
+        setSelectedCity(savedCity || detectedCity)
 
         localStorage.setItem("locationCheckDate", today)
       } catch {
@@ -66,11 +60,7 @@ export default function Navbar() {
 
         const savedCity = localStorage.getItem("selectedCity")
 
-        if (!savedCity && isHomePage) {
-          setShowLocationModal(true)
-        } else {
-          setSelectedCity(savedCity || fallback)
-        }
+        setSelectedCity(savedCity || fallback)
 
         localStorage.setItem("locationCheckDate", today)
       }
@@ -92,14 +82,21 @@ export default function Navbar() {
   const dashboardLink = () => {
     const role = user?.role || user?.user_type || ""
 
+    if (role === "org_admin") {
+      return user?.org_type === "organization"
+        ? "/company/dashboard"
+        : user?.organization_id
+          ? "/agency/dashboard"
+          : "/agency/onboarding"
+    }
+
     const map = {
       recruiter: "/agency/recruiter/dashboard",
       team_manager: "/agency/team/dashboard",
       recruitment_manager: "/agency/dashboard",
-      org_admin: "/agency/dashboard",
       employer: "/employer/dashboard",
       hiring_manager: "/employer/dashboard",
-      candidate: "/candidate/dashboard",
+      candidate: user?.profile_completed ? "/candidate/dashboard" : "/candidate/onboarding",
       admin: "/platform/dashboard",
     }
 
@@ -199,8 +196,17 @@ export default function Navbar() {
               </Link>
 
               <Link
-                to="/register"
-                className="inline-flex h-12 px-7 items-center justify-center rounded-2xl bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white font-bold shadow-[0_16px_35px_rgba(108,77,255,0.28)] hover:scale-[1.02] transition gap-2"
+                to="/register?type=staffing_agency"
+                className="hidden xl:inline-flex h-12 px-5 items-center justify-center rounded-2xl border border-[#C9D8FF] bg-white/70 text-[#6C4DFF] font-bold shadow-sm hover:shadow-md transition gap-2"
+              >
+                <Building2 className="w-5 h-5" />
+
+                {isRtl ? "לחברות השמה" : "For staffing organizations"}
+              </Link>
+
+              <Link
+                to="/register?type=candidate"
+                className="inline-flex h-12 px-5 items-center justify-center rounded-2xl bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white font-bold shadow-[0_16px_35px_rgba(108,77,255,0.28)] hover:scale-[1.02] transition gap-2"
               >
                 <UserPlus className="w-5 h-5" />
 
@@ -271,15 +277,24 @@ export default function Navbar() {
                 </Link>
 
                 <Link
-                  to="/register"
+                  to="/register?type=candidate"
                   className="flex-1 text-center py-3 rounded-xl bg-gradient-to-l from-[#2F80FF] to-[#A855F7] text-white font-bold text-sm"
                   onClick={() => setMobileOpen(false)}
                 >
-                  {t("common.register")}
+                  {isRtl ? "מועמד" : "Candidate"}
                 </Link>
               </>
             )}
           </div>
+          {!user && (
+            <Link
+              to="/register?type=staffing_agency"
+              className="block text-center py-3 rounded-xl border border-[#C9D8FF] text-[#6C4DFF] font-bold text-sm"
+              onClick={() => setMobileOpen(false)}
+            >
+              {isRtl ? "רישום חברת השמה" : "Register a staffing organization"}
+            </Link>
+          )}
 
           <div className="pt-3">
             <LanguageSwitcher variant="badge" />

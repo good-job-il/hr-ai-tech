@@ -40,6 +40,7 @@ import CandidateApplications from "@/pages/candidate/CandidateApplications"
 import CandidateDashboard from "@/pages/candidate/CandidateDashboard"
 import CandidateInterviews from "@/pages/candidate/CandidateInterviews"
 import CandidateMessages from "@/pages/candidate/CandidateMessages"
+import CandidateOnboarding from "@/pages/candidate/CandidateOnboarding"
 import CandidateSavedJobs from "@/pages/candidate/CandidateSavedJobs"
 import CandidateProfile from "@/pages/candidate/CandidateProfile"
 import CompanyAnalyticsPage from "@/pages/company/CompanyAnalyticsPage"
@@ -546,6 +547,18 @@ const AuthenticatedApp = () => {
 
       {/* ── CANDIDATE ───────────────────────────────────────────────── */}
       <Route element={<ProtectedRoute requiredRoles={["candidate"]} />}>
+        <Route path="/candidate/onboarding" element={<CandidateOnboarding />} />
+      </Route>
+
+      <Route
+        element={
+          <ProtectedRoute
+            requiredRoles={["candidate"]}
+            requiredProfileCompleted
+            incompleteProfileRedirect="/candidate/onboarding"
+          />
+        }
+      >
         <Route element={<CandidateLayout />}>
           <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
 

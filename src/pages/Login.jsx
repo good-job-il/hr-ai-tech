@@ -33,7 +33,7 @@ export default function Login() {
       const role = user.role || user.user_type || ""
 
       const redirects = {
-        candidate: "/candidate/dashboard",
+        candidate: user.profile_completed ? "/candidate/dashboard" : "/candidate/onboarding",
         employer: "/employer/dashboard",
         recruiter: "/agency/recruiter/dashboard",
         team_manager: "/agency/team/dashboard",
@@ -44,7 +44,12 @@ export default function Login() {
         // org_admin without an organization yet gets bounced to onboarding
         // automatically by ProtectedRoute; company-type admins go straight
         // to their dashboard.
-        org_admin: user.org_type === "organization" ? "/company/dashboard" : "/agency/dashboard",
+        org_admin:
+          user.org_type === "organization"
+            ? "/company/dashboard"
+            : user.organization_id
+              ? "/agency/dashboard"
+              : "/agency/onboarding",
       }
 
       window.location.href = redirects[role] || "/"

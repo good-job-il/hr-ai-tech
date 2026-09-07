@@ -34,6 +34,28 @@ export class AgencyInvitationEntity extends BaseEntity {
   })
   status: string
 
+  @Column({
+    name: "pending_org_admin_slot",
+    type: "int",
+    nullable: true,
+    asExpression:
+      "CASE WHEN status = 'pending' AND role = 'org_admin' THEN organization_id ELSE NULL END",
+    generatedType: "STORED",
+    select: false,
+  })
+  pending_org_admin_slot: number | null
+
+  @Column({
+    name: "pending_recruitment_manager_slot",
+    type: "int",
+    nullable: true,
+    asExpression:
+      "CASE WHEN status = 'pending' AND role = 'recruitment_manager' THEN organization_id ELSE NULL END",
+    generatedType: "STORED",
+    select: false,
+  })
+  pending_recruitment_manager_slot: number | null
+
   @Column({ name: "invited_by", type: "int" })
   invited_by: number
 

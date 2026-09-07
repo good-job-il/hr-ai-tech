@@ -21,6 +21,16 @@ export default function Register() {
 
   const isRtl = !i18n.language?.startsWith("en")
 
+  const urlParams = new URLSearchParams(window.location.search)
+
+  const registrationType = urlParams.get("type")
+
+  const isCandidateFlow = registrationType === "candidate"
+
+  const isAgencyFlow = registrationType === "staffing_agency"
+
+  const isRoleLocked = isCandidateFlow || isAgencyFlow
+
   const USER_TYPES = [
     {
       id: "candidate",
@@ -54,8 +64,6 @@ export default function Register() {
     },
   ]
 
-  const urlParams = new URLSearchParams(window.location.search)
-
   const phoneFromUrl = urlParams.get("phone") || ""
 
   const inviteToken = urlParams.get("invite") || ""
@@ -74,9 +82,9 @@ export default function Register() {
 
   const [confirmPassword, setConfirmPassword] = useState("")
 
-  const [userType, setUserType] = useState(inviteRole || "candidate")
+  const [userType, setUserType] = useState(inviteRole || (isAgencyFlow ? "org_admin" : "candidate"))
 
-  const [orgType, setOrgType] = useState("")
+  const [orgType, setOrgType] = useState(isAgencyFlow ? "staffing_agency" : "")
 
   const [error, setError] = useState("")
 
@@ -175,7 +183,7 @@ export default function Register() {
       localStorage.setItem("registered_role", userType)
 
       const redirects = {
-        candidate: "/candidate/dashboard",
+        candidate: "/candidate/onboarding",
         employer: "/employer/dashboard",
         recruiter: "/agency/recruiter/dashboard",
         team_manager: "/agency/team/dashboard",
@@ -192,9 +200,11 @@ export default function Register() {
       console.error("[Register] register error:", err)
 
       const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        (isRtl ? "שגיאה בהרשמה" : "Registration error")
+        err?.code === "EMAIL_ALREADY_EXISTS"
+          ? t("errors.emailAlreadyExists")
+          : err?.response?.data?.message ||
+            err?.message ||
+            (isRtl ? "שגיאה בהרשמה" : "Registration error")
 
       showError(msg)
     } finally {
@@ -218,13 +228,23 @@ export default function Register() {
             />
 
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              {isRtl ? "הצטרף לHeadHunter" : "Join HeadHunter"}
+              {isAgencyFlow
+                ? isRtl
+                  ? "רישום חברת השמה"
+                  : "Register your staffing organization"
+                : isRtl
+                  ? "הרשמה כמועמד"
+                  : "Create your candidate account"}
             </h1>
 
             <p className="text-sm text-gray-600">
-              {isRtl
-                ? "אלפי משרות מחכות לך — הרשמה לוקחת פחות מדקה"
-                : "Thousands of jobs await you — registration takes less than a minute"}
+              {isAgencyFlow
+                ? isRtl
+                  ? "צור חשבון מנהל ולאחר מכן נגדיר יחד את סביבת העבודה שלך"
+                  : "Create the admin account, then we’ll set up your recruiting workspace"
+                : isRtl
+                  ? "צור חשבון ולאחר מכן נבנה יחד את הפרופיל המקצועי שלך"
+                  : "Create an account, then we’ll build your professional profile"}
             </p>
           </div>
 
@@ -295,7 +315,7 @@ export default function Register() {
                 </div>
               )}
 
-              {!isFromInvite && (
+              {!isFromInvite && !isRoleLocked && (
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     {isRtl ? "אני מצטרף בתור" : "I am joining as"}
@@ -339,7 +359,7 @@ export default function Register() {
                 </div>
               )}
 
-              {requiresOrg && !isFromInvite && (
+              {requiresOrg && !isFromInvite && !isRoleLocked && (
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     {isRtl ? "סוג הארגון" : "Organization type"}
@@ -384,8 +404,8 @@ export default function Register() {
 
                 <p className="text-xs text-gray-500 mt-1">
                   {isRtl
-                    ? "לפחות 6 תווים — בחר משהו שתזכור"
-                    : "At least 6 characters — choose something you remember"}
+                    ? "לפחות 8 תווים — בחר משהו שתזכור"
+                    : "At least 8 characters — choose something you remember"}
                 </p>
               </div>
 

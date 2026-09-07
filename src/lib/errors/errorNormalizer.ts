@@ -106,11 +106,18 @@ export class ErrorNormalizer {
         })
 
       case 409:
-        return AppError.conflict(data?.message || "Resource already exists", {
-          details: data?.details || data,
-          originalError: error,
-          requestId,
-        })
+        return new AppError(
+          data?.message || "Resource already exists",
+          Object.values(ErrorCode).includes(data?.code as ErrorCode)
+            ? (data.code as ErrorCode)
+            : ErrorCode.CONFLICT,
+          409,
+          {
+            details: data?.details || data,
+            originalError: error,
+            requestId,
+          },
+        )
 
       case 429:
         return AppError.rateLimited(data?.message || "Too many requests", {
@@ -179,6 +186,12 @@ export class ErrorNormalizer {
       [ErrorCode.CONFLICT]: "Resource already exists",
       [ErrorCode.DUPLICATE]: "This resource already exists",
       [ErrorCode.ALREADY_EXISTS]: "Resource already exists",
+      [ErrorCode.EMAIL_ALREADY_EXISTS]: "A user with this email already exists",
+      [ErrorCode.STAFFING_ORG_ADMIN_LIMIT]:
+        "A staffing agency can only have one organization admin",
+      [ErrorCode.STAFFING_RECRUITMENT_MANAGER_LIMIT]:
+        "A staffing agency can only have one recruitment manager",
+      [ErrorCode.TEAM_MANAGER_ALREADY_ASSIGNED]: "A team manager can only be assigned to one team",
       [ErrorCode.INTERNAL_ERROR]: "An error occurred. Please try again",
       [ErrorCode.SERVER_ERROR]: "Server error. Please try again later",
       [ErrorCode.UNHANDLED_ERROR]: "An unexpected error occurred",

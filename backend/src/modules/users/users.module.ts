@@ -6,10 +6,12 @@ import { IntegrationsModule } from "../integrations/integrations.module"
 import { UsersController } from "./users.controller"
 import { PermissionsModule } from "../permissions/permissions.module"
 import { AuditModule } from "../audit/audit.module"
+import { OrganizationEntity } from "../organizations/organization.entity"
+import { AgencyTeamEntity } from "../agency-teams/agency-team.entity"
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, OrganizationEntity, AgencyTeamEntity]),
     IntegrationsModule,
     PermissionsModule,
     AuditModule,

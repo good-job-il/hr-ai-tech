@@ -36,7 +36,7 @@ export interface CreateOrganizationInput {
 export type UpdateOrganizationInput = Partial<CreateOrganizationInput>
 export type OnboardAgencyInput = Pick<
   CreateOrganizationInput,
-  "name" | "contact_email" | "logo_url"
+  "name" | "contact_email" | "logo_url" | "settings"
 >
 
 class OrganizationService extends ResourceService<

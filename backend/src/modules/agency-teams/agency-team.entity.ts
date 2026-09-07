@@ -3,6 +3,7 @@ import { BaseEntity } from "../../common/entities/base.entity"
 
 @Entity("agency_teams")
 @Index(["organization_id", "name"], { unique: true })
+@Index("UQ_agency_team_manager", ["manager_id"], { unique: true })
 export class AgencyTeamEntity extends BaseEntity {
   @Column({ name: "organization_id", type: "int" })
   organization_id: number

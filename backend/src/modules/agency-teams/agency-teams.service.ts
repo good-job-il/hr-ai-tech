@@ -11,6 +11,11 @@ import * as bcrypt from "bcrypt"
 import * as crypto from "crypto"
 import { UserEntity } from "../users/user.entity"
 import { UserRole } from "../../common/enums/user-role.enum"
+import { OrgType } from "../../common/enums/org-type.enum"
+import {
+  emailAlreadyExistsException,
+  isUniqueConstraintViolation,
+} from "../../common/utils/user-email-conflict.utils"
 import { AuditService } from "../audit/audit.service"
 import { AgencyTeamEntity } from "./agency-team.entity"
 import { AgencyInvitationEntity } from "./agency-invitation.entity"
@@ -27,6 +32,19 @@ const AGENCY_ROLES = [
   UserRole.TEAM_MANAGER,
   UserRole.RECRUITER,
 ]
+
+const READABLE_TEAM_ROLES = [
+  UserRole.ORG_ADMIN,
+  UserRole.RECRUITMENT_MANAGER,
+  UserRole.TEAM_MANAGER,
+  UserRole.ADMIN,
+]
+
+const STAFFING_ORG_ADMIN_LIMIT = "STAFFING_ORG_ADMIN_LIMIT"
+
+const STAFFING_RECRUITMENT_MANAGER_LIMIT = "STAFFING_RECRUITMENT_MANAGER_LIMIT"
+
+const TEAM_MANAGER_ALREADY_ASSIGNED = "TEAM_MANAGER_ALREADY_ASSIGNED"
 
 @Injectable()
 export class AgencyTeamsService {
@@ -98,6 +116,10 @@ export class AgencyTeamsService {
   }
 
   async overview(actor: UserEntity) {
+    if (!READABLE_TEAM_ROLES.includes(actor.role)) {
+      throw new ForbiddenException("This role cannot view agency teams")
+    }
+
     const organization_id = this.orgId(actor)
 
     if (actor.role === UserRole.TEAM_MANAGER) {
@@ -161,10 +183,12 @@ export class AgencyTeamsService {
       }),
     ])
 
+    const activeTeams = teams.filter((team) => team.is_active !== false)
+
     const visibleTeams =
       actor.role === UserRole.RECRUITMENT_MANAGER
-        ? teams.filter((team) => team.recruitment_manager_id === actor.id)
-        : teams
+        ? activeTeams.filter((team) => team.recruitment_manager_id === actor.id)
+        : activeTeams
 
     const visibleTeamIds = new Set(visibleTeams.map((team) => team.id))
 
@@ -233,6 +257,13 @@ export class AgencyTeamsService {
 
       return team
     } catch (error: any) {
+      if (isUniqueConstraintViolation(error, ["UQ_agency_team_manager"])) {
+        throw new ConflictException({
+          code: TEAM_MANAGER_ALREADY_ASSIGNED,
+          message: "A team manager can only be assigned to one team",
+        })
+      }
+
       if (error?.code === "ER_DUP_ENTRY") {
         throw new ConflictException("A team with this name already exists")
       }
@@ -253,12 +284,25 @@ export class AgencyTeamsService {
     const previousManagerId = team.manager_id
 
     if (dto.manager_id) {
-      await this.assertAssignableManager(dto.manager_id, actor)
+      await this.assertAssignableManager(dto.manager_id, actor, team.id)
     }
 
     Object.assign(team, dto)
 
-    const saved = await this.teams.save(team)
+    let saved: AgencyTeamEntity
+
+    try {
+      saved = await this.teams.save(team)
+    } catch (error) {
+      if (isUniqueConstraintViolation(error, ["UQ_agency_team_manager"])) {
+        throw new ConflictException({
+          code: TEAM_MANAGER_ALREADY_ASSIGNED,
+          message: "A team manager can only be assigned to one team",
+        })
+      }
+
+      throw error
+    }
 
     if (previousManagerId && previousManagerId !== saved.manager_id) {
       await this.users.update(previousManagerId, { team_id: null })
@@ -309,7 +353,7 @@ export class AgencyTeamsService {
     const email = dto.email.toLowerCase()
 
     if (await this.users.findOne({ where: { email } })) {
-      throw new ConflictException("A user with this email already exists")
+      throw emailAlreadyExistsException()
     }
 
     const pending = await this.invitations.findOne({
@@ -321,6 +365,13 @@ export class AgencyTeamsService {
     }
 
     const payload = await this.normalizeInvitation(dto, actor)
+
+    await this.assertLeadershipRoleAvailable(
+      payload.role as UserRole,
+      organization_id,
+      undefined,
+      true,
+    )
 
     const token = crypto.randomBytes(32).toString("hex")
 
@@ -336,7 +387,14 @@ export class AgencyTeamsService {
       expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
 
-    const invitation = await this.invitations.save(record)
+    let invitation: AgencyInvitationEntity
+
+    try {
+      invitation = await this.invitations.save(record)
+    } catch (error) {
+      this.throwLeadershipConstraintConflict(error)
+      throw error
+    }
 
     await this.log(actor, "AgencyInvitation", invitation.id, "create", {
       email,
@@ -394,24 +452,52 @@ export class AgencyTeamsService {
     }
 
     if (await this.users.findOne({ where: { email: invitation.email } })) {
-      throw new ConflictException("A user with this email already exists")
+      throw emailAlreadyExistsException()
     }
 
-    const user = await this.users.save(
-      this.users.create({
-        email: invitation.email,
-        full_name: invitation.full_name,
-        phone: invitation.phone,
-        role: invitation.role,
-        organization_id: invitation.organization_id,
-        team_id: invitation.team_id,
-        password_hash: await bcrypt.hash(password, 12),
-        is_active: true,
-        recruitment_manager_id: await this.invitationRecruitmentManagerId(invitation),
-        team_manager_id:
-          invitation.role === UserRole.RECRUITER ? await this.managerId(invitation.team_id) : null,
-      }),
+    await this.assertLeadershipRoleAvailable(
+      invitation.role,
+      invitation.organization_id,
+      undefined,
+      false,
     )
+
+    const recruitmentManagerId = await this.invitationRecruitmentManagerId(invitation)
+
+    let user: UserEntity
+
+    try {
+      user = await this.users.save(
+        this.users.create({
+          email: invitation.email,
+          full_name: invitation.full_name,
+          phone: invitation.phone,
+          role: invitation.role,
+          organization_id: invitation.organization_id,
+          org_type: OrgType.STAFFING_AGENCY,
+          team_id: invitation.role === UserRole.TEAM_MANAGER ? null : invitation.team_id,
+          password_hash: await bcrypt.hash(password, 12),
+          is_active: true,
+          recruitment_manager_id: recruitmentManagerId,
+          team_manager_id:
+            invitation.role === UserRole.RECRUITER
+              ? await this.managerId(invitation.team_id)
+              : null,
+        }),
+      )
+    } catch (error) {
+      if (isUniqueConstraintViolation(error, ["IDX_user_email", "UQ_users_email"])) {
+        throw emailAlreadyExistsException()
+      }
+
+      this.throwLeadershipConstraintConflict(error)
+
+      throw error
+    }
+
+    if (user.role === UserRole.TEAM_MANAGER) {
+      await this.createManagerTeam(user)
+    }
 
     invitation.status = "accepted"
     invitation.accepted_at = new Date()
@@ -426,6 +512,7 @@ export class AgencyTeamsService {
     const member = await this.assertManageableMember(id, actor)
 
     if (
+      !this.isOrganizationAdmin(actor) &&
       member.id === actor.id &&
       (dto.role !== undefined || dto.team_id !== undefined || dto.is_active !== undefined)
     ) {
@@ -433,6 +520,24 @@ export class AgencyTeamsService {
     }
 
     this.validateMemberUpdate(member, dto, actor)
+
+    const nextRole = (dto.role ?? member.role) as UserRole
+
+    if (nextRole !== member.role) {
+      await this.assertLeadershipRoleAvailable(nextRole, this.orgId(actor), member.id, false)
+    }
+
+    if (
+      member.role === UserRole.TEAM_MANAGER &&
+      dto.team_id !== undefined &&
+      dto.team_id !== member.team_id
+    ) {
+      throw new BadRequestException("A team manager can only belong to their managed team")
+    }
+
+    if (member.role !== UserRole.TEAM_MANAGER && nextRole === UserRole.TEAM_MANAGER) {
+      dto.team_id = null
+    }
 
     if (member.id === actor.id && dto.is_active === false) {
       throw new BadRequestException("You cannot deactivate your own account")
@@ -480,7 +585,18 @@ export class AgencyTeamsService {
           : member.team_manager_id,
     })
 
-    const saved = await this.users.save(member)
+    let saved: UserEntity
+
+    try {
+      saved = await this.users.save(member)
+    } catch (error) {
+      this.throwLeadershipConstraintConflict(error)
+      throw error
+    }
+
+    if (before.role !== UserRole.TEAM_MANAGER && saved.role === UserRole.TEAM_MANAGER) {
+      await this.createManagerTeam(saved)
+    }
 
     await this.log(actor, "User", saved.id, dto.is_active === false ? "deactivate" : "update", {
       before,
@@ -602,7 +718,7 @@ export class AgencyTeamsService {
     }
   }
 
-  private async assertAssignableManager(id: number, actor: UserEntity) {
+  private async assertAssignableManager(id: number, actor: UserEntity, currentTeamId?: number) {
     const manager = await this.assertMember(id, actor, [UserRole.TEAM_MANAGER])
 
     if (
@@ -610,6 +726,17 @@ export class AgencyTeamsService {
       manager.recruitment_manager_id !== actor.id
     ) {
       throw new NotFoundException(`Organization member ${id} not found`)
+    }
+
+    const assignedTeam = await this.teams.findOne({
+      where: { organization_id: this.orgId(actor), manager_id: id },
+    })
+
+    if (assignedTeam && assignedTeam.id !== currentTeamId) {
+      throw new ConflictException({
+        code: TEAM_MANAGER_ALREADY_ASSIGNED,
+        message: "A team manager can only be assigned to one team",
+      })
     }
 
     return manager
@@ -635,11 +762,113 @@ export class AgencyTeamsService {
       )
     }
 
+    if (dto.role === UserRole.TEAM_MANAGER) {
+      return { ...dto, team_id: null }
+    }
+
     if (dto.team_id) {
       await this.scopedTeam(dto.team_id, actor)
     }
 
     return dto
+  }
+
+  private async assertLeadershipRoleAvailable(
+    role: UserRole,
+    organizationId: number,
+    currentUserId?: number,
+    includePending = false,
+  ) {
+    if (![UserRole.ORG_ADMIN, UserRole.RECRUITMENT_MANAGER].includes(role)) {
+      return
+    }
+
+    const existing = await this.users.findOne({
+      where: { organization_id: organizationId, role },
+    })
+
+    if (existing && existing.id !== currentUserId) {
+      throw this.leadershipLimitException(role)
+    }
+
+    if (includePending) {
+      const pending = await this.invitations.findOne({
+        where: { organization_id: organizationId, role, status: "pending" },
+      })
+
+      if (pending) {
+        throw this.leadershipLimitException(role)
+      }
+    }
+  }
+
+  private leadershipLimitException(role: UserRole) {
+    if (role === UserRole.ORG_ADMIN) {
+      return new ConflictException({
+        code: STAFFING_ORG_ADMIN_LIMIT,
+        message: "A staffing agency can only have one organization admin",
+      })
+    }
+
+    return new ConflictException({
+      code: STAFFING_RECRUITMENT_MANAGER_LIMIT,
+      message: "A staffing agency can only have one recruitment manager",
+    })
+  }
+
+  private throwLeadershipConstraintConflict(error: unknown): void {
+    if (
+      isUniqueConstraintViolation(error, [
+        "UQ_users_staffing_org_admin",
+        "UQ_invitation_pending_org_admin",
+      ])
+    ) {
+      throw this.leadershipLimitException(UserRole.ORG_ADMIN)
+    }
+
+    if (
+      isUniqueConstraintViolation(error, [
+        "UQ_users_staffing_recruitment_manager",
+        "UQ_invitation_pending_recruitment_manager",
+      ])
+    ) {
+      throw this.leadershipLimitException(UserRole.RECRUITMENT_MANAGER)
+    }
+  }
+
+  private async createManagerTeam(manager: UserEntity) {
+    const suffix = ` (${manager.id})`
+
+    const base = `${manager.full_name?.trim() || manager.email} Team`
+
+    const name = `${base.slice(0, 120 - suffix.length)}${suffix}`
+
+    let team: AgencyTeamEntity
+
+    try {
+      team = await this.teams.save(
+        this.teams.create({
+          organization_id: manager.organization_id,
+          name,
+          description: null,
+          manager_id: manager.id,
+          recruitment_manager_id: manager.recruitment_manager_id,
+          is_active: true,
+        }),
+      )
+    } catch (error) {
+      if (isUniqueConstraintViolation(error, ["UQ_agency_team_manager"])) {
+        throw new ConflictException({
+          code: TEAM_MANAGER_ALREADY_ASSIGNED,
+          message: "A team manager can only be assigned to one team",
+        })
+      }
+
+      throw error
+    }
+
+    manager.team_id = team.id
+    await this.users.save(manager)
   }
 
   private async scopedInvitation(id: number, actor: UserEntity) {

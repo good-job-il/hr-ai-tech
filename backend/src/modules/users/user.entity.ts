@@ -5,11 +5,11 @@ import { UserRole } from "../../common/enums/user-role.enum"
 import { OrgType } from "../../common/enums/org-type.enum"
 
 @Entity("users")
-@Index(["email"], { unique: true })
+@Index("IDX_user_email", ["email"], { unique: true })
 @Index(["organization_id"])
 @Index(["role"])
 export class UserEntity extends BaseEntity {
-  @Column({ type: "varchar", length: 255, unique: true })
+  @Column({ type: "varchar", length: 255 })
   email: string
 
   @Column({ name: "password_hash", type: "varchar", length: 255 })
@@ -44,6 +44,28 @@ export class UserEntity extends BaseEntity {
     nullable: true,
   })
   org_type: OrgType | null
+
+  @Column({
+    name: "staffing_org_admin_slot",
+    type: "int",
+    nullable: true,
+    asExpression:
+      "CASE WHEN org_type = 'staffing_agency' AND role = 'org_admin' THEN organization_id ELSE NULL END",
+    generatedType: "STORED",
+    select: false,
+  })
+  staffing_org_admin_slot: number | null
+
+  @Column({
+    name: "staffing_recruitment_manager_slot",
+    type: "int",
+    nullable: true,
+    asExpression:
+      "CASE WHEN org_type = 'staffing_agency' AND role = 'recruitment_manager' THEN organization_id ELSE NULL END",
+    generatedType: "STORED",
+    select: false,
+  })
+  staffing_recruitment_manager_slot: number | null
 
   @Column({ type: "varchar", length: 50, nullable: true })
   phone: string | null
@@ -84,6 +106,9 @@ export class UserEntity extends BaseEntity {
 
   @Column({ name: "is_active", type: "boolean", default: true })
   is_active: boolean
+
+  @Column({ name: "profile_completed", type: "boolean", default: false })
+  profile_completed: boolean
 
   @Column({ name: "last_login", type: "datetime", nullable: true })
   last_login: Date | null

@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/AuthContext"
  * candidate → /candidate/dashboard
  * org_admin with no organization yet → /agency/onboarding
  */
-function getRoleHome(role, orgType, hasOrganization, intendedOrgType) {
+function getRoleHome(role, orgType, hasOrganization, intendedOrgType, profileCompleted) {
   // Platform operators
   if (role === "admin") {
     return "/platform/dashboard"
@@ -16,7 +16,7 @@ function getRoleHome(role, orgType, hasOrganization, intendedOrgType) {
 
   // Candidate
   if (role === "candidate") {
-    return "/candidate/dashboard"
+    return profileCompleted ? "/candidate/dashboard" : "/candidate/onboarding"
   }
 
   // org_admin who hasn't created their organization yet — onboard first.
@@ -77,7 +77,7 @@ export default function RoleFallback() {
   if (user) {
     const role = user.role || user.user_type
 
-    const home = getRoleHome(role, orgType, !!organization, intendedOrgType)
+    const home = getRoleHome(role, orgType, !!organization, intendedOrgType, user.profile_completed)
 
     return <Navigate to={home} replace />
   }

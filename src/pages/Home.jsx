@@ -445,22 +445,64 @@ function HeroSection() {
   const dashboardLink = () => {
     const role = user?.role || user?.user_type || ""
 
+    if (role === "org_admin") {
+      return user?.org_type === "organization"
+        ? "/company/dashboard"
+        : user?.organization_id
+          ? "/agency/dashboard"
+          : "/agency/onboarding"
+    }
+
     const map = {
       recruiter: "/agency/recruiter/dashboard",
       team_manager: "/agency/team/dashboard",
       recruitment_manager: "/agency/dashboard",
-      org_admin: "/agency/dashboard",
       employer: "/employer/dashboard",
       hiring_manager: "/employer/dashboard",
-      candidate: "/candidate/dashboard",
+      candidate: user?.profile_completed ? "/candidate/dashboard" : "/candidate/onboarding",
       admin: "/platform/dashboard",
     }
 
     return map[role] || "/"
   }
 
+  const choices = [
+    {
+      icon: UserPlus,
+      eyebrow: isRtl ? "למחפשי עבודה" : "For job seekers",
+      title: isRtl ? "אני מחפש עבודה" : "I’m looking for a job",
+      description: isRtl
+        ? "בנה פרופיל מקצועי, קבל התאמות אישיות ועקוב אחר כל המועמדויות במקום אחד."
+        : "Build your professional profile, get personal matches and track every application in one place.",
+      benefits: isRtl
+        ? ["התאמות משרות חכמות", "שדרוג קורות חיים עם AI", "מעקב אחר מועמדויות וראיונות"]
+        : ["Smart job matching", "AI-powered resume support", "Application and interview tracking"],
+      cta: isRtl ? "הרשמה כמועמד" : "Register as a candidate",
+      to: "/register?type=candidate",
+      accent: "from-[#2F80FF] to-[#6C4DFF]",
+    },
+    {
+      icon: Building2,
+      eyebrow: isRtl ? "לחברות השמה וכוח אדם" : "For staffing organizations",
+      title: isRtl ? "אני מייצג חברת השמה" : "I represent a staffing organization",
+      description: isRtl
+        ? "נהל לקוחות, משרות, מועמדים וצוותי גיוס עם סביבת עבודה אחת מסודרת."
+        : "Manage clients, jobs, candidates and recruiting teams in one organized workspace.",
+      benefits: isRtl
+        ? ["CRM ופייפליין גיוס", "התאמת מועמדים עם AI", "צוותים, הרשאות ודוחות"]
+        : [
+            "Recruiting CRM and pipeline",
+            "AI candidate matching",
+            "Teams, permissions and reports",
+          ],
+      cta: isRtl ? "רישום חברת השמה" : "Register a staffing organization",
+      to: "/register?type=staffing_agency",
+      accent: "from-[#7C3AED] to-[#EC4899]",
+    },
+  ]
+
   return (
-    <section className="relative overflow-hidden bg-[#F7FBFF]" style={{ minHeight: 820 }}>
+    <section className="relative overflow-hidden bg-[#F7FBFF]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(139,92,246,0.18),transparent_28%),radial-gradient(circle_at_78%_18%,rgba(47,128,255,0.18),transparent_32%),linear-gradient(180deg,#F8FCFF_0%,#EEF8FF_100%)]" />
 
       <div className="absolute left-20 top-32 w-72 h-72 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#2FB8FF] opacity-20 blur-3xl" />
@@ -468,11 +510,10 @@ function HeroSection() {
       <div className="absolute right-28 bottom-24 w-80 h-80 rounded-full bg-[#2FB8FF]/20 blur-3xl" />
 
       <div
-        className="relative max-w-[1500px] mx-auto px-8 py-16 grid grid-cols-1 lg:grid-cols-[35%_30%_35%] gap-10 items-center"
-        style={{ minHeight: 820 }}
+        className="relative max-w-[1320px] mx-auto px-5 sm:px-8 py-16 lg:py-20"
         dir={isRtl ? "rtl" : "ltr"}
       >
-        <div className={isRtl ? "text-right lg:order-1" : "text-left lg:order-1"}>
+        <div className="mx-auto max-w-4xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#D8E4FF] bg-white/75 backdrop-blur-xl px-5 py-2.5 text-[#6C4DFF] font-bold shadow-sm mb-8">
             <Sparkles className="w-4 h-4" />
 
@@ -481,97 +522,103 @@ function HeroSection() {
               : "Israel's Leading AI Recruitment Platform"}
           </div>
 
-          <h1 className="text-[76px] leading-[0.98] font-black tracking-tight text-[#0F172A] mb-8">
-            {isRtl ? (
-              <>
-                הקריירה שלך
-                <br />
-                <span className={gradientText}>מתחילה כאן.</span>
-              </>
-            ) : (
-              <>
-                Your career
-                <br />
-                <span className={gradientText}>starts here.</span>
-              </>
-            )}
+          <h1 className="text-4xl sm:text-6xl lg:text-[72px] leading-[1.02] font-black tracking-tight text-[#0F172A] mb-7">
+            {isRtl ? "העבודה הבאה או צוות הגיוס הבא שלך" : "Your next job or your next great hire"}
+            <span className={`${gradientText} block mt-2`}>
+              {isRtl ? "מתחילים כאן." : "starts here."}
+            </span>
           </h1>
 
-          <p className="text-[23px] leading-9 text-[#475569] max-w-[620px] mb-10">
+          <p className="text-lg sm:text-xl leading-8 text-[#475569] max-w-3xl mx-auto mb-11">
             {isRtl
-              ? "משרות איכותיות, התאמה אישית, תהליך פשוט ומהיר — כל מה שאתה צריך כדי למצוא את העבודה הבאה שלך."
-              : "Quality jobs, personalized matching, and a fast simple process — everything you need to find your next job."}
+              ? "HeadHunter מחברת בין מועמדים איכותיים לחברות השמה באמצעות התאמה חכמה ותהליך גיוס פשוט וברור."
+              : "HeadHunter connects talented candidates with staffing organizations through smart matching and a clear recruiting process."}
           </p>
+        </div>
 
-          <div className="flex flex-wrap gap-5 mb-10">
-            <Link
-              to="/jobs"
-              className="h-16 px-11 rounded-2xl bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white font-extrabold text-lg shadow-[0_20px_45px_rgba(108,77,255,0.30)] inline-flex items-center justify-center hover:scale-[1.02] transition"
-            >
-              <Search className="w-5 h-5 mr-3" />
-
-              {t("jobs.searchButton")}
-            </Link>
-
-            {isAuthenticated && user ? (
-              <Link
-                to={dashboardLink()}
-                className="h-16 px-11 rounded-2xl bg-white/85 border border-[#C9D8FF] text-[#6C4DFF] font-extrabold text-lg shadow-[0_20px_45px_rgba(79,124,255,0.10)] inline-flex items-center justify-center hover:scale-[1.02] transition"
-              >
-                <Rocket className="w-5 h-5 mr-3" />
-
-                {t("common.dashboard")}
-              </Link>
-            ) : (
-              <Link
-                to="/register"
-                className="h-16 px-11 rounded-2xl bg-white/85 border border-[#C9D8FF] text-[#6C4DFF] font-extrabold text-lg shadow-[0_20px_45px_rgba(79,124,255,0.10)] inline-flex items-center justify-center hover:scale-[1.02] transition"
-              >
-                <UserPlus className="w-5 h-5 mr-3" />
-
-                {isRtl ? "הרשמה כמועמד חדש" : "Register as Candidate"}
-              </Link>
-            )}
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="flex -space-x-3">
-              {["👩🏻", "👨🏽", "👩🏼", "👨🏻"].map((a, i) => (
-                <div
-                  key={i}
-                  className="w-12 h-12 rounded-full bg-white border-4 border-white shadow-md flex items-center justify-center text-xl"
-                >
-                  {a}
-                </div>
-              ))}
-
-              <div className="w-12 h-12 rounded-full bg-white border-4 border-white shadow-md flex items-center justify-center text-[#6C4DFF] font-black">
-                +
-              </div>
-            </div>
-
-            <p className="text-[#64748B] font-semibold">
+        {isAuthenticated && user ? (
+          <div className={`${glassCard} mx-auto max-w-2xl p-8 text-center`}>
+            <h2 className="text-2xl font-black text-[#0F172A] mb-3">
               {isRtl
-                ? "אלפי מועמדים כבר מצאו את המקום שלהם"
-                : "Thousands of candidates have already found their place"}
+                ? `ברוך הבא, ${user.full_name || ""}`
+                : `Welcome back, ${user.full_name || ""}`}
+            </h2>
+            <p className="text-[#64748B] mb-6">
+              {isRtl ? "המשך בדיוק מהמקום שבו עצרת." : "Continue exactly where you left off."}
             </p>
+            <Link
+              to={dashboardLink()}
+              className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-l from-[#2F80FF] to-[#7C3AED] px-9 text-lg font-extrabold text-white shadow-lg"
+            >
+              <Rocket className="h-5 w-5" /> {t("common.dashboard")}
+            </Link>
           </div>
-        </div>
-
-        <div className="lg:order-2 flex justify-center">
-          <AIOrb />
-        </div>
-
-        <div className="lg:order-3 flex justify-center">
-          <CandidateCard />
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+            {choices.map((choice) => (
+              <article
+                key={choice.to}
+                className={`${glassCard} group relative overflow-hidden p-7 sm:p-9 transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_90px_rgba(79,124,255,0.18)]`}
+              >
+                <div
+                  className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${choice.accent}`}
+                />
+                <div className="mb-6 flex items-center gap-4">
+                  <div
+                    className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${choice.accent} text-white shadow-lg`}
+                  >
+                    <choice.icon className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold uppercase tracking-[0.12em] text-[#6C4DFF]">
+                      {choice.eyebrow}
+                    </p>
+                    <h2 className="mt-1 text-2xl sm:text-3xl font-black text-[#0F172A]">
+                      {choice.title}
+                    </h2>
+                  </div>
+                </div>
+                <p className="mb-6 text-base sm:text-lg leading-7 text-[#526177]">
+                  {choice.description}
+                </p>
+                <ul className="mb-8 space-y-3">
+                  {choice.benefits.map((benefit) => (
+                    <li
+                      key={benefit}
+                      className="flex items-center gap-3 font-semibold text-[#334155]"
+                    >
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50 text-sm font-black text-emerald-600">
+                        ✓
+                      </span>
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to={choice.to}
+                  className={`flex min-h-14 w-full items-center justify-center rounded-2xl bg-gradient-to-r ${choice.accent} px-5 py-4 text-center text-base font-extrabold text-white shadow-lg transition group-hover:scale-[1.01]`}
+                >
+                  {choice.cta}
+                </Link>
+                {choice.to.includes("candidate") && (
+                  <Link
+                    to="/jobs"
+                    className="mt-4 flex justify-center font-bold text-[#5B4FEA] hover:underline"
+                  >
+                    {isRtl ? "צפייה במשרות לפני ההרשמה" : "Browse jobs before registering"}
+                  </Link>
+                )}
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )
 }
 
 function WhySection() {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
 
   const isRtl = !i18n.language?.startsWith("en")
 
@@ -660,6 +707,70 @@ function WhySection() {
 
               <p className="text-[#64748B] leading-7">{item.text}</p>
             </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function StaffingSection() {
+  const { i18n } = useTranslation()
+
+  const isRtl = !i18n.language?.startsWith("en")
+
+  const items = [
+    [
+      Users,
+      isRtl ? "CRM מועמדים ולקוחות" : "Candidate and client CRM",
+      isRtl
+        ? "כל המידע, הפעילות והתקשורת נשארים בהקשר אחד."
+        : "Keep profiles, activity and client context together.",
+    ],
+    [
+      Target,
+      isRtl ? "פייפליין והתאמות AI" : "Pipeline and AI matching",
+      isRtl
+        ? "נהל שלבים והתאם מועמדים למשרות בצורה מהירה ומדויקת."
+        : "Move candidates through stages and match them to the right roles.",
+    ],
+    [
+      ShieldCheck,
+      isRtl ? "תפקידים והרשאות" : "Roles and permissions",
+      isRtl
+        ? "סביבת עבודה ברורה למנהלים, ראשי צוותים ומגייסים."
+        : "A clear workspace for managers, team leads and recruiters.",
+    ],
+  ]
+
+  return (
+    <section className="bg-[#071124] py-20 text-white">
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-8" dir={isRtl ? "rtl" : "ltr"}>
+        <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <p className="mb-3 font-bold text-cyan-300">
+              {isRtl ? "לחברות השמה" : "For staffing organizations"}
+            </p>
+            <h2 className="text-4xl font-black sm:text-5xl">
+              {isRtl
+                ? "כל תהליך הגיוס בסביבת עבודה אחת"
+                : "Your entire recruiting operation in one workspace"}
+            </h2>
+          </div>
+          <Link
+            to="/register?type=staffing_agency"
+            className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-white px-7 font-black text-violet-700 shadow-xl"
+          >
+            {isRtl ? "הקמת חברת השמה" : "Set up your organization"}
+          </Link>
+        </div>
+        <div className="grid gap-5 md:grid-cols-3">
+          {items.map(([Icon, title, text]) => (
+            <article key={title} className="rounded-3xl border border-white/10 bg-white/[0.07] p-7">
+              <Icon className="mb-5 h-9 w-9 text-cyan-300" />
+              <h3 className="text-xl font-black">{title}</h3>
+              <p className="mt-3 leading-7 text-white/65">{text}</p>
+            </article>
           ))}
         </div>
       </div>
@@ -773,7 +884,7 @@ function SearchSection() {
 }
 
 function AICenter() {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
 
   const isRtl = !i18n.language?.startsWith("en")
 
@@ -988,24 +1099,30 @@ function CTASection() {
         <div className="rounded-lg bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] p-12 text-white shadow-[0_30px_90px_rgba(108,77,255,0.28)] flex flex-col lg:flex-row items-center justify-between gap-8">
           <div>
             <h2 style={{ fontSize: 48, fontWeight: 900, lineHeight: 1.1, marginBottom: 12 }}>
-              {isRtl
-                ? "מוכן לעשות את הצעד הבא בקריירה שלך?"
-                : "Ready to take the next step in your career?"}
+              {isRtl ? "מוכן להתחיל?" : "Ready to get started?"}
             </h2>
 
             <p className="text-white/80 text-lg">
               {isRtl
-                ? "הצטרף עכשיו לאלפי מועמדים שמצאו את העבודה המשתלמת דרך HeadHunter."
-                : "Join thousands of candidates who found their dream job through HeadHunter."}
+                ? "בחר את המסלול שמתאים לך והשלם את ההגדרה בכמה צעדים ברורים."
+                : "Choose the path that fits you and complete setup in a few clear steps."}
             </p>
           </div>
 
-          <Link
-            to="/register"
-            className="h-16 px-10 rounded-2xl bg-white text-[#6C4DFF] font-black inline-flex items-center shadow-xl whitespace-nowrap"
-          >
-            {isRtl ? "הרשמה כמועמד חדש" : "Register as Candidate"}
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link
+              to="/register?type=candidate"
+              className="flex h-16 items-center justify-center whitespace-nowrap rounded-2xl bg-white px-8 font-black text-[#6C4DFF] shadow-xl"
+            >
+              {isRtl ? "הרשמה כמועמד" : "Register as a candidate"}
+            </Link>
+            <Link
+              to="/register?type=staffing_agency"
+              className="flex h-16 items-center justify-center whitespace-nowrap rounded-2xl border border-white/40 bg-white/10 px-8 font-black text-white"
+            >
+              {isRtl ? "רישום חברת השמה" : "Register an organization"}
+            </Link>
+          </div>
         </div>
       </div>
     </section>
@@ -1078,6 +1195,8 @@ function HomeFooter() {
   )
 }
 
+const _legacyHomepageVisuals = [CandidateCard, AIOrb, StatsSection]
+
 export default function Home() {
   const { i18n } = useTranslation()
 
@@ -1110,11 +1229,11 @@ export default function Home() {
 
       <WhySection />
 
+      <StaffingSection />
+
       <SearchSection />
 
       <AICenter />
-
-      <StatsSection />
 
       <HowItWorks />
 

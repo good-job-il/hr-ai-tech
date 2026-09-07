@@ -1,6 +1,5 @@
 import {
   Injectable,
-  ConflictException,
   UnauthorizedException,
   NotFoundException,
   BadRequestException,
@@ -19,6 +18,10 @@ import { AuditService } from "../modules/audit/audit.service"
 import { RegisterDto } from "./dto/auth.dto"
 import { JwtPayload } from "./strategies/jwt.strategy"
 import { EmailService } from "../modules/integrations/services/email.service"
+import {
+  emailAlreadyExistsException,
+  isUniqueConstraintViolation,
+} from "../common/utils/user-email-conflict.utils"
 
 export interface AuthTokens {
   access_token: string
@@ -89,7 +92,7 @@ export class AuthService {
     })
 
     if (existing) {
-      throw new ConflictException("An account with this email already exists")
+      throw emailAlreadyExistsException()
     }
 
     const password_hash = await bcrypt.hash(dto.password, this.SALT_ROUNDS)
@@ -107,7 +110,17 @@ export class AuthService {
       last_login: new Date(),
     })
 
-    const saved = await this.userRepository.save(user)
+    let saved: UserEntity
+
+    try {
+      saved = await this.userRepository.save(user)
+    } catch (error) {
+      if (isUniqueConstraintViolation(error, ["IDX_user_email", "UQ_users_email"])) {
+        throw emailAlreadyExistsException()
+      }
+
+      throw error
+    }
 
     const tokens = await this.generateTokens(saved)
 
@@ -142,6 +155,7 @@ export class AuthService {
       "display_role_name",
       "last_login",
       "org_type",
+      "profile_completed",
       "is_active",
       "company_culture",
       "benefits",

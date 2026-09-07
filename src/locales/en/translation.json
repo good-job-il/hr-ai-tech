@@ -1080,6 +1080,7 @@
     "sessionExpired": "Your session has expired. Please log in again.",
     "formValidation": "Please fix the errors in the form.",
     "emailInvalid": "Invalid email address",
+    "emailAlreadyExists": "A user with this email already exists",
     "passwordTooShort": "Password must be at least 8 characters",
     "passwordMismatch": "Passwords do not match",
     "required": "This field is required",
@@ -1190,6 +1191,11 @@
     "emptyTeams": "No teams yet. Create the first team to assign managers and recruiters.",
     "emptyInvites": "No invitations yet",
     "errorTitle": "Could not load organization teams",
+    "errors": {
+      "orgAdminLimit": "A staffing agency can only have one organization admin.",
+      "recruitmentManagerLimit": "A staffing agency can only have one recruitment manager.",
+      "teamManagerAlreadyAssigned": "A team manager can only be assigned to one team."
+    },
     "tabs": {
       "members": "Members",
       "teams": "Teams",
@@ -1225,18 +1231,26 @@
       "hint": "The invitation expires after 7 days. Its secure link is shown once and copied after creation.",
       "send": "Create invitation",
       "copied": "Invitation link copied",
-      "linkReady": "Invitation created"
+      "linkReady": "Invitation created",
+      "teamManagerTeamHint": "A new team will be created automatically when this Team Manager accepts the invitation."
     },
     "teamModal": {
       "title": "Create team",
+      "editTitle": "Edit team",
       "name": "Team name",
       "description": "Description",
       "manager": "Team manager",
-      "created": "Team created"
+      "created": "Team created",
+      "saved": "Team updated",
+      "deleted": "Team deleted",
+      "actionsFor": "Actions for {{name}}",
+      "deleteTitle": "Delete team",
+      "deleteConfirm": "Delete {{name}}? Its members will be unassigned and the team history will be retained."
     },
     "memberModal": {
       "title": "Edit {{name}}",
-      "saved": "Member updated"
+      "saved": "Member updated",
+      "teamManagerTeamHint": "A Team Manager is permanently linked to their own managed team."
     },
     "memberActions": {
       "actions": "Actions",
