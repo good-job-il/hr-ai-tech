@@ -675,7 +675,7 @@ export default function OrganizationsPage() {
 }
 import { Link } from "react-router-dom"
 import { Plus, MoreVertical, ExternalLink } from "lucide-react"
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import {
   PlatformCard,
   PlatformEmptyState,

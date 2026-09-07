@@ -803,7 +803,7 @@ export default function UsersManagementPage() {
   )
 }
 import { Plus, SlidersHorizontal, X } from "lucide-react"
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import {
   PlatformCard,
   PlatformEmptyState,
