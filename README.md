@@ -32,6 +32,10 @@ Import this repository into Vercel and use the Vite defaults:
 - Output directory: `dist`
 - Install command: `npm ci`
 
+The checked-in `vercel.json` rewrites application routes such as `/login` to
+`index.html`, allowing React Router to handle direct navigation and page
+refreshes without a Vercel 404.
+
 Set `VITE_API_BASE_URL` for Production and Preview to the public API URL,
 including the `/api` prefix:
 
