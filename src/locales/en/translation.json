@@ -1804,6 +1804,21 @@
     "navigatePrompt": "Navigate through the candidates list",
     "loadingError": "Error loading data",
     "tryAgain": "Try again",
+    "editCandidate": {
+      "title": "Edit candidate",
+      "subtitle": "Update the candidate's contact and professional details.",
+      "languages": "Languages",
+      "languagesPlaceholder": "Hebrew, English",
+      "salaryMin": "Minimum desired salary (₪)",
+      "salaryMax": "Maximum desired salary (₪)",
+      "salaryRangeError": "Maximum salary must be greater than or equal to minimum salary.",
+      "summary": "Professional summary",
+      "summaryPlaceholder": "Briefly describe the candidate's background and strengths",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "success": "{{name}} was updated successfully",
+      "error": "Unable to update the candidate. Please try again."
+    },
     "overview": {
       "summary": "Summary",
       "previousCompanies": "Previous Companies",

@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/AuthContext"
 import { candidateService } from "@/api/services/candidateService"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
+import { toast } from "sonner"
 
 export default function CandidateCRMPage() {
   const { t, i18n } = useTranslation()
@@ -51,6 +52,8 @@ export default function CandidateCRMPage() {
 
   const [deleting, setDeleting] = useState(false)
 
+  const [showEditCandidate, setShowEditCandidate] = useState(false)
+
   const handleDelete = async () => {
     if (!window.confirm(t("candidateCRM.deleteConfirm"))) {
       return
@@ -92,6 +95,12 @@ export default function CandidateCRMPage() {
     sendToEmployer,
     requestDocuments,
   } = crm
+
+  const handleCandidateUpdated = (updatedCandidate) => {
+    setShowEditCandidate(false)
+    toast.success(t("candidateCRM.editCandidate.success", { name: updatedCandidate.full_name }))
+    reload()
+  }
 
   // Lazy-load timeline/communications only when tab is opened
   const handleTabChange = useCallback(
@@ -211,7 +220,8 @@ export default function CandidateCRMPage() {
           candidate={candidate}
           tags={tags}
           applications={applications}
-          onStatusChange={updateStatus}
+          onStatusChange={canUpdate ? updateStatus : undefined}
+          onEdit={canUpdate ? () => setShowEditCandidate(true) : undefined}
           onAssignSuccess={reload}
         />
 
@@ -414,6 +424,13 @@ export default function CandidateCRMPage() {
           </div>
         </div>
       </div>
+
+      <CreateCandidateModal
+        isOpen={showEditCandidate}
+        candidate={candidate}
+        onClose={() => setShowEditCandidate(false)}
+        onSuccess={handleCandidateUpdated}
+      />
     </div>
   )
 }
@@ -425,5 +442,6 @@ import RecruiterWorkspacePanel from "@/components/crm/candidate/RecruiterWorkspa
 import DocumentsPanel from "@/components/crm/candidate/DocumentsPanel"
 import ApplicationsPanel from "@/components/crm/candidate/ApplicationsPanel"
 import WhatsAppPanel from "@/components/crm/candidate/WhatsAppPanel"
+import CreateCandidateModal from "@/components/crm/candidate/CreateCandidateModal"
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
 import { ArrowRight, RefreshCw, AlertCircle, Trash2 } from "lucide-react"

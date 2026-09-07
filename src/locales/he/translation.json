@@ -1804,6 +1804,21 @@
     "navigatePrompt": "נווט דרך רשימת המועמדים",
     "loadingError": "שגיאה בטעינת נתונים",
     "tryAgain": "נסה שוב",
+    "editCandidate": {
+      "title": "עריכת מועמד",
+      "subtitle": "עדכון פרטי הקשר והפרטים המקצועיים של המועמד.",
+      "languages": "שפות",
+      "languagesPlaceholder": "עברית, אנגלית",
+      "salaryMin": "שכר מינימלי רצוי (₪)",
+      "salaryMax": "שכר מקסימלי רצוי (₪)",
+      "salaryRangeError": "השכר המקסימלי חייב להיות גדול או שווה לשכר המינימלי.",
+      "summary": "תקציר מקצועי",
+      "summaryPlaceholder": "תיאור קצר של הרקע והחוזקות של המועמד",
+      "save": "שמור שינויים",
+      "saving": "שומר...",
+      "success": "{{name}} עודכן בהצלחה",
+      "error": "לא ניתן לעדכן את המועמד. נסו שוב."
+    },
     "overview": {
       "summary": "סיכום",
       "previousCompanies": "חברות קודמות",
