@@ -8,6 +8,11 @@ import { ApiResponse, RequestConfig } from "@/types/api"
 
 type ApiPayload<T> = ApiResponse<T> | T
 
+const apiBaseUrl = (
+  (import.meta as ImportMeta & { env: { VITE_API_BASE_URL?: string } }).env.VITE_API_BASE_URL ||
+  "/api"
+).replace(/\/+$/, "")
+
 function isEnvelope<T>(payload: ApiPayload<T>): payload is ApiResponse<T> {
   return Boolean(
     payload &&
@@ -31,7 +36,7 @@ export class HttpClient {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: "/api",
+      baseURL: apiBaseUrl,
       timeout: 30000,
     })
 
@@ -104,7 +109,7 @@ export class HttpClient {
 
     if (!this.refreshPromise) {
       this.refreshPromise = axios
-        .post("/api/auth/refresh", { refresh_token: refreshToken })
+        .post(`${apiBaseUrl}/auth/refresh`, { refresh_token: refreshToken })
         .then((res) => {
           const tokens = res.data?.data || res.data
           tokenStorage.setTokens(tokens.access_token, tokens.refresh_token)
