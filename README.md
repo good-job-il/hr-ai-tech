@@ -40,9 +40,11 @@ VITE_API_BASE_URL=https://your-api-host.example/api
 ```
 
 After changing this variable, redeploy the client because Vite embeds it at
-build time. The build also adds the URL's origin to the CSP `connect-src`
-allowlist; relative values such as `/api` are already covered by `'self'`.
-The API must allow each Vercel deployment origin through CORS.
+build time. The production API origin is always present in the CSP
+`connect-src` allowlist. If `VITE_API_BASE_URL` points to a different absolute
+URL, the build adds that origin too; relative values such as `/api` are already
+covered by `'self'`. The API must allow each Vercel deployment origin through
+CORS.
 
 ## Verification
 

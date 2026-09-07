@@ -21,7 +21,8 @@ function cspApiOrigin(apiBaseUrl) {
   return {
     name: "csp-api-origin",
     transformIndexHtml(html) {
-      return html.replaceAll(CSP_API_ORIGIN_PLACEHOLDER, origin)
+      const apiSource = origin && !html.includes(origin) ? origin : ""
+      return html.replaceAll(CSP_API_ORIGIN_PLACEHOLDER, apiSource)
     },
   }
 }
