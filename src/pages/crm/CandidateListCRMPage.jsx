@@ -8,6 +8,9 @@ import { User, UsersRound, UserCheck, Clock3, ShieldAlert } from "lucide-react"
 import { getAgencyScopeFilter, isAgencyUser } from "@/domain/agency/access"
 import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
 import { recruiterCandidateRouteFilter } from "@/domain/agency/recruiterWorkspace"
+import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
+import CreateCandidateModal from "@/components/crm/candidate/CreateCandidateModal"
+import { toast } from "sonner"
 
 const STATUS_COLORS = {
   new: "bg-blue-100 text-blue-700",
@@ -32,6 +35,8 @@ export default function CandidateListCRMPage({ candidateRoute }) {
 
   const { user } = useAuth()
 
+  const { can } = usePermissionMatrix()
+
   const { t, i18n } = useTranslation()
 
   const [candidates, setCandidates] = useState([])
@@ -50,7 +55,17 @@ export default function CandidateListCRMPage({ candidateRoute }) {
 
   const [appendLoading, setAppendLoading] = useState(false)
 
+  const [showCreateCandidate, setShowCreateCandidate] = useState(false)
+
   const isRTL = i18n.language === "he"
+
+  const canCreateCandidate = location.pathname.startsWith("/agency/") && can("create")
+
+  const handleCandidateCreated = (candidate) => {
+    setShowCreateCandidate(false)
+    toast.success(t("crm.createCandidate.success", { name: candidate.full_name }))
+    navigate(`${resolvedCandidateRoute}?id=${candidate.id}`)
+  }
 
   const loadCandidates = async (append = false) => {
     if (!user) {
@@ -160,13 +175,25 @@ export default function CandidateListCRMPage({ candidateRoute }) {
           subtitle={t("crm.candidatesCount", { count: filtered.length })}
           icon={UsersRound}
           actions={
-            <button
-              onClick={loadCandidates}
-              className="flex h-11 items-center gap-2 rounded-xl border border-white bg-white/90 px-4 text-xs font-bold text-slate-600 shadow-[0_7px_20px_rgba(60,74,125,0.08)] transition hover:text-[#6C4DFF]"
-            >
-              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />{" "}
-              {t("crm.refresh")}
-            </button>
+            <>
+              <button
+                onClick={() => loadCandidates()}
+                className="flex h-11 items-center gap-2 rounded-xl border border-white bg-white/90 px-4 text-xs font-bold text-slate-600 shadow-[0_7px_20px_rgba(60,74,125,0.08)] transition hover:text-[#6C4DFF]"
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />{" "}
+                {t("crm.refresh")}
+              </button>
+
+              {canCreateCandidate && (
+                <button
+                  onClick={() => setShowCreateCandidate(true)}
+                  className="gradient-brand flex h-11 items-center gap-2 rounded-xl px-4 text-sm font-bold text-white shadow-[0_7px_20px_rgba(99,72,210,0.22)] transition hover:-translate-y-0.5 hover:opacity-95"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  {t("crm.addCandidate")}
+                </button>
+              )}
+            </>
           }
         />
 
@@ -309,6 +336,12 @@ export default function CandidateListCRMPage({ candidateRoute }) {
           )}
         </PlatformCard>
       </div>
+
+      <CreateCandidateModal
+        isOpen={showCreateCandidate}
+        onClose={() => setShowCreateCandidate(false)}
+        onSuccess={handleCandidateCreated}
+      />
     </PlatformPageShell>
   )
 }
@@ -397,7 +430,7 @@ const CandidateRowMemo = React.memo(function CandidateRow({ candidate, onClick, 
   )
 })
 
-import { Search, RefreshCw, ChevronLeft } from "lucide-react"
+import { Search, RefreshCw, ChevronLeft, UserPlus } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
   PlatformCard,
