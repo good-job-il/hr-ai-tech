@@ -1,775 +1,206 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { useAuth } from "@/lib/AuthContext"
 import {
-  UserPlus,
-  Bell,
-  Bot,
-  Zap,
-  ShieldCheck,
-  TrendingUp,
-  BriefcaseBusiness,
-  Building2,
-  Trophy,
-  Rocket,
-  Send,
-  Brain,
-  FileText,
-  MessageSquare,
-  Target,
-  Users,
-  ChevronDown,
-  Search,
-  Sparkles,
+  ArrowLeft, ArrowRight, BadgeCheck, BarChart3, Bell, Bot, BrainCircuit,
+  BriefcaseBusiness, Building2, ChevronDown, Clock3, FileText, Globe2,
+  LockKeyhole, MapPin, MessageSquareText, Quote, Rocket, Search, Send,
+  ShieldCheck, Sparkles, Star, Target, Trophy, UserPlus, Users, Zap,
 } from "lucide-react"
 import Navbar from "@/components/home/Navbar"
 import SEOHead from "@/components/SEOHead"
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher"
+import "./Home.css"
 
-const gradientText =
-  "bg-gradient-to-l from-[#6C4DFF] via-[#5B7CFF] to-[#2FB8FF] bg-clip-text text-transparent"
-
-const glassCard =
-  "bg-white/82 backdrop-blur-2xl border border-[#DDEBFF] shadow-[0_24px_80px_rgba(79,124,255,0.12)] rounded-lg"
-
-function HHLogo() {
-  return (
-    <Link to="/" className="flex items-center select-none" style={{ textDecoration: "none" }}>
-      <img
-        src="/logo.png"
-        alt="HeadHunter HR-Tech"
-        style={{ height: 48, width: "auto", objectFit: "contain", imageRendering: "crisp-edges" }}
-      />
-    </Link>
-  )
+const icons = {
+  features: [BarChart3, Bell, ShieldCheck, Zap, Bot],
+  tools: [BarChart3, MessageSquareText, Target, FileText],
+  stats: [Trophy, BriefcaseBusiness, Building2, Users],
+  steps: [UserPlus, BrainCircuit, Send, Rocket],
 }
 
-function CandidateCard() {
-  const { i18n } = useTranslation()
-
-  const isRtl = !i18n.language?.startsWith("en")
-
-  return (
-    <div className={`${glassCard} w-[360px] p-7 relative overflow-hidden`}>
-      <div className="absolute -top-16 -left-16 w-40 h-40 bg-[#7C3AED]/10 rounded-full blur-3xl" />
-
-      <div className="flex items-start gap-4 mb-6">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#EAF8FF] to-[#EDE9FE] border-4 border-white shadow-xl flex items-center justify-center text-3xl">
-          👨‍💻
-        </div>
-
-        <div>
-          <h3 className="text-[#0F172A] text-xl font-extrabold">
-            {isRtl ? "דניאל כהן" : "Daniel Cohen"}
-          </h3>
-
-          <p className="text-[#48556A] font-semibold">Full Stack Developer</p>
-
-          <p className="text-[#6C4DFF] text-sm font-semibold mt-1">
-            {isRtl ? "תל אביב, ישראל" : "Tel Aviv, Israel"}
-          </p>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-4 mb-5">
-        <div className="w-16 h-16 rounded-full bg-white border-[6px] border-[#AEEFF7] shadow-inner flex items-center justify-center">
-          <span className="text-[#12A7A8] font-extrabold text-xl">95%</span>
-        </div>
-
-        <div className="font-bold text-[#172033]">{isRtl ? "התאמה למשרות" : "Job Match"}</div>
-      </div>
-
-      <button className="w-full h-13 rounded-2xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold shadow-[0_14px_35px_rgba(79,124,255,0.25)] mb-5 py-4">
-        <Sparkles className="inline w-4 h-4 mr-2" />
-
-        {isRtl ? "שדרוג קורות החיים עם AI" : "Upgrade Resume with AI"}
-      </button>
-
-      <div className="flex flex-wrap gap-2 mb-6">
-        {["React", "Node.js", "TypeScript", "PostgreSQL", "AWS"].map((tag) => (
-          <span
-            key={tag}
-            className="px-3 py-1.5 rounded-full bg-[#F0F4FF] text-[#5B4FEA] text-xs font-bold"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-
-      <div className="space-y-4 border-t border-[#E6EEFF] pt-5">
-        <div className="flex items-start justify-between gap-5">
-          <BriefcaseBusiness className="w-6 h-6 text-[#6C4DFF]" />
-
-          <div className="text-right">
-            <p className="text-[#0F172A] font-extrabold">
-              {isRtl ? "ניסיון תעסוקתי" : "Work Experience"}
-            </p>
-
-            <p className="text-[#64748B] text-sm">Senior Frontend Developer</p>
-
-            <p className="text-[#94A3B8] text-xs">2021 — {isRtl ? "היום" : "Present"}</p>
-          </div>
-        </div>
-
-        <div className="flex items-start justify-between gap-5">
-          <Building2 className="w-6 h-6 text-[#2F80FF]" />
-
-          <div className="text-right">
-            <p className="text-[#0F172A] font-extrabold">{isRtl ? "השכלה" : "Education"}</p>
-
-            <p className="text-[#64748B] text-sm">
-              {isRtl ? "B.Sc במדעי המחשב" : "B.Sc Computer Science"}
-            </p>
-
-            <p className="text-[#94A3B8] text-xs">
-              {isRtl ? "אוניברסיטת תל אביב" : "Tel Aviv University"}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function AIOrb() {
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: 420,
-        height: 420,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(108,77,255,0.22) 0%, rgba(47,128,255,0.12) 45%, transparent 72%)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          width: 400,
-          height: 400,
-          borderRadius: "50%",
-          border: "1px solid rgba(164,196,255,0.28)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          width: 350,
-          height: 350,
-          borderRadius: "50%",
-          border: "1px solid rgba(164,196,255,0.22)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          width: 300,
-          height: 300,
-          borderRadius: "50%",
-          border: "1px solid rgba(164,196,255,0.18)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          width: 260,
-          height: 260,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle at 38% 32%, rgba(255,255,255,0.22) 0%, transparent 42%), linear-gradient(145deg, #6C3FDD 0%, #4F7CFF 40%, #06B6D4 100%)",
-          boxShadow:
-            "0 0 0 1px rgba(255,255,255,0.18), 0 0 60px rgba(108,77,255,0.55), 0 0 120px rgba(79,124,255,0.3), 0 30px 80px rgba(79,124,255,0.3)",
-          overflow: "hidden",
-        }}
-      >
-        <svg
-          viewBox="0 0 260 260"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.5 }}
-        >
-          <defs>
-            <linearGradient id="nl1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#fff" stopOpacity="0.8" />
-
-              <stop offset="100%" stopColor="#7DE3FF" stopOpacity="0.3" />
-            </linearGradient>
-          </defs>
-
-          <line x1="20" y1="80" x2="130" y2="120" stroke="url(#nl1)" strokeWidth="0.8" />
-
-          <line x1="130" y1="120" x2="240" y2="70" stroke="url(#nl1)" strokeWidth="0.8" />
-
-          <line x1="130" y1="120" x2="200" y2="180" stroke="url(#nl1)" strokeWidth="0.8" />
-
-          <line x1="130" y1="120" x2="60" y2="190" stroke="url(#nl1)" strokeWidth="0.8" />
-
-          <line x1="60" y1="190" x2="200" y2="180" stroke="url(#nl1)" strokeWidth="0.8" />
-
-          <circle cx="130" cy="120" r="4" fill="white" opacity="0.9" />
-
-          <circle cx="20" cy="80" r="3" fill="white" opacity="0.7" />
-
-          <circle cx="240" cy="70" r="3" fill="white" opacity="0.7" />
-
-          <circle cx="200" cy="180" r="3" fill="white" opacity="0.7" />
-
-          <circle cx="60" cy="190" r="3" fill="white" opacity="0.7" />
-        </svg>
-
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <svg
-            viewBox="0 0 120 148"
-            width="108"
-            height="133"
-            style={{
-              filter:
-                "drop-shadow(0 0 20px rgba(165,243,252,0.7)) drop-shadow(0 0 8px rgba(255,255,255,0.4))",
-            }}
-          >
-            <defs>
-              <linearGradient id="hf2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="rgba(255,255,255,0.35)" />
-
-                <stop offset="100%" stopColor="rgba(167,243,252,0.2)" />
-              </linearGradient>
-
-              <linearGradient id="cl2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
-
-                <stop offset="100%" stopColor="#A5F3FC" stopOpacity="0.7" />
-              </linearGradient>
-            </defs>
-
-            <rect
-              x="44"
-              y="110"
-              width="32"
-              height="28"
-              rx="6"
-              fill="url(#hf2)"
-              stroke="rgba(255,255,255,0.4)"
-              strokeWidth="1"
-            />
-
-            <path
-              d="M60 8 C30 8 16 32 16 58 C16 84 26 100 42 112 L42 122 L78 122 L78 112 C94 100 104 84 104 58 C104 32 90 8 60 8 Z"
-              fill="url(#hf2)"
-              stroke="rgba(255,255,255,0.55)"
-              strokeWidth="1.5"
-            />
-
-            <rect
-              x="8"
-              y="52"
-              width="9"
-              height="20"
-              rx="4.5"
-              fill="rgba(255,255,255,0.22)"
-              stroke="rgba(255,255,255,0.4)"
-              strokeWidth="1"
-            />
-
-            <rect
-              x="103"
-              y="52"
-              width="9"
-              height="20"
-              rx="4.5"
-              fill="rgba(255,255,255,0.22)"
-              stroke="rgba(255,255,255,0.4)"
-              strokeWidth="1"
-            />
-
-            <line
-              x1="34"
-              y1="52"
-              x2="57"
-              y2="52"
-              stroke="url(#cl2)"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              opacity="0.85"
-            />
-
-            <line
-              x1="63"
-              y1="52"
-              x2="86"
-              y2="52"
-              stroke="url(#cl2)"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              opacity="0.85"
-            />
-
-            <line
-              x1="60"
-              y1="40"
-              x2="60"
-              y2="78"
-              stroke="url(#cl2)"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              opacity="0.75"
-            />
-
-            <line
-              x1="36"
-              y1="66"
-              x2="84"
-              y2="66"
-              stroke="url(#cl2)"
-              strokeWidth="1"
-              strokeLinecap="round"
-              opacity="0.65"
-            />
-
-            {[
-              [60, 52],
-              [60, 66],
-              [42, 56],
-              [78, 56],
-              [42, 76],
-              [78, 76],
-              [60, 40],
-              [60, 78],
-            ].map(([cx, cy], i) => (
-              <circle key={i} cx={cx} cy={cy} r="2.8" fill="white" opacity={0.8 + (i % 2) * 0.15} />
-            ))}
-
-            <ellipse cx="47" cy="56" rx="5.5" ry="3.5" fill="rgba(167,243,252,0.6)" />
-
-            <ellipse cx="73" cy="56" rx="5.5" ry="3.5" fill="rgba(167,243,252,0.6)" />
-
-            <circle cx="47" cy="56" r="2.2" fill="white" opacity="0.95" />
-
-            <circle cx="73" cy="56" r="2.2" fill="white" opacity="0.95" />
-
-            <path
-              d="M50 88 Q60 94 70 88"
-              fill="none"
-              stroke="rgba(255,255,255,0.6)"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
-          top: 60,
-          right: 50,
-          width: 12,
-          height: 12,
-          borderRadius: "50%",
-          background: "#A5F3FC",
-          boxShadow: "0 0 14px rgba(165,243,252,0.9)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          bottom: 65,
-          left: 48,
-          width: 8,
-          height: 8,
-          borderRadius: "50%",
-          background: "#C4B5FD",
-          boxShadow: "0 0 12px rgba(196,181,253,0.9)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          top: 80,
-          left: 70,
-          width: 7,
-          height: 7,
-          borderRadius: "50%",
-          background: "#93C5FD",
-          boxShadow: "0 0 10px rgba(147,197,253,0.8)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          bottom: 85,
-          right: 65,
-          width: 14,
-          height: 14,
-          borderRadius: "50%",
-          background: "rgba(255,255,255,0.18)",
-          border: "1px solid rgba(255,255,255,0.4)",
-          backdropFilter: "blur(4px)",
-        }}
-      />
-    </div>
-  )
-}
-
-function HeroSection() {
-  const { user, isAuthenticated } = useAuth()
-
-  const { t, i18n } = useTranslation()
-
-  const isRtl = !i18n.language?.startsWith("en")
-
-  const dashboardLink = () => {
-    const role = user?.role || user?.user_type || ""
-
-    if (role === "org_admin") {
-      return user?.org_type === "organization"
-        ? "/company/dashboard"
-        : user?.organization_id
-          ? "/agency/dashboard"
-          : "/agency/onboarding"
-    }
-
-    const map = {
-      recruiter: "/agency/recruiter/dashboard",
-      team_manager: "/agency/team/dashboard",
-      recruitment_manager: "/agency/dashboard",
-      employer: "/employer/dashboard",
-      hiring_manager: "/employer/dashboard",
-      candidate: user?.profile_completed ? "/candidate/dashboard" : "/candidate/onboarding",
-      admin: "/platform/dashboard",
-    }
-
-    return map[role] || "/"
-  }
-
-  const choices = [
-    {
-      icon: UserPlus,
-      eyebrow: isRtl ? "למחפשי עבודה" : "For job seekers",
-      title: isRtl ? "אני מחפש עבודה" : "I’m looking for a job",
-      description: isRtl
-        ? "בנה פרופיל מקצועי, קבל התאמות אישיות ועקוב אחר כל המועמדויות במקום אחד."
-        : "Build your professional profile, get personal matches and track every application in one place.",
-      benefits: isRtl
-        ? ["התאמות משרות חכמות", "שדרוג קורות חיים עם AI", "מעקב אחר מועמדויות וראיונות"]
-        : ["Smart job matching", "AI-powered resume support", "Application and interview tracking"],
-      cta: isRtl ? "הרשמה כמועמד" : "Register as a candidate",
-      to: "/register?type=candidate",
-      accent: "from-[#2F80FF] to-[#6C4DFF]",
+const content = {
+  he: {
+    seoTitle: "HeadHunter - הקריירה שלך מתחילה כאן",
+    seoDescription: "פלטפורמת הגיוס המובילה בישראל למציאת משרות והתאמת קריירה באמצעות AI.",
+    heroPill: "פלטפורמת הגיוס המובילה AI בישראל",
+    heroTitle: "הקריירה שלך",
+    heroAccent: "מתחילה כאן",
+    heroText: ["משרות איכותיות, התאמה אישית, תהליך פשוט ומהיר", "כל מה שאתה צריך כדי למצוא את העבודה הבאה שלך."],
+    searchJobs: "חיפוש משרות",
+    register: "הרשמה כמועמד חדש",
+    proof: "אלפי מועמדים כבר מצאו את המקום שלהם",
+    candidate: {
+      name: "דניאל כהן", location: "תל אביב, ישראל", match: "התאמה למשרות",
+      upgrade: "שדרוג קורות החיים עם AI", new: "חדש", experience: "ניסיון תעסוקתי",
+      period: "TensorAid · היום — 2021", education: "השכלה", degree: "B.Sc במדעי המחשב",
+      university: "אוניברסיטת תל אביב · 2021",
     },
-    {
-      icon: Building2,
-      eyebrow: isRtl ? "לחברות השמה וכוח אדם" : "For staffing organizations",
-      title: isRtl ? "אני מייצג חברת השמה" : "I represent a staffing organization",
-      description: isRtl
-        ? "נהל לקוחות, משרות, מועמדים וצוותי גיוס עם סביבת עבודה אחת מסודרת."
-        : "Manage clients, jobs, candidates and recruiting teams in one organized workspace.",
-      benefits: isRtl
-        ? ["CRM ופייפליין גיוס", "התאמת מועמדים עם AI", "צוותים, הרשאות ודוחות"]
-        : [
-            "Recruiting CRM and pipeline",
-            "AI candidate matching",
-            "Teams, permissions and reports",
-          ],
-      cta: isRtl ? "רישום חברת השמה" : "Register a staffing organization",
-      to: "/register?type=staffing_agency",
-      accent: "from-[#7C3AED] to-[#EC4899]",
-    },
-  ]
-
-  return (
-    <section className="relative overflow-hidden bg-[#F7FBFF]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(139,92,246,0.18),transparent_28%),radial-gradient(circle_at_78%_18%,rgba(47,128,255,0.18),transparent_32%),linear-gradient(180deg,#F8FCFF_0%,#EEF8FF_100%)]" />
-
-      <div className="absolute left-20 top-32 w-72 h-72 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#2FB8FF] opacity-20 blur-3xl" />
-
-      <div className="absolute right-28 bottom-24 w-80 h-80 rounded-full bg-[#2FB8FF]/20 blur-3xl" />
-
-      <div
-        className="relative max-w-[1320px] mx-auto px-5 sm:px-8 py-16 lg:py-20"
-        dir={isRtl ? "rtl" : "ltr"}
-      >
-        <div className="mx-auto max-w-4xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#D8E4FF] bg-white/75 backdrop-blur-xl px-5 py-2.5 text-[#6C4DFF] font-bold shadow-sm mb-8">
-            <Sparkles className="w-4 h-4" />
-
-            {isRtl
-              ? "פלטפורמת הגיוס המובילה AI בישראל"
-              : "Israel's Leading AI Recruitment Platform"}
-          </div>
-
-          <h1 className="text-4xl sm:text-6xl lg:text-[72px] leading-[1.02] font-black tracking-tight text-[#0F172A] mb-7">
-            {isRtl ? "העבודה הבאה או צוות הגיוס הבא שלך" : "Your next job or your next great hire"}
-            <span className={`${gradientText} block mt-2`}>
-              {isRtl ? "מתחילים כאן." : "starts here."}
-            </span>
-          </h1>
-
-          <p className="text-lg sm:text-xl leading-8 text-[#475569] max-w-3xl mx-auto mb-11">
-            {isRtl
-              ? "HeadHunter מחברת בין מועמדים איכותיים לחברות השמה באמצעות התאמה חכמה ותהליך גיוס פשוט וברור."
-              : "HeadHunter connects talented candidates with staffing organizations through smart matching and a clear recruiting process."}
-          </p>
-        </div>
-
-        {isAuthenticated && user ? (
-          <div className={`${glassCard} mx-auto max-w-2xl p-8 text-center`}>
-            <h2 className="text-2xl font-black text-[#0F172A] mb-3">
-              {isRtl
-                ? `ברוך הבא, ${user.full_name || ""}`
-                : `Welcome back, ${user.full_name || ""}`}
-            </h2>
-            <p className="text-[#64748B] mb-6">
-              {isRtl ? "המשך בדיוק מהמקום שבו עצרת." : "Continue exactly where you left off."}
-            </p>
-            <Link
-              to={dashboardLink()}
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-gradient-to-l from-[#2F80FF] to-[#7C3AED] px-9 text-lg font-extrabold text-white shadow-lg"
-            >
-              <Rocket className="h-5 w-5" /> {t("common.dashboard")}
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-            {choices.map((choice) => (
-              <article
-                key={choice.to}
-                className={`${glassCard} group relative overflow-hidden p-7 sm:p-9 transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_90px_rgba(79,124,255,0.18)]`}
-              >
-                <div
-                  className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${choice.accent}`}
-                />
-                <div className="mb-6 flex items-center gap-4">
-                  <div
-                    className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${choice.accent} text-white shadow-lg`}
-                  >
-                    <choice.icon className="h-7 w-7" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold uppercase tracking-[0.12em] text-[#6C4DFF]">
-                      {choice.eyebrow}
-                    </p>
-                    <h2 className="mt-1 text-2xl sm:text-3xl font-black text-[#0F172A]">
-                      {choice.title}
-                    </h2>
-                  </div>
-                </div>
-                <p className="mb-6 text-base sm:text-lg leading-7 text-[#526177]">
-                  {choice.description}
-                </p>
-                <ul className="mb-8 space-y-3">
-                  {choice.benefits.map((benefit) => (
-                    <li
-                      key={benefit}
-                      className="flex items-center gap-3 font-semibold text-[#334155]"
-                    >
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50 text-sm font-black text-emerald-600">
-                        ✓
-                      </span>
-                      {benefit}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to={choice.to}
-                  className={`flex min-h-14 w-full items-center justify-center rounded-2xl bg-gradient-to-r ${choice.accent} px-5 py-4 text-center text-base font-extrabold text-white shadow-lg transition group-hover:scale-[1.01]`}
-                >
-                  {choice.cta}
-                </Link>
-                {choice.to.includes("candidate") && (
-                  <Link
-                    to="/jobs"
-                    className="mt-4 flex justify-center font-bold text-[#5B4FEA] hover:underline"
-                  >
-                    {isRtl ? "צפייה במשרות לפני ההרשמה" : "Browse jobs before registering"}
-                  </Link>
-                )}
-              </article>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
-  )
-}
-
-function WhySection() {
-  const { i18n } = useTranslation()
-
-  const isRtl = !i18n.language?.startsWith("en")
-
-  const items = [
-    {
-      icon: Bot,
-      title: isRtl ? "AI אישי לקריירה שלך" : "Personal AI for Your Career",
-      text: isRtl
-        ? "AI שמנתח את הפרופיל שלך ומציע משרות שמתאימות בדיוק לניסיון, לכישורים וליעדים שלך."
-        : "AI that analyzes your profile and suggests jobs that match your experience, skills and goals exactly.",
-      badge: isRtl ? "חדש" : "New",
-    },
-    {
-      icon: Bell,
-      title: isRtl ? "התראות בזמן אמת" : "Real-Time Alerts",
-      text: isRtl
-        ? "קבל התראות על משרות חדשות שמתאימות לך בדיוק."
-        : "Get notified about new jobs that match your profile.",
-    },
-    {
-      icon: ShieldCheck,
-      title: isRtl ? "משרות איכותיות בלבד" : "Quality Jobs Only",
-      text: isRtl
-        ? "אנחנו עובדים רק עם חברות מובילות ומעסיקים אמינים."
-        : "We work only with leading companies and trusted employers.",
-    },
-    {
-      icon: Zap,
-      title: isRtl ? "תהליך מהיר ופשוט" : "Fast & Simple Process",
-      text: isRtl
-        ? "מגישים מועמדות בלחיצה אחת ומתקדמים בתהליך בצורה מהירה ונוחה."
-        : "Apply in one click and advance through the process quickly and conveniently.",
-    },
-    {
-      icon: TrendingUp,
-      title: isRtl ? "קידום הקריירה שלך" : "Advance Your Career",
-      text: isRtl
-        ? "כלים, טיפים ותובנות שיעזרו לך להתקדם מהר יותר."
-        : "Tools, tips and insights to help you move forward faster.",
-    },
-  ]
-
-  return (
-    <section className="relative bg-white" style={{ padding: "80px 0" }}>
-      <div className="max-w-[1560px] mx-auto px-8" dir={isRtl ? "rtl" : "ltr"}>
-        <h2
-          style={{
-            fontSize: 52,
-            fontWeight: 900,
-            lineHeight: 1.1,
-            color: "#0F172A",
-            textAlign: "center",
-            marginBottom: 48,
-          }}
-        >
-          {isRtl ? (
-            <>
-              למה מועמדים בוחרים ב־<span className={gradientText}>HeadHunter?</span>
-            </>
-          ) : (
-            <>
-              Why candidates choose <span className={gradientText}>HeadHunter?</span>
-            </>
-          )}
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          {items.map((item) => (
-            <div
-              key={item.title}
-              className={`${glassCard} p-7 min-h-[240px] hover:-translate-y-1 hover:shadow-[0_30px_90px_rgba(108,77,255,0.16)] transition`}
-            >
-              <div className="flex justify-between items-start mb-6">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F4EEFF] to-[#EAF8FF] flex items-center justify-center">
-                  <item.icon className="w-8 h-8 text-[#6C4DFF]" />
-                </div>
-
-                {item.badge && (
-                  <span className="px-3 py-1 rounded-full bg-[#6C4DFF] text-white text-xs font-bold">
-                    {item.badge}
-                  </span>
-                )}
-              </div>
-
-              <h3 className="text-xl font-extrabold text-[#0F172A] mb-3">{item.title}</h3>
-
-              <p className="text-[#64748B] leading-7">{item.text}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function StaffingSection() {
-  const { i18n } = useTranslation()
-
-  const isRtl = !i18n.language?.startsWith("en")
-
-  const items = [
-    [
-      Users,
-      isRtl ? "CRM מועמדים ולקוחות" : "Candidate and client CRM",
-      isRtl
-        ? "כל המידע, הפעילות והתקשורת נשארים בהקשר אחד."
-        : "Keep profiles, activity and client context together.",
+    featuresTitle: "למה מועמדים ב־",
+    featuresText: "כל מה שצריך כדי לעבור מחיפוש מתיש להזדמנות שמתאימה באמת לניסיון, לכישורים ולשאיפות שלך.",
+    features: [
+      ["קידום הקריירה שלך", "כלים, טיפים ותובנות שיעזרו לך להתקדם"],
+      ["התראות בזמן אמת", "קבל התראות על משרות חדשות המתאימות לך"],
+      ["משרות איכותיות בלבד", "אנחנו עובדים רק עם חברות מובילות ומעסיקים אמינים"],
+      ["תהליך מהיר ופשוט", "מגישים מועמדות בלחיצה אחת ומתקדמים בזמן אמת"],
+      ["AI אישי לקריירה שלך", "AI שמנתח את הפרופיל שלך וממליץ על משרות וטיפים", "חדש"],
     ],
-    [
-      Target,
-      isRtl ? "פייפליין והתאמות AI" : "Pipeline and AI matching",
-      isRtl
-        ? "נהל שלבים והתאם מועמדים למשרות בצורה מהירה ומדויקת."
-        : "Move candidates through stages and match them to the right roles.",
+    findJobs: "חפש משרות", matchYou: "שמתאימות לך", placeholder: "תפקיד, תחום או מילת מפתח",
+    location: "מיקום", allFields: "כל התחומים", moreFields: "עוד תחומים",
+    tags: ["שיווק דיגיטלי", "מוצר", "מפתח Full Stack", "מפתח Frontend", "UI/UX Designer", "DevOps", "Data Analyst"],
+    jobsEyebrow: "משרות נבחרות",
+    jobsTitle: "הזדמנויות שמחכות להתאמה הנכונה",
+    jobsText: "תפקידים איכותיים מחברות מובילות, עם מידע ברור לפני שמגישים מועמדות.",
+    featuredJobs: [
+      ["Senior Frontend Developer", "NovaTech", "תל אביב", "היברידי", ["React", "TypeScript", "Design Systems"]],
+      ["Product Designer", "Monday Labs", "רמת גן", "היברידי", ["Figma", "Research", "B2B SaaS"]],
+      ["Data Analyst", "Finora", "הרצליה", "משרה מלאה", ["SQL", "Python", "Tableau"]],
     ],
-    [
-      ShieldCheck,
-      isRtl ? "תפקידים והרשאות" : "Roles and permissions",
-      isRtl
-        ? "סביבת עבודה ברורה למנהלים, ראשי צוותים ומגייסים."
-        : "A clear workspace for managers, team leads and recruiters.",
+    recentlyPosted: "פורסם לאחרונה", viewRole: "לפרטי המשרה", viewAllJobs: "לכל המשרות",
+    tools: [
+      ["תובנות קריירה", "דוחות אישיים והמלצות לקידום הקריירה שלך"],
+      ["הכנה לראיונות", "תרגול שאלות ראיון וקבלת משוב חכם לפני הראיון"],
+      ["התאמת משרות חכמה", "AI מוצא עבורך משרות שמתאימות בדיוק לפרופיל שלך"],
+      ["שדרוג קורות חיים", "שפר את קורות החיים שלך עם AI והבלט את הניסיון שלך"],
     ],
-  ]
+    aiTitle: "חדש! מרכז AI לקריירה", aiText: "סוויטת כלים חכמים לשדרוג הסיכויים שלך ולקבל את העבודה הבאה", aiCta: "כניסה למרכז AI",
+    stats: [["98%", "שביעות רצון מועמדים"], ["8,500+", "משרות פתוחות"], ["1,200+", "חברות מגייסות"], ["15,000+", "מועמדים פעילים"]],
+    how: "איך זה עובד?", howText: "ארבעה צעדים ברורים מפרופיל מקצועי ועד להזדמנות הבאה שלך.",
+    steps: [
+      ["יוצרים פרופיל", "מעלים קורות חיים וממלאים פרטים בסיסיים"],
+      ["AI מתאים עבורך", "המערכת מנתחת את הפרופיל שלך ומוצאת משרות רלוונטיות"],
+      ["מגישים בקליק", "מגישים מועמדות בלחיצה אחת ומקבלים עדכונים"],
+      ["מתקדמים לקריירה", "מקבלים זימונים לראיונות ומתחילים פרק חדש"],
+    ],
+    storyEyebrow: "סיפורי הצלחה",
+    storyTitle: "חיפוש עבודה שמרגיש אישי",
+    storyQuote: "במקום לשלוח קורות חיים לעשרות משרות לא רלוונטיות, קיבלתי התאמות שבאמת דיברו לניסיון שלי. בתוך שלושה שבועות כבר הייתי בשני ראיונות.",
+    storyName: "נועה לוי", storyRole: "Product Designer, Tel Aviv", storyMetric: "4.9 מתוך 5", storyMetricText: "דירוג מועמדים לתהליך ההתאמה",
+    ctaTitle: "מוכן לעשות את הצעד הבא בקריירה שלך?", ctaText: "הצטרף עכשיו לאלפי מועמדים שמצאו את העבודה המושלמת דרך HeadHunter",
+    trust: [["100% אמינות", "משרות אמיתיות מחברות אמינות בלבד"], ["ללא עלות", "חוסך זמן ומאמץ"], ["תהליך מהיר", "ההרשמה למועמדים חינמית לחלוטין"], ["מאובטח ופרטי", "המידע שלך מוגן"]],
+    footerDescription: "פלטפורמת הגיוס החכמה של ישראל. מחברת מועמדים איכותיים עם חברות מובילות באמצעות AI.",
+    footerColumns: [
+      ["למועמדים", [["חיפוש משרות", "/jobs"], ["פרופיל אישי", "/register?type=candidate"], ["התאמות AI", "/ai-career"], ["קורות חיים", "/register?type=candidate"]]],
+      ["לחברות", [["פרסום משרה", "/register?type=staffing_agency"], ["חיפוש מועמדים", "/register?type=staffing_agency"], ["התאמות AI", "/ai-career"], ["אנליטיקה", "/register?type=staffing_agency"]]],
+      ["החברה", [["אודות", "/about"], ["קריירה", "/about"], ["בלוג", "/blog"], ["צור קשר", "/contact"]]],
+    ],
+    support: "תמיכה", supportLinks: [["מרכז עזרה", "/contact"], ["מדריכים", "/resources"], ["סטטוס המערכת", "/contact"], ["שאלות נפוצות", "/resources"]],
+    copyright: "© 2024 HeadHunter. כל הזכויות שמורות.", terms: "תנאי שימוש", privacy: "מדיניות פרטיות", language: "English",
+  },
+  en: {
+    seoTitle: "HeadHunter - Your career starts here",
+    seoDescription: "Israel's leading AI recruitment platform for finding quality jobs and building your career.",
+    heroPill: "Israel's leading AI recruitment platform",
+    heroTitle: "Your career",
+    heroAccent: "starts here",
+    heroText: ["Quality jobs, personal matching, a fast and simple process", "Everything you need to find your next opportunity."],
+    searchJobs: "Search Jobs", register: "Register as a Candidate", proof: "Thousands of candidates have already found their place",
+    candidate: {
+      name: "Daniel Cohen", location: "Tel Aviv, Israel", match: "Job match", upgrade: "Upgrade your resume with AI",
+      new: "New", experience: "Work experience", period: "TensorAid · 2021 — Present", education: "Education",
+      degree: "B.Sc. Computer Science", university: "Tel Aviv University · 2021",
+    },
+    featuresTitle: "Why candidates choose ",
+    featuresText: "Everything you need to move from an exhausting search to an opportunity that truly fits your experience, skills and ambitions.",
+    features: [
+      ["Advance your career", "Tools, tips and insights that help you move forward"],
+      ["Real-time alerts", "Get notified when new jobs match your profile"],
+      ["Quality jobs only", "We work only with leading companies and trusted employers"],
+      ["Fast and simple", "Apply in one click and move forward in real time"],
+      ["Personal career AI", "AI analyzes your profile and recommends jobs and practical tips", "New"],
+    ],
+    findJobs: "Find jobs", matchYou: "that match you", placeholder: "Role, field or keyword", location: "Location", allFields: "All fields", moreFields: "More fields",
+    tags: ["Digital Marketing", "Product", "Full Stack Developer", "Frontend Developer", "UI/UX Designer", "DevOps", "Data Analyst"],
+    jobsEyebrow: "Featured opportunities",
+    jobsTitle: "Open roles waiting for the right match",
+    jobsText: "Quality positions from leading companies, with the details you need before you apply.",
+    featuredJobs: [
+      ["Senior Frontend Developer", "NovaTech", "Tel Aviv", "Hybrid", ["React", "TypeScript", "Design Systems"]],
+      ["Product Designer", "Monday Labs", "Ramat Gan", "Hybrid", ["Figma", "Research", "B2B SaaS"]],
+      ["Data Analyst", "Finora", "Herzliya", "Full time", ["SQL", "Python", "Tableau"]],
+    ],
+    recentlyPosted: "Recently posted", viewRole: "View role", viewAllJobs: "View all jobs",
+    tools: [
+      ["Career insights", "Personal reports and recommendations to advance your career"],
+      ["Interview preparation", "Practice interview questions and receive intelligent feedback"],
+      ["Smart job matching", "AI finds jobs that precisely match your profile"],
+      ["Resume upgrade", "Improve your resume with AI and highlight your experience"],
+    ],
+    aiTitle: "New! AI Career Center", aiText: "A smart suite of tools designed to improve your chances of landing your next job", aiCta: "Enter AI Center",
+    stats: [["98%", "Candidate satisfaction"], ["8,500+", "Open positions"], ["1,200+", "Hiring companies"], ["15,000+", "Active candidates"]],
+    how: "How does it work?", howText: "Four clear steps from a professional profile to your next opportunity.",
+    steps: [
+      ["Create a profile", "Upload your resume and add your basic details"],
+      ["AI matches you", "The platform analyzes your profile and finds relevant jobs"],
+      ["Apply in one click", "Submit applications easily and receive live updates"],
+      ["Advance your career", "Get interview invitations and start a new chapter"],
+    ],
+    storyEyebrow: "Candidate success",
+    storyTitle: "A job search that feels personal",
+    storyQuote: "Instead of sending my resume to dozens of irrelevant positions, I received matches that genuinely reflected my experience. Within three weeks, I already had two interviews.",
+    storyName: "Noa Levi", storyRole: "Product Designer, Tel Aviv", storyMetric: "4.9 out of 5", storyMetricText: "Candidate rating for the matching experience",
+    ctaTitle: "Ready to take the next step in your career?", ctaText: "Join thousands of candidates who found the perfect job through HeadHunter",
+    trust: [["100% trusted", "Real jobs from trusted companies only"], ["Free to use", "Save time and effort"], ["Fast process", "Registration is completely free for candidates"], ["Secure and private", "Your information is protected"]],
+    footerDescription: "Israel's smart recruitment platform. Connecting quality candidates with leading companies through AI.",
+    footerColumns: [
+      ["For Candidates", [["Search Jobs", "/jobs"], ["Personal Profile", "/register?type=candidate"], ["AI Matching", "/ai-career"], ["Resume", "/register?type=candidate"]]],
+      ["For Companies", [["Post a Job", "/register?type=staffing_agency"], ["Find Candidates", "/register?type=staffing_agency"], ["AI Matching", "/ai-career"], ["Analytics", "/register?type=staffing_agency"]]],
+      ["Company", [["About", "/about"], ["Careers", "/about"], ["Blog", "/blog"], ["Contact", "/contact"]]],
+    ],
+    support: "Support", supportLinks: [["Help Center", "/contact"], ["Guides", "/resources"], ["System Status", "/contact"], ["FAQ", "/resources"]],
+    copyright: "© 2024 HeadHunter. All rights reserved.", terms: "Terms of Use", privacy: "Privacy Policy", language: "עברית",
+  },
+}
+
+function CandidateCard({ copy }) {
+  const candidate = copy.candidate
+
+  return <article className="candidate-card"><div className="candidate-head"><div className="candidate-avatar"><Users /></div><div><h3>{candidate.name}</h3><p>Full Stack Developer</p><span><MapPin /> {candidate.location}</span></div></div><div className="candidate-match"><div className="match-score">95%</div><strong>{candidate.match}</strong></div><button className="candidate-ai"><Sparkles /> {candidate.upgrade} <small>{candidate.new}</small></button><div className="candidate-tags">{["React", "Node.js", "TypeScript", "AWS", "PostgreSQL"].map((tag) => <span key={tag}>{tag}</span>)}</div><div className="candidate-line"><BriefcaseBusiness /><div><b>{candidate.experience}</b><strong>Senior Frontend Developer</strong><span>{candidate.period}</span></div></div><div className="candidate-line"><Building2 /><div><b>{candidate.education}</b><strong>{candidate.degree}</strong><span>{candidate.university}</span></div></div></article>
+}
+
+function Hero({ copy }) {
+  return <section className="hh-hero"><div className="hero-glow hero-glow-one" /><div className="hero-glow hero-glow-two" /><div className="hh-shell hero-grid"><div className="hero-copy"><div className="hero-pill"><Sparkles /> {copy.heroPill} <Sparkles /></div><h1>{copy.heroTitle}<br /><span>{copy.heroAccent}</span></h1><p>{copy.heroText[0]}<br />{copy.heroText[1]}</p><div className="hero-actions"><Link className="hh-button" to="/jobs"><Search /> {copy.searchJobs}</Link><Link className="hh-button hh-button-outline" to="/register?type=candidate"><UserPlus /> {copy.register}</Link></div><div className="candidate-proof"><div className="proof-avatars"><span>A</span><span>N</span><span>D</span><span>Y</span><b>+</b></div><p>{copy.proof}</p></div></div><div className="hero-visual" aria-hidden="true"><div className="ai-orb"><span>AI</span></div><div className="orbit orbit-one" /><div className="orbit orbit-two" /><CandidateCard copy={copy} /></div></div></section>
+}
+
+function FeatureSection({ copy }) {
+  return <section className="hh-section features-section"><div className="hh-shell"><h2 className="section-title">{copy.featuresTitle}<span>HeadHunter?</span></h2><p className="section-description">{copy.featuresText}</p><div className="feature-grid">{copy.features.map(([title, text, badge], index) => {
+ const Icon = icons.features[index];
+
+ return <article className="hh-card feature-card" key={title}>{badge && <small>{badge}</small>}<Icon /><h3>{title}</h3><p>{text}</p></article> 
+})}</div></div></section>
+}
+
+function SearchSection({ copy }) {
+  const navigate = useNavigate()
+
+  const [query, setQuery] = useState("")
+
+  const search = () => navigate(query.trim() ? `/jobs?search=${encodeURIComponent(query.trim())}` : "/jobs")
+
+  return <section className="hh-section jobs-section"><div className="hh-shell hh-card search-card"><h2 className="section-title">{copy.findJobs} <span>{copy.matchYou}</span></h2><div className="search-row"><label><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => event.key === "Enter" && search()} placeholder={copy.placeholder} /></label><button className="search-select"><MapPin /> {copy.location} <ChevronDown /></button><button className="search-select"><BriefcaseBusiness /> {copy.allFields} <ChevronDown /></button><button className="hh-button search-submit" onClick={search}>{copy.searchJobs}</button></div><div className="tag-row"><span>{copy.moreFields}</span>{copy.tags.map((tag) => <button key={tag} onClick={() => navigate(`/jobs?search=${encodeURIComponent(tag)}`)}>{tag}</button>)}</div></div></section>
+}
+
+function FeaturedJobs({ copy, isEnglish }) {
+  const Arrow = isEnglish ? ArrowRight : ArrowLeft
 
   return (
-    <section className="bg-[#071124] py-20 text-white">
-      <div className="mx-auto max-w-[1320px] px-5 sm:px-8" dir={isRtl ? "rtl" : "ltr"}>
-        <div className="mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl">
-            <p className="mb-3 font-bold text-cyan-300">
-              {isRtl ? "לחברות השמה" : "For staffing organizations"}
-            </p>
-            <h2 className="text-4xl font-black sm:text-5xl">
-              {isRtl
-                ? "כל תהליך הגיוס בסביבת עבודה אחת"
-                : "Your entire recruiting operation in one workspace"}
-            </h2>
+    <section className="hh-section featured-jobs-section">
+      <div className="hh-shell">
+        <div className="section-heading-row">
+          <div>
+            <span className="section-kicker">{copy.jobsEyebrow}</span>
+            <h2 className="section-title">{copy.jobsTitle}</h2>
+            <p className="section-description">{copy.jobsText}</p>
           </div>
-          <Link
-            to="/register?type=staffing_agency"
-            className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-white px-7 font-black text-violet-700 shadow-xl"
-          >
-            {isRtl ? "הקמת חברת השמה" : "Set up your organization"}
-          </Link>
+          <Link className="section-link" to="/jobs">{copy.viewAllJobs} <Arrow /></Link>
         </div>
-        <div className="grid gap-5 md:grid-cols-3">
-          {items.map(([Icon, title, text]) => (
-            <article key={title} className="rounded-3xl border border-white/10 bg-white/[0.07] p-7">
-              <Icon className="mb-5 h-9 w-9 text-cyan-300" />
-              <h3 className="text-xl font-black">{title}</h3>
-              <p className="mt-3 leading-7 text-white/65">{text}</p>
+        <div className="featured-jobs-grid">
+          {copy.featuredJobs.map(([title, company, location, mode, skills], index) => (
+            <article className="job-preview-card" key={title}>
+              <div className="job-preview-top"><span className="company-avatar">{company.charAt(0)}</span><div className="job-preview-badges">{index === 0 && <small className="job-match"><Sparkles /> 95% match</small>}<span className="job-fresh"><Clock3 /> {copy.recentlyPosted}</span></div></div>
+              <h3>{title}</h3><p className="job-company">{company}</p>
+              <div className="job-meta"><span><MapPin /> {location}</span><span><BriefcaseBusiness /> {mode}</span></div>
+              <div className="job-skills">{skills.map((skill) => <span key={skill}>{skill}</span>)}</div>
+              <Link to={`/jobs?search=${encodeURIComponent(title)}`}>{copy.viewRole} <Arrow /></Link>
             </article>
           ))}
         </div>
@@ -778,468 +209,67 @@ function StaffingSection() {
   )
 }
 
-function SearchSection() {
-  const navigate = useNavigate()
+function AICenter({ copy }) {
+  return <section className="hh-section ai-section"><div className="hh-shell ai-panel"><div className="ai-tool-grid">{copy.tools.map(([title, text], index) => {
+ const Icon = icons.tools[index];
 
-  const { t, i18n } = useTranslation()
+ return <article className="hh-card ai-tool" key={title}><Icon /><div><h3>{title}</h3><p>{text}</p></div></article> 
+})}</div><aside className="ai-intro"><span>{copy.candidate.new}</span><h2>{copy.aiTitle}</h2><p>{copy.aiText}</p><Link to="/ai-career">{copy.aiCta} <Sparkles /></Link></aside></div></section>
+}
 
-  const isRtl = !i18n.language?.startsWith("en")
+function Stats({ copy }) {
+  return <section className="hh-section stats-section"><div className="hh-shell hh-card stats-grid">{copy.stats.map(([value, label], index) => {
+ const Icon = icons.stats[index];
 
-  const [q, setQ] = useState("")
+ return <div key={label}><Icon /><strong>{value}</strong><span>{label}</span></div> 
+})}</div></section>
+}
 
-  const doSearch = () => {
-    navigate(q.trim() ? `/jobs?search=${encodeURIComponent(q.trim())}` : "/jobs")
-  }
+function HowItWorks({ copy, isEnglish }) {
+  return <section className="hh-section how-section"><div className="hh-shell"><h2 className="section-title">{copy.how}</h2><p className="section-description">{copy.howText}</p><div className="steps-grid">{copy.steps.map(([title, text], index) => {
+ const Icon = icons.steps[index];
 
-  const tags = isRtl
-    ? [
-        "מפתח Frontend",
-        "מפתח Full Stack",
-        "מפתח Backend",
-        "DevOps",
-        "אנליסט נתונים",
-        "מעצב UI/UX",
-        "מוצר",
-        "שיווק דיגיטלי",
-      ]
-    : [
-        "Frontend Developer",
-        "Full Stack Developer",
-        "Backend Developer",
-        "DevOps",
-        "Data Analyst",
-        "UI/UX Designer",
-        "Product",
-        "Digital Marketing",
-      ]
+ return <article className="hh-card step-card" key={title}><span>{index + 1}</span><Icon /><h3>{title}</h3><p>{text}</p>{index < 3 && <i>{isEnglish ? "⟶" : "⟵"}</i>}</article> 
+})}</div></div></section>
+}
 
+function CandidateStory({ copy }) {
   return (
-    <section className="bg-[#F6FBFF]" style={{ padding: "80px 0" }}>
-      <div className="max-w-[1560px] mx-auto px-8" dir={isRtl ? "rtl" : "ltr"}>
-        <h2
-          style={{
-            fontSize: 48,
-            fontWeight: 900,
-            lineHeight: 1.1,
-            color: "#0F172A",
-            textAlign: "center",
-            marginBottom: 32,
-          }}
-        >
-          {isRtl ? "חפש משרות שמתאימות לך" : "Find jobs that match you"}
-        </h2>
-
-        <div className={`${glassCard} p-9`}>
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_220px] gap-4">
-            <div className="h-16 rounded-2xl bg-white border border-[#DCE8FF] flex items-center px-5">
-              <Search className="w-5 h-5 text-[#9AA8BD] mr-3" />
-
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && doSearch()}
-                placeholder={t("jobs.searchPlaceholder")}
-                className="w-full outline-none bg-transparent text-[#0F172A] placeholder:text-[#9AA8BD] font-semibold"
-              />
-            </div>
-
-            <div className="h-16 rounded-2xl bg-white border border-[#DCE8FF] flex items-center justify-between px-5 text-[#64748B] font-semibold">
-              <span>{isRtl ? "מיקום" : "Location"}</span>
-
-              <ChevronDown className="w-5 h-5" />
-            </div>
-
-            <div className="h-16 rounded-2xl bg-white border border-[#DCE8FF] flex items-center justify-between px-5 text-[#64748B] font-semibold">
-              <span>{isRtl ? "כל התחומים" : "All fields"}</span>
-
-              <ChevronDown className="w-5 h-5" />
-            </div>
-
-            <button
-              onClick={doSearch}
-              className="h-16 rounded-2xl bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] text-white font-extrabold shadow-[0_18px_38px_rgba(108,77,255,0.25)]"
-            >
-              {t("jobs.searchButton")}
-            </button>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-3 mt-7">
-            {tags.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => {
-                  setQ(tag)
-                  navigate(`/jobs?search=${encodeURIComponent(tag)}`)
-                }}
-                className="px-5 py-2 rounded-full bg-white border border-[#DCE8FF] text-[#6C4DFF] font-bold shadow-sm hover:shadow-md transition"
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
-        </div>
+    <section className="hh-section story-section">
+      <div className="hh-shell story-panel">
+        <div className="story-copy"><span className="section-kicker">{copy.storyEyebrow}</span><Quote /><h2>{copy.storyTitle}</h2><blockquote>“{copy.storyQuote}”</blockquote><div className="story-person"><span>{copy.storyName.charAt(0)}</span><div><strong>{copy.storyName}</strong><small>{copy.storyRole}</small></div><BadgeCheck /></div></div>
+        <aside className="story-rating"><div className="stars">{[1, 2, 3, 4, 5].map((star) => <Star key={star} />)}</div><strong>{copy.storyMetric}</strong><p>{copy.storyMetricText}</p><div><Users /><span>15,000+</span></div></aside>
       </div>
     </section>
   )
 }
 
-function AICenter() {
-  const { i18n } = useTranslation()
+function BottomCta({ copy }) {
+  const trustIcons = [ShieldCheck, Zap, Target, LockKeyhole]
 
-  const isRtl = !i18n.language?.startsWith("en")
+  return <section className="hh-section bottom-section"><div className="hh-shell"><div className="bottom-cta"><div><h2>{copy.ctaTitle}</h2><p>{copy.ctaText}</p></div><Link to="/register?type=candidate">{copy.register} <UserPlus /></Link></div><div className="trust-row">{copy.trust.map(([title, text], index) => {
+ const Icon = trustIcons[index];
 
-  const cards = [
-    {
-      icon: FileText,
-      title: isRtl ? "שדרוג קורות חיים" : "Resume Upgrade",
-      text: isRtl
-        ? "שפר את קורות החיים שלך כך שיבלטו לעיני מעסיקים מובילים."
-        : "Improve your resume so it stands out to top employers.",
-    },
-    {
-      icon: Target,
-      title: isRtl ? "התאמת משרות חכמה" : "Smart Job Matching",
-      text: isRtl
-        ? "AI מוצא עבורך משרות שמתאימות בדיוק לפרופיל שלך."
-        : "AI finds jobs that match your profile exactly.",
-    },
-    {
-      icon: MessageSquare,
-      title: isRtl ? "הכנה לראיונות" : "Interview Prep",
-      text: isRtl
-        ? "תרגול שאלות ראיון וקבלת משוב חכם לפני הראיון."
-        : "Practice interview questions and get smart feedback before the interview.",
-    },
-    {
-      icon: TrendingUp,
-      title: isRtl ? "תובנות קריירה" : "Career Insights",
-      text: isRtl
-        ? "דוחות אישיים והמלצות לקידום הקריירה שלך."
-        : "Personal reports and recommendations to advance your career.",
-    },
-  ]
-
-  return (
-    <section className="bg-white" style={{ padding: "80px 0" }}>
-      <div className="max-w-[1560px] mx-auto px-8" dir={isRtl ? "rtl" : "ltr"}>
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
-          <div className={`${glassCard} p-8 bg-gradient-to-br from-white to-[#F3F0FF]`}>
-            <span className="inline-flex px-3 py-1 rounded-full bg-[#6C4DFF] text-white text-xs font-bold mb-5">
-              {isRtl ? "חדש" : "New"}
-            </span>
-
-            <h2
-              style={{
-                fontSize: 44,
-                fontWeight: 900,
-                lineHeight: 1.1,
-                color: "#0F172A",
-                marginBottom: 16,
-              }}
-            >
-              {isRtl ? "מרכז AI לקריירה" : "AI Career Center"}
-            </h2>
-
-            <p className="text-[#64748B] leading-7 mb-6">
-              {isRtl
-                ? "סט כלים חכמים לשדרוג הסיכויים שלך לקבל את העבודה הבאה."
-                : "A smart set of tools to boost your chances of landing the next job."}
-            </p>
-
-            <Link
-              to="/register"
-              className="h-12 px-6 rounded-2xl bg-gradient-to-l from-[#2F80FF] to-[#8B5CF6] text-white font-bold inline-flex items-center"
-            >
-              {isRtl ? "כניסה למרכז AI" : "Enter AI Center"}
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {cards.map((card) => {
-              const Icon = card.icon
-
-              return (
-                <div key={card.title} className={`${glassCard} p-7`}>
-                  <Icon className="w-9 h-9 text-[#6C4DFF] mb-6" />
-
-                  <h3 className="text-xl font-extrabold text-[#0F172A] mb-3">{card.title}</h3>
-
-                  <p className="text-[#64748B] leading-7">{card.text}</p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
+ return <div key={title}><Icon /><b>{title}</b><span>{text}</span></div> 
+})}</div></div></section>
 }
 
-function StatsSection() {
-  const { i18n } = useTranslation()
-
-  const isRtl = !i18n.language?.startsWith("en")
-
-  const stats = [
-    { icon: Users, value: "15,000+", label: isRtl ? "מועמדים פעילים" : "Active Candidates" },
-    { icon: Building2, value: "1,200+", label: isRtl ? "חברות מגייסות" : "Hiring Companies" },
-    { icon: BriefcaseBusiness, value: "8,500+", label: isRtl ? "משרות פתוחות" : "Open Positions" },
-    { icon: Trophy, value: "98%", label: isRtl ? "שביעות רצון מועמדים" : "Candidate Satisfaction" },
-  ]
-
-  return (
-    <section className="bg-[#F6FBFF]" style={{ padding: "60px 0" }}>
-      <div className="max-w-[1560px] mx-auto px-8" dir={isRtl ? "rtl" : "ltr"}>
-        <div
-          className={`${glassCard} grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[#DCE8FF]`}
-        >
-          {stats.map((s) => {
-            const Icon = s.icon
-
-            return (
-              <div key={s.label} className="p-9 text-center">
-                <Icon className="w-10 h-10 text-[#6C4DFF] mx-auto mb-4" />
-
-                <div className="text-4xl font-black text-[#6C4DFF] mb-2">{s.value}</div>
-
-                <div className="text-[#64748B] font-bold">{s.label}</div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
+function FooterLinks({ title, links, className = "" }) {
+  return <div className={`hh-footer-column ${className}`}><h3>{title}</h3>{links.map(([label, href]) => <Link key={label} to={href}>{label}</Link>)}</div>
 }
 
-function HowItWorks() {
-  const { i18n } = useTranslation()
-
-  const isRtl = !i18n.language?.startsWith("en")
-
-  const steps = [
-    {
-      icon: UserPlus,
-      title: isRtl ? "יוצרים פרופיל" : "Create a Profile",
-      text: isRtl
-        ? "מעלים קורות חיים וממלאים פרטים בסיסיים."
-        : "Upload your resume and fill in basic details.",
-    },
-    {
-      icon: Brain,
-      title: isRtl ? "AI מתאים עבורך" : "AI Matches for You",
-      text: isRtl
-        ? "המערכת מנתחת את הפרופיל שלך ומוצאת משרות רלוונטיות."
-        : "The system analyzes your profile and finds relevant jobs.",
-    },
-    {
-      icon: Send,
-      title: isRtl ? "מגישים בקליק" : "Apply in One Click",
-      text: isRtl
-        ? "שולחים מועמדות בלחיצה אחת ומקבלים עדכונים."
-        : "Send your application in one click and receive updates.",
-    },
-    {
-      icon: Rocket,
-      title: isRtl ? "מתקדמים לקריירה" : "Advance Your Career",
-      text: isRtl
-        ? "עוקבים אחרי ההתקדמות ומקבלים תובנות להמשך הדרך."
-        : "Track progress and get insights for the road ahead.",
-    },
-  ]
-
-  return (
-    <section className="bg-white" style={{ padding: "80px 0" }}>
-      <div className="max-w-[1560px] mx-auto px-8" dir={isRtl ? "rtl" : "ltr"}>
-        <h2
-          style={{
-            fontSize: 48,
-            fontWeight: 900,
-            lineHeight: 1.1,
-            color: "#0F172A",
-            textAlign: "center",
-            marginBottom: 48,
-          }}
-        >
-          {isRtl ? "איך זה עובד?" : "How does it work?"}
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {steps.map((step, index) => {
-            const Icon = step.icon
-
-            return (
-              <div key={step.title} className={`${glassCard} p-8 text-center relative`}>
-                <div className="absolute top-5 right-5 w-9 h-9 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] text-white flex items-center justify-center font-black">
-                  {index + 1}
-                </div>
-
-                <Icon className="w-12 h-12 text-[#6C4DFF] mx-auto mb-6 mt-6" />
-
-                <h3 className="text-xl font-extrabold text-[#0F172A] mb-3">{step.title}</h3>
-
-                <p className="text-[#64748B] leading-7">{step.text}</p>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
+function Footer({ copy, isEnglish, changeLanguage }) {
+  return <footer className="hh-footer" dir={isEnglish ? "ltr" : "rtl"}><div className="hh-footer-shell"><div className="hh-footer-grid"><div className="hh-footer-intro"><img src="/logo.png" alt="HeadHunter" /><p>{copy.footerDescription}</p></div>{copy.footerColumns.map(([title, links]) => <FooterLinks key={title} title={title} links={links} />)}<FooterLinks className="hh-footer-support" title={copy.support} links={copy.supportLinks} /></div><div className="hh-footer-bottom"><span>{copy.copyright}</span><nav aria-label="Footer"><button type="button" onClick={changeLanguage}><Globe2 /> {copy.language}</button><Link to="/terms">{copy.terms}</Link><Link to="/privacy">{copy.privacy}</Link></nav></div></div></footer>
 }
-
-function CTASection() {
-  const { i18n } = useTranslation()
-
-  const isRtl = !i18n.language?.startsWith("en")
-
-  return (
-    <section className="bg-[#F6FBFF]" style={{ padding: "80px 0" }}>
-      <div className="max-w-[1560px] mx-auto px-8" dir={isRtl ? "rtl" : "ltr"}>
-        <div className="rounded-lg bg-gradient-to-l from-[#2F80FF] via-[#6C4DFF] to-[#A855F7] p-12 text-white shadow-[0_30px_90px_rgba(108,77,255,0.28)] flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div>
-            <h2 style={{ fontSize: 48, fontWeight: 900, lineHeight: 1.1, marginBottom: 12 }}>
-              {isRtl ? "מוכן להתחיל?" : "Ready to get started?"}
-            </h2>
-
-            <p className="text-white/80 text-lg">
-              {isRtl
-                ? "בחר את המסלול שמתאים לך והשלם את ההגדרה בכמה צעדים ברורים."
-                : "Choose the path that fits you and complete setup in a few clear steps."}
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              to="/register?type=candidate"
-              className="flex h-16 items-center justify-center whitespace-nowrap rounded-2xl bg-white px-8 font-black text-[#6C4DFF] shadow-xl"
-            >
-              {isRtl ? "הרשמה כמועמד" : "Register as a candidate"}
-            </Link>
-            <Link
-              to="/register?type=staffing_agency"
-              className="flex h-16 items-center justify-center whitespace-nowrap rounded-2xl border border-white/40 bg-white/10 px-8 font-black text-white"
-            >
-              {isRtl ? "רישום חברת השמה" : "Register an organization"}
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function HomeFooter() {
-  const { t, i18n } = useTranslation()
-
-  const isRtl = !i18n.language?.startsWith("en")
-
-  const columns = isRtl
-    ? [
-        ["למועמדים", "חיפוש משרות", "פרופיל אישי", "התאמות AI", "קורות חיים"],
-        ["לחברות", "פרסום משרה", "חיפוש מועמדים", "AI Matching", "אנליטיקה"],
-        ["חברה", "אודות", "קריירה", "בלוג", "צור קשר"],
-        ["תמיכה", "מרכז עזרה", "מדריכים", "סטטוס מערכת", "שאלות נפוצות"],
-      ]
-    : [
-        ["For Candidates", "Search Jobs", "Personal Profile", "AI Matching", "Resume"],
-        ["For Companies", "Post a Job", "Find Candidates", "AI Matching", "Analytics"],
-        ["Company", "About", "Careers", "Blog", "Contact"],
-        ["Support", "Help Center", "Guides", "System Status", "FAQ"],
-      ]
-
-  return (
-    <footer className="bg-[#071124] text-white pt-16 pb-8" dir={isRtl ? "rtl" : "ltr"}>
-      <div className="max-w-[1560px] mx-auto px-8">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 mb-12">
-          <div className="md:col-span-2">
-            <HHLogo />
-
-            <p className="text-white/60 leading-8 mt-5 max-w-md">
-              {isRtl
-                ? "פלטפורמת הגיוס החכמה בישראל. מחברת בין מועמדים איכותיים לחברות מובילות באמצעות AI."
-                : "Israel's smart recruitment platform. Connecting quality candidates with leading companies through AI."}
-            </p>
-          </div>
-
-          {columns.map(([title, ...links]) => (
-            <div key={title}>
-              <h4 className="font-black mb-5">{title}</h4>
-
-              <div className="space-y-3 text-white/55">
-                {links.map((l) => (
-                  <div key={l}>{l}</div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-white/50">
-          <div>
-            {isRtl
-              ? "© 2024 HeadHunter. כל הזכויות שמורות."
-              : "© 2024 HeadHunter. All rights reserved."}
-          </div>
-
-          <div className="flex items-center gap-6">
-            <LanguageSwitcher variant="minimal" className="text-white/50 hover:text-white/80" />
-
-            <span>{isRtl ? "תנאי שימוש" : t("common.terms")}</span>
-
-            <span>{isRtl ? "מדיניות פרטיות" : t("common.privacy")}</span>
-          </div>
-        </div>
-      </div>
-    </footer>
-  )
-}
-
-const _legacyHomepageVisuals = [CandidateCard, AIOrb, StatsSection]
 
 export default function Home() {
   const { i18n } = useTranslation()
 
-  const isRtl = !i18n.language?.startsWith("en")
+  const isEnglish = i18n.language?.startsWith("en")
 
-  return (
-    <div className="min-h-screen bg-[#F7FBFF] text-[#0F172A]" dir={isRtl ? "rtl" : "ltr"}>
-      <SEOHead
-        title={
-          isRtl
-            ? "HeadHunter - פלטפורמת גיוס מבוססת AI"
-            : "HeadHunter - AI-Powered Recruitment Platform"
-        }
-        description={
-          isRtl
-            ? "HeadHunter היא פלטפורמת גיוס חכמה המחברת בין מועמדים איכותיים לחברות מובילות באמצעות AI."
-            : "HeadHunter is a smart recruitment platform connecting quality candidates with leading companies through AI."
-        }
-        canonical="https://headhunter.co.il/"
-        keywords={
-          isRtl
-            ? "דרושים, משרות, גיוס, AI, קריירה, HeadHunter, HR-Tech"
-            : "jobs, recruitment, AI, career, HeadHunter, HR-Tech, Israel"
-        }
-      />
+  const copy = content[isEnglish ? "en" : "he"]
 
-      <Navbar />
+  const changeLanguage = () => i18n.changeLanguage(isEnglish ? "he" : "en")
 
-      <HeroSection />
-
-      <WhySection />
-
-      <StaffingSection />
-
-      <SearchSection />
-
-      <AICenter />
-
-      <HowItWorks />
-
-      <CTASection />
-
-      <HomeFooter />
-    </div>
-  )
+  return <div className="headhunter-home" dir={isEnglish ? "ltr" : "rtl"}><SEOHead title={copy.seoTitle} description={copy.seoDescription} canonical="https://headhunter.co.il/" keywords={isEnglish ? "jobs, recruitment, career, AI, Israel" : "משרות, דרושים, גיוס, קריירה, AI"} /><Navbar /><main><Hero copy={copy} /><FeatureSection copy={copy} /><SearchSection copy={copy} /><FeaturedJobs copy={copy} isEnglish={isEnglish} /><AICenter copy={copy} /><Stats copy={copy} /><HowItWorks copy={copy} isEnglish={isEnglish} /><CandidateStory copy={copy} /><BottomCta copy={copy} /></main><Footer copy={copy} isEnglish={isEnglish} changeLanguage={changeLanguage} /></div>
 }
