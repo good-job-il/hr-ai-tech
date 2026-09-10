@@ -1,18 +1,81 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { publicJobService } from "@/api/services/publicJobService"
 import { publicWorkflowService } from "@/api/services/publicWorkflowService"
+import { taxonomyService } from "@/api/services/taxonomyService"
 import { useQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
-import { Brain, ShieldCheck, Zap, Building2 } from "lucide-react"
+import {
+  ArrowLeft,
+  BarChart2,
+  Bookmark,
+  Brain,
+  Briefcase,
+  Building2,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  LayoutGrid,
+  List,
+  MapPin,
+  RotateCcw,
+  Search,
+  Share2,
+  ShieldCheck,
+  SlidersHorizontal,
+  Sparkles,
+  Tag,
+  TrendingUp,
+  Wand2,
+  X,
+  Zap,
+} from "lucide-react"
+import SEOHead from "@/components/SEOHead"
+import Navbar from "@/components/home/Navbar"
+import LandingFooter from "@/components/home/LandingFooter"
+import "./Home.css"
+import "./Jobs.css"
 
 const glass = {
   background: "rgba(255,255,255,0.78)",
   backdropFilter: "blur(28px)",
   WebkitBackdropFilter: "blur(28px)",
   border: "1px solid rgba(221,235,255,0.86)",
-  borderRadius: 8,
+  borderRadius: 20,
   boxShadow: "0 28px 80px rgba(79,124,255,0.11), 0 3px 12px rgba(15,23,42,0.04)",
+}
+
+const footerContent = {
+  en: {
+    footerDescription:
+      "Israel's smart recruitment platform. Connecting quality candidates with leading companies through AI.",
+    footerColumns: [
+      ["For Candidates", [["Search Jobs", "/jobs"], ["Personal Profile", "/register?type=candidate"], ["AI Matching", "/ai-career"], ["Resume", "/register?type=candidate"]]],
+      ["For Companies", [["Post a Job", "/register?type=staffing_agency"], ["Find Candidates", "/register?type=staffing_agency"], ["AI Matching", "/ai-career"], ["Analytics", "/register?type=staffing_agency"]]],
+      ["Company", [["About", "/about"], ["Careers", "/about"], ["Blog", "/blog"], ["Contact", "/contact"]]],
+    ],
+    support: "Support",
+    supportLinks: [["Help Center", "/contact"], ["Guides", "/resources"], ["System Status", "/contact"], ["FAQ", "/resources"]],
+    copyright: "© 2024 HeadHunter. All rights reserved.",
+    terms: "Terms of Use",
+    privacy: "Privacy Policy",
+    language: "עברית",
+  },
+  he: {
+    footerDescription:
+      "פלטפורמת הגיוס החכמה של ישראל. מחברת מועמדים איכותיים עם חברות מובילות באמצעות AI.",
+    footerColumns: [
+      ["למועמדים", [["חיפוש משרות", "/jobs"], ["פרופיל אישי", "/register?type=candidate"], ["התאמות AI", "/ai-career"], ["קורות חיים", "/register?type=candidate"]]],
+      ["לחברות", [["פרסום משרה", "/register?type=staffing_agency"], ["חיפוש מועמדים", "/register?type=staffing_agency"], ["התאמות AI", "/ai-career"], ["אנליטיקה", "/register?type=staffing_agency"]]],
+      ["החברה", [["אודות", "/about"], ["קריירה", "/about"], ["בלוג", "/blog"], ["צור קשר", "/contact"]]],
+    ],
+    support: "תמיכה",
+    supportLinks: [["מרכז עזרה", "/contact"], ["מדריכים", "/resources"], ["סטטוס המערכת", "/contact"], ["שאלות נפוצות", "/resources"]],
+    copyright: "© 2024 HeadHunter. כל הזכויות שמורות.",
+    terms: "תנאי שימוש",
+    privacy: "מדיניות פרטיות",
+    language: "English",
+  },
 }
 
 function MatchBadge({ score }) {
@@ -109,15 +172,15 @@ function JobCard({ job }) {
   const isNew = daysAgo <= 3
 
   return (
-    <div
-      className="group relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
+    <article
+      className="job-result-card group relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
       style={glass}
     >
       <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-l from-[#A855F7] via-[#6C4DFF] to-[#2FB8FF] opacity-0 group-hover:opacity-100 transition-opacity" />
 
       <div className="absolute -top-24 -left-24 w-56 h-56 rounded-full bg-[#8B5CF6]/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      <div className="p-7 relative">
+      <div className="job-result-card__body p-7 relative">
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-3">
             <div
@@ -143,7 +206,7 @@ function JobCard({ job }) {
           </div>
         </div>
 
-        <h3 className="text-[22px] leading-[1.25] font-black text-[#0F172A] mb-2 w-[90%]">
+        <h3 className="job-result-card__title text-[22px] leading-[1.25] font-black text-[#0F172A] mb-2">
           {job.title}
         </h3>
 
@@ -192,7 +255,7 @@ function JobCard({ job }) {
           </span>
         </div>
 
-        <div className="flex items-center justify-between pt-5 border-t border-[#E4ECFF]">
+        <div className="job-result-card__footer flex items-center justify-between pt-5 border-t border-[#E4ECFF]">
           <span className="flex items-center gap-1.5 text-xs font-bold text-[#94A3B8]">
             <Calendar className="w-4 h-4" />
 
@@ -233,7 +296,7 @@ function JobCard({ job }) {
           </div>
         </div>
       </div>
-    </div>
+    </article>
   )
 }
 
@@ -242,7 +305,9 @@ export default function Jobs() {
 
   const isRtl = !i18n.language?.startsWith("en")
 
-  const urlP = new URLSearchParams(window.location.search)
+  const [urlP] = useSearchParams()
+
+  const urlSearch = urlP.toString()
 
   const navigate = useNavigate()
 
@@ -260,13 +325,23 @@ export default function Jobs() {
     { value: "5+", label: isRtl ? "5+ שנות ניסיון" : "5+ years experience" },
   ]
 
+  const { data: domains = [] } = useQuery({
+    queryKey: ["job-search-domains"],
+    queryFn: () => taxonomyService.domains(),
+    staleTime: 5 * 60 * 1000,
+  })
+
   const [search, setSearch] = useState(urlP.get("search") || urlP.get("q") || "")
 
-  const [loc, setLoc] = useState("")
+  const [loc, setLoc] = useState(urlP.get("location") || "")
 
-  const [jobTypes, setJobTypes] = useState([])
+  const [domainId, setDomainId] = useState(urlP.get("domain_id") || "")
+
+  const [jobTypes, setJobTypes] = useState(urlP.getAll("type"))
 
   const [viewMode, setViewMode] = useState("list")
+
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
   const [openFilters, setOpenFilters] = useState({
     type: true,
@@ -280,13 +355,26 @@ export default function Jobs() {
   const toggleType = (v) =>
     setJobTypes((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]))
 
+  useEffect(() => {
+    const params = new URLSearchParams(urlSearch)
+
+    setSearch(params.get("search") || params.get("q") || "")
+    setLoc(params.get("location") || "")
+    setDomainId(params.get("domain_id") || "")
+    setJobTypes(params.getAll("type"))
+  }, [urlSearch])
+
   const { data: jobs = [], isLoading } = useQuery({
-    queryKey: ["jobs", search, loc, jobTypes],
+    queryKey: ["jobs", search, loc, domainId, jobTypes],
     queryFn: async () => {
-      if (search) {
+      if (search || loc || domainId || jobTypes.length) {
         const r = await publicWorkflowService.searchJobs({
           query: search,
-          filters: { type: jobTypes, location: loc || undefined },
+          filters: {
+            type: jobTypes.length ? jobTypes : undefined,
+            location: loc || undefined,
+            domain_id: domainId ? Number(domainId) : undefined,
+          },
           type: "search",
           limit: 100,
         })
@@ -314,18 +402,51 @@ export default function Jobs() {
     initialData: [],
   })
 
-  const handleSearch = () => {
-    if (search) {
-      navigate(`/jobs?search=${encodeURIComponent(search)}`)
-    } else {
-      navigate("/jobs")
+  const buildSearchPath = (searchTerm = search) => {
+    const params = new URLSearchParams()
+
+    if (searchTerm.trim()) {
+      params.set("search", searchTerm.trim())
     }
+
+    if (loc.trim()) {
+      params.set("location", loc.trim())
+    }
+
+    if (domainId) {
+      params.set("domain_id", domainId)
+    }
+
+    jobTypes.forEach((type) => params.append("type", type))
+
+    const queryString = params.toString()
+
+    return queryString ? `/jobs?${queryString}` : "/jobs"
   }
+
+  const handleSearch = () => navigate(buildSearchPath())
+
+  const applyQuickSearch = (tag) => {
+    setSearch(tag)
+    navigate(buildSearchPath(tag))
+  }
+
+  const clearFilters = () => {
+    setSearch("")
+    setLoc("")
+    setDomainId("")
+    setJobTypes([])
+    navigate("/jobs")
+  }
+
+  const jobsFooterCopy = footerContent[isRtl ? "he" : "en"]
+
+  const changeLanguage = () => i18n.changeLanguage(isRtl ? "en" : "he")
 
   return (
     <div
       dir={isRtl ? "rtl" : "ltr"}
-      className="min-h-screen relative overflow-hidden"
+      className="headhunter-home jobs-page min-h-screen relative overflow-hidden"
       style={{
         background: "linear-gradient(180deg,#F6FBFF 0%,#EEF6FF 46%,#F7FBFF 100%)",
       }}
@@ -343,15 +464,15 @@ export default function Jobs() {
 
       <Navbar />
 
-      <main className="relative z-10 max-w-[1540px] mx-auto px-7 py-12">
-        <section className="text-center mb-10">
+      <main className="jobs-main relative z-10">
+        <section className="jobs-intro text-center">
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/80 border border-[#DDEBFF] text-[#7C3AED] font-black shadow-[0_12px_30px_rgba(108,77,255,0.10)] mb-5">
             <Sparkles className="w-4 h-4" />
 
             {isRtl ? "פלטפורמת משרות מבוססת AI בישראל" : "AI-Powered Jobs Platform in Israel"}
           </div>
 
-          <h1 className="text-[58px] leading-[1.05] font-black text-[#0F172A] mb-5">
+          <h1 className="jobs-title text-[58px] leading-[1.05] font-black text-[#0F172A] mb-5">
             {isRtl ? "משרות שמותאמות" : "Jobs tailored"}
 
             <span className="block bg-gradient-to-l from-[#8B5CF6] via-[#6C4DFF] to-[#2FB8FF] bg-clip-text text-transparent">
@@ -366,9 +487,9 @@ export default function Jobs() {
           </p>
         </section>
 
-        <section className="mb-10" style={glass}>
-          <div className="p-7">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr_0.8fr_auto] gap-4">
+        <section className="jobs-search-card" style={glass}>
+          <div className="jobs-search-card__inner p-7">
+            <div className="jobs-search-grid grid grid-cols-1 lg:grid-cols-[1.4fr_1fr_0.8fr_auto] gap-4">
               <div className="h-16 rounded-2xl bg-white border border-[#DDEBFF] flex items-center gap-3 px-5">
                 <Search className="w-5 h-5 text-[#94A3B8]" />
 
@@ -398,14 +519,15 @@ export default function Jobs() {
                 <Tag className="w-5 h-5 text-[#94A3B8]" />
 
                 <select
+                  value={domainId}
                   className="w-full bg-transparent outline-none text-[15px] font-bold text-[#64748B]"
-                  onChange={(e) => setJobTypes(e.target.value ? [e.target.value] : [])}
+                  onChange={(e) => setDomainId(e.target.value)}
                 >
-                  <option value="">{isRtl ? "כל הסוגים" : "All types"}</option>
+                  <option value="">{isRtl ? "כל התחומים" : "All fields"}</option>
 
-                  {JOB_TYPES.map((jt) => (
-                    <option key={jt.value} value={jt.value}>
-                      {jt.label}
+                  {domains.map((domain) => (
+                    <option key={domain.domain_id} value={domain.domain_id}>
+                      {domain.name}
                     </option>
                   ))}
                 </select>
@@ -425,7 +547,7 @@ export default function Jobs() {
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-3 mt-5 justify-center">
+            <div className="jobs-quick-search flex flex-wrap gap-3 mt-5 justify-center">
               {(isRtl
                 ? [
                     "אנליסט נתונים",
@@ -450,7 +572,7 @@ export default function Jobs() {
               ).map((tag) => (
                 <button
                   key={tag}
-                  onClick={() => setSearch(tag)}
+                  onClick={() => applyQuickSearch(tag)}
                   className="px-5 py-2.5 rounded-full bg-white border border-[#DDEBFF] text-[#6C4DFF] text-sm font-black shadow-sm hover:shadow-md transition"
                 >
                   {tag}
@@ -460,8 +582,25 @@ export default function Jobs() {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 xl:grid-cols-[280px_1fr_300px] gap-8 items-start">
-          <aside className="hidden xl:block sticky top-[110px]" style={glass}>
+        <button
+          type="button"
+          className="jobs-mobile-filter-button"
+          onClick={() => setMobileFiltersOpen((open) => !open)}
+          aria-expanded={mobileFiltersOpen}
+        >
+          {mobileFiltersOpen ? <X /> : <SlidersHorizontal />}
+          {mobileFiltersOpen
+            ? isRtl
+              ? "סגירת מסננים"
+              : "Close filters"
+            : t("jobs.filters.title")}
+        </button>
+
+        <div className="jobs-workspace">
+          <aside
+            className={`jobs-filters ${mobileFiltersOpen ? "jobs-filters--open" : ""}`}
+            style={glass}
+          >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-black text-[#0F172A] flex items-center gap-2">
@@ -470,7 +609,7 @@ export default function Jobs() {
                   {t("jobs.filters.title")}
                 </h3>
 
-                <button className="text-[#94A3B8] text-sm font-bold flex items-center gap-1">
+                <button onClick={clearFilters} className="text-[#94A3B8] text-sm font-bold flex items-center gap-1">
                   <RotateCcw className="w-4 h-4" />
 
                   {t("jobs.filters.clearAll")}
@@ -534,8 +673,8 @@ export default function Jobs() {
             </div>
           </aside>
 
-          <section>
-            <div className="flex items-center justify-between mb-6">
+          <section className="jobs-results">
+            <div className="jobs-results-toolbar flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-[26px] font-black text-[#0F172A]">
                   {isRtl ? `${jobs.length} משרות נמצאו` : `${jobs.length} jobs found`}
@@ -607,7 +746,7 @@ export default function Jobs() {
             )}
           </section>
 
-          <aside className="hidden xl:flex flex-col gap-6 sticky top-[110px]">
+          <aside className="jobs-insights">
             <div style={glass} className="p-6">
               <h3 className="text-xl font-black text-[#0F172A] mb-5 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-[#7C3AED]" />
@@ -615,25 +754,25 @@ export default function Jobs() {
                 {isRtl ? "משרות מומלצות עבורך" : "Recommended for you"}
               </h3>
 
-              {[
-                ["Frontend Developer", "WalkMe", "₪16K–₪22K", "WM"],
-                ["Data Analyst", "SimilarWeb", "₪15K–₪20K", "SW"],
-                ["DevOps Engineer", "CyberArk", "₪20K–₪28K", "CA"],
-              ].map(([title, company, salary, init]) => (
+              {jobs.slice(0, 3).map((job) => (
                 <div
-                  key={title}
+                  key={job.id}
                   className="flex items-center gap-4 py-4 border-b border-[#E4ECFF] last:border-b-0"
                 >
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] text-white flex items-center justify-center text-sm font-black">
-                    {init}
+                    {job.company_initials || (job.company || "HR").slice(0, 2)}
                   </div>
 
                   <div>
-                    <div className="font-black text-[#0F172A] text-sm">{title}</div>
+                    <Link to={`/jobs/${job.id}`} className="font-black text-[#0F172A] text-sm">
+                      {job.title}
+                    </Link>
 
-                    <div className="text-[#64748B] text-xs font-bold">{company}</div>
+                    <div className="text-[#64748B] text-xs font-bold">{job.company}</div>
 
-                    <div className="text-[#7C3AED] text-xs font-black">{salary}</div>
+                    <div className="text-[#7C3AED] text-xs font-black">
+                      {job.location || (isRtl ? "ישראל" : "Israel")}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -642,7 +781,7 @@ export default function Jobs() {
             <div style={glass} className="p-6">
               <h3 className="text-xl font-black text-[#0F172A] mb-5 flex items-center gap-2">
                 <BarChart2 className="w-5 h-5 text-[#2F80FF]" />
-                תובנות שוק העבודה
+                {isRtl ? "תובנות שוק העבודה" : "Job market insights"}
               </h3>
 
               <div className="rounded-lg p-6 bg-gradient-to-br from-[#F3EFFF] to-[#EAF8FF] border border-[#DDEBFF]">
@@ -650,11 +789,13 @@ export default function Jobs() {
                   +24%
                 </div>
 
-                <p className="text-[#64748B] font-bold mb-4">עלייה בביקוש למשרות טכנולוגיה</p>
+                <p className="text-[#64748B] font-bold mb-4">
+                  {isRtl ? "עלייה בביקוש למשרות טכנולוגיה" : "Growth in demand for technology roles"}
+                </p>
 
                 <div className="flex items-center gap-2 text-[#10B981] font-black text-sm">
                   <TrendingUp className="w-4 h-4" />
-                  ביקוש גבוה בתחום פיתוח
+                  {isRtl ? "ביקוש גבוה בתחום פיתוח" : "Strong demand in development"}
                 </div>
               </div>
             </div>
@@ -662,7 +803,7 @@ export default function Jobs() {
             <div
               className="p-7 text-white relative overflow-hidden"
               style={{
-                borderRadius: 8,
+                borderRadius: 20,
                 background: "linear-gradient(135deg,#A855F7,#6C4DFF,#2F80FF)",
                 boxShadow: "0 28px 80px rgba(108,77,255,0.30)",
               }}
@@ -671,29 +812,41 @@ export default function Jobs() {
 
               <Wand2 className="w-9 h-9 mb-4 relative" />
 
-              <h3 className="text-2xl font-black mb-3 relative">לא יודע מה לחפש?</h3>
+              <h3 className="text-2xl font-black mb-3 relative">
+                {isRtl ? "לא יודע מה לחפש?" : "Not sure what to search for?"}
+              </h3>
 
               <p className="text-white/80 font-semibold leading-7 mb-6 relative">
-                תן ל־AI למצוא עבורך את המשרות שהכי מתאימות לניסיון, לכישורים וליעדים שלך.
+                {isRtl
+                  ? "תן ל־AI למצוא עבורך את המשרות שהכי מתאימות לניסיון, לכישורים וליעדים שלך."
+                  : "Let AI find the roles that best match your experience, skills and career goals."}
               </p>
 
               <Link
                 to="/register"
                 className="relative h-12 rounded-2xl bg-white/18 border border-white/30 backdrop-blur-xl flex items-center justify-center text-white font-black"
               >
-                התחל חיפוש חכם
+                {isRtl ? "התחל חיפוש חכם" : "Start smart matching"}
               </Link>
             </div>
           </aside>
         </div>
 
-        <section className="grid grid-cols-1 md:grid-cols-4 gap-5 mt-12">
-          {[
-            [ShieldCheck, "100% אנונימי", "המעסיק רואה אותך רק אחרי אישור"],
-            [Zap, "תהליך מהיר", "הגשה למשרות בלחיצה אחת"],
-            [Brain, "AI Matching", "התאמות חכמות בזמן אמת"],
-            [Building2, "חברות איכותיות", "משרות מחברות מובילות בלבד"],
-          ].map(([Icon, title, text]) => (
+        <section className="jobs-trust-grid grid grid-cols-1 md:grid-cols-4 gap-5 mt-12">
+          {(isRtl
+            ? [
+                [ShieldCheck, "100% אנונימי", "המעסיק רואה אותך רק אחרי אישור"],
+                [Zap, "תהליך מהיר", "הגשה למשרות בלחיצה אחת"],
+                [Brain, "התאמת AI", "התאמות חכמות בזמן אמת"],
+                [Building2, "חברות איכותיות", "משרות מחברות מובילות בלבד"],
+              ]
+            : [
+                [ShieldCheck, "Private by design", "Employers see your profile only after approval"],
+                [Zap, "Fast process", "Apply to relevant roles in one click"],
+                [Brain, "AI matching", "Smart recommendations updated in real time"],
+                [Building2, "Quality companies", "Openings from trusted employers only"],
+              ]
+          ).map(([Icon, title, text]) => (
             <div key={title} className="p-6 text-center" style={glass}>
               <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center mb-4">
                 <Icon className="w-7 h-7 text-white" />
@@ -706,29 +859,11 @@ export default function Jobs() {
           ))}
         </section>
       </main>
+      <LandingFooter
+        copy={jobsFooterCopy}
+        isEnglish={!isRtl}
+        changeLanguage={changeLanguage}
+      />
     </div>
   )
 }
-import { Link } from "react-router-dom"
-import {
-  Search,
-  MapPin,
-  Bookmark,
-  Share2,
-  Calendar,
-  Briefcase,
-  Sparkles,
-  SlidersHorizontal,
-  LayoutGrid,
-  List,
-  BarChart2,
-  TrendingUp,
-  ChevronDown,
-  ChevronUp,
-  RotateCcw,
-  Tag,
-  ArrowLeft,
-  Wand2,
-} from "lucide-react"
-import SEOHead from "@/components/SEOHead"
-import Navbar from "@/components/home/Navbar"

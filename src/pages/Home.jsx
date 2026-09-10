@@ -1,14 +1,20 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { useQuery } from "@tanstack/react-query"
 import {
   ArrowLeft, ArrowRight, BadgeCheck, BarChart3, Bell, Bot, BrainCircuit,
-  BriefcaseBusiness, Building2, ChevronDown, Clock3, FileText, Globe2,
+  BriefcaseBusiness, Building2, ChevronDown, Clock3, FileText,
   LockKeyhole, MapPin, MessageSquareText, Quote, Rocket, Search, Send,
   ShieldCheck, Sparkles, Star, Target, Trophy, UserPlus, Users, Zap,
 } from "lucide-react"
 import Navbar from "@/components/home/Navbar"
+import LandingFooter from "@/components/home/LandingFooter"
 import SEOHead from "@/components/SEOHead"
+import { publicJobService } from "@/api/services/publicJobService"
+import { taxonomyService } from "@/api/services/taxonomyService"
+import { candidateProfileService } from "@/api/services/candidateProfileService"
+import { useAuth } from "@/lib/AuthContext"
 import "./Home.css"
 
 const icons = {
@@ -152,13 +158,130 @@ const content = {
 }
 
 function CandidateCard({ copy }) {
+  const { user, isLoadingAuth } = useAuth()
+
+  const { i18n } = useTranslation()
+
+  const isEnglish = i18n.language?.startsWith("en")
+
+  const isCandidate = (user?.role || user?.user_type) === "candidate"
+
+  const { data: profile = null, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ["landing-candidate-profile", user?.email],
+    queryFn: () => candidateProfileService.me(),
+    enabled: isCandidate,
+    retry: false,
+  })
+
+  if (isLoadingAuth || (isCandidate && isLoadingProfile)) {
+    return <article className="candidate-card candidate-card-loading" aria-label={isEnglish ? "Loading candidate profile" : "טוען פרופיל מועמד"}><span /><span /><span /><span /><span /></article>
+  }
+
+  if (!isCandidate) {
+    const guest = isEnglish
+      ? {
+          name: "Your professional profile",
+          title: "Get jobs matched to your experience",
+          location: "Personal, private and free",
+          match: "Personal matching starts here",
+          action: "Create your candidate profile",
+          badge: "Free",
+          tags: ["Job matches", "Smart alerts", "AI resume"],
+          firstLabel: "One profile",
+          firstTitle: "Apply faster to relevant roles",
+          firstText: "Keep your experience and skills in one place",
+          secondLabel: "Career AI",
+          secondTitle: "Get recommendations made for you",
+          secondText: "Sign in to unlock your personal workspace",
+        }
+      : {
+          name: "הפרופיל המקצועי שלך",
+          title: "קבל משרות שמתאימות לניסיון שלך",
+          location: "אישי, מאובטח וללא עלות",
+          match: "ההתאמה האישית מתחילה כאן",
+          action: "יצירת פרופיל מועמד",
+          badge: "חינם",
+          tags: ["התאמת משרות", "התראות חכמות", "קורות חיים AI"],
+          firstLabel: "פרופיל אחד",
+          firstTitle: "מגישים מהר למשרות רלוונטיות",
+          firstText: "כל הניסיון והכישורים במקום אחד",
+          secondLabel: "AI לקריירה",
+          secondTitle: "מקבלים המלצות אישיות",
+          secondText: "נרשמים ופותחים סביבת עבודה אישית",
+        }
+
+    return <article className="candidate-card candidate-card-guest"><div className="candidate-head"><div className="candidate-avatar"><UserPlus /></div><div><h3>{guest.name}</h3><p>{guest.title}</p><span><ShieldCheck /> {guest.location}</span></div></div><div className="candidate-match"><div className="match-score match-score-guest"><Sparkles /></div><strong>{guest.match}</strong></div><Link className="candidate-ai" to="/register?type=candidate"><UserPlus /> {guest.action} <small>{guest.badge}</small></Link><div className="candidate-tags">{guest.tags.map((tag) => <span key={tag}>{tag}</span>)}</div><div className="candidate-line"><BriefcaseBusiness /><div><b>{guest.firstLabel}</b><strong>{guest.firstTitle}</strong><span>{guest.firstText}</span></div></div><div className="candidate-line"><BrainCircuit /><div><b>{guest.secondLabel}</b><strong>{guest.secondTitle}</strong><span>{guest.secondText}</span></div></div></article>
+  }
+
   const candidate = copy.candidate
 
-  return <article className="candidate-card"><div className="candidate-head"><div className="candidate-avatar"><Users /></div><div><h3>{candidate.name}</h3><p>Full Stack Developer</p><span><MapPin /> {candidate.location}</span></div></div><div className="candidate-match"><div className="match-score">95%</div><strong>{candidate.match}</strong></div><button className="candidate-ai"><Sparkles /> {candidate.upgrade} <small>{candidate.new}</small></button><div className="candidate-tags">{["React", "Node.js", "TypeScript", "AWS", "PostgreSQL"].map((tag) => <span key={tag}>{tag}</span>)}</div><div className="candidate-line"><BriefcaseBusiness /><div><b>{candidate.experience}</b><strong>Senior Frontend Developer</strong><span>{candidate.period}</span></div></div><div className="candidate-line"><Building2 /><div><b>{candidate.education}</b><strong>{candidate.degree}</strong><span>{candidate.university}</span></div></div></article>
+  const experience = Array.isArray(profile?.experience) ? profile.experience[0] : null
+
+  const education = Array.isArray(profile?.education)
+    ? profile.education[0]
+    : profile?.education
+
+  const educationTitle =
+    typeof education === "string"
+      ? education
+      : education?.degree || education?.title || education?.institution
+
+  const completionFields = [
+    profile?.full_name,
+    profile?.title,
+    profile?.location,
+    profile?.summary,
+    profile?.skills?.length,
+    profile?.experience?.length,
+    profile?.education && (Array.isArray(profile.education) ? profile.education.length : true),
+    profile?.resume_url,
+  ]
+
+  const profileStrength = Math.round(
+    (completionFields.filter(Boolean).length / completionFields.length) * 100,
+  )
+
+  const labels = isEnglish
+    ? {
+        fallbackTitle: "Candidate profile",
+        fallbackLocation: "Add your location",
+        strength: "Profile strength",
+        complete: "Complete your profile",
+        addResume: "Add your resume",
+        upgrade: "Upgrade your resume with AI",
+        experience: "Work experience",
+        addExperience: "Add work experience",
+        education: "Education",
+        addEducation: "Add education",
+        updated: "Keep your profile up to date",
+      }
+    : {
+        fallbackTitle: "פרופיל מועמד",
+        fallbackLocation: "הוספת מיקום",
+        strength: "חוזק הפרופיל",
+        complete: "השלמת הפרופיל",
+        addResume: "הוספת קורות חיים",
+        upgrade: "שדרוג קורות החיים עם AI",
+        experience: "ניסיון תעסוקתי",
+        addExperience: "הוספת ניסיון תעסוקתי",
+        education: "השכלה",
+        addEducation: "הוספת השכלה",
+        updated: "כדאי לשמור על פרופיל מעודכן",
+      }
+
+  const action = profile?.resume_url
+    ? { label: labels.upgrade, to: "/ai-career" }
+    : { label: profile ? labels.addResume : labels.complete, to: "/candidate/profile" }
+
+  const skills = profile?.skills?.slice(0, 5) || []
+
+  const name = profile?.full_name || user?.full_name || user?.email
+
+  return <article className="candidate-card"><div className="candidate-head"><div className="candidate-avatar"><Users /></div><div><h3>{name}</h3><p>{profile?.title || labels.fallbackTitle}</p><span><MapPin /> {profile?.location || labels.fallbackLocation}</span></div></div><div className="candidate-match"><div className="match-score" style={{ background: `conic-gradient(#61d6d7 0 ${profileStrength}%, #e4eeee ${profileStrength}% 100%)` }}>{profileStrength}%</div><strong>{labels.strength}</strong></div><Link className="candidate-ai" to={action.to}><Sparkles /> {action.label} <small>{candidate.new}</small></Link>{skills.length > 0 && <div className="candidate-tags">{skills.map((tag) => <span key={tag}>{tag}</span>)}</div>}<div className="candidate-line"><BriefcaseBusiness /><div><b>{labels.experience}</b><strong>{experience?.role || experience?.title || labels.addExperience}</strong><span>{experience ? [experience.company, experience.years || experience.period].filter(Boolean).join(" · ") : labels.updated}</span></div></div><div className="candidate-line"><Building2 /><div><b>{labels.education}</b><strong>{educationTitle || labels.addEducation}</strong><span>{typeof education === "object" ? [education?.institution, education?.year].filter(Boolean).join(" · ") || labels.updated : labels.updated}</span></div></div></article>
 }
 
 function Hero({ copy }) {
-  return <section className="hh-hero"><div className="hero-glow hero-glow-one" /><div className="hero-glow hero-glow-two" /><div className="hh-shell hero-grid"><div className="hero-copy"><div className="hero-pill"><Sparkles /> {copy.heroPill} <Sparkles /></div><h1>{copy.heroTitle}<br /><span>{copy.heroAccent}</span></h1><p>{copy.heroText[0]}<br />{copy.heroText[1]}</p><div className="hero-actions"><Link className="hh-button" to="/jobs"><Search /> {copy.searchJobs}</Link><Link className="hh-button hh-button-outline" to="/register?type=candidate"><UserPlus /> {copy.register}</Link></div><div className="candidate-proof"><div className="proof-avatars"><span>A</span><span>N</span><span>D</span><span>Y</span><b>+</b></div><p>{copy.proof}</p></div></div><div className="hero-visual" aria-hidden="true"><div className="ai-orb"><span>AI</span></div><div className="orbit orbit-one" /><div className="orbit orbit-two" /><CandidateCard copy={copy} /></div></div></section>
+  return <section className="hh-hero"><div className="hero-glow hero-glow-one" /><div className="hero-glow hero-glow-two" /><div className="hh-shell hero-grid"><div className="hero-copy"><div className="hero-pill"><Sparkles /> {copy.heroPill} <Sparkles /></div><h1>{copy.heroTitle}<br /><span>{copy.heroAccent}</span></h1><p>{copy.heroText[0]}<br />{copy.heroText[1]}</p><div className="hero-actions"><Link className="hh-button" to="/jobs"><Search /> {copy.searchJobs}</Link><Link className="hh-button hh-button-outline" to="/register?type=candidate"><UserPlus /> {copy.register}</Link></div><div className="candidate-proof"><div className="proof-avatars"><span>A</span><span>N</span><span>D</span><span>Y</span><b>+</b></div><p>{copy.proof}</p></div></div><div className="hero-visual"><div className="ai-orb" aria-hidden="true"><span>AI</span></div><div className="orbit orbit-one" aria-hidden="true" /><div className="orbit orbit-two" aria-hidden="true" /><CandidateCard copy={copy} /></div></div></section>
 }
 
 function FeatureSection({ copy }) {
@@ -174,13 +297,91 @@ function SearchSection({ copy }) {
 
   const [query, setQuery] = useState("")
 
-  const search = () => navigate(query.trim() ? `/jobs?search=${encodeURIComponent(query.trim())}` : "/jobs")
+  const [selectedLocation, setSelectedLocation] = useState("")
 
-  return <section className="hh-section jobs-section"><div className="hh-shell hh-card search-card"><h2 className="section-title">{copy.findJobs} <span>{copy.matchYou}</span></h2><div className="search-row"><label><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => event.key === "Enter" && search()} placeholder={copy.placeholder} /></label><button className="search-select"><MapPin /> {copy.location} <ChevronDown /></button><button className="search-select"><BriefcaseBusiness /> {copy.allFields} <ChevronDown /></button><button className="hh-button search-submit" onClick={search}>{copy.searchJobs}</button></div><div className="tag-row"><span>{copy.moreFields}</span>{copy.tags.map((tag) => <button key={tag} onClick={() => navigate(`/jobs?search=${encodeURIComponent(tag)}`)}>{tag}</button>)}</div></div></section>
+  const [selectedDomain, setSelectedDomain] = useState("")
+
+  const { data: domains = [] } = useQuery({
+    queryKey: ["landing-job-domains"],
+    queryFn: () => taxonomyService.domains(),
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const { data: availableJobs = [] } = useQuery({
+    queryKey: ["landing-job-locations"],
+    queryFn: () => publicJobService.list({ limit: 500, sort: "created_date", order: "DESC" }),
+    staleTime: 60 * 1000,
+  })
+
+  const locations = Array.from(
+    new Set(availableJobs.map((job) => job.location?.trim()).filter(Boolean)),
+  ).sort((a, b) => a.localeCompare(b))
+
+  const goToJobs = (searchTerm = query) => {
+    const params = new URLSearchParams()
+
+    if (searchTerm.trim()) {
+      params.set("search", searchTerm.trim())
+    }
+
+    if (selectedLocation) {
+      params.set("location", selectedLocation)
+    }
+
+    if (selectedDomain) {
+      params.set("domain_id", selectedDomain)
+    }
+
+    const queryString = params.toString()
+
+    navigate(queryString ? `/jobs?${queryString}` : "/jobs")
+  }
+
+  return <section className="hh-section jobs-section"><div className="hh-shell hh-card search-card"><h2 className="section-title">{copy.findJobs} <span>{copy.matchYou}</span></h2><div className="search-row"><label><Search /><input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => event.key === "Enter" && goToJobs()} placeholder={copy.placeholder} /></label><label className="search-select"><MapPin /><select aria-label={copy.location} value={selectedLocation} onChange={(event) => setSelectedLocation(event.target.value)}><option value="">{copy.location}</option>{locations.map((location) => <option key={location} value={location}>{location}</option>)}</select><ChevronDown /></label><label className="search-select"><BriefcaseBusiness /><select aria-label={copy.allFields} value={selectedDomain} onChange={(event) => setSelectedDomain(event.target.value)}><option value="">{copy.allFields}</option>{domains.map((domain) => <option key={domain.domain_id} value={domain.domain_id}>{domain.name}</option>)}</select><ChevronDown /></label><button className="hh-button search-submit" onClick={() => goToJobs()}>{copy.searchJobs}</button></div><div className="tag-row"><span>{copy.moreFields}</span>{copy.tags.map((tag) => <button key={tag} onClick={() => goToJobs(tag)}>{tag}</button>)}</div></div></section>
 }
 
 function FeaturedJobs({ copy, isEnglish }) {
   const Arrow = isEnglish ? ArrowRight : ArrowLeft
+
+  const { data: jobs = [], isLoading, isError } = useQuery({
+    queryKey: ["landing-featured-jobs"],
+    queryFn: () =>
+      publicJobService.list({ limit: 100, sort: "created_date", order: "DESC" }),
+    staleTime: 60 * 1000,
+  })
+
+  const featuredJobs = jobs
+    .filter((job) => {
+      const title = job.title?.trim()
+
+      return Boolean(
+        title &&
+          job.company?.trim() &&
+          title.length <= 120 &&
+          !title.includes("</") &&
+          !title.includes("\\/") &&
+          !title.includes('"statusCode"'),
+      )
+    })
+    .sort((a, b) => {
+      const quality = (job) =>
+        Number(Boolean(job.location?.trim())) * 4 +
+        Number(Boolean(job.description?.trim())) * 2 +
+        Number(Boolean(job.category?.trim()))
+
+      return quality(b) - quality(a)
+    })
+    .slice(0, 3)
+
+  const typeLabels = isEnglish
+    ? { full: "Full time", part: "Part time", daily: "Daily", remote: "Remote" }
+    : { full: "משרה מלאה", part: "משרה חלקית", daily: "יומי", remote: "מרחוק" }
+
+  const formatDate = (value) =>
+    new Intl.DateTimeFormat(isEnglish ? "en-GB" : "he-IL", {
+      day: "numeric",
+      month: "short",
+    }).format(new Date(value))
 
   return (
     <section className="hh-section featured-jobs-section">
@@ -194,15 +395,48 @@ function FeaturedJobs({ copy, isEnglish }) {
           <Link className="section-link" to="/jobs">{copy.viewAllJobs} <Arrow /></Link>
         </div>
         <div className="featured-jobs-grid">
-          {copy.featuredJobs.map(([title, company, location, mode, skills], index) => (
-            <article className="job-preview-card" key={title}>
-              <div className="job-preview-top"><span className="company-avatar">{company.charAt(0)}</span><div className="job-preview-badges">{index === 0 && <small className="job-match"><Sparkles /> 95% match</small>}<span className="job-fresh"><Clock3 /> {copy.recentlyPosted}</span></div></div>
-              <h3>{title}</h3><p className="job-company">{company}</p>
-              <div className="job-meta"><span><MapPin /> {location}</span><span><BriefcaseBusiness /> {mode}</span></div>
-              <div className="job-skills">{skills.map((skill) => <span key={skill}>{skill}</span>)}</div>
-              <Link to={`/jobs?search=${encodeURIComponent(title)}`}>{copy.viewRole} <Arrow /></Link>
+          {isLoading && [1, 2, 3].map((item) => (
+            <article className="job-preview-card job-preview-loading" key={item} aria-hidden="true">
+              <span /><span /><span /><span />
             </article>
           ))}
+
+          {!isLoading && !isError && featuredJobs.map((job) => {
+            const skills = [
+              ...(Array.isArray(job.required_skills) ? job.required_skills : []),
+              ...(Array.isArray(job.preferred_skills) ? job.preferred_skills : []),
+              job.category,
+            ].filter(Boolean).slice(0, 3)
+
+            return (
+              <article className="job-preview-card" key={job.id}>
+                <div className="job-preview-top">
+                  <span className="company-avatar">{job.company_initials || job.company.charAt(0)}</span>
+                  <div className="job-preview-badges">
+                    <span className="job-fresh"><Clock3 /> {formatDate(job.created_date)}</span>
+                  </div>
+                </div>
+                <h3>{job.title}</h3>
+                <p className="job-company">{job.company}</p>
+                <div className="job-meta">
+                  {job.location && <span><MapPin /> {job.location}</span>}
+                  <span><BriefcaseBusiness /> {typeLabels[job.type] || job.type}</span>
+                </div>
+                {skills.length > 0 && <div className="job-skills">
+                  {skills.map((skill) => <span key={skill}>{skill}</span>)}
+                </div>}
+                <Link to={`/jobs/${job.id}`}>{copy.viewRole} <Arrow /></Link>
+              </article>
+            )
+          })}
+
+          {!isLoading && (isError || featuredJobs.length === 0) && (
+            <div className="featured-jobs-empty">
+              <BriefcaseBusiness />
+              <p>{isEnglish ? "No open roles are available right now." : "אין כרגע משרות פתוחות להצגה."}</p>
+              <Link to="/jobs">{copy.viewAllJobs} <Arrow /></Link>
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -254,14 +488,6 @@ function BottomCta({ copy }) {
 })}</div></div></section>
 }
 
-function FooterLinks({ title, links, className = "" }) {
-  return <div className={`hh-footer-column ${className}`}><h3>{title}</h3>{links.map(([label, href]) => <Link key={label} to={href}>{label}</Link>)}</div>
-}
-
-function Footer({ copy, isEnglish, changeLanguage }) {
-  return <footer className="hh-footer" dir={isEnglish ? "ltr" : "rtl"}><div className="hh-footer-shell"><div className="hh-footer-grid"><div className="hh-footer-intro"><img src="/logo.png" alt="HeadHunter" /><p>{copy.footerDescription}</p></div>{copy.footerColumns.map(([title, links]) => <FooterLinks key={title} title={title} links={links} />)}<FooterLinks className="hh-footer-support" title={copy.support} links={copy.supportLinks} /></div><div className="hh-footer-bottom"><span>{copy.copyright}</span><nav aria-label="Footer"><button type="button" onClick={changeLanguage}><Globe2 /> {copy.language}</button><Link to="/terms">{copy.terms}</Link><Link to="/privacy">{copy.privacy}</Link></nav></div></div></footer>
-}
-
 export default function Home() {
   const { i18n } = useTranslation()
 
@@ -271,5 +497,5 @@ export default function Home() {
 
   const changeLanguage = () => i18n.changeLanguage(isEnglish ? "he" : "en")
 
-  return <div className="headhunter-home" dir={isEnglish ? "ltr" : "rtl"}><SEOHead title={copy.seoTitle} description={copy.seoDescription} canonical="https://headhunter.co.il/" keywords={isEnglish ? "jobs, recruitment, career, AI, Israel" : "משרות, דרושים, גיוס, קריירה, AI"} /><Navbar /><main><Hero copy={copy} /><FeatureSection copy={copy} /><SearchSection copy={copy} /><FeaturedJobs copy={copy} isEnglish={isEnglish} /><AICenter copy={copy} /><Stats copy={copy} /><HowItWorks copy={copy} isEnglish={isEnglish} /><CandidateStory copy={copy} /><BottomCta copy={copy} /></main><Footer copy={copy} isEnglish={isEnglish} changeLanguage={changeLanguage} /></div>
+  return <div className="headhunter-home" dir={isEnglish ? "ltr" : "rtl"}><SEOHead title={copy.seoTitle} description={copy.seoDescription} canonical="https://headhunter.co.il/" keywords={isEnglish ? "jobs, recruitment, career, AI, Israel" : "משרות, דרושים, גיוס, קריירה, AI"} /><Navbar /><main><Hero copy={copy} /><FeatureSection copy={copy} /><SearchSection copy={copy} /><FeaturedJobs copy={copy} isEnglish={isEnglish} /><AICenter copy={copy} /><Stats copy={copy} /><HowItWorks copy={copy} isEnglish={isEnglish} /><CandidateStory copy={copy} /><BottomCta copy={copy} /></main><LandingFooter copy={copy} isEnglish={isEnglish} changeLanguage={changeLanguage} /></div>
 }

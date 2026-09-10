@@ -7,6 +7,7 @@ export interface JobSearchInput {
     type?: string[]
     location?: string
     category?: string[]
+    domain_id?: number
     salary_min?: number
     salary_max?: number
   }
