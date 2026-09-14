@@ -94,7 +94,9 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       // 401 / 403 just means the stored token is stale — not an app-level error.
       // Clear the stale token from storage and treat the user as unauthenticated.
-      if (error.status === 401 || error.status === 403) {
+      const status = error?.statusCode ?? error?.status ?? error?.response?.status
+
+      if (status === 401 || status === 403) {
         tokenStorage.clearTokens()
       } else {
         console.error("User auth check failed:", error)
