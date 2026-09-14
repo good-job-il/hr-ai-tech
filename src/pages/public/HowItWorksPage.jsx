@@ -1,287 +1,401 @@
-import { useTranslation } from 'react-i18next';
-import { UserPlus, Search, Sparkles, Send, CheckCircle, Briefcase, Building2, Brain } from 'lucide-react';
+import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import {
+  ArrowLeft,
+  ArrowRight,
+  BrainCircuit,
+  BriefcaseBusiness,
+  Building2,
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  Clock3,
+  FileCheck2,
+  LayoutDashboard,
+  Search,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  UserPlus,
+  Users,
+} from "lucide-react"
+import Navbar from "@/components/home/Navbar"
+import LandingFooter from "@/components/home/LandingFooter"
+import SEOHead from "@/components/SEOHead"
+import "../Home.css"
+import "./HowItWorksPage.css"
+
+const pageContent = {
+  en: {
+    eyebrow: "How HeadHunter works",
+    title: "A clearer path from profile",
+    titleAccent: "to the right opportunity",
+    intro:
+      "Create one professional profile, get relevant job matches and manage every application without losing track of what comes next.",
+    candidateCta: "Start as a candidate",
+    employerCta: "I am hiring",
+    profile: "Professional profile",
+    profileDetail: "Experience, skills and preferences",
+    matching: "AI matching",
+    matchingDetail: "Roles ranked for relevance",
+    progress: "Application progress",
+    progressDetail: "Every update in one place",
+    metricSatisfaction: "candidate satisfaction",
+    metricSpeed: "faster job discovery",
+    metricJobs: "open positions",
+    metricCandidates: "active candidates",
+    candidateEyebrow: "For candidates",
+    candidateTitle: "One simple journey, with guidance at every step",
+    candidateIntro:
+      "Your profile stays at the center of the process, so each match and application becomes more focused.",
+    candidateSteps: [
+      {
+        icon: UserPlus,
+        number: "01",
+        title: "Create your profile",
+        desc: "Add your experience, skills, salary expectations and preferred location. Upload an existing resume or complete the profile manually.",
+        meta: "About 2 minutes",
+      },
+      {
+        icon: BrainCircuit,
+        number: "02",
+        title: "AI analyzes and matches",
+        desc: "The matching engine compares your professional profile with open roles using skills, seniority, location and preferences.",
+        meta: "Automatic",
+      },
+      {
+        icon: Search,
+        number: "03",
+        title: "Review relevant opportunities",
+        desc: "See a focused list of jobs with a match score and the details you need before deciding whether to apply.",
+        meta: "Updated regularly",
+      },
+      {
+        icon: Send,
+        number: "04",
+        title: "Apply with confidence",
+        desc: "Send your professional profile to the recruiter and prepare stronger application materials for the role.",
+        meta: "Simple application",
+      },
+      {
+        icon: LayoutDashboard,
+        number: "05",
+        title: "Track every application",
+        desc: "Follow statuses, updates and interview reminders from one personal workspace without losing context.",
+        meta: "Always organized",
+      },
+    ],
+    candidateButton: "Create your free candidate profile",
+    employerEyebrow: "For employers",
+    employerTitle: "A focused hiring flow from role to shortlist",
+    employerIntro:
+      "Publish a clear role, surface relevant candidates and keep the hiring team aligned in one workspace.",
+    employerSteps: [
+      {
+        icon: BriefcaseBusiness,
+        number: "01",
+        title: "Publish the position",
+        desc: "Define the role, requirements and hiring context in a structured job post.",
+      },
+      {
+        icon: Users,
+        number: "02",
+        title: "Find relevant candidates",
+        desc: "Use matching signals to focus the team on candidates whose experience fits the role.",
+      },
+      {
+        icon: FileCheck2,
+        number: "03",
+        title: "Manage the hiring process",
+        desc: "Coordinate reviews, interviews, decisions and offers from the same workflow.",
+      },
+    ],
+    employerButton: "Post your first position",
+    faqEyebrow: "Good to know",
+    faqTitle: "Frequently asked questions",
+    faqIntro: "The essential details before you create a profile or publish a position.",
+    faq: [
+      {
+        q: "Is the service free?",
+        a: "Candidates can create a profile and use the job-search experience at no cost. Employer access depends on the selected plan and available offer.",
+      },
+      {
+        q: "How long does it take to find a job?",
+        a: "Timing depends on the role, market and availability. A complete profile and focused applications help recruiters assess your fit more quickly.",
+      },
+      {
+        q: "How does AI know which roles fit me?",
+        a: "Matching uses the information in your profile — including experience, skills, location and preferences — and compares it with the requirements of each role.",
+      },
+      {
+        q: "Is my information secure?",
+        a: "You control the information in your profile and what is shared with employers. The platform is designed to keep candidate data private and protected.",
+      },
+    ],
+    ctaEyebrow: "Choose your next step",
+    ctaTitle: "Ready to move forward?",
+    ctaText: "Join as a candidate to discover roles, or create an employer account to start hiring.",
+    secure: "Private and secure",
+    freeCandidate: "Free candidate profile",
+  },
+  he: {
+    eyebrow: "איך HeadHunter עובד",
+    title: "מסלול ברור יותר מהפרופיל",
+    titleAccent: "להזדמנות הנכונה",
+    intro:
+      "יוצרים פרופיל מקצועי אחד, מקבלים התאמות רלוונטיות למשרות ומנהלים כל מועמדות בלי לאבד את הצעד הבא.",
+    candidateCta: "מתחילים כמועמדים",
+    employerCta: "אני מגייס/ת",
+    profile: "פרופיל מקצועי",
+    profileDetail: "ניסיון, כישורים והעדפות",
+    matching: "התאמת AI",
+    matchingDetail: "דירוג משרות לפי רלוונטיות",
+    progress: "התקדמות המועמדות",
+    progressDetail: "כל עדכון במקום אחד",
+    metricSatisfaction: "שביעות רצון מועמדים",
+    metricSpeed: "איתור משרות מהיר יותר",
+    metricJobs: "משרות פתוחות",
+    metricCandidates: "מועמדים פעילים",
+    candidateEyebrow: "למועמדים",
+    candidateTitle: "מסלול פשוט אחד, עם הכוונה בכל שלב",
+    candidateIntro:
+      "הפרופיל שלך נשאר במרכז התהליך, כך שכל התאמה ומועמדות הופכות ממוקדות יותר.",
+    candidateSteps: [
+      {
+        icon: UserPlus,
+        number: "01",
+        title: "יוצרים פרופיל",
+        desc: "מוסיפים ניסיון, כישורים, ציפיות שכר ומיקום מועדף. אפשר להעלות קורות חיים קיימים או להשלים ידנית.",
+        meta: "כ-2 דקות",
+      },
+      {
+        icon: BrainCircuit,
+        number: "02",
+        title: "ה-AI מנתח ומתאים",
+        desc: "מנוע ההתאמה משווה את הפרופיל המקצועי למשרות פתוחות לפי כישורים, ותק, מיקום והעדפות.",
+        meta: "אוטומטי",
+      },
+      {
+        icon: Search,
+        number: "03",
+        title: "בוחנים הזדמנויות רלוונטיות",
+        desc: "מקבלים רשימה ממוקדת של משרות עם ציון התאמה והמידע הדרוש לפני שמחליטים להגיש.",
+        meta: "מתעדכן באופן שוטף",
+      },
+      {
+        icon: Send,
+        number: "04",
+        title: "מגישים בביטחון",
+        desc: "שולחים את הפרופיל המקצועי למגייס ומתכוננים עם חומרים חזקים יותר לתפקיד.",
+        meta: "הגשה פשוטה",
+      },
+      {
+        icon: LayoutDashboard,
+        number: "05",
+        title: "עוקבים אחרי כל מועמדות",
+        desc: "רואים סטטוסים, עדכונים ותזכורות לראיונות בסביבת עבודה אישית אחת.",
+        meta: "תמיד מסודר",
+      },
+    ],
+    candidateButton: "יצירת פרופיל מועמד בחינם",
+    employerEyebrow: "למעסיקים",
+    employerTitle: "תהליך גיוס ממוקד מהמשרה לרשימה הקצרה",
+    employerIntro:
+      "מפרסמים תפקיד ברור, מאתרים מועמדים רלוונטיים ומשאירים את צוות הגיוס מתואם בסביבה אחת.",
+    employerSteps: [
+      {
+        icon: BriefcaseBusiness,
+        number: "01",
+        title: "מפרסמים את המשרה",
+        desc: "מגדירים את התפקיד, הדרישות והקשר הגיוס במודעת משרה מובנית.",
+      },
+      {
+        icon: Users,
+        number: "02",
+        title: "מאתרים מועמדים רלוונטיים",
+        desc: "משתמשים באותות התאמה כדי להתמקד במועמדים שהניסיון שלהם מתאים לתפקיד.",
+      },
+      {
+        icon: FileCheck2,
+        number: "03",
+        title: "מנהלים את תהליך הגיוס",
+        desc: "מתאמים סקירות, ראיונות, החלטות והצעות באותו תהליך עבודה.",
+      },
+    ],
+    employerButton: "פרסום המשרה הראשונה",
+    faqEyebrow: "כדאי לדעת",
+    faqTitle: "שאלות נפוצות",
+    faqIntro: "הפרטים החשובים לפני יצירת פרופיל או פרסום משרה.",
+    faq: [
+      {
+        q: "האם השירות בחינם?",
+        a: "מועמדים יכולים ליצור פרופיל ולהשתמש בחיפוש המשרות ללא עלות. הגישה למעסיקים תלויה במסלול ובהצעה הזמינה.",
+      },
+      {
+        q: "כמה זמן לוקח למצוא עבודה?",
+        a: "משך הזמן תלוי בתפקיד, בשוק ובזמינות. פרופיל מלא והגשות ממוקדות עוזרים למגייסים להעריך התאמה מהר יותר.",
+      },
+      {
+        q: "איך ה-AI יודע אילו משרות מתאימות לי?",
+        a: "ההתאמה משתמשת במידע שבפרופיל — כולל ניסיון, כישורים, מיקום והעדפות — ומשווה אותו לדרישות של כל משרה.",
+      },
+      {
+        q: "האם המידע שלי מאובטח?",
+        a: "השליטה במידע שבפרופיל ובמה שנחשף למעסיקים נשארת בידיך. הפלטפורמה נועדה לשמור על נתוני המועמדים פרטיים ומוגנים.",
+      },
+    ],
+    ctaEyebrow: "בוחרים את הצעד הבא",
+    ctaTitle: "מוכנים להתקדם?",
+    ctaText: "מצטרפים כמועמדים כדי לגלות משרות, או יוצרים חשבון מעסיק ומתחילים לגייס.",
+    secure: "פרטי ומאובטח",
+    freeCandidate: "פרופיל מועמד בחינם",
+  },
+}
 
 export default function HowItWorksPage() {
-  const { i18n } = useTranslation();
+  const { i18n } = useTranslation()
 
-  const isRtl = !i18n.language?.startsWith('en');
+  const isEnglish = i18n.language?.startsWith("en")
 
-  const CANDIDATE_STEPS = [
-    {
-      icon: UserPlus,
-      num: '1',
-      title: isRtl ? 'יוצרים פרופיל' : 'Create a Profile',
-      desc: isRtl
-        ? 'הרשמה פשוטה עם אימייל. מלא את הפרופיל שלך — ניסיון, כישורים, ציפיות שכר ואיזור. מעלה קורות חיים וה-AI עושה את השאר.'
-        : 'Simple sign-up with email. Fill in your profile — experience, skills, salary expectations and location. Upload your resume and the AI does the rest.',
-      time: isRtl ? '2 דקות' : '2 minutes',
-    },
-    {
-      icon: Sparkles,
-      num: '2',
-      title: isRtl ? 'AI מנתח ומתאים' : 'AI Analyzes & Matches',
-      desc: isRtl
-        ? 'המנוע שלנו סורק אלפי משרות ומחפש את ההתאמות הטובות ביותר עבורך — לפי ניסיון, כישורים, שכר ומיקום.'
-        : 'Our engine scans thousands of jobs and finds the best matches for you — by experience, skills, salary and location.',
-      time: isRtl ? 'אוטומטי' : 'Automatic',
-    },
-    {
-      icon: Search,
-      num: '3',
-      title: isRtl ? 'מגלה משרות מותאמות' : 'Discover Matched Jobs',
-      desc: isRtl
-        ? 'קבל רשימה אישית של משרות שמתאימות לך, עם ציון התאמה והסבר מדוע. גם ממשרות שלא פרסמו עדיין.'
-        : 'Get a personalized list of jobs that fit you, with a match score and explanation why. Including jobs not yet publicly posted.',
-      time: isRtl ? 'בזמן אמת' : 'Real-time',
-    },
-    {
-      icon: Send,
-      num: '4',
-      title: isRtl ? 'מגיש מועמדות בקליק' : 'Apply with One Click',
-      desc: isRtl
-        ? 'גש ממשרות בלחיצה אחת — הפרופיל שלך נשלח ישירות למגייס. אפשר גם לכתוב מכתב AI מותאם אישית.'
-        : 'Apply to jobs with one click — your profile is sent directly to the recruiter. You can also write an AI-personalized cover letter.',
-      time: isRtl ? '30 שניות' : '30 seconds',
-    },
-    {
-      icon: CheckCircle,
-      num: '5',
-      title: isRtl ? 'עוקב אחרי ההגשות' : 'Track Your Applications',
-      desc: isRtl
-        ? 'לוח בקרה אישי לכל הגשה — סטטוס, עדכונים בזמן אמת, ותזכורות לראיונות.'
-        : 'A personal dashboard for every application — status, real-time updates, and interview reminders.',
-      time: isRtl ? 'תמיד מעודכן' : 'Always up to date',
-    },
-  ];
+  const copy = pageContent[isEnglish ? "en" : "he"]
 
-  const EMPLOYER_STEPS = [
-    {
-      icon: Briefcase,
-      num: '1',
-      title: isRtl ? 'מפרסמים משרה' : 'Post a Job',
-      desc: isRtl
-        ? 'טופס פשוט לפרסום משרה. AI ממלא אוטומטית דרישות ומילות מפתח כדי להגיע למועמדים הנכונים.'
-        : 'A simple form to post a job. AI automatically fills in requirements and keywords to reach the right candidates.',
-    },
-    {
-      icon: Brain,
-      num: '2',
-      title: isRtl ? 'AI מוצא מועמדים' : 'AI Finds Candidates',
-      desc: isRtl
-        ? 'המנוע סורק את מאגר המועמדים ומדרג לפי התאמה. תקבל רשימת מועמדים מומלצים תוך דקות.'
-        : 'The engine scans the candidate pool and ranks by fit. You get a list of recommended candidates within minutes.',
-    },
-    {
-      icon: Building2,
-      num: '3',
-      title: isRtl ? 'מנהל תהליך גיוס' : 'Manage Hiring Process',
-      desc: isRtl
-        ? 'לוח קנבן לניהול כל המועמדים, קביעת ראיונות, שליחת הצעות — הכל במקום אחד.'
-        : 'A Kanban board to manage all candidates, schedule interviews, send offers — all in one place.',
-    },
-  ];
-
-  const STATS = [
-    { num: '88%', label: isRtl ? 'מועמדים מרוצים' : 'Satisfied candidates' },
-    { num: '3x', label: isRtl ? 'מהיר יותר מחיפוש רגיל' : 'Faster than regular search' },
-    { num: '+8,500', label: isRtl ? 'משרות פתוחות' : 'Open positions' },
-    { num: '+15,000', label: isRtl ? 'מועמדים פעילים' : 'Active candidates' },
-  ];
-
-  const FAQ = [
-    {
-      q: isRtl ? 'האם השירות בחינם?' : 'Is the service free?',
-      a: isRtl
-        ? 'כן! מועמדים יכולים להשתמש בפלטפורמה ללא עלות. מעסיקים יכולים לפרסם עד 5 משרות בחינם.'
-        : 'Yes! Candidates can use the platform at no cost. Employers can post up to 5 jobs for free.',
-    },
-    {
-      q: isRtl ? 'כמה זמן לוקח למצוא עבודה?' : 'How long does it take to find a job?',
-      a: isRtl
-        ? 'ממוצע של 3–4 שבועות ממועד ההרשמה עד קבלת הצעת עבודה. תלוי בתחום ובזמינות.'
-        : 'An average of 3–4 weeks from registration to receiving a job offer. Depends on the field and availability.',
-    },
-    {
-      q: isRtl ? 'איך ה-AI יודע מה מתאים לי?' : 'How does the AI know what suits me?',
-      a: isRtl
-        ? 'הוא מנתח את כל הפרופיל שלך — ניסיון, כישורים, מיקום ושכר — ומשווה אל מאות פרמטרים בכל משרה.'
-        : 'It analyzes your entire profile — experience, skills, location and salary — and compares it against hundreds of parameters in each job.',
-    },
-    {
-      q: isRtl ? 'האם הנתונים שלי מאובטחים?' : 'Is my data secure?',
-      a: isRtl
-        ? 'בהחלט. כל המידע מוצפן ולא נמכר לצד שלישי. אתה שולט מה גלוי למעסיקים.'
-        : 'Absolutely. All data is encrypted and never sold to third parties. You control what is visible to employers.',
-    },
-  ];
+  const ForwardArrow = isEnglish ? ArrowRight : ArrowLeft
 
   return (
-    <PublicLayout>
-      <div dir={isRtl ? 'rtl' : 'ltr'} className="min-h-screen bg-white">
+    <div className="headhunter-home how-page" dir={isEnglish ? "ltr" : "rtl"}>
+      <SEOHead
+        title={isEnglish ? "How HeadHunter Works" : "איך HeadHunter עובד"}
+        description={copy.intro}
+        canonical="https://headhunter.co.il/how-it-works"
+      />
+      <Navbar />
 
-        {/* Hero */}
-        <div className="bg-gradient-to-b from-blue-50 to-white py-16 px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <span className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              {isRtl ? 'איך זה עובד?' : 'How does it work?'}
-            </span>
-
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              {isRtl ? (
-                <>פשוט, חכם, יעיל —<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">מוצא לך עבודה</span></>
-              ) : (
-                <>Simple, smart, effective —<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">finds you a job</span></>
-              )}
-            </h1>
-
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {isRtl
-                ? 'HeadHunter משלב AI מתקדם עם פשטות השימוש כדי לחבר בין מועמדים לעבודות בדיוק מדהים'
-                : 'HeadHunter combines advanced AI with ease of use to connect candidates to jobs with remarkable precision'}
-            </p>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="py-10 px-4 border-y border-gray-100 bg-gray-50">
-          <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {STATS.map((s, i) => (
-              <div key={i}>
-                <p className="text-3xl font-black text-purple-600 mb-1">{s.num}</p>
-
-                <p className="text-sm text-gray-500">{s.label}</p>
+      <main>
+        <section className="how-hero">
+          <div className="how-shell how-hero-grid">
+            <div className="how-hero-copy">
+              <span className="how-pill"><Sparkles />{copy.eyebrow}</span>
+              <h1>{copy.title}<span>{copy.titleAccent}</span></h1>
+              <p>{copy.intro}</p>
+              <div className="how-hero-actions">
+                <Link to="/register?type=candidate" className="how-primary-button">
+                  <UserPlus />{copy.candidateCta}
+                </Link>
+                <Link to="/register?type=staffing_agency" className="how-secondary-button">
+                  <Building2 />{copy.employerCta}
+                </Link>
               </div>
+            </div>
+
+            <div className="how-flow" aria-hidden="true">
+              <div className="how-flow-glow" />
+              <article className="how-flow-card how-flow-profile">
+                <span><UserPlus /></span>
+                <div><strong>{copy.profile}</strong><small>{copy.profileDetail}</small></div>
+                <Check />
+              </article>
+              <i className="how-flow-connector how-flow-connector-one"><ForwardArrow /></i>
+              <article className="how-flow-card how-flow-match">
+                <span><BrainCircuit /></span>
+                <div><strong>{copy.matching}</strong><small>{copy.matchingDetail}</small></div>
+                <b>AI</b>
+              </article>
+              <i className="how-flow-connector how-flow-connector-two"><ForwardArrow /></i>
+              <article className="how-flow-card how-flow-progress">
+                <span><LayoutDashboard /></span>
+                <div><strong>{copy.progress}</strong><small>{copy.progressDetail}</small></div>
+                <CheckCircle2 />
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section className="how-metrics-section">
+          <div className="how-shell how-metrics">
+            {[
+              ["98%", copy.metricSatisfaction],
+              ["3×", copy.metricSpeed],
+              ["8,500+", copy.metricJobs],
+              ["15,000+", copy.metricCandidates],
+            ].map(([value, label]) => (
+              <div key={label}><strong>{value}</strong><span>{label}</span></div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* For candidates */}
-        <div className="py-16 px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 mb-10">
-              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                <UserPlus className="w-5 h-5 text-purple-600" />
-              </div>
-
-              <div>
-                <p className="text-xs font-bold text-purple-600 uppercase tracking-wider">
-                  {isRtl ? 'למועמדים' : 'For Candidates'}
-                </p>
-
-                <h2 className="text-2xl font-black text-gray-900">
-                  {isRtl ? 'מוצא עבודה בדרך שלך' : 'Find a job your way'}
-                </h2>
-              </div>
+        <section className="how-candidate-section">
+          <div className="how-shell">
+            <div className="how-section-heading">
+              <span>{copy.candidateEyebrow}</span><h2>{copy.candidateTitle}</h2><p>{copy.candidateIntro}</p>
             </div>
-
-            <div className="space-y-6">
-              {CANDIDATE_STEPS.map((step, i) => (
-                <div key={i} className="flex gap-5 items-start bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center text-white font-black text-lg flex-shrink-0 shadow-md">
-                    {step.num}
+            <div className="how-candidate-journey">
+              {copy.candidateSteps.map(({ icon: Icon, number, title, desc, meta }) => (
+                <article key={number}>
+                  <div className="how-step-marker"><span>{number}</span><i /></div>
+                  <div className="how-step-card">
+                    <div className="how-step-icon"><Icon /></div>
+                    <div className="how-step-copy"><h3>{title}</h3><p>{desc}</p></div>
+                    <small><Clock3 />{meta}</small>
                   </div>
-
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="text-lg font-bold text-gray-900">{step.title}</h3>
-
-                      <span className="text-xs bg-green-100 text-green-700 font-semibold px-2 py-1 rounded-full">{step.time}</span>
-                    </div>
-
-                    <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
-                  </div>
-                </div>
+                </article>
               ))}
             </div>
-
-            <div className="mt-8 text-center">
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-8 py-4 rounded-xl hover:opacity-90 transition-all shadow-lg"
-              >
-                <UserPlus className="w-4 h-4" />
-
-                {isRtl ? 'התחל לחפש עבודה — בחינם' : 'Start Job Searching — Free'}
-              </Link>
+            <div className="how-center-action">
+              <Link to="/register?type=candidate">{copy.candidateButton}<ForwardArrow /></Link>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Divider */}
-        <div className="border-t border-gray-100 mx-4" />
-
-        {/* For employers */}
-        <div className="py-16 px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 mb-10">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-blue-600" />
-              </div>
-
-              <div>
-                <p className="text-xs font-bold text-blue-600 uppercase tracking-wider">
-                  {isRtl ? 'למעסיקים' : 'For Employers'}
-                </p>
-
-                <h2 className="text-2xl font-black text-gray-900">
-                  {isRtl ? 'גייס מהר יותר, חכם יותר' : 'Hire faster, smarter'}
-                </h2>
-              </div>
+        <section className="how-employer-section">
+          <div className="how-shell">
+            <div className="how-employer-heading">
+              <div><span>{copy.employerEyebrow}</span><h2>{copy.employerTitle}</h2><p>{copy.employerIntro}</p></div>
+              <Building2 />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {EMPLOYER_STEPS.map((step, i) => (
-                <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm text-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <step.icon className="w-5 h-5 text-blue-600" />
-                  </div>
-
-                  <span className="text-xs font-bold text-blue-500 mb-2 block">
-                    {isRtl ? `שלב ${step.num}` : `Step ${step.num}`}
-                  </span>
-
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
-
-                  <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
-                </div>
+            <div className="how-employer-grid">
+              {copy.employerSteps.map(({ icon: Icon, number, title, desc }) => (
+                <article key={number}>
+                  <div><span>{number}</span><Icon /></div><h3>{title}</h3><p>{desc}</p>
+                </article>
               ))}
             </div>
-
-            <div className="mt-8 text-center">
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold px-8 py-4 rounded-xl hover:opacity-90 transition-all shadow-lg"
-              >
-                <Building2 className="w-4 h-4" />
-
-                {isRtl ? 'פרסם משרה ראשונה — בחינם' : 'Post Your First Job — Free'}
-              </Link>
+            <div className="how-center-action how-employer-action">
+              <Link to="/register?type=staffing_agency">{copy.employerButton}<ForwardArrow /></Link>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* FAQ */}
-        <div className="py-16 px-4 bg-gray-50">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-black text-center text-gray-900 mb-10">
-              {isRtl ? 'שאלות נפוצות' : 'Frequently Asked Questions'}
-            </h2>
-
-            <div className="space-y-4">
-              {FAQ.map((item, i) => (
-                <div key={i} className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-                  <h3 className="font-bold text-gray-900 mb-2">{item.q}</h3>
-
-                  <p className="text-gray-500 text-sm leading-relaxed">{item.a}</p>
-                </div>
+        <section className="how-faq-section">
+          <div className="how-shell how-faq-layout">
+            <div className="how-faq-intro">
+              <span>{copy.faqEyebrow}</span><h2>{copy.faqTitle}</h2><p>{copy.faqIntro}</p>
+              <div><ShieldCheck /><strong>{copy.secure}</strong></div>
+            </div>
+            <div className="how-faq-list">
+              {copy.faq.map((item, index) => (
+                <details key={item.q} open={index === 0}>
+                  <summary><span>{item.q}</span><ChevronDown /></summary><p>{item.a}</p>
+                </details>
               ))}
             </div>
           </div>
-        </div>
+        </section>
 
-      </div>
-    </PublicLayout>
-  );
+        <section className="how-cta-section">
+          <div className="how-shell how-cta">
+            <div>
+              <span><Sparkles />{copy.ctaEyebrow}</span><h2>{copy.ctaTitle}</h2><p>{copy.ctaText}</p>
+            </div>
+            <div className="how-cta-actions">
+              <Link to="/register?type=candidate">{copy.candidateCta}<ForwardArrow /></Link>
+              <Link to="/register?type=staffing_agency">{copy.employerCta}</Link>
+              <small><Check />{copy.freeCandidate}</small>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <LandingFooter />
+    </div>
+  )
 }
-import PublicLayout from "@/components/layouts/PublicLayout"
-import { Link } from "react-router-dom"

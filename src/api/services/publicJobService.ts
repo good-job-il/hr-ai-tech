@@ -15,6 +15,7 @@ export type PublicJobQuery = Pick<
   | "domain_id"
   | "type"
   | "seniority"
+  | "is_closed"
 >
 
 export const publicJobService = {

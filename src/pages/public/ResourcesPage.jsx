@@ -1,244 +1,372 @@
-import { useTranslation } from 'react-i18next';
-import { FileText, BookOpen, Calculator, TrendingUp } from 'lucide-react';
+import { useState } from "react"
+import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  BrainCircuit,
+  Calculator,
+  Check,
+  Clock3,
+  Download,
+  FileText,
+  FolderOpen,
+  Mail,
+  Play,
+  ShieldCheck,
+  Sparkles,
+  TrendingUp,
+  Video,
+} from "lucide-react"
+import Navbar from "@/components/home/Navbar"
+import LandingFooter from "@/components/home/LandingFooter"
+import SEOHead from "@/components/SEOHead"
+import "../Home.css"
+import "./ResourcesPage.css"
+
+const pageContent = {
+  en: {
+    eyebrow: "Free career resources",
+    title: "Practical tools for every",
+    titleAccent: "step of your career",
+    intro:
+      "Resume templates, clear guides, market reports and useful tools — organized so you can find what you need quickly.",
+    browse: "Browse resources",
+    aiCta: "Explore AI tools",
+    library: "Career resource library",
+    libraryDetail: "Templates, guides, tools and reports",
+    ready: "Ready to use",
+    readyDetail: "Clear formats and practical next steps",
+    freeAccess: "Free access",
+    freeAccessDetail: "Built to support every candidate",
+    resourceCount: "career resources",
+    categoryCount: "focused collections",
+    videoCount: "video guides",
+    accessLabel: "for candidates",
+    aiEyebrow: "Featured AI tool",
+    aiTitle: "Turn your resume into a stronger professional profile",
+    aiText:
+      "Use HeadHunter AI to identify gaps, clarify achievements and prepare your experience for better-fit opportunities.",
+    aiButton: "Open AI Career Center",
+    aiScore: "Profile score",
+    aiRecommendation: "Personal recommendations",
+    resourcesEyebrow: "Resource library",
+    resourcesTitle: "Choose the support you need right now",
+    resourcesText:
+      "Each collection is focused on a specific part of the job search, from preparing a resume to understanding the market.",
+    categories: [
+      {
+        icon: FileText,
+        title: "Resume templates",
+        desc: "Professional structures for different roles and levels",
+        tone: "violet",
+        items: [
+          ["Tech CV template", "Popular", "DOCX"],
+          ["Marketing & sales CV template", "", "DOCX"],
+          ["Executive CV template", "New", "DOCX"],
+          ["English CV template", "", "DOCX"],
+        ],
+      },
+      {
+        icon: BookOpen,
+        title: "Professional guides",
+        desc: "Straightforward advice for a more focused job search",
+        tone: "blue",
+        items: [
+          ["Resume writing guide", "Essential", "PDF"],
+          ["Job interview guide", "Popular", "PDF"],
+          ["LinkedIn guide", "", "PDF"],
+          ["First job search guide", "New", "PDF"],
+        ],
+      },
+      {
+        icon: Calculator,
+        title: "Tools & calculators",
+        desc: "Compare options, understand compensation and plan ahead",
+        tone: "cyan",
+        items: [
+          ["Gross-to-net salary calculator", "Useful", "Tool"],
+          ["Pension & benefits calculator", "", "Tool"],
+          ["Job offer comparison", "New", "Tool"],
+          ["Vacation days calculator", "", "Tool"],
+        ],
+      },
+      {
+        icon: TrendingUp,
+        title: "Job market reports",
+        desc: "Market context, hiring trends and role demand",
+        tone: "orange",
+        items: [
+          ["High-tech salary report Q1 2025", "Latest", "PDF"],
+          ["Recruitment trends 2025", "", "PDF"],
+          ["Role demand report", "", "PDF"],
+          ["AI impact on the job market", "Hot", "PDF"],
+        ],
+      },
+    ],
+    videosEyebrow: "Learn at your pace",
+    videosTitle: "Short video guides for practical career skills",
+    videosText: "Focused explanations you can watch before improving your profile or preparing for an interview.",
+    videos: [
+      ["How to write a CV recruiters can assess quickly", "12:34", "Resume"],
+      ["Five ways to prepare for a stronger job interview", "8:15", "Interview"],
+      ["How HeadHunter AI turns a profile into job matches", "5:20", "AI matching"],
+    ],
+    newsletterEyebrow: "New resources",
+    newsletterTitle: "Keep your career toolkit up to date",
+    newsletterText: "Receive new templates, reports and guides in one concise email.",
+    emailPlaceholder: "Your email address",
+    subscribe: "Subscribe",
+    subscribed: "You are subscribed",
+    privacy: "No spam. Unsubscribe whenever you want.",
+  },
+  he: {
+    eyebrow: "משאבי קריירה בחינם",
+    title: "כלים מעשיים לכל",
+    titleAccent: "שלב בקריירה שלך",
+    intro:
+      "תבניות קורות חיים, מדריכים ברורים, דוחות שוק וכלים שימושיים — מסודרים כך שאפשר למצוא במהירות את מה שצריך.",
+    browse: "לכל המשאבים",
+    aiCta: "לכלי ה-AI",
+    library: "ספריית משאבי קריירה",
+    libraryDetail: "תבניות, מדריכים, כלים ודוחות",
+    ready: "מוכנים לשימוש",
+    readyDetail: "מבנה ברור וצעדים מעשיים",
+    freeAccess: "גישה בחינם",
+    freeAccessDetail: "נבנה כדי לתמוך בכל מועמד ומועמדת",
+    resourceCount: "משאבי קריירה",
+    categoryCount: "אוספים ממוקדים",
+    videoCount: "מדריכי וידאו",
+    accessLabel: "למועמדים",
+    aiEyebrow: "כלי AI מומלץ",
+    aiTitle: "להפוך את קורות החיים לפרופיל מקצועי חזק יותר",
+    aiText:
+      "HeadHunter AI עוזר לזהות פערים, לחדד הישגים ולהכין את הניסיון שלך להזדמנויות מתאימות יותר.",
+    aiButton: "פתיחת מרכז הקריירה AI",
+    aiScore: "ציון הפרופיל",
+    aiRecommendation: "המלצות אישיות",
+    resourcesEyebrow: "ספריית המשאבים",
+    resourcesTitle: "בוחרים את התמיכה שצריך עכשיו",
+    resourcesText:
+      "כל אוסף מתמקד בחלק אחר של חיפוש העבודה, מהכנת קורות החיים ועד להבנת השוק.",
+    categories: [
+      {
+        icon: FileText,
+        title: "תבניות קורות חיים",
+        desc: "מבנים מקצועיים לתפקידים ולרמות ניסיון שונות",
+        tone: "violet",
+        items: [
+          ["תבנית קורות חיים טכנולוגית", "פופולרי", "DOCX"],
+          ["תבנית קורות חיים לשיווק ומכירות", "", "DOCX"],
+          ["תבנית קורות חיים למנהלים", "חדש", "DOCX"],
+          ["תבנית קורות חיים באנגלית", "", "DOCX"],
+        ],
+      },
+      {
+        icon: BookOpen,
+        title: "מדריכים מקצועיים",
+        desc: "עצות ברורות לחיפוש עבודה ממוקד יותר",
+        tone: "blue",
+        items: [
+          ["מדריך לכתיבת קורות חיים", "בסיסי", "PDF"],
+          ["מדריך לראיון עבודה", "פופולרי", "PDF"],
+          ["מדריך LinkedIn", "", "PDF"],
+          ["מדריך לחיפוש עבודה ראשונה", "חדש", "PDF"],
+        ],
+      },
+      {
+        icon: Calculator,
+        title: "כלים ומחשבונים",
+        desc: "השוואת אפשרויות, הבנת שכר ותכנון קדימה",
+        tone: "cyan",
+        items: [
+          ["מחשבון שכר ברוטו-נטו", "שימושי", "כלי"],
+          ["מחשבון פנסיה והפרשות", "", "כלי"],
+          ["השוואת הצעות עבודה", "חדש", "כלי"],
+          ["מחשבון ימי חופשה", "", "כלי"],
+        ],
+      },
+      {
+        icon: TrendingUp,
+        title: "דוחות שוק העבודה",
+        desc: "תמונת שוק, מגמות גיוס וביקוש לתפקידים",
+        tone: "orange",
+        items: [
+          ["דוח שכר הייטק רבעון ראשון 2025", "עדכני", "PDF"],
+          ["מגמות גיוס 2025", "", "PDF"],
+          ["דוח ביקוש לתפקידים", "", "PDF"],
+          ["השפעת AI על שוק העבודה", "חם", "PDF"],
+        ],
+      },
+    ],
+    videosEyebrow: "לומדים בקצב שלך",
+    videosTitle: "מדריכי וידאו קצרים למיומנויות קריירה מעשיות",
+    videosText: "הסברים ממוקדים לצפייה לפני שיפור הפרופיל או הכנה לראיון.",
+    videos: [
+      ["איך לכתוב קורות חיים שמגייסים יכולים להעריך במהירות", "12:34", "קורות חיים"],
+      ["חמש דרכים להתכונן לראיון עבודה חזק יותר", "8:15", "ראיון"],
+      ["איך HeadHunter AI הופך פרופיל להתאמות למשרות", "5:20", "התאמת AI"],
+    ],
+    newsletterEyebrow: "משאבים חדשים",
+    newsletterTitle: "שומרים על ארגז הכלים לקריירה מעודכן",
+    newsletterText: "מקבלים תבניות, דוחות ומדריכים חדשים במייל אחד ממוקד.",
+    emailPlaceholder: "כתובת האימייל שלך",
+    subscribe: "הרשמה",
+    subscribed: "נרשמת בהצלחה",
+    privacy: "ללא ספאם. אפשר להסיר את ההרשמה בכל זמן.",
+  },
+}
 
 export default function ResourcesPage() {
-  const { i18n } = useTranslation();
+  const { i18n } = useTranslation()
 
-  const isRtl = !i18n.language?.startsWith('en');
+  const isEnglish = i18n.language?.startsWith("en")
 
-  const CATEGORIES = [
-    {
-      icon: FileText,
-      color: 'bg-purple-100 text-purple-600',
-      title: isRtl ? 'תבניות קורות חיים' : 'Resume Templates',
-      desc: isRtl ? 'תבניות מקצועיות שמגייסים אוהבים' : 'Professional templates that recruiters love',
-      items: [
-        { name: isRtl ? 'תבנית CV טכנולוגי' : 'Tech CV Template', tag: isRtl ? 'פופולרי' : 'Popular', type: 'DOCX' },
-        { name: isRtl ? 'תבנית CV שיווק ומכירות' : 'Marketing & Sales CV Template', tag: '', type: 'DOCX' },
-        { name: isRtl ? 'תבנית CV מנהלים' : 'Executive CV Template', tag: isRtl ? 'חדש' : 'New', type: 'DOCX' },
-        { name: isRtl ? 'תבנית CV אנגלית' : 'English CV Template', tag: '', type: 'DOCX' },
-      ],
-    },
-    {
-      icon: BookOpen,
-      color: 'bg-blue-100 text-blue-600',
-      title: isRtl ? 'מדריכים מקצועיים' : 'Professional Guides',
-      desc: isRtl ? 'כל מה שצריך לדעת לחיפוש עבודה' : 'Everything you need to know for job searching',
-      items: [
-        { name: isRtl ? 'מדריך כתיבת קורות חיים' : 'Resume Writing Guide', tag: isRtl ? 'בסיסי' : 'Essential', type: 'PDF' },
-        { name: isRtl ? 'מדריך ראיון עבודה' : 'Job Interview Guide', tag: isRtl ? 'פופולרי' : 'Popular', type: 'PDF' },
-        { name: isRtl ? 'מדריך LinkedIn' : 'LinkedIn Guide', tag: '', type: 'PDF' },
-        { name: isRtl ? 'מדריך לחיפוש עבודה ראשונה' : 'First Job Search Guide', tag: isRtl ? 'חדש' : 'New', type: 'PDF' },
-      ],
-    },
-    {
-      icon: Calculator,
-      color: 'bg-green-100 text-green-600',
-      title: isRtl ? 'כלים ומחשבונים' : 'Tools & Calculators',
-      desc: isRtl ? 'חשב שכר, השווה תנאים, תכנן' : 'Calculate salary, compare offers, plan ahead',
-      items: [
-        { name: isRtl ? 'מחשבון שכר ברוטו-נטו' : 'Gross-to-Net Salary Calculator', tag: isRtl ? 'שימושי' : 'Useful', type: isRtl ? 'כלי' : 'Tool' },
-        { name: isRtl ? 'מחשבון פנסיה והפרשות' : 'Pension & Benefits Calculator', tag: '', type: isRtl ? 'כלי' : 'Tool' },
-        { name: isRtl ? 'השוואת הצעות עבודה' : 'Job Offer Comparison', tag: isRtl ? 'חדש' : 'New', type: isRtl ? 'כלי' : 'Tool' },
-        { name: isRtl ? 'מחשבון ימי חופשה' : 'Vacation Days Calculator', tag: '', type: isRtl ? 'כלי' : 'Tool' },
-      ],
-    },
-    {
-      icon: TrendingUp,
-      color: 'bg-orange-100 text-orange-600',
-      title: isRtl ? 'דוחות שוק העבודה' : 'Job Market Reports',
-      desc: isRtl ? 'נתונים עדכניים ומגמות' : 'Up-to-date data and trends',
-      items: [
-        { name: isRtl ? 'דוח שכר הייטק Q1 2025' : 'High-Tech Salary Report Q1 2025', tag: isRtl ? 'עדכני' : 'Latest', type: 'PDF' },
-        { name: isRtl ? 'מגמות גיוס 2025' : 'Recruitment Trends 2025', tag: '', type: 'PDF' },
-        { name: isRtl ? 'דוח ביקוש לתפקידים' : 'Role Demand Report', tag: '', type: 'PDF' },
-        { name: isRtl ? 'השפעת AI על שוק העבודה' : 'AI Impact on the Job Market', tag: isRtl ? 'חם' : 'Hot', type: 'PDF' },
-      ],
-    },
-  ];
+  const copy = pageContent[isEnglish ? "en" : "he"]
 
-  const VIDEOS = [
-    {
-      title: isRtl ? 'איך לכתוב CV שמגייסים אוהבים' : 'How to write a CV that recruiters love',
-      duration: '12:34',
-      thumb: '🎬',
-    },
-    {
-      title: isRtl ? '5 טיפים לראיון עבודה מוצלח' : '5 tips for a successful job interview',
-      duration: '8:15',
-      thumb: '🎯',
-    },
-    {
-      title: isRtl ? 'כיצד ה-AI של HeadHunter עובד' : 'How HeadHunter AI works',
-      duration: '5:20',
-      thumb: '🤖',
-    },
-  ];
+  const [subscribed, setSubscribed] = useState(false)
+
+  const ForwardArrow = isEnglish ? ArrowRight : ArrowLeft
 
   return (
-    <PublicLayout>
-      <div dir={isRtl ? 'rtl' : 'ltr'} className="min-h-screen bg-white">
+    <div className="headhunter-home resources-page" dir={isEnglish ? "ltr" : "rtl"}>
+      <SEOHead
+        title={isEnglish ? "Free Career Resources | HeadHunter" : "משאבי קריירה בחינם | HeadHunter"}
+        description={copy.intro}
+        canonical="https://headhunter.co.il/resources"
+      />
+      <Navbar />
 
-        {/* Hero */}
-        <div className="bg-gradient-to-b from-green-50 to-white py-14 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <span className="inline-block bg-green-100 text-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              {isRtl ? 'משאבים חינמיים' : 'Free Resources'}
-            </span>
-
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              {isRtl ? (
-                <>כלים ומשאבים<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600">לקריירה שלך</span></>
-              ) : (
-                <>Tools and resources<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600">for your career</span></>
-              )}
-            </h1>
-
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {isRtl
-                ? 'תבניות, מדריכים, דוחות שוק וכלים חינמיים — הכל במקום אחד'
-                : 'Templates, guides, market reports and free tools — all in one place'}
-            </p>
-          </div>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-4 py-8">
-
-          {/* AI Tool Highlight */}
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 md:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-yellow-300" />
-
-                <span className="font-bold text-yellow-200 text-sm">
-                  {isRtl ? 'כלי AI חינמי' : 'Free AI Tool'}
-                </span>
+      <main>
+        <section className="resources-hero">
+          <div className="resources-shell resources-hero-grid">
+            <div className="resources-hero-copy">
+              <span className="resources-pill"><FolderOpen />{copy.eyebrow}</span>
+              <h1>{copy.title}<span>{copy.titleAccent}</span></h1>
+              <p>{copy.intro}</p>
+              <div className="resources-hero-actions">
+                <a href="#resource-library" className="resources-primary-button">
+                  <BookOpen />{copy.browse}
+                </a>
+                <Link to="/ai-career" className="resources-secondary-button">
+                  <Sparkles />{copy.aiCta}
+                </Link>
               </div>
-
-              <h3 className="text-2xl font-black mb-2">
-                {isRtl ? 'ניתוח קורות החיים שלך עם AI' : 'Analyze your resume with AI'}
-              </h3>
-
-              <p className="text-purple-100 text-sm leading-relaxed max-w-md">
-                {isRtl
-                  ? 'העלה את ה-CV שלך וקבל ניתוח מעמיק תוך שניות — ציון, המלצות שיפור, וניסוח מחדש'
-                  : 'Upload your CV and get a deep analysis within seconds — a score, improvement tips, and rephrasing suggestions'}
-              </p>
             </div>
 
-            <Link
-              to="/ai-career"
-              className="flex-shrink-0 bg-white text-purple-700 font-bold px-8 py-3 rounded-xl hover:bg-purple-50 transition-colors flex items-center gap-2"
-            >
-              <Sparkles className="w-4 h-4" />
-
-              {isRtl ? 'נסה בחינם' : 'Try for free'}
-            </Link>
-          </div>
-
-          {/* Resource categories */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            {CATEGORIES.map((cat, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="p-5 border-b border-gray-50">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${cat.color}`}>
-                      <cat.icon className="w-5 h-5" />
-                    </div>
-
-                    <div>
-                      <h3 className="font-bold text-gray-900">{cat.title}</h3>
-
-                      <p className="text-xs text-gray-500">{cat.desc}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="divide-y divide-gray-50">
-                  {cat.items.map((item, j) => (
-                    <div key={j} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 cursor-pointer transition-colors group">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-800 group-hover:text-purple-700 transition-colors">{item.name}</span>
-
-                        {item.tag && (
-                          <span className="text-xs bg-purple-100 text-purple-600 font-semibold px-2 py-0.5 rounded-full">{item.tag}</span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{item.type}</span>
-
-                        <Download className="w-4 h-4 text-gray-300 group-hover:text-purple-500 transition-colors" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <div className="resources-hero-library" aria-hidden="true">
+              <div className="resources-library-glow" />
+              <article className="resources-library-main">
+                <span><FolderOpen /></span>
+                <div><strong>{copy.library}</strong><small>{copy.libraryDetail}</small></div>
+                <b>16</b>
+              </article>
+              <article className="resources-library-note resources-library-note-one">
+                <FileText /><div><strong>{copy.ready}</strong><small>{copy.readyDetail}</small></div><Check />
+              </article>
+              <article className="resources-library-note resources-library-note-two">
+                <ShieldCheck /><div><strong>{copy.freeAccess}</strong><small>{copy.freeAccessDetail}</small></div><Check />
+              </article>
+              <div className="resources-library-types">
+                <span>PDF</span><span>DOCX</span><span><Video /></span><span><Calculator /></span>
               </div>
-            ))}
+            </div>
           </div>
+        </section>
 
-          {/* Video section */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
-              <Video className="w-6 h-6 text-red-500" />
+        <section className="resources-metrics-section">
+          <div className="resources-shell resources-metrics">
+            <div><FileText /><strong>16</strong><span>{copy.resourceCount}</span></div>
+            <div><FolderOpen /><strong>4</strong><span>{copy.categoryCount}</span></div>
+            <div><Video /><strong>3</strong><span>{copy.videoCount}</span></div>
+            <div><ShieldCheck /><strong>100%</strong><span>{copy.accessLabel}</span></div>
+          </div>
+        </section>
 
-              {isRtl ? 'סרטוני הדרכה' : 'Tutorial Videos'}
-            </h2>
+        <section className="resources-ai-section">
+          <div className="resources-shell resources-ai-card">
+            <div className="resources-ai-copy">
+              <span><Sparkles />{copy.aiEyebrow}</span><h2>{copy.aiTitle}</h2><p>{copy.aiText}</p>
+              <Link to="/ai-career">{copy.aiButton}<ForwardArrow /></Link>
+            </div>
+            <div className="resources-ai-preview" aria-hidden="true">
+              <div className="resources-ai-score"><BrainCircuit /><strong>86%</strong><small>{copy.aiScore}</small></div>
+              <div className="resources-ai-bars">
+                <span><i /></span><span><i /></span><span><i /></span>
+                <strong>{copy.aiRecommendation}</strong>
+              </div>
+            </div>
+          </div>
+        </section>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {VIDEOS.map((vid, i) => (
-                <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden cursor-pointer group hover:shadow-md transition-shadow">
-                  <div className="bg-gradient-to-br from-gray-800 to-gray-900 h-36 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-4xl mb-2">{vid.thumb}</div>
-
-                      <div className="w-12 h-8 bg-red-500 rounded-md flex items-center justify-center mx-auto">
-                        <div className="w-0 h-0 border-t-[6px] border-b-[6px] border-l-[10px] border-t-transparent border-b-transparent border-l-white mr-0.5" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 text-sm group-hover:text-purple-700 transition-colors">{vid.title}</h3>
-
-                    <p className="text-xs text-gray-400 mt-1">⏱ {vid.duration}</p>
-                  </div>
-                </div>
+        <section id="resource-library" className="resources-library-section">
+          <div className="resources-shell">
+            <div className="resources-section-heading">
+              <span>{copy.resourcesEyebrow}</span><h2>{copy.resourcesTitle}</h2><p>{copy.resourcesText}</p>
+            </div>
+            <div className="resources-category-grid">
+              {copy.categories.map(({ icon: Icon, title, desc, tone, items }) => (
+                <article key={title} className={`resources-category-card resources-tone-${tone}`}>
+                  <header>
+                    <span><Icon /></span><div><h3>{title}</h3><p>{desc}</p></div><small>{items.length}</small>
+                  </header>
+                  <ul>
+                    {items.map(([name, tag, type]) => (
+                      <li key={name}>
+                        <div><strong>{name}</strong>{tag && <small>{tag}</small>}</div>
+                        <span>{type}<Download /></span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
               ))}
             </div>
           </div>
+        </section>
 
-          {/* Newsletter */}
-          <div className="bg-gray-50 rounded-2xl p-8 text-center border border-gray-100">
-            <h3 className="text-2xl font-black text-gray-900 mb-2">
-              {isRtl ? 'קבל עדכונים על משאבים חדשים' : 'Get updates on new resources'}
-            </h3>
-
-            <p className="text-gray-500 mb-6 text-sm">
-              {isRtl
-                ? 'נשלח לך תבניות, דוחות וכלים חדשים ישירות לאימייל'
-                : "We'll send you new templates, reports and tools directly to your email"}
-            </p>
-
-            <div className="flex gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder={isRtl ? 'האימייל שלך' : 'Your email'}
-                className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-900 text-sm focus:outline-none focus:border-purple-400"
-                dir="ltr"
-              />
-
-              <button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 transition-all text-sm">
-                {isRtl ? 'הירשם' : 'Subscribe'}
-              </button>
+        <section className="resources-videos-section">
+          <div className="resources-shell">
+            <div className="resources-section-heading">
+              <span>{copy.videosEyebrow}</span><h2>{copy.videosTitle}</h2><p>{copy.videosText}</p>
+            </div>
+            <div className="resources-video-grid">
+              {copy.videos.map(([title, duration, category], index) => (
+                <article key={title}>
+                  <div className={`resources-video-visual resources-video-${index + 1}`}>
+                    <span><Play /></span><small><Clock3 />{duration}</small><i /><i />
+                  </div>
+                  <div className="resources-video-copy"><span>{category}</span><h3>{title}</h3></div>
+                </article>
+              ))}
             </div>
           </div>
+        </section>
 
-        </div>
-      </div>
-    </PublicLayout>
-  );
+        <section className="resources-newsletter-section">
+          <div className="resources-shell resources-newsletter">
+            <div>
+              <span><Sparkles />{copy.newsletterEyebrow}</span><h2>{copy.newsletterTitle}</h2><p>{copy.newsletterText}</p>
+            </div>
+            {subscribed ? (
+              <div className="resources-subscribed"><Check />{copy.subscribed}</div>
+            ) : (
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  setSubscribed(true)
+                }}
+              >
+                <label><Mail /><input type="email" required placeholder={copy.emailPlaceholder} dir="ltr" /></label>
+                <button type="submit">{copy.subscribe}<ForwardArrow /></button>
+                <small>{copy.privacy}</small>
+              </form>
+            )}
+          </div>
+        </section>
+      </main>
+
+      <LandingFooter />
+    </div>
+  )
 }
-import PublicLayout from "@/components/layouts/PublicLayout"
-import { Link } from "react-router-dom"
-import { Download, Sparkles, Video } from "lucide-react"

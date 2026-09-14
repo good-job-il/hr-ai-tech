@@ -1,14 +1,34 @@
 import React, { useState } from "react"
 import { useAuth } from "@/lib/AuthContext"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
+import {
+  AlertCircle,
+  ArrowLeft,
+  Briefcase,
+  Clock,
+  Eye,
+  MapPin,
+  RefreshCw,
+  Send,
+  Upload,
+} from "lucide-react"
 import { publicJobService } from "@/api/services/publicJobService"
 import { applicationService } from "@/api/services/applicationService"
 import { candidateProfileService } from "@/api/services/candidateProfileService"
 import { fileService } from "@/api/services/fileService"
 import { publicWorkflowService } from "@/api/services/publicWorkflowService"
+import SaveJobButton from "@/components/jobs/SaveJobButton"
+import ShareButtons from "@/components/jobs/ShareButtons"
+import SimilarJobsList from "@/components/jobs/SimilarJobsList"
+import Navbar from "@/components/home/Navbar"
+import LandingFooter from "@/components/home/LandingFooter"
+import SEOHead from "@/components/SEOHead"
 
 import { logError, getErrorMessage } from "@/lib/errorHandler"
+import "./Home.css"
+import "./JobDetail.css"
 
 // Validation
 const validateForm = (form) => {
@@ -59,6 +79,10 @@ const typeLabels = { full: "Full-time", part: "Part-time", daily: "Daily", remot
 
 export default function JobDetail() {
   const { id } = useParams()
+
+  const { i18n } = useTranslation()
+
+  const isEnglish = i18n.language?.startsWith("en")
 
   const { user } = useAuth()
 
@@ -317,7 +341,8 @@ export default function JobDetail() {
   if (isLoading) {
     return (
       <div
-        className="min-h-screen"
+        className="headhunter-home job-detail-page min-h-screen"
+        dir={isEnglish ? "ltr" : "rtl"}
         style={{ background: "linear-gradient(to bottom, #F7FBFF 0%, #EEF5FF 100%)" }}
       >
         <Navbar />
@@ -331,6 +356,8 @@ export default function JobDetail() {
 
           <p className="text-[15px] font-bold text-[#64748B]">Loading job details...</p>
         </div>
+
+        <LandingFooter />
       </div>
     )
   }
@@ -338,7 +365,8 @@ export default function JobDetail() {
   if (jobLoadError || !job) {
     return (
       <div
-        className="min-h-screen"
+        className="headhunter-home job-detail-page min-h-screen"
+        dir={isEnglish ? "ltr" : "rtl"}
         style={{ background: "linear-gradient(to bottom, #F7FBFF 0%, #EEF5FF 100%)" }}
       >
         <Navbar />
@@ -382,6 +410,8 @@ export default function JobDetail() {
             </Link>
           </div>
         </div>
+
+        <LandingFooter />
       </div>
     )
   }
@@ -467,7 +497,8 @@ export default function JobDetail() {
 
   return (
     <div
-      className="min-h-screen"
+      className="headhunter-home job-detail-page min-h-screen"
+      dir={isEnglish ? "ltr" : "rtl"}
       style={{ background: "linear-gradient(to bottom, #F7FBFF 0%, #EEF5FF 100%)" }}
     >
       <SEOHead
@@ -480,13 +511,13 @@ export default function JobDetail() {
 
       <Navbar />
 
-      <div className="max-w-[1200px] mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main className="job-detail-shell">
+        <div className="job-detail-layout">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="job-detail-main">
             <Link
               to="/jobs"
-              className="inline-flex items-center gap-2 mb-6 text-[14px] font-bold text-[#64748B] hover:text-[#7C3AED] transition-colors"
+              className="job-detail-back inline-flex items-center gap-2 mb-6 text-[14px] font-bold text-[#64748B] hover:text-[#7C3AED] transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to All Jobs
@@ -494,15 +525,15 @@ export default function JobDetail() {
 
             {/* Hero Card */}
             <div
-              className="relative group overflow-hidden transition-all duration-300 mb-6"
+              className="job-detail-hero-card relative group overflow-hidden transition-all duration-300 mb-6"
               style={glass}
             >
               <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-l from-[#A855F7] via-[#6C4DFF] to-[#2FB8FF]" />
 
               <div className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
 
-              <div className="p-8 relative">
-                <div className="flex items-start gap-6 mb-6">
+              <div className="job-detail-hero-body p-8 relative">
+                <div className="job-detail-heading flex items-start gap-6 mb-6">
                   <div
                     className="w-[72px] h-[72px] rounded-2xl flex items-center justify-center text-white text-[20px] font-black shadow-[0_20px_45px_rgba(108,77,255,0.25)] flex-shrink-0"
                     style={{
@@ -528,7 +559,7 @@ export default function JobDetail() {
                       )}
                     </div>
 
-                    <h1 className="text-[32px] leading-[1.25] font-black text-[#0F172A] mb-2">
+                    <h1 className="job-detail-title text-[32px] leading-[1.25] font-black text-[#0F172A] mb-2">
                       {job.title}
                     </h1>
 
@@ -583,7 +614,7 @@ export default function JobDetail() {
 
                 {/* Job Description */}
                 {job.description && (
-                  <div className="mb-6">
+                  <div className="job-detail-description mb-6">
                     <h2 className="text-[18px] font-black text-[#0F172A] mb-4 flex items-center gap-2">
                       <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white text-sm">
                         📋
@@ -608,7 +639,7 @@ export default function JobDetail() {
 
             {/* Related Links Card */}
             <div
-              className="transition-all duration-300 mb-6"
+              className="job-detail-related transition-all duration-300 mb-6"
               style={{
                 ...glass,
                 background: "rgba(248,250,252,0.82)",
@@ -662,8 +693,8 @@ export default function JobDetail() {
           </div>
 
           {/* Sidebar - Apply Form */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
+          <aside className="job-detail-sidebar">
+            <div className="job-detail-sidebar__sticky sticky top-24">
               {job.is_closed ? (
                 <div
                   className="text-center transition-all duration-300"
@@ -688,7 +719,7 @@ export default function JobDetail() {
               ) : !showApply ? (
                 <button
                   onClick={() => setShowApply(true)}
-                  className="w-full h-14 rounded-2xl font-black text-[16px] text-white transition-all duration-300 shadow-[0_20px_45px_rgba(124,58,237,0.35)] hover:shadow-[0_25px_55px_rgba(124,58,237,0.45)] active:scale-[0.98] flex items-center justify-center gap-2.5"
+                  className="job-detail-apply-button w-full h-14 rounded-2xl font-black text-[16px] text-white transition-all duration-300 shadow-[0_20px_45px_rgba(124,58,237,0.35)] hover:shadow-[0_25px_55px_rgba(124,58,237,0.45)] active:scale-[0.98] flex items-center justify-center gap-2.5"
                   style={{
                     background: "linear-gradient(135deg, #8B5CF6 0%, #2F80FF 100%)",
                   }}
@@ -742,7 +773,11 @@ export default function JobDetail() {
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleApply} className="transition-all duration-300" style={glass}>
+                <form
+                  onSubmit={handleApply}
+                  className="job-detail-apply-form transition-all duration-300"
+                  style={glass}
+                >
                   <div className="p-6 space-y-5">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#2F80FF] flex items-center justify-center text-white shadow-lg">
@@ -997,26 +1032,11 @@ export default function JobDetail() {
                 </form>
               )}
             </div>
-          </div>
+          </aside>
         </div>
-      </div>
+      </main>
+
+      <LandingFooter />
     </div>
   )
 }
-import SaveJobButton from "@/components/jobs/SaveJobButton"
-import ShareButtons from "@/components/jobs/ShareButtons"
-import { Link } from "react-router-dom"
-import {
-  ArrowLeft,
-  MapPin,
-  Briefcase,
-  Eye,
-  Clock,
-  Send,
-  Upload,
-  AlertCircle,
-  RefreshCw,
-} from "lucide-react"
-import Navbar from "@/components/home/Navbar"
-import SEOHead from "@/components/SEOHead"
-import SimilarJobsList from "@/components/jobs/SimilarJobsList"

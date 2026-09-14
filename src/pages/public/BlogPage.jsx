@@ -1,216 +1,401 @@
-import { useTranslation } from 'react-i18next';
+import { useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
+import {
+  ArrowLeft,
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  BrainCircuit,
+  Check,
+  Clock3,
+  FileText,
+  Lightbulb,
+  Mail,
+  MessageSquare,
+  Sparkles,
+  TrendingUp,
+  UserRound,
+  Users,
+} from "lucide-react"
+import Navbar from "@/components/home/Navbar"
+import LandingFooter from "@/components/home/LandingFooter"
+import SEOHead from "@/components/SEOHead"
+import "../Home.css"
+import "./BlogPage.css"
 
-export default function BlogPage() {
-  const { i18n } = useTranslation();
+const pageContent = {
+  en: {
+    eyebrow: "HeadHunter career journal",
+    title: "Ideas that help you make",
+    titleAccent: "better career decisions",
+    intro:
+      "Practical guides, recruiting insights and clear perspectives on the Israeli job market — written for candidates and hiring teams.",
+    latest: "Latest insights",
+    guide: "Practical guides",
+    market: "Market perspective",
+    featured: "Featured article",
+    articlesEyebrow: "Explore the journal",
+    articlesTitle: "Advice for every side of the hiring process",
+    articlesText: "Filter by topic and focus on the information most useful to you right now.",
+    all: "All",
+    categories: [
+      "All",
+      "AI & Recruitment",
+      "Candidate Tips",
+      "Job Market",
+      "Job Interview",
+      "Career",
+      "For Employers",
+    ],
+    posts: [
+      {
+        id: 1,
+        icon: BrainCircuit,
+        category: "AI & Recruitment",
+        title: "How AI is transforming recruitment in Israel",
+        excerpt:
+          "Artificial intelligence is changing how companies identify talent — from resume screening to more focused candidate matching.",
+        author: "Yair Levy",
+        date: "May 2025",
+        readTime: "5 min read",
+        tone: "violet",
+      },
+      {
+        id: 2,
+        icon: FileText,
+        category: "Candidate Tips",
+        title: "10 common resume mistakes that lead to rejection",
+        excerpt:
+          "Learn what makes a resume difficult to assess and how to present your experience with more clarity and impact.",
+        author: "Michal Avni",
+        date: "April 2025",
+        readTime: "7 min read",
+        tone: "blue",
+      },
+      {
+        id: 3,
+        icon: BarChart3,
+        category: "Job Market",
+        title: "Israeli high-tech market report — Q1 2025",
+        excerpt:
+          "A focused look at salaries, in-demand capabilities and the trends shaping Israel’s technology job market.",
+        author: "HeadHunter Team",
+        date: "April 2025",
+        readTime: "10 min read",
+        tone: "cyan",
+      },
+      {
+        id: 4,
+        icon: MessageSquare,
+        category: "Job Interview",
+        title: "The complete guide to a technical job interview",
+        excerpt:
+          "What to prepare, how to structure technical answers and how to approach algorithm questions under pressure.",
+        author: "Daniel Cohen",
+        date: "March 2025",
+        readTime: "12 min read",
+        tone: "orange",
+      },
+      {
+        id: 5,
+        icon: TrendingUp,
+        category: "Career",
+        title: "When is the right time to change jobs?",
+        excerpt:
+          "The signals worth noticing and a practical way to evaluate whether your next professional move is due.",
+        author: "Sarah Golan",
+        date: "March 2025",
+        readTime: "6 min read",
+        tone: "indigo",
+      },
+      {
+        id: 6,
+        icon: Users,
+        category: "For Employers",
+        title: "How to hire better candidates in less time",
+        excerpt:
+          "Practical ways to reduce time-to-fill while improving role clarity, team alignment and candidate experience.",
+        author: "Ron Shapira",
+        date: "February 2025",
+        readTime: "8 min read",
+        tone: "purple",
+      },
+    ],
+    newsletterEyebrow: "Weekly career briefing",
+    newsletterTitle: "Useful insight, delivered without the noise",
+    newsletterText:
+      "Get one concise email with new guides, market context and practical job-search advice.",
+    emailPlaceholder: "Your email address",
+    subscribe: "Subscribe",
+    subscribed: "You are subscribed",
+    privacy: "No spam. Unsubscribe whenever you want.",
+  },
+  he: {
+    eyebrow: "מגזין הקריירה של HeadHunter",
+    title: "תובנות שעוזרות לקבל",
+    titleAccent: "החלטות קריירה טובות יותר",
+    intro:
+      "מדריכים מעשיים, תובנות מעולם הגיוס ונקודת מבט ברורה על שוק העבודה הישראלי — למועמדים ולצוותי גיוס.",
+    latest: "התובנות האחרונות",
+    guide: "מדריכים מעשיים",
+    market: "מבט על השוק",
+    featured: "מאמר מומלץ",
+    articlesEyebrow: "לגלות את המגזין",
+    articlesTitle: "מידע שימושי לכל צד בתהליך הגיוס",
+    articlesText: "מסננים לפי נושא ומתמקדים במידע שהכי שימושי עבורך עכשיו.",
+    all: "הכול",
+    categories: [
+      "הכול",
+      "AI וגיוס",
+      "טיפים למועמד",
+      "שוק העבודה",
+      "ראיון עבודה",
+      "קריירה",
+      "למעסיקים",
+    ],
+    posts: [
+      {
+        id: 1,
+        icon: BrainCircuit,
+        category: "AI וגיוס",
+        title: "כיצד AI משנה את עולם הגיוס בישראל",
+        excerpt:
+          "בינה מלאכותית משנה את הדרך שבה חברות מאתרות כישרונות — מסינון קורות חיים ועד התאמה ממוקדת יותר.",
+        author: "יאיר לוי",
+        date: "מאי 2025",
+        readTime: "5 דקות קריאה",
+        tone: "violet",
+      },
+      {
+        id: 2,
+        icon: FileText,
+        category: "טיפים למועמד",
+        title: "10 טעויות נפוצות בקורות חיים שמובילות לדחייה",
+        excerpt:
+          "מה מקשה על מגייסים להעריך קורות חיים ואיך להציג את הניסיון שלך בצורה ברורה ומשפיעה יותר.",
+        author: "מיכל אבני",
+        date: "אפריל 2025",
+        readTime: "7 דקות קריאה",
+        tone: "blue",
+      },
+      {
+        id: 3,
+        icon: BarChart3,
+        category: "שוק העבודה",
+        title: "דוח שוק ההייטק הישראלי — רבעון ראשון 2025",
+        excerpt:
+          "מבט ממוקד על שכר, יכולות מבוקשות והמגמות שמעצבות את שוק העבודה הטכנולוגי בישראל.",
+        author: "צוות HeadHunter",
+        date: "אפריל 2025",
+        readTime: "10 דקות קריאה",
+        tone: "cyan",
+      },
+      {
+        id: 4,
+        icon: MessageSquare,
+        category: "ראיון עבודה",
+        title: "המדריך המלא לראיון עבודה טכני",
+        excerpt:
+          "מה להכין, איך לבנות תשובות טכניות ואיך לגשת לשאלות אלגוריתמים גם תחת לחץ.",
+        author: "דניאל כהן",
+        date: "מרץ 2025",
+        readTime: "12 דקות קריאה",
+        tone: "orange",
+      },
+      {
+        id: 5,
+        icon: TrendingUp,
+        category: "קריירה",
+        title: "מתי הזמן הנכון להחליף עבודה?",
+        excerpt:
+          "הסימנים שכדאי לזהות ודרך מעשית להעריך אם הגיע הזמן לצעד המקצועי הבא.",
+        author: "שרה גולן",
+        date: "מרץ 2025",
+        readTime: "6 דקות קריאה",
+        tone: "indigo",
+      },
+      {
+        id: 6,
+        icon: Users,
+        category: "למעסיקים",
+        title: "איך לגייס מועמדים טובים יותר בפחות זמן",
+        excerpt:
+          "דרכים מעשיות לקצר את זמן האיוש ולשפר את בהירות התפקיד, תיאום הצוות וחוויית המועמד.",
+        author: "רון שפירא",
+        date: "פברואר 2025",
+        readTime: "8 דקות קריאה",
+        tone: "purple",
+      },
+    ],
+    newsletterEyebrow: "עדכון קריירה שבועי",
+    newsletterTitle: "מידע שימושי, בלי רעש מיותר",
+    newsletterText: "מייל אחד ממוקד עם מדריכים חדשים, תמונת מצב של השוק וטיפים מעשיים לחיפוש עבודה.",
+    emailPlaceholder: "כתובת האימייל שלך",
+    subscribe: "הרשמה",
+    subscribed: "נרשמת בהצלחה",
+    privacy: "ללא ספאם. אפשר להסיר את ההרשמה בכל זמן.",
+  },
+}
 
-  const isRtl = !i18n.language?.startsWith('en');
-
-  const POSTS = [
-    {
-      id: 1,
-      category: isRtl ? 'AI וגיוס' : 'AI & Recruitment',
-      title: isRtl ? 'כיצד AI משנה את עולם הגיוס בישראל' : 'How AI is transforming recruitment in Israel',
-      excerpt: isRtl
-        ? 'טכנולוגיות בינה מלאכותית מחוללות מהפכה בדרך שבה חברות מגייסות עובדים — ממיון קורות חיים ועד ראיונות חכמים.'
-        : 'Artificial intelligence technologies are revolutionizing the way companies recruit — from CV screening to smart interviews.',
-      author: isRtl ? 'יאיר לוי' : 'Yair Levy',
-      date: isRtl ? 'מאי 2025' : 'May 2025',
-      readTime: isRtl ? '5 דק׳' : '5 min',
-      color: 'from-purple-500 to-blue-500',
-    },
-    {
-      id: 2,
-      category: isRtl ? 'טיפים למועמד' : 'Candidate Tips',
-      title: isRtl ? '10 טעויות נפוצות בקורות חיים שמובילות לדחייה' : '10 common resume mistakes that lead to rejection',
-      excerpt: isRtl
-        ? 'מה הגיוסים באמת מחפשים? חשפנו את הטעויות הנפוצות ביותר שגורמות לקורות חיים להיזרק לפח — ואיך להימנע מהן.'
-        : "What are recruiters really looking for? We exposed the most common mistakes that get resumes thrown in the bin — and how to avoid them.",
-      author: isRtl ? 'מיכל אבני' : 'Michal Avni',
-      date: isRtl ? 'אפריל 2025' : 'April 2025',
-      readTime: isRtl ? '7 דק׳' : '7 min',
-      color: 'from-pink-500 to-rose-500',
-    },
-    {
-      id: 3,
-      category: isRtl ? 'שוק העבודה' : 'Job Market',
-      title: isRtl ? 'דוח שוק ההייטק הישראלי — Q1 2025' : 'Israeli High-Tech Market Report — Q1 2025',
-      excerpt: isRtl
-        ? 'נתונים עדכניים על שכר, דרישות, וטרנדים מרכזיים בשוק ההייטק הישראלי לרבעון הראשון של 2025.'
-        : 'Up-to-date data on salaries, requirements, and key trends in the Israeli high-tech market for Q1 2025.',
-      author: isRtl ? 'צוות HeadHunter' : 'HeadHunter Team',
-      date: isRtl ? 'אפריל 2025' : 'April 2025',
-      readTime: isRtl ? '10 דק׳' : '10 min',
-      color: 'from-green-500 to-teal-500',
-    },
-    {
-      id: 4,
-      category: isRtl ? 'ראיון עבודה' : 'Job Interview',
-      title: isRtl ? 'המדריך המלא לראיון עבודה טכני' : 'The complete guide to a technical job interview',
-      excerpt: isRtl
-        ? 'איך מתכוננים לראיון טכני? מה שואלים? איך עונים על שאלות אלגוריתמים? כל מה שצריך לדעת לפני הראיון.'
-        : 'How to prepare for a technical interview? What do they ask? How to answer algorithm questions? Everything you need to know before the interview.',
-      author: isRtl ? 'דניאל כהן' : 'Daniel Cohen',
-      date: isRtl ? 'מרץ 2025' : 'March 2025',
-      readTime: isRtl ? '12 דק׳' : '12 min',
-      color: 'from-orange-500 to-amber-500',
-    },
-    {
-      id: 5,
-      category: isRtl ? 'קריירה' : 'Career',
-      title: isRtl ? 'מתי הזמן הנכון להחליף עבודה?' : 'When is the right time to change jobs?',
-      excerpt: isRtl
-        ? 'סימנים שאומרים שהגיע הזמן לצעד הבא. איך מנתחים את המצב הנוכחי ומחליטים בצורה חכמה.'
-        : 'Signs that say it is time for the next step. How to analyze your current situation and make a smart decision.',
-      author: isRtl ? 'שרה גולן' : 'Sarah Golan',
-      date: isRtl ? 'מרץ 2025' : 'March 2025',
-      readTime: isRtl ? '6 דק׳' : '6 min',
-      color: 'from-indigo-500 to-violet-500',
-    },
-    {
-      id: 6,
-      category: isRtl ? 'למעסיקים' : 'For Employers',
-      title: isRtl ? 'איך לגייס מועמדים טובים יותר בפחות זמן' : 'How to hire better candidates in less time',
-      excerpt: isRtl
-        ? 'אסטרטגיות מוכחות לשיפור תהליך הגיוס, קיצור זמן האיוש, ושיפור חווית המועמד.'
-        : 'Proven strategies to improve the recruitment process, reduce time-to-fill, and enhance the candidate experience.',
-      author: isRtl ? 'רון שפירא' : 'Ron Shapira',
-      date: isRtl ? 'פברואר 2025' : 'February 2025',
-      readTime: isRtl ? '8 דק׳' : '8 min',
-      color: 'from-cyan-500 to-blue-500',
-    },
-  ];
-
-  const CATEGORIES = isRtl
-    ? ['הכל', 'AI וגיוס', 'טיפים למועמד', 'שוק העבודה', 'ראיון עבודה', 'קריירה', 'למעסיקים']
-    : ['All', 'AI & Recruitment', 'Candidate Tips', 'Job Market', 'Job Interview', 'Career', 'For Employers'];
-
-  const allLabel = isRtl ? 'הכל' : 'All';
+function PostVisual({ post, large = false }) {
+  const Icon = post.icon
 
   return (
-    <PublicLayout>
-      <div dir={isRtl ? 'rtl' : 'ltr'} className="min-h-screen bg-gradient-to-b from-purple-50/40 to-white">
-
-        {/* Hero */}
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 py-16 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <span className="inline-block bg-purple-100 text-purple-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              {isRtl ? 'הבלוג של HeadHunter' : 'HeadHunter Blog'}
-            </span>
-
-            <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              {isRtl ? (
-                <>תובנות, טיפים ומגמות<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">מעולם הקריירה</span></>
-              ) : (
-                <>Insights, tips and trends<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">from the world of careers</span></>
-              )}
-            </h1>
-
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {isRtl
-                ? 'מאמרים מקצועיים, עצות שוות, ונתונים עדכניים על שוק העבודה הישראלי'
-                : 'Professional articles, valuable advice, and up-to-date data on the Israeli job market'}
-            </p>
-          </div>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-4 py-12">
-
-          {/* Categories */}
-          <div className="flex flex-wrap gap-2 mb-10 justify-center">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  cat === allLabel
-                    ? 'bg-purple-600 text-white shadow-md'
-                    : 'bg-white border border-gray-200 text-gray-600 hover:border-purple-300 hover:text-purple-600'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Featured post */}
-          <div className="mb-10 rounded-2xl overflow-hidden border border-gray-100 shadow-sm bg-white flex flex-col md:flex-row">
-            <div className={`bg-gradient-to-br ${POSTS[0].color} md:w-2/5 min-h-[200px] flex items-center justify-center`}>
-              <span className="text-6xl">✍️</span>
-            </div>
-
-            <div className="p-8 flex flex-col justify-center md:w-3/5">
-              <span className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-2">
-                {POSTS[0].category} · {isRtl ? 'מאמר מומלץ' : 'Featured Article'}
-              </span>
-
-              <h2 className="text-2xl font-black text-gray-900 mb-3">{POSTS[0].title}</h2>
-
-              <p className="text-gray-600 mb-4 leading-relaxed">{POSTS[0].excerpt}</p>
-
-              <div className="flex items-center gap-4 text-sm text-gray-400">
-                <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" />{POSTS[0].author}</span>
-
-                <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{POSTS[0].readTime}</span>
-
-                <span>{POSTS[0].date}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {POSTS.slice(1).map(post => (
-              <div key={post.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden cursor-pointer group">
-                <div className={`bg-gradient-to-br ${post.color} h-36 flex items-center justify-center`}>
-                  <span className="text-4xl opacity-80">📝</span>
-                </div>
-
-                <div className="p-5">
-                  <span className="text-xs font-bold text-purple-600 uppercase tracking-wider">{post.category}</span>
-
-                  <h3 className="text-lg font-bold text-gray-900 mt-1 mb-2 group-hover:text-purple-700 transition-colors leading-snug">{post.title}</h3>
-
-                  <p className="text-sm text-gray-500 mb-4 leading-relaxed">{post.excerpt}</p>
-
-                  <div className="flex items-center justify-between text-xs text-gray-400">
-                    <span className="flex items-center gap-1"><User className="w-3 h-3" />{post.author}</span>
-
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{post.readTime} · {post.date}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Newsletter CTA */}
-          <div className="mt-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 text-center text-white">
-            <h3 className="text-2xl font-black mb-2">
-              {isRtl ? 'קבל עדכונים ישירות למייל' : 'Get updates directly to your email'}
-            </h3>
-
-            <p className="text-purple-100 mb-6">
-              {isRtl
-                ? 'הירשם לניוזלטר ותקבל מאמרים, נתוני שוק וטיפים פעם בשבוע'
-                : 'Subscribe to the newsletter and receive articles, market data and tips once a week'}
-            </p>
-
-            <div className="flex gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder={isRtl ? 'האימייל שלך' : 'Your email'}
-                className="flex-1 px-4 py-3 rounded-xl text-gray-900 text-sm focus:outline-none"
-                dir="ltr"
-              />
-
-              <button className="bg-white text-purple-700 font-bold px-6 py-3 rounded-xl hover:bg-purple-50 transition-colors text-sm">
-                {isRtl ? 'הירשם' : 'Subscribe'}
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </PublicLayout>
-  );
+    <div className={`blog-post-visual blog-tone-${post.tone} ${large ? "is-large" : ""}`}>
+      <div className="blog-visual-grid" />
+      <span><Icon /></span>
+      <small>{post.category}</small>
+      <i /><i />
+    </div>
+  )
 }
-import PublicLayout from "@/components/layouts/PublicLayout"
-import { Clock, User } from "lucide-react"
+
+function PostMeta({ post }) {
+  return (
+    <div className="blog-post-meta">
+      <span><UserRound />{post.author}</span>
+      <span><Clock3 />{post.readTime}</span>
+      <time>{post.date}</time>
+    </div>
+  )
+}
+
+export default function BlogPage() {
+  const { i18n } = useTranslation()
+
+  const isEnglish = i18n.language?.startsWith("en")
+
+  const copy = pageContent[isEnglish ? "en" : "he"]
+
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0)
+
+  const [subscribed, setSubscribed] = useState(false)
+
+  const ForwardArrow = isEnglish ? ArrowRight : ArrowLeft
+
+  const filteredPosts = useMemo(
+    () =>
+      activeCategoryIndex === 0
+        ? copy.posts
+        : copy.posts.filter((post) => post.category === copy.categories[activeCategoryIndex]),
+    [activeCategoryIndex, copy],
+  )
+
+  const featuredPost = filteredPosts[0]
+
+  const remainingPosts = filteredPosts.slice(1)
+
+  return (
+    <div className="headhunter-home blog-page" dir={isEnglish ? "ltr" : "rtl"}>
+      <SEOHead
+        title={isEnglish ? "Career Insights & Hiring Advice | HeadHunter" : "תובנות קריירה וגיוס | HeadHunter"}
+        description={copy.intro}
+        canonical="https://headhunter.co.il/blog"
+      />
+      <Navbar />
+
+      <main>
+        <section className="blog-hero">
+          <div className="blog-shell blog-hero-grid">
+            <div className="blog-hero-copy">
+              <span className="blog-pill"><BookOpen />{copy.eyebrow}</span>
+              <h1>{copy.title}<span>{copy.titleAccent}</span></h1>
+              <p>{copy.intro}</p>
+            </div>
+            <div className="blog-hero-stack" aria-hidden="true">
+              <article className="blog-stack-card blog-stack-card-one">
+                <span><BrainCircuit /></span><small>{copy.latest}</small>
+                <strong>{copy.posts[0].title}</strong>
+              </article>
+              <article className="blog-stack-card blog-stack-card-two">
+                <span><Lightbulb /></span><small>{copy.guide}</small>
+                <strong>{copy.posts[1].title}</strong>
+              </article>
+              <article className="blog-stack-card blog-stack-card-three">
+                <span><BarChart3 /></span><small>{copy.market}</small>
+                <strong>{copy.posts[2].title}</strong>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section className="blog-content-section">
+          <div className="blog-shell">
+            <div className="blog-section-heading">
+              <span>{copy.articlesEyebrow}</span><h2>{copy.articlesTitle}</h2><p>{copy.articlesText}</p>
+            </div>
+
+            <nav className="blog-categories" aria-label={copy.articlesEyebrow}>
+              {copy.categories.map((category, index) => (
+                <button
+                  key={category}
+                  type="button"
+                  className={activeCategoryIndex === index ? "is-active" : ""}
+                  onClick={() => setActiveCategoryIndex(index)}
+                  aria-pressed={activeCategoryIndex === index}
+                >
+                  {category}
+                </button>
+              ))}
+            </nav>
+
+            {featuredPost && (
+              <article className="blog-featured-post">
+                <PostVisual post={featuredPost} large />
+                <div className="blog-featured-copy">
+                  <span>{featuredPost.category} · {copy.featured}</span>
+                  <h2>{featuredPost.title}</h2>
+                  <p>{featuredPost.excerpt}</p>
+                  <PostMeta post={featuredPost} />
+                  <div className="blog-reading-line"><i /></div>
+                </div>
+              </article>
+            )}
+
+            {remainingPosts.length > 0 && (
+              <div className="blog-post-grid">
+                {remainingPosts.map((post) => (
+                  <article key={post.id} className="blog-post-card">
+                    <PostVisual post={post} />
+                    <div className="blog-post-copy">
+                      <span>{post.category}</span><h3>{post.title}</h3><p>{post.excerpt}</p>
+                      <PostMeta post={post} />
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="blog-newsletter-section">
+          <div className="blog-shell blog-newsletter">
+            <div className="blog-newsletter-copy">
+              <span><Sparkles />{copy.newsletterEyebrow}</span>
+              <h2>{copy.newsletterTitle}</h2><p>{copy.newsletterText}</p>
+            </div>
+            {subscribed ? (
+              <div className="blog-subscribed"><Check />{copy.subscribed}</div>
+            ) : (
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  setSubscribed(true)
+                }}
+              >
+                <label>
+                  <Mail />
+                  <input type="email" required placeholder={copy.emailPlaceholder} dir="ltr" />
+                </label>
+                <button type="submit">{copy.subscribe}<ForwardArrow /></button>
+                <small>{copy.privacy}</small>
+              </form>
+            )}
+          </div>
+        </section>
+      </main>
+
+      <LandingFooter />
+    </div>
+  )
+}

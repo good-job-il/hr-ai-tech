@@ -13,7 +13,10 @@ import {
   Briefcase,
   Building2,
   Calendar,
+  Check,
+  ChevronLeft,
   ChevronDown,
+  ChevronRight,
   ChevronUp,
   LayoutGrid,
   List,
@@ -43,6 +46,16 @@ const glass = {
   border: "1px solid rgba(221,235,255,0.86)",
   borderRadius: 20,
   boxShadow: "0 28px 80px rgba(79,124,255,0.11), 0 3px 12px rgba(15,23,42,0.04)",
+}
+
+const PAGE_SIZE_OPTIONS = [15, 30, 50, 100]
+
+const getPageNumber = (value) => Math.max(1, Number.parseInt(value || "1", 10) || 1)
+
+const getPageSize = (value) => {
+  const parsed = Number.parseInt(value || "15", 10)
+
+  return PAGE_SIZE_OPTIONS.includes(parsed) ? parsed : 15
 }
 
 const footerContent = {
@@ -104,31 +117,22 @@ function MatchBadge({ score }) {
 
 function Checkbox({ label, checked, onChange }) {
   return (
-    <label className="flex items-center gap-3 cursor-pointer py-1.5">
-      <button
-        type="button"
-        onClick={onChange}
-        className="w-[18px] h-[18px] rounded-md flex items-center justify-center transition-all"
-        style={{
-          background: checked ? "linear-gradient(135deg,#8B5CF6,#2F80FF)" : "#fff",
-          border: checked ? "1px solid #7C3AED" : "1px solid #CBD5E1",
-          boxShadow: checked ? "0 4px 12px rgba(124,58,237,0.28)" : "none",
-        }}
-      >
-        {checked && (
-          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-            <path
-              d="M2 5.5L4.5 8L9 3"
-              stroke="white"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        )}
-      </button>
+    <label className="jobs-checkbox">
+      <input type="checkbox" checked={checked} onChange={onChange} />
+      <span className="jobs-checkbox__control" aria-hidden="true">
+        <Check />
+      </span>
+      <span>{label}</span>
+    </label>
+  )
+}
 
-      <span className="text-[14px] font-semibold text-[#475569]">{label}</span>
+function RadioButton({ name, label, value, checked, onChange }) {
+  return (
+    <label className="jobs-radio">
+      <input type="radio" name={name} value={value} checked={checked} onChange={onChange} />
+      <span className="jobs-radio__control" aria-hidden="true" />
+      <span>{label}</span>
     </label>
   )
 }
@@ -325,6 +329,12 @@ export default function Jobs() {
     { value: "5+", label: isRtl ? "5+ שנות ניסיון" : "5+ years experience" },
   ]
 
+  const WORK_MODES = [
+    { value: "hybrid", label: isRtl ? "היברידי" : "Hybrid" },
+    { value: "remote", label: isRtl ? "מהבית" : "Remote" },
+    { value: "onsite", label: isRtl ? "במשרד" : "On-site" },
+  ]
+
   const { data: domains = [] } = useQuery({
     queryKey: ["job-search-domains"],
     queryFn: () => taxonomyService.domains(),
@@ -339,9 +349,21 @@ export default function Jobs() {
 
   const [jobTypes, setJobTypes] = useState(urlP.getAll("type"))
 
+  const [experienceLevel, setExperienceLevel] = useState(urlP.get("experience") || "")
+
+  const [salaryMin, setSalaryMin] = useState(urlP.get("salary_min") || "")
+
+  const [salaryMax, setSalaryMax] = useState(urlP.get("salary_max") || "")
+
+  const [workMode, setWorkMode] = useState(urlP.get("work_mode") || "")
+
   const [viewMode, setViewMode] = useState("list")
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+
+  const [currentPage, setCurrentPage] = useState(getPageNumber(urlP.get("page")))
+
+  const [pageSize, setPageSize] = useState(getPageSize(urlP.get("page_size")))
 
   const [openFilters, setOpenFilters] = useState({
     type: true,
@@ -352,9 +374,6 @@ export default function Jobs() {
 
   const toggle = (k) => setOpenFilters((f) => ({ ...f, [k]: !f[k] }))
 
-  const toggleType = (v) =>
-    setJobTypes((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]))
-
   useEffect(() => {
     const params = new URLSearchParams(urlSearch)
 
@@ -362,18 +381,55 @@ export default function Jobs() {
     setLoc(params.get("location") || "")
     setDomainId(params.get("domain_id") || "")
     setJobTypes(params.getAll("type"))
+    setExperienceLevel(params.get("experience") || "")
+    setSalaryMin(params.get("salary_min") || "")
+    setSalaryMax(params.get("salary_max") || "")
+    setWorkMode(params.get("work_mode") || "")
+    setCurrentPage(getPageNumber(params.get("page")))
+    setPageSize(getPageSize(params.get("page_size")))
   }, [urlSearch])
 
   const { data: jobs = [], isLoading } = useQuery({
-    queryKey: ["jobs", search, loc, domainId, jobTypes],
+    queryKey: [
+      "jobs",
+      search,
+      loc,
+      domainId,
+      jobTypes,
+      experienceLevel,
+      salaryMin,
+      salaryMax,
+      workMode,
+    ],
     queryFn: async () => {
-      if (search || loc || domainId || jobTypes.length) {
+      const experienceRange = {
+        "0": { min: 0, max: 0 },
+        "1-2": { min: 1, max: 2 },
+        "3-5": { min: 3, max: 5 },
+        "5+": { min: 5, max: undefined },
+      }[experienceLevel]
+
+      if (
+        search ||
+        loc ||
+        domainId ||
+        jobTypes.length ||
+        experienceLevel ||
+        salaryMin ||
+        salaryMax ||
+        workMode
+      ) {
         const r = await publicWorkflowService.searchJobs({
           query: search,
           filters: {
             type: jobTypes.length ? jobTypes : undefined,
             location: loc || undefined,
             domain_id: domainId ? Number(domainId) : undefined,
+            salary_min: salaryMin ? Number(salaryMin) : undefined,
+            salary_max: salaryMax ? Number(salaryMax) : undefined,
+            experience_min: experienceRange?.min,
+            experience_max: experienceRange?.max,
+            work_mode: workMode || undefined,
           },
           type: "search",
           limit: 100,
@@ -402,7 +458,18 @@ export default function Jobs() {
     initialData: [],
   })
 
-  const buildSearchPath = (searchTerm = search) => {
+  const buildSearchPath = (
+    searchTerm = search,
+    {
+      page = currentPage,
+      size = pageSize,
+      types = jobTypes,
+      experience = experienceLevel,
+      minimumSalary = salaryMin,
+      maximumSalary = salaryMax,
+      mode = workMode,
+    } = {},
+  ) => {
     const params = new URLSearchParams()
 
     if (searchTerm.trim()) {
@@ -417,18 +484,70 @@ export default function Jobs() {
       params.set("domain_id", domainId)
     }
 
-    jobTypes.forEach((type) => params.append("type", type))
+    types.forEach((type) => params.append("type", type))
+
+    if (experience) {
+      params.set("experience", experience)
+    }
+
+    if (minimumSalary) {
+      params.set("salary_min", minimumSalary)
+    }
+
+    if (maximumSalary) {
+      params.set("salary_max", maximumSalary)
+    }
+
+    if (mode) {
+      params.set("work_mode", mode)
+    }
+
+    params.set("page", String(page))
+    params.set("page_size", String(size))
 
     const queryString = params.toString()
 
     return queryString ? `/jobs?${queryString}` : "/jobs"
   }
 
-  const handleSearch = () => navigate(buildSearchPath())
+  const toggleType = (value) => {
+    const nextTypes = jobTypes.includes(value)
+      ? jobTypes.filter((type) => type !== value)
+      : [...jobTypes, value]
+
+    setJobTypes(nextTypes)
+    navigate(buildSearchPath(search, { page: 1, types: nextTypes }))
+  }
+
+  const changeExperience = (value) => {
+    const nextExperience = experienceLevel === value ? "" : value
+
+    setExperienceLevel(nextExperience)
+    navigate(buildSearchPath(search, { page: 1, experience: nextExperience }))
+  }
+
+  const changeWorkMode = (value) => {
+    const nextMode = workMode === value ? "" : value
+
+    setWorkMode(nextMode)
+    navigate(buildSearchPath(search, { page: 1, mode: nextMode }))
+  }
+
+  const applySalaryFilters = () => {
+    navigate(
+      buildSearchPath(search, {
+        page: 1,
+        minimumSalary: salaryMin,
+        maximumSalary: salaryMax,
+      }),
+    )
+  }
+
+  const handleSearch = () => navigate(buildSearchPath(search, { page: 1 }))
 
   const applyQuickSearch = (tag) => {
     setSearch(tag)
-    navigate(buildSearchPath(tag))
+    navigate(buildSearchPath(tag, { page: 1 }))
   }
 
   const clearFilters = () => {
@@ -436,7 +555,45 @@ export default function Jobs() {
     setLoc("")
     setDomainId("")
     setJobTypes([])
-    navigate("/jobs")
+    setExperienceLevel("")
+    setSalaryMin("")
+    setSalaryMax("")
+    setWorkMode("")
+    navigate(`/jobs?page=1&page_size=${pageSize}`)
+  }
+
+  const sortedJobs = [...jobs].sort((firstJob, secondJob) => {
+    const firstTimestamp = Date.parse(
+      firstJob.created_date || firstJob.created_at || firstJob.published_at || "",
+    )
+
+    const secondTimestamp = Date.parse(
+      secondJob.created_date || secondJob.created_at || secondJob.published_at || "",
+    )
+
+    const safeFirstTimestamp = Number.isNaN(firstTimestamp) ? 0 : firstTimestamp
+
+    const safeSecondTimestamp = Number.isNaN(secondTimestamp) ? 0 : secondTimestamp
+
+    return safeSecondTimestamp - safeFirstTimestamp
+  })
+
+  const totalPages = Math.max(1, Math.ceil(sortedJobs.length / pageSize))
+
+  const activePage = Math.min(currentPage, totalPages)
+
+  const paginatedJobs = sortedJobs.slice((activePage - 1) * pageSize, activePage * pageSize)
+
+  const visiblePages = Array.from({ length: totalPages }, (_, index) => index + 1)
+
+  const goToPage = (page) => {
+    const nextPage = Math.min(Math.max(page, 1), totalPages)
+
+    navigate(buildSearchPath(search, { page: nextPage }))
+  }
+
+  const changePageSize = (size) => {
+    navigate(buildSearchPath(search, { page: 1, size }))
   }
 
   const jobsFooterCopy = footerContent[isRtl ? "he" : "en"]
@@ -637,7 +794,14 @@ export default function Jobs() {
                 onToggle={() => toggle("exp")}
               >
                 {EXP_LEVELS.map((e) => (
-                  <Checkbox key={e.value} label={e.label} checked={false} onChange={() => {}} />
+                  <RadioButton
+                    key={e.value}
+                    name="experience"
+                    label={e.label}
+                    value={e.value}
+                    checked={experienceLevel === e.value}
+                    onChange={() => changeExperience(e.value)}
+                  />
                 ))}
               </FilterBlock>
 
@@ -648,13 +812,27 @@ export default function Jobs() {
               >
                 <div className="grid grid-cols-2 gap-3">
                   <input
+                    type="number"
+                    min="0"
+                    inputMode="numeric"
                     className="h-11 rounded-xl border border-[#DDEBFF] bg-white px-3 text-sm outline-none"
                     placeholder={isRtl ? "מינימום" : "Minimum"}
+                    value={salaryMin}
+                    onChange={(event) => setSalaryMin(event.target.value)}
+                    onBlur={applySalaryFilters}
+                    onKeyDown={(event) => event.key === "Enter" && applySalaryFilters()}
                   />
 
                   <input
+                    type="number"
+                    min="0"
+                    inputMode="numeric"
                     className="h-11 rounded-xl border border-[#DDEBFF] bg-white px-3 text-sm outline-none"
                     placeholder={isRtl ? "מקסימום" : "Maximum"}
+                    value={salaryMax}
+                    onChange={(event) => setSalaryMax(event.target.value)}
+                    onBlur={applySalaryFilters}
+                    onKeyDown={(event) => event.key === "Enter" && applySalaryFilters()}
                   />
                 </div>
               </FilterBlock>
@@ -664,11 +842,16 @@ export default function Jobs() {
                 open={openFilters.mode}
                 onToggle={() => toggle("mode")}
               >
-                {(isRtl ? ["היברידי", "מהבית", "פיזי"] : ["Hybrid", "Remote", "On-site"]).map(
-                  (m) => (
-                    <Checkbox key={m} label={m} checked={false} onChange={() => {}} />
-                  ),
-                )}
+                {WORK_MODES.map((mode) => (
+                  <RadioButton
+                    key={mode.value}
+                    name="work-mode"
+                    label={mode.label}
+                    value={mode.value}
+                    checked={workMode === mode.value}
+                    onChange={() => changeWorkMode(mode.value)}
+                  />
+                ))}
               </FilterBlock>
             </div>
           </aside>
@@ -736,13 +919,72 @@ export default function Jobs() {
                 </p>
               </div>
             ) : (
-              <div
-                className={`grid gap-6 ${viewMode === "grid" ? "lg:grid-cols-2" : "grid-cols-1"}`}
-              >
-                {jobs.map((job) => (
-                  <JobCard key={job.id} job={job} />
-                ))}
-              </div>
+              <>
+                <div
+                  className={`grid gap-6 ${viewMode === "grid" ? "lg:grid-cols-2" : "grid-cols-1"}`}
+                >
+                  {paginatedJobs.map((job) => (
+                    <JobCard key={job.id} job={job} />
+                  ))}
+                </div>
+
+                <nav
+                  className="jobs-pagination"
+                  aria-label={isRtl ? "ניווט בין דפי משרות" : "Jobs pagination"}
+                >
+                  <div className="jobs-pagination__summary">
+                    {isRtl
+                      ? `מציגים ${(activePage - 1) * pageSize + 1}–${Math.min(activePage * pageSize, jobs.length)} מתוך ${jobs.length}`
+                      : `Showing ${(activePage - 1) * pageSize + 1}–${Math.min(activePage * pageSize, jobs.length)} of ${jobs.length}`}
+                  </div>
+
+                  <div className="jobs-pagination__pages">
+                    <button
+                      type="button"
+                      onClick={() => goToPage(activePage - 1)}
+                      disabled={activePage === 1}
+                      aria-label={isRtl ? "העמוד הקודם" : "Previous page"}
+                    >
+                      {isRtl ? <ChevronRight /> : <ChevronLeft />}
+                    </button>
+
+                    {visiblePages.map((page) => (
+                      <button
+                        type="button"
+                        key={page}
+                        onClick={() => goToPage(page)}
+                        className={page === activePage ? "is-active" : ""}
+                        aria-current={page === activePage ? "page" : undefined}
+                      >
+                        {page}
+                      </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={() => goToPage(activePage + 1)}
+                      disabled={activePage === totalPages}
+                      aria-label={isRtl ? "העמוד הבא" : "Next page"}
+                    >
+                      {isRtl ? <ChevronLeft /> : <ChevronRight />}
+                    </button>
+                  </div>
+
+                  <label className="jobs-pagination__size">
+                    <span>{isRtl ? "משרות בעמוד" : "Jobs per page"}</span>
+                    <select
+                      value={pageSize}
+                      onChange={(event) => changePageSize(Number(event.target.value))}
+                    >
+                      {PAGE_SIZE_OPTIONS.map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </nav>
+              </>
             )}
           </section>
 
@@ -754,7 +996,7 @@ export default function Jobs() {
                 {isRtl ? "משרות מומלצות עבורך" : "Recommended for you"}
               </h3>
 
-              {jobs.slice(0, 3).map((job) => (
+              {sortedJobs.slice(0, 3).map((job) => (
                 <div
                   key={job.id}
                   className="flex items-center gap-4 py-4 border-b border-[#E4ECFF] last:border-b-0"

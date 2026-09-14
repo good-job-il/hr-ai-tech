@@ -1,272 +1,377 @@
-import { useTranslation } from 'react-i18next';
-import { Sparkles, FileText, Target, TrendingUp, MessageSquare, Shield } from 'lucide-react';
+import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import {
+  ArrowLeft,
+  ArrowRight,
+  BarChart3,
+  BrainCircuit,
+  BriefcaseBusiness,
+  Check,
+  CheckCircle2,
+  Clock3,
+  FileText,
+  LockKeyhole,
+  MessageSquare,
+  Quote,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Target,
+  TrendingUp,
+  UserPlus,
+  WandSparkles,
+} from "lucide-react"
+import Navbar from "@/components/home/Navbar"
+import LandingFooter from "@/components/home/LandingFooter"
+import SEOHead from "@/components/SEOHead"
+import "../Home.css"
+import "./AICareerPage.css"
+
+const pageContent = {
+  en: {
+    eyebrow: "Your personal AI career center",
+    title: "Make every career move",
+    titleAccent: "with more confidence",
+    heroText:
+      "From a stronger resume to better-fit jobs and interview preparation — HeadHunter AI turns your experience into a clear next step.",
+    primaryCta: "Create your free profile",
+    secondaryCta: "Explore open jobs",
+    free: "Free for candidates",
+    private: "Your data stays private",
+    available: "Available whenever you need it",
+    workspace: "AI career workspace",
+    workspaceCaption: "Personal guidance based on your profile",
+    profileStrength: "Profile strength",
+    matchLabel: "Top job match",
+    matchValue: "94% match",
+    recommendation: "Next recommendation",
+    recommendationText: "Highlight measurable impact in your latest role.",
+    metricTools: "AI career tools",
+    metricCandidates: "active candidates",
+    metricSupport: "career support",
+    sectionEyebrow: "Everything in one place",
+    sectionTitle: "Practical AI tools for your next opportunity",
+    sectionText:
+      "Each tool uses the same professional profile, so your recommendations stay relevant and consistent.",
+    features: [
+      {
+        icon: FileText,
+        title: "AI resume analysis",
+        desc: "Find weak points, sharpen achievements and understand how recruiters read your resume.",
+        tag: "Resume",
+      },
+      {
+        icon: Target,
+        title: "Personalized job matching",
+        desc: "Rank open roles by experience, skills, location and your professional preferences.",
+        tag: "Matching",
+      },
+      {
+        icon: MessageSquare,
+        title: "Interview coaching",
+        desc: "Practice realistic questions and receive clear feedback before the real conversation.",
+        tag: "Practice",
+      },
+      {
+        icon: TrendingUp,
+        title: "Career path planning",
+        desc: "See possible next roles and the skills that can help you reach them with confidence.",
+        tag: "Growth",
+      },
+      {
+        icon: WandSparkles,
+        title: "Cover letter writing",
+        desc: "Create a focused, role-specific draft that reflects your real experience and strengths.",
+        tag: "Application",
+      },
+      {
+        icon: BarChart3,
+        title: "Salary insights",
+        desc: "Prepare for compensation conversations with relevant role and market context.",
+        tag: "Salary",
+      },
+    ],
+    processEyebrow: "Simple by design",
+    processTitle: "From profile to opportunity in four steps",
+    processText:
+      "Set up your profile once. The platform uses it to improve every recommendation that follows.",
+    steps: [
+      ["01", "Create your profile", "Add your experience, goals, skills and preferences."],
+      ["02", "Upload your resume", "Use your existing CV or complete the profile manually."],
+      ["03", "Get AI guidance", "Receive matches and practical recommendations tailored to you."],
+      ["04", "Apply with confidence", "Choose relevant roles and move forward with stronger materials."],
+    ],
+    testimonialEyebrow: "Candidate stories",
+    testimonialTitle: "More clarity at every stage of the search",
+    testimonials: [
+      {
+        name: "Daniel K.",
+        role: "Frontend Developer",
+        text: "The matching helped me focus on roles that genuinely fit my experience instead of applying everywhere.",
+      },
+      {
+        name: "Michelle A.",
+        role: "Product Manager",
+        text: "The resume feedback was specific and useful. My profile finally communicated the value of my work clearly.",
+      },
+      {
+        name: "Ron S.",
+        role: "DevOps Engineer",
+        text: "Interview practice gave me a clear structure for my answers and made the real interview much less stressful.",
+      },
+    ],
+    ctaTitle: "Your next career step can start today",
+    ctaText: "Build one professional profile and let HeadHunter AI help you make the most of it.",
+    ctaButton: "Start free",
+    ctaNote: "No credit card required",
+  },
+  he: {
+    eyebrow: "מרכז הקריירה האישי שלך עם AI",
+    title: "לקבל כל החלטת קריירה",
+    titleAccent: "עם יותר ביטחון",
+    heroText:
+      "מקורות חיים חזקים יותר, דרך משרות שבאמת מתאימות לך ועד הכנה לראיון — HeadHunter AI הופך את הניסיון שלך לצעד הבא הברור.",
+    primaryCta: "יצירת פרופיל בחינם",
+    secondaryCta: "למשרות הפתוחות",
+    free: "חינם למועמדים",
+    private: "המידע שלך נשאר פרטי",
+    available: "זמין בכל זמן שצריך",
+    workspace: "סביבת הקריירה עם AI",
+    workspaceCaption: "הכוונה אישית המבוססת על הפרופיל שלך",
+    profileStrength: "חוזק הפרופיל",
+    matchLabel: "ההתאמה המובילה",
+    matchValue: "94% התאמה",
+    recommendation: "ההמלצה הבאה",
+    recommendationText: "כדאי להדגיש הישג מדיד מהתפקיד האחרון שלך.",
+    metricTools: "כלי AI לקריירה",
+    metricCandidates: "מועמדים פעילים",
+    metricSupport: "תמיכה בקריירה",
+    sectionEyebrow: "הכול במקום אחד",
+    sectionTitle: "כלי AI מעשיים להזדמנות הבאה שלך",
+    sectionText:
+      "כל הכלים עובדים עם אותו פרופיל מקצועי, כך שההמלצות נשארות רלוונטיות ועקביות.",
+    features: [
+      {
+        icon: FileText,
+        title: "ניתוח קורות חיים עם AI",
+        desc: "לזהות נקודות חלשות, לחדד הישגים ולהבין איך מגייסים קוראים את קורות החיים שלך.",
+        tag: "קורות חיים",
+      },
+      {
+        icon: Target,
+        title: "התאמה אישית למשרות",
+        desc: "דירוג משרות פתוחות לפי ניסיון, כישורים, מיקום והעדפות מקצועיות.",
+        tag: "התאמה",
+      },
+      {
+        icon: MessageSquare,
+        title: "אימון לראיון עבודה",
+        desc: "תרגול שאלות מציאותיות וקבלת משוב ברור לפני השיחה האמיתית.",
+        tag: "תרגול",
+      },
+      {
+        icon: TrendingUp,
+        title: "תכנון מסלול קריירה",
+        desc: "לגלות תפקידים אפשריים וכישורים שיעזרו להגיע אליהם בביטחון.",
+        tag: "צמיחה",
+      },
+      {
+        icon: WandSparkles,
+        title: "כתיבת מכתב מקדים",
+        desc: "יצירת טיוטה ממוקדת למשרה שמשקפת את הניסיון והחוזקות האמיתיים שלך.",
+        tag: "מועמדות",
+      },
+      {
+        icon: BarChart3,
+        title: "תובנות שכר",
+        desc: "הכנה לשיחות שכר עם הקשר רלוונטי לתפקיד ולשוק העבודה.",
+        tag: "שכר",
+      },
+    ],
+    processEyebrow: "פשוט בכוונה",
+    processTitle: "מפרופיל להזדמנות בארבעה צעדים",
+    processText:
+      "מגדירים את הפרופיל פעם אחת. המערכת משתמשת בו כדי לשפר כל המלצה בהמשך.",
+    steps: [
+      ["01", "יוצרים פרופיל", "מוסיפים ניסיון, מטרות, כישורים והעדפות."],
+      ["02", "מעלים קורות חיים", "משתמשים בקובץ הקיים או משלימים ידנית."],
+      ["03", "מקבלים הכוונת AI", "מקבלים התאמות והמלצות מעשיות המותאמות לך."],
+      ["04", "מגישים בביטחון", "בוחרים משרות רלוונטיות ומתקדמים עם חומרים חזקים יותר."],
+    ],
+    testimonialEyebrow: "סיפורי מועמדים",
+    testimonialTitle: "יותר בהירות בכל שלב בחיפוש",
+    testimonials: [
+      {
+        name: "דניאל כ.",
+        role: "Frontend Developer",
+        text: "ההתאמות עזרו לי להתמקד בתפקידים שבאמת מתאימים לניסיון שלי במקום להגיש לכל מקום.",
+      },
+      {
+        name: "מיכל א.",
+        role: "Product Manager",
+        text: "המשוב על קורות החיים היה מדויק ושימושי. סוף סוף הפרופיל שלי הציג בצורה ברורה את הערך שאני מביאה.",
+      },
+      {
+        name: "רון ש.",
+        role: "DevOps Engineer",
+        text: "התרגול נתן לי מבנה ברור לתשובות והפך את הראיון האמיתי להרבה פחות מלחיץ.",
+      },
+    ],
+    ctaTitle: "הצעד הבא בקריירה יכול להתחיל היום",
+    ctaText: "בונים פרופיל מקצועי אחד ונותנים ל-HeadHunter AI לעזור להפיק ממנו את המרב.",
+    ctaButton: "מתחילים בחינם",
+    ctaNote: "ללא צורך בכרטיס אשראי",
+  },
+}
 
 export default function AICareerPage() {
-  const { i18n } = useTranslation();
+  const { i18n } = useTranslation()
 
-  const isRtl = !i18n.language?.startsWith('en');
+  const isEnglish = i18n.language?.startsWith("en")
 
-  const FEATURES = [
-    {
-      icon: FileText,
-      color: 'bg-purple-100 text-purple-600',
-      title: isRtl ? 'ניתוח קורות חיים ב-AI' : 'AI Resume Analysis',
-      desc: isRtl
-        ? 'העלה את קורות החיים שלך וקבל ניתוח מעמיק: חוזקות, חולשות, המלצות שיפור ונקודות לחיזוק — הכל תוך שניות.'
-        : 'Upload your resume and get a deep analysis: strengths, weaknesses, improvement recommendations — all within seconds.',
-    },
-    {
-      icon: Target,
-      color: 'bg-blue-100 text-blue-600',
-      title: isRtl ? 'התאמה אישית למשרות' : 'Personalized Job Matching',
-      desc: isRtl
-        ? 'מנוע ה-AI שלנו סורק אלפי משרות ומדרג אותן לפי ההתאמה האישית שלך — ניסיון, כישורים ורצונות.'
-        : 'Our AI engine scans thousands of jobs and ranks them by your personal fit — experience, skills and preferences.',
-    },
-    {
-      icon: MessageSquare,
-      color: 'bg-green-100 text-green-600',
-      title: isRtl ? 'אימון לראיון עבודה' : 'Interview Coaching',
-      desc: isRtl
-        ? 'תרגל ראיונות עבודה מול AI שמדמה מגייס אמיתי. קבל משוב על תשובותיך ושפר את הביצועים.'
-        : 'Practice job interviews with an AI that simulates a real recruiter. Get feedback on your answers and improve your performance.',
-    },
-    {
-      icon: TrendingUp,
-      color: 'bg-orange-100 text-orange-600',
-      title: isRtl ? 'תכנון מסלול קריירה' : 'Career Path Planning',
-      desc: isRtl
-        ? 'בהתבסס על הפרופיל שלך, ה-AI ממליץ על מסלולי קריירה, כישורים לפתח, וקורסים רלוונטיים.'
-        : 'Based on your profile, AI recommends career paths, skills to develop, and relevant courses.',
-    },
-    {
-      icon: Sparkles,
-      color: 'bg-pink-100 text-pink-600',
-      title: isRtl ? 'כתיבת מכתב מוטיבציה' : 'Cover Letter Writing',
-      desc: isRtl
-        ? 'הזן את המשרה שאליה אתה מגיש מועמדות, ו-AI יכתוב לך מכתב מוטיבציה מותאם אישית.'
-        : 'Enter the job you are applying for, and AI will write you a personalized cover letter.',
-    },
-    {
-      icon: Shield,
-      color: 'bg-indigo-100 text-indigo-600',
-      title: isRtl ? 'ניתוח שכר ומשא ומתן' : 'Salary Analysis & Negotiation',
-      desc: isRtl
-        ? 'קבל נתוני שכר עדכניים לתפקיד ולתחום שלך, וטיפים איך לנהל משא ומתן יעיל על שכר.'
-        : 'Get up-to-date salary data for your role and field, plus tips on how to negotiate effectively.',
-    },
-  ];
+  const copy = pageContent[isEnglish ? "en" : "he"]
 
-  const STEPS = [
-    {
-      num: '01',
-      title: isRtl ? 'הרשם בחינם' : 'Register Free',
-      desc: isRtl ? 'צור פרופיל ב-30 שניות' : 'Create a profile in 30 seconds',
-    },
-    {
-      num: '02',
-      title: isRtl ? 'העלה קורות חיים' : 'Upload Resume',
-      desc: isRtl ? 'או בנה פרופיל ידנית' : 'Or build your profile manually',
-    },
-    {
-      num: '03',
-      title: isRtl ? 'ה-AI מנתח' : 'AI Analyzes',
-      desc: isRtl ? 'ומצא התאמות מדויקות' : 'And finds precise matches',
-    },
-    {
-      num: '04',
-      title: isRtl ? 'קבל עבודה' : 'Get Hired',
-      desc: isRtl ? 'ותתקדם בקריירה' : 'And advance your career',
-    },
-  ];
-
-  const TESTIMONIALS = [
-    {
-      name: isRtl ? 'דניאל כ.' : 'Daniel K.',
-      role: 'Frontend Developer',
-      text: isRtl
-        ? 'תוך שבוע מצאתי 3 הצעות עבודה רלוונטיות. ה-AI הצליח להתאים אותי למשרות שלא הייתי מוצא לבד.'
-        : 'Within a week I found 3 relevant job offers. The AI matched me to jobs I would never have found on my own.',
-    },
-    {
-      name: isRtl ? 'מיכל א.' : 'Michelle A.',
-      role: 'Product Manager',
-      text: isRtl
-        ? 'ניתוח קורות החיים היה מדויק ומועיל. שיפרתי את ה-CV ומיד קיבלתי יותר שיחות מגייסים.'
-        : 'The resume analysis was accurate and helpful. I improved my CV and immediately got more recruiter calls.',
-    },
-    {
-      name: isRtl ? 'רון ש.' : 'Ron S.',
-      role: 'DevOps Engineer',
-      text: isRtl
-        ? 'האימון לראיון עזר לי להגיע מוכן. קיבלתי את המשרה שרציתי אחרי הראיון הראשון!'
-        : 'The interview coaching helped me arrive prepared. I got the job I wanted after the first interview!',
-    },
-  ];
+  const ForwardArrow = isEnglish ? ArrowRight : ArrowLeft
 
   return (
-    <PublicLayout>
-      <div dir={isRtl ? 'rtl' : 'ltr'} className="min-h-screen bg-white">
+    <div className="headhunter-home ai-career-page" dir={isEnglish ? "ltr" : "rtl"}>
+      <SEOHead
+        title={isEnglish ? "AI Career Center | HeadHunter" : "מרכז קריירה AI | HeadHunter"}
+        description={copy.heroText}
+        canonical="https://headhunter.co.il/ai-career"
+      />
+      <Navbar />
 
-        {/* Hero */}
-        <div className="bg-gradient-to-br from-purple-900 via-purple-700 to-blue-700 text-white py-20 px-4 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 right-20 w-64 h-64 bg-white rounded-full blur-3xl" />
-
-            <div className="absolute bottom-10 left-20 w-48 h-48 bg-blue-300 rounded-full blur-3xl" />
-          </div>
-
-          <div className="max-w-4xl mx-auto text-center relative z-10">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              <Sparkles className="w-4 h-4" />
-
-              {isRtl ? 'מופעל על ידי AI מתקדם' : 'Powered by Advanced AI'}
+      <main>
+        <section className="ai-career-hero">
+          <div className="ai-career-shell ai-career-hero-grid">
+            <div className="ai-career-hero-copy">
+              <span className="ai-career-pill"><Sparkles />{copy.eyebrow}</span>
+              <h1>{copy.title}<span>{copy.titleAccent}</span></h1>
+              <p>{copy.heroText}</p>
+              <div className="ai-career-actions">
+                <Link to="/register?type=candidate" className="ai-career-primary-button">
+                  <UserPlus />{copy.primaryCta}
+                </Link>
+                <Link to="/jobs" className="ai-career-secondary-button">
+                  {copy.secondaryCta}<ForwardArrow />
+                </Link>
+              </div>
+              <div className="ai-career-trust-row">
+                <span><CheckCircle2 /> {copy.free}</span>
+                <span><LockKeyhole /> {copy.private}</span>
+                <span><Clock3 /> {copy.available}</span>
+              </div>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-black mb-5 leading-tight">
-              {isRtl ? (
-                <>AI שעובד בשבילך<br /><span className="text-yellow-300">24/7 לאורך כל הקריירה</span></>
-              ) : (
-                <>AI that works for you<br /><span className="text-yellow-300">24/7 throughout your career</span></>
-              )}
-            </h1>
-
-            <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto leading-relaxed">
-              {isRtl
-                ? 'מניתוח קורות חיים, דרך התאמה מדויקת למשרות, ועד אימון לראיונות — HeadHunter AI מלווה אותך בכל שלב.'
-                : 'From resume analysis, through precise job matching, to interview coaching — HeadHunter AI guides you every step of the way.'}
-            </p>
-
-            <div className="flex gap-4 justify-center flex-wrap">
-              <Link
-                to="/register"
-                className="bg-white text-purple-700 font-bold px-8 py-4 rounded-xl hover:bg-purple-50 transition-all shadow-lg text-base"
-              >
-                {isRtl ? 'התחל בחינם — אין צורך בכרטיס אשראי' : 'Start Free — No Credit Card Required'}
-              </Link>
-
-              <Link
-                to="/jobs"
-                className="bg-white/20 backdrop-blur text-white font-bold px-8 py-4 rounded-xl hover:bg-white/30 transition-all text-base border border-white/30"
-              >
-                {isRtl ? 'חיפוש משרות' : 'Search Jobs'}
-              </Link>
-            </div>
-
-            <p className="text-purple-200 text-sm mt-4">
-              {isRtl ? '+15,000 מועמדים פעילים כבר משתמשים ב-AI שלנו' : '+15,000 active candidates are already using our AI'}
-            </p>
-          </div>
-        </div>
-
-        {/* How it works */}
-        <div className="py-16 px-4 bg-gray-50">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-black text-center text-gray-900 mb-12">
-              {isRtl ? 'איך זה עובד?' : 'How does it work?'}
-            </h2>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {STEPS.map((step, i) => (
-                <div key={i} className="text-center">
-                  <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-lg mx-auto mb-3 shadow-md">
-                    {step.num}
-                  </div>
-
-                  <h3 className="font-bold text-gray-900 mb-1">{step.title}</h3>
-
-                  <p className="text-sm text-gray-500">{step.desc}</p>
+            <div className="ai-career-visual" aria-hidden="true">
+              <div className="ai-career-orb"><BrainCircuit /></div>
+              <div className="ai-career-orbit ai-career-orbit-one" />
+              <div className="ai-career-orbit ai-career-orbit-two" />
+              <div className="ai-career-workspace-card">
+                <div className="ai-career-workspace-head">
+                  <span><Sparkles /></span>
+                  <div><strong>{copy.workspace}</strong><small>{copy.workspaceCaption}</small></div>
+                  <b>AI</b>
                 </div>
+                <div className="ai-career-profile-progress">
+                  <div className="ai-career-progress-ring">86%</div>
+                  <div>
+                    <small>{copy.profileStrength}</small><strong>86 / 100</strong><span><i /></span>
+                  </div>
+                </div>
+                <div className="ai-career-match-card">
+                  <span><BriefcaseBusiness /></span>
+                  <div><small>{copy.matchLabel}</small><strong>Senior Product Designer</strong></div>
+                  <b>{copy.matchValue}</b>
+                </div>
+                <div className="ai-career-recommendation">
+                  <WandSparkles />
+                  <div><strong>{copy.recommendation}</strong><p>{copy.recommendationText}</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="ai-career-metrics" aria-label={copy.workspace}>
+          <div className="ai-career-shell ai-career-metrics-grid">
+            <div><BrainCircuit /><strong>6</strong><span>{copy.metricTools}</span></div>
+            <div><UserPlus /><strong>15,000+</strong><span>{copy.metricCandidates}</span></div>
+            <div><Clock3 /><strong>24/7</strong><span>{copy.metricSupport}</span></div>
+          </div>
+        </section>
+
+        <section className="ai-career-tools-section">
+          <div className="ai-career-shell">
+            <div className="ai-career-section-heading">
+              <span>{copy.sectionEyebrow}</span><h2>{copy.sectionTitle}</h2><p>{copy.sectionText}</p>
+            </div>
+            <div className="ai-career-tools-grid">
+              {copy.features.map(({ icon: Icon, title, desc, tag }, index) => (
+                <article key={title} className={`ai-career-tool ai-career-tool-${index + 1}`}>
+                  <div className="ai-career-tool-top"><span><Icon /></span><small>{tag}</small></div>
+                  <h3>{title}</h3><p>{desc}</p><div className="ai-career-tool-line"><i /></div>
+                </article>
               ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Features */}
-        <div className="py-16 px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-black text-gray-900 mb-3">
-                {isRtl ? 'כל הכלים שתצטרך' : 'All the tools you need'}
-              </h2>
-
-              <p className="text-gray-500 text-lg">
-                {isRtl ? 'חבילה מלאה של כלי AI לקריירה שלך' : 'A complete package of AI tools for your career'}
-              </p>
+        <section className="ai-career-process-section">
+          <div className="ai-career-shell ai-career-process-layout">
+            <div className="ai-career-process-intro">
+              <span>{copy.processEyebrow}</span><h2>{copy.processTitle}</h2><p>{copy.processText}</p>
+              <div className="ai-career-process-note">
+                <ShieldCheck /><div><strong>{copy.private}</strong><span>{copy.free}</span></div>
+              </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {FEATURES.map((feat, i) => (
-                <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${feat.color}`}>
-                    <feat.icon className="w-5 h-5" />
-                  </div>
-
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{feat.title}</h3>
-
-                  <p className="text-gray-500 text-sm leading-relaxed">{feat.desc}</p>
-                </div>
+            <ol className="ai-career-steps">
+              {copy.steps.map(([number, title, desc]) => (
+                <li key={number}>
+                  <span>{number}</span><div><h3>{title}</h3><p>{desc}</p></div><Check />
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
-        </div>
+        </section>
 
-        {/* Testimonials */}
-        <div className="py-16 px-4 bg-gradient-to-r from-purple-50 to-blue-50">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-black text-gray-900 mb-10">
-              {isRtl ? 'מה אומרים המשתמשים?' : 'What users say'}
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {TESTIMONIALS.map((item, i) => (
-                <div key={i} className={`bg-white rounded-2xl p-6 shadow-sm ${isRtl ? 'text-right' : 'text-left'}`}>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-4">"{item.text}"</p>
-
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                      {item.name[0]}
-                    </div>
-
-                    <div>
-                      <p className="font-bold text-gray-900 text-sm">{item.name}</p>
-
-                      <p className="text-gray-400 text-xs">{item.role}</p>
+        <section className="ai-career-testimonials-section">
+          <div className="ai-career-shell">
+            <div className="ai-career-section-heading">
+              <span>{copy.testimonialEyebrow}</span><h2>{copy.testimonialTitle}</h2>
+            </div>
+            <div className="ai-career-testimonials-grid">
+              {copy.testimonials.map((item) => (
+                <article key={item.name}>
+                  <Quote /><p>{item.text}</p>
+                  <div>
+                    <span>{item.name.slice(0, 1)}</span>
+                    <div><strong>{item.name}</strong><small>{item.role}</small></div>
+                    <div className="ai-career-review-stars">
+                      {[1, 2, 3, 4, 5].map((star) => <Star key={star} />)}
                     </div>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* CTA */}
-        <div className="py-16 px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-black text-gray-900 mb-4">
-              {isRtl ? 'מוכן להתחיל?' : 'Ready to start?'}
-            </h2>
-
-            <p className="text-gray-500 mb-8">
-              {isRtl
-                ? 'הצטרף לאלפי מועמדים שכבר מצאו עבודה עם HeadHunter AI'
-                : 'Join thousands of candidates who have already found a job with HeadHunter AI'}
-            </p>
-
-            <Link
-              to="/register"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-10 py-4 rounded-xl hover:opacity-90 transition-all shadow-lg text-lg"
-            >
-              <Sparkles className="w-5 h-5" />
-
-              {isRtl ? 'הרשמה חינמית' : 'Free Registration'}
-            </Link>
+        <section className="ai-career-cta-section">
+          <div className="ai-career-shell ai-career-cta">
+            <div>
+              <span><Sparkles /> HeadHunter AI</span><h2>{copy.ctaTitle}</h2><p>{copy.ctaText}</p>
+            </div>
+            <div>
+              <Link to="/register?type=candidate">{copy.ctaButton}<ForwardArrow /></Link>
+              <small>{copy.ctaNote}</small>
+            </div>
           </div>
-        </div>
+        </section>
+      </main>
 
-      </div>
-    </PublicLayout>
-  );
+      <LandingFooter />
+    </div>
+  )
 }
-import PublicLayout from "@/components/layouts/PublicLayout"
-import { Link } from "react-router-dom"

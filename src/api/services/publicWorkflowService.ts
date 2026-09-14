@@ -10,6 +10,9 @@ export interface JobSearchInput {
     domain_id?: number
     salary_min?: number
     salary_max?: number
+    experience_min?: number
+    experience_max?: number
+    work_mode?: "hybrid" | "remote" | "onsite"
   }
   type?: "search" | "autocomplete" | "recommendations"
   limit?: number

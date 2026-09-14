@@ -1,18 +1,118 @@
 import { useState } from "react"
-import { useParams } from "react-router-dom"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { Link, useParams } from "react-router-dom"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
+import {
+  ArrowLeft,
+  ArrowRight,
+  BriefcaseBusiness,
+  Building2,
+  CheckCircle2,
+  ExternalLink,
+  Gift,
+  Globe2,
+  MapPin,
+  Plus,
+  Sparkles,
+  Star,
+  Users,
+} from "lucide-react"
 import { companyService } from "@/api/services/companyService"
 import { publicJobService } from "@/api/services/publicJobService"
 import { useAuth } from "@/lib/AuthContext"
+import Navbar from "@/components/home/Navbar"
+import LandingFooter from "@/components/home/LandingFooter"
+import SEOHead from "@/components/SEOHead"
+import "./Home.css"
+import "./CompanyProfile.css"
 
-function StarRating({ value, onChange }) {
+const content = {
+  en: {
+    back: "Back to companies",
+    hiring: "Actively hiring",
+    reviews: "reviews",
+    openRoles: "Open positions",
+    rating: "Employee rating",
+    verified: "Trusted employer",
+    about: "About the company",
+    culture: "Company culture",
+    cultureText: "A collaborative environment focused on employee growth and innovation.",
+    benefits: "Benefits",
+    benefitsText: "Flexible work, professional development and employee wellbeing.",
+    jobsTitle: "Open opportunities",
+    jobsText: "Explore the latest roles available at this company.",
+    noJobs: "There are no open roles at this company right now.",
+    viewRole: "View role",
+    reviewsTitle: "Employee reviews",
+    writeReview: "Write a review",
+    noReviews: "No reviews yet. Be the first to share your experience.",
+    overall: "Overall rating",
+    salary: "Salary and benefits",
+    management: "Management",
+    worklife: "Work-life balance",
+    reviewTitle: "Review title",
+    pros: "What worked well?",
+    cons: "What could be improved?",
+    anonymous: "Publish anonymously",
+    cancel: "Cancel",
+    submit: "Publish review",
+    submitting: "Publishing...",
+    anonymousUser: "Anonymous employee",
+    visitWebsite: "Visit website",
+    exploreJobs: "Explore open roles",
+    loading: "Loading company profile...",
+    notFound: "Company profile is unavailable",
+  },
+  he: {
+    back: "חזרה לחברות",
+    hiring: "מגייסים עכשיו",
+    reviews: "ביקורות",
+    openRoles: "משרות פתוחות",
+    rating: "דירוג עובדים",
+    verified: "מעסיק אמין",
+    about: "על החברה",
+    culture: "תרבות החברה",
+    cultureText: "סביבה שיתופית המתמקדת בצמיחת עובדים ובחדשנות.",
+    benefits: "הטבות",
+    benefitsText: "עבודה גמישה, פיתוח מקצועי ודאגה לרווחת העובדים.",
+    jobsTitle: "הזדמנויות פתוחות",
+    jobsText: "גלו את המשרות העדכניות הזמינות בחברה.",
+    noJobs: "אין כרגע משרות פתוחות בחברה זו.",
+    viewRole: "לפרטי המשרה",
+    reviewsTitle: "ביקורות עובדים",
+    writeReview: "כתבו ביקורת",
+    noReviews: "אין ביקורות עדיין. היו הראשונים לשתף מהחוויה שלכם.",
+    overall: "דירוג כללי",
+    salary: "שכר והטבות",
+    management: "ניהול",
+    worklife: "איזון עבודה וחיים",
+    reviewTitle: "כותרת הביקורת",
+    pros: "מה עבד טוב?",
+    cons: "מה אפשר לשפר?",
+    anonymous: "פרסום בעילום שם",
+    cancel: "ביטול",
+    submit: "פרסום ביקורת",
+    submitting: "מפרסם...",
+    anonymousUser: "עובד אנונימי",
+    visitWebsite: "לאתר החברה",
+    exploreJobs: "לכל המשרות",
+    loading: "טוען את פרופיל החברה...",
+    notFound: "פרופיל החברה אינו זמין",
+  },
+}
+
+function StarRating({ value, onChange, label }) {
   return (
-    <div className="flex gap-1">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <button key={i} type="button" onClick={() => onChange && onChange(i)}>
-          <Star
-            className={`w-5 h-5 ${i <= value ? "text-yellow-400 fill-yellow-400" : "text-gray-200"}`}
-          />
+    <div className="company-profile-stars" aria-label={label}>
+      {[1, 2, 3, 4, 5].map((rating) => (
+        <button
+          key={rating}
+          type="button"
+          onClick={() => onChange?.(rating)}
+          disabled={!onChange}
+          aria-label={onChange ? `${rating} of 5` : undefined}
+        >
+          <Star className={rating <= value ? "is-active" : ""} />
         </button>
       ))}
     </div>
@@ -24,7 +124,17 @@ export default function CompanyProfile() {
 
   const { user } = useAuth()
 
+  const { i18n } = useTranslation()
+
   const queryClient = useQueryClient()
+
+  const isEnglish = i18n.language?.startsWith("en")
+
+  const copy = content[isEnglish ? "en" : "he"]
+
+  const BackArrow = isEnglish ? ArrowLeft : ArrowRight
+
+  const ForwardArrow = isEnglish ? ArrowRight : ArrowLeft
 
   const [showReviewForm, setShowReviewForm] = useState(false)
 
@@ -39,7 +149,7 @@ export default function CompanyProfile() {
     is_anonymous: false,
   })
 
-  const { data: company } = useQuery({
+  const { data: company, isLoading, isError } = useQuery({
     queryKey: ["company", id],
     queryFn: () => companyService.get(Number(id)),
   })
@@ -47,9 +157,13 @@ export default function CompanyProfile() {
   const { data: jobs = [] } = useQuery({
     queryKey: ["company-jobs", id],
     queryFn: async () =>
-      (await publicJobService.list({ search: company?.name, is_closed: false, limit: 100 })).filter(
-        (job) => job.company === company?.name,
-      ),
+      publicJobService.list({
+        employer_company_id: Number(id),
+        is_closed: false,
+        sort: "created_date",
+        order: "DESC",
+        limit: 100,
+      }),
     enabled: !!company,
   })
 
@@ -65,256 +179,315 @@ export default function CompanyProfile() {
         company_name: company?.name,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["company-reviews"] })
+      queryClient.invalidateQueries({ queryKey: ["company-reviews", id] })
       setShowReviewForm(false)
     },
   })
 
   const avgRating = reviews.length
-    ? (reviews.reduce((s, r) => s + r.rating_overall, 0) / reviews.length).toFixed(1)
+    ? (reviews.reduce((sum, review) => sum + review.rating_overall, 0) / reviews.length).toFixed(1)
     : null
 
-  if (!company) {
+  if (isLoading || !company) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#eaf7fb" }} dir="rtl">
+      <div className="headhunter-home company-profile-page" dir={isEnglish ? "ltr" : "rtl"}>
         <Navbar />
-
-        <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-4 border-gray-200 border-t-hhblue rounded-full animate-spin" />
-        </div>
+        <main className="company-profile-state">
+          {isError ? (
+            <>
+              <Building2 />
+              <h1>{copy.notFound}</h1>
+              <Link to="/companies">{copy.back}</Link>
+            </>
+          ) : (
+            <>
+              <span className="company-profile-loader" />
+              <p>{copy.loading}</p>
+            </>
+          )}
+        </main>
+        <LandingFooter />
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen" style={{ backgroundColor: "#eaf7fb" }} dir="rtl">
-      <SEOHead
-        title={`${company?.name || "חברה"} - דרושים ופרטים`}
-        description={`${company?.name} - ${company?.industry || "חברה"} בישראל. ${company?.job_count || 0} משרות פתוחות. ללא ודא עם HeadHunter.`}
-        keywords={`${company?.name}, ${company?.industry || ""}, משרות, דרושים, חברה`}
-        canonical={`https://headhunter.co.il/companies/${company?.id}`}
-      />
+  const jobCount = jobs.length || company.job_count || 0
 
+  return (
+    <div className="headhunter-home company-profile-page" dir={isEnglish ? "ltr" : "rtl"}>
+      <SEOHead
+        title={`${company.name} | HeadHunter`}
+        description={`${company.name} — ${company.industry || "company"} in Israel. ${jobCount} open positions.`}
+        keywords={`${company.name}, ${company.industry || ""}, jobs, careers, company`}
+        canonical={`https://headhunter.co.il/companies/${company.id}`}
+      />
       <Navbar />
 
-      <div className="max-w-[900px] mx-auto px-4 py-6">
-        <Link
-          to="/companies"
-          className="text-hhblue hover:underline text-sm flex items-center gap-1 mb-5"
-        >
-          <ArrowRight className="w-4 h-4" /> חזרה לחברות
-        </Link>
+      <main>
+        <section className="company-profile-hero">
+          <div className="company-profile-shell">
+            <Link to="/companies" className="company-profile-back">
+              <BackArrow />
+              {copy.back}
+            </Link>
 
-        {/* Company header */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 mb-4">
-          <div className="flex items-center gap-4">
-            <div
-              className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-lg"
-              style={{ backgroundColor: company.color || "#3da8c8" }}
-            >
-              {company.initials || company.name?.slice(0, 2)}
-            </div>
-
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{company.name}</h1>
-
-              <div className="text-gray-500 text-sm mt-0.5">{company.industry}</div>
-
-              {avgRating && (
-                <div className="flex items-center gap-1 mt-1">
-                  <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-
-                  <span className="font-semibold text-sm">{avgRating}</span>
-
-                  <span className="text-gray-400 text-xs">({reviews.length} ביקורות)</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Company profile enriched with culture and benefits */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-4">
-          <h2 className="font-semibold text-gray-900 mb-3">🌟 על החברה</h2>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-1">תרבות החברה</h3>
-
-              <p className="text-sm text-gray-600">סביבה יצירתית ותומכת, הערכת עובדים וחדשנות</p>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-1">הטבות</h3>
-
-              <p className="text-sm text-gray-600">ביטוח בריאות, ימי עבודה גמישים, פיתוח מקצועי</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Jobs */}
-        {jobs.length > 0 && (
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-4">
-            <h2 className="font-semibold text-gray-900 mb-3">{jobs.length} משרות פתוחות</h2>
-
-            <div className="space-y-2">
-              {jobs.map((j) => (
-                <Link
-                  key={j.id}
-                  to={`/jobs/${j.id}`}
-                  className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors group"
-                >
-                  <div>
-                    <div className="text-sm font-medium text-gray-900 group-hover:text-hhblue">
-                      {j.title}
-                    </div>
-
-                    <div className="text-xs text-gray-400 mt-0.5">{j.location}</div>
-                  </div>
-
-                  {j.salary_min && (
-                    <div className="text-xs text-green-600 font-medium">
-                      ₪{j.salary_min.toLocaleString()}+
-                    </div>
-                  )}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Reviews */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="font-semibold text-gray-900">ביקורות עובדים</h2>
-
-            {user && !showReviewForm && (
-              <button
-                onClick={() => setShowReviewForm(true)}
-                className="flex items-center gap-1 text-hhblue text-sm hover:underline"
+            <div className="company-profile-identity">
+              <div
+                className="company-profile-logo"
+                style={{
+                  background: company.logo_url
+                    ? "#fff"
+                    : `linear-gradient(145deg, ${company.color || "#8a31f3"}, #2f9cf4)`,
+                }}
               >
-                <Plus className="w-3.5 h-3.5" /> כתוב ביקורת
-              </button>
-            )}
-          </div>
+                {company.logo_url ? (
+                  <img src={company.logo_url} alt="" />
+                ) : (
+                  company.initials || company.name?.slice(0, 2)
+                )}
+              </div>
 
-          {showReviewForm && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                submitReview.mutate(reviewForm)
-              }}
-              className="bg-gray-50 rounded-xl p-4 mb-4 space-y-3"
-            >
+              <div className="company-profile-heading">
+                <span className="company-profile-hiring">
+                  <Sparkles />
+                  {copy.hiring}
+                </span>
+                <h1>{company.name}</h1>
+                <p>{company.industry || (isEnglish ? "Growing company" : "חברה בצמיחה")}</p>
+                {avgRating && (
+                  <div className="company-profile-rating">
+                    <Star />
+                    <strong>{avgRating}</strong>
+                    <span>({reviews.length} {copy.reviews})</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="company-profile-actions">
+                {jobCount > 0 && (
+                  <a href="#open-roles" className="company-profile-primary-action">
+                    <BriefcaseBusiness />
+                    {copy.exploreJobs}
+                  </a>
+                )}
+                {company.website && (
+                  <a
+                    href={company.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="company-profile-secondary-action"
+                  >
+                    <Globe2 />
+                    {copy.visitWebsite}
+                    <ExternalLink />
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <div className="company-profile-metrics">
               <div>
-                <label className="text-xs font-medium text-gray-600 block mb-1">דירוג כללי</label>
-
-                <StarRating
-                  value={reviewForm.rating_overall}
-                  onChange={(v) => setReviewForm((f) => ({ ...f, rating_overall: v }))}
-                />
+                <BriefcaseBusiness />
+                <strong>{jobCount}</strong>
+                <span>{copy.openRoles}</span>
               </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  ["rating_salary", "שכר ותגמולים"],
-                  ["rating_management", "ניהול"],
-                  ["rating_worklife", "איזון עבודה-חיים"],
-                ].map(([key, label]) => (
-                  <div key={key}>
-                    <label className="text-xs text-gray-500 block mb-1">{label}</label>
-
-                    <StarRating
-                      value={reviewForm[key]}
-                      onChange={(v) => setReviewForm((f) => ({ ...f, [key]: v }))}
-                    />
-                  </div>
-                ))}
+              <div>
+                <Star />
+                <strong>{avgRating || "—"}</strong>
+                <span>{copy.rating}</span>
               </div>
-
-              <input
-                value={reviewForm.title}
-                onChange={(e) => setReviewForm((f) => ({ ...f, title: e.target.value }))}
-                placeholder="כותרת הביקורת"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30"
-              />
-
-              <textarea
-                value={reviewForm.pros}
-                onChange={(e) => setReviewForm((f) => ({ ...f, pros: e.target.value }))}
-                placeholder="יתרונות"
-                rows={2}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none resize-none"
-              />
-
-              <textarea
-                value={reviewForm.cons}
-                onChange={(e) => setReviewForm((f) => ({ ...f, cons: e.target.value }))}
-                placeholder="חסרונות"
-                rows={2}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none resize-none"
-              />
-
-              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={reviewForm.is_anonymous}
-                  onChange={(e) => setReviewForm((f) => ({ ...f, is_anonymous: e.target.checked }))}
-                />
-                פרסם בעילום שם
-              </label>
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowReviewForm(false)}
-                  className="flex-1 border border-gray-200 py-2 rounded-lg text-sm"
-                >
-                  ביטול
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={!reviewForm.rating_overall || submitReview.isPending}
-                  className="flex-1 bg-hhblue text-white py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
-                >
-                  {submitReview.isPending ? "שולח..." : "פרסם"}
-                </button>
+              <div>
+                <CheckCircle2 />
+                <strong>100%</strong>
+                <span>{copy.verified}</span>
               </div>
-            </form>
-          )}
-
-          {reviews.length === 0 ? (
-            <div className="text-center py-8 text-gray-400 text-sm">
-              אין ביקורות עדיין. היה הראשון לכתוב!
             </div>
-          ) : (
-            <div className="space-y-3">
-              {reviews.map((r) => (
-                <div key={r.id} className="border-b border-gray-50 pb-3 last:border-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="font-medium text-sm text-gray-900">{r.reviewer_name}</div>
+          </div>
+        </section>
 
-                    <StarRating value={r.rating_overall} />
+        <section className="company-profile-content">
+          <div className="company-profile-shell company-profile-layout">
+            <div className="company-profile-main">
+              <article className="company-profile-card company-profile-about">
+                <span className="company-profile-kicker">{copy.about}</span>
+                <h2>{company.name}</h2>
+                <div className="company-profile-about-grid">
+                  <div>
+                    <Users />
+                    <h3>{copy.culture}</h3>
+                    <p>{copy.cultureText}</p>
                   </div>
-
-                  {r.title && (
-                    <div className="text-sm font-medium text-gray-700 mb-1">{r.title}</div>
-                  )}
-
-                  {r.pros && <div className="text-xs text-green-700 mb-0.5">✓ {r.pros}</div>}
-
-                  {r.cons && <div className="text-xs text-red-600">✗ {r.cons}</div>}
+                  <div>
+                    <Gift />
+                    <h3>{copy.benefits}</h3>
+                    <p>{copy.benefitsText}</p>
+                  </div>
                 </div>
-              ))}
+              </article>
+
+              <section id="open-roles" className="company-profile-card company-profile-jobs">
+                <div className="company-profile-section-heading">
+                  <div>
+                    <span>{copy.openRoles}</span>
+                    <h2>{copy.jobsTitle}</h2>
+                    <p>{copy.jobsText}</p>
+                  </div>
+                  <BriefcaseBusiness />
+                </div>
+
+                {jobs.length > 0 ? (
+                  <div className="company-profile-job-list">
+                    {jobs.map((job) => (
+                      <Link key={job.id} to={`/jobs/${job.id}`} className="company-profile-job">
+                        <div>
+                          <h3>{job.title}</h3>
+                          <p>
+                            <MapPin />
+                            {job.location || (isEnglish ? "Israel" : "ישראל")}
+                          </p>
+                        </div>
+                        {job.salary_min && (
+                          <strong>₪{job.salary_min.toLocaleString()}+</strong>
+                        )}
+                        <span>
+                          {copy.viewRole}
+                          <ForwardArrow />
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="company-profile-no-jobs">{copy.noJobs}</div>
+                )}
+              </section>
+
+              <section className="company-profile-card company-profile-reviews">
+                <div className="company-profile-section-heading">
+                  <div>
+                    <span>{copy.reviewsTitle}</span>
+                    <h2>{copy.reviewsTitle}</h2>
+                  </div>
+                  {user && !showReviewForm && (
+                    <button type="button" onClick={() => setShowReviewForm(true)}>
+                      <Plus />
+                      {copy.writeReview}
+                    </button>
+                  )}
+                </div>
+
+                {showReviewForm && (
+                  <form
+                    className="company-profile-review-form"
+                    onSubmit={(event) => {
+                      event.preventDefault()
+                      submitReview.mutate(reviewForm)
+                    }}
+                  >
+                    <div>
+                      <label>{copy.overall}</label>
+                      <StarRating
+                        value={reviewForm.rating_overall}
+                        label={copy.overall}
+                        onChange={(value) =>
+                          setReviewForm((form) => ({ ...form, rating_overall: value }))
+                        }
+                      />
+                    </div>
+
+                    <div className="company-profile-rating-grid">
+                      {[
+                        ["rating_salary", copy.salary],
+                        ["rating_management", copy.management],
+                        ["rating_worklife", copy.worklife],
+                      ].map(([key, label]) => (
+                        <div key={key}>
+                          <label>{label}</label>
+                          <StarRating
+                            value={reviewForm[key]}
+                            label={label}
+                            onChange={(value) =>
+                              setReviewForm((form) => ({ ...form, [key]: value }))
+                            }
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    <input
+                      value={reviewForm.title}
+                      onChange={(event) =>
+                        setReviewForm((form) => ({ ...form, title: event.target.value }))
+                      }
+                      placeholder={copy.reviewTitle}
+                    />
+                    <textarea
+                      value={reviewForm.pros}
+                      onChange={(event) =>
+                        setReviewForm((form) => ({ ...form, pros: event.target.value }))
+                      }
+                      placeholder={copy.pros}
+                      rows={3}
+                    />
+                    <textarea
+                      value={reviewForm.cons}
+                      onChange={(event) =>
+                        setReviewForm((form) => ({ ...form, cons: event.target.value }))
+                      }
+                      placeholder={copy.cons}
+                      rows={3}
+                    />
+                    <label className="company-profile-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={reviewForm.is_anonymous}
+                        onChange={(event) =>
+                          setReviewForm((form) => ({
+                            ...form,
+                            is_anonymous: event.target.checked,
+                          }))
+                        }
+                      />
+                      <span />
+                      {copy.anonymous}
+                    </label>
+                    <div className="company-profile-form-actions">
+                      <button type="button" onClick={() => setShowReviewForm(false)}>
+                        {copy.cancel}
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={!reviewForm.rating_overall || submitReview.isPending}
+                      >
+                        {submitReview.isPending ? copy.submitting : copy.submit}
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {reviews.length === 0 ? (
+                  <div className="company-profile-empty-reviews">{copy.noReviews}</div>
+                ) : (
+                  <div className="company-profile-review-list">
+                    {reviews.map((review) => (
+                      <article key={review.id}>
+                        <div>
+                          <strong>{review.reviewer_name || copy.anonymousUser}</strong>
+                          <StarRating value={review.rating_overall} label={copy.overall} />
+                        </div>
+                        {review.title && <h3>{review.title}</h3>}
+                        {review.pros && <p className="is-positive">✓ {review.pros}</p>}
+                        {review.cons && <p className="is-negative">✗ {review.cons}</p>}
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+        </section>
+      </main>
+
+      <LandingFooter />
     </div>
   )
 }
-import { Link } from "react-router-dom"
-import Navbar from "@/components/home/Navbar"
-import { Star, Plus, ArrowRight } from "lucide-react"
-import SEOHead from "@/components/SEOHead"
