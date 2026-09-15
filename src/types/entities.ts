@@ -33,17 +33,37 @@ export interface Job {
   location?: string
   salary_min?: number
   salary_max?: number
+  /** @deprecated compatibility mirror; use employment_type_id and work_mode_id. */
   type: "full" | "part" | "daily" | "remote"
+  employment_type_id?: number | null
+  work_mode_id?: number | null
+  source?: "manual" | "import" | "crawler" | "api"
   description?: string
   domain_id?: number
   role_id?: number
   specialization_id?: number
+  category?: string | null
+  required_skills?: string[] | null
+  preferred_skills?: string[] | null
+  role_domain?: string | null
+  seniority?: "junior" | "mid" | "senior" | "lead" | "manager" | "director" | "any"
+  years_experience_required?: number | null
+  employer_company_id?: number | null
+  created_by_user_id?: number | null
+  recruiter_id?: number | null
+  team_id?: number | null
+  team_manager_id?: number | null
+  recruitment_manager_id?: number | null
+  job_code?: string | null
+  apply_email?: string | null
+  apply_url?: string | null
   views: number
   is_closed: boolean
   state: "draft" | "open" | "on_hold" | "filled" | "closed"
   is_anonymous: boolean
   show_company_name?: boolean
   show_company_info?: boolean
+  show_contact_details?: boolean
   contact_email?: string
   contact_phone?: string
   applications_count: number

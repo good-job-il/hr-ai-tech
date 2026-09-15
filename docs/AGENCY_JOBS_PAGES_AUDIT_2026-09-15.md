@@ -28,12 +28,12 @@
 
 ## Состояние маршрутов
 
-| Маршрут | Что готово | Что наблюдалось | Статус |
-| --- | --- | --- | --- |
-| `/agency/jobs` | Общий экран, поиск, переключатель `Show closed`, CRUD-кнопки по permission | API вернул 200 записей; по умолчанию показано 79, после `Show closed` — 200; карточки показывают `200 / 79 / 121` | Частично готов |
-| `/agency/jobs/open` | Серверный `state=open`, активный пункт навигации, поиск, таблица и действия | Показано 79 строк, все видимые status-select имеют `open`; поиск `נציג גבייה` оставил одну корректную строку | Базовый read-сценарий готов |
-| `/agency/jobs/filled` | Серверный `state=filled`, активный пункт навигации, loading/empty state | В текущей БД 0 записей; показан empty state | Реализован, данные/CRUD E2E не подтверждены |
-| `/agency/jobs/hold` | Маршрут корректно отображает `on_hold`, серверный фильтр подключён | В текущей БД 0 записей; показан empty state | Реализован, данные/CRUD E2E не подтверждены |
+| Маршрут               | Что готово                                                                  | Что наблюдалось                                                                                                   | Статус                                      |
+| --------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `/agency/jobs`        | Общий экран, поиск, переключатель `Show closed`, CRUD-кнопки по permission  | API вернул 200 записей; по умолчанию показано 79, после `Show closed` — 200; карточки показывают `200 / 79 / 121` | Частично готов                              |
+| `/agency/jobs/open`   | Серверный `state=open`, активный пункт навигации, поиск, таблица и действия | Показано 79 строк, все видимые status-select имеют `open`; поиск `נציג גבייה` оставил одну корректную строку      | Базовый read-сценарий готов                 |
+| `/agency/jobs/filled` | Серверный `state=filled`, активный пункт навигации, loading/empty state     | В текущей БД 0 записей; показан empty state                                                                       | Реализован, данные/CRUD E2E не подтверждены |
+| `/agency/jobs/hold`   | Маршрут корректно отображает `on_hold`, серверный фильтр подключён          | В текущей БД 0 записей; показан empty state                                                                       | Реализован, данные/CRUD E2E не подтверждены |
 
 Неизвестные подпути вроде `/agency/jobs/:id` в agency namespace не определены. Деталь/редактирование открывается модальным окном из списка; публичная деталь вакансии живёт на `/jobs/:id`.
 
@@ -85,6 +85,8 @@ React экранирует эти значения, поэтому в прове
 
 Критерий готовности: ни одна строка не содержит HTML/JSON fragments; title имеет согласованный лимит и соответствует названию должности; regression-тесты покрывают Jobicy и другие источники.
 
+**Статус реализации: выполнено 15 сентября 2026.** Jobicy JSON теперь разбирается как структурированный feed, а HTML-источники принимают только правдоподобные ссылки на вакансии. Перед созданием и обновлением нормализуются `title`, `company`, `location`, `description`; для title установлен лимит 160 символов и проверка на служебные/privacy/CTA/JSON-значения. Миграции сохранили исходные lifecycle-поля и soft-delete 74 повреждённые импортированные записи. Контрольный SQL-запрос после миграции: 0 активных импортированных записей, подходящих под malformed/non-title признаки. Regression-тесты покрывают Jobicy JSON, обычный HTML-источник и общий JobsService.
+
 ### P0 — не терять AgencyClient при редактировании
 
 У проверенной вакансии `נציג גבייה / מי עדן` таблица показывает существующего клиента, но в Edit Job select содержал только placeholder `Select a client`. Значение select было пустым, а React вывел warning о `value=null`. При этом submit явно требует `employer_company_id`, поэтому изменение другого поля в такой записи упирается в client selection.
@@ -100,11 +102,15 @@ React экранирует эти значения, поэтому в прове
 
 Критерий готовности: открыть и сохранить без изменений любую tenant-scoped вакансию; select всегда показывает канонического клиента или явное migration error state.
 
+**Статус реализации: выполнено 15 сентября 2026.** Backfill связал 193 legacy-вакансии с Company и активным tenant-scoped AgencyClient; после миграции у всех 194 активных agency-вакансий заполнен `employer_company_id`, существует AgencyClient relationship и его status — `active`. Вакансия `נציג גבייה / מי עדן` теперь связана с active AgencyClient. Форма нормализует `null` ID в пустую строку, загружает текущую связь независимо от статуса, показывает archived/unavailable relationship отдельным disabled option с объяснением и блокирует Save до выбора активного клиента. Frontend regression-тесты покрывают canonical, archived и missing relationship состояния; backend-тесты подтверждают canonical company snapshot и отказ для неактивной связи.
+
 ### P0 — применить Permission Matrix к чтению
 
 UI использует `create`, `update`, `view_compensation`, но не проверяет `view`. `GET /jobs` имеет RLS, однако не защищён `AgencyActionPolicyGuard` + `@RequiresPermission("view")`. Это не доказанная cross-tenant утечка, но снятие permission `view` не блокирует сам список.
 
 Критерий готовности: пользователь со снятым `view` получает 403 и в UI, и при прямом HTTP-запросе; RLS отдельно продолжает ограничивать tenant/team/recruiter scope.
+
+**Статус реализации: выполнено 15 сентября 2026.** Авторизованные `GET /jobs`, `GET /jobs/stats` и `GET /jobs/:id` защищены `AgencyActionPolicyGuard` и permission `view`; публичный `/public/jobs` остался доступен без этой agency-проверки. Agency UI не отправляет jobs-запросы после снятия `view` и показывает явный экран `403 — Access denied`. HTTP regression-тест подтверждает 403 и отсутствие вызова JobsService при revoked permission, а существующие и новые service-тесты отдельно подтверждают organization/team/recruiter RLS.
 
 ### P1 — настоящая пагинация, server search и totals
 
@@ -120,6 +126,8 @@ UI использует `create`, `update`, `view_compensation`, но не пр�
 
 Критерий готовности: результаты и KPI совпадают на наборе больше 500 записей; поиск находит запись за пределами первой страницы; route transition не меняет смысл глобальных stat cards.
 
+**Статус реализации: выполнено 15 сентября 2026.** Экран использует `listPage` с page size 25, server-side `state`/`is_closed`, debounce поиска 300 мс и навигацию Previous/Next с диапазоном результатов. Backend-поиск охватывает title, company и location. Новый `/jobs/stats` одним RLS-scoped агрегатом возвращает глобальные totals по всем status; KPI не получают route/search/page параметры и поэтому сохраняют смысл при переходах. Regression-тест моделирует 501 поисковый результат и отдельный набор totals из 610 вакансий в team RLS scope; frontend contract-тесты закрепляют server query и pagination.
+
 ### P1 — исправить status/KPI semantics
 
 - `Closed jobs` считает только `filled + closed`, но meta подписан `Completed or paused`; `on_hold` при этом не учитывается.
@@ -129,6 +137,8 @@ UI использует `create`, `update`, `view_compensation`, но не пр�
 - В форме нельзя выбрать initial state или draft; статус меняется только после создания из списка.
 
 Нужно утвердить значение каждой KPI-карточки и контекстные empty actions, нормализовать legacy state и использовать одну функцию определения effective state.
+
+**Статус реализации: выполнено 15 сентября 2026.** KPI закреплены как `All jobs = total`, `Open jobs = open`, `Not recruiting = on_hold + filled + closed`; подпись третьей карточки теперь точно перечисляет входящие состояния. Все route, поиск и page используют глобальный stats-ответ, поэтому `/open`, `/filled` и `/hold` не меняют значения карточек. Общая функция effective state применяется для badge, select и Close/Reopen и учитывает legacy `is_closed`. Миграция с backup согласует `state/is_closed` в существующих БД. `/filled` и `/hold` получили информационные empty states без создания open-вакансии, поисковый empty state предлагает очистить поиск, а форма позволяет выбрать initial status, включая Draft. Дополнительно исправлен разбор query boolean: строка `false` больше не превращается в `true`.
 
 ### P1 — завершить генерацию job code/email/public link
 
@@ -142,6 +152,8 @@ UI использует `create`, `update`, `view_compensation`, но не пр�
 - мигрировать/перегенерировать legacy Base44 links;
 - показывать ошибку/retry, а не бесконечный `Waiting for code...`.
 
+**Статус реализации: выполнено 15 сентября 2026.** Backend стал единственным источником истины для публикационных реквизитов: пользовательские create/update payload больше не могут задавать `job_code`, `apply_email` или `apply_url`. При создании генерируется криптографически случайный `HI-XXXXXXXXXX`; уникальность атомарно обеспечивается существующим unique index БД, а конфликт приводит к ограниченному retry с новым кодом. Из этого же кода детерминированно строятся alias `jobs+<code>@<JOB_APPLY_EMAIL_DOMAIN>` и canonical URL `<JOB_PUBLIC_BASE_URL>/jobs/<code>`. Публичный endpoint принимает новый code и сохраняет совместимость с числовым ID. Reversible-миграция с backup выдаёт коды отсутствующим строкам и пересобирает email/URL всем существующим вакансиям, тем самым удаляя legacy Base44 links. В таблице бесконечный `Waiting for code...` заменён явным incomplete state с защищённым permission `update` retry endpoint и сообщением об ошибке.
+
 ### P1 — локализация и RTL
 
 После переключения на עברית sidebar и shell перевелись и стали RTL, но весь Jobs screen остался английским: title, KPI, search, columns, statuses, empty/error messages и modal. `ManageJobsPage` также явно передаёт `dir="ltr"`.
@@ -150,11 +162,15 @@ UI использует `create`, `update`, `view_compensation`, но не пр�
 
 Критерий готовности: EN полностью LTR, HE полностью RTL; на странице нет служебных строк другого языка, кроме пользовательских данных.
 
+**Статус реализации: выполнено 15 сентября 2026.** Все пользовательские строки `ManageJobsPage` и `JobFormModal`, включая заголовки, KPI, поиск, колонки, статусы, contextual empty/error states, pagination, publication retry, validation, visibility, compensation и toast-сообщения, вынесены в симметричный namespace `jobs_management` локалей EN/HE. Оба компонента получают направление из `i18n.dir()`; hard-coded LTR у jobs shell удалён, используются logical `start/end` отступы, а технические code/email/URL значения изолированы как LTR внутри RTL UI. Числа, KPI, диапазоны страниц, проценты, шекели и дни форматируются через `Intl.NumberFormat` с `en-US` или `he-IL`. Regression-тест проверяет одинаковую структуру словарей, отсутствие английских служебных строк в HE и иврита в EN, direction wiring и locale-specific currency output.
+
 ### P1 — адаптивность таблицы
 
 При ширине 1280 px agency sidebar оставляет контенту меньше ширины, чем `min-w-[1080px]`. Поэтому таблица требует горизонтальной прокрутки: в English сначала видна в основном Position, а status/actions находятся далеко справа; в Hebrew начальная сторона меняется и Position оказывается скрыт. Связь строки с действиями теряется.
 
 Нужно заменить desktop-table на responsive layout: закрепить Position и Actions, скрывать второстепенные столбцы с раскрытием строки либо использовать карточки на узких экранах. Добавить явный affordance горизонтального scroll, если он остаётся.
+
+**Статус реализации: выполнено 15 сентября 2026.** До breakpoint `2xl`, включая viewport 1280 px с agency sidebar, вакансии отображаются отдельными responsive-карточками: Position, Company, Location, Status и доступные Actions всегда видимы, а code/email/link, category, compensation и warranty раскрываются кнопкой с `aria-expanded`/`aria-controls`. В RTL карточка сохраняет ту же информационную иерархию без перестановки Position за пределы viewport. Desktop-table оставлена только для действительно широкого экрана, переведена на `table-fixed` с явным `colgroup`; `min-w-[1080px]` и горизонтальный scroll удалены, поэтому отдельный scroll affordance больше не требуется. Regression-тест закрепляет оба breakpoint-режима, раскрытие деталей и отсутствие forced-width/overflow контейнера.
 
 ### P1 — доступность модального окна и icon actions
 
@@ -162,11 +178,15 @@ UI использует `create`, `update`, `view_compensation`, но не пр�
 
 Нужно использовать общий Dialog primitive, связать title через `aria-labelledby`, добавить focus management и `aria-label`/visible labels для icon-only controls.
 
+**Статус реализации: выполнено 15 сентября 2026.** `JobFormModal` переведён с самодельного overlay на общий Radix Dialog primitive. Он создаёт modal dialog semantics, удерживает tab-focus внутри, закрывается по Escape, возвращает фокус вызвавшей кнопке и блокирует прокрутку body; title явно связан через уникальный `aria-labelledby`, а при открытии фокус программно переходит в Job Title. Header close и Cancel используют `DialogClose`, закрытие во время Save блокируется. Search получил связанный visually-hidden label, оба responsive status select — контекстный `aria-label` с названием вакансии, группы действий и пустой desktop header — доступные имена. Refresh, Edit, Pipeline, Close/Reopen, Copy и modal Close имеют локализованные `title`/`aria-label`; основные поля формы связаны с label через `htmlFor/id`. Regression-тест закрепляет использование общего primitive, labelled title, initial focus и accessible names.
+
 ### P2 — расширить форму до заявленного agency workflow
 
 По продуктовой спецификации в вакансии также нужны требования/skills, seniority/experience, формат работы, назначение Team Manager/Recruiter, source/owner и связь с compensation plan. Backend поддерживает часть этих полей, но форма их не предлагает. Сейчас `Remote` смешан с job type (`full/part/daily/remote`), из-за чего нельзя выразить, например, full-time remote.
 
 Рекомендуется разделить employment type и work mode, добавить assignment controls по role/scope и сделать переход Pipeline контекстным (`jobId`), а не просто вести в общий pipeline.
+
+**Статус реализации: выполнено 15 сентября 2026.** В Job добавлены канонические ссылки на taxonomy `employment_type_id` и `work_mode_id`; прежнее `type` сохранено только как compatibility mirror. Миграция разделяет legacy `remote` на Full-time + Remote и заполняет новые поля для остальных записей. Форма теперь независимо выбирает тип занятости и формат работы, принимает обязательные/желательные skills с нормализацией и дедупликацией, seniority и минимальный опыт. Для agency workflow добавлены role/scoped списки Team Manager, Recruiter и Recruitment Manager с ограничением одной командой; недоступные исторические назначения показаны явно и не теряются при изменении других полей. Source и защищённый owner (`created_by_user_id`) отображаются как provenance, а доступный по Permission Matrix compensation plan можно связать/отвязать через существующий `plan.job_id`. Кнопка Pipeline формирует URL с `jobId`, а Pipeline передаёт этот фильтр серверу и дополнительно применяет exact-match. DTO ограничивает taxonomy IDs, опыт и skills; crawler помечает source и использует тот же legacy mapping. Добавлены backend и frontend regression-тесты.
 
 ### P2 — более точные error/loading states
 
@@ -175,6 +195,8 @@ UI использует `create`, `update`, `view_compensation`, но не пр�
 - Copy использует Clipboard API без обработки отказа.
 - Status mutation перезагружает весь список, нет rollback/локального восстановления контекста.
 - При search с нулём результатов текст всё равно предлагает создать вакансию вместо очистки поиска.
+
+**Статус реализации: выполнено 15 сентября 2026.** Jobs, глобальные totals и compensation plans теперь запускаются независимо и параллельно; ошибка одного дополнительного ресурса не скрывает таблицу. Для compensation предусмотрены отдельные loading/unavailable значения, локализованный alert и Retry, а ошибка totals показывается рядом с KPI. В форме загрузка AgencyClient вынесена в повторяемый request: Retry доступен прямо под select и сохраняет уже полученные options. Оба Copy-компонента дожидаются `Clipboard.writeText`, обрабатывают отсутствие API/rejection, показывают доступное error state и toast там, где он доступен. Status/Close/Reopen используют optimistic local update вакансии, pagination и KPI; при отказе восстанавливаются точные snapshots, при успехе страница, search, раскрытые строки и scroll не перезагружаются. Empty state учитывает введённый search сразу, предлагает Clear search и синхронно очищает input/debounced query вместо Create Job. Добавлены regression-тесты для recovery paths, clipboard rejection и optimistic state semantics.
 
 ## Рекомендуемый порядок работ
 
@@ -212,4 +234,3 @@ UI использует `create`, `update`, `view_compensation`, но не пр�
 - `src/api/services/resourceService.ts:22-59` — list/listPage и потеря pagination при `list()`.
 - `backend/src/modules/jobs/jobs.service.ts:42-125` — RLS, server filters и pagination.
 - `backend/src/modules/jobs/jobs.controller.ts:42-95` — GET без view permission guard; mutation guards присутствуют.
-

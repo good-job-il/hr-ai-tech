@@ -106,6 +106,7 @@ export function PlatformStatCard({
   icon: Icon,
   label,
   value,
+  formattedValue,
   prefix = "",
   suffix = "",
   change,
@@ -141,7 +142,7 @@ export function PlatformStatCard({
             <p className="mt-2 text-[28px] font-black tracking-tight text-slate-900">
               {prefix}
 
-              {formatPlatformNumber(value)}
+              {formattedValue ?? formatPlatformNumber(value)}
 
               {suffix}
             </p>

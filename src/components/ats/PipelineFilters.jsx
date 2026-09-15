@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 const SOURCES = ["linkedin", "app", "jobsite", "import", "facebook"]
 
 const DEFAULT_FILTERS = {
+  jobId: null,
   role: "",
   recruiter: "",
   aiMin: 0,
@@ -23,7 +24,7 @@ export default function PipelineFilters({ filters, onChange }) {
 
   const update = (key, value) => onChange({ ...filters, [key]: value })
 
-  const reset = () => onChange(DEFAULT_FILTERS)
+  const reset = () => onChange({ ...DEFAULT_FILTERS, jobId: filters.jobId || null })
 
   const hasBasic = filters.role || filters.source || filters.aiMin
 

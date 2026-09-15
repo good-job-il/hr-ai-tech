@@ -7,6 +7,9 @@ export interface AuthUser {
   full_name?: string
   role: UserRole
   organization_id?: number | null
+  team_id?: number | null
+  team_manager_id?: number | null
+  recruitment_manager_id?: number | null
   org_type?: "staffing_agency" | "organization" | null
   phone?: string | null
   display_role_name?: string | null

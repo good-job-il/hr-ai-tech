@@ -14,6 +14,8 @@ export interface JobQuery extends ResourceQuery {
   team_manager_id?: number
   domain_id?: number
   type?: Job["type"]
+  employment_type_id?: number
+  work_mode_id?: number
   is_closed?: boolean
   state?: JobState
   is_deleted?: boolean
@@ -23,6 +25,16 @@ export interface JobQuery extends ResourceQuery {
 
 export type JobSeniority = "junior" | "mid" | "senior" | "lead" | "manager" | "director" | "any"
 export type JobState = "draft" | "open" | "on_hold" | "filled" | "closed"
+export type JobSource = "manual" | "import" | "crawler" | "api"
+
+export interface JobStats {
+  total: number
+  draft: number
+  open: number
+  on_hold: number
+  filled: number
+  closed: number
+}
 
 export interface CreateJobInput {
   title: string
@@ -34,6 +46,9 @@ export interface CreateJobInput {
   salary_max?: number | null
   category?: string | null
   type?: Job["type"]
+  employment_type_id?: number | null
+  work_mode_id?: number | null
+  source?: JobSource
   description?: string | null
   employer_company_id?: number | null
   recruiter_id?: number | null
@@ -56,15 +71,12 @@ export interface CreateJobInput {
   seniority?: JobSeniority
   years_experience_required?: number | null
   ai_keywords?: string[] | null
-  apply_url?: string | null
   external_id?: string | null
 }
 
 export interface UpdateJobInput extends Partial<CreateJobInput> {
   views?: number
   applications_count?: number
-  job_code?: string | null
-  apply_email?: string | null
   is_deleted?: boolean
   deleted_by?: string | null
 }
@@ -73,11 +85,17 @@ export class JobService extends ResourceService<Job, JobQuery, CreateJobInput, U
   constructor() {
     super("/jobs")
   }
+  stats() {
+    return httpClient.get<JobStats>("/jobs/stats", { cache: false })
+  }
   close(id: number | string) {
     return httpClient.post<Job>(`/jobs/${id}/close`)
   }
   reopen(id: number | string) {
     return httpClient.post<Job>(`/jobs/${id}/reopen`)
+  }
+  provisionPublication(id: number | string) {
+    return httpClient.post<Job>(`/jobs/${id}/provision-publication`)
   }
   incrementViews(id: number | string) {
     return httpClient.post<void>(`/jobs/${id}/view`)

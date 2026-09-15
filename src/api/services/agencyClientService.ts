@@ -30,6 +30,7 @@ export interface AgencyClient {
 }
 
 export interface AgencyClientQuery extends Pick<ResourceQuery, "page" | "limit"> {
+  company_id?: number
   search?: string
   status?: AgencyClientStatus
   industry?: string

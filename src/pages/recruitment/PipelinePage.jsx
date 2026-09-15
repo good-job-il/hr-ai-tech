@@ -29,7 +29,10 @@ export default function PipelinePage() {
 
   const [searchParams, setSearchParams] = useSearchParams()
 
+  const contextualJobId = Number(searchParams.get("jobId")) || null
+
   const [filters, setFilters] = useState({
+    jobId: contextualJobId,
     role: "",
     recruiter: "",
     aiMin: 0,
@@ -39,6 +42,10 @@ export default function PipelinePage() {
     expMin: "",
     expMax: "",
   })
+
+  useEffect(() => {
+    setFilters((current) => ({ ...current, jobId: contextualJobId }))
+  }, [contextualJobId])
 
   const [showFilters, setShowFilters] = useState(false)
 

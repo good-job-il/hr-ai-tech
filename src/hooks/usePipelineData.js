@@ -40,6 +40,7 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
 
       const apps = await applicationService.list({
         ...scopeFilter,
+        ...(filters.jobId ? { job_id: Number(filters.jobId) } : {}),
         sort: "created_date",
         order: "DESC",
         limit: 500,
@@ -175,6 +176,10 @@ function applyFilters(apps, filters, user) {
 
   if (filters.role) {
     result = result.filter((a) => a.job_title?.toLowerCase().includes(filters.role.toLowerCase()))
+  }
+
+  if (filters.jobId) {
+    result = result.filter((application) => Number(application.job_id) === Number(filters.jobId))
   }
 
   if (filters.recruiter) {
