@@ -252,7 +252,20 @@ Backend guard является источником истины; frontend permi
 
 ---
 
-## Шаг 3. Создать новую модель данных
+## ✅ Шаг 3. Создать новую модель данных
+
+**Статус:** выполнено 2026-09-16.
+
+Результат:
+
+- `import_sources` получил lifecycle/configuration/health/scheduling/assignment поля, tenant/client ownership и индексы; состояние `active` невозможно без organization и canonical AgencyClient;
+- созданы tenant-scoped `source_job_records`, `job_import_runs` и `job_import_run_items` с composite foreign keys, typed JSON payloads, confidence/validation metadata и воспроизводимым before/after/diff;
+- identity внешней вакансии закреплена unique constraint `(organization_id, import_source_id, external_key)`, а cross-tenant связи run/record/job блокируются базой данных;
+- `jobs.source_job_record_id` добавлен как nullable unique composite FK; `jobs.external_id` оставлен только для legacy compatibility, canonical `jobs.apply_url` миграция не переписывает;
+- внешний posting/apply URL хранится в source record и доступен через защищённый `GET /jobs/:id/import-provenance` без выдачи raw payload;
+- backfill назначает ownership и создаёт staging record только при доказуемой связи source URL + external key + существующий AgencyClient; для ранее канонизированных `jobs.apply_url` используется сохранённый original URL из publication backup; ambiguous/unmatched sources становятся `needs_attention`, доказуемые — безопасно `paused`;
+- удаление source заменено архивированием; FK используют `RESTRICT`, поэтому source/archive flow не удаляет существующие jobs;
+- migration `1754200000000-JobImportPlatformDataModel` проверена на MySQL 8 в цикле `up → down → legacy fixtures → up`, включая collision, ambiguous ownership и cross-tenant negative tests.
 
 ### Цель
 

@@ -57,6 +57,7 @@ export interface Job {
   job_code?: string | null
   apply_email?: string | null
   apply_url?: string | null
+  source_job_record_id?: number | null
   views: number
   is_closed: boolean
   state: "draft" | "open" | "on_hold" | "filled" | "closed"

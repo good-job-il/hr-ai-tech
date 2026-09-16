@@ -36,6 +36,36 @@ export interface JobStats {
   closed: number
 }
 
+export interface JobImportProvenance {
+  job_id: number
+  imported: boolean
+  source_job_record_id: number | null
+  import_source_id?: number
+  external_key?: string
+  lifecycle?: string
+  source_posting_url?: string | null
+  source_apply_url?: string | null
+  field_provenance?: Record<
+    string,
+    {
+      ownership: "platform" | "user" | "source_until_edited" | "review_on_conflict"
+      connector_type: string
+      source_path: string | null
+      observed_at: string
+      confidence: number
+    }
+  >
+  confidence?: number
+  validation_issues?: Array<{
+    code: string
+    field: string | null
+    message: string
+    severity: "warning" | "error"
+  }>
+  first_seen_at?: string
+  last_seen_at?: string
+}
+
 export interface CreateJobInput {
   title: string
   company: string
@@ -99,6 +129,9 @@ export class JobService extends ResourceService<Job, JobQuery, CreateJobInput, U
   }
   incrementViews(id: number | string) {
     return httpClient.post<void>(`/jobs/${id}/view`)
+  }
+  importProvenance(id: number | string) {
+    return httpClient.get<JobImportProvenance>(`/jobs/${id}/import-provenance`, { cache: false })
   }
 }
 

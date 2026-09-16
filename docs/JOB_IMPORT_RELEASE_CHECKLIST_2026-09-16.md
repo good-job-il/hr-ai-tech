@@ -20,11 +20,11 @@
 - [x] Strict domain/API contracts are the runtime and TypeScript source of truth.
 - [x] `job_imports` has a separate deny-by-default backend-enforced permission resource.
 - [ ] Preview is read-only and proven by an invariant test.
-- [ ] ImportSource is tenant- and AgencyClient-scoped.
+- [x] ImportSource is tenant- and AgencyClient-scoped for active execution; unresolved legacy sources fail closed in `needs_attention`.
 - [x] Runtime fields are not browser-editable.
-- [ ] Source identity is tenant/source scoped.
+- [x] Source identity is tenant/source scoped.
 - [ ] Connectors cannot write jobs directly.
-- [ ] Source URLs and canonical public apply URL are separated.
+- [x] Source URLs and canonical public apply URL are separated in storage and provenance API.
 
 ## Legacy safety freeze
 
