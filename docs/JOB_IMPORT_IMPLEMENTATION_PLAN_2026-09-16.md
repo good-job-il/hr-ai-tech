@@ -167,7 +167,19 @@ Safety freeze
 
 ---
 
-## Шаг 2. Зафиксировать доменные и API-контракты
+## ✅ Шаг 2. Зафиксировать доменные и API-контракты
+
+**Статус:** выполнено 2026-09-16.
+
+Результат:
+
+- строгие Zod-схемы являются единым runtime/TypeScript source of truth для connector, source, run, snapshot, lifecycle, action, error, ownership и canonical normalized job;
+- `NormalizedSourceJob` разделяет employment type/work mode, хранит structured locations, constraints, taxonomy, experience, skills, salary, source URLs/status/dates, field provenance/confidence и SHA-256 checksum;
+- typed import errors имеют стабильный machine code, retry metadata и безопасный scalar context;
+- Permission Matrix расширена отдельным deny-by-default resource `job_imports` с actions `view/create/update/run/review/manage_credentials/archive`;
+- backend resource guard защищает source CRUD и run/preview endpoints; frontend получил только UX helper `canResource`;
+- partial resource permission update не сбрасывает существующие global/resource permissions;
+- контракт и правила совместимости зафиксированы в [`JOB_IMPORT_DOMAIN_API_CONTRACT_2026-09-16.md`](./JOB_IMPORT_DOMAIN_API_CONTRACT_2026-09-16.md).
 
 ### Цель
 

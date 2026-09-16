@@ -4,6 +4,13 @@ import type { PaginatedResponse } from "@/types/api"
 
 export type OrganizationType = "staffing_agency" | "organization"
 
+export type JobImportPermissionAction =
+  "view" | "create" | "update" | "run" | "review" | "manage_credentials" | "archive"
+
+export interface ResourcePermissionSet {
+  job_imports?: Partial<Record<JobImportPermissionAction, boolean>>
+}
+
 export interface PermissionSet {
   view?: boolean
   create?: boolean
@@ -15,6 +22,7 @@ export interface PermissionSet {
   edit_compensation?: boolean
   manage_users?: boolean
   manage_settings?: boolean
+  resources?: ResourcePermissionSet
 }
 
 export interface PermissionMatrixRecord {
@@ -31,7 +39,11 @@ export interface EffectivePermissionsResponse {
   org_type: OrganizationType | null
   role_key: string
   source: "organization" | "template" | "platform_admin" | "none"
-  permissions: Required<PermissionSet>
+  permissions: Required<Omit<PermissionSet, "resources">> & {
+    resources: {
+      job_imports: Record<JobImportPermissionAction, boolean>
+    }
+  }
 }
 
 export interface PermissionMatrixQuery extends ResourceQuery {

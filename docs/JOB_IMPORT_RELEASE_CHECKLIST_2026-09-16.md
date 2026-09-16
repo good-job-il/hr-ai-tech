@@ -17,6 +17,8 @@
 
 ## Foundation gate
 
+- [x] Strict domain/API contracts are the runtime and TypeScript source of truth.
+- [x] `job_imports` has a separate deny-by-default backend-enforced permission resource.
 - [ ] Preview is read-only and proven by an invariant test.
 - [ ] ImportSource is tenant- and AgencyClient-scoped.
 - [x] Runtime fields are not browser-editable.

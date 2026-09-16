@@ -137,6 +137,17 @@ export function usePermissionMatrix() {
     [permissions],
   )
 
+  const canResource = useCallback(
+    (resource, action) => {
+      if (!permissions) {
+        return false
+      }
+
+      return !!permissions.resources?.[resource]?.[action]
+    },
+    [permissions],
+  )
+
   const refresh = useCallback(() => {
     if (user) {
       invalidatePermissionMatrixCache({ organizationId: user.organization_id, roleKey: user.role })
@@ -144,8 +155,18 @@ export function usePermissionMatrix() {
     }
   }, [user])
 
-  return { can, permissions, loading, refresh }
+  return { can, canResource, permissions, loading, refresh }
 }
+
+const _emptyJobImportPermissions = () => ({
+  view: false,
+  create: false,
+  update: false,
+  run: false,
+  review: false,
+  manage_credentials: false,
+  archive: false,
+})
 
 function _buildFullPermissions() {
   return {
@@ -159,6 +180,11 @@ function _buildFullPermissions() {
     edit_compensation: true,
     manage_users: true,
     manage_settings: true,
+    resources: {
+      job_imports: Object.fromEntries(
+        Object.keys(_emptyJobImportPermissions()).map((action) => [action, true]),
+      ),
+    },
   }
 }
 
@@ -174,5 +200,8 @@ function _buildEmptyPermissions() {
     edit_compensation: false,
     manage_users: false,
     manage_settings: false,
+    resources: {
+      job_imports: _emptyJobImportPermissions(),
+    },
   }
 }
