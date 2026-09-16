@@ -266,6 +266,7 @@ Backend guard является источником истины; frontend permi
 - backfill назначает ownership и создаёт staging record только при доказуемой связи source URL + external key + существующий AgencyClient; для ранее канонизированных `jobs.apply_url` используется сохранённый original URL из publication backup; ambiguous/unmatched sources становятся `needs_attention`, доказуемые — безопасно `paused`;
 - удаление source заменено архивированием; FK используют `RESTRICT`, поэтому source/archive flow не удаляет существующие jobs;
 - migration `1754200000000-JobImportPlatformDataModel` проверена на MySQL 8 в цикле `up → down → legacy fixtures → up`, включая collision, ambiguous ownership и cross-tenant negative tests.
+- URL backfill явно нормализует mixed `utf8mb4_bin`/`utf8mb4_unicode_ci` comparisons; migration resume guard безопасно продолжает повторный запуск после уже закоммиченной MySQL DDL-фазы `import_sources`.
 
 ### Цель
 
