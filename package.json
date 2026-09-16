@@ -19,6 +19,7 @@
     "test:tm4:frontend": "node --test src/domain/agency/workspace.test.mjs src/domain/agency/access.test.mjs src/domain/agency/tmAcceptance.test.mjs",
     "test:r4:frontend": "node --test src/domain/agency/recruiterWorkspace.test.mjs",
     "test:agency-jobs:frontend": "node --test src/domain/agency/jobClientSelection.test.mjs src/domain/agency/jobListQuery.test.mjs src/domain/agency/jobState.test.mjs src/domain/agency/jobLocalization.test.mjs src/domain/agency/jobResponsiveLayout.test.mjs src/domain/agency/jobAccessibility.test.mjs src/domain/agency/jobWorkflow.test.mjs src/domain/agency/clipboard.test.mjs src/domain/agency/jobErrorStates.test.mjs",
+    "test:job-import-flags": "node --test src/config/jobImportFeatureFlags.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
