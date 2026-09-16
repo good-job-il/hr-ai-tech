@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { importSourceService } from "@/api/services/importSourceService"
 import { jobService } from "@/api/services/jobService"
 
+const LEGACY_SOURCE_EXECUTION_DISABLED = true
+
 export default function ImportSources() {
   const queryClient = useQueryClient()
 
@@ -26,8 +28,6 @@ export default function ImportSources() {
 
   const [scanning, setScanning] = useState({})
 
-  const [expandedLogs, setExpandedLogs] = useState({})
-
   const { data: sources = [], isLoading } = useQuery({
     queryKey: ["import-sources"],
     queryFn: () => importSourceService.list({ limit: 50 }),
@@ -38,13 +38,11 @@ export default function ImportSources() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["import-sources"] }),
   })
 
-  const syncMutation = useMutation({
-    mutationFn: (source) => importSourceService.run(source.id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["import-sources"] }),
-    onError: () => queryClient.invalidateQueries({ queryKey: ["import-sources"] }),
-  })
-
   const scanSource = async (source) => {
+    if (LEGACY_SOURCE_EXECUTION_DISABLED) {
+      return
+    }
+
     setScanning((prev) => ({ ...prev, [source.id]: true }))
     setScanResults((prev) => ({ ...prev, [source.id]: null }))
 
@@ -61,6 +59,10 @@ export default function ImportSources() {
   }
 
   const quickScan = async () => {
+    if (LEGACY_SOURCE_EXECUTION_DISABLED) {
+      return
+    }
+
     if (!quickUrl) {
       return
     }
@@ -90,6 +92,10 @@ export default function ImportSources() {
 
   const syncAllMutation = useMutation({
     mutationFn: async () => {
+      if (LEGACY_SOURCE_EXECUTION_DISABLED) {
+        throw new Error("Legacy source execution is disabled")
+      }
+
       const activeSources = sources.filter((s) => s.is_active)
 
       const results = await Promise.allSettled(
@@ -258,19 +264,23 @@ export default function ImportSources() {
             <h1 className="text-2xl font-bold text-gray-900">מנוע ייבוא משרות</h1>
 
             <p className="text-sm text-gray-500 mt-1">
-              סריקה אוטומטית + ניהול מקורות - הזן URL אחד, המערכת מגלה את כל המשרות
+              הגדרת מקורות legacy במצב בטיחותי — preview, סריקה ותזמון מושבתים זמנית
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => syncAllMutation.mutate()}
-              disabled={syncAllMutation.isPending || sources.length === 0}
+              disabled={
+                LEGACY_SOURCE_EXECUTION_DISABLED ||
+                syncAllMutation.isPending ||
+                sources.length === 0
+              }
               className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
             >
               <RefreshCw className={`w-4 h-4 ${syncAllMutation.isPending ? "animate-spin" : ""}`} />
 
-              {syncAllMutation.isPending ? "מייבא..." : "ייבא הכל"}
+              {syncAllMutation.isPending ? "מייבא..." : "סנכרון מושבת"}
             </button>
 
             <button
@@ -285,13 +295,20 @@ export default function ImportSources() {
           </div>
         </div>
 
+        <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong>מצב בטיחות:</strong> עמוד legacy זה אינו מחובר לניווט production. פעולות
+          preview/sync מושבתות עד להשלמת staging read-only ובידוד tenant/client.
+        </div>
+
         {/* Quick Scan */}
         <div className="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-2xl p-5 mb-6">
           <h2 className="font-bold text-purple-800 mb-1 flex items-center gap-2">
-            <Search className="w-4 h-4" /> סריקה מהירה — בלי להוסיף מקור
+            <Search className="w-4 h-4" /> Preview מושבת זמנית
           </h2>
 
-          <p className="text-xs text-purple-600 mb-4">הכנס URL לבדיקה חד-פעמית ללא שמירה</p>
+          <p className="text-xs text-purple-600 mb-4">
+            לא מתבצעת סריקה ולא נעשה שינוי במשרות עד להשלמת workflow read-only.
+          </p>
 
           <div className="flex gap-2 flex-wrap">
             <input
@@ -311,7 +328,7 @@ export default function ImportSources() {
 
             <button
               onClick={quickScan}
-              disabled={!quickUrl || quickScanning}
+              disabled={LEGACY_SOURCE_EXECUTION_DISABLED || !quickUrl || quickScanning}
               className="bg-purple-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2 shrink-0"
             >
               {quickScanning ? (
@@ -320,7 +337,7 @@ export default function ImportSources() {
                 <Play className="w-4 h-4" />
               )}
 
-              {quickScanning ? "סורק..." : "סרוק עכשיו"}
+              {quickScanning ? "סורק..." : "Preview לא זמין"}
             </button>
           </div>
 
@@ -332,7 +349,7 @@ export default function ImportSources() {
                 <div className="font-semibold">סורק את עמוד הקריירה...</div>
 
                 <div className="text-xs text-purple-500 mt-0.5">
-                  המערכת מזהה משרות, עוברת בין עמודים ומחלצת תוכן מלא. זה עשוי לקחת מספר דקות.
+                  הפעולה מושבתת עד להשלמת הפרדת preview מתהליך השמירה.
                 </div>
               </div>
             </div>
@@ -515,7 +532,7 @@ export default function ImportSources() {
 
                     <button
                       onClick={() => scanSource(source)}
-                      disabled={scanning[source.id]}
+                      disabled={LEGACY_SOURCE_EXECUTION_DISABLED || scanning[source.id]}
                       className="flex items-center gap-1.5 bg-purple-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
                     >
                       {scanning[source.id] ? (
@@ -524,7 +541,7 @@ export default function ImportSources() {
                         </>
                       ) : (
                         <>
-                          <Play className="w-3.5 h-3.5" /> סרוק
+                          <Play className="w-3.5 h-3.5" /> מושבת
                         </>
                       )}
                     </button>

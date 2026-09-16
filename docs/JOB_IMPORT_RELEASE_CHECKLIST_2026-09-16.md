@@ -19,10 +19,20 @@
 
 - [ ] Preview is read-only and proven by an invariant test.
 - [ ] ImportSource is tenant- and AgencyClient-scoped.
-- [ ] Runtime fields are not browser-editable.
+- [x] Runtime fields are not browser-editable.
 - [ ] Source identity is tenant/source scoped.
 - [ ] Connectors cannot write jobs directly.
 - [ ] Source URLs and canonical public apply URL are separated.
+
+## Legacy safety freeze
+
+- [x] Preview and manual legacy source execution return `501` without invoking the crawler.
+- [x] Legacy unscoped scheduler execution is disabled.
+- [x] Already queued legacy source jobs fail closed without invoking the crawler.
+- [x] Legacy sources default to inactive with no schedule.
+- [x] Crawler job lookup by external ID/apply URL includes organization scope.
+- [x] Crawler rejects actors without an organization.
+- [x] Orphaned legacy pages remain outside production routing and expose disabled controls only.
 
 ## Product gate
 

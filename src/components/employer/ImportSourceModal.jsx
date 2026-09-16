@@ -5,8 +5,8 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
   const [form, setForm] = useState({
     name: source?.name || "",
     url: source?.url || "",
-    interval_hours: source?.interval_hours || 6,
-    is_active: source?.is_active ?? true,
+    interval_hours: 0,
+    is_active: false,
   })
 
   const [loading, setLoading] = useState(false)
@@ -15,8 +15,8 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
     setForm({
       name: source?.name || "",
       url: source?.url || "",
-      interval_hours: source?.interval_hours || 6,
-      is_active: source?.is_active ?? true,
+      interval_hours: 0,
+      is_active: false,
     })
   }, [source])
 
@@ -46,6 +46,10 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
+          <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+            המקור יישמר כבוי. preview, סריקה ותזמון אינם זמינים עד השלמת בידוד tenant/client.
+          </div>
+
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-1">שם המקור *</label>
 
@@ -78,9 +82,10 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
 
             <input
               type="number"
-              min="1"
-              max="24"
+              min="0"
+              max="0"
               value={form.interval_hours}
+              disabled
               onChange={(e) => setForm({ ...form, interval_hours: Number(e.target.value) })}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-hhblue/30 text-gray-900 bg-white"
             />
@@ -90,10 +95,11 @@ export default function ImportSourceModal({ source, onClose, onSaved }) {
             <input
               type="checkbox"
               checked={form.is_active}
+              disabled
               onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
               className="rounded"
             />
-            מקור פעיל
+            הפעלה מושבתת זמנית
           </label>
 
           <div className="flex gap-3 pt-2">

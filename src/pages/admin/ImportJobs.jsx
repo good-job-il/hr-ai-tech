@@ -3,21 +3,11 @@ import { importSourceService } from "@/api/services/importSourceService"
 import { jobService } from "@/api/services/jobService"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
-const SOURCE_TYPES = [
-  { value: "career_page", label: "עמוד קריירה רגיל" },
-  { value: "paginated", label: "עמוד עם pagination" },
-  { value: "load_more", label: 'עמוד עם "טען עוד"' },
-  { value: "org_system", label: "מערכת קריירה ארגונית" },
-  { value: "custom", label: "מקור מותאם אישית" },
-]
+const LEGACY_SOURCE_EXECUTION_DISABLED = true
 
-const INTERVALS = [
-  { value: 0, label: "ידני בלבד" },
-  { value: 1, label: "כל שעה" },
-  { value: 6, label: "כל 6 שעות" },
-  { value: 24, label: "פעם ביום" },
-  { value: 168, label: "פעם בשבוע" },
-]
+const SOURCE_TYPES = [{ value: "career_page", label: "מקור legacy בעמוד יחיד" }]
+
+const INTERVALS = [{ value: 0, label: "מושבת זמנית" }]
 
 function ScanResultPanel({ result, onClose }) {
   const [showLog, setShowLog] = useState(false)
@@ -131,9 +121,8 @@ function SourceFormModal({ source, onClose, onSaved }) {
     name: source?.name || "",
     url: source?.url || "",
     provider: source?.provider || "career_page",
-    interval_hours: source?.interval_hours ?? 6,
-    is_active: source?.is_active ?? true,
-    company_name: source?.company_name || "",
+    interval_hours: 0,
+    is_active: false,
   })
 
   const [saving, setSaving] = useState(false)
@@ -148,13 +137,7 @@ function SourceFormModal({ source, onClose, onSaved }) {
     if (source?.id) {
       await importSourceService.update(source.id, form)
     } else {
-      await importSourceService.create({
-        ...form,
-        last_sync_status: "pending",
-        jobs_added: 0,
-        jobs_updated: 0,
-        jobs_closed: 0,
-      })
+      await importSourceService.create(form)
     }
 
     setSaving(false)
@@ -193,21 +176,8 @@ function SourceFormModal({ source, onClose, onSaved }) {
           />
 
           <p className="text-xs text-gray-400 mt-1">
-            הכנס כתובת URL אחת בלבד — המערכת תסרוק אוטומטית את כל העמודים
+            הכתובת תישמר בלבד. סריקה ותזמון מושבתים עד השלמת בידוד tenant ולקוח.
           </p>
-        </div>
-
-        <div>
-          <label className="text-xs font-medium text-gray-600 mb-1 block">
-            שם חברה (פנימי, לא יוצג)
-          </label>
-
-          <input
-            value={form.company_name}
-            onChange={(e) => setForm((p) => ({ ...p, company_name: e.target.value }))}
-            placeholder="שם החברה האמיתי לשימוש פנימי"
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-purple-500/30 text-gray-900 bg-white"
-          />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -249,12 +219,13 @@ function SourceFormModal({ source, onClose, onSaved }) {
             type="checkbox"
             id="isActive"
             checked={form.is_active}
+            disabled
             onChange={(e) => setForm((p) => ({ ...p, is_active: e.target.checked }))}
             className="accent-purple-600"
           />
 
           <label htmlFor="isActive" className="text-sm text-gray-700">
-            מקור פעיל
+            הפעלה מושבתת זמנית
           </label>
         </div>
 
@@ -314,6 +285,10 @@ export default function ImportJobs() {
   })
 
   const scanSource = async (source) => {
+    if (LEGACY_SOURCE_EXECUTION_DISABLED) {
+      return
+    }
+
     setScanning((prev) => ({ ...prev, [source.id]: true }))
     setScanResults((prev) => ({ ...prev, [source.id]: null }))
 
@@ -330,6 +305,10 @@ export default function ImportJobs() {
   }
 
   const quickScan = async () => {
+    if (LEGACY_SOURCE_EXECUTION_DISABLED) {
+      return
+    }
+
     if (!quickUrl) {
       return
     }
@@ -370,8 +349,6 @@ export default function ImportJobs() {
 
   const totalNew = sources.reduce((sum, s) => sum + (s.jobs_added || 0), 0)
 
-  const totalUpdated = sources.reduce((sum, s) => sum + (s.jobs_updated || 0), 0)
-
   const { data: activeJobsCount = 0 } = useQuery({
     queryKey: ["active-jobs-count"],
     queryFn: async () => {
@@ -391,7 +368,7 @@ export default function ImportJobs() {
             </h1>
 
             <p className="text-sm text-gray-500 mt-1">
-              סריקה אוטומטית רב-עמודית — הזן URL אחד, המערכת מגלה את כל המשרות
+              הגדרת מקורות legacy במצב בטיחותי — preview, סריקה ותזמון מושבתים זמנית
             </p>
           </div>
 
@@ -404,6 +381,11 @@ export default function ImportJobs() {
           >
             <Plus className="w-4 h-4" /> הוסף מקור
           </button>
+        </div>
+
+        <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong>מצב בטיחות:</strong> הממשק אינו מחובר לניווט production, וכל פעולות preview/sync
+          מושבתות עד השלמת staging read-only ובידוד tenant/client.
         </div>
 
         {/* Stats */}
@@ -433,10 +415,12 @@ export default function ImportJobs() {
         {/* Quick Scan */}
         <div className="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-2xl p-5 mb-6">
           <h2 className="font-bold text-purple-800 mb-1 flex items-center gap-2">
-            <Search className="w-4 h-4" /> סריקה מהירה — בלי להוסיף מקור
+            <Search className="w-4 h-4" /> Preview מושבת זמנית
           </h2>
 
-          <p className="text-xs text-purple-600 mb-4">הכנס URL לבדיקה חד-פעמית ללא שמירה</p>
+          <p className="text-xs text-purple-600 mb-4">
+            לא מתבצעת סריקה ולא נעשה שינוי במשרות עד להשלמת workflow read-only.
+          </p>
 
           <div className="flex gap-2 flex-wrap">
             <input
@@ -456,7 +440,7 @@ export default function ImportJobs() {
 
             <button
               onClick={quickScan}
-              disabled={!quickUrl || quickScanning}
+              disabled={LEGACY_SOURCE_EXECUTION_DISABLED || !quickUrl || quickScanning}
               className="bg-purple-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2 shrink-0"
             >
               {quickScanning ? (
@@ -465,7 +449,7 @@ export default function ImportJobs() {
                 <Play className="w-4 h-4" />
               )}
 
-              {quickScanning ? "סורק..." : "סרוק עכשיו"}
+              {quickScanning ? "סורק..." : "Preview לא זמין"}
             </button>
           </div>
 
@@ -477,7 +461,7 @@ export default function ImportJobs() {
                 <div className="font-semibold">סורק את עמוד הקריירה...</div>
 
                 <div className="text-xs text-purple-500 mt-0.5">
-                  המערכת מזהה משרות, עוברת בין עמודים ומחלצת תוכן מלא. זה עשוי לקחת מספר דקות.
+                  הפעולה מושבתת עד להשלמת הפרדת preview מתהליך השמירה.
                 </div>
               </div>
             </div>
@@ -624,7 +608,7 @@ export default function ImportJobs() {
 
                     <button
                       onClick={() => scanSource(source)}
-                      disabled={scanning[source.id]}
+                      disabled={LEGACY_SOURCE_EXECUTION_DISABLED || scanning[source.id]}
                       className="flex items-center gap-1.5 bg-purple-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
                     >
                       {scanning[source.id] ? (
@@ -633,7 +617,7 @@ export default function ImportJobs() {
                         </>
                       ) : (
                         <>
-                          <Play className="w-3.5 h-3.5" /> סרוק
+                          <Play className="w-3.5 h-3.5" /> מושבת
                         </>
                       )}
                     </button>

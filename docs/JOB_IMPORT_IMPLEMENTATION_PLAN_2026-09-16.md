@@ -115,7 +115,19 @@ Safety freeze
 
 ---
 
-## Шаг 1. Немедленно сделать текущую функцию безопасной
+## ✅ Шаг 1. Немедленно сделать текущую функцию безопасной
+
+**Статус:** выполнено 2026-09-16.
+
+Реализованный safety boundary:
+
+- `POST /import-sources/preview` и ручной source run возвращают `501` и не вызывают crawler/queue;
+- scheduler не запускает legacy sources, а уже поставленная legacy-задача завершается как `failed` без записи вакансий;
+- create source по умолчанию создаёт выключенный источник без расписания;
+- public update DTO принимает только editable-поля и отклоняет runtime counters/status/log/retry metadata;
+- поиск существующей вакансии по `external_id` и `apply_url` всегда включает `organization_id`, а crawler без organization запрещён;
+- orphaned legacy UI не подключён к production routes; execution controls заблокированы, unsupported promises/providers удалены, добавлено safety-warning;
+- добавлены backend regression-тесты safety boundary и frontend static safety contract.
 
 ### Цель
 
