@@ -370,7 +370,21 @@ Unique constraint: `(organization_id, import_source_id, external_key)`.
 
 ---
 
-## Шаг 4. Переписать ImportSource CRUD с tenant boundary
+## ✅ Шаг 4. Переписать ImportSource CRUD с tenant boundary
+
+**Статус:** выполнено 2026-09-17.
+
+Результат:
+
+- agency CRUD принимает authenticated user и во всех чтениях/изменениях ограничивает source по `organization_id`; Team Manager дополнительно видит только назначенные ему или его команде sources;
+- create требует canonical AgencyClient и connector type, всегда создаёт inert `draft`, не принимает runtime/state/scheduling fields и не включает расписание;
+- update использует закрытый DTO, проверяет client/team/manager/recruiter ownership и увеличивает `configuration_version`;
+- pause/resume/archive оформлены отдельными state commands; delete является recoverable archive, а resume требует активного AgencyClient и завершённого подтверждённого apply-run;
+- credential reference изменяется только отдельным endpoint с `job_imports.manage_credentials`; API никогда не возвращает сам reference, а legacy secret-like keys в configuration маскируются в ответе;
+- role ceilings закрепляют Org Admin как единственного полного управляющего, Recruitment Manager — `view/run/review`, Team Manager — `view/review`, Recruiter — read-only независимо от ошибочно расширенной tenant matrix;
+- platform-support health endpoint отделён от agency CRUD, доступен только в native platform-admin context и возвращает фиксированную metadata projection без URL/configuration/credentials/logs/raw payload;
+- disabled manual run сначала проверяет tenant/source access; legacy crawler больше не может обновить runtime metadata source из другой organization;
+- regression-набор покрывает cross-tenant read/run/update, archived client activation, confirmed-run gate, DTO/runtime/secret rejection, credential redaction, support projection и permission contracts.
 
 ### Цель
 
