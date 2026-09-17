@@ -559,7 +559,22 @@ Generic JSON работает через общий interface; старый mapp
 
 ---
 
-## Шаг 7. Реализовать настоящий read-only preview
+## ✅ Шаг 7. Реализовать настоящий read-only preview
+
+**Статус:** выполнено 2026-09-17.
+
+Результат:
+
+- `POST /import-sources/:id/runs` принимает только explicit `mode=preview`, проверяет `job_imports.run`, tenant/team scope, feature flag, canonical AgencyClient и зарегистрированный connector;
+- endpoint атомарно по смыслу связывает tenant-scoped `JobImportRun` с idempotent background job; лишний pending run при idempotency race переводится в `cancelled`;
+- worker повторно проверяет organization, source, feature flag, connector/configuration/mapping versions и отклоняет legacy, malformed и cross-tenant payload как permanent failure;
+- preview executor выполняет discover → safe fetch → map → quality validation → source-scoped lookup → proposed action и сохраняет только `job_import_runs`/`job_import_run_items`;
+- executor намеренно не зависит от `JobEntity`/Jobs repository и не имеет write-path для `SourceJobRecord`; source schedule/runtime state также не изменяется;
+- результат содержит connector detection/confidence, capabilities/limitations, source metadata, snapshot completeness/pagination, quality summary, typed warnings/errors, create/update/close/reopen/skip/review/error forecast и до 20 normalized samples с field diff;
+- invariant `job_changes_applied: false` присутствует во всех completed/partial/failed preview responses;
+- item-level mapping error переводит run в `partial` и snapshot в `partial`, а не маскируется как full successful snapshot;
+- frontend API получил typed `ImportPreviewResult`, explicit preview queue contract и polling через существующий background-job endpoint; legacy arbitrary `POST /import-sources/preview` остаётся отключённым;
+- feature может включаться для staging/production tenant через `job_imports_enabled`; apply и schedule по-прежнему не активируются.
 
 ### Цель
 
