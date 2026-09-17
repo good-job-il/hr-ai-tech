@@ -433,7 +433,20 @@ CRUD проходит RLS/permissions, source всегда принадлежи�
 
 ---
 
-## Шаг 5. Ввести Connector SDK
+## ✅ Шаг 5. Ввести Connector SDK
+
+**Статус:** выполнено 2026-09-17.
+
+Результат:
+
+- создан независимый `JobImportConnector` contract для `detect`, `validateConfig`, `discover`, `fetchPage`, `map`, `identify` и `classifyHealth`;
+- сетевой доступ передаётся connector-у через `ConnectorTransport`, поэтому adapter не импортирует `fetch`, TypeORM repositories, Job entity, UI или role context;
+- `ConnectorRegistryService` регистрирует adapters по canonical type, блокирует дубликаты, ранжирует detection и отдаёт immutable connector type/version metadata для каждого будущего run;
+- capabilities объявляются кодом и валидируются closed schema; Generic JSON честно объявляет `full_snapshot` и conditional `incremental_sync`, не обещая pagination/detail/closure/salary/auth/webhook;
+- Generic JSON `1.0.0` реализует config validation, detection, discovery, conditional headers, raw page/snapshot metadata, canonical mapping в `NormalizedSourceJob`, deterministic checksum/identity и typed health errors;
+- временный legacy JSON mapper вызывается только как pure mapping bridge одного raw item и не получает доступ к persistence;
+- ImportSource create/update получает connector version из registry и не сохраняет неизвестную либо невалидную adapter configuration;
+- добавлены immutable Jobicy/results fixtures и reusable contract tests на интерфейс, raw immutability, normalized schema, metadata, capabilities, version, registry, rate-limit/network classification и отсутствие запрещённых зависимостей.
 
 ### Цель
 
