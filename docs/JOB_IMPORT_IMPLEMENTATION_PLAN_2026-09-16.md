@@ -500,7 +500,22 @@ Generic JSON работает через общий interface; старый mapp
 
 ---
 
-## Шаг 6. Выделить безопасный HTTP Fetcher
+## ✅ Шаг 6. Выделить безопасный HTTP Fetcher
+
+**Статус:** выполнено 2026-09-17.
+
+Результат:
+
+- создан единый `SafeHttpFetcherService` и экспортирован из `JobImportsModule`; legacy `JobCrawlerService` больше не использует глобальный `fetch`;
+- разрешены только HTTP/HTTPS на портах 80/443, URL credentials запрещены, vendor API отделены allowlist-policy от arbitrary/crawler URL;
+- hostname резолвится заново на каждом redirect, mixed public/private DNS отклоняется, а фактический socket соединяется с проверенным IP через pinned lookup при сохранении исходных Host/SNI;
+- введены лимиты redirects, timeout, compressed/decoded bytes, decompression ratio, pages/items per run, per-domain concurrency и requests/minute;
+- crawler policy проверяет и кэширует `robots.txt`, использует идентифицируемый product User-Agent и не переносит credential headers между origins;
+- разрешён только минимальный набор request headers; `ETag`/`If-None-Match`, `If-Modified-Since`, `304` и `429 Retry-After` проходят через transport contract;
+- credentials, sensitive query parameters и URL fragments удаляются из operational logs и crawler summaries;
+- operational metrics учитывают status, bytes, latency, failures и rate-limit events;
+- добавлен архитектурный regression-test, запрещающий connector-ам прямой `fetch`, и security tests для IP/IPv6/mixed DNS, DNS pinning, redirects, limits, compression, content type, timeout/429/5xx, robots, redaction, budgets и throttling;
+- параметры boundary задокументированы в `backend/.env.example` и проходят безопасную числовую валидацию с bounded defaults.
 
 ### Цель
 
