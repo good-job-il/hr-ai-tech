@@ -12,6 +12,13 @@ export type ImportAction =
   | "review"
   | "error"
 
+export type ImportValidationOutcome =
+  | "valid"
+  | "review_required"
+  | "quarantined"
+  | "duplicate_candidate"
+  | "invalid"
+
 export interface ImportSourceRecord {
   id: number
   organization_id: number
@@ -73,6 +80,12 @@ export interface ImportPreviewSample {
   job_id: number | null
   external_key: string
   proposed_action: ImportAction
+  validation_outcome: ImportValidationOutcome
+  identity: {
+    strategy: "vendor_id" | "posting_url" | "fingerprint"
+    namespace: string
+  }
+  probable_duplicate_record_ids: number[]
   normalized_candidate: Record<string, unknown> & {
     external_key: string
     title: string
