@@ -614,7 +614,20 @@ Quick Scan можно безопасно использовать в staging и 
 
 ---
 
-## Шаг 8. Реализовать validation, identity и diff engine
+## ✅ Шаг 8. Реализовать validation, identity и diff engine
+
+**Статус:** выполнено 2026-09-20.
+
+**Результат:**
+
+- Выделен единый `JobImportAnalysisService`, который выполняет sanitization, normalization, validation, identity resolution, checksum, duplicate detection и воспроизводимый field-level diff.
+- Identity выбирается в порядке vendor stable ID → canonical posting URL → connector-specific deterministic fingerprint и всегда сопоставляется в tenant/source namespace.
+- Изменение fallback identity и вероятные совпадения между источниками не объединяются автоматически: item получает `duplicate_candidate`/`review` с объяснимой issue.
+- Введены явные validation outcomes: `valid`, `review_required`, `quarantined`, `duplicate_candidate`, `invalid`.
+- Diff является трёхсторонним (`source_before`, `source_after`, `current_job`); одновременное изменение source-managed поля источником и пользователем создаёт `CURRENT_JOB_FIELD_CONFLICT` и блокирует автоматический update.
+- Generic JSON connector извлекает данные без обязательного vendor ID или URL, сохраняет некорректные URL для actionable validation и нормализует employment/work-mode/status aliases.
+- Preview сохраняет identity metadata, validation outcome, probable duplicate IDs, proposed action и field-level diff для каждой успешно извлечённой item.
+- Добавлены regression-тесты для tenant/source namespace, HTML/privacy/JSON fragments, HTML entities, mixed HE/EN, remote + employment type, URL validation, taxonomy aliases, стабильного checksum, fallback identity, duplicate review и current-job conflicts.
 
 ### Цель
 
