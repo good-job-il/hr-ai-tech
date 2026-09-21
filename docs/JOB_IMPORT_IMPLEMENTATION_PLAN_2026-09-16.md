@@ -679,7 +679,21 @@ Quick Scan можно безопасно использовать в staging и 
 
 ---
 
-## Шаг 9. Реализовать единый Apply Service через JobsService
+## ✅ Шаг 9. Реализовать единый Apply Service через JobsService
+
+**Статус:** выполнено 2026-09-21.
+
+**Результат:**
+
+- Создан единый `JobImportApplyService`: он применяет подтверждённый preview run, поддерживает batch processing, item-level failures, повтор failed items и apply idempotency.
+- Каждая item выполняется в отдельной database transaction: `Job`, `SourceJobRecord`, `JobImportRunItem` и audit либо фиксируются вместе, либо откатываются вместе.
+- Create и update выполняются только через import-aware domain commands `JobsService`; Apply Service, connectors и crawler не имеют прямого write-доступа к `jobs`.
+- Создание импортированной вакансии всегда использует tenant organization, активного AgencyClient, canonical company snapshot, проверенные assignment defaults и начальный state `draft`.
+- `job_code`, `apply_email` и canonical `apply_url` генерируются существующим publication lifecycle. Внешние posting/apply URLs остаются только в `SourceJobRecord` и не принимаются JobsService как publication fields.
+- Update использует source-record ownership scope, повторно проверяет AgencyClient и сохраняет platform publication/ownership fields.
+- Audit выполняется внутри той же транзакции и содержит actor, source, run, source-record и external key.
+- Legacy `JobCrawlerService` переведён в disabled compatibility stub; production path с прямым `jobRepo.save` удалён.
+- Добавлены regression-тесты для canonical client/publication fields, source URL isolation, idempotency, invalid assignments, transaction rollback, batch continuation/retry, audit context и отсутствия прямых Job writes.
 
 ### Цель
 
