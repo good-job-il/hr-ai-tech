@@ -1049,6 +1049,13 @@
         "engineering": "הנדסה"
       },
       "description": "תיאור המשרה",
+      "importProvenance": "מקור המשרה המיובאת",
+      "importSourceManaged": "שדות שמנוהלים על ידי המקור נשארים מסונכרנים עד לעריכה ידנית.",
+      "importLockedFields": "עריכות ידניות מגנות על השדות הבאים מעדכוני המקור: {{fields}}.",
+      "resumeSourceSync": "חידוש סנכרון מהמקור",
+      "resumeFieldSync": "חידוש סנכרון מהמקור עבור {{field}}",
+      "resumingSourceSync": "מחדש סנכרון…",
+      "resumeSourceSyncError": "לא ניתן לחדש את הסנכרון מהמקור. נסו שוב.",
       "descriptionPlaceholder": "תיאור מפורט של התפקיד, הדרישות והתנאים...",
       "requirements": "דרישות",
       "benefits": "הטבות",

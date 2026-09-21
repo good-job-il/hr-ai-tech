@@ -62,8 +62,31 @@ export interface JobImportProvenance {
     message: string
     severity: "warning" | "error"
   }>
+  field_ownership?: Record<
+    string,
+    "platform" | "user" | "source_until_edited" | "review_on_conflict"
+  >
+  manual_overrides?: Record<
+    string,
+    {
+      field: string
+      ownership: "user"
+      source_baseline: unknown
+      manual_value: unknown
+      overridden_at: string
+      overridden_by: number
+      reason: "manual_edit" | "manual_terminal_state"
+    }
+  >
   first_seen_at?: string
   last_seen_at?: string
+}
+
+export interface ResetJobImportOverridesResult {
+  job_id: number
+  source_job_record_id: number
+  reset_fields: string[]
+  manual_overrides: NonNullable<JobImportProvenance["manual_overrides"]>
 }
 
 export interface CreateJobInput {
@@ -132,6 +155,11 @@ export class JobService extends ResourceService<Job, JobQuery, CreateJobInput, U
   }
   importProvenance(id: number | string) {
     return httpClient.get<JobImportProvenance>(`/jobs/${id}/import-provenance`, { cache: false })
+  }
+  resetImportOverrides(id: number | string, fields: string[]) {
+    return httpClient.post<ResetJobImportOverridesResult>(`/jobs/${id}/import-overrides/reset`, {
+      fields,
+    })
   }
 }
 

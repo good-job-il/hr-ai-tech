@@ -1049,6 +1049,13 @@
         "engineering": "Engineering"
       },
       "description": "Job Description",
+      "importProvenance": "Imported job provenance",
+      "importSourceManaged": "Source-managed fields stay synchronized until they are edited manually.",
+      "importLockedFields": "Manual edits protect these fields from source updates: {{fields}}.",
+      "resumeSourceSync": "Resume source sync",
+      "resumeFieldSync": "Resume source sync for {{field}}",
+      "resumingSourceSync": "Resuming sync…",
+      "resumeSourceSyncError": "Unable to resume source synchronization. Try again.",
       "descriptionPlaceholder": "Detailed description of the role, requirements and benefits...",
       "requirements": "Requirements",
       "benefits": "Benefits",

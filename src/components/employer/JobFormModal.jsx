@@ -103,7 +103,7 @@ const FALLBACK_TAXONOMY = {
 export default function JobFormModal({ job, isOpen, onClose, onSave, preselectedClientId = null }) {
   const { user } = useAuth()
 
-  const { can } = usePermissionMatrix()
+  const { can, canResource } = usePermissionMatrix()
 
   const { t, i18n } = useTranslation()
 
@@ -158,6 +158,12 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
 
   const [clientsError, setClientsError] = useState("")
 
+  const [importProvenance, setImportProvenance] = useState(null)
+
+  const [overrideResetting, setOverrideResetting] = useState(null)
+
+  const [overrideResetError, setOverrideResetError] = useState("")
+
   const isAgency = user?.org_type === "staffing_agency"
 
   const canViewCompensation = can("view_compensation")
@@ -172,6 +178,68 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
   ].includes(user?.role)
 
   useEffect(() => setError(""), [i18n.resolvedLanguage])
+
+  useEffect(() => {
+    let active = true
+
+    if (!isOpen || !job?.id || (!job.source_job_record_id && job.source !== "import")) {
+      setImportProvenance(null)
+
+      return () => {
+        active = false
+      }
+    }
+
+    jobService
+      .importProvenance(job.id)
+      .then((provenance) => active && setImportProvenance(provenance.imported ? provenance : null))
+      .catch(() => active && setImportProvenance(null))
+
+    return () => {
+      active = false
+    }
+  }, [isOpen, job?.id, job?.source, job?.source_job_record_id])
+
+  const lockedFieldLabels = useMemo(() => {
+    const labels = {
+      title: t("jobs_management.form.title"),
+      description: t("jobs_management.form.description"),
+      location: t("jobs_management.form.location"),
+      employment_type_id: t("jobs_management.form.employmentType"),
+      work_mode_id: t("jobs_management.form.workMode"),
+      required_skills: t("jobs_management.form.requiredSkills"),
+      preferred_skills: t("jobs_management.form.preferredSkills"),
+      state: t("jobs_management.form.status"),
+      category: t("jobs_management.form.category"),
+      seniority: t("jobs_management.form.seniority"),
+    }
+
+    return Object.keys(importProvenance?.manual_overrides || {}).map((field) => ({
+      field,
+      label: labels[field] || field,
+    }))
+  }, [importProvenance?.manual_overrides, t])
+
+  const handleResumeSourceSync = async (field) => {
+    if (!job?.id || !field) {
+      return
+    }
+
+    setOverrideResetting(field)
+    setOverrideResetError("")
+
+    try {
+      const result = await jobService.resetImportOverrides(job.id, [field])
+
+      setImportProvenance((current) =>
+        current ? { ...current, manual_overrides: result.manual_overrides } : current,
+      )
+    } catch {
+      setOverrideResetError(t("jobs_management.form.resumeSourceSyncError"))
+    } finally {
+      setOverrideResetting(null)
+    }
+  }
 
   const loadAgencyClients = useCallback(async () => {
     if (!isOpen || !isAgency) {
@@ -588,6 +656,52 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
               className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700"
             >
               ❌ {error}
+            </div>
+          )}
+
+          {importProvenance && (
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
+              <div className="flex items-center gap-2 font-semibold">
+                <LockKeyhole className="h-4 w-4" aria-hidden="true" />
+                {t("jobs_management.form.importProvenance")}
+              </div>
+
+              <p className="mt-1 text-xs text-blue-800">
+                {lockedFieldLabels.length
+                  ? t("jobs_management.form.importLockedFields", {
+                      fields: lockedFieldLabels.map(({ label }) => label).join(", "),
+                    })
+                  : t("jobs_management.form.importSourceManaged")}
+              </p>
+
+              {overrideResetError && (
+                <p role="alert" className="mt-2 text-xs font-medium text-red-700">
+                  {overrideResetError}
+                </p>
+              )}
+
+              {lockedFieldLabels.length > 0 && canResource("job_imports", "review") && (
+                <ul className="mt-2 space-y-1.5">
+                  {lockedFieldLabels.map(({ field, label }) => (
+                    <li key={field} className="flex items-center justify-between gap-3">
+                      <span className="text-xs font-medium">{label}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleResumeSourceSync(field)}
+                        disabled={Boolean(overrideResetting)}
+                        aria-label={t("jobs_management.form.resumeFieldSync", { field: label })}
+                        className="rounded-lg border border-blue-300 bg-white px-2.5 py-1 text-xs font-semibold text-blue-800 transition-colors hover:bg-blue-100 disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {t(
+                          overrideResetting === field
+                            ? "jobs_management.form.resumingSourceSync"
+                            : "jobs_management.form.resumeSourceSync",
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
 
@@ -1500,4 +1614,4 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
     </Dialog>
   )
 }
-import { X, Eye, Copy, Check } from "lucide-react"
+import { X, Eye, Copy, Check, LockKeyhole } from "lucide-react"

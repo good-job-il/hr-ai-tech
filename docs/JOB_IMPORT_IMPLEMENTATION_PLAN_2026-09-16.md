@@ -735,7 +735,19 @@ Quick Scan можно безопасно использовать в staging и 
 
 ---
 
-## Шаг 10. Добавить field ownership и защиту ручных правок
+## ✅ Шаг 10. Добавить field ownership и защиту ручных правок
+
+**Статус:** выполнено 2026-09-21.
+
+**Результат:**
+
+- Введена единая ownership map: platform publication/identity, user assignments/compensation/internal fields, source-until-edited content и review-on-conflict state/taxonomy.
+- Ручное изменение импортируемого поля, включая команды `filled/closed`, создаёт tenant-scoped override с source baseline, manual value, actor, timestamp и причиной.
+- Analysis/diff engine выполняет трёхстороннее сравнение source baseline → новый source candidate → текущая Job, маркирует каждое изменение ownership/apply/resolution и объясняет пропуск через `FIELD_MANUAL_OVERRIDE` или review policy.
+- Apply Service фильтрует защищённые поля, поэтому последующая синхронизация не перезаписывает ручную работу; сброшенный override снова разрешает source update.
+- Job provenance API и EN/HE UI формы показывают source ownership и список заблокированных полей.
+- Добавлены single и bulk reset API. Операция «возобновить синхронизацию» удаляет override транзакционно и пишет audit before/after; backend требует `job_imports.review`, а bulk DTO также требует явный `confirmed: true`.
+- Добавлены regression-тесты ручного title, обновления неизменённого source-owned поля, reset/re-apply, защиты terminal state, audit actor/before/after, permission contract и bulk confirmation.
 
 ### Цель
 
