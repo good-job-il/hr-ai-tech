@@ -123,7 +123,9 @@
       "teams": "Teams & Users",
       "financial": "Financial",
       "compensation": "Compensation",
+      "import": "Import",
       "importCandidates": "Import Candidates",
+      "importJobs": "Job Sources",
       "analysis": "Analysis",
       "reportsInsights": "Reports & Insights",
       "activityLog": "Activity Log",
@@ -210,6 +212,8 @@
       "aiUsage": "AI Usage",
       "parsingImports": "Parsing & Imports",
       "integrationsHealth": "Integration Health",
+      "operations": "Operations",
+      "jobImports": "Job Imports",
       "security": "Security",
       "activityLog": "Activity Log",
       "permissionChanges": "Permission Changes",
@@ -1482,6 +1486,104 @@
       "deleteTitle": "Delete member",
       "confirm": "Delete {{name}} from the organization? Their access will be revoked. Their work history will be retained.",
       "deleted": "Member deleted"
+    }
+  },
+  "jobImports": {
+    "common": {
+      "backToSources": "Back to job sources",
+      "loadError": "Job import data could not be loaded",
+      "loadErrorHint": "Retry the request. If it continues to fail, check the source health and your access."
+    },
+    "hub": {
+      "title": "Import",
+      "description": "Choose what you want to bring into the agency workspace. Candidate files and external job sources use separate workflows.",
+      "candidates": {
+        "title": "Candidates",
+        "description": "Upload candidate files and map candidate profile fields.",
+        "action": "Open candidate import"
+      },
+      "jobs": {
+        "title": "Job sources",
+        "description": "Connect external career feeds, preview changes and review job synchronization runs.",
+        "action": "Manage job sources"
+      }
+    },
+    "sources": {
+      "eyebrow": "Job imports",
+      "title": "Job sources",
+      "description": "Manage tenant-scoped sources and inspect their health before applying changes to live jobs.",
+      "add": "Add source",
+      "connector": "Connector",
+      "lastSuccess": "Last success",
+      "emptyTitle": "No job sources yet",
+      "emptyDescription": "Add a source to configure its connector and run a read-only preview.",
+      "metrics": {
+        "total": "Sources",
+        "active": "Active",
+        "needs_attention": "Needs attention",
+        "error": "Errors"
+      }
+    },
+    "new": {
+      "eyebrow": "New source",
+      "title": "Connect a job source",
+      "description": "The onboarding flow keeps source configuration, field mapping and the first read-only preview separate.",
+      "readOnlyNotice": "The first scan is a read-only preview. It cannot create, update or close live jobs.",
+      "steps": {
+        "source": {
+          "title": "Source",
+          "description": "Choose a client, connector and source URL."
+        },
+        "mapping": { "title": "Mapping", "description": "Validate taxonomy and field ownership." },
+        "preview": {
+          "title": "Preview",
+          "description": "Review proposed changes before any apply action."
+        }
+      }
+    },
+    "detail": {
+      "eyebrow": "Job source",
+      "connector": "Connector",
+      "client": "Agency client ID",
+      "lastSuccess": "Last success",
+      "nextRun": "Next run",
+      "runs": "Import runs",
+      "runsDescription": "Preview and apply history for this source.",
+      "noRuns": "No runs have been created for this source.",
+      "items": "{{count}} items"
+    },
+    "run": {
+      "backToSource": "Back to source",
+      "eyebrow": "Import review",
+      "title": "Run #{{id}}",
+      "description": "Inspect staged decisions and field-level outcomes without reading internal tables.",
+      "items": "Staged items",
+      "itemsDescription": "Each item shows the server-proposed action and resolution state.",
+      "noItems": "This run has no staged items.",
+      "untitled": "Untitled source record",
+      "confidence": "{{value}}% confidence",
+      "actions": {
+        "create": "Create",
+        "update": "Update",
+        "close": "Close",
+        "reopen": "Reopen",
+        "review": "Review",
+        "error": "Errors"
+      }
+    },
+    "platform": {
+      "eyebrow": "Platform operations",
+      "title": "Job import health",
+      "description": "Cross-tenant operational metadata. Raw source payloads and credentials are intentionally excluded.",
+      "visibleSources": "Visible sources",
+      "attention": "Need attention",
+      "payloadPolicy": "Data access",
+      "metadataOnly": "Metadata only",
+      "empty": "No source health records match the current view.",
+      "source": "Source",
+      "organization": "Organization",
+      "connector": "Connector",
+      "lastAttempt": "Last attempt"
     }
   },
   "platform": {

@@ -7,9 +7,11 @@ const serviceSource = readFileSync(
   "utf8",
 )
 
-test("job import client queues an explicit preview and waits for its typed result", () => {
+test("job import client queues an explicit preview and polls the tenant-scoped run", () => {
   assert.match(serviceSource, /mode:\s*"preview"/)
-  assert.match(serviceSource, /waitForJob<ImportPreviewResult>/)
+  assert.match(serviceSource, /post<QueuedImportRun>/)
+  assert.match(serviceSource, /waitForRun\(queued\.run_id\)/)
+  assert.match(serviceSource, /getRun\(runId/)
   assert.match(serviceSource, /job_changes_applied:\s*false/)
   assert.equal(serviceSource.includes('post<ImportPreviewResult>("/import-sources/preview"'), false)
 })

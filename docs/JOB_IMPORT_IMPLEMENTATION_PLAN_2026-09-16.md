@@ -890,7 +890,26 @@ Scheduled run воспроизводим, tenant-safe и не зависит о�
 
 ---
 
-## Шаг 13. Завершить backend API для UI
+## ✅ Шаг 13. Завершить backend API для UI
+
+**Статус:** выполнено 2026-09-29.
+
+**Результат:**
+
+- Сохранён tenant-safe source CRUD/pause/resume/archive и добавлены server-side search/filter по source name/provider/URL, connector, client, state и health.
+- Добавлен `POST /import-sources/:id/discover`, который валидирует configuration через зарегистрированный connector и возвращает только version, capabilities, limitations и безопасные discovery metadata.
+- Preview queue теперь возвращает стабильный UI envelope с `run_id`, `source_id`, mode, status, background job ID и idempotency key, не раскрывая внутреннюю queue entity.
+- Добавлены paginated `GET /import-sources/:id/runs`, `GET /import-runs/:id` и `GET /import-runs/:id/items` с tenant/team boundary, status/action filters и server-side search по title, company и external key.
+- Добавлены `POST /import-runs/:id/apply`, single approve/reject/retry и batch resolve до 100 items. Review/error item требует конкретный resolved action; validation errors нельзя подтвердить иначе чем skip/reject.
+- Review и batch commands идемпотентны. Circuit breaker снимается только при явном `confirm_circuit_breaker: true` и сохраняет reviewer/timestamp в run metadata.
+- Single и batch retry используют Apply Service/JobsService; UI не принимает бизнес-решения и не получает production path к legacy crawler contracts.
+- Исправлен activation contract: source можно активировать после фактически подтверждённого и завершённого apply исходного preview-run.
+- Существующий `GET /jobs/:id/import-provenance` остаётся tenant-scoped и возвращает source URLs/provenance без normalized/raw payload.
+- Добавлены connector catalog, tenant health aggregation и platform operations health projection без credentials, configuration, normalized candidates или raw payload.
+- Все endpoints защищены backend Permission Matrix (`view`, `run`, `review`, source-management actions), а mutations имеют idempotency keys и audit entries.
+- Добавлена миграция `1754400000000-JobImportUiApiAudit`, расширяющая audit entity/action enums без удаления audit records в down migration.
+- Добавлены Zod DTO, typed domain errors и Swagger/OpenAPI operations/responses для frontend workflow.
+- Regression-тесты покрывают tenant boundary, pagination/search/filtering, DTO limits, permission contract, discover/catalog, apply delegation, idempotent review, batch circuit-breaker confirmation, health redaction, source audit, single-item retry и audit migration.
 
 ### Цель
 
@@ -930,7 +949,19 @@ Frontend может реализовать весь workflow, не исполь�
 
 ---
 
-## Шаг 14. Сформировать frontend information architecture
+## ✅ Шаг 14. Сформировать frontend information architecture
+
+**Статус:** выполнено 2026-09-29.
+
+**Результат:**
+
+- `/agency/import` стал единым hub с явно разделёнными сценариями импорта кандидатов и источников вакансий; candidate import сохранён на `/agency/import/candidates`, старый team-manager URL ведёт на canonical route.
+- Подключены canonical routes sources dashboard, onboarding entry, source detail/runs, run review и отдельный `/platform/operations/job-imports` без raw payload/credentials.
+- Agency navigation теперь использует parent `Import` с children `Candidates` и `Job sources`; второй пункт появляется только при tenant feature flag `job_imports_enabled` и permission `job_imports.view`.
+- Прямые job-import routes дополнительно защищены frontend gate; backend Permission Matrix остаётся источником истины для API и каждой mutation.
+- Выбрана новая реализация `pages/jobImports/*`; legacy `admin/ImportJobs.jsx`, `employer/ImportSources.jsx` и `admin/ImportMonitoring.jsx` не подключены к production routes. Их физическое удаление отложено до feature parity следующих UI-шагов.
+- Новый frontend API client использует Step 13 contracts: paginated sources/runs/items, tenant health, platform health и polling по `run_id`, а не legacy crawler/background-job contract.
+- Добавлены EN/HE строки, RTL-compatible layout и regression tests маршрутов, feature/permission visibility и отсутствия legacy pages в routing.
 
 ### Цель
 

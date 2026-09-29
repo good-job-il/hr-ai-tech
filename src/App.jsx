@@ -2,6 +2,7 @@ import { QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom"
 import { Toaster } from "sonner"
 import ProtectedRoute from "@/components/ProtectedRoute"
+import { JobImportAccessGate } from "@/components/jobImports/JobImportAccessGate"
 import { DrawerContainer } from "@/components/dialogs/DrawerContainer"
 import { ModalContainer } from "@/components/dialogs/ModalContainer"
 import ErrorBoundary from "@/components/errors/ErrorBoundary"
@@ -59,6 +60,12 @@ import PlaceholderPlatform from "@/pages/platform/PlaceholderPlatform"
 import PlatformDashboard from "@/pages/platform/PlatformDashboard"
 import SubscriptionsPage from "@/pages/platform/SubscriptionsPage"
 import UsersManagementPage from "@/pages/platform/UsersManagementPage"
+import PlatformJobImportOperationsPage from "@/pages/platform/PlatformJobImportOperationsPage"
+import ImportHubPage from "@/pages/jobImports/ImportHubPage"
+import JobImportNewPage from "@/pages/jobImports/JobImportNewPage"
+import JobImportRunReviewPage from "@/pages/jobImports/JobImportRunReviewPage"
+import JobImportSourceDetailPage from "@/pages/jobImports/JobImportSourceDetailPage"
+import JobImportSourcesPage from "@/pages/jobImports/JobImportSourcesPage"
 import MarketplaceCandidatesPage from "@/pages/platform/marketplace/MarketplaceCandidatesPage"
 import MarketplaceExposurePage from "@/pages/platform/marketplace/MarketplaceExposurePage"
 import MarketplacePage from "@/pages/platform/marketplace/MarketplacePage"
@@ -227,6 +234,11 @@ const AuthenticatedApp = () => {
 
           <Route path="/platform/analytics/integrations" element={<PlaceholderPlatform />} />
 
+          <Route
+            path="/platform/operations/job-imports"
+            element={<PlatformJobImportOperationsPage />}
+          />
+
           <Route path="/platform/security" element={<PlaceholderPlatform />} />
 
           <Route path="/platform/security/audit" element={<AuditLogPage />} />
@@ -280,6 +292,20 @@ const AuthenticatedApp = () => {
         <Route element={<StaffingAgencyLayout />}>
           <Route path="/agency/teams" element={<AgencyTeamsPage />} />
 
+          <Route path="/agency/import" element={<ImportHubPage />} />
+
+          <Route path="/agency/import/candidates" element={<ImportDashboard />} />
+
+          <Route element={<JobImportAccessGate />}>
+            <Route path="/agency/import/jobs" element={<JobImportSourcesPage />} />
+
+            <Route path="/agency/import/jobs/new" element={<JobImportNewPage />} />
+
+            <Route path="/agency/import/jobs/runs/:runId" element={<JobImportRunReviewPage />} />
+
+            <Route path="/agency/import/jobs/:sourceId" element={<JobImportSourceDetailPage />} />
+          </Route>
+
           {/* Organization-wide operational routes. */}
           <Route element={<ProtectedRoute requiredRoles={["org_admin", "recruitment_manager"]} />}>
             <Route path="/agency/dashboard" element={<AgencyDashboardRoute />} />
@@ -319,8 +345,6 @@ const AuthenticatedApp = () => {
             <Route path="/agency/ai-matching" element={<AIMatchingPage />} />
 
             <Route path="/agency/compensation" element={<CompensationPage />} />
-
-            <Route path="/agency/import" element={<ImportDashboard />} />
 
             <Route path="/agency/clients" element={<AgencyClients />} />
 
@@ -391,7 +415,10 @@ const AuthenticatedApp = () => {
 
             <Route path="/agency/team/ai-matching" element={<AIMatchingPage />} />
 
-            <Route path="/agency/team/import" element={<ImportDashboard />} />
+            <Route
+              path="/agency/team/import"
+              element={<Navigate to="/agency/import/candidates" replace />}
+            />
 
             <Route path="/agency/team/reports" element={<AgencyReportsPage />} />
 

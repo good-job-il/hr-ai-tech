@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Settings,
   Eye,
+  ActivitySquare,
 } from "lucide-react"
 
 export const PLATFORM_NAV = [
@@ -117,6 +118,20 @@ export const PLATFORM_NAV = [
         id: "security-suspicious",
         labelKey: "nav.platform.suspiciousActivity",
         route: "/platform/security/suspicious",
+      },
+    ],
+  },
+
+  {
+    id: "platform-operations",
+    labelKey: "nav.platform.operations",
+    route: "/platform/operations",
+    icon: ActivitySquare,
+    children: [
+      {
+        id: "platform-job-import-operations",
+        labelKey: "nav.platform.jobImports",
+        route: "/platform/operations/job-imports",
       },
     ],
   },

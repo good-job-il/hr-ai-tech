@@ -12,8 +12,12 @@ const adminLegacySource = readSource("pages/admin/ImportJobs.jsx")
 const employerLegacySource = readSource("pages/employer/ImportSources.jsx")
 
 test("orphaned legacy source pages are not routed in production", () => {
-  for (const componentName of ["ImportJobs", "ImportSources", "ImportMonitoring"]) {
-    assert.equal(appSource.includes(componentName), false)
+  for (const legacyImport of [
+    "@/pages/admin/ImportJobs",
+    "@/pages/employer/ImportSources",
+    "@/pages/admin/ImportMonitoring",
+  ]) {
+    assert.equal(appSource.includes(legacyImport), false)
   }
 })
 

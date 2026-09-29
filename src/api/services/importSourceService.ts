@@ -1,23 +1,11 @@
 import { ResourceService, ResourceQuery } from "./resourceService"
 import { httpClient } from "@/api/client/httpClient"
-import type { BackgroundJob } from "./candidateImportService"
-import { candidateImportService } from "./candidateImportService"
+import type { PaginatedResponse } from "@/types/api"
 
-export type ImportAction =
-  | "create"
-  | "update"
-  | "close"
-  | "reopen"
-  | "skip"
-  | "review"
-  | "error"
+export type ImportAction = "create" | "update" | "close" | "reopen" | "skip" | "review" | "error"
 
 export type ImportValidationOutcome =
-  | "valid"
-  | "review_required"
-  | "quarantined"
-  | "duplicate_candidate"
-  | "invalid"
+  "valid" | "review_required" | "quarantined" | "duplicate_candidate" | "invalid"
 
 export interface ImportSourceRecord {
   id: number
@@ -35,6 +23,10 @@ export interface ImportSourceRecord {
   interval_hours: number
   is_active: boolean
   next_run_at: string | null
+  last_attempt_at?: string | null
+  last_success_at?: string | null
+  health_state?: "unknown" | "healthy" | "degraded" | "error"
+  health_error_code?: string | null
   credentials_connected: boolean
   [key: string]: unknown
 }
@@ -140,6 +132,68 @@ export interface ImportPreviewResult {
   completed_at: string | null
 }
 
+export interface QueuedImportRun {
+  run_id: number
+  source_id: number
+  mode: "preview"
+  status: string
+  background_job_id: number
+  idempotency_key: string
+}
+
+export interface ImportRun {
+  id: number
+  organization_id: number
+  import_source_id: number
+  mode: "preview" | "apply"
+  status: "pending" | "running" | "completed" | "partial" | "failed" | "dead_letter" | "cancelled"
+  snapshot_completeness: "full" | "incremental" | "partial" | "failed" | null
+  connector_type: string
+  connector_version: string
+  items_fetched: number
+  create_count: number
+  update_count: number
+  close_count: number
+  reopen_count: number
+  skip_count: number
+  review_count: number
+  error_count: number
+  started_at: string | null
+  completed_at: string | null
+}
+
+export interface ImportRunItem {
+  id: number
+  job_import_run_id: number
+  job_id: number | null
+  proposed_action: ImportAction
+  normalized_candidate: Record<string, unknown>
+  field_diff: Record<string, unknown>
+  validation_issues: ImportPreviewIssue[]
+  confidence: number
+  status: "pending" | "approved" | "rejected" | "applied" | "skipped" | "failed"
+}
+
+export interface JobImportHealth {
+  generated_at: string
+  sources: Record<string, number>
+  runs_24h: Record<string, number>
+}
+
+export interface PlatformImportSourceHealth {
+  id: number
+  organization_id: number
+  employer_company_id: number
+  connector_type: string
+  connector_version: string
+  state: ImportSourceRecord["state"]
+  health_state: string
+  health_error_code: string | null
+  last_attempt_at: string | null
+  last_success_at: string | null
+  next_run_at: string | null
+}
+
 class ImportSourceService extends ResourceService<
   ImportSourceRecord,
   ResourceQuery,
@@ -151,18 +205,70 @@ class ImportSourceService extends ResourceService<
   }
 
   queuePreview(sourceId: number, idempotencyKey?: string) {
-    return httpClient.post<BackgroundJob<ImportPreviewResult>>(`/import-sources/${sourceId}/runs`, {
+    return httpClient.post<QueuedImportRun>(`/import-sources/${sourceId}/runs`, {
       mode: "preview",
-      idempotency_key:
-        idempotencyKey ?? `preview-${sourceId}-${Date.now()}-${crypto.randomUUID()}`,
+      idempotency_key: idempotencyKey ?? `preview-${sourceId}-${Date.now()}-${crypto.randomUUID()}`,
     })
   }
 
   async preview(sourceId: number, idempotencyKey?: string) {
-    const job = await this.queuePreview(sourceId, idempotencyKey)
+    const queued = await this.queuePreview(sourceId, idempotencyKey)
 
-    return candidateImportService.waitForJob<ImportPreviewResult>(job.id)
+    return this.waitForRun(queued.run_id)
+  }
+
+  listRuns(sourceId: number, query: ResourceQuery = {}) {
+    const params = new URLSearchParams()
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") params.set(key, String(value))
+    })
+    return httpClient.get<PaginatedResponse<ImportRun>>(
+      `/import-sources/${sourceId}/runs${params.size ? `?${params}` : ""}`,
+      { cache: false },
+    )
+  }
+
+  getRun(runId: number) {
+    return httpClient.get<ImportRun>(`/import-runs/${runId}`, { cache: false })
+  }
+
+  listRunItems(runId: number, query: ResourceQuery = {}) {
+    const params = new URLSearchParams()
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") params.set(key, String(value))
+    })
+    return httpClient.get<PaginatedResponse<ImportRunItem>>(
+      `/import-runs/${runId}/items${params.size ? `?${params}` : ""}`,
+      { cache: false },
+    )
+  }
+
+  getHealth() {
+    return httpClient.get<JobImportHealth>("/job-imports/health", { cache: false })
+  }
+
+  private async waitForRun(runId: number) {
+    for (let attempt = 0; attempt < 120; attempt += 1) {
+      const run = await this.getRun(runId)
+      if (!["pending", "running"].includes(run.status)) return run
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    }
+
+    throw new Error(`Import run ${runId} did not finish in time`)
   }
 }
 
 export const importSourceService = new ImportSourceService()
+
+export const platformJobImportService = {
+  listHealth(query: ResourceQuery & { organization_id?: number; health_state?: string } = {}) {
+    const params = new URLSearchParams()
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") params.set(key, String(value))
+    })
+    return httpClient.get<PaginatedResponse<PlatformImportSourceHealth>>(
+      `/platform-support/import-sources/health${params.size ? `?${params}` : ""}`,
+      { cache: false },
+    )
+  },
+}

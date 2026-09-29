@@ -82,9 +82,22 @@ export const AGENCY_ADMIN_NAV = [
   },
   {
     id: "agency-import",
-    labelKey: "nav.agency.importCandidates",
+    labelKey: "nav.agency.import",
     route: "/agency/import",
     icon: FileText,
+    children: [
+      {
+        id: "agency-import-candidates",
+        labelKey: "nav.agency.importCandidates",
+        route: "/agency/import/candidates",
+      },
+      {
+        id: "agency-import-jobs",
+        labelKey: "nav.agency.importJobs",
+        route: "/agency/import/jobs",
+        requiresJobImports: true,
+      },
+    ],
   },
 
   {
@@ -279,9 +292,22 @@ export const AGENCY_TEAM_MANAGER_NAV = [
   },
   {
     id: "tm-import",
-    labelKey: "nav.teamManager.importCandidates",
-    route: "/agency/team/import",
+    labelKey: "nav.agency.import",
+    route: "/agency/import",
     icon: FileText,
+    children: [
+      {
+        id: "tm-import-candidates",
+        labelKey: "nav.teamManager.importCandidates",
+        route: "/agency/import/candidates",
+      },
+      {
+        id: "tm-import-jobs",
+        labelKey: "nav.agency.importJobs",
+        route: "/agency/import/jobs",
+        requiresJobImports: true,
+      },
+    ],
   },
   {
     id: "tm-reports",
@@ -296,3 +322,10 @@ export const AGENCY_TEAM_MANAGER_NAV = [
     icon: Activity,
   },
 ]
+
+export function buildAgencyNavigation(items, { jobImportsVisible = false } = {}) {
+  return items.map((item) => ({
+    ...item,
+    children: item.children?.filter((child) => !child.requiresJobImports || jobImportsVisible),
+  }))
+}
