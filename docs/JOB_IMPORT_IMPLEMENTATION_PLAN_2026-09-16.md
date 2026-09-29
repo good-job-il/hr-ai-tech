@@ -780,7 +780,21 @@ Quick Scan можно безопасно использовать в staging и 
 
 ---
 
-## Шаг 11. Реализовать reconciliation create/update/close/reopen
+## ✅ Шаг 11. Реализовать reconciliation create/update/close/reopen
+
+**Статус:** выполнено 2026-09-29.
+
+**Результат:**
+
+- Создан единый `JobImportReconciliationService`, который формирует объяснимые `create/update/close/reopen/skip/review` решения до изменения рабочих вакансий.
+- Missing comparison выполняется только для доказанного `full` snapshot и только при разрешающей closing policy; `incremental`, `partial`, `failed`, paused, needs-attention и archived sources не создают missing-close предложения.
+- Первое подтверждённое отсутствие создаёт `suspected_missing`; закрытие предлагается только после повторных полных snapshots и прохождения настроенных run/hour grace thresholds.
+- Explicit source close и reappearance поддержаны через source-owned lifecycle metadata. `filled`, вручную закрытые и state-overridden вакансии автоматически не закрываются и не переоткрываются.
+- Apply Service применяет `close/reopen` только через import-aware command `JobsService`; `Job`, `SourceJobRecord`, run item и audit остаются в одной item transaction.
+- Добавлен circuit breaker для резкого падения относительно последнего успешного full-run baseline, массового закрытия, parser/validation regression и неподтверждённой смены connector/mapping version.
+- Circuit-breaker run сохраняет причины в run metadata и preview response, переводит изменения в review и полностью блокирует apply до отдельного review/confirmation flow.
+- Snapshot completeness агрегируется консервативно по всем страницам; connector без capability `full_snapshot` не может инициировать missing reconciliation.
+- Regression-тесты покрывают 750 items на трёх страницах, ошибку средней страницы, пустой ранее крупный source, два missing snapshots, explicit close, source-owned reopen, защиту filled/manual closed, paused/partial/failed safety и блокировку apply circuit breaker-ом.
 
 ### Цель
 
@@ -825,7 +839,21 @@ Quick Scan можно безопасно использовать в staging и 
 
 ---
 
-## Шаг 12. Перестроить background processing и scheduler
+## ✅ Шаг 12. Перестроить background processing и scheduler
+
+**Статус:** выполнено 2026-09-29.
+
+**Результат:**
+
+- Очередь import-source runs теперь хранит полный tenant/source/run context, mode и configuration version; scheduled preview создаётся от имени явного system actor без поиска или зависимости от активного admin-пользователя.
+- Scheduler атомарно забирает due source, а worker сохраняет conditional claim и recovery abandoned jobs. Устаревшая configuration version и paused/archived/needs-attention source отменяют queued run без обращения к connector-у.
+- Введены typed retryable/permanent outcomes, поддержка `Retry-After`, exponential fallback и terminal `failed`/`dead_letter` состояния. Exhausted run сохраняет typed error и больше не запускается бесконечно.
+- Добавлены защищённые команды ручного replay failed/dead-letter run и retry failed run items с tenant scope, permission checks и idempotency key.
+- Добавлены глобальный worker limit и database-enforced per-domain concurrency key; unique generated key не позволяет двум workers одновременно исполнять конфликтующие запросы к одному внешнему домену.
+- Apply Service блокирует параллельный apply другого run для того же source через pessimistic source lock и проверку незавершённого apply.
+- `next_run_at` теперь пересчитывается после terminal completion с учётом текущего состояния source и interval; во время retry новый scheduled run не создаётся.
+- Добавлена миграция `1754300000000-JobImportBackgroundScheduling` для nullable system actor, concurrency keys/indexes и `dead_letter` run status. Down migration не удаляет вакансии или runs.
+- Regression-тесты покрывают concurrent workers, duplicate enqueue, paused/stale queued source, abandoned recovery, `Retry-After`, permanent security error, dead letter, system actor без user dependency, manual replay, global/per-domain limits и concurrent apply lock.
 
 ### Цель
 
