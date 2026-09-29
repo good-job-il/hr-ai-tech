@@ -996,7 +996,20 @@ Frontend может реализовать весь workflow, не исполь�
 
 ---
 
-## Шаг 15. Реализовать onboarding wizard
+## ✅ Шаг 15. Реализовать onboarding wizard
+
+**Статус:** выполнено 2026-09-29.
+
+**Результат:**
+
+- Реализован канонический семишаговый wizard `/agency/import/jobs/new`: Source, Client, Connection, Sample, Mapping/defaults, Dry-run и Confirmation. Для доступного сейчас Generic JSON connector выбор выполняется автоматически; catalog и capabilities берутся из backend API.
+- Добавлен безопасный server-side onboarding draft: источник создаётся без расписания и без обязательного клиента, а продолжить к preview/apply можно только после выбора доступного AgencyClient. Текущий шаг и onboarding metadata сохраняются в `import_sources`, поэтому refresh, browser Back и возврат по `sourceId` не теряют прогресс.
+- Connection и Sample показывают capabilities/limitations, typed health errors с конкретным следующим действием, read-only preview, warnings, normalized candidate и raw source payload. Preview остаётся инвариантно read-only и не меняет Jobs.
+- Mapping/defaults сохраняет taxonomy defaults, team/manager/recruiter assignments, schedule, publish/closing/overwrite policies. После изменения mapping запускается новый dry-run, чтобы пользователь видел актуальный полный effect до apply.
+- Dry-run группирует create/update/close/reopen/skip/review/error, блокирует apply для failed/partial/empty/review/error результата и требует отдельного подтверждения destructive close actions.
+- Confirmation импортирует вакансии только как drafts через typed apply API; расписание активируется отдельно и только после успешного apply. Cancel сохраняет recoverable draft либо позволяет явно архивировать его.
+- Добавлены EN/HE переводы, RTL/LTR layout и keyboard-accessible controls. Frontend regression tests покрывают URL validation, preview gates, actionable typed errors, backend persistence, raw comparison, recoverable cancel и локализацию.
+- Backend дополнен onboarding DTO/API, persisted progress, connector defaults, raw staging payload и обратимой миграцией `1754500000000-JobImportOnboardingWizard`. Unit/migration tests покрывают draft lifecycle, versioning, mapping defaults, raw preview storage и schema rollback.
 
 ### Цель
 

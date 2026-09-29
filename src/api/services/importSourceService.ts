@@ -10,7 +10,7 @@ export type ImportValidationOutcome =
 export interface ImportSourceRecord {
   id: number
   organization_id: number
-  employer_company_id: number
+  employer_company_id: number | null
   name: string
   provider: string | null
   url: string
@@ -20,6 +20,21 @@ export interface ImportSourceRecord {
   configuration: Record<string, unknown>
   configuration_version: number
   mapping_version: number
+  publish_policy: "draft" | "review" | "auto_publish"
+  closing_policy: "disabled" | "explicit_only" | "full_snapshot" | "missing_grace"
+  missing_grace_runs: number
+  missing_grace_hours: number
+  default_team_id: number | null
+  default_team_manager_id: number | null
+  default_recruiter_id: number | null
+  default_recruitment_manager_id: number | null
+  onboarding_step: number
+  onboarding_state: {
+    discovery?: Record<string, unknown>
+    preview_run_id?: number
+    preview_completed_at?: string
+    overwrite_policy?: "source_until_edited" | "review_on_conflict"
+  } | null
   interval_hours: number
   is_active: boolean
   next_run_at: string | null
@@ -49,6 +64,17 @@ export interface ImportSourceInput {
   default_team_manager_id?: number | null
   default_recruiter_id?: number | null
   default_recruitment_manager_id?: number | null
+  onboarding_step?: number
+  onboarding_state?: ImportSourceRecord["onboarding_state"]
+}
+
+export interface ImportSourceOnboardingDraftInput {
+  name: string
+  url: string
+  connector_type: ImportSourceRecord["connector_type"]
+  configuration?: Record<string, unknown>
+  locale?: string
+  timezone?: string
 }
 
 export interface ImportPreviewIssue {
@@ -150,6 +176,7 @@ export interface ImportRun {
   snapshot_completeness: "full" | "incremental" | "partial" | "failed" | null
   connector_type: string
   connector_version: string
+  configuration_version: number
   items_fetched: number
   create_count: number
   update_count: number
@@ -158,6 +185,8 @@ export interface ImportRun {
   skip_count: number
   review_count: number
   error_count: number
+  error?: ImportPreviewError | null
+  confirmation_metadata?: Record<string, unknown> | null
   started_at: string | null
   completed_at: string | null
 }
@@ -168,6 +197,9 @@ export interface ImportRunItem {
   job_id: number | null
   proposed_action: ImportAction
   normalized_candidate: Record<string, unknown>
+  source_payload: Record<string, unknown> | null
+  before_payload?: Record<string, unknown> | null
+  after_payload?: Record<string, unknown> | null
   field_diff: Record<string, unknown>
   validation_issues: ImportPreviewIssue[]
   confidence: number
@@ -178,6 +210,41 @@ export interface JobImportHealth {
   generated_at: string
   sources: Record<string, number>
   runs_24h: Record<string, number>
+}
+
+export interface ConnectorCatalogItem {
+  type: ImportSourceRecord["connector_type"]
+  version: string
+  capabilities: string[]
+  limitations: string[]
+}
+
+export interface ConnectorDiscoveryResult {
+  source_id: number
+  configuration_version: number
+  connector: ConnectorCatalogItem
+  discovery: {
+    source_url: string
+    detected_type: string
+    connector_version: string
+    capabilities: string[]
+    warnings: ImportPreviewIssue[]
+  }
+}
+
+export interface ImportApplyResult {
+  run_id: number
+  idempotency_key: string
+  applied: number
+  skipped: number
+  failed: number
+  items: Array<{
+    item_id: number
+    status: "applied" | "skipped" | "failed"
+    action: ImportAction
+    job_id: number | null
+    error: string | null
+  }>
 }
 
 export interface PlatformImportSourceHealth {
@@ -202,6 +269,20 @@ class ImportSourceService extends ResourceService<
 > {
   constructor() {
     super("/import-sources")
+  }
+
+  createOnboardingDraft(payload: ImportSourceOnboardingDraftInput) {
+    return httpClient.post<ImportSourceRecord>("/import-sources/onboarding-drafts", payload)
+  }
+
+  connectorCatalog() {
+    return httpClient
+      .get<{ data: ConnectorCatalogItem[] }>("/job-import-connectors", { cache: false })
+      .then((response) => response.data)
+  }
+
+  discover(sourceId: number) {
+    return httpClient.post<ConnectorDiscoveryResult>(`/import-sources/${sourceId}/discover`, {})
   }
 
   queuePreview(sourceId: number, idempotencyKey?: string) {
@@ -245,6 +326,20 @@ class ImportSourceService extends ResourceService<
 
   getHealth() {
     return httpClient.get<JobImportHealth>("/job-imports/health", { cache: false })
+  }
+
+  applyRun(runId: number, idempotencyKey: string) {
+    return httpClient.post<ImportApplyResult>(`/import-runs/${runId}/apply`, {
+      idempotency_key: idempotencyKey,
+    })
+  }
+
+  resume(sourceId: number) {
+    return httpClient.post<ImportSourceRecord>(`/import-sources/${sourceId}/resume`, {})
+  }
+
+  pause(sourceId: number) {
+    return httpClient.post<ImportSourceRecord>(`/import-sources/${sourceId}/pause`, {})
   }
 
   private async waitForRun(runId: number) {

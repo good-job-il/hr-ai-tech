@@ -12,6 +12,7 @@
     "add": "Add",
     "close": "Close",
     "back": "Back",
+    "continue": "Continue",
     "next": "Next",
     "prev": "Previous",
     "loading": "Loading...",
@@ -1489,6 +1490,178 @@
     }
   },
   "jobImports": {
+    "connectors": {
+      "generic_json": "JSON feed"
+    },
+    "employment": {
+      "full_time": "Full time",
+      "part_time": "Part time",
+      "contract": "Contract",
+      "temporary": "Temporary",
+      "internship": "Internship",
+      "freelance": "Freelance"
+    },
+    "workMode": {
+      "unspecified": "Not specified",
+      "onsite": "On-site",
+      "hybrid": "Hybrid",
+      "remote": "Remote"
+    },
+    "capabilities": {
+      "pagination": "No pagination",
+      "full_snapshot": "No complete-snapshot guarantee",
+      "detail_fetch": "No detail fetch",
+      "closure_status": "No closure status",
+      "salary": "No salary extraction",
+      "authentication": "No authentication",
+      "webhook": "No webhooks"
+    },
+    "wizard": {
+      "progressLabel": "Job source setup progress",
+      "genericError": "The operation could not be completed.",
+      "changeSettings": "Change settings",
+      "cancelSetup": "Cancel setup",
+      "cancelTitle": "What should happen to this draft?",
+      "cancelDescription": "Keep it for later or archive it without affecting jobs.",
+      "keepDraft": "Keep draft",
+      "archiveDraft": "Archive draft",
+      "draftArchived": "Draft source archived",
+      "completed": "Job source connected successfully",
+      "steps": {
+        "source": "Source",
+        "client": "Client",
+        "connection": "Connection",
+        "sample": "Sample",
+        "mapping": "Defaults",
+        "dryRun": "Dry run",
+        "confirmation": "Confirm"
+      },
+      "titles": {
+        "source": "Where should jobs come from?",
+        "client": "Which client owns these jobs?",
+        "connection": "Check the connection",
+        "sample": "Review source data",
+        "mapping": "Set mapping and defaults",
+        "dryRun": "Review the full effect",
+        "confirmation": "Confirm the first import"
+      },
+      "descriptions": {
+        "source": "Enter a feed URL and choose a supported connector.",
+        "client": "Every imported job must belong to an active AgencyClient.",
+        "connection": "Review connector capabilities and limitations.",
+        "sample": "Compare read-only source values with normalized fields.",
+        "mapping": "Choose fallbacks, assignments, schedule and overwrite behavior.",
+        "dryRun": "Nothing is applied yet. Check every action group.",
+        "confirmation": "Jobs are created as drafts; scheduling starts after apply."
+      },
+      "source": {
+        "url": "Source URL",
+        "urlHint": "Use a direct HTTP or HTTPS job feed URL.",
+        "name": "Source name",
+        "nameHint": "Shown only inside your agency workspace.",
+        "namePlaceholder": "Company job feed",
+        "connector": "Connector",
+        "connectorHint": "A sole compatible connector is selected automatically.",
+        "selectConnector": "Select a connector",
+        "supportedCapabilities": "Supported capabilities"
+      },
+      "client": {
+        "label": "Agency client",
+        "hint": "Only active clients can be synchronized.",
+        "select": "Select an active client",
+        "none": "No active AgencyClients are available.",
+        "manage": "Manage clients"
+      },
+      "connection": {
+        "connector": "Detected connector",
+        "status": "Configuration status",
+        "validated": "Validated",
+        "notChecked": "Ready to validate",
+        "capabilities": "Capabilities",
+        "limitations": "Known limitations",
+        "noLimitations": "No declared limitations"
+      },
+      "sample": {
+        "title": "Run a safe sample scan",
+        "description": "Staging data is saved; live jobs cannot change.",
+        "run": "Run sample",
+        "results": "{{count}} source items found",
+        "readOnly": "No job changes were applied.",
+        "empty": "No sample rows are available.",
+        "sourceValue": "Source",
+        "normalized": "Normalized",
+        "action": "Action",
+        "warnings": "Validation",
+        "rawView": "View raw source JSON",
+        "noWarnings": "Valid"
+      },
+      "mapping": {
+        "collectionPath": "Job array path",
+        "auto": "Detect automatically",
+        "employmentDefault": "Default employment type",
+        "workModeDefault": "Default work mode",
+        "categoryDefault": "Default category",
+        "team": "Team",
+        "teamManager": "Team manager",
+        "recruiter": "Recruiter",
+        "recruitmentManager": "Recruitment manager",
+        "noAssignment": "No default assignment",
+        "schedule": "Schedule",
+        "manual": "Manual only",
+        "publishPolicy": "Publication policy",
+        "drafts": "Import as drafts",
+        "review": "Require review",
+        "closingPolicy": "Closing policy",
+        "neverClose": "Never close automatically",
+        "explicitClose": "Explicit source status only",
+        "missingGrace": "After grace period",
+        "overwritePolicy": "Manual edits",
+        "protectEdits": "Protect edited fields",
+        "reviewConflicts": "Review conflicts"
+      },
+      "dryRun": {
+        "title": "Run the final dry run",
+        "description": "Uses the mapping and defaults you saved.",
+        "run": "Run dry run",
+        "confirmClose": "I reviewed and approve {{count}} proposed job closures."
+      },
+      "previewStates": {
+        "missing": "Run a dry run before continuing.",
+        "running": "The dry run is still processing.",
+        "failed": "The source could not produce a safe snapshot.",
+        "partial": "The snapshot is partial. Apply is blocked until a complete retry.",
+        "empty": "No jobs were found. Check the URL or mapping.",
+        "errors": "Some records are invalid. Fix the mapping.",
+        "review": "Some records require review before applying."
+      },
+      "confirmation": {
+        "title": "Ready to import into drafts",
+        "description": "The confirmed run contains {{count}} source items.",
+        "activate": "Activate scheduled synchronization after apply",
+        "activateHint": "Interval: every {{hours}} hours. Manual sources remain inactive.",
+        "confirm": "I reviewed the dry-run summary and authorize these changes.",
+        "apply": "Apply confirmed changes",
+        "applyResult": "Applied: {{applied}}, skipped: {{skipped}}, failed: {{failed}}."
+      },
+      "errors": {
+        "invalidUrl": "Enter a complete HTTP or HTTPS URL.",
+        "connectorRequired": "Choose a supported connector.",
+        "clientRequired": "Choose an active AgencyClient.",
+        "applyPartial": "{{count}} items failed. Review them before activation."
+      },
+      "errorActions": {
+        "credentials": "Reconnect credentials and retry.",
+        "checkAccess": "Confirm the source or account is accessible.",
+        "chooseAnotherSource": "Use a permitted source URL.",
+        "retryLater": "Wait for the rate limit and retry.",
+        "changeConnector": "Choose a compatible connector.",
+        "reviewMapping": "Correct mapping and run another preview.",
+        "retryPreview": "Retry until a complete snapshot succeeds.",
+        "chooseClient": "Choose another active client.",
+        "openReview": "Resolve duplicates in run review.",
+        "retry": "Retry or contact platform support."
+      }
+    },
     "common": {
       "backToSources": "Back to job sources",
       "loadError": "Job import data could not be loaded",

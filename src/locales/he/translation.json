@@ -12,6 +12,7 @@
     "add": "הוסף",
     "close": "סגור",
     "back": "חזור",
+    "continue": "המשך",
     "next": "הבא",
     "prev": "הקודם",
     "loading": "טוען...",
@@ -1489,6 +1490,178 @@
     }
   },
   "jobImports": {
+    "connectors": {
+      "generic_json": "פיד JSON"
+    },
+    "employment": {
+      "full_time": "משרה מלאה",
+      "part_time": "משרה חלקית",
+      "contract": "חוזה",
+      "temporary": "זמנית",
+      "internship": "התמחות",
+      "freelance": "פרילנס"
+    },
+    "workMode": {
+      "unspecified": "לא צוין",
+      "onsite": "במשרד",
+      "hybrid": "היברידי",
+      "remote": "מרחוק"
+    },
+    "capabilities": {
+      "pagination": "ללא עימוד",
+      "full_snapshot": "ללא הבטחת תמונה מלאה",
+      "detail_fetch": "ללא טעינת פרטים",
+      "closure_status": "ללא סטטוס סגירה",
+      "salary": "ללא חילוץ שכר",
+      "authentication": "ללא אימות",
+      "webhook": "ללא webhook"
+    },
+    "wizard": {
+      "progressLabel": "התקדמות בהגדרת מקור",
+      "genericError": "לא ניתן להשלים את הפעולה.",
+      "changeSettings": "שינוי הגדרות",
+      "cancelSetup": "ביטול ההגדרה",
+      "cancelTitle": "מה לעשות עם הטיוטה?",
+      "cancelDescription": "אפשר לשמור להמשך או להעביר לארכיון ללא שינוי משרות.",
+      "keepDraft": "שמירת טיוטה",
+      "archiveDraft": "העברה לארכיון",
+      "draftArchived": "הטיוטה הועברה לארכיון",
+      "completed": "המקור חובר בהצלחה",
+      "steps": {
+        "source": "מקור",
+        "client": "לקוח",
+        "connection": "חיבור",
+        "sample": "דוגמה",
+        "mapping": "ברירות מחדל",
+        "dryRun": "הרצת ניסיון",
+        "confirmation": "אישור"
+      },
+      "titles": {
+        "source": "מאיפה לייבא משרות?",
+        "client": "לאיזה לקוח שייכות המשרות?",
+        "connection": "בדיקת החיבור",
+        "sample": "בדיקת נתוני המקור",
+        "mapping": "הגדרת מיפוי וברירות מחדל",
+        "dryRun": "בדיקת ההשפעה המלאה",
+        "confirmation": "אישור הייבוא הראשון"
+      },
+      "descriptions": {
+        "source": "הזינו כתובת פיד ובחרו מחבר נתמך.",
+        "client": "כל משרה חייבת להיות משויכת ללקוח פעיל.",
+        "connection": "בדקו יכולות ומגבלות.",
+        "sample": "השוו ערכי מקור לקריאה בלבד מול שדות מנורמלים.",
+        "mapping": "בחרו ברירות מחדל, שיוכים ותזמון.",
+        "dryRun": "עדיין לא הוחלו שינויים.",
+        "confirmation": "המשרות ייווצרו כטיוטות והתזמון יתחיל אחרי החלה."
+      },
+      "source": {
+        "url": "כתובת המקור",
+        "urlHint": "השתמשו בכתובת HTTP או HTTPS ישירה.",
+        "name": "שם המקור",
+        "nameHint": "מוצג רק בסביבת הסוכנות.",
+        "namePlaceholder": "פיד משרות",
+        "connector": "מחבר",
+        "connectorHint": "מחבר מתאים יחיד נבחר אוטומטית.",
+        "selectConnector": "בחירת מחבר",
+        "supportedCapabilities": "יכולות נתמכות"
+      },
+      "client": {
+        "label": "לקוח סוכנות",
+        "hint": "רק לקוחות פעילים זמינים לסנכרון.",
+        "select": "בחירת לקוח פעיל",
+        "none": "אין לקוחות פעילים.",
+        "manage": "ניהול לקוחות"
+      },
+      "connection": {
+        "connector": "מחבר שזוהה",
+        "status": "מצב הגדרה",
+        "validated": "נבדק",
+        "notChecked": "מוכן לבדיקה",
+        "capabilities": "יכולות",
+        "limitations": "מגבלות",
+        "noLimitations": "אין מגבלות מוצהרות"
+      },
+      "sample": {
+        "title": "הרצת דוגמה בטוחה",
+        "description": "נשמרים נתוני ביניים בלבד.",
+        "run": "הרצת דוגמה",
+        "results": "נמצאו {{count}} פריטים",
+        "readOnly": "לא הוחלו שינויים.",
+        "empty": "אין שורות דוגמה.",
+        "sourceValue": "מקור",
+        "normalized": "מנורמל",
+        "action": "פעולה",
+        "warnings": "אימות",
+        "rawView": "הצגת JSON גולמי",
+        "noWarnings": "תקין"
+      },
+      "mapping": {
+        "collectionPath": "נתיב מערך",
+        "auto": "זיהוי אוטומטי",
+        "employmentDefault": "סוג העסקה",
+        "workModeDefault": "מתכונת עבודה",
+        "categoryDefault": "קטגוריה",
+        "team": "צוות",
+        "teamManager": "מנהל צוות",
+        "recruiter": "מגייס",
+        "recruitmentManager": "מנהל גיוס",
+        "noAssignment": "ללא שיוך",
+        "schedule": "תזמון",
+        "manual": "ידני בלבד",
+        "publishPolicy": "מדיניות פרסום",
+        "drafts": "ייבוא כטיוטות",
+        "review": "דרושה בדיקה",
+        "closingPolicy": "מדיניות סגירה",
+        "neverClose": "ללא סגירה אוטומטית",
+        "explicitClose": "רק סטטוס מפורש",
+        "missingGrace": "לאחר תקופת חסד",
+        "overwritePolicy": "עריכות ידניות",
+        "protectEdits": "הגנת שדות ערוכים",
+        "reviewConflicts": "בדיקת התנגשויות"
+      },
+      "dryRun": {
+        "title": "הרצת ניסיון סופית",
+        "description": "משתמשת במיפוי שנשמר.",
+        "run": "הרצת ניסיון",
+        "confirmClose": "בדקתי ואני מאשר/ת {{count}} סגירות."
+      },
+      "previewStates": {
+        "missing": "יש להריץ ניסיון.",
+        "running": "ההרצה עדיין מתבצעת.",
+        "failed": "לא התקבלה תמונה בטוחה.",
+        "partial": "התמונה חלקית. ההחלה חסומה.",
+        "empty": "לא נמצאו משרות.",
+        "errors": "יש רשומות לא תקינות.",
+        "review": "יש רשומות הדורשות בדיקה."
+      },
+      "confirmation": {
+        "title": "מוכן לייבוא כטיוטות",
+        "description": "ההרצה כוללת {{count}} פריטים.",
+        "activate": "הפעלת סנכרון לאחר החלה",
+        "activateHint": "מרווח: כל {{hours}} שעות.",
+        "confirm": "בדקתי ואני מאשר/ת את השינויים.",
+        "apply": "החלת השינויים",
+        "applyResult": "הוחלו: {{applied}}, דולגו: {{skipped}}, נכשלו: {{failed}}."
+      },
+      "errors": {
+        "invalidUrl": "יש להזין כתובת מלאה.",
+        "connectorRequired": "יש לבחור מחבר.",
+        "clientRequired": "יש לבחור לקוח פעיל.",
+        "applyPartial": "{{count}} פריטים נכשלו."
+      },
+      "errorActions": {
+        "credentials": "חברו פרטי גישה מחדש.",
+        "checkAccess": "ודאו שיש גישה למקור.",
+        "chooseAnotherSource": "בחרו מקור מותר.",
+        "retryLater": "המתינו ונסו שוב.",
+        "changeConnector": "בחרו מחבר מתאים.",
+        "reviewMapping": "תקנו מיפוי והריצו שוב.",
+        "retryPreview": "נסו שוב עד לקבלת תמונה מלאה.",
+        "chooseClient": "בחרו לקוח פעיל אחר.",
+        "openReview": "טפלו בכפילויות בבדיקת ההרצה.",
+        "retry": "נסו שוב או פנו לתמיכה."
+      }
+    },
     "common": {
       "backToSources": "חזרה למקורות משרות",
       "loadError": "לא ניתן לטעון את נתוני ייבוא המשרות",
