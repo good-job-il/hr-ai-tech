@@ -41,6 +41,7 @@ export interface ImportSourceRecord {
   last_attempt_at?: string | null
   last_success_at?: string | null
   health_state?: "unknown" | "healthy" | "degraded" | "error"
+  operational_status?: ImportSourceOperationalStatus
   health_error_code?: string | null
   credentials_connected: boolean
   [key: string]: unknown
@@ -66,6 +67,15 @@ export interface ImportSourceInput {
   default_recruitment_manager_id?: number | null
   onboarding_step?: number
   onboarding_state?: ImportSourceRecord["onboarding_state"]
+}
+
+export interface ImportSourceDashboardQuery extends ResourceQuery {
+  q?: string
+  state?: ImportSourceRecord["state"]
+  health_state?: "unknown" | "healthy" | "degraded" | "error"
+  connector_type?: ImportSourceRecord["connector_type"]
+  employer_company_id?: number
+  include_archived?: boolean
 }
 
 export interface ImportSourceOnboardingDraftInput {
@@ -191,6 +201,46 @@ export interface ImportRun {
   completed_at: string | null
 }
 
+export type ImportSourceOperationalStatus =
+  | "healthy"
+  | "running"
+  | "needs_review"
+  | "degraded"
+  | "auth_required"
+  | "paused"
+  | "draft"
+  | "unknown"
+
+export interface ImportRunSummary {
+  id: number
+  mode: ImportRun["mode"]
+  status: ImportRun["status"]
+  snapshot_completeness: ImportRun["snapshot_completeness"]
+  items_fetched: number
+  create_count: number
+  update_count: number
+  close_count: number
+  reopen_count: number
+  skip_count: number
+  review_count: number
+  error_count: number
+  error_code: string | null
+  started_at: string | null
+  completed_at: string | null
+}
+
+export interface ImportSourceDashboardRecord extends ImportSourceRecord {
+  operational_status: ImportSourceOperationalStatus
+  latest_run: ImportRunSummary | null
+  trend: {
+    items_fetched: number
+    changes: number
+    review: number
+    errors: number
+    comparison_available: boolean
+  } | null
+}
+
 export interface ImportRunItem {
   id: number
   job_import_run_id: number
@@ -275,6 +325,17 @@ class ImportSourceService extends ResourceService<
     return httpClient.post<ImportSourceRecord>("/import-sources/onboarding-drafts", payload)
   }
 
+  listDashboard(query: ImportSourceDashboardQuery = {}) {
+    const params = new URLSearchParams()
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") params.set(key, String(value))
+    })
+    return httpClient.get<PaginatedResponse<ImportSourceDashboardRecord>>(
+      `/import-sources/dashboard${params.size ? `?${params}` : ""}`,
+      { cache: false },
+    )
+  }
+
   connectorCatalog() {
     return httpClient
       .get<{ data: ConnectorCatalogItem[] }>("/job-import-connectors", { cache: false })
@@ -340,6 +401,23 @@ class ImportSourceService extends ResourceService<
 
   pause(sourceId: number) {
     return httpClient.post<ImportSourceRecord>(`/import-sources/${sourceId}/pause`, {})
+  }
+
+  reconnectCredentials(sourceId: number, credentialReference: string) {
+    return httpClient.post<ImportSourceRecord>(
+      `/import-sources/${sourceId}/reconnect-credentials`,
+      { credential_reference: credentialReference },
+    )
+  }
+
+  replayRun(runId: number, idempotencyKey?: string) {
+    return httpClient.post<QueuedImportRun>(`/import-runs/${runId}/replay`, {
+      idempotency_key: idempotencyKey ?? `replay-${runId}-${Date.now()}-${crypto.randomUUID()}`,
+    })
+  }
+
+  archive(sourceId: number) {
+    return httpClient.delete<void>(`/import-sources/${sourceId}`)
   }
 
   private async waitForRun(runId: number) {

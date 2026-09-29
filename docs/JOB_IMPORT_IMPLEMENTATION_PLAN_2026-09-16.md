@@ -1052,7 +1052,20 @@ Frontend может реализовать весь workflow, не исполь�
 
 ---
 
-## Шаг 16. Реализовать Sources Dashboard и Source Detail
+## ✅ Шаг 16. Реализовать Sources Dashboard и Source Detail
+
+**Статус:** выполнено 2026-09-29.
+
+**Результат:**
+
+- Sources Dashboard переведён на tenant-scoped server projection `GET /import-sources/dashboard`: для каждого source возвращаются latest run, предыдущая run для trend и единый operational status без N+1 запросов.
+- Health cards Healthy, Running, Needs review, Degraded, Auth required и Paused используют взаимоисключающий приоритет состояния; клик по карточке применяет соответствующий server-side filter. Добавлены debounced search, connector filter, pagination и корректный filtered empty state.
+- В каждой строке отдельно показаны last attempt, last success, next run, freshness, counts create/update/close/review последней run и сравнение с предыдущей. Manual, draft, paused и stale sources имеют разные freshness semantics.
+- Dashboard actions защищены Permission Matrix: read-only preview/run, pause/resume, settings, review и recoverable archive. Автоматическое polling не создаёт шумных уведомлений; toast появляется только после meaningful user action.
+- Source Detail показывает configuration versions/policies, credential connection state, connector capabilities/limitations, linked AgencyClient, default team/manager/recruiter assignments, paginated run history, latest changes, review count, health timeline и доступные audit events.
+- Добавлены manual retry failed/dead-letter run, reconnect через opaque credential reference, pause/resume и archive. Перед archive показывается consequence summary: schedule остановится, Jobs и история сохранятся.
+- Все operational строки и status pills локализованы для EN/HE и корректно работают в LTR/RTL. Archive confirmation использует доступный focus-managed AlertDialog.
+- Backend regression tests покрывают tenant-scoped dashboard projection, latest/previous trend, mutually exclusive operational filters и DTO validation. Frontend tests покрывают freshness, trends, permissions, recoverable archive, dashboard API contract, detail sections и локализацию.
 
 ### Цель
 

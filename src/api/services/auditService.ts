@@ -19,6 +19,9 @@ export const AUDIT_ENTITY_TYPES = [
   "RoleTemplate",
   "Billing",
   "Integration",
+  "ImportSource",
+  "JobImportRun",
+  "JobImportRunItem",
 ] as const
 
 export const AUDIT_ACTIONS = [
@@ -40,6 +43,11 @@ export const AUDIT_ACTIONS = [
   "deactivate",
   "resend",
   "cancel",
+  "archive",
+  "approve",
+  "reject",
+  "retry",
+  "run",
 ] as const
 
 export type AuditEntityType = (typeof AUDIT_ENTITY_TYPES)[number]

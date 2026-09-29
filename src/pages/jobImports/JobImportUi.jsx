@@ -31,6 +31,8 @@ export function Panel({ children, className = "" }) {
 }
 
 export function StatusPill({ value = "unknown" }) {
+  const { t } = useTranslation()
+
   const tone =
     {
       active: "bg-emerald-50 text-emerald-700",
@@ -50,7 +52,7 @@ export function StatusPill({ value = "unknown" }) {
 
   return (
     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${tone}`}>
-      {String(value).replaceAll("_", " ")}
+      {t(`jobImports.statuses.${value}`, { defaultValue: String(value).replaceAll("_", " ") })}
     </span>
   )
 }
