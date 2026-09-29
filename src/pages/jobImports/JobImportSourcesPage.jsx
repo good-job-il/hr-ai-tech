@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CirclePause,
+  ClipboardCheck,
   Eye,
   Filter,
   Loader2,
@@ -429,6 +430,15 @@ export default function JobImportSourcesPage() {
             >
               <RefreshCw className={`h-4 w-4 ${sources.isFetching ? "animate-spin" : ""}`} />
             </button>
+            {can.review && (
+              <Link
+                to="/agency/import/jobs/review"
+                className="inline-flex items-center gap-2 rounded-xl border border-violet-200 bg-white px-4 py-2.5 text-sm font-bold text-violet-700 hover:bg-violet-50"
+              >
+                <ClipboardCheck className="h-4 w-4" />
+                {t("jobImports.sources.reviewQueue")}
+              </Link>
+            )}
             {canResource("job_imports", "create") && (
               <Link
                 to="/agency/import/jobs/new"

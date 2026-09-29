@@ -1099,7 +1099,19 @@ Frontend может реализовать весь workflow, не исполь�
 
 ---
 
-## Шаг 17. Реализовать Review Queue
+## ✅ Шаг 17. Реализовать Review Queue
+
+**Статус:** выполнено 2026-09-29.
+
+**Результат:**
+
+- Добавлен единый tenant-scoped Review Queue на `/agency/import/jobs/review` и сохранён per-run review route. Очередь использует server-side pagination/search и фильтры source, AgencyClient, action, issue и confidence; filter/page/open item/selection сохраняются в URL после mutations.
+- Review item показывает рядом raw source payload, normalized candidate и актуальную Job, field-level diff, ownership, validation issues, confidence и probable duplicate candidates. Dashboard получил отдельный permission-aware переход в очередь.
+- Реализованы approve, reject, ignore/skip, retry failed item, inline correction и явный duplicate-link. Probable duplicate нельзя объединить автоматически: backend принимает только предложенный tenant-scoped target с существующей Job и пишет audit metadata.
+- Inline correction повторно проходит normalization/validation. Mapping rule можно сохранить только для разрешённых полей и детерминированных transforms `trim`, `strip_html`, `decode_entities`; Generic JSON connector применяет эти versioned rules к следующим records.
+- Batch resolve ограничен 100 items, tenant/run-scoped и idempotent. Bulk close требует отдельный флаг подтверждения, а UI до подтверждения показывает полный список затронутых вакансий.
+- Preview сохраняет snapshot `job_updated_at`. Approve/apply повторно проверяют актуальность Job; stale item не применяется, возвращается в pending conflict review с typed `STALE_ITEM_CONFLICT`, поэтому ручная правка не перезаписывается.
+- Добавлены typed API/DTO для общей очереди, corrections и duplicate resolution, EN/HE локализация и RTL/LTR UI. Backend regression tests покрывают фильтры, batch limit/close confirmation, stale conflict, whitelist mapping rules и apply safety; frontend tests покрывают routes, URL state, review controls и локализацию.
 
 ### Цель
 

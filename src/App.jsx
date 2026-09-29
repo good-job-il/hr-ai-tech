@@ -301,6 +301,8 @@ const AuthenticatedApp = () => {
 
             <Route path="/agency/import/jobs/new" element={<JobImportNewPage />} />
 
+            <Route path="/agency/import/jobs/review" element={<JobImportRunReviewPage />} />
+
             <Route path="/agency/import/jobs/runs/:runId" element={<JobImportRunReviewPage />} />
 
             <Route path="/agency/import/jobs/:sourceId" element={<JobImportSourceDetailPage />} />

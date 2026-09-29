@@ -1520,7 +1520,11 @@
       "close": "Close",
       "reopen": "Reopen",
       "skip": "Skip",
-      "review": "Review"
+      "review": "Review",
+      "platform": "Platform managed",
+      "user": "User managed",
+      "source_until_edited": "Source until edited",
+      "review_on_conflict": "Review on conflict"
     },
     "connectors": {
       "generic_json": "JSON feed"
@@ -1718,6 +1722,7 @@
       "title": "Job sources",
       "description": "Manage tenant-scoped sources and inspect their health before applying changes to live jobs.",
       "add": "Add source",
+      "reviewQueue": "Review queue",
       "refresh": "Refresh source health",
       "connector": "Connector",
       "connectorValue": "{{connector}} · v{{version}}",
@@ -1934,6 +1939,103 @@
         "review": "Review",
         "error": "Errors"
       }
+    },
+    "review": {
+      "backToSources": "Back to job sources",
+      "eyebrow": "Job import operations",
+      "title": "Review queue",
+      "description": "Resolve import exceptions with source context, normalized data and the current job in one place.",
+      "refresh": "Refresh review queue",
+      "queue": "Items requiring a decision",
+      "queueDescription": "Filters, page and selection are kept in the URL while you resolve items.",
+      "empty": "No matching review items",
+      "emptyHint": "Change the filters or return after the next import run.",
+      "selectItem": "Select {{title}}",
+      "job": "Job",
+      "newJob": "New job",
+      "reason": "Decision reason",
+      "reasonRequired": "Add a reason for reject or ignore.",
+      "stale": "The job changed after this dry-run. This item must be recalculated before approval.",
+      "sourcePayload": "Source payload",
+      "normalized": "Normalized candidate",
+      "currentJob": "Current job",
+      "fieldDiff": "Field-level diff",
+      "noFieldChanges": "No field changes were calculated.",
+      "field": "Field",
+      "sourceBefore": "Source baseline",
+      "sourceAfter": "Proposed source value",
+      "ownership": "Ownership",
+      "validationIssues": "Validation and review issues",
+      "noIssues": "No validation issues.",
+      "filters": {
+        "search": "Search review items",
+        "searchPlaceholder": "Search title, external key or issue",
+        "source": "Filter by source",
+        "allSources": "All sources",
+        "client": "Filter by client",
+        "allClients": "All clients",
+        "action": "Filter by action",
+        "allActions": "All actions",
+        "issue": "Filter by issue",
+        "allIssues": "All issues",
+        "confidence": "Filter by confidence",
+        "allConfidence": "All confidence levels",
+        "confidenceLevels": { "low": "Low", "medium": "Medium", "high": "High" }
+      },
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject",
+        "ignore": "Ignore",
+        "retry": "Retry"
+      },
+      "correction": {
+        "title": "Inline correction",
+        "noChanges": "Change at least one field before saving.",
+        "fields": {
+          "title": "Title",
+          "source_company_label": "Source company",
+          "category": "Category",
+          "description": "Description"
+        },
+        "saveRule": "Also save an allowed mapping rule",
+        "noRule": "Do not save a rule",
+        "transform": "Transform",
+        "transforms": {
+          "trim": "Trim whitespace",
+          "strip_html": "Strip HTML",
+          "decode_entities": "Decode HTML entities"
+        },
+        "ruleHint": "Only deterministic text cleanup rules are allowed. The rule applies to future records from this source.",
+        "save": "Save correction"
+      },
+      "duplicates": {
+        "title": "Probable duplicates",
+        "description": "Duplicates are never merged automatically. Link only after comparing the records.",
+        "link": "Link to this job",
+        "defaultReason": "Confirmed duplicate after review"
+      },
+      "bulk": {
+        "selected": "{{count}} selected",
+        "reason": "Batch decision reason",
+        "defaultReason": "Reviewed in batch",
+        "apply": "Apply batch decision",
+        "clear": "Clear selection",
+        "closeTitle": "Close {{count}} affected jobs?",
+        "closeDescription": "Review every affected job below. This confirmation applies only to this exact selection.",
+        "confirmClose": "Confirm bulk close"
+      },
+      "notifications": {
+        "approved": "Item approved",
+        "rejected": "Item rejected",
+        "ignored": "Item ignored",
+        "retried": "Failed item queued for retry",
+        "corrected": "Correction saved",
+        "linked": "Duplicate linked after review",
+        "batchResolved": "Batch decision saved",
+        "failed": "The review action could not be completed"
+      },
+      "pagination": "Review queue pages",
+      "page": "Page {{page}} of {{pages}} · {{total}} items"
     },
     "platform": {
       "eyebrow": "Platform operations",

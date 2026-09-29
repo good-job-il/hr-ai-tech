@@ -244,6 +244,7 @@ export interface ImportSourceDashboardRecord extends ImportSourceRecord {
 export interface ImportRunItem {
   id: number
   job_import_run_id: number
+  source_job_record_id: number | null
   job_id: number | null
   proposed_action: ImportAction
   normalized_candidate: Record<string, unknown>
@@ -254,6 +255,62 @@ export interface ImportRunItem {
   validation_issues: ImportPreviewIssue[]
   confidence: number
   status: "pending" | "approved" | "rejected" | "applied" | "skipped" | "failed"
+  error?: ImportPreviewError | null
+  reviewed_by?: number | null
+  reviewed_at?: string | null
+  review_reason?: string | null
+  stale?: boolean
+  run?: {
+    id: number
+    status: ImportRun["status"]
+    mode: ImportRun["mode"]
+    completed_at: string | null
+  } | null
+  source?: {
+    id: number
+    name: string
+    employer_company_id: number | null
+  } | null
+  current_job?: Record<string, unknown> & {
+    id: number
+    title: string
+    state: string
+    updated_date: string
+  }
+  probable_duplicates?: Array<{
+    source_job_record_id: number
+    job_id: number | null
+    external_key: string
+    title: string
+    company: string | null
+    location: string | null
+    lifecycle: string
+  }>
+}
+
+export interface ImportReviewQueueQuery extends ResourceQuery {
+  run_id?: number
+  source_id?: number
+  employer_company_id?: number
+  action?: ImportAction
+  status?: ImportRunItem["status"]
+  issue_code?: string
+  min_confidence?: number
+  max_confidence?: number
+  has_errors?: boolean
+  q?: string
+}
+
+export interface ImportItemCorrection {
+  corrections: Partial<
+    Pick<ImportPreviewSample["normalized_candidate"], "title" | "source_company_label">
+  > &
+    Record<string, unknown>
+  reason: string
+  mapping_rule?: {
+    field: "title" | "source_company_label" | "description" | "category"
+    transform: "trim" | "strip_html" | "decode_entities"
+  }
 }
 
 export interface JobImportHealth {
@@ -383,6 +440,70 @@ class ImportSourceService extends ResourceService<
       `/import-runs/${runId}/items${params.size ? `?${params}` : ""}`,
       { cache: false },
     )
+  }
+
+  listReviewItems(query: ImportReviewQueueQuery = {}) {
+    const params = new URLSearchParams()
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") params.set(key, String(value))
+    })
+    return httpClient.get<PaginatedResponse<ImportRunItem>>(
+      `/job-imports/review-items${params.size ? `?${params}` : ""}`,
+      { cache: false },
+    )
+  }
+
+  approveItem(itemId: number, resolvedAction: ImportAction, reason?: string) {
+    return httpClient.post<ImportRunItem>(`/import-run-items/${itemId}/approve`, {
+      idempotency_key: `approve-${itemId}-${Date.now()}-${crypto.randomUUID()}`,
+      resolved_action: resolvedAction,
+      reason,
+    })
+  }
+
+  rejectItem(itemId: number, reason: string) {
+    return httpClient.post<ImportRunItem>(`/import-run-items/${itemId}/reject`, {
+      idempotency_key: `reject-${itemId}-${Date.now()}-${crypto.randomUUID()}`,
+      reason,
+    })
+  }
+
+  ignoreItem(itemId: number, reason: string) {
+    return this.approveItem(itemId, "skip", reason)
+  }
+
+  retryItem(itemId: number) {
+    return httpClient.post(`/import-run-items/${itemId}/retry`, {
+      idempotency_key: `retry-${itemId}-${Date.now()}-${crypto.randomUUID()}`,
+    })
+  }
+
+  correctItem(itemId: number, payload: ImportItemCorrection) {
+    return httpClient.post<ImportRunItem>(`/import-run-items/${itemId}/correct`, payload)
+  }
+
+  linkDuplicate(itemId: number, targetRecordId: number, reason: string) {
+    return httpClient.post<ImportRunItem>(`/import-run-items/${itemId}/link-duplicate`, {
+      target_source_job_record_id: targetRecordId,
+      idempotency_key: `link-${itemId}-${targetRecordId}-${crypto.randomUUID()}`,
+      reason,
+    })
+  }
+
+  batchResolve(
+    runId: number,
+    payload: {
+      item_ids: number[]
+      resolution: "approve" | "reject"
+      reason?: string
+      resolved_action?: Exclude<ImportAction, "review" | "error">
+      confirm_bulk_close?: true
+    },
+  ) {
+    return httpClient.post(`/import-runs/${runId}/items/resolve`, {
+      ...payload,
+      idempotency_key: `batch-${runId}-${Date.now()}-${crypto.randomUUID()}`,
+    })
   }
 
   getHealth() {
