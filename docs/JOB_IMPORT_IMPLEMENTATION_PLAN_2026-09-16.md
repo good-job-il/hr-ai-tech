@@ -1144,7 +1144,19 @@ Frontend может реализовать весь workflow, не исполь�
 
 ---
 
-## Шаг 18. Добавить provenance в Job UI
+## ✅ Шаг 18. Добавить provenance в Job UI
+
+**Статус:** выполнено 2026-09-30.
+
+**Результат:**
+
+- В карточках и desktop-таблице вакансий добавлен локализованный badge `Imported`. Он определяется по canonical `source_job_record_id` с fallback для импортированных legacy records.
+- Tenant-scoped provenance API расширен безопасными operational metadata: source и AgencyClient, state/health, last attempt/success, последний successful run, последний run item и очищенная Job audit timeline. Raw payload, configuration и credentials наружу не возвращаются.
+- Edit Job показывает источник, клиента, external posting link, health/error code, дату последнего успешного sync и ссылки на Source Detail, Run и конкретный Review Item. External URL допускает только HTTP/HTTPS.
+- Для source-managed и review-on-conflict полей возле label отображается `Synced`; существующий ручной override отображается как `Manual override`. Перед первым ручным изменением синхронизируемых полей форма перечисляет затронутые поля и требует подтверждение.
+- Существующий action «возобновить sync» сохранён и встроен в provenance panel; он доступен только с `job_imports.review`, удаляет override транзакционно и оставляет audit entry.
+- Добавлена локализованная import history timeline. Архивный или отсутствующий source и неактивный/архивный client показываются явно, но не блокируют открытие и редактирование Job.
+- Добавлены regression tests для tenant-scoped provenance, source/manual field states, override detection, безопасных external URLs и полного UI contract. Backend и frontend production builds проходят.
 
 ### Цель
 

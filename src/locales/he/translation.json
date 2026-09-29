@@ -938,6 +938,7 @@
     "deleteJob": "מחק משרה",
     "viewApplications": "צפה בהגשות",
     "applicationsCount": "הגשות",
+    "imported": "מיובאת",
     "copyAddress": "העתקת כתובת",
     "copyError": "לא ניתן להעתיק. יש לבדוק את הרשאת הלוח בדפדפן.",
     "refresh": "רענון משרות",
@@ -1061,6 +1062,55 @@
       "resumeFieldSync": "חידוש סנכרון מהמקור עבור {{field}}",
       "resumingSourceSync": "מחדש סנכרון…",
       "resumeSourceSyncError": "לא ניתן לחדש את הסנכרון מהמקור. נסו שוב.",
+      "sourceUnavailable": "המקור אינו זמין",
+      "sourceClient": "לקוח",
+      "clientUnavailable": "בארכיון או לא זמין",
+      "lastSuccessfulSync": "סנכרון מוצלח אחרון",
+      "neverSynced": "לא תועד סנכרון מוצלח",
+      "sourceHealth": "תקינות המקור",
+      "externalPosting": "המודעה במקור",
+      "openImportSource": "פתיחת המקור",
+      "openLastRun": "פתיחת ההרצה האחרונה",
+      "openReviewItem": "פתיחת פריט הבדיקה",
+      "importHistory": "היסטוריית הייבוא",
+      "health": {
+        "unknown": "לא ידוע",
+        "healthy": "תקין",
+        "degraded": "תפקוד חלקי",
+        "error": "שגיאה"
+      },
+      "fieldSync": {
+        "source": "מסונכרן",
+        "sourceHelp": "השדה מסונכרן עם מקור הייבוא. עריכה תיצור דריסה ידנית מוגנת.",
+        "manual": "דריסה ידנית",
+        "manualHelp": "עדכונים מהמקור לא ידרסו שדה זה עד לחידוש הסנכרון."
+      },
+      "fieldNames": {
+        "title": "שם המשרה",
+        "description": "תיאור",
+        "location": "מיקום",
+        "employment_type_id": "סוג העסקה",
+        "work_mode_id": "מתכונת עבודה",
+        "required_skills": "כישורים נדרשים",
+        "preferred_skills": "כישורים מועדפים",
+        "salary_min": "שכר מינימום",
+        "salary_max": "שכר מקסימום",
+        "state": "סטטוס",
+        "category": "קטגוריה",
+        "seniority": "בכירות",
+        "years_experience_required": "ניסיון"
+      },
+      "overrideConfirmation": {
+        "title": "להגן על העריכות הידניות?",
+        "description": "שיניתם שדות שמסונכרנים מהמקור: {{fields}}. השמירה תיצור דריסות ידניות, ולכן הייבוא הבא לא ידרוס אותם עד לחידוש הסנכרון.",
+        "cancel": "בדיקת השינויים",
+        "confirm": "שמירת הדריסות הידניות"
+      },
+      "history": {
+        "job_import": "הוחל ממקור הייבוא",
+        "manual_field_override": "נוצרה דריסה ידנית",
+        "resume_source_field_sync": "הסנכרון מהמקור חודש"
+      },
       "descriptionPlaceholder": "תיאור מפורט של התפקיד, הדרישות והתנאים...",
       "requirements": "דרישות",
       "benefits": "הטבות",

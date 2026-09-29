@@ -80,6 +80,45 @@ export interface JobImportProvenance {
   >
   first_seen_at?: string
   last_seen_at?: string
+  last_successful_run_id?: number | null
+  source?: {
+    id: number
+    name: string | null
+    state: "draft" | "active" | "paused" | "needs_attention" | "archived" | "unavailable"
+    available: boolean
+    connector_type: string | null
+    health_state: "unknown" | "healthy" | "degraded" | "error"
+    health_error_code: string | null
+    last_attempt_at: string | null
+    last_success_at: string | null
+  }
+  client?: {
+    company_id: number | null
+    name: string
+    status: "prospect" | "active" | "inactive" | "archived" | "unavailable"
+    available: boolean
+  }
+  latest_run_item?: {
+    id: number
+    run_id: number
+    action: string
+    status: string
+    reviewed_at: string | null
+    applied_at: string | null
+  } | null
+  history?: Array<{
+    id: number
+    action: string
+    actor_email: string | null
+    actor_role: string | null
+    created_at: string
+    origin: string | null
+    fields: string[]
+    state: string | null
+    previous_state: string | null
+    import_run_id: number | null
+    import_run_item_id: number | null
+  }>
 }
 
 export interface ResetJobImportOverridesResult {

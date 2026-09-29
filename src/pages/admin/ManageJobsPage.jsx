@@ -23,6 +23,7 @@ import {
 } from "@/domain/agency/jobState"
 import { buildJobPipelinePath } from "@/domain/agency/jobWorkflow"
 import { copyText } from "@/domain/agency/clipboard"
+import { isImportedJob } from "@/domain/agency/jobImportProvenance"
 
 function CopyButton({ text }) {
   const { t } = useTranslation()
@@ -752,9 +753,17 @@ export default function ManageJobsPage() {
                   <PlatformCard key={job.id} as="article" className="overflow-hidden p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0 flex-1">
-                        <h2 className="truncate text-base font-black text-slate-900">
-                          {job.title}
-                        </h2>
+                        <div className="flex min-w-0 flex-wrap items-center gap-2">
+                          <h2 className="truncate text-base font-black text-slate-900">
+                            {job.title}
+                          </h2>
+                          {isImportedJob(job) && (
+                            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-blue-700">
+                              <CloudDownload className="h-3 w-3" aria-hidden="true" />
+                              {t("jobs_management.imported")}
+                            </span>
+                          )}
+                        </div>
 
                         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                           <span className="flex min-w-0 items-center gap-1.5">
@@ -1021,7 +1030,15 @@ export default function ManageJobsPage() {
                         className="border-b border-slate-100 transition-colors last:border-0 hover:bg-[#F8FAFF]"
                       >
                         <td className="px-5 py-4">
-                          <div className="font-bold text-[#0F172A] text-sm">{job.title}</div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <div className="font-bold text-[#0F172A] text-sm">{job.title}</div>
+                            {isImportedJob(job) && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-blue-700">
+                                <CloudDownload className="h-3 w-3" aria-hidden="true" />
+                                {t("jobs_management.imported")}
+                              </span>
+                            )}
+                          </div>
 
                           <div className="text-xs text-[#94A3B8] mt-0.5">{job.category || "—"}</div>
                         </td>
@@ -1280,6 +1297,7 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  CloudDownload,
 } from "lucide-react"
 import JobFormModal from "@/components/employer/JobFormModal"
 import {

@@ -10,7 +10,13 @@ import { getEffectiveJobState } from "@/domain/agency/jobState"
 import { getJobWorkflowDefaults, parseSkillsInput } from "@/domain/agency/jobWorkflow"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
 import { copyText } from "@/domain/agency/clipboard"
+import {
+  changedImportManagedFields,
+  importFieldState,
+  safeExternalJobUrl,
+} from "@/domain/agency/jobImportProvenance"
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
 import {
   Dialog,
   DialogClose,
@@ -18,6 +24,42 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+
+function FieldSyncIndicator({ field, provenance }) {
+  const { t } = useTranslation()
+
+  const state = importFieldState(provenance, field)
+
+  if (state === "none") {
+    return null
+  }
+
+  return (
+    <span
+      className={`ms-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+        state === "manual" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"
+      }`}
+      title={t(`jobs_management.form.fieldSync.${state}Help`)}
+    >
+      {state === "manual" ? (
+        <LockKeyhole className="h-3 w-3" aria-hidden="true" />
+      ) : (
+        <RefreshCw className="h-3 w-3" aria-hidden="true" />
+      )}
+      {t(`jobs_management.form.fieldSync.${state}`)}
+    </span>
+  )
+}
 
 function CopyInline({ text }) {
   const { t } = useTranslation()
@@ -164,6 +206,8 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
 
   const [overrideResetError, setOverrideResetError] = useState("")
 
+  const [overrideConfirmation, setOverrideConfirmation] = useState(null)
+
   const isAgency = user?.org_type === "staffing_agency"
 
   const canViewCompensation = can("view_compensation")
@@ -219,6 +263,8 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
       label: labels[field] || field,
     }))
   }, [importProvenance?.manual_overrides, t])
+
+  const externalPostingUrl = safeExternalJobUrl(importProvenance?.source_posting_url)
 
   const handleResumeSourceSync = async (field) => {
     if (!job?.id || !field) {
@@ -478,8 +524,8 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
       (Number(plan.employer_company_id) === Number(form.employer_company_id) && !plan.job_id),
   )
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e, manualOverrideConfirmed = false) => {
+    e?.preventDefault()
 
     if (!form.title) {
       setError(t("jobs_management.form.titleRequired"))
@@ -559,6 +605,16 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
         payload.recruitment_manager_id = user.recruitment_manager_id
       }
     }
+
+    const changedManagedFields = changedImportManagedFields(job, form, importProvenance)
+
+    if (!manualOverrideConfirmed && changedManagedFields.length > 0) {
+      setOverrideConfirmation(changedManagedFields)
+
+      return
+    }
+
+    setOverrideConfirmation(null)
 
     setLoading(true)
 
@@ -674,6 +730,102 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                   : t("jobs_management.form.importSourceManaged")}
               </p>
 
+              <dl className="mt-3 grid gap-2 rounded-lg border border-blue-100 bg-white/80 p-3 text-xs sm:grid-cols-2">
+                <div>
+                  <dt className="font-bold text-slate-500">{t("jobs_management.form.source")}</dt>
+                  <dd className="mt-0.5 font-semibold text-slate-900">
+                    {importProvenance.source?.name || t("jobs_management.form.sourceUnavailable")}
+                    {importProvenance.source && (
+                      <span className="ms-1 text-slate-500">
+                        ·{" "}
+                        {t(`jobImports.statuses.${importProvenance.source.state}`, {
+                          defaultValue: importProvenance.source.state,
+                        })}
+                      </span>
+                    )}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-bold text-slate-500">
+                    {t("jobs_management.form.sourceClient")}
+                  </dt>
+                  <dd className="mt-0.5 font-semibold text-slate-900">
+                    {importProvenance.client?.name || job?.company || "—"}
+                    {importProvenance.client && !importProvenance.client.available && (
+                      <span className="ms-1 text-amber-700">
+                        · {t("jobs_management.form.clientUnavailable")}
+                      </span>
+                    )}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-bold text-slate-500">
+                    {t("jobs_management.form.lastSuccessfulSync")}
+                  </dt>
+                  <dd className="mt-0.5 font-semibold text-slate-900">
+                    {importProvenance.source?.last_success_at
+                      ? new Intl.DateTimeFormat(locale, {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        }).format(new Date(importProvenance.source.last_success_at))
+                      : t("jobs_management.form.neverSynced")}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-bold text-slate-500">
+                    {t("jobs_management.form.sourceHealth")}
+                  </dt>
+                  <dd className="mt-0.5 font-semibold text-slate-900">
+                    {t(
+                      `jobs_management.form.health.${importProvenance.source?.health_state || "unknown"}`,
+                    )}
+                    {importProvenance.source?.health_error_code && (
+                      <span className="ms-1 font-mono text-red-700">
+                        ({importProvenance.source.health_error_code})
+                      </span>
+                    )}
+                  </dd>
+                </div>
+              </dl>
+
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold">
+                {externalPostingUrl && (
+                  <a
+                    href={externalPostingUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-white px-2.5 py-1.5 text-blue-800 hover:bg-blue-100"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t("jobs_management.form.externalPosting")}
+                  </a>
+                )}
+                {importProvenance.source?.available && (
+                  <Link
+                    to={`/agency/import/jobs/${importProvenance.source.id}`}
+                    className="rounded-lg border border-blue-200 bg-white px-2.5 py-1.5 text-blue-800 hover:bg-blue-100"
+                  >
+                    {t("jobs_management.form.openImportSource")}
+                  </Link>
+                )}
+                {importProvenance.last_successful_run_id && (
+                  <Link
+                    to={`/agency/import/jobs/runs/${importProvenance.last_successful_run_id}`}
+                    className="rounded-lg border border-blue-200 bg-white px-2.5 py-1.5 text-blue-800 hover:bg-blue-100"
+                  >
+                    {t("jobs_management.form.openLastRun")}
+                  </Link>
+                )}
+                {importProvenance.latest_run_item && (
+                  <Link
+                    to={`/agency/import/jobs/runs/${importProvenance.latest_run_item.run_id}?open=${importProvenance.latest_run_item.id}`}
+                    className="rounded-lg border border-blue-200 bg-white px-2.5 py-1.5 text-blue-800 hover:bg-blue-100"
+                  >
+                    {t("jobs_management.form.openReviewItem")}
+                  </Link>
+                )}
+              </div>
+
               {overrideResetError && (
                 <p role="alert" className="mt-2 text-xs font-medium text-red-700">
                   {overrideResetError}
@@ -701,6 +853,32 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {(importProvenance.history || []).length > 0 && (
+                <details className="mt-3 rounded-lg border border-blue-100 bg-white/80 p-3">
+                  <summary className="cursor-pointer font-bold text-blue-900">
+                    {t("jobs_management.form.importHistory")}
+                  </summary>
+                  <ol className="mt-3 space-y-2 border-s border-blue-200 ps-3">
+                    {importProvenance.history.slice(0, 10).map((entry) => (
+                      <li key={entry.id} className="text-xs text-slate-600">
+                        <p className="font-bold text-slate-900">
+                          {t(`jobs_management.form.history.${entry.origin || entry.action}`, {
+                            defaultValue: entry.action,
+                          })}
+                        </p>
+                        <p>
+                          {new Intl.DateTimeFormat(locale, {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          }).format(new Date(entry.created_at))}
+                          {entry.actor_email ? ` · ${entry.actor_email}` : ""}
+                        </p>
+                      </li>
+                    ))}
+                  </ol>
+                </details>
               )}
             </div>
           )}
@@ -747,6 +925,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="block text-sm font-semibold text-gray-900 mb-2"
               >
                 {t("jobs_management.form.title")} *
+                <FieldSyncIndicator field="title" provenance={importProvenance} />
               </label>
 
               <input
@@ -864,6 +1043,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="block text-sm font-semibold text-gray-900 mb-2"
               >
                 {t("jobs_management.form.category")} *
+                <FieldSyncIndicator field="category" provenance={importProvenance} />
               </label>
 
               <select
@@ -895,6 +1075,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="block text-sm font-semibold text-gray-900 mb-2"
               >
                 {t("jobs_management.form.employmentType")} *
+                <FieldSyncIndicator field="employment_type_id" provenance={importProvenance} />
               </label>
 
               <select
@@ -920,6 +1101,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="block text-sm font-semibold text-gray-900 mb-2"
               >
                 {t("jobs_management.form.workMode")} *
+                <FieldSyncIndicator field="work_mode_id" provenance={importProvenance} />
               </label>
 
               <select
@@ -945,6 +1127,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="block text-sm font-semibold text-gray-900 mb-2"
               >
                 {t(job ? "jobs_management.form.status" : "jobs_management.form.initialStatus")} *
+                <FieldSyncIndicator field="state" provenance={importProvenance} />
               </label>
 
               <select
@@ -969,6 +1152,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
               className="block text-sm font-semibold text-gray-900 mb-2"
             >
               {t("jobs_management.form.location")}
+              <FieldSyncIndicator field="location" provenance={importProvenance} />
             </label>
 
             <input
@@ -988,6 +1172,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="block text-sm font-semibold text-gray-900 mb-2"
               >
                 {t("jobs_management.form.salaryMin")}
+                <FieldSyncIndicator field="salary_min" provenance={importProvenance} />
               </label>
 
               <input
@@ -1006,6 +1191,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 className="block text-sm font-semibold text-gray-900 mb-2"
               >
                 {t("jobs_management.form.salaryMax")}
+                <FieldSyncIndicator field="salary_max" provenance={importProvenance} />
               </label>
 
               <input
@@ -1025,6 +1211,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
               className="block text-sm font-semibold text-gray-900 mb-2"
             >
               {t("jobs_management.form.description")}
+              <FieldSyncIndicator field="description" provenance={importProvenance} />
             </label>
 
             <textarea
@@ -1050,6 +1237,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                   className="block text-sm font-semibold text-gray-900 mb-2"
                 >
                   {t("jobs_management.form.requiredSkills")}
+                  <FieldSyncIndicator field="required_skills" provenance={importProvenance} />
                 </label>
                 <textarea
                   id="job-form-required-skills"
@@ -1070,6 +1258,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                   className="block text-sm font-semibold text-gray-900 mb-2"
                 >
                   {t("jobs_management.form.preferredSkills")}
+                  <FieldSyncIndicator field="preferred_skills" provenance={importProvenance} />
                 </label>
                 <textarea
                   id="job-form-preferred-skills"
@@ -1091,6 +1280,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                   className="block text-sm font-semibold text-gray-900 mb-2"
                 >
                   {t("jobs_management.form.seniority")}
+                  <FieldSyncIndicator field="seniority" provenance={importProvenance} />
                 </label>
                 <select
                   id="job-form-seniority"
@@ -1114,6 +1304,10 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                   className="block text-sm font-semibold text-gray-900 mb-2"
                 >
                   {t("jobs_management.form.experienceYears")}
+                  <FieldSyncIndicator
+                    field="years_experience_required"
+                    provenance={importProvenance}
+                  />
                 </label>
                 <input
                   id="job-form-experience-years"
@@ -1611,7 +1805,36 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
           </div>
         </form>
       </DialogContent>
+      <AlertDialog
+        open={Boolean(overrideConfirmation)}
+        onOpenChange={(open) => !open && setOverrideConfirmation(null)}
+      >
+        <AlertDialogContent dir={direction}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("jobs_management.form.overrideConfirmation.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("jobs_management.form.overrideConfirmation.description", {
+                fields: (overrideConfirmation || [])
+                  .map((field) =>
+                    t(`jobs_management.form.fieldNames.${field}`, { defaultValue: field }),
+                  )
+                  .join(", "),
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {t("jobs_management.form.overrideConfirmation.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleSubmit(null, true)}>
+              {t("jobs_management.form.overrideConfirmation.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }
-import { X, Eye, Copy, Check, LockKeyhole } from "lucide-react"
+import { X, Eye, Copy, Check, ExternalLink, LockKeyhole, RefreshCw } from "lucide-react"

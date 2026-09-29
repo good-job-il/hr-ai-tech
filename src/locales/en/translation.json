@@ -938,6 +938,7 @@
     "deleteJob": "Delete Job",
     "viewApplications": "View Applications",
     "applicationsCount": "Applications",
+    "imported": "Imported",
     "copyAddress": "Copy address",
     "copyError": "Unable to copy. Check browser clipboard permission.",
     "refresh": "Refresh jobs",
@@ -1061,6 +1062,55 @@
       "resumeFieldSync": "Resume source sync for {{field}}",
       "resumingSourceSync": "Resuming sync…",
       "resumeSourceSyncError": "Unable to resume source synchronization. Try again.",
+      "sourceUnavailable": "Source unavailable",
+      "sourceClient": "Client",
+      "clientUnavailable": "archived or unavailable",
+      "lastSuccessfulSync": "Last successful sync",
+      "neverSynced": "No successful sync recorded",
+      "sourceHealth": "Source health",
+      "externalPosting": "External posting",
+      "openImportSource": "Open source",
+      "openLastRun": "Open last run",
+      "openReviewItem": "Open review item",
+      "importHistory": "Import history",
+      "health": {
+        "unknown": "Unknown",
+        "healthy": "Healthy",
+        "degraded": "Degraded",
+        "error": "Error"
+      },
+      "fieldSync": {
+        "source": "Synced",
+        "sourceHelp": "This field follows the import source. Editing it creates a protected manual override.",
+        "manual": "Manual override",
+        "manualHelp": "Source updates will not overwrite this field until source sync is resumed."
+      },
+      "fieldNames": {
+        "title": "job title",
+        "description": "description",
+        "location": "location",
+        "employment_type_id": "employment type",
+        "work_mode_id": "work mode",
+        "required_skills": "required skills",
+        "preferred_skills": "preferred skills",
+        "salary_min": "minimum salary",
+        "salary_max": "maximum salary",
+        "state": "status",
+        "category": "category",
+        "seniority": "seniority",
+        "years_experience_required": "experience"
+      },
+      "overrideConfirmation": {
+        "title": "Protect these manual edits?",
+        "description": "You changed source-synced fields: {{fields}}. Saving creates manual overrides, so future imports will not overwrite them until you resume synchronization.",
+        "cancel": "Review changes",
+        "confirm": "Save manual overrides"
+      },
+      "history": {
+        "job_import": "Applied from import source",
+        "manual_field_override": "Manual override created",
+        "resume_source_field_sync": "Source synchronization resumed"
+      },
       "descriptionPlaceholder": "Detailed description of the role, requirements and benefits...",
       "requirements": "Requirements",
       "benefits": "Benefits",
