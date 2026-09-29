@@ -13,7 +13,24 @@ import {
   Globe,
   Layers,
   DollarSign,
+  ChevronDown,
+  ChevronUp,
+  Save,
+  RotateCcw,
+  Info,
+  SlidersHorizontal,
+  Check,
+  X,
+  Undo2,
 } from "lucide-react"
+import {
+  PlatformCard,
+  PlatformEmptyState,
+  PlatformPageHeader,
+  PlatformPageShell,
+  PlatformStatCard,
+  PlatformWidgetHeader,
+} from "@/components/platform/PlatformUI"
 
 // ─── Feature catalogue ───────────────────────────────────────────────────────
 
@@ -248,20 +265,26 @@ function loadMatrix() {
 
 // ─── Toggle switch ────────────────────────────────────────────────────────────
 
-function Toggle({ value, onChange, disabled }) {
+function Toggle({ value, onChange, disabled, label }) {
+  const Icon = value ? Check : X
+
   return (
     <button
       type="button"
       onClick={() => !disabled && onChange(!value)}
       disabled={disabled}
-      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition-all duration-200
-        ${disabled ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}
-        ${value ? "border-violet-500 bg-gradient-to-r from-violet-600 to-indigo-500 shadow-[0_4px_12px_rgba(109,75,220,0.25)]" : "border-slate-200 bg-slate-100"}`}
+      aria-label={label}
+      aria-pressed={value}
+      className={`inline-flex min-w-[92px] shrink-0 items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-black uppercase tracking-wide transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-200
+        ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}
+        ${
+          value
+            ? "border-emerald-600 bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
+            : "border-slate-300 bg-slate-100 text-slate-700 hover:border-slate-400 hover:bg-slate-200"
+        }`}
     >
-      <span
-        className={`inline-block h-[18px] w-[18px] transform rounded-full bg-white shadow-sm transition-transform duration-200
-        ${value ? "translate-x-[20px]" : "translate-x-0.5"}`}
-      />
+      <Icon className="h-3.5 w-3.5" strokeWidth={3} />
+      {value ? "Enabled" : "Disabled"}
     </button>
   )
 }
@@ -438,6 +461,7 @@ function PlanMatrixTab() {
                           <Toggle
                             value={!!matrix[plan]?.[feat.id]}
                             onChange={() => toggleFeature(plan, feat.id)}
+                            label={`${feat.label} for ${plan}: ${matrix[plan]?.[feat.id] ? "enabled" : "disabled"}`}
                           />
                         </div>
                       ))}
@@ -471,6 +495,8 @@ function OrgOverridesTab() {
   const [savedOrgs, setSavedOrgs] = useState({})
 
   const [localOverrides, setLocalOverrides] = useState({})
+
+  const [saveErrors, setSaveErrors] = useState({})
 
   const qc = useQueryClient()
 
@@ -515,6 +541,16 @@ function OrgOverridesTab() {
       },
     }))
     setSavedOrgs((prev) => ({ ...prev, [org.id]: false }))
+    setSaveErrors((prev) => ({ ...prev, [org.id]: false }))
+  }
+
+  const handleClearFeatureOverride = (org, featureId) => {
+    const nextFlags = { ...getOrgFlags(org) }
+
+    delete nextFlags[featureId]
+    setLocalOverrides((prev) => ({ ...prev, [org.id]: nextFlags }))
+    setSavedOrgs((prev) => ({ ...prev, [org.id]: false }))
+    setSaveErrors((prev) => ({ ...prev, [org.id]: false }))
   }
 
   const handleSaveOrg = async (org) => {
@@ -525,20 +561,32 @@ function OrgOverridesTab() {
     }
 
     setSaving((prev) => ({ ...prev, [org.id]: true }))
+    setSaveErrors((prev) => ({ ...prev, [org.id]: false }))
 
     try {
-      await organizationService.update(org.id, {
+      const savedOrg = await organizationService.update(org.id, {
         settings: { ...(org.settings || {}), feature_flags: flags },
       })
-      qc.invalidateQueries(["platform-orgs"])
+      qc.setQueryData(["platform-orgs"], (current = []) =>
+        current.map((item) => (item.id === org.id ? savedOrg : item)),
+      )
+      setLocalOverrides((prev) => {
+        const next = { ...prev }
+
+        delete next[org.id]
+
+        return next
+      })
       setSavedOrgs((prev) => ({ ...prev, [org.id]: true }))
       setTimeout(() => setSavedOrgs((prev) => ({ ...prev, [org.id]: false })), 2500)
+    } catch {
+      setSaveErrors((prev) => ({ ...prev, [org.id]: true }))
     } finally {
       setSaving((prev) => ({ ...prev, [org.id]: false }))
     }
   }
 
-  const handleResetOrg = (org) => {
+  const handleDiscardChanges = (org) => {
     setLocalOverrides((prev) => {
       const next = { ...prev }
 
@@ -546,14 +594,22 @@ function OrgOverridesTab() {
 
       return next
     })
+    setSaveErrors((prev) => ({ ...prev, [org.id]: false }))
+  }
+
+  const handleResetToPlan = (org) => {
+    const nextFlags = { ...(org.settings?.feature_flags || {}) }
+
+    FEATURES.forEach(({ id }) => delete nextFlags[id])
+    setLocalOverrides((prev) => ({ ...prev, [org.id]: nextFlags }))
+    setSavedOrgs((prev) => ({ ...prev, [org.id]: false }))
+    setSaveErrors((prev) => ({ ...prev, [org.id]: false }))
   }
 
   const countOverrides = (org) => {
     const flags = getOrgFlags(org)
 
-    const planDefaults = loadMatrix()[org.plan || "trial"] || {}
-
-    return Object.entries(flags).filter(([k, v]) => planDefaults[k] !== v).length
+    return FEATURES.filter(({ id }) => Object.prototype.hasOwnProperty.call(flags, id)).length
   }
 
   return (
@@ -698,31 +754,70 @@ function OrgOverridesTab() {
 
                               const activeVal = overrideVal !== undefined ? overrideVal : planVal
 
-                              const isOverridden =
-                                overrideVal !== undefined && overrideVal !== planVal
+                              const hasExplicitOverride = Object.prototype.hasOwnProperty.call(
+                                flags,
+                                feat.id,
+                              )
+
+                              const isOverridden = hasExplicitOverride && overrideVal !== planVal
 
                               return (
                                 <div
                                   key={feat.id}
-                                  className={`flex items-center justify-between gap-3 rounded-xl border bg-white px-3 py-3 transition-all
-                                  ${isOverridden ? "border-orange-200 shadow-[0_5px_16px_rgba(251,146,60,0.08)]" : "border-slate-100 hover:border-violet-100"}`}
+                                  className={`flex min-h-[108px] flex-col justify-between gap-3 rounded-2xl border p-4 transition-all
+                                  ${
+                                    isOverridden
+                                      ? "border-violet-300 bg-violet-50/70 shadow-[0_8px_24px_rgba(124,58,237,0.08)]"
+                                      : hasExplicitOverride
+                                        ? "border-blue-200 bg-blue-50/50"
+                                        : "border-slate-200 bg-white hover:border-slate-300"
+                                  }`}
                                 >
-                                  <div className="min-w-0">
-                                    <p className="truncate text-sm font-bold text-slate-800">
-                                      {feat.label}
-                                    </p>
-
-                                    {isOverridden && (
-                                      <p className="text-xs font-semibold text-orange-500">
-                                        override {planVal ? "(plan: on)" : "(plan: off)"}
+                                  <div>
+                                    <div className="flex items-start justify-between gap-3">
+                                      <p className="text-sm font-black text-slate-900">
+                                        {feat.label}
                                       </p>
-                                    )}
+                                      <span
+                                        className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-wide ${
+                                          hasExplicitOverride
+                                            ? "bg-violet-100 text-violet-800"
+                                            : "bg-slate-100 text-slate-600"
+                                        }`}
+                                      >
+                                        {hasExplicitOverride
+                                          ? "Organization override"
+                                          : "Inherited"}
+                                      </span>
+                                    </div>
+                                    <p className="mt-1 text-xs leading-5 text-slate-500">
+                                      {hasExplicitOverride
+                                        ? `Plan default: ${planVal ? "enabled" : "disabled"}`
+                                        : `${plan.charAt(0).toUpperCase() + plan.slice(1)} plan default`}
+                                    </p>
                                   </div>
 
-                                  <Toggle
-                                    value={activeVal}
-                                    onChange={() => handleToggleOverride(org, feat.id)}
-                                  />
+                                  <div className="flex items-center justify-between gap-3">
+                                    {hasExplicitOverride ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleClearFeatureOverride(org, feat.id)}
+                                        className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-bold text-violet-700 hover:bg-violet-100"
+                                      >
+                                        <Undo2 className="h-3.5 w-3.5" />
+                                        Use plan default
+                                      </button>
+                                    ) : (
+                                      <span className="text-xs font-semibold text-slate-400">
+                                        Effective state
+                                      </span>
+                                    )}
+                                    <Toggle
+                                      value={activeVal}
+                                      onChange={() => handleToggleOverride(org, feat.id)}
+                                      label={`${feat.label}: ${activeVal ? "enabled" : "disabled"}`}
+                                    />
+                                  </div>
                                 </div>
                               )
                             })}
@@ -732,27 +827,37 @@ function OrgOverridesTab() {
                     })}
 
                     {/* Save / reset actions */}
-                    <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
+                    <div className="sticky bottom-3 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-[0_12px_35px_rgba(15,23,42,0.12)] backdrop-blur">
                       <button
                         type="button"
-                        onClick={() => handleResetOrg(org)}
-                        disabled={!isDirty}
-                        className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 transition hover:border-violet-200 hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        onClick={() => handleResetToPlan(org)}
+                        disabled={overridesCount === 0 && !isDirty}
+                        className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-xs font-black text-slate-700 transition hover:border-violet-300 hover:bg-violet-50 hover:text-violet-800 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-400"
                       >
                         <RotateCcw className="h-3.5 w-3.5" />
-                        Reset
+                        Reset to plan
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDiscardChanges(org)}
+                        disabled={!isDirty}
+                        className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-black text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:border-slate-100 disabled:bg-slate-50 disabled:text-slate-400"
+                      >
+                        <Undo2 className="h-3.5 w-3.5" />
+                        Discard edits
                       </button>
 
                       <button
                         type="button"
                         onClick={() => handleSaveOrg(org)}
                         disabled={!isDirty || saving[org.id]}
-                        className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+                        className={`flex items-center gap-1.5 rounded-xl border px-4 py-2.5 text-xs font-black transition-all ${
                           savedOrgs[org.id]
-                            ? "bg-emerald-500 text-white"
+                            ? "border-emerald-600 bg-emerald-600 text-white"
                             : isDirty
-                              ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-[0_8px_18px_rgba(99,72,210,0.2)]"
-                              : "cursor-not-allowed bg-slate-100 text-slate-400"
+                              ? "border-violet-700 bg-violet-700 text-white shadow-[0_8px_18px_rgba(99,72,210,0.2)] hover:bg-violet-800"
+                              : "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500"
                         }`}
                       >
                         <Save className="h-3.5 w-3.5" />
@@ -764,12 +869,31 @@ function OrgOverridesTab() {
                             : "Save overrides"}
                       </button>
 
-                      <p className="ml-2 text-xs text-slate-400">
-                        Overrides saved to{" "}
-                        <code className="rounded bg-slate-100 px-1">
-                          Organization.settings.feature_flags
-                        </code>
-                      </p>
+                      <div className="min-w-[190px] flex-1 text-end">
+                        <p
+                          className={`text-xs font-bold ${
+                            saveErrors[org.id]
+                              ? "text-red-700"
+                              : isDirty
+                                ? "text-amber-700"
+                                : savedOrgs[org.id]
+                                  ? "text-emerald-700"
+                                  : "text-slate-500"
+                          }`}
+                          role="status"
+                        >
+                          {saveErrors[org.id]
+                            ? "Could not save overrides. Try again."
+                            : isDirty
+                              ? "Unsaved organization changes"
+                              : savedOrgs[org.id]
+                                ? "Overrides saved successfully"
+                                : `${overridesCount} saved organization override${overridesCount === 1 ? "" : "s"}`}
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-slate-400">
+                          Effective values are shown on every feature card.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -878,12 +1002,3 @@ export default function FlagsPage() {
     </PlatformPageShell>
   )
 }
-import { ChevronDown, ChevronUp, Save, RotateCcw, Info, SlidersHorizontal } from "lucide-react"
-import {
-  PlatformCard,
-  PlatformEmptyState,
-  PlatformPageHeader,
-  PlatformPageShell,
-  PlatformStatCard,
-  PlatformWidgetHeader,
-} from "@/components/platform/PlatformUI"
