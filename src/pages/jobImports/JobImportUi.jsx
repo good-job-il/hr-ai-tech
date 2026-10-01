@@ -1,5 +1,15 @@
 import { AlertTriangle, ArrowLeft, ArrowRight, RefreshCw } from "lucide-react"
 import { useTranslation } from "react-i18next"
+export {
+  formatImportCurrency,
+  formatImportDate,
+  formatImportNumber,
+  formatImportPercent,
+  formatImportRelativeTime,
+  importErrorCode,
+  localizedImportError,
+  localizedImportIssue,
+} from "@/domain/jobImports/presentation"
 
 export function PageHeading({ eyebrow, title, description, actions }) {
   return (
@@ -8,18 +18,33 @@ export function PageHeading({ eyebrow, title, description, actions }) {
         {eyebrow && (
           <p className="text-xs font-bold uppercase tracking-wider text-violet-600">{eyebrow}</p>
         )}
-        <h1 className="mt-1 text-2xl font-black text-slate-900 sm:text-3xl">{title}</h1>
+        <h1 dir="auto" className="mt-1 break-words text-2xl font-black text-slate-900 sm:text-3xl">
+          {title}
+        </h1>
         {description && (
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{description}</p>
+          <p dir="auto" className="mt-2 max-w-3xl break-words text-sm leading-6 text-slate-600">
+            {description}
+          </p>
         )}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && (
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">{actions}</div>
+      )}
     </div>
   )
 }
 
 export function PageShell({ children }) {
-  return <main className="mx-auto w-full max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">{children}</main>
+  const { i18n } = useTranslation()
+
+  return (
+    <main
+      dir={i18n.dir()}
+      className="job-import-workflow mx-auto w-full min-w-0 max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8"
+    >
+      {children}
+    </main>
+  )
 }
 
 export function Panel({ children, className = "" }) {
@@ -31,7 +56,7 @@ export function Panel({ children, className = "" }) {
 }
 
 export function StatusPill({ value = "unknown" }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const tone =
     {
@@ -52,7 +77,9 @@ export function StatusPill({ value = "unknown" }) {
 
   return (
     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${tone}`}>
-      {t(`jobImports.statuses.${value}`, { defaultValue: String(value).replaceAll("_", " ") })}
+      {i18n.exists(`jobImports.statuses.${value}`)
+        ? t(`jobImports.statuses.${value}`)
+        : t("jobImports.statuses.unknown")}
     </span>
   )
 }
@@ -87,15 +114,5 @@ export function BackIcon() {
     <ArrowRight className="h-4 w-4" />
   ) : (
     <ArrowLeft className="h-4 w-4" />
-  )
-}
-
-export function formatImportDate(value, locale) {
-  if (!value) {
-    return "—"
-  }
-
-  return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(
-    new Date(value),
   )
 }

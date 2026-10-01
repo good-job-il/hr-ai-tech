@@ -27,7 +27,26 @@ import {
   summarizeImportRun,
 } from "@/domain/jobImports/onboardingWizard"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
-import { BackIcon, PageHeading, PageShell, Panel, StatusPill } from "./JobImportUi"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {
+  BackIcon,
+  formatImportNumber,
+  importErrorCode,
+  localizedImportError,
+  localizedImportIssue,
+  PageHeading,
+  PageShell,
+  Panel,
+  StatusPill,
+} from "./JobImportUi"
 
 const EMPTY_FORM = {
   name: "",
@@ -205,67 +224,73 @@ function SampleTable({ items }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200">
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-start text-sm">
-          <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-            <tr>
-              <th className="px-4 py-3 text-start">{t("jobImports.wizard.sample.sourceValue")}</th>
-              <th className="px-4 py-3 text-start">{t("jobImports.wizard.sample.normalized")}</th>
-              <th className="px-4 py-3 text-start">{t("jobImports.wizard.sample.action")}</th>
-              <th className="px-4 py-3 text-start">{t("jobImports.wizard.sample.warnings")}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {items.map((item) => (
-              <tr key={item.id} className="align-top">
-                <td className="max-w-[260px] px-4 py-3">
-                  <p className="font-bold text-slate-900">
-                    {String(
-                      item.source_payload?.title ||
-                        item.source_payload?.jobTitle ||
-                        item.normalized_candidate.title ||
-                        "—",
-                    )}
-                  </p>
-                  <details className="mt-2">
-                    <summary className="cursor-pointer text-xs font-bold text-violet-700">
-                      {t("jobImports.wizard.sample.rawView")}
-                    </summary>
-                    <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-slate-950 p-3 text-[11px] text-slate-100">
-                      {JSON.stringify(item.source_payload, null, 2)}
-                    </pre>
-                  </details>
-                </td>
-                <td className="max-w-[260px] px-4 py-3">
-                  <p className="font-semibold text-slate-800">
-                    {String(item.normalized_candidate.title || "—")}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {String(item.normalized_candidate.source_company_label || "—")}
-                  </p>
-                </td>
-                <td className="px-4 py-3">
-                  <StatusPill value={item.proposed_action} />
-                </td>
-                <td className="max-w-[280px] px-4 py-3">
-                  {item.validation_issues?.length ? (
-                    <ul className="space-y-1 text-xs text-amber-700">
-                      {item.validation_issues.map((issue, index) => (
-                        <li key={`${issue.code}-${index}`}>{issue.message}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <span className="text-xs text-emerald-700">
-                      {t("jobImports.wizard.sample.noWarnings")}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="grid min-w-0 gap-3" role="list">
+      {items.map((item) => (
+        <article
+          key={item.id}
+          role="listitem"
+          className="min-w-0 rounded-xl border border-slate-200 p-4"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-slate-500">
+                {t("jobImports.wizard.sample.normalized")}
+              </p>
+              <p dir="auto" className="mt-1 break-words font-bold text-slate-900">
+                {String(item.normalized_candidate.title || "—")}
+              </p>
+              <p dir="auto" className="mt-1 break-words text-xs text-slate-500">
+                {String(item.normalized_candidate.source_company_label || "—")}
+              </p>
+            </div>
+            <StatusPill value={item.proposed_action} />
+          </div>
+          <div className="mt-3 grid gap-3 border-t border-slate-100 pt-3 text-xs sm:grid-cols-2">
+            <div className="min-w-0">
+              <p className="font-bold text-slate-500">
+                {t("jobImports.wizard.sample.sourceValue")}
+              </p>
+              <p dir="auto" className="mt-1 break-words text-slate-700">
+                {String(
+                  item.source_payload?.title ||
+                    item.source_payload?.jobTitle ||
+                    item.normalized_candidate.title ||
+                    "—",
+                )}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <p className="font-bold text-slate-500">{t("jobImports.wizard.sample.warnings")}</p>
+              {item.validation_issues?.length ? (
+                <ul className="mt-1 space-y-1 text-amber-800">
+                  {item.validation_issues.map((issue, index) => (
+                    <li key={`${issue.code}-${index}`}>
+                      {localizedImportIssue(issue, t)}{" "}
+                      <code dir="ltr" className="text-[10px]">
+                        ({issue.code})
+                      </code>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-1 text-emerald-700">{t("jobImports.wizard.sample.noWarnings")}</p>
+              )}
+            </div>
+          </div>
+          <details className="mt-3 border-t border-slate-100 pt-3">
+            <summary className="cursor-pointer rounded text-xs font-bold text-violet-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500">
+              {t("jobImports.wizard.sample.rawView")}
+            </summary>
+            <pre
+              dir="ltr"
+              lang="en"
+              className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-all rounded-lg bg-slate-950 p-3 text-left text-[11px] text-slate-100"
+            >
+              {JSON.stringify(item.source_payload, null, 2)}
+            </pre>
+          </details>
+        </article>
+      ))}
     </div>
   )
 }
@@ -304,6 +329,8 @@ export default function JobImportNewPage() {
   const [activateSchedule, setActivateSchedule] = useState(true)
 
   const [archivePrompt, setArchivePrompt] = useState(false)
+
+  const archiveOpenerRef = useRef(null)
 
   const [applyResult, setApplyResult] = useState(null)
 
@@ -416,15 +443,15 @@ export default function JobImportNewPage() {
       })
       .catch((caught) => {
         if (!cancelled) {
-          setError(caught?.message || "Preview result could not be restored")
-          setErrorCode(caught?.code || null)
+          setError(localizedImportError(caught, t, t("jobImports.wizard.restoreError")))
+          setErrorCode(importErrorCode(caught))
         }
       })
 
     return () => {
       cancelled = true
     }
-  }, [source?.onboarding_state?.preview_run_id, previewRun?.id])
+  }, [source?.onboarding_state?.preview_run_id, previewRun?.id, t])
 
   const selectedConnector = catalog.find((item) => item.type === form.connector_type)
 
@@ -452,9 +479,9 @@ export default function JobImportNewPage() {
   }
 
   const showError = (caught, fallbackCode = null) => {
-    const typed = caught?.details?.code || caught?.details?.error?.code || caught?.code
+    const typed = importErrorCode(caught)
 
-    setError(caught?.message || t("jobImports.wizard.genericError"))
+    setError(localizedImportError(caught, t, t("jobImports.wizard.genericError")))
     setErrorCode(typed || fallbackCode)
   }
 
@@ -777,7 +804,7 @@ export default function JobImportNewPage() {
     return (
       <PageShell>
         <WizardError
-          error={sourceQuery.error?.message || t("jobImports.common.loadError")}
+          error={localizedImportError(sourceQuery.error, t, t("jobImports.common.loadError"))}
           onRetry={() => sourceQuery.refetch()}
         />
       </PageShell>
@@ -816,6 +843,7 @@ export default function JobImportNewPage() {
         {sourceId && (
           <button
             type="button"
+            ref={archiveOpenerRef}
             onClick={() => setArchivePrompt(true)}
             className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100"
           >
@@ -830,38 +858,42 @@ export default function JobImportNewPage() {
         description={t(`jobImports.wizard.descriptions.${stepKey}`)}
       />
       <WizardProgress step={step} onStep={(next) => persistProgress(next)} />
-      {archivePrompt && (
-        <Panel className="border-amber-200 bg-amber-50">
-          <p className="font-black text-amber-950">{t("jobImports.wizard.cancelTitle")}</p>
-          <p className="mt-1 text-sm text-amber-800">{t("jobImports.wizard.cancelDescription")}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
+      <AlertDialog open={archivePrompt} onOpenChange={setArchivePrompt}>
+        <AlertDialogContent
+          className="max-w-[calc(100vw-2rem)] sm:max-w-lg"
+          onCloseAutoFocus={(event) => {
+            if (archiveOpenerRef.current?.isConnected) {
+              event.preventDefault()
+              archiveOpenerRef.current.focus()
+            }
+          }}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("jobImports.wizard.cancelTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("jobImports.wizard.cancelDescription")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.continue")}</AlertDialogCancel>
             <button
               type="button"
               onClick={() => navigate("/agency/import/jobs")}
-              className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-bold text-slate-700 shadow-sm"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-bold text-slate-700 focus-visible:ring-2 focus-visible:ring-violet-500"
             >
-              <Save className="h-4 w-4" />
-              {t("jobImports.wizard.keepDraft")}
+              <Save className="h-4 w-4" /> {t("jobImports.wizard.keepDraft")}
             </button>
             <button
               type="button"
               onClick={archiveDraft}
               disabled={busy}
-              className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-sm font-bold text-white"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-bold text-white focus-visible:ring-2 focus-visible:ring-red-500 disabled:opacity-50"
             >
-              <Archive className="h-4 w-4" />
-              {t("jobImports.wizard.archiveDraft")}
+              <Archive className="h-4 w-4" /> {t("jobImports.wizard.archiveDraft")}
             </button>
-            <button
-              type="button"
-              onClick={() => setArchivePrompt(false)}
-              className="px-3 py-2 text-sm font-bold text-amber-800"
-            >
-              {t("common.continue")}
-            </button>
-          </div>
-        </Panel>
-      )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Panel>
         {error && ![1, 2].includes(step) && (
           <div className="mb-5">
@@ -927,6 +959,8 @@ export default function JobImportNewPage() {
 }
 
 function WizardStep(props) {
+  const { i18n } = useTranslation()
+
   const {
     step,
     t,
@@ -973,6 +1007,7 @@ function WizardStep(props) {
           <input
             autoFocus
             type="url"
+            dir="ltr"
             value={form.url}
             onChange={setField("url")}
             placeholder="https://company.example/jobs.json"
@@ -1107,7 +1142,9 @@ function WizardStep(props) {
             {selectedConnector?.limitations.length ? (
               selectedConnector.limitations.map((value) => (
                 <li key={value}>
-                  {t(`jobImports.capabilities.${value}`, { defaultValue: value })}
+                  {t(`jobImports.capabilities.${value}`, {
+                    defaultValue: t("jobImports.capabilities.unknown"),
+                  })}
                 </li>
               ))
             ) : (
@@ -1148,11 +1185,15 @@ function WizardStep(props) {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-black text-slate-900">
-                  {t("jobImports.wizard.sample.results", { count: previewRun.items_fetched })}
+                  {t("jobImports.wizard.sample.results", {
+                    count: formatImportNumber(previewRun.items_fetched, i18n.language),
+                  })}
                 </p>
                 <p className="text-sm text-slate-500">{t("jobImports.wizard.sample.readOnly")}</p>
               </div>
-              <StatusPill value={previewRun.status} />
+              <span role="status" aria-live="polite" aria-atomic="true">
+                <StatusPill value={previewRun.status} />
+              </span>
             </div>
             <SampleTable items={previewItems.slice(0, 10)} />
           </>
@@ -1199,13 +1240,30 @@ function WizardStep(props) {
             {form.pagination_mode !== "none" && (
               <>
                 <Field label={t("jobImports.wizard.mapping.pageSize")}>
-                  <input type="number" min="1" max="500" value={form.page_size} onChange={setField("page_size")} className={inputClass} />
+                  <input
+                    type="number"
+                    min="1"
+                    max="500"
+                    value={form.page_size}
+                    onChange={setField("page_size")}
+                    className={inputClass}
+                  />
                 </Field>
                 <Field label={t("jobImports.wizard.mapping.paginationParameter")}>
-                  <input value={form.pagination_parameter} onChange={setField("pagination_parameter")} placeholder={form.pagination_mode} className={inputClass} />
+                  <input
+                    value={form.pagination_parameter}
+                    onChange={setField("pagination_parameter")}
+                    placeholder={form.pagination_mode}
+                    className={inputClass}
+                  />
                 </Field>
                 <Field label={t("jobImports.wizard.mapping.paginationSizeParameter")}>
-                  <input value={form.pagination_size_parameter} onChange={setField("pagination_size_parameter")} placeholder="limit" className={inputClass} />
+                  <input
+                    value={form.pagination_size_parameter}
+                    onChange={setField("pagination_size_parameter")}
+                    placeholder="limit"
+                    className={inputClass}
+                  />
                 </Field>
               </>
             )}
@@ -1458,7 +1516,7 @@ function WizardStep(props) {
                     {t(`jobImports.run.actions.${action}`)}
                   </p>
                   <p className="mt-1 text-xl font-black text-slate-900">
-                    {previewRun[`${action}_count`] || 0}
+                    {formatImportNumber(previewRun[`${action}_count`] || 0, i18n.language)}
                   </p>
                 </div>
               ))}

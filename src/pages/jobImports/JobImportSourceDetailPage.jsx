@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   AlertTriangle,
@@ -37,6 +37,9 @@ import {
   BackIcon,
   ErrorPanel,
   formatImportDate,
+  formatImportNumber,
+  formatImportRelativeTime,
+  localizedImportError,
   PageHeading,
   PageShell,
   Panel,
@@ -46,6 +49,8 @@ import {
 const RUN_PAGE_SIZE = 10
 
 function ChangeCount({ label, value, tone }) {
+  const { i18n } = useTranslation()
+
   const tones = {
     green: "border-emerald-200 bg-emerald-50 text-emerald-800",
     blue: "border-blue-200 bg-blue-50 text-blue-800",
@@ -57,7 +62,7 @@ function ChangeCount({ label, value, tone }) {
   return (
     <div className={`rounded-xl border p-3 ${tones[tone]}`}>
       <p className="text-xs font-bold">{label}</p>
-      <p className="mt-1 text-xl font-black">{value || 0}</p>
+      <p className="mt-1 text-xl font-black">{formatImportNumber(value || 0, i18n.language)}</p>
     </div>
   )
 }
@@ -82,6 +87,8 @@ export default function JobImportSourceDetailPage() {
   const [busy, setBusy] = useState("")
 
   const [archiveOpen, setArchiveOpen] = useState(false)
+
+  const archiveOpenerRef = useRef(null)
 
   const [reconnectOpen, setReconnectOpen] = useState(false)
 
@@ -185,7 +192,7 @@ export default function JobImportSourceDetailPage() {
       toast.success(t("jobImports.detail.notifications.previewQueued"))
       navigate(`/agency/import/jobs/runs/${queued.run_id}`)
     } catch (error) {
-      toast.error(error.message || t("jobImports.detail.notifications.actionFailed"))
+      toast.error(localizedImportError(error, t, t("jobImports.detail.notifications.actionFailed")))
     } finally {
       setBusy("")
     }
@@ -213,7 +220,7 @@ export default function JobImportSourceDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ["job-import-source"] })
       await refresh()
     } catch (error) {
-      toast.error(error.message || t("jobImports.detail.notifications.actionFailed"))
+      toast.error(localizedImportError(error, t, t("jobImports.detail.notifications.actionFailed")))
     } finally {
       setBusy("")
     }
@@ -232,7 +239,7 @@ export default function JobImportSourceDetailPage() {
       toast.success(t("jobImports.detail.notifications.retryQueued"))
       navigate(`/agency/import/jobs/runs/${queued.run_id}`)
     } catch (error) {
-      toast.error(error.message || t("jobImports.detail.notifications.actionFailed"))
+      toast.error(localizedImportError(error, t, t("jobImports.detail.notifications.actionFailed")))
     } finally {
       setBusy("")
     }
@@ -249,7 +256,7 @@ export default function JobImportSourceDetailPage() {
       setReconnectOpen(false)
       await source.refetch()
     } catch (error) {
-      toast.error(error.message || t("jobImports.detail.notifications.actionFailed"))
+      toast.error(localizedImportError(error, t, t("jobImports.detail.notifications.actionFailed")))
     } finally {
       setBusy("")
     }
@@ -263,7 +270,7 @@ export default function JobImportSourceDetailPage() {
       toast.success(t("jobImports.detail.notifications.archived"))
       navigate("/agency/import/jobs")
     } catch (error) {
-      toast.error(error.message || t("jobImports.detail.notifications.actionFailed"))
+      toast.error(localizedImportError(error, t, t("jobImports.detail.notifications.actionFailed")))
     } finally {
       setBusy("")
     }
@@ -350,8 +357,8 @@ export default function JobImportSourceDetailPage() {
               <p className="font-black text-amber-900">{t("jobImports.detail.attention.title")}</p>
               <p className="mt-1 text-sm text-amber-800">
                 {sourceData.health_error_code
-                  ? t("jobImports.detail.attention.errorCode", {
-                      code: sourceData.health_error_code,
+                  ? t(`jobImports.errors.${sourceData.health_error_code}`, {
+                      defaultValue: t("jobImports.detail.notifications.actionFailed"),
                     })
                   : t("jobImports.detail.attention.review", { count: reviewCount })}
               </p>
@@ -425,8 +432,18 @@ export default function JobImportSourceDetailPage() {
             </div>
             <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
               {[
-                ["publishPolicy", sourceData.publish_policy],
-                ["closingPolicy", sourceData.closing_policy],
+                [
+                  "publishPolicy",
+                  t(`jobImports.detail.policyValues.${sourceData.publish_policy}`, {
+                    defaultValue: t("jobImports.statuses.unknown"),
+                  }),
+                ],
+                [
+                  "closingPolicy",
+                  t(`jobImports.detail.policyValues.${sourceData.closing_policy}`, {
+                    defaultValue: t("jobImports.statuses.unknown"),
+                  }),
+                ],
                 [
                   "schedule",
                   sourceData.interval_hours
@@ -464,7 +481,9 @@ export default function JobImportSourceDetailPage() {
                 <ul className="mt-3 list-inside list-disc space-y-1 text-xs text-slate-500">
                   {connector.limitations.map((limitation) => (
                     <li key={limitation}>
-                      {t(`jobImports.capabilities.${limitation}`, { defaultValue: limitation })}
+                      {t(`jobImports.capabilities.${limitation}`, {
+                        defaultValue: t("jobImports.capabilities.unknown"),
+                      })}
                     </li>
                   ))}
                 </ul>
@@ -499,29 +518,32 @@ export default function JobImportSourceDetailPage() {
                   {t("jobImports.detail.runsDescription")}
                 </p>
               </div>
-              <select
-                value={runStatus}
-                onChange={(event) => {
-                  setRunStatus(event.target.value)
-                  setRunPage(1)
-                }}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
-              >
-                <option value="">{t("jobImports.detail.allStatuses")}</option>
-                {[
-                  "pending",
-                  "running",
-                  "completed",
-                  "partial",
-                  "failed",
-                  "dead_letter",
-                  "cancelled",
-                ].map((value) => (
-                  <option key={value} value={value}>
-                    {t(`jobImports.detail.runStatuses.${value}`)}
-                  </option>
-                ))}
-              </select>
+              <label className="text-xs font-bold text-slate-700">
+                {t("jobImports.detail.filterRunStatus")}
+                <select
+                  value={runStatus}
+                  onChange={(event) => {
+                    setRunStatus(event.target.value)
+                    setRunPage(1)
+                  }}
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                >
+                  <option value="">{t("jobImports.detail.allStatuses")}</option>
+                  {[
+                    "pending",
+                    "running",
+                    "completed",
+                    "partial",
+                    "failed",
+                    "dead_letter",
+                    "cancelled",
+                  ].map((value) => (
+                    <option key={value} value={value}>
+                      {t(`jobImports.detail.runStatuses.${value}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
             {runs.isLoading ? (
               <div className="p-8 text-center text-sm text-slate-500">{t("common.loading")}</div>
@@ -539,13 +561,19 @@ export default function JobImportSourceDetailPage() {
                   >
                     <div>
                       <p className="text-xs text-slate-500">#{run.id}</p>
-                      <p className="font-bold text-slate-900">{run.mode}</p>
+                      <p className="font-bold text-slate-900">
+                        {t(`jobImports.detail.runModes.${run.mode}`, {
+                          defaultValue: t("jobImports.statuses.unknown"),
+                        })}
+                      </p>
                     </div>
                     <div className="text-sm text-slate-700">
                       {t("jobImports.detail.runSummary", {
-                        items: run.items_fetched,
-                        changes:
+                        items: formatImportNumber(run.items_fetched, i18n.language),
+                        changes: formatImportNumber(
                           run.create_count + run.update_count + run.close_count + run.reopen_count,
+                          i18n.language,
+                        ),
                       })}
                     </div>
                     <div className="text-sm text-slate-600">
@@ -652,13 +680,24 @@ export default function JobImportSourceDetailPage() {
                   />
                   <div className="flex items-center justify-between gap-2">
                     <StatusPill value={run.status} />
-                    <span className="text-xs text-slate-400">#{run.id}</span>
+                    <span dir="ltr" className="text-xs text-slate-600">
+                      #{run.id}
+                    </span>
                   </div>
                   <p className="mt-1 text-xs text-slate-500">
                     {formatImportDate(run.completed_at || run.started_at, i18n.language)}
                   </p>
+                  {(run.completed_at || run.started_at) && (
+                    <p className="text-xs text-slate-500">
+                      {formatImportRelativeTime(run.completed_at || run.started_at, i18n.language)}
+                    </p>
+                  )}
                   {run.error?.code && (
-                    <p className="mt-1 text-xs font-bold text-red-700">{run.error.code}</p>
+                    <p className="mt-1 text-xs font-bold text-red-700">
+                      {t(`jobImports.errors.${run.error.code}`, {
+                        defaultValue: t("jobImports.detail.notifications.actionFailed"),
+                      })}
+                    </p>
                   )}
                 </li>
               ))}
@@ -680,7 +719,7 @@ export default function JobImportSourceDetailPage() {
                   <li key={event.id} className="border-s border-slate-200 ps-3">
                     <p className="text-sm font-bold text-slate-800">
                       {t(`jobImports.detail.auditActions.${event.action}`, {
-                        defaultValue: event.action,
+                        defaultValue: t("jobImports.detail.auditActions.unknown"),
                       })}
                     </p>
                     <p className="mt-1 text-xs text-slate-500">
@@ -726,6 +765,7 @@ export default function JobImportSourceDetailPage() {
                 {can.archive && (
                   <button
                     type="button"
+                    ref={archiveOpenerRef}
                     onClick={() => setArchiveOpen(true)}
                     className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700"
                   >
@@ -771,7 +811,14 @@ export default function JobImportSourceDetailPage() {
       </div>
 
       <AlertDialog open={archiveOpen} onOpenChange={setArchiveOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent
+          onCloseAutoFocus={(event) => {
+            if (archiveOpenerRef.current?.isConnected) {
+              event.preventDefault()
+              archiveOpenerRef.current.focus()
+            }
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>{t("jobImports.detail.archive.title")}</AlertDialogTitle>
             <AlertDialogDescription>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
   AlertTriangle,
@@ -8,7 +8,6 @@ import {
   ChevronRight,
   Edit3,
   ExternalLink,
-  Filter,
   Link2,
   Loader2,
   RefreshCw,
@@ -33,7 +32,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { BackIcon, ErrorPanel, PageHeading, PageShell, Panel, StatusPill } from "./JobImportUi"
+import {
+  BackIcon,
+  ErrorPanel,
+  formatImportCurrency,
+  formatImportDate,
+  formatImportNumber,
+  formatImportPercent,
+  localizedImportError,
+  localizedImportIssue,
+  PageHeading,
+  PageShell,
+  Panel,
+  StatusPill,
+} from "./JobImportUi"
 
 const PAGE_SIZE = 25
 
@@ -61,7 +73,52 @@ const stringify = (value) => {
   return JSON.stringify(value, null, 2)
 }
 
-function DataPanel({ title, value, tone = "slate" }) {
+const displayValue = (value, field, locale, t) => {
+  if (typeof value === "number") {
+    return formatImportNumber(value, locale)
+  }
+
+  if (
+    value &&
+    typeof value === "object" &&
+    value.currency &&
+    (value.minimum != null || value.maximum != null)
+  ) {
+    return [value.minimum, value.maximum]
+      .filter((amount) => amount != null)
+      .map((amount) => formatImportCurrency(amount, value.currency, locale))
+      .join(" – ")
+  }
+
+  if (
+    typeof value === "string" &&
+    /(?:_at|_date|valid_through)$/.test(field) &&
+    !Number.isNaN(Date.parse(value))
+  ) {
+    return formatImportDate(value, locale)
+  }
+
+  if (typeof value === "string") {
+    const namespace = {
+      employment_type: "employment",
+      work_mode: "workMode",
+      source_status: "statuses",
+      state: "statuses",
+    }[field]
+
+    if (namespace) {
+      return t(`jobImports.${namespace}.${value}`, {
+        defaultValue: t("jobImports.statuses.unknown"),
+      })
+    }
+  }
+
+  return stringify(value)
+}
+
+function DataPanel({ title, value, tone = "slate", raw = false }) {
+  const { t, i18n } = useTranslation()
+
   const tones = {
     slate: "border-slate-200 bg-slate-50",
     violet: "border-violet-200 bg-violet-50",
@@ -77,9 +134,18 @@ function DataPanel({ title, value, tone = "slate" }) {
             .filter(([key]) => !["field_provenance", "raw_checksum"].includes(key))
             .map(([key, entry]) => (
               <div key={key} className="grid gap-1 border-b border-black/5 pb-2 last:border-0">
-                <dt className="font-bold text-slate-500">{key.replaceAll("_", " ")}</dt>
-                <dd className="whitespace-pre-wrap break-words text-slate-800">
-                  {stringify(entry)}
+                <dt className="font-bold text-slate-500">
+                  {raw ? (
+                    <code dir="ltr">{key}</code>
+                  ) : (
+                    t(`jobImports.fields.${key}`, { defaultValue: t("jobImports.fields.unknown") })
+                  )}
+                </dt>
+                <dd
+                  dir={raw ? "ltr" : "auto"}
+                  className="whitespace-pre-wrap break-all text-slate-800"
+                >
+                  {raw ? stringify(entry) : displayValue(entry, key, i18n.language, t)}
                 </dd>
               </div>
             ))
@@ -92,6 +158,8 @@ function DataPanel({ title, value, tone = "slate" }) {
 }
 
 function FieldDiff({ diff, t }) {
+  const { i18n } = useTranslation()
+
   const rows = Object.entries(diff || {}).filter(([field]) => !field.startsWith("_"))
 
   if (!rows.length) {
@@ -99,41 +167,35 @@ function FieldDiff({ diff, t }) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-slate-200">
-      <table className="min-w-[760px] w-full text-start text-xs">
-        <thead className="bg-slate-50 text-slate-500">
-          <tr>
-            <th className="p-3 text-start">{t("jobImports.review.field")}</th>
-            <th className="p-3 text-start">{t("jobImports.review.sourceBefore")}</th>
-            <th className="p-3 text-start">{t("jobImports.review.sourceAfter")}</th>
-            <th className="p-3 text-start">{t("jobImports.review.currentJob")}</th>
-            <th className="p-3 text-start">{t("jobImports.review.ownership")}</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {rows.map(([field, raw]) => {
-            const value = raw && typeof raw === "object" ? raw : {}
+    <div className="grid min-w-0 gap-3">
+      {rows.map(([field, raw]) => {
+        const value = raw && typeof raw === "object" ? raw : {}
 
-            return (
-              <tr key={field}>
-                <td className="p-3 font-bold text-slate-800">{field.replaceAll("_", " ")}</td>
-                <td className="max-w-48 whitespace-pre-wrap break-words p-3 text-slate-600">
-                  {stringify(value.source_before)}
-                </td>
-                <td className="max-w-48 whitespace-pre-wrap break-words bg-violet-50/50 p-3 text-slate-900">
-                  {stringify(value.source_after)}
-                </td>
-                <td className="max-w-48 whitespace-pre-wrap break-words bg-blue-50/50 p-3 text-slate-900">
-                  {stringify(value.current_job)}
-                </td>
-                <td className="p-3">
-                  <StatusPill value={value.ownership || "unknown"} />
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+        return (
+          <article key={field} className="min-w-0 rounded-xl border border-slate-200 p-3 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h4 className="font-bold text-slate-900">
+                {t(`jobImports.fields.${field}`, { defaultValue: t("jobImports.fields.unknown") })}
+              </h4>
+              <StatusPill value={value.ownership || "unknown"} />
+            </div>
+            <dl className="mt-3 grid min-w-0 gap-2 md:grid-cols-3">
+              {[
+                ["sourceBefore", value.source_before],
+                ["sourceAfter", value.source_after],
+                ["currentJob", value.current_job],
+              ].map(([key, entry]) => (
+                <div key={key} className="min-w-0 rounded-lg bg-slate-50 p-3">
+                  <dt className="font-bold text-slate-500">{t(`jobImports.review.${key}`)}</dt>
+                  <dd dir="auto" className="mt-1 whitespace-pre-wrap break-all text-slate-800">
+                    {displayValue(entry, field, i18n.language, t)}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+        )
+      })}
     </div>
   )
 }
@@ -272,7 +334,7 @@ function ReviewItemDetails({ item, busy, onCorrect, onLink, t }) {
         </div>
       )}
       <div className="grid gap-3 lg:grid-cols-3">
-        <DataPanel title={t("jobImports.review.sourcePayload")} value={item.source_payload} />
+        <DataPanel title={t("jobImports.review.sourcePayload")} value={item.source_payload} raw />
         <DataPanel
           title={t("jobImports.review.normalized")}
           value={item.normalized_candidate}
@@ -293,10 +355,12 @@ function ReviewItemDetails({ item, busy, onCorrect, onLink, t }) {
               className={`rounded-lg px-3 py-2 text-xs ${issue.severity === "error" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-800"}`}
             >
               <p className="font-black">
-                {issue.code}
-                {issue.field ? ` · ${issue.field}` : ""}
+                <code dir="ltr">
+                  {issue.code}
+                  {issue.field ? ` · ${issue.field}` : ""}
+                </code>
               </p>
-              <p className="mt-1 leading-5">{issue.message}</p>
+              <p className="mt-1 leading-5">{localizedImportIssue(issue, t)}</p>
             </div>
           ))}
           {!item.validation_issues?.length && (
@@ -367,6 +431,8 @@ export default function JobImportRunReviewPage() {
 
   const [closeConfirmation, setCloseConfirmation] = useState(null)
 
+  const bulkApplyRef = useRef(null)
+
   const param = (key) => searchParams.get(key) || ""
 
   const page = Math.max(1, Number(param("page")) || 1)
@@ -425,6 +491,8 @@ export default function JobImportRunReviewPage() {
     queryKey: ["job-import-run", numericRunId],
     queryFn: () => importSourceService.getRun(numericRunId),
     enabled: Boolean(numericRunId),
+    refetchInterval: (queryState) =>
+      ["pending", "running"].includes(queryState.state.data?.status) ? 10_000 : false,
   })
 
   const items = useQuery({
@@ -465,7 +533,7 @@ export default function JobImportRunReviewPage() {
 
       await refresh()
     } catch (error) {
-      toast.error(error.message || t("jobImports.review.notifications.failed"))
+      toast.error(localizedImportError(error, t, t("jobImports.review.notifications.failed")))
     } finally {
       setBusy("")
     }
@@ -588,6 +656,17 @@ export default function JobImportRunReviewPage() {
           </button>
         }
       />
+      {numericRunId && run.data && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="flex items-center gap-2 text-sm text-slate-700"
+        >
+          <span>{t("jobImports.review.runStatus")}</span>
+          <StatusPill value={run.data.status} />
+        </div>
+      )}
       {counters.length ? (
         <div className="grid grid-cols-3 gap-3 lg:grid-cols-6">
           {counters.map((key) => (
@@ -596,7 +675,7 @@ export default function JobImportRunReviewPage() {
                 {t(`jobImports.run.actions.${key}`)}
               </p>
               <p className="mt-2 text-xl font-black text-slate-900">
-                {run.data?.[`${key}_count`] || 0}
+                {formatImportNumber(run.data?.[`${key}_count`] || 0, i18n.language)}
               </p>
             </Panel>
           ))}
@@ -606,8 +685,13 @@ export default function JobImportRunReviewPage() {
       <Panel className="space-y-4">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
           <label className="relative xl:col-span-2">
-            <span className="sr-only">{t("jobImports.review.filters.search")}</span>
-            <Search className="absolute start-3 top-3 h-4 w-4 text-slate-400" />
+            <span className="mb-1 block text-xs font-bold text-slate-700">
+              {t("jobImports.review.filters.search")}
+            </span>
+            <Search
+              className="absolute bottom-3 start-3 h-4 w-4 text-slate-400"
+              aria-hidden="true"
+            />
             <input
               type="search"
               value={search}
@@ -617,74 +701,86 @@ export default function JobImportRunReviewPage() {
             />
           </label>
           {!numericRunId && (
-            <select
-              aria-label={t("jobImports.review.filters.source")}
-              value={param("source")}
-              onChange={(event) => setParam("source", event.target.value, true)}
-              className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
-            >
-              <option value="">{t("jobImports.review.filters.allSources")}</option>
-              {(sources.data?.data || []).map((source) => (
-                <option key={source.id} value={source.id}>
-                  {source.name}
-                </option>
-              ))}
-            </select>
+            <label className="block text-xs font-bold text-slate-700">
+              {t("jobImports.review.filters.source")}
+              <select
+                value={param("source")}
+                onChange={(event) => setParam("source", event.target.value, true)}
+                className="mt-1 w-full min-w-0 rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
+              >
+                <option value="">{t("jobImports.review.filters.allSources")}</option>
+                {(sources.data?.data || []).map((source) => (
+                  <option key={source.id} value={source.id}>
+                    {source.name}
+                  </option>
+                ))}
+              </select>
+            </label>
           )}
           {!numericRunId && (
+            <label className="block text-xs font-bold text-slate-700">
+              {t("jobImports.review.filters.client")}
+              <select
+                value={param("client")}
+                onChange={(event) => setParam("client", event.target.value, true)}
+                className="mt-1 w-full min-w-0 rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
+              >
+                <option value="">{t("jobImports.review.filters.allClients")}</option>
+                {(clients.data?.data || []).map((client) => (
+                  <option key={client.id} value={client.company_id}>
+                    {client.company?.name || `#${client.company_id}`}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <label className="block text-xs font-bold text-slate-700">
+            {t("jobImports.review.filters.action")}
             <select
-              aria-label={t("jobImports.review.filters.client")}
-              value={param("client")}
-              onChange={(event) => setParam("client", event.target.value, true)}
-              className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
+              value={param("action")}
+              onChange={(event) => setParam("action", event.target.value, true)}
+              className="mt-1 w-full min-w-0 rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
             >
-              <option value="">{t("jobImports.review.filters.allClients")}</option>
-              {(clients.data?.data || []).map((client) => (
-                <option key={client.id} value={client.company_id}>
-                  {client.company?.name || `#${client.company_id}`}
+              <option value="">{t("jobImports.review.filters.allActions")}</option>
+              {[...REVIEW_ACTIONS, "review", "error"].map((value) => (
+                <option key={value} value={value}>
+                  {t(`jobImports.statuses.${value}`)}
                 </option>
               ))}
             </select>
-          )}
-          <select
-            aria-label={t("jobImports.review.filters.action")}
-            value={param("action")}
-            onChange={(event) => setParam("action", event.target.value, true)}
-            className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
-          >
-            <option value="">{t("jobImports.review.filters.allActions")}</option>
-            {[...REVIEW_ACTIONS, "review", "error"].map((value) => (
-              <option key={value} value={value}>
-                {t(`jobImports.statuses.${value}`)}
-              </option>
-            ))}
-          </select>
-          <select
-            aria-label={t("jobImports.review.filters.issue")}
-            value={param("issue")}
-            onChange={(event) => setParam("issue", event.target.value, true)}
-            className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
-          >
-            <option value="">{t("jobImports.review.filters.allIssues")}</option>
-            {ISSUE_CODES.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-          <select
-            aria-label={t("jobImports.review.filters.confidence")}
-            value={confidence}
-            onChange={(event) => setParam("confidence", event.target.value, true)}
-            className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
-          >
-            <option value="">{t("jobImports.review.filters.allConfidence")}</option>
-            {["low", "medium", "high"].map((value) => (
-              <option key={value} value={value}>
-                {t(`jobImports.review.filters.confidenceLevels.${value}`)}
-              </option>
-            ))}
-          </select>
+          </label>
+          <label className="block text-xs font-bold text-slate-700">
+            {t("jobImports.review.filters.issue")}
+            <select
+              value={param("issue")}
+              onChange={(event) => setParam("issue", event.target.value, true)}
+              className="mt-1 w-full min-w-0 rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
+            >
+              <option value="">{t("jobImports.review.filters.allIssues")}</option>
+              {ISSUE_CODES.map((value) => (
+                <option key={value} value={value}>
+                  {t(`jobImports.issues.${value}`, {
+                    defaultValue: t("jobImports.issues.generic"),
+                  })}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-xs font-bold text-slate-700">
+            {t("jobImports.review.filters.confidence")}
+            <select
+              value={confidence}
+              onChange={(event) => setParam("confidence", event.target.value, true)}
+              className="mt-1 w-full min-w-0 rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
+            >
+              <option value="">{t("jobImports.review.filters.allConfidence")}</option>
+              {["low", "medium", "high"].map((value) => (
+                <option key={value} value={value}>
+                  {t(`jobImports.review.filters.confidenceLevels.${value}`)}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </Panel>
 
@@ -693,27 +789,34 @@ export default function JobImportRunReviewPage() {
           <p className="font-black text-violet-950">
             {t("jobImports.review.bulk.selected", { count: selected.size })}
           </p>
-          <select
-            value={bulkAction}
-            onChange={(event) => setBulkAction(event.target.value)}
-            className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
-          >
-            <option value="skip">{t("jobImports.review.actions.ignore")}</option>
-            {["create", "update", "close", "reopen"].map((value) => (
-              <option key={value} value={value}>
-                {t(`jobImports.statuses.${value}`)}
-              </option>
-            ))}
-            <option value="reject">{t("jobImports.review.actions.reject")}</option>
-          </select>
-          <input
-            value={bulkReason}
-            onChange={(event) => setBulkReason(event.target.value)}
-            placeholder={t("jobImports.review.bulk.reason")}
-            className="min-w-56 flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm"
-          />
+          <label className="text-xs font-bold text-slate-700">
+            {t("jobImports.review.bulk.action")}
+            <select
+              value={bulkAction}
+              onChange={(event) => setBulkAction(event.target.value)}
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            >
+              <option value="skip">{t("jobImports.review.actions.ignore")}</option>
+              {["create", "update", "close", "reopen"].map((value) => (
+                <option key={value} value={value}>
+                  {t(`jobImports.statuses.${value}`)}
+                </option>
+              ))}
+              <option value="reject">{t("jobImports.review.actions.reject")}</option>
+            </select>
+          </label>
+          <label className="min-w-0 flex-1 text-xs font-bold text-slate-700">
+            {t("jobImports.review.bulk.reason")}
+            <input
+              value={bulkReason}
+              onChange={(event) => setBulkReason(event.target.value)}
+              placeholder={t("jobImports.review.bulk.reason")}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            />
+          </label>
           <button
             type="button"
+            ref={bulkApplyRef}
             onClick={() => bulkResolve()}
             disabled={busy === "bulk" || (bulkAction === "reject" && !bulkReason.trim())}
             className="inline-flex items-center gap-2 rounded-lg bg-violet-700 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
@@ -738,7 +841,24 @@ export default function JobImportRunReviewPage() {
             <h2 className="font-black text-slate-900">{t("jobImports.review.queue")}</h2>
             <p className="mt-1 text-sm text-slate-500">{t("jobImports.review.queueDescription")}</p>
           </div>
-          <Filter className="h-5 w-5 text-slate-400" />
+          {rows.length > 0 && canReview && (
+            <label className="flex items-center gap-2 text-xs font-bold text-slate-700">
+              <input
+                type="checkbox"
+                checked={rows.every((item) => selected.has(item.id))}
+                onChange={(event) => {
+                  const next = new Set(selected)
+
+                  rows.forEach((item) =>
+                    event.target.checked ? next.add(item.id) : next.delete(item.id),
+                  )
+                  setParam("selected", [...next].join(","))
+                }}
+                className="h-4 w-4"
+              />
+              {t("jobImports.review.selectPage")}
+            </label>
+          )}
         </div>
         {items.isLoading ? (
           <div className="p-10 text-center text-sm text-slate-500">{t("common.loading")}</div>
@@ -784,18 +904,25 @@ export default function JobImportRunReviewPage() {
                     <button
                       type="button"
                       onClick={() => setParam("open", open ? "" : item.id)}
+                      aria-expanded={open}
+                      aria-controls={`job-import-review-${item.id}`}
                       className="min-w-0 text-start"
                     >
                       <span className="flex items-center gap-2">
                         <ChevronDown
                           className={`h-4 w-4 shrink-0 transition ${open ? "rotate-180" : ""}`}
                         />
-                        <strong className="truncate text-slate-900">
+                        <strong dir="auto" className="break-words text-slate-900">
                           {String(item.normalized_candidate.title || t("jobImports.run.untitled"))}
                         </strong>
-                        {item.stale && <AlertTriangle className="h-4 w-4 text-red-600" />}
+                        {item.stale && (
+                          <>
+                            <AlertTriangle aria-hidden="true" className="h-4 w-4 text-red-600" />
+                            <span className="sr-only">{t("jobImports.review.stale")}</span>
+                          </>
+                        )}
                       </span>
-                      <span className="mt-1 block truncate text-xs text-slate-500">
+                      <span dir="auto" className="mt-1 block break-words text-xs text-slate-500">
                         {item.source?.name || "—"} · #{item.id} ·{" "}
                         {item.current_job
                           ? `${t("jobImports.review.job")} #${item.current_job.id}`
@@ -806,7 +933,7 @@ export default function JobImportRunReviewPage() {
                       <StatusPill value={item.proposed_action} />
                       <p className="mt-1 text-xs text-slate-500">
                         {t("jobImports.run.confidence", {
-                          value: Math.round(Number(item.confidence) * 100),
+                          value: formatImportPercent(item.confidence, i18n.language),
                         })}
                       </p>
                     </div>
@@ -816,38 +943,53 @@ export default function JobImportRunReviewPage() {
                           key={issue.code}
                           className="rounded bg-amber-50 px-1.5 py-1 text-[10px] font-bold text-amber-800"
                         >
-                          {issue.code}
+                          {t(`jobImports.issues.${issue.code}`, {
+                            defaultValue: t("jobImports.issues.generic"),
+                          })}
                         </span>
                       ))}
                     </div>
                     {canReview && (
-                      <div className="grid gap-2 sm:grid-cols-[120px_minmax(120px,1fr)_auto_auto_auto]">
-                        <select
-                          value={action}
-                          onChange={(event) =>
-                            setActions((current) => ({ ...current, [item.id]: event.target.value }))
-                          }
-                          className="rounded-lg border border-slate-200 px-2 py-2 text-xs"
-                        >
-                          {REVIEW_ACTIONS.map((value) => (
-                            <option key={value} value={value}>
-                              {t(`jobImports.statuses.${value}`)}
-                            </option>
-                          ))}
-                        </select>
-                        <input
-                          value={reason}
-                          onChange={(event) =>
-                            setReasons((current) => ({ ...current, [item.id]: event.target.value }))
-                          }
-                          placeholder={t("jobImports.review.reason")}
-                          className="rounded-lg border border-slate-200 px-2 py-2 text-xs"
-                        />
+                      <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(110px,1fr)_minmax(120px,1fr)_auto_auto_auto]">
+                        <label className="text-xs font-bold text-slate-700">
+                          {t("jobImports.review.actionForItem")}
+                          <select
+                            value={action}
+                            onChange={(event) =>
+                              setActions((current) => ({
+                                ...current,
+                                [item.id]: event.target.value,
+                              }))
+                            }
+                            className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-2 text-xs"
+                          >
+                            {REVIEW_ACTIONS.map((value) => (
+                              <option key={value} value={value}>
+                                {t(`jobImports.statuses.${value}`)}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="text-xs font-bold text-slate-700">
+                          {t("jobImports.review.reason")}
+                          <input
+                            value={reason}
+                            onChange={(event) =>
+                              setReasons((current) => ({
+                                ...current,
+                                [item.id]: event.target.value,
+                              }))
+                            }
+                            placeholder={t("jobImports.review.reason")}
+                            className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-2 text-xs"
+                          />
+                        </label>
                         <button
                           type="button"
                           onClick={() => resolveItem(item, "approve")}
                           disabled={Boolean(busy) || item.stale}
                           title={t("jobImports.review.actions.approve")}
+                          aria-label={t("jobImports.review.actions.approve")}
                           className="rounded-lg bg-emerald-600 p-2 text-white disabled:opacity-40"
                         >
                           <Check className="h-4 w-4" />
@@ -857,6 +999,7 @@ export default function JobImportRunReviewPage() {
                           onClick={() => resolveItem(item, "reject")}
                           disabled={Boolean(busy)}
                           title={t("jobImports.review.actions.reject")}
+                          aria-label={t("jobImports.review.actions.reject")}
                           className="rounded-lg bg-red-50 p-2 text-red-700 disabled:opacity-40"
                         >
                           <X className="h-4 w-4" />
@@ -874,6 +1017,7 @@ export default function JobImportRunReviewPage() {
                             }
                             disabled={Boolean(busy)}
                             title={t("jobImports.review.actions.retry")}
+                            aria-label={t("jobImports.review.actions.retry")}
                             className="rounded-lg bg-blue-50 p-2 text-blue-700"
                           >
                             <RotateCcw className="h-4 w-4" />
@@ -884,6 +1028,7 @@ export default function JobImportRunReviewPage() {
                             onClick={() => resolveItem(item, "ignore")}
                             disabled={Boolean(busy)}
                             title={t("jobImports.review.actions.ignore")}
+                            aria-label={t("jobImports.review.actions.ignore")}
                             className="rounded-lg bg-slate-100 p-2 text-slate-700"
                           >
                             <SkipForward className="h-4 w-4" />
@@ -893,35 +1038,37 @@ export default function JobImportRunReviewPage() {
                     )}
                   </div>
                   {open && (
-                    <ReviewItemDetails
-                      item={item}
-                      busy={Boolean(busy)}
-                      t={t}
-                      onCorrect={(payload) =>
-                        mutate(
-                          `correct-${item.id}`,
-                          () => importSourceService.correctItem(item.id, payload),
-                          "corrected",
-                        )
-                      }
-                      onLink={(duplicate) => {
-                        const reasonValue = String(
-                          reasons[item.id] || t("jobImports.review.duplicates.defaultReason"),
-                        )
+                    <div id={`job-import-review-${item.id}`}>
+                      <ReviewItemDetails
+                        item={item}
+                        busy={Boolean(busy)}
+                        t={t}
+                        onCorrect={(payload) =>
+                          mutate(
+                            `correct-${item.id}`,
+                            () => importSourceService.correctItem(item.id, payload),
+                            "corrected",
+                          )
+                        }
+                        onLink={(duplicate) => {
+                          const reasonValue = String(
+                            reasons[item.id] || t("jobImports.review.duplicates.defaultReason"),
+                          )
 
-                        mutate(
-                          `link-${item.id}`,
-                          () =>
-                            importSourceService.linkDuplicate(
-                              item.id,
-                              duplicate.source_job_record_id,
-                              reasonValue,
-                            ),
-                          "linked",
-                          [item.id],
-                        )
-                      }}
-                    />
+                          mutate(
+                            `link-${item.id}`,
+                            () =>
+                              importSourceService.linkDuplicate(
+                                item.id,
+                                duplicate.source_job_record_id,
+                                reasonValue,
+                              ),
+                            "linked",
+                            [item.id],
+                          )
+                        }}
+                      />
+                    </div>
                   )}
                 </article>
               )
@@ -977,7 +1124,14 @@ export default function JobImportRunReviewPage() {
         open={Boolean(closeConfirmation)}
         onOpenChange={(open) => !open && setCloseConfirmation(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent
+          onCloseAutoFocus={(event) => {
+            if (bulkApplyRef.current?.isConnected) {
+              event.preventDefault()
+              bulkApplyRef.current.focus()
+            }
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>
               {t("jobImports.review.bulk.closeTitle", { count: closeConfirmation?.length || 0 })}

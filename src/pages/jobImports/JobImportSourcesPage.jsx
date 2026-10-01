@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   AlertTriangle,
@@ -42,6 +42,9 @@ import {
 import {
   ErrorPanel,
   formatImportDate,
+  formatImportNumber,
+  formatImportRelativeTime,
+  localizedImportError,
   PageHeading,
   PageShell,
   Panel,
@@ -51,6 +54,8 @@ import {
 const PAGE_SIZE = 20
 
 function MetricCard({ status, count, active, onClick, t }) {
+  const { i18n } = useTranslation()
+
   const icons = {
     healthy: RefreshCw,
     running: Play,
@@ -77,12 +82,16 @@ function MetricCard({ status, count, active, onClick, t }) {
         </span>
         <Icon className="h-4 w-4 text-slate-400" />
       </div>
-      <p className="mt-2 text-2xl font-black text-slate-900">{count}</p>
+      <p className="mt-2 text-2xl font-black text-slate-900">
+        {count === "—" ? count : formatImportNumber(count, i18n.language)}
+      </p>
     </button>
   )
 }
 
 function Count({ label, value, tone = "slate" }) {
+  const { i18n } = useTranslation()
+
   const tones = {
     slate: "bg-slate-100 text-slate-700",
     green: "bg-emerald-50 text-emerald-700",
@@ -93,7 +102,7 @@ function Count({ label, value, tone = "slate" }) {
 
   return (
     <span className={`rounded-lg px-2 py-1 text-xs font-bold ${tones[tone]}`}>
-      {label} {value}
+      {label} {formatImportNumber(value, i18n.language)}
     </span>
   )
 }
@@ -113,13 +122,16 @@ function SourceRow({ source, actionBusy, onRun, onPause, onArchive, can, t, i18n
         <div className="flex flex-wrap items-center gap-2">
           <Link
             to={`/agency/import/jobs/${source.id}`}
-            className="truncate font-black text-slate-900 hover:text-violet-700"
+            dir="auto"
+            className="block break-words font-black text-slate-900 hover:text-violet-700"
           >
             {source.name}
           </Link>
           <StatusPill value={source.operational_status} />
         </div>
-        <p className="mt-1 truncate text-xs text-slate-500">{source.url}</p>
+        <p dir="ltr" className="mt-1 break-all text-left text-xs text-slate-500">
+          {source.url}
+        </p>
         <p className="mt-2 text-xs text-slate-500">
           {t("jobImports.sources.connectorValue", {
             connector: t(`jobImports.connectors.${source.connector_type}`, {
@@ -142,6 +154,11 @@ function SourceRow({ source, actionBusy, onRun, onPause, onArchive, can, t, i18n
           <dd className="mt-1 font-semibold text-slate-800">
             {formatImportDate(source.last_success_at, i18n.language)}
           </dd>
+          {source.last_success_at && (
+            <dd className="text-slate-500">
+              {formatImportRelativeTime(source.last_success_at, i18n.language)}
+            </dd>
+          )}
         </div>
         <div>
           <dt className="text-slate-500">{t("jobImports.sources.nextRun")}</dt>
@@ -188,7 +205,10 @@ function SourceRow({ source, actionBusy, onRun, onPause, onArchive, can, t, i18n
             </div>
             <p className="mt-2 text-xs text-slate-500">
               {t(`jobImports.sources.trend.${trend}`, {
-                count: Math.abs(source.trend?.changes || changes),
+                count: formatImportNumber(
+                  Math.abs(source.trend?.changes || changes),
+                  i18n.language,
+                ),
               })}
             </p>
           </>
@@ -249,7 +269,7 @@ function SourceRow({ source, actionBusy, onRun, onPause, onArchive, can, t, i18n
         {can.archive && (
           <button
             type="button"
-            onClick={() => onArchive(source)}
+            onClick={(event) => onArchive(source, event.currentTarget)}
             disabled={Boolean(actionBusy)}
             aria-label={t("jobImports.sources.actions.archiveNamed", { name: source.name })}
             className="inline-flex items-center rounded-lg border border-red-200 p-2 text-red-700 disabled:opacity-50"
@@ -284,6 +304,8 @@ export default function JobImportSourcesPage() {
   const [actionBusy, setActionBusy] = useState("")
 
   const [archiveTarget, setArchiveTarget] = useState(null)
+
+  const archiveOpenerRef = useRef(null)
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -335,7 +357,9 @@ export default function JobImportSourcesPage() {
       toast.success(t("jobImports.sources.notifications.previewQueued"))
       navigate(`/agency/import/jobs/runs/${queued.run_id}`)
     } catch (error) {
-      toast.error(error.message || t("jobImports.sources.notifications.actionFailed"))
+      toast.error(
+        localizedImportError(error, t, t("jobImports.sources.notifications.actionFailed")),
+      )
     } finally {
       setActionBusy("")
     }
@@ -357,7 +381,9 @@ export default function JobImportSourcesPage() {
       await queryClient.invalidateQueries({ queryKey: ["job-import-source"] })
       await refresh()
     } catch (error) {
-      toast.error(error.message || t("jobImports.sources.notifications.actionFailed"))
+      toast.error(
+        localizedImportError(error, t, t("jobImports.sources.notifications.actionFailed")),
+      )
     } finally {
       setActionBusy("")
     }
@@ -376,7 +402,9 @@ export default function JobImportSourcesPage() {
       setArchiveTarget(null)
       await refresh()
     } catch (error) {
-      toast.error(error.message || t("jobImports.sources.notifications.actionFailed"))
+      toast.error(
+        localizedImportError(error, t, t("jobImports.sources.notifications.actionFailed")),
+      )
     } finally {
       setActionBusy("")
     }
@@ -483,8 +511,13 @@ export default function JobImportSourcesPage() {
       <Panel className="space-y-4">
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px_auto]">
           <label className="relative">
-            <span className="sr-only">{t("jobImports.sources.search")}</span>
-            <Search className="absolute start-3 top-3 h-4 w-4 text-slate-400" />
+            <span className="mb-1 block text-xs font-bold text-slate-700">
+              {t("jobImports.sources.search")}
+            </span>
+            <Search
+              aria-hidden="true"
+              className="absolute bottom-3 start-3 h-4 w-4 text-slate-400"
+            />
             <input
               type="search"
               value={search}
@@ -494,8 +527,13 @@ export default function JobImportSourcesPage() {
             />
           </label>
           <label className="relative">
-            <span className="sr-only">{t("jobImports.sources.connectorFilter")}</span>
-            <Filter className="absolute start-3 top-3 h-4 w-4 text-slate-400" />
+            <span className="mb-1 block text-xs font-bold text-slate-700">
+              {t("jobImports.sources.connectorFilter")}
+            </span>
+            <Filter
+              aria-hidden="true"
+              className="absolute bottom-3 start-3 h-4 w-4 text-slate-400"
+            />
             <select
               value={connector}
               onChange={(event) => {
@@ -556,7 +594,10 @@ export default function JobImportSourcesPage() {
                 actionBusy={actionBusy}
                 onRun={runPreview}
                 onPause={togglePause}
-                onArchive={setArchiveTarget}
+                onArchive={(source, opener) => {
+                  archiveOpenerRef.current = opener
+                  setArchiveTarget(source)
+                }}
                 can={can}
                 t={t}
                 i18n={i18n}
@@ -613,7 +654,14 @@ export default function JobImportSourcesPage() {
         open={Boolean(archiveTarget)}
         onOpenChange={(open) => !open && setArchiveTarget(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent
+          onCloseAutoFocus={(event) => {
+            if (archiveOpenerRef.current?.isConnected) {
+              event.preventDefault()
+              archiveOpenerRef.current.focus()
+            }
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>{t("jobImports.sources.archive.title")}</AlertDialogTitle>
             <AlertDialogDescription>

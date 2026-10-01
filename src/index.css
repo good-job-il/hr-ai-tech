@@ -4,6 +4,26 @@
 @tailwind components;
 @tailwind utilities;
 
+.job-import-workflow :is(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid #6d28d9;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .job-import-workflow *,
+  .job-import-workflow *::before,
+  .job-import-workflow *::after {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  [role="alertdialog"] {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @layer base {
   :root {
     --font-assistant: "Assistant", sans-serif;
