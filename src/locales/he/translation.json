@@ -1577,7 +1577,10 @@
       "review_on_conflict": "בדיקה בעת התנגשות"
     },
     "connectors": {
-      "generic_json": "פיד JSON"
+      "generic_json": "פיד JSON",
+      "json_ld": "JobPosting (JSON-LD)",
+      "greenhouse": "לוח Greenhouse",
+      "lever": "אתר Lever"
     },
     "employment": {
       "full_time": "משרה מלאה",
@@ -1668,6 +1671,7 @@
         "noLimitations": "אין מגבלות מוצהרות"
       },
       "sample": {
+        "configureFirstHint": "אם המקור דורש נתיב לאוסף או בורר לדפי משרה, המשיכו תחילה למיפוי ולאחר מכן הריצו בדיקת ייבוא.",
         "title": "הרצת דוגמה בטוחה",
         "description": "נשמרים נתוני ביניים בלבד.",
         "run": "הרצת דוגמה",
@@ -1683,6 +1687,24 @@
       },
       "mapping": {
         "collectionPath": "נתיב מערך",
+        "paginationMode": "דפדוף",
+        "pagination": {
+          "none": "ללא דפדוף",
+          "page": "מספר עמוד",
+          "offset": "היסט",
+          "cursor": "סמן"
+        },
+        "pageSize": "גודל עמוד",
+        "paginationParameter": "פרמטר URL לעמוד, היסט או סמן",
+        "paginationSizeParameter": "פרמטר URL לגודל עמוד",
+        "nextCursorPath": "נתיב JSON לסמן הבא",
+        "titlePath": "נתיבי שם משרה (מופרדים בפסיקים)",
+        "externalKeyPath": "נתיבי מזהה יציב",
+        "descriptionPath": "נתיבי תיאור",
+        "fullSnapshotProof": "הפיד כולל את כל המשרות הנוכחיות לאחר סיום הדפדוף",
+        "detailLinkSelector": "בורר CSS לקישורי דפי המשרות",
+        "singlePosting": "כתובת זו מציגה משרה אחת",
+        "listingComplete": "הרשימה כוללת את כל המשרות הנוכחיות",
         "auto": "זיהוי אוטומטי",
         "employmentDefault": "סוג העסקה",
         "workModeDefault": "מתכונת עבודה",

@@ -35,6 +35,18 @@ const EMPTY_FORM = {
   connector_type: "",
   employer_company_id: "",
   collection_path: "",
+  full_snapshot: false,
+  pagination_mode: "none",
+  pagination_parameter: "",
+  pagination_size_parameter: "limit",
+  page_size: "100",
+  next_cursor_path: "next_cursor",
+  mapping_title: "",
+  mapping_external_key: "",
+  mapping_description: "",
+  detail_link_selector: "",
+  listing_is_complete: false,
+  single_posting: false,
   employment_type: "full_time",
   work_mode: "unspecified",
   category: "",
@@ -342,6 +354,20 @@ export default function JobImportNewPage() {
       connector_type: source.connector_type || "",
       employer_company_id: source.employer_company_id ? String(source.employer_company_id) : "",
       collection_path: source.configuration?.collection_path || "",
+      full_snapshot: source.configuration?.full_snapshot === true,
+      pagination_mode: source.configuration?.pagination?.mode || "none",
+      pagination_parameter: source.configuration?.pagination?.parameter || "",
+      pagination_size_parameter: source.configuration?.pagination?.size_parameter || "limit",
+      page_size: String(
+        source.configuration?.pagination?.page_size || source.configuration?.page_size || 100,
+      ),
+      next_cursor_path: source.configuration?.pagination?.next_path || "next_cursor",
+      mapping_title: source.configuration?.mapping?.title?.join(", ") || "",
+      mapping_external_key: source.configuration?.mapping?.external_key?.join(", ") || "",
+      mapping_description: source.configuration?.mapping?.description?.join(", ") || "",
+      detail_link_selector: source.configuration?.detail_link_selector || "",
+      listing_is_complete: source.configuration?.listing_is_complete === true,
+      single_posting: source.configuration?.single_posting === true,
       employment_type: defaults.employment_type || "full_time",
       work_mode: defaults.work_mode || "unspecified",
       category: defaults.category || "",
@@ -565,17 +591,63 @@ export default function JobImportNewPage() {
     setError(null)
 
     try {
+      const connectorConfiguration =
+        form.connector_type === "generic_json"
+          ? {
+              ...(form.collection_path ? { collection_path: form.collection_path } : {}),
+              full_snapshot: form.full_snapshot,
+              ...(form.pagination_mode !== "none"
+                ? {
+                    pagination: {
+                      mode: form.pagination_mode,
+                      page_size: Number(form.page_size),
+                      ...(form.pagination_parameter.trim()
+                        ? { parameter: form.pagination_parameter.trim() }
+                        : {}),
+                      size_parameter: form.pagination_size_parameter.trim() || "limit",
+                      ...(form.pagination_mode === "cursor"
+                        ? { next_path: form.next_cursor_path.trim() }
+                        : {}),
+                    },
+                  }
+                : {}),
+              mapping: Object.fromEntries(
+                [
+                  ["title", form.mapping_title],
+                  ["external_key", form.mapping_external_key],
+                  ["description", form.mapping_description],
+                ]
+                  .filter(([, value]) => value.trim())
+                  .map(([key, value]) => [
+                    key,
+                    value
+                      .split(",")
+                      .map((part) => part.trim())
+                      .filter(Boolean),
+                  ]),
+              ),
+              defaults: {
+                employment_type: form.employment_type,
+                work_mode: form.work_mode,
+                category: form.category.trim() || null,
+              },
+            }
+          : form.connector_type === "json_ld"
+            ? {
+                ...(form.detail_link_selector.trim()
+                  ? { detail_link_selector: form.detail_link_selector.trim() }
+                  : {}),
+                listing_is_complete: form.listing_is_complete,
+                single_posting: form.single_posting,
+              }
+            : form.connector_type === "lever"
+              ? { page_size: Number(form.page_size) }
+              : {}
+
       await persistProgress(
         6,
         {
-          configuration: {
-            ...(form.collection_path ? { collection_path: form.collection_path } : {}),
-            defaults: {
-              employment_type: form.employment_type,
-              work_mode: form.work_mode,
-              category: form.category.trim() || null,
-            },
-          },
+          configuration: connectorConfiguration,
           default_team_id: asNullableNumber(form.default_team_id),
           default_team_manager_id: asNullableNumber(form.default_team_manager_id),
           default_recruiter_id: asNullableNumber(form.default_recruiter_id),
@@ -716,7 +788,7 @@ export default function JobImportNewPage() {
     1: handleSource,
     2: handleClient,
     3: handleConnection,
-    4: () => (previewRun ? persistProgress(5) : executePreview()),
+    4: () => persistProgress(5),
     5: handleMapping,
     6: handleDryRunContinue,
     7: handleApply,
@@ -725,7 +797,6 @@ export default function JobImportNewPage() {
   const nextDisabled =
     (step === 1 && (!form.url || !form.connector_type)) ||
     (step === 2 && !form.employer_company_id) ||
-    (step === 4 && !previewRun) ||
     (step === 6 &&
       (!readiness.ready || (previewSummary.destructive > 0 && !destructiveConfirmed))) ||
     (step === 7 && !confirmed)
@@ -812,6 +883,7 @@ export default function JobImportNewPage() {
           step={step}
           t={t}
           form={form}
+          setForm={setForm}
           setField={setField}
           error={error}
           errorCode={errorCode}
@@ -859,6 +931,7 @@ function WizardStep(props) {
     step,
     t,
     form,
+    setForm,
     setField,
     error,
     errorCode,
@@ -1056,6 +1129,9 @@ function WizardStep(props) {
             <p className="mt-1 text-sm text-slate-600">
               {t("jobImports.wizard.sample.description")}
             </p>
+            <p className="mt-2 text-xs text-slate-500">
+              {t("jobImports.wizard.sample.configureFirstHint")}
+            </p>
             <button
               type="button"
               onClick={executePreview}
@@ -1097,21 +1173,122 @@ function WizardStep(props) {
 
     return (
       <div className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Field label={t("jobImports.wizard.mapping.collectionPath")}>
-            <select
-              value={form.collection_path}
-              onChange={setField("collection_path")}
+        {form.connector_type === "generic_json" && (
+          <div className="grid gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
+            <Field label={t("jobImports.wizard.mapping.collectionPath")}>
+              <input
+                value={form.collection_path}
+                onChange={setField("collection_path")}
+                placeholder="jobs or data.results"
+                className={inputClass}
+              />
+            </Field>
+            <Field label={t("jobImports.wizard.mapping.paginationMode")}>
+              <select
+                value={form.pagination_mode}
+                onChange={setField("pagination_mode")}
+                className={inputClass}
+              >
+                {["none", "page", "offset", "cursor"].map((mode) => (
+                  <option key={mode} value={mode}>
+                    {t(`jobImports.wizard.mapping.pagination.${mode}`)}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            {form.pagination_mode !== "none" && (
+              <>
+                <Field label={t("jobImports.wizard.mapping.pageSize")}>
+                  <input type="number" min="1" max="500" value={form.page_size} onChange={setField("page_size")} className={inputClass} />
+                </Field>
+                <Field label={t("jobImports.wizard.mapping.paginationParameter")}>
+                  <input value={form.pagination_parameter} onChange={setField("pagination_parameter")} placeholder={form.pagination_mode} className={inputClass} />
+                </Field>
+                <Field label={t("jobImports.wizard.mapping.paginationSizeParameter")}>
+                  <input value={form.pagination_size_parameter} onChange={setField("pagination_size_parameter")} placeholder="limit" className={inputClass} />
+                </Field>
+              </>
+            )}
+            {form.pagination_mode === "cursor" && (
+              <Field label={t("jobImports.wizard.mapping.nextCursorPath")}>
+                <input
+                  value={form.next_cursor_path}
+                  onChange={setField("next_cursor_path")}
+                  className={inputClass}
+                />
+              </Field>
+            )}
+            {[
+              ["mapping_title", "titlePath"],
+              ["mapping_external_key", "externalKeyPath"],
+              ["mapping_description", "descriptionPath"],
+            ].map(([field, label]) => (
+              <Field key={field} label={t(`jobImports.wizard.mapping.${label}`)}>
+                <input
+                  value={form[field]}
+                  onChange={setField(field)}
+                  placeholder="data.title, title"
+                  className={inputClass}
+                />
+              </Field>
+            ))}
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 sm:col-span-2">
+              <input
+                type="checkbox"
+                checked={form.full_snapshot}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, full_snapshot: event.target.checked }))
+                }
+              />
+              {t("jobImports.wizard.mapping.fullSnapshotProof")}
+            </label>
+          </div>
+        )}
+        {form.connector_type === "json_ld" && (
+          <div className="grid gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
+            <Field label={t("jobImports.wizard.mapping.detailLinkSelector")}>
+              <input
+                value={form.detail_link_selector}
+                onChange={setField("detail_link_selector")}
+                placeholder="a.job-link"
+                className={inputClass}
+              />
+            </Field>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+              <input
+                type="checkbox"
+                checked={form.single_posting}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, single_posting: event.target.checked }))
+                }
+              />
+              {t("jobImports.wizard.mapping.singlePosting")}
+            </label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-800 sm:col-span-2">
+              <input
+                type="checkbox"
+                checked={form.listing_is_complete}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, listing_is_complete: event.target.checked }))
+                }
+              />
+              {t("jobImports.wizard.mapping.listingComplete")}
+            </label>
+          </div>
+        )}
+        {form.connector_type === "lever" && (
+          <Field label={t("jobImports.wizard.mapping.pageSize")}>
+            <input
+              type="number"
+              min="1"
+              max="100"
+              value={form.page_size}
+              onChange={setField("page_size")}
               className={inputClass}
-            >
-              <option value="">{t("jobImports.wizard.mapping.auto")}</option>
-              {["jobs", "data", "results", "root"].map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
+            />
           </Field>
+        )}
+        <div className="grid gap-4 sm:grid-cols-3">
           <Field label={t("jobImports.wizard.mapping.employmentDefault")}>
             <select
               value={form.employment_type}

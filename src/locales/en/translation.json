@@ -1577,7 +1577,10 @@
       "review_on_conflict": "Review on conflict"
     },
     "connectors": {
-      "generic_json": "JSON feed"
+      "generic_json": "JSON feed",
+      "json_ld": "JobPosting (JSON-LD)",
+      "greenhouse": "Greenhouse board",
+      "lever": "Lever site"
     },
     "employment": {
       "full_time": "Full time",
@@ -1668,6 +1671,7 @@
         "noLimitations": "No declared limitations"
       },
       "sample": {
+        "configureFirstHint": "If this source needs a collection path or detail-page selector, continue to Mapping first, then run the required dry-run.",
         "title": "Run a safe sample scan",
         "description": "Staging data is saved; live jobs cannot change.",
         "run": "Run sample",
@@ -1683,6 +1687,24 @@
       },
       "mapping": {
         "collectionPath": "Job array path",
+        "paginationMode": "Pagination",
+        "pagination": {
+          "none": "No pagination",
+          "page": "Page number",
+          "offset": "Offset",
+          "cursor": "Cursor"
+        },
+        "pageSize": "Page size",
+        "paginationParameter": "Page, offset or cursor query parameter",
+        "paginationSizeParameter": "Page-size query parameter",
+        "nextCursorPath": "Next cursor JSON path",
+        "titlePath": "Title aliases (comma separated JSON paths)",
+        "externalKeyPath": "Stable ID aliases",
+        "descriptionPath": "Description aliases",
+        "fullSnapshotProof": "This feed contains all current jobs after pagination completes",
+        "detailLinkSelector": "Detail page link selector (CSS)",
+        "singlePosting": "This URL is one job posting",
+        "listingComplete": "This listing contains every current posting",
         "auto": "Detect automatically",
         "employmentDefault": "Default employment type",
         "workModeDefault": "Default work mode",

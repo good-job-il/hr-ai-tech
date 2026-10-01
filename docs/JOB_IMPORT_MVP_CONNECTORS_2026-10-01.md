@@ -1,0 +1,32 @@
+# MVP-коннекторы импорта вакансий
+
+Дата: 2026-10-01. Контракт: `backend/src/modules/job-imports/connectors/`. Все запросы проходят общий Safe HTTP Fetcher; коннекторы не пишут в `jobs`. Применение идёт через существующие preview → diff/review → apply → reconciliation. Версия коннектора сохраняется в run; изменение версии требует повторного подтверждения до автоматического применения.
+
+## Для пользователя
+
+Создайте draft source в `/agency/import/jobs/new`, выберите активного AgencyClient и коннектор, проверьте sample, задайте mapping/defaults, затем запустите обязательный dry-run. Если sample не удаётся получить до настройки пути коллекции или CSS-селектора, перейдите к Mapping и выполните dry-run после сохранения конфигурации. Новые вакансии создаются как drafts; source URL не заменяет публичный URL вакансии на платформе. Закрытия проходят отдельные правила grace period, circuit breaker и review.
+
+| Коннектор | Вход и настройки | Полный снимок и ограничения |
+| --- | --- | --- |
+| Generic JSON `1.1.0` | HTTPS/HTTP JSON URL, необязательный `collection_path` (`jobs`, `data.results`, `root`), aliases для полей. `pagination.mode`: `page`, `offset`, `cursor` — только при явной настройке; имена URL-параметров страницы/размера настраиваются. | По умолчанию `partial`: отсутствие записи не закрывает вакансию. `full_snapshot=true` означает подтверждение владельцем source, что endpoint отдаёт все активные записи и pagination завершена. Без этого close-by-missing запрещён. Jobicy-style payload проверен fixture, это **не** отдельный Jobicy adapter. |
+| JSON-LD JobPosting `1.0.0` | HTTPS detail URL (`single_posting`) или listing URL + `detail_link_selector`; извлекает структурированные данные с detail pages. | Full только для однозначного single posting или явно подтверждённого полного listing. По умолчанию partial. Максимум 20 detail pages; превышение — `PARTIAL_SNAPSHOT`, не закрытие. Listing без найденных ссылок считается возможной поломкой селектора, а не доказанным пустым снимком. При несовпадении title с видимым H1 запись отклоняется. |
+| Greenhouse `1.0.0` | Публичный `boards.greenhouse.io/{board_token}` или `job-boards.greenhouse.io/{board_token}`. | Board API `/v1/boards/{token}/jobs?content=true` возвращает весь список без документированной пагинации. `meta.total` должен совпасть с числом jobs; иначе `PARTIAL_SNAPSHOT`. Используется **posting** ID, а не internal job ID. |
+| Lever `1.0.0` | Публичный `jobs.lever.co/{site}` или EU-эквивалент; `page_size` 1–100. | Postings API `skip/limit`; все страницы до короткой/пустой последней. Промежуточные страницы partial. Используется posting ID и `descriptionPlain` с fallback на HTML. |
+
+Заявленные capabilities описывают возможности адаптера, а не гарантию качества конкретного source. Salary/remote/location зависят от фактически опубликованных полей. Greenhouse и Lever — публичные board/postings API; приватные ATS credentials в этом MVP не поддержаны. Generic HTML beta в этот набор не входит.
+
+## Для operations
+
+- Перед активацией проверьте draft client, URL, sample, количество fetched items, snapshot completeness, warnings и прогноз close. Не подтверждайте `full_snapshot` для filtered feeds, неполной пагинации или нестабильного listing.
+- Код `PARSER_CHANGED` означает изменение схемы/селектора, `PARTIAL_SNAPSHOT` — невозможность доказать полноту, `RATE_LIMITED` несёт `Retry-After`, `SOURCE_FORBIDDEN`/`AUTH_REQUIRED` требуют проверки доступа. Не переводите такие run в successful full вручную.
+- Порог preview: до 25 HTTP-страниц и 10 000 items. Для source за этим пределом требуется отдельная настройка/развитие fetch budget; истощённый бюджет не разрешает массовое закрытие.
+- При резком падении количества записей, росте ошибок mapping, смене connector/mapping version или массовом close действует reconciliation circuit breaker. Проверяйте run items и audit до apply.
+- Для regression используйте immutable fixtures в `backend/src/modules/job-imports/connectors/{generic-json,json-ld,greenhouse,lever}/fixtures/`, contract tests и тесты общих analysis/apply/reconciliation services. Большие наборы генерируются детерминированно в тестах, чтобы не хранить сотни однотипных JSON-записей.
+
+Поля source posting/apply URLs хранятся в provenance/staging; `jobs.apply_url` остаётся канонической ссылкой платформы. Нормализация и validation выполняются до apply, а изменения ручных полей защищены ownership/review policy.
+
+## API-основание
+
+- [Greenhouse Job Board API: list jobs](https://github.com/grnhse/greenhouse-api-docs/blob/master/source/includes/job-board/_jobs.md)
+- [Lever Postings API](https://github.com/lever/postings-api/blob/master/README.md)
+- [Schema.org JobPosting](https://schema.org/JobPosting)

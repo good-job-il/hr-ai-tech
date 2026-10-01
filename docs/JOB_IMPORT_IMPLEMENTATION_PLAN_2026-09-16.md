@@ -1180,7 +1180,13 @@ Recruiter понимает, какие поля можно редактиров�
 
 ---
 
-## Шаг 19. Реализовать MVP connectors
+## ✅ Шаг 19. Реализовать MVP connectors
+
+**Статус:** выполнено 2026-10-01.
+
+**Результат:** Generic JSON `1.1.0` получил настраиваемые collection path, mapping aliases, явную пагинацию и консервативный full/partial snapshot. Добавлены адаптеры JSON-LD JobPosting, Greenhouse Board API и Lever Postings API с versioned capabilities, typed health errors, immutable fixtures и contract tests. Все четыре адаптера зарегистрированы в общем SDK и используют Safe HTTP Fetcher; Greenhouse/Lever используют отдельную vendor API policy. Их кандидаты проходят общий preview/staging/diff, а apply и close/reopen остаются в единых JobsService/reconciliation сервисах. Wizard показывает настройки коннекторов и не блокируется, если sample до настройки mapping получить невозможно. [Пользовательская и операционная документация](JOB_IMPORT_MVP_CONNECTORS_2026-10-01.md).
+
+**Проверка:** backend build и 137 тестов модуля job-imports; frontend build, wizard tests и lint изменённой страницы. Live smoke на реальных внешних sources и production rollout остаются отдельными операционными проверками, не выполнялись в этой задаче.
 
 ### 19.1 Generic JSON
 
