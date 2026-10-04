@@ -1,5 +1,5 @@
 import { Users, Briefcase, Clock, TrendingUp } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { jobService } from "@/api/services/jobService"
 import { candidateService } from "@/api/services/candidateService"
 import { interviewService } from "@/api/services/interviewService"
@@ -42,7 +42,7 @@ export default function EmployerDashboard() {
 
   const [loadError, setLoadError] = useState("")
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user) {
       return
     }
@@ -70,11 +70,11 @@ export default function EmployerDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
   useEffect(() => {
     load()
-  }, [user?.email])
+  }, [load])
 
   return (
     <div dir="ltr" className="space-y-6">

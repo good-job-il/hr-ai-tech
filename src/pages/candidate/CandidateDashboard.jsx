@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { applicationService } from "@/api/services/applicationService"
 import { interviewService } from "@/api/services/interviewService"
 import { savedJobService } from "@/api/services/savedJobService"
@@ -40,7 +40,7 @@ export default function CandidateDashboard() {
 
   const [loading, setLoading] = useState(true)
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user) {
       return
     }
@@ -64,11 +64,11 @@ export default function CandidateDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
   useEffect(() => {
     load()
-  }, [user?.email])
+  }, [load])
 
   return (
     <div dir="rtl" className="space-y-6">

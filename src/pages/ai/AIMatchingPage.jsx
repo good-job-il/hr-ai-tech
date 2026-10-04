@@ -121,7 +121,7 @@ export default function AIMatchingPage() {
         setToast({ message: error?.message || "Unable to load matching data", type: "error" })
       })
       .finally(() => setLoading(false))
-  }, [user?.id, user?.role, user?.organization_id, user?.team_id])
+  }, [user])
 
   const filteredCandidates = candidates.filter(
     (c) =>

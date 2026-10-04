@@ -17,7 +17,7 @@ function getDefaultStages(t) {
 }
 
 export function usePipelineData(user, filters = {}, onNotificationCreated) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   const [applications, setApplications] = useState([])
 
@@ -29,7 +29,7 @@ export function usePipelineData(user, filters = {}, onNotificationCreated) {
 
   const appsSnapshot = useRef([])
 
-  const stages = useMemo(() => getDefaultStages(t), [t, i18n.language])
+  const stages = useMemo(() => getDefaultStages(t), [t])
 
   const loadData = useCallback(async () => {
     setLoading(true)

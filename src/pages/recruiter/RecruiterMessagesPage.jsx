@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { communicationService } from "@/api/services/communicationService"
 import { useAuth } from "@/lib/AuthContext"
 
@@ -11,7 +11,7 @@ export default function RecruiterMessagesPage() {
 
   const [error, setError] = useState("")
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user) {
       return
     }
@@ -27,11 +27,11 @@ export default function RecruiterMessagesPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
   useEffect(() => {
     load()
-  }, [user?.email])
+  }, [load])
 
   const CHANNEL_LABELS = {
     email: "אימייל",

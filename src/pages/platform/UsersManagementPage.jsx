@@ -85,7 +85,7 @@ function UserModal({ open, onClose, user, orgs, onSave, isSaving, t, isRTL }) {
           : { ...EMPTY_FORM },
       )
     }
-  }, [open, user?.id])
+  }, [open, user, isEdit])
 
   const set = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }))
@@ -363,7 +363,7 @@ function Toast({ message, type, onClose }) {
     const timer = setTimeout(onClose, 3500)
 
     return () => clearTimeout(timer)
-  }, [message])
+  }, [message, onClose])
 
   if (!message) {
     return null
@@ -399,6 +399,8 @@ export default function UsersManagementPage() {
   const [deleteTarget, setDeleteTarget] = useState(null)
 
   const [toast, setToast] = useState(null)
+
+  const closeToast = React.useCallback(() => setToast(null), [])
 
   const isRTL = i18n.language?.startsWith("he")
 
@@ -551,7 +553,7 @@ export default function UsersManagementPage() {
         isRTL={isRTL}
       />
 
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
 
       <div className="space-y-5">
         <PlatformPageHeader

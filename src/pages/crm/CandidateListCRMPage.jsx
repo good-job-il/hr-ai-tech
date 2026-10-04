@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react"
+import React, { useState, useEffect, useMemo, useCallback } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { candidateService } from "@/api/services/candidateService"
@@ -67,88 +67,87 @@ export default function CandidateListCRMPage({ candidateRoute }) {
     navigate(`${resolvedCandidateRoute}?id=${candidate.id}`)
   }
 
-  const loadCandidates = async (append = false) => {
-    if (!user) {
-      return
-    }
-
-    if (append) {
-      setAppendLoading(true)
-    } else {
-      setLoading(true)
-    }
-
-    setError(null)
-
-    try {
-      // ───────────────────────────────────────────────────────────────────────
-      // VISIBILITY POLICY — CandidateListCRMPage
-      // PERFORMANCE: Paginated loading with 50 records per page
-      // ───────────────────────────────────────────────────────────────────────
-      const filter = { search: search.trim() || undefined }
-
-      const importBatchId = new URLSearchParams(location.search).get("importBatchId")
-
-      if (importBatchId) {
-        filter.import_batch_id = Number(importBatchId)
+  const loadCandidates = useCallback(
+    async (append = false, requestedPage = 1) => {
+      if (!user) {
+        return
       }
 
-      if (statusFilter !== "all") {
-        filter.status = statusFilter
+      if (append) {
+        setAppendLoading(true)
+      } else {
+        setLoading(true)
       }
 
-      Object.assign(filter, recruiterCandidateRouteFilter(location.pathname))
+      setError(null)
 
-      if (isAgencyUser(user)) {
-        Object.assign(filter, getAgencyScopeFilter(user))
+      try {
+        // ───────────────────────────────────────────────────────────────────────
+        // VISIBILITY POLICY — CandidateListCRMPage
+        // PERFORMANCE: Paginated loading with 50 records per page
+        // ───────────────────────────────────────────────────────────────────────
+        const filter = { search: search.trim() || undefined }
+
+        const importBatchId = new URLSearchParams(location.search).get("importBatchId")
+
+        if (importBatchId) {
+          filter.import_batch_id = Number(importBatchId)
+        }
+
+        if (statusFilter !== "all") {
+          filter.status = statusFilter
+        }
+
+        Object.assign(filter, recruiterCandidateRouteFilter(location.pathname))
+
+        if (isAgencyUser(user)) {
+          Object.assign(filter, getAgencyScopeFilter(user))
+        }
+
+        const response = await candidateService.listPage({
+          ...filter,
+          page: requestedPage,
+          sort: "created_date",
+          order: "DESC",
+          limit: PAGE_SIZE,
+        })
+
+        setHasMore(response.pagination.hasNextPage)
+        setPage(requestedPage)
+        setCandidates((previous) =>
+          append
+            ? [
+                ...new Map(
+                  [...previous, ...response.data].map((candidate) => [candidate.id, candidate]),
+                ).values(),
+              ]
+            : response.data,
+        )
+      } catch (requestError) {
+        setError({
+          status: requestError?.status || requestError?.response?.status || null,
+          message: requestError?.message || "Unable to load candidates",
+        })
+
+        if (!append) {
+          setCandidates([])
+        }
+      } finally {
+        setLoading(false)
+        setAppendLoading(false)
       }
-
-      const requestedPage = append ? page + 1 : 1
-
-      const response = await candidateService.listPage({
-        ...filter,
-        page: requestedPage,
-        sort: "created_date",
-        order: "DESC",
-        limit: PAGE_SIZE,
-      })
-
-      setHasMore(response.pagination.hasNextPage)
-      setPage(requestedPage)
-      setCandidates((previous) =>
-        append
-          ? [
-              ...new Map(
-                [...previous, ...response.data].map((candidate) => [candidate.id, candidate]),
-              ).values(),
-            ]
-          : response.data,
-      )
-    } catch (requestError) {
-      setError({
-        status: requestError?.status || requestError?.response?.status || null,
-        message: requestError?.message || "Unable to load candidates",
-      })
-
-      if (!append) {
-        setCandidates([])
-      }
-    } finally {
-      setLoading(false)
-      setAppendLoading(false)
-    }
-  }
+    },
+    [user, search, statusFilter, location.pathname, location.search],
+  )
 
   // Performance: Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (user) {
-        loadCandidates()
-      }
+      loadCandidates()
     }, 300)
 
     return () => clearTimeout(timer)
-  }, [statusFilter, search, user?.id, location.pathname, location.search, location.key])
+  }, [loadCandidates, location.key])
 
   // Performance: Memoized filtering
   const filtered = candidates
@@ -324,7 +323,7 @@ export default function CandidateListCRMPage({ candidateRoute }) {
                     </div>
                   ) : (
                     <button
-                      onClick={() => loadCandidates(true)}
+                      onClick={() => loadCandidates(true, page + 1)}
                       className="text-purple-600 font-bold hover:underline"
                     >
                       {t("crm.loadMore")}

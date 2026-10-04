@@ -51,7 +51,7 @@ export default function NotificationCenter() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadNotifications()

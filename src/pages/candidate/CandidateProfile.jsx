@@ -134,32 +134,38 @@ export default function CandidateProfile() {
       return
     }
 
-    if (form !== null) {
-      return
-    }
+    setForm((current) => {
+      if (current !== null) {
+        return current
+      }
 
-    if (profile) {
-      setForm({ ...profile })
-    } else if (user) {
-      setForm({
-        full_name: user.full_name || "",
-        phone: "",
-        location: "",
-        title: "",
-        summary: "",
-        skills: [],
-        experience_years: 0,
-        education: "",
-        experience: [],
-        desired_salary_min: null,
-        desired_salary_max: null,
-        job_type: "any",
-        categories: [],
-        is_public: true,
-        is_open_to_work: false,
-        resume_url: "",
-      })
-    }
+      if (profile) {
+        return { ...profile }
+      }
+
+      if (user) {
+        return {
+          full_name: user.full_name || "",
+          phone: "",
+          location: "",
+          title: "",
+          summary: "",
+          skills: [],
+          experience_years: 0,
+          education: "",
+          experience: [],
+          desired_salary_min: null,
+          desired_salary_max: null,
+          job_type: "any",
+          categories: [],
+          is_public: true,
+          is_open_to_work: false,
+          resume_url: "",
+        }
+      }
+
+      return current
+    })
   }, [isLoading, profile, user])
 
   const upd = (key, val) => setForm((f) => ({ ...f, [key]: val }))

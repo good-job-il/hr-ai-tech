@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { notificationService } from "@/api/services/notificationService"
 import { useAuth } from "@/lib/AuthContext"
 import { useNavigate } from "react-router-dom"
@@ -21,7 +21,7 @@ export default function Notifications() {
 
   const [filter, setFilter] = useState("all") // all | unread | read
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!user?.email) {
       return
     }
@@ -36,7 +36,7 @@ export default function Notifications() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user?.email])
 
   useEffect(() => {
     fetchNotifications()
@@ -44,7 +44,7 @@ export default function Notifications() {
     const interval = window.setInterval(fetchNotifications, 15000)
 
     return () => window.clearInterval(interval)
-  }, [user?.email])
+  }, [fetchNotifications])
 
   const markAsRead = async (id) => {
     await notificationService.markRead(id)

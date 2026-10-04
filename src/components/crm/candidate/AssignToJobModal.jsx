@@ -54,7 +54,7 @@ export default function AssignToJobModal({ candidate, onClose, onAssignSuccess }
     }
 
     fetchJobs()
-  }, [user?.id, user?.role, user?.team_id, user?.organization_id])
+  }, [user])
 
   // Filter jobs based on search
   useEffect(() => {

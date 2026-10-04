@@ -63,7 +63,7 @@ export default function CandidateCard({ application, stageColor, slaHours, onCli
       missingRequired: !explanation.requiredMet,
       nextAction: explanation.nextAction,
     }
-  }, [application.id])
+  }, [application])
 
   const slaBreached =
     slaHours &&

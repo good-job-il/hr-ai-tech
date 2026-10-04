@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect } from "react"
+import { createContext, useState, useContext, useEffect, useCallback } from "react"
 import { tokenStorage } from "@/api/client/tokenStorage"
 import { authService } from "@/api/services/authService"
 import { organizationService } from "@/api/services/organizationService"
@@ -34,23 +34,7 @@ export const AuthProvider = ({ children }) => {
   // workspace via a scoped token (see tokenStorage workspace slot below).
   const [isImpersonating, setIsImpersonating] = useState(false)
 
-  useEffect(() => {
-    checkAppState()
-  }, [])
-
-  const checkAppState = async () => {
-    // With the NestJS JWT backend there's no separate "app public settings"
-    // handshake — we simply check whether a stored access token is valid.
-    if (tokenStorage.hasToken()) {
-      await checkUserAuth()
-    } else {
-      setIsLoadingAuth(false)
-      setIsAuthenticated(false)
-      setAuthChecked(true)
-    }
-  }
-
-  const checkUserAuth = async () => {
+  const checkUserAuth = useCallback(async () => {
     try {
       // Now check if the user is authenticated
       setIsLoadingAuth(true)
@@ -102,6 +86,26 @@ export const AuthProvider = ({ children }) => {
         console.error("User auth check failed:", error)
       }
 
+      setIsLoadingAuth(false)
+      setIsAuthenticated(false)
+      setAuthChecked(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (tokenStorage.hasToken()) {
+      checkUserAuth()
+    } else {
+      setIsLoadingAuth(false)
+      setIsAuthenticated(false)
+      setAuthChecked(true)
+    }
+  }, [checkUserAuth])
+
+  const checkAppState = async () => {
+    if (tokenStorage.hasToken()) {
+      await checkUserAuth()
+    } else {
       setIsLoadingAuth(false)
       setIsAuthenticated(false)
       setAuthChecked(true)

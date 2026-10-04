@@ -195,7 +195,7 @@ export function useCandidateCRM(candidateId) {
 
       return event
     },
-    [candidateId, candidate, user],
+    [candidateId, user],
   )
 
   // ── NOTES ─────────────────────────────────────────────────────────────────
@@ -228,7 +228,7 @@ export function useCandidateCRM(candidateId) {
 
       return note
     },
-    [candidateId, candidate, user, addTimelineEvent, invalidateCache],
+    [candidateId, user, addTimelineEvent, invalidateCache],
   )
 
   const updateNote = useCallback(
@@ -272,7 +272,7 @@ export function useCandidateCRM(candidateId) {
 
       return interview
     },
-    [candidateId, candidate, user, addTimelineEvent, invalidateCache],
+    [candidateId, candidate, addTimelineEvent, invalidateCache],
   )
 
   const updateInterview = useCallback(
@@ -365,7 +365,7 @@ export function useCandidateCRM(candidateId) {
 
       return newTag
     },
-    [candidateId, tags, user, addTimelineEvent, invalidateCache],
+    [candidateId, tags, addTimelineEvent, invalidateCache],
   )
 
   const removeTag = useCallback(
@@ -392,7 +392,7 @@ export function useCandidateCRM(candidateId) {
 
       return doc
     },
-    [candidateId, candidate, user, addTimelineEvent, invalidateCache],
+    [candidateId, addTimelineEvent, invalidateCache],
   )
 
   // ── SEND TO EMPLOYER ──────────────────────────────────────────────────────
@@ -403,7 +403,7 @@ export function useCandidateCRM(candidateId) {
 
       return candidate
     },
-    [candidateId, candidate, addTimelineEvent, invalidateCache],
+    [candidateId, candidate, invalidateCache],
   )
 
   // ── REQUEST DOCUMENTS ─────────────────────────────────────────────────────

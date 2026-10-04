@@ -80,20 +80,26 @@ export default function CandidateDrawer({
 
   const isRTL = !i18n.language?.startsWith("en")
 
+  const jobId = application?.job_id
+
+  const hasJob = Boolean(job)
+
   useEffect(() => {
     setNote("")
     setActionError("")
   }, [application?.id])
 
   useEffect(() => {
-    if (!open || !application?.job_id || job) {
+    setJobDetails(null)
+
+    if (!open || !jobId || hasJob) {
       return
     }
 
     let active = true
 
     jobService
-      .get(application.job_id)
+      .get(jobId)
       .then((value) => {
         if (active) {
           setJobDetails(value)
@@ -108,7 +114,7 @@ export default function CandidateDrawer({
     return () => {
       active = false
     }
-  }, [open, application?.job_id, job?.id])
+  }, [open, jobId, hasJob])
 
   const tabs = TAB_IDS.map((id) => ({
     id,
@@ -154,7 +160,7 @@ export default function CandidateDrawer({
     const { score, explanation } = scoreMatch(candidate, jobObj)
 
     return { score, explanation }
-  }, [application?.id, job?.id, jobDetails?.id])
+  }, [application, job, jobDetails])
 
   if (!open || !application) {
     return null

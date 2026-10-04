@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { interviewService } from "@/api/services/interviewService"
 import { useAuth } from "@/lib/AuthContext"
 import { Clock, Video, Phone, MapPin } from "lucide-react"
@@ -34,7 +34,7 @@ export default function RecruiterInterviewsPage() {
 
   const [error, setError] = useState("")
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user) {
       return
     }
@@ -58,11 +58,11 @@ export default function RecruiterInterviewsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
   useEffect(() => {
     load()
-  }, [user?.id])
+  }, [load])
 
   const today = new Date().toISOString().split("T")[0]
 

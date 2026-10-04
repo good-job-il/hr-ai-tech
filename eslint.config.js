@@ -74,7 +74,10 @@ export default [
       ],
 
       "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/exhaustive-deps": [
+        "error",
+        { enableDangerousAutofixThisMayCauseInfiniteLoops: false },
+      ],
 
       // Require {} for if / else / for / while
       curly: ["error", "all"],

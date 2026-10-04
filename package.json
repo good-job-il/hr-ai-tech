@@ -8,6 +8,8 @@
     "build": "vite build",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint src --fix",
+    "lint:hooks": "eslint src --config eslint.hooks.config.js --max-warnings 0",
+    "test:hooks": "node --test scripts/react-hooks.test.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "npm run typecheck:api && tsc -p ./jsconfig.json",

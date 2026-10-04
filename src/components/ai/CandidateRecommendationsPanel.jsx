@@ -2,7 +2,7 @@
  * CandidateRecommendationsPanel
  * Shows top matching Jobs for a given Candidate.
  */
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { jobService } from "@/api/services/jobService"
 import { rankJobsForCandidate } from "@/lib/aiMatching"
@@ -12,28 +12,52 @@ export default function CandidateRecommendationsPanel({ candidate, onAssignToJob
 
   const isRTL = i18n.language === "he"
 
-  const [results, setResults] = useState([])
+  const [jobs, setJobs] = useState([])
+
+  const candidateId = candidate?.id
+
+  const results = useMemo(
+    () => (candidate ? rankJobsForCandidate(candidate, jobs).slice(0, 10) : []),
+    [candidate, jobs],
+  )
 
   const [loading, setLoading] = useState(true)
 
   const [expanded, setExpanded] = useState(null)
 
   useEffect(() => {
-    if (!candidate) {
+    if (!candidateId) {
+      setJobs([])
+      setLoading(false)
+
       return
     }
+
+    let active = true
 
     setLoading(true)
     jobService
       .list({ is_closed: false, sort: "created_date", order: "DESC", limit: 50 })
       .then((jobs) => {
-        const ranked = rankJobsForCandidate(candidate, jobs || []).slice(0, 10)
-
-        setResults(ranked)
+        if (active) {
+          setJobs(jobs || [])
+        }
       })
-      .catch(() => setResults([]))
-      .finally(() => setLoading(false))
-  }, [candidate?.id])
+      .catch(() => {
+        if (active) {
+          setJobs([])
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false)
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [candidateId])
 
   if (loading) {
     return (
