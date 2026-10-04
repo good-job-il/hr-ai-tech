@@ -6,7 +6,13 @@ import pluginUnusedImports from "eslint-plugin-unused-imports"
 
 export default [
   {
-    ignores: ["backend/**", "coverage/**", "dist/**", "node_modules/**", "public/**"],
+    ignores: ["backend/**", "coverage/**", "dist/**", "node_modules/**", "public/**", "playwright-report/**", "test-results/**"],
+  },
+
+  {
+    ...pluginJs.configs.recommended,
+    files: ["e2e/**/*.mjs", "playwright.config.mjs"],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 
   {

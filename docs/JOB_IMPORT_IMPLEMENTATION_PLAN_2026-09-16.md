@@ -1316,7 +1316,8 @@ Feature flags остаются opt-in; backfill не включает функц
 - [x] Подтверждённое восстановление unchanged incident-paused sources в draft без schedule; mapping version повышается на сервере при изменении configuration/connector.
 - [x] [Runbook и rollout contract](JOB_IMPORT_OPERATIONS_RUNBOOK_2026-10-04.md): diagnostics, pause, replay, mapping migration, parser recovery, false-close/cross-tenant incident, credentials rotation.
 - [x] Backend regression: **25 suites / 228 tests**, плюс повторная проверка последних analytics/operations изменений **23/23**; frontend import safety **38/38**, flags **9/9**, agency jobs **33/33**; TypeScript, targeted ESLint, builds и diff checks успешны.
-- [ ] Оператор применяет `1754800000000-JobImportOperations`, задаёт `JOB_IMPORT_OPERATIONS_USER_IDS`, включает `JOB_IMPORT_ALERTS_ENABLED=true` после migration и проверяет свежий heartbeat.
+- [x] Миграция `1754800000000-JobImportOperations` применена оператором — подтверждено пользователем 4 октября 2026; независимая проверка целевой БД ещё не выполнялась.
+- [ ] Настроить `JOB_IMPORT_OPERATIONS_USER_IDS`, включить `JOB_IMPORT_ALERTS_ENABLED=true` после migration и проверить свежий heartbeat. В локальном `backend/.env` обе настройки пока отсутствуют.
 - [ ] На staging подтвердить реальные MySQL aggregates, connector-wide regression alert, pause/recovery/replay и delivery через согласованный log drain/alert manager (или polling alerts API). Внешний routing/получатели и production rollout требуют Operations approval; новая общая галочка не означает автоматически включённый production мониторинг.
 
 ### Backend metrics
@@ -1369,7 +1370,17 @@ Operations обнаруживает системный parser regression ран�
 
 ---
 
-## Шаг 22. Полная тестовая матрица
+## ✅ Шаг 22. Полная тестовая матрица
+
+Завершён 4 октября 2026: оба локальных release gate прошли полностью. Backend: lint/build, **73 suites / 468 tests**, затем **18 реальных MySQL integration/E2E сценариев**. Frontend: lint/hooks/typecheck/build, **88 domain/hooks checks** и **14 Chromium workflow tests**. Новые suites подключены к CI.
+
+- [x] Unit и security regression suites.
+- [x] Изолированная MySQL: реальные миграции, constraints, staging, JobsService transactions, audit и worker recovery/retry.
+- [x] Backend HTTP/JWT/permission/DTO tests и tenant-scoped lifecycle на fixture ATS.
+- [x] Frontend browser workflow, EN/HE, 320/768/1280, keyboard, конфликт/retry/provenance/access states.
+- [x] Воспроизводимые release commands, CI и безопасная disposable test database.
+
+Уровни покрытия, ограничения и команды: [тестовая матрица шага 22](JOB_IMPORT_STEP22_TEST_MATRIX_2026-10-04.md). Браузерные тесты используют mock API; MySQL suite использует реальные domain services и fixture network responses. Это не подтверждение доступности live vendor API или доставки production alerts из шага 21. Remote CI ещё не запускался в рамках этой проверки.
 
 ### Unit
 
@@ -1431,7 +1442,23 @@ Release gate запускает backend build/lint/tests, frontend build/lint/ty
 
 ---
 
-## Шаг 23. Миграция существующих данных
+## ✅ Шаг 23. Миграция существующих данных
+
+Статус на 4 октября 2026: **выполнен для подтверждённого agency scope**, с явным inventory исключений без автоматического ownership/закрытия. [Итоговый отчёт и evidence](JOB_IMPORT_STEP23_COMPLETION_2026-10-04.md). Global/unassigned и soft-deleted cohort не мигрировались в agency; это не обещание готовности их синхронизации.
+
+- [x] Подготовлен read-only inventory CLI с explicit host/port/database boundary, redacted reconciliation report и unit tests.
+- [x] Проверено наличие additive schema/tenant constraints и publication backup в существующих migrations; повторный DDL не добавлен.
+- [x] Подготовлен [migration runbook](JOB_IMPORT_STEP23_MIGRATION_RUNBOOK_2026-10-04.md), включая review legacy URL-derived backfill и запрет изменения job states.
+- [x] Выполнен read-only before inventory Northflank по `backend/.env`: 434 jobs (128 soft-deleted), 11 sources, 9 records. [Reconciliation report](JOB_IMPORT_STEP23_NORTHFLANK_INVENTORY_2026-10-04.md).
+- [x] Transaction-aware JobsService repair + audit применён к 9 proven jobs 428–436: canonical public URL, без изменения job code/tenant/client/lifecycle.
+- [x] After inventory и shadow reconciliation: 434 jobs до/после, изменены только allowlisted 9 fingerprints, 9 audit entries; statuses/deletion не менялись.
+- [x] Actual tenant FK/unique/CHECK присутствуют; legacy direct writes остаются запрещены regression tests.
+- [x] Подготовлен [конкретный список оставшихся решений](JOB_IMPORT_STEP23_DECISIONS_2026-10-04.md): 102 scoped legacy jobs, 100 global Jobicy, job 222, 128 soft-deleted.
+- [x] Подготовлен exact-ID review manifest; full backend regression **76 suites / 484 tests**, lint/build и реальные before/after shadow checks прошли.
+- [x] Локальный `JOB_PUBLIC_BASE_URL` отделён от development `FRONTEND_URL`, чтобы не генерировать новые localhost publication при следующем запуске backend.
+- [x] Пользователь подтвердил архивирование 102 scoped legacy jobs без sync; применено одной транзакцией, originals сохранены, after report записан. Остальные unassigned/global records не изменены.
+- [x] Actual verification + shadow reconciliation passed: 434 jobs до/после, 102 разрешённых изменений, lifecycle/ownership сохранены; повторный apply не добавляет jobs/records/audit.
+- [x] Backend lint/build и 78 suites / 495 tests; frontend release gate, включая 16 Playwright tests, прошли. Архивное provenance локализовано EN/HE и не обещает resync.
 
 ### Этап A — inventory
 

@@ -32,6 +32,14 @@ jobs:
         run: npm run lint
       - name: Type-check
         run: npm run typecheck
+      - name: Hooks and Job Import domain safety
+        run: |
+          npm run lint:hooks
+          npm run test:hooks
+          npm run test:agency-jobs:frontend
+          npm run test:job-import-flags
+          npm run test:job-import-safety
+          node --test src/domain/jobImports/navigation.test.mjs
       - name: Test team-manager flows
         run: npm run test:tm4:frontend
       - name: Test recruitment-manager flows
@@ -40,3 +48,14 @@ jobs:
         run: npm run test:r4:frontend
       - name: Build
         run: npm run build
+      - name: Install E2E Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Job Imports browser E2E (isolated fixture API)
+        run: npm run test:job-import:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: job-import-browser-failures
+          path: |
+            playwright-report/
+            test-results/

@@ -76,11 +76,13 @@ export function importFieldState(provenance, field) {
     return "manual"
   }
 
-  return IMPORT_MANAGED_OWNERSHIP.has(provenance.field_ownership?.[field]) ? "source" : "none"
+  return IMPORT_MANAGED_OWNERSHIP.has(provenance.field_ownership?.[field])
+    ? provenance.legacy_archive ? "archived" : "source"
+    : "none"
 }
 
 export function changedImportManagedFields(job, form, provenance) {
-  if (!job || !provenance?.imported) {
+  if (!job || !provenance?.imported || provenance.legacy_archive) {
     return []
   }
 

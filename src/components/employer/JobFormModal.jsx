@@ -47,11 +47,11 @@ function FieldSyncIndicator({ field, provenance }) {
   return (
     <span
       className={`ms-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-        state === "manual" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"
+        state === "source" ? "bg-blue-100 text-blue-800" : "bg-amber-100 text-amber-800"
       }`}
       title={t(`jobs_management.form.fieldSync.${state}Help`)}
     >
-      {state === "manual" ? (
+      {state !== "source" ? (
         <LockKeyhole className="h-3 w-3" aria-hidden="true" />
       ) : (
         <RefreshCw className="h-3 w-3" aria-hidden="true" />
@@ -734,7 +734,9 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
               </div>
 
               <p className="mt-1 text-xs text-blue-800">
-                {lockedFieldLabels.length
+                {importProvenance.legacy_archive
+                  ? t("jobs_management.form.legacyArchiveDescription")
+                  : lockedFieldLabels.length
                   ? t("jobs_management.form.importLockedFields", {
                       fields: lockedFieldLabels.map(({ label }) => label).join(", "),
                     })
@@ -745,7 +747,9 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 <div>
                   <dt className="font-bold text-slate-500">{t("jobs_management.form.source")}</dt>
                   <dd className="mt-0.5 font-semibold text-slate-900">
-                    {importProvenance.source?.name || t("jobs_management.form.sourceUnavailable")}
+                    {importProvenance.legacy_archive
+                      ? t("jobs_management.form.legacyArchiveName", { client: importProvenance.client?.name || job?.company || "—" })
+                      : importProvenance.source?.name || t("jobs_management.form.sourceUnavailable")}
                     {importProvenance.source && (
                       <span className="ms-1 text-slate-600">
                         ·{" "}
@@ -843,7 +847,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 </p>
               )}
 
-              {lockedFieldLabels.length > 0 && canResource("job_imports", "review") && (
+              {lockedFieldLabels.length > 0 && !importProvenance.legacy_archive && canResource("job_imports", "review") && (
                 <ul className="mt-2 space-y-1.5">
                   {lockedFieldLabels.map(({ field, label }) => (
                     <li key={field} className="flex items-center justify-between gap-3">

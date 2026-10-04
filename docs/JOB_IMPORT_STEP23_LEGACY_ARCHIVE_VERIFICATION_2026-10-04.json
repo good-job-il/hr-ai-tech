@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "migration_reference": "step23-legacy-archive-v1",
+  "before_job_count": 434,
+  "after_job_count": 434,
+  "archived_jobs": 102,
+  "archived_records": 102,
+  "archive_sources": [
+    {
+      "source_id": 12,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "state": "archived",
+      "sync_disabled": true
+    },
+    {
+      "source_id": 13,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "state": "archived",
+      "sync_disabled": true
+    },
+    {
+      "source_id": 14,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "state": "archived",
+      "sync_disabled": true
+    }
+  ],
+  "original_snapshots_verified": 102,
+  "audit_counts": {
+    "ImportSource": 3,
+    "Job": 102
+  },
+  "raw_payload_exported": false,
+  "allowed_field_changes": [
+    "source_job_record_id",
+    "job_code",
+    "apply_email",
+    "apply_url",
+    "company",
+    "company_initials",
+    "company_color",
+    "updated_date"
+  ],
+  "problems": []
+}

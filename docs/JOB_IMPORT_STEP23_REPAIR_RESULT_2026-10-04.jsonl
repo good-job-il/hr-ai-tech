@@ -1,0 +1,11 @@
+{"status":"started","before_report":"/Users/reuvenyanturin/Projects/hire-israel-link/client/docs/JOB_IMPORT_INVENTORY_BEFORE_VALIDATED_2026-10-04.json","selected_ids":[428,429,430,431,432,433,434,435,436],"public_base_url":"https://hr-ai.tech"}
+{"job_id":428,"status":"repaired"}
+{"job_id":429,"status":"repaired"}
+{"job_id":430,"status":"repaired"}
+{"job_id":431,"status":"repaired"}
+{"job_id":432,"status":"repaired"}
+{"job_id":433,"status":"repaired"}
+{"job_id":434,"status":"repaired"}
+{"job_id":435,"status":"repaired"}
+{"job_id":436,"status":"repaired"}
+{"status":"completed","before_count":434,"after_count":434,"results":[{"job_id":428,"status":"repaired"},{"job_id":429,"status":"repaired"},{"job_id":430,"status":"repaired"},{"job_id":431,"status":"repaired"},{"job_id":432,"status":"repaired"},{"job_id":433,"status":"repaired"},{"job_id":434,"status":"repaired"},{"job_id":435,"status":"repaired"},{"job_id":436,"status":"repaired"}]}

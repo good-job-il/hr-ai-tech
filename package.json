@@ -23,6 +23,8 @@
     "test:agency-jobs:frontend": "node --test src/domain/agency/jobClientSelection.test.mjs src/domain/agency/jobListQuery.test.mjs src/domain/agency/jobState.test.mjs src/domain/agency/jobLocalization.test.mjs src/domain/agency/jobResponsiveLayout.test.mjs src/domain/agency/jobAccessibility.test.mjs src/domain/agency/jobWorkflow.test.mjs src/domain/agency/jobImportProvenance.test.mjs src/domain/agency/clipboard.test.mjs src/domain/agency/jobErrorStates.test.mjs",
     "test:job-import-flags": "node --test src/config/jobImportFeatureFlags.test.mjs src/domain/platform/featureFlagsUi.test.mjs",
     "test:job-import-safety": "node --test src/domain/jobImports/legacySourceSafety.test.mjs src/domain/jobImports/readOnlyPreview.test.mjs src/domain/jobImports/onboardingWizard.test.mjs src/domain/jobImports/onboardingWizardUi.test.mjs src/domain/jobImports/sourceOperations.test.mjs src/domain/jobImports/sourceOperationsUi.test.mjs src/domain/jobImports/reviewQueue.test.mjs src/domain/jobImports/presentation.test.mjs src/domain/jobImports/permissions.test.mjs src/domain/jobImports/qaFixes.test.mjs src/domain/jobImports/operations.test.mjs",
+    "test:job-import:e2e": "playwright test",
+    "release:job-imports": "npm run lint && npm run lint:hooks && npm run typecheck && npm run test:hooks && npm run test:agency-jobs:frontend && npm run test:job-import-flags && npm run test:job-import-safety && node --test src/domain/jobImports/navigation.test.mjs && npm run build && npm run test:job-import:e2e",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -95,6 +97,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^22.13.5",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",

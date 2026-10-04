@@ -39,6 +39,8 @@ export interface JobStats {
 export interface JobImportProvenance {
   job_id: number
   imported: boolean
+  legacy_archive?: boolean
+  original_source_identity?: "unknown" | null
   source_job_record_id: number | null
   import_source_id?: number
   external_key?: string

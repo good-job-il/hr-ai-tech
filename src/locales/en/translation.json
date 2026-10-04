@@ -1062,6 +1062,8 @@
       "description": "Job Description",
       "importProvenance": "Imported job provenance",
       "importSourceManaged": "Source-managed fields stay synchronized until they are edited manually.",
+      "legacyArchiveDescription": "Historical snapshot only. The original source is unknown and automatic synchronization is disabled. You can edit this job normally; the original snapshot is retained.",
+      "legacyArchiveName": "Legacy archive · {{client}}",
       "importLockedFields": "Manual edits protect these fields from source updates: {{fields}}.",
       "resumeSourceSync": "Resume source sync",
       "resumeFieldSync": "Resume source sync for {{field}}",
@@ -1085,6 +1087,8 @@
         "error": "Error"
       },
       "fieldSync": {
+        "archived": "Archived snapshot",
+        "archivedHelp": "Historical snapshot; no source synchronization. Manual edits remain under your control.",
         "source": "Synced",
         "sourceHelp": "This field follows the import source. Editing it creates a protected manual override.",
         "manual": "Manual override",
@@ -1112,6 +1116,7 @@
         "confirm": "Save manual overrides"
       },
       "history": {
+        "job_import_migration": "Historical import migration",
         "job_import": "Applied from import source",
         "manual_field_override": "Manual override created",
         "resume_source_field_sync": "Source synchronization resumed"

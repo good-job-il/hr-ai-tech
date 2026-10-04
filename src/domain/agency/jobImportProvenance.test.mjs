@@ -35,6 +35,13 @@ test("external posting links only allow http and https", () => {
   assert.equal(safeExternalJobUrl("https://vendor.test/jobs/1"), "https://vendor.test/jobs/1")
 })
 
+test("legacy archives show historical snapshot, never a synced field or resync confirmation", () => {
+  const archive = { ...provenance, legacy_archive: true }
+
+  assert.equal(importFieldState(archive, "title"), "archived")
+  assert.deepEqual(changedImportManagedFields({ title: "Old" }, { title: "Edited" }, archive), [])
+})
+
 test("only newly edited source-managed fields require confirmation", () => {
   const job = { title: "Engineer", required_skills: ["SQL"], recruiter_id: 5, domain_id: 17 }
 

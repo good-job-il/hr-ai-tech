@@ -1,0 +1,937 @@
+{
+  "target": {
+    "host": "primary.hr-ai-tech-mysql--6bjlwswdqrwg.addon.code.run",
+    "port": 59449,
+    "database": "d9ebba5b47c5"
+  },
+  "migration_reference": "step23-legacy-archive-v1",
+  "approved_disposition": "archive_without_sync",
+  "actor_id": 6,
+  "publication": {
+    "publicBaseUrl": "https://hr-ai.tech",
+    "applyEmailDomain": "hr-ai.tech"
+  },
+  "before_job_count": 434,
+  "items": [
+    {
+      "job_id": 88,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "9c6822975ed32cdb06eaac46b1aaf16f12c5f27d2afd44a42b33cb6a800e81a2",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-2439093D11"
+    },
+    {
+      "job_id": 89,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "46125d7a2d9ccf65d7a4af5cf7d59476ebf89883dcd728638657e9c9f42d3d3d",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-189A685BBC"
+    },
+    {
+      "job_id": 90,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "ed9e6966e36b8768679920624c86502d1def9ebeb7828edad2c6ba0d73055064",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-CA2CCF8C15"
+    },
+    {
+      "job_id": 91,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "4bea48405d5052c95fb11c6252ae84262f5d19d5a5444cede00ba9f037a76aee",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-CE0368EE09"
+    },
+    {
+      "job_id": 92,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "c145db86ec0fdcda33b1bb7dd9c10c4cbd81f100a45e4918e2732ce1adb6d9bb",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-691AAD4F34"
+    },
+    {
+      "job_id": 94,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "118e25c9ad9bf065575ea9dc1c13337af0eb9568e280d7cc60a546a307c5f17a",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-AA9CD989AA"
+    },
+    {
+      "job_id": 95,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "90ae5f004f48b019f765c45b35b51174e5d32a641668ebabe4f4fc90e5ae0cba",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-264CF01448"
+    },
+    {
+      "job_id": 96,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "3eb342564facdb6200a26e45211b6e24fef4d14d8e4932b612f97b6a68cd4a5f",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-48E7E87C16"
+    },
+    {
+      "job_id": 97,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "f276ed585c6d8118108a81865a76f0e166a45cb077817a552ec48e71c52c373b",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-FA3CEC2858"
+    },
+    {
+      "job_id": 98,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "00e6975d369dfe6c9f85607cb5608ca39a1d47500652b3a62f6add23d3893112",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-4050A057D1"
+    },
+    {
+      "job_id": 99,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "244b8e1f8a59e83173e0a8d79642c9214eb3c19cbb8dfbbd43e0a2e9e653f7ad",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-5F297FEA09"
+    },
+    {
+      "job_id": 100,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "fb19aa4ced88171ab9be2e4794103ba066853a9d9fda0a11ad23ed53f239947e",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-08CD75339E"
+    },
+    {
+      "job_id": 101,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "3af7b2f8fc07e9140bb40578a544b104c31756c5cf7bf4f4b657b3b3ea9e5960",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-8FD6E5DC92"
+    },
+    {
+      "job_id": 102,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "89b9be1855ef81ff9eccb54a8bea6b252a7c2a510c8817c8a485db3dbc933c2c",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-B709005958"
+    },
+    {
+      "job_id": 103,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "67900e13d3491d8737ff35ee57dfb93ab9d686353ab6a6b98d829f2f649b23ae",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-505578DB8B"
+    },
+    {
+      "job_id": 104,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "ef60c591c58120b138a65b00bb6306144b5edb544571f98de1166baa7373d7de",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-05BEE0BA25"
+    },
+    {
+      "job_id": 105,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "fe93100375aa9f060a883210b1dc934aed8cb9114b17325c4052ea472e1b0beb",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-80BB2F191D"
+    },
+    {
+      "job_id": 106,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "d9019e68de755ff32073cf1b339983cf68a938447cf3229892b961191a9c921a",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-07693D95DA"
+    },
+    {
+      "job_id": 107,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "638589b2cbc2bc6a3eb9418f7315c3eb71aa9e0449f1654f921ff67d35ea1b79",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-14B707D544"
+    },
+    {
+      "job_id": 108,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "e12322b4bb6c975d469b3d3fb1169b34475bebfd604ec9f4bf00bc288c866bb9",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-811410C809"
+    },
+    {
+      "job_id": 109,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "fed5cbdf13894e72fbd0b3b6241268cffc5780fa6fcb1bbeda41b33408ba6f22",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-0DBDDFE7C6"
+    },
+    {
+      "job_id": 110,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "d20bfd33dadc3a98c424b53e6a8d01f9cbd84138ce72b0d0e421b3c89ff32d01",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-0213B6BAFA"
+    },
+    {
+      "job_id": 111,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "efd833570391ddc96e911b1a109a3bf95c2f48800d14b6ba4b626d7bff7c0482",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-53A78A97EB"
+    },
+    {
+      "job_id": 112,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "511f270f4bffad5396b87e721fc893c2ce8dcf989e0ce00b2c3f4fb814ed7938",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-E19591FE84"
+    },
+    {
+      "job_id": 113,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "3ae98187c3c409eec28ba0d95191bd3880d77df4ccbaf1175e9d8a0325692862",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-2B95696B0C"
+    },
+    {
+      "job_id": 114,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "6bd4252ea26705fbfd730bf64ef9b6cef7cd139a78c9cd0a02612a629361bedb",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-4ABCF59800"
+    },
+    {
+      "job_id": 115,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "3d193b22762549223cedffb3fc67124b44a89e897c15cb55be09891ae85170c6",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-8A3B858AAF"
+    },
+    {
+      "job_id": 116,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "b0e877e4af189e2031493345771ecec6daa8ec253873d360a2e3df0da4eeb424",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-AF1A50ACF7"
+    },
+    {
+      "job_id": 117,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "f054b915a2725f4676c9b0938529ab64c1b9b0f804536d16b284b78dd56b9b15",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-7D01DDD460"
+    },
+    {
+      "job_id": 118,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "258399d198bbf9ceb3fb259d44f377e93f96b732016491a9a6e19c1e0c3f3e21",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-D7A520DB1E"
+    },
+    {
+      "job_id": 119,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "6765cfc20064bef06518805cd3bf7b1fa50ad6ae2d0da90afab345952894b9b5",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-B4CA88B84E"
+    },
+    {
+      "job_id": 120,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "8de5353e60ba88fe1cf66f8db76ca216261640ded24dcba057170972dcaaa8eb",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-D7649A6097"
+    },
+    {
+      "job_id": 121,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "99ca686d0e08238a0d7b0282b3d748f979a76f51691cf948f0a568ad10bd8428",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-6E060B90B6"
+    },
+    {
+      "job_id": 122,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "be18ebf413e1380d01b9beee871bcf1e417013d5e45339497a800b56e89e1c08",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-F7A8D63771"
+    },
+    {
+      "job_id": 123,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "571c7defd8e2c8f39cad1076dfe3a30f9c31a33aa935d5674418491a4611cabe",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-EC1CD19721"
+    },
+    {
+      "job_id": 124,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "e1490a92c6c9f6faf3f3158b13c1c6397fbef43971c9aefb9df7a9da37775b2a",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-C842B81021"
+    },
+    {
+      "job_id": 125,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "519cd67d946e2f8a05f6d2227cbf877ac0975386bd8f99e53fbf8cb4dddf2649",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-A2F77E1256"
+    },
+    {
+      "job_id": 126,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "eb712ec66d749ec08a4cf3295622a314b6cb9c3e98ee2422b4c2d373ed2dba6e",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-25DB2186FA"
+    },
+    {
+      "job_id": 127,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "e2ac7d54a4cdef531eeacd301e04a9033885b1273ff27ee0b99b7c5a5a3bd2ca",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-EFEBF79859"
+    },
+    {
+      "job_id": 128,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "042caf013a7a57806e637dc1faff87ba0b81d1a28a7d6da25e61307c7645610b",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-8D076D2A6F"
+    },
+    {
+      "job_id": 129,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "3d6814e7ae535bdf4dd4f58e3d2dbadc2b0a8301ee1b9488cb96388a1947c20e",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-12D8EFAA63"
+    },
+    {
+      "job_id": 130,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "da700cb843f8a84642f77721a1411b9f7c83558488d7eb6698a89c711d14a055",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-20D9B2C96B"
+    },
+    {
+      "job_id": 131,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "84516e5f67e4751ab0a188e8f7c16853f9b879f60264db4ded1635b30d18392e",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-7525811326"
+    },
+    {
+      "job_id": 132,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "cfbeba93fc35631c3efcf4547ad73b658d88689a17e6a445187ca7fc4237dc4e",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-7683AE54C5"
+    },
+    {
+      "job_id": 133,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "c754a5bf1e0c3d26feac73a737e0202c38b538f06235ba07b8b5b3e0c93e6931",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-A7404DF336"
+    },
+    {
+      "job_id": 134,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "76e52dfb986ca39c7d98dee1498c342158e2c12433c00e1028f432ab7ae12128",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-E8C03910CB"
+    },
+    {
+      "job_id": 135,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "54dd6b796d6674c1d8080d39dcf919b604a3b24a6610c4f75471bc616f13be1f",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-E0984937B6"
+    },
+    {
+      "job_id": 136,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "0e66b1a9b233dd9827def09a5a459427cfcbb7c34f7c86babbf90741c7757c3c",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-776DCC575D"
+    },
+    {
+      "job_id": 137,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "177a1f34292e36bdd4c213273631cc19fdabc7d4620122c25d121c5a056fe0eb",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-A799F75E90"
+    },
+    {
+      "job_id": 138,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "19c0c43086a2207c6b6e9e5b7c421021b3bd8f0f7c6aa16f3884253189d0c9ca",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-22029C6EB4"
+    },
+    {
+      "job_id": 139,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "3e76da94bcea35763ccfa5eb4214d32d6776ce86bec467a622b1da73b785a486",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-15F897C159"
+    },
+    {
+      "job_id": 141,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "28940a61e052652b36632a4618df1dbd0085518442384c39c11e5d2caec71a1a",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-D26CD17DA5"
+    },
+    {
+      "job_id": 143,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "79717b930ba91d150a4c79b18f74b183cb82f42b305e4ba673b8b8d096e09f58",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-197D8D9CF6"
+    },
+    {
+      "job_id": 144,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "96dbc347440332b991da4309f83581018a374cce17fe2f3730b194acf5d3ca0a",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-735FEB2929"
+    },
+    {
+      "job_id": 145,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "a28e564a6755bee2d055d0afae7a63c32dba3551029a80e22e84de5f317e390f",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-4F72AF715B"
+    },
+    {
+      "job_id": 146,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "a4d542dc5e45167630c7c2c0f11261994535d5b0d88eb97a82a395f5c437d9fa",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-C8C2B1A147"
+    },
+    {
+      "job_id": 147,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "a3d9c07f39960d27ae47d1488cccaeae12b41b777ffd09459713d6a21555352f",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-820F14F0F0"
+    },
+    {
+      "job_id": 148,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "3a4d3330f1d3e385b18c30060fb3e26bf9df476bbc23eddae1e006f94e036f1c",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-D3AA8281EE"
+    },
+    {
+      "job_id": 149,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "4170f401673435a5a2d6be54e9aae65211592ae007b3b260cfa12bdd9fa5e57e",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-7069FA1E2F"
+    },
+    {
+      "job_id": 150,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "f9c84fd77d91d317d8c04ee9c940274d339db03aab0895f8180887e678604e18",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-C7781B0C05"
+    },
+    {
+      "job_id": 151,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "ffa2fc4b161877026ab8f9cb26fe0f91480408ef01729651c27ffc91d596cbcb",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-97CA68C227"
+    },
+    {
+      "job_id": 152,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "74a9a9936513d1d73305c41f3755c7286b1ae5185515ca900c37758ee6401312",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-B7918AFFFA"
+    },
+    {
+      "job_id": 153,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "14f02b1ab862f8dbcaab59716bd0ab1611d94f15b6a7d6213cd6a9ba47b96d37",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-DAD7F98F0F"
+    },
+    {
+      "job_id": 154,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "0ea0ca7e1c25f676da8461e508c4fc434292a8de4caefb554401d09b28368b71",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-02D1803C49"
+    },
+    {
+      "job_id": 155,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "761ef7219da1ded517d4f5df4886a326c4391679eec0d28261a83e22f49e68dc",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-0EFDF8BBE2"
+    },
+    {
+      "job_id": 156,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "e2954ab4f63594a1a2f3b863f70eca707b917078a4698ae54b1cce3cc02cf231",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-0F05CC6D26"
+    },
+    {
+      "job_id": 157,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "d60a3b89122d8647f082a987f88d4103d62f7c024ac7451a7c5c0353e29fad77",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-726478E7F9"
+    },
+    {
+      "job_id": 158,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "6261649b807b0e44beb453cb0c66e5a9cd74ec75ad3c0900d209f31601673bda",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-EB66C43B0E"
+    },
+    {
+      "job_id": 159,
+      "organization_id": 1,
+      "employer_company_id": 18,
+      "expected_checksum": "2b83f1e031fc1735ecbb52f233d6b5dd4313016fe6327d23188cb73fdfc72afd",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-36DF378145"
+    },
+    {
+      "job_id": 160,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "9b6820b03355e8410173573574e2f4025cbf2f425b6144f8c933a5176d1603ef",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-9164A4C193"
+    },
+    {
+      "job_id": 161,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "f68bf447137723c985160c0880da0f71d18c11a28b6dfd7e4a09575ab38942cb",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-97B4EA39F9"
+    },
+    {
+      "job_id": 162,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "b4cf9bbdf89bf1b8afa4fdb8dac41e56f76e6d0496dbb07161fcc833ecd9ee17",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-55BBB1E050"
+    },
+    {
+      "job_id": 163,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "2278d4655f9e74243a1231cd01c02a1466512c5afe7534c0740960b350063839",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-37BEE876A2"
+    },
+    {
+      "job_id": 164,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "48b55e460a9b0b0d8bf0db878a0303d641d23705154e7493a90402d004df8f46",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-F8A72029CD"
+    },
+    {
+      "job_id": 165,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "dd1135b530895e4029feb59e9c1aee745cdd3c4fc414271abdc9970aba52f5ab",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-405E79990F"
+    },
+    {
+      "job_id": 166,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "1eef7d947a94b258612ace56a3f4587d5173c740874a171b9f5840c9ff239ea2",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-8C41F2EB09"
+    },
+    {
+      "job_id": 167,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "ca6b3dae2e4f5adb4123331376aa4a874c94d39413073d521504e2d458b275ee",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-2891C1A3FA"
+    },
+    {
+      "job_id": 168,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "fb9ac80b6ee537f41e691363629569c2fb5176756be4d83c6a61a72a2d58f80d",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-0A53F1C457"
+    },
+    {
+      "job_id": 170,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "716d98f2525c42f63aea3aecc1a7528fad71db24a8e697497732fb306c2fc00b",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-24AEE2C2FC"
+    },
+    {
+      "job_id": 171,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "d049a2c7a7fcfa285555836aa74814edb91508507482a47d650167a8aa686577",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-F89676F2B7"
+    },
+    {
+      "job_id": 172,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "a6db83648ed66066aa5973a8e9e992fd37f20706a5f22e762e7c0df2450821c2",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-5A76A333CC"
+    },
+    {
+      "job_id": 173,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "67ee251f25e3c7aa693c1e61b6e2d60914ae85e71ef121c825a563b838e6f842",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-518CC75D4B"
+    },
+    {
+      "job_id": 174,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "6bd046360abfcec415b80b1132a17e180457395540d95568155a1afaa46d213a",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-8F273A5EC1"
+    },
+    {
+      "job_id": 175,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "1d85b7b9eec2b515c4825a5ea7b5359a04000706f980c8f8c4aceeb64219aa86",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-DF9C3CA81F"
+    },
+    {
+      "job_id": 176,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "aa65058d8459ecc9830be5c425fcce06a121512a780d577d0eb365a65ffd2158",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-2E72C8C611"
+    },
+    {
+      "job_id": 177,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "fb667eb5edc05ec6cc5607c22f5899e8796465b20710a5337734ba25e0d038a2",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-3CA87C5215"
+    },
+    {
+      "job_id": 178,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "8c453ef002d945a6481ac2cf8f89aedc2aef33794125f46e525617fa89d198ea",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-F73C0B9B09"
+    },
+    {
+      "job_id": 179,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "e975a9a49739525cbdc2ed708ea3f466a85d88ded3f80f6a6bb389e713b160ed",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-B889565094"
+    },
+    {
+      "job_id": 180,
+      "organization_id": 1,
+      "employer_company_id": 16,
+      "expected_checksum": "2d157d40a6e104c7dff995ae703bcdf0a7d6b4d46a1777ffdcaed9602cba70b0",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-B1733E5CE4"
+    },
+    {
+      "job_id": 181,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "3e88a564fc7921024700a9a06a0f1f7ca4efec69dae1754e579d1b6353c13703",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-8C50958941"
+    },
+    {
+      "job_id": 182,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "b1f064f1b2f5191351aa9f176371ba8623a06a75fd64dbc4ce6df3a30195068d",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-21BF5E23E1"
+    },
+    {
+      "job_id": 183,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "042ac6b21f689a5f83931b18b7f3928b10d36bf8f0a8e27336866df1d8a8894c",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-B3800B0773"
+    },
+    {
+      "job_id": 184,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "eccb50f392d4117e20b09f5de57d9e243bebafb8cae1794b5d1156787a7d4e09",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-B5F91E3A42"
+    },
+    {
+      "job_id": 185,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "c6efdc08b930af9800e4a7975d31cb61dfb9401b173585219c4a96cda5809820",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-D2A162318F"
+    },
+    {
+      "job_id": 186,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "bb9b3ab2ab09584d6094e0245a40c2622c34552c1007776ab5b6431bef164b2f",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-EC46DA7EC8"
+    },
+    {
+      "job_id": 187,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "3d948f67c910f797ef1bea10362c0182bd2e52364363b9de670aca08fb69eb5a",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-68A60F6E27"
+    },
+    {
+      "job_id": 188,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "1d1831d343f3be494dc9f27a1eb6f0264f0513d607b74d2ab345ace94deaf3b2",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-17B3BACAA4"
+    },
+    {
+      "job_id": 189,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "ae7dd4781727eb3aabbb839deaa746feeed3e3f58087b058fc6f5fcc7138c0c3",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-663CC75794"
+    },
+    {
+      "job_id": 190,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "e2aa52f23d60180fe5714c631d9b0767750d2a8469e07d2da7f55c4afe6915f4",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-4A16D0C444"
+    },
+    {
+      "job_id": 191,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "952858df59f9d23759c9adbbd4e5ae610e45c9f96a8a8d557627903ce387ce33",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-1B9A17D11C"
+    },
+    {
+      "job_id": 192,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "1691d6410fbcd84c19101c229101d2204772bd877d6bffb35be779f7f6d88906",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-C5FB13B551"
+    },
+    {
+      "job_id": 193,
+      "organization_id": 1,
+      "employer_company_id": 17,
+      "expected_checksum": "ec86ca014c22515f60ed24113190bd4fbc4a3737803606c2795fbdfc6251bc06",
+      "state": "closed",
+      "is_closed": true,
+      "expected_job_code": "HI-283F8E0AB5"
+    }
+  ],
+  "generated_at": "2026-10-04T20:26:07.674Z",
+  "raw_payload_exported": false
+}

@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "before_count": 434,
+  "after_count": 434,
+  "before_deleted_count": 128,
+  "after_deleted_count": 128,
+  "import_candidate_ids_before": 340,
+  "import_candidate_ids_after": 340,
+  "changed_ids": [428, 429, 430, 431, 432, 433, 434, 435, 436],
+  "allowed_ids": [428, 429, 430, 431, 432, 433, 434, 435, 436],
+  "lifecycle_changed_ids": [],
+  "missing_ids": [],
+  "added_ids": [],
+  "audit_entries": 9,
+  "audit_actor_user_id": 6,
+  "migration_reference": "step23-2026-10-04-local-publication",
+  "problems": [],
+  "scope": "publication-only repair of proven scoped source records; unresolved legacy records untouched"
+}
