@@ -4,20 +4,6 @@ import { candidateProfileService } from "@/api/services/candidateProfileService"
 import { fileService } from "@/api/services/fileService"
 import { useAuth } from "@/lib/AuthContext"
 
-const CATEGORIES = [
-  "פיתוח תוכנה",
-  "עיצוב",
-  "שיווק",
-  "מכירות",
-  "כספים",
-  "HR",
-  "הנדסה",
-  "רפואה",
-  "חינוך",
-  "לוגיסטיקה",
-  "אחר",
-]
-
 export default function CandidateProfilePage() {
   const { user } = useAuth()
 

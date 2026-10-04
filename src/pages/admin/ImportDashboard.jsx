@@ -9,7 +9,7 @@ import { candidateImportService } from "@/api/services/candidateImportService"
 import { fileService } from "@/api/services/fileService"
 import { useAuth } from "@/lib/AuthContext"
 import { useAgencyWorkspace } from "@/hooks/useAgencyWorkspace"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import {
   Upload,
   CheckCircle2,
@@ -46,8 +46,6 @@ export default function ImportDashboard() {
   const { paths } = useAgencyWorkspace()
 
   const navigate = useNavigate()
-
-  const qc = useQueryClient()
 
   const [activeTab, setActiveTab] = useState("resume") // 'resume' | 'csv'
 

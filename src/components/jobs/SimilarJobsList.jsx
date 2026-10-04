@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { publicWorkflowService } from "@/api/services/publicWorkflowService"
 
-export default function SimilarJobsList({ jobId, title }) {
+export default function SimilarJobsList({ jobId }) {
   const { data: recommendations = [], isLoading } = useQuery({
     queryKey: ["similar-jobs", jobId],
     queryFn: async () => {

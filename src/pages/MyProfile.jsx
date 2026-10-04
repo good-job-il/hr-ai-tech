@@ -21,9 +21,7 @@ const statusColors = {
 export default function MyProfile() {
   const { user } = useAuth()
 
-  const { t, i18n } = useTranslation()
-
-  const isRtl = !i18n.language?.startsWith("en")
+  const { t } = useTranslation()
 
   const statusLabels = {
     new: t("candidate.applications.status.new"),

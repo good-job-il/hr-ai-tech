@@ -21,8 +21,6 @@ export default function ImportMonitoring() {
 
     const oneHourAgo = new Date(now - 60 * 60 * 1000)
 
-    const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000)
-
     return {
       total: sources.length,
       active: sources.filter((s) => s.is_active).length,

@@ -109,7 +109,7 @@ export default function JobDetail() {
 
   const [extracting, setExtracting] = useState(false)
 
-  const [scrollPosition, setScrollPosition] = useState(0)
+  const [, setScrollPosition] = useState(0)
 
   const [formErrors, setFormErrors] = useState({})
 

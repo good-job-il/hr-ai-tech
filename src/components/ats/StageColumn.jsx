@@ -4,7 +4,6 @@ export default function StageColumn({
   stage,
   applications,
   onCandidateClick,
-  isDragging,
   colWidth,
   canMove = true,
 }) {

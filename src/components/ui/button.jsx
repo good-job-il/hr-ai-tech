@@ -102,14 +102,13 @@ const sizes = {
   },
 }
 
-/** @param {React.ButtonHTMLAttributes<HTMLButtonElement> & {variant?: keyof typeof buttonVariants, size?: keyof typeof sizes, asChild?: boolean}} props */
+/** @param {React.ButtonHTMLAttributes<HTMLButtonElement> & {variant?: keyof typeof buttonVariants, size?: keyof typeof sizes}} props */
 export function Button({
   children = null,
   variant = "primary",
   size = "md",
   className = "",
   disabled = false,
-  asChild = false,
   ...props
 }) {
   const variantStyles = buttonVariants[variant]

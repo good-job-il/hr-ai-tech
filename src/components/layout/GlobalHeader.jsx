@@ -11,8 +11,8 @@ const HEADER_HEIGHT = 88
 
 const HEADER_PADDING = SPACING[6] // 24px
 
-export default function GlobalHeader({ user, variant = "public" }) {
-  const { t, i18n } = useTranslation()
+export default function GlobalHeader({ user }) {
+  const { i18n } = useTranslation()
 
   const location = useLocation()
 

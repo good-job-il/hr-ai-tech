@@ -65,9 +65,6 @@ export default function ImportProgressMonitor({ batchId }) {
   const percentProcessed =
     progress.total > 0 ? Math.round((progress.processed / progress.total) * 100) : 0
 
-  const percentSuccessful =
-    progress.processed > 0 ? Math.round((progress.successful / progress.processed) * 100) : 0
-
   return (
     <div className="space-y-4">
       {/* Status */}

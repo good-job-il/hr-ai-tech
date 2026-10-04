@@ -23,7 +23,7 @@ function getHomeRoute(role) {
   }
 }
 
-export default function Logo({ size = "md", href, className = "" }) {
+export default function Logo({ href, className = "" }) {
   const navigate = useNavigate()
 
   const { user } = useAuth()

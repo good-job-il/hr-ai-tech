@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { useSearchParams } from "react-router-dom"
 
 const ROLES = [
   { id: "recruiter", label: "רכז גיוס" },
@@ -8,8 +7,6 @@ const ROLES = [
 ]
 
 export default function StaffInvite() {
-  const [searchParams] = useSearchParams()
-
   const [email, setEmail] = useState("")
 
   const [fullName, setFullName] = useState("")

@@ -93,12 +93,6 @@ export default function WhatsAppPanel({ candidate, communications, onAddCommunic
         status: logOutcome,
       })
 
-      const outcomeLabels = {
-        sent: t("candidateCRM.whatsapp.outcomes.sent"),
-        read: t("candidateCRM.whatsapp.outcomes.read"),
-        failed: t("candidateCRM.whatsapp.outcomes.failed"),
-      }
-
       if (onAddCommunication) {
         onAddCommunication()
       }

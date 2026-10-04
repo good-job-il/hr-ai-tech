@@ -38,7 +38,7 @@ export default function ResumeImportReview({ results, onComplete, onBack }) {
       }
 
       // Create bulk candidates
-      const createResult = await candidateImportService.createBulk(
+      await candidateImportService.createBulk(
         candidatesToCreate.map((c) => c.data),
         results.importBatchId,
       )

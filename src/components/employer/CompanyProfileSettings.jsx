@@ -1,12 +1,9 @@
 import { useState } from "react"
-import { useAuth } from "@/lib/AuthContext"
 import { authService } from "@/api/services/authService"
 import { fileService } from "@/api/services/fileService"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 export default function CompanyProfileSettings() {
-  const { user } = useAuth()
-
   const queryClient = useQueryClient()
 
   const [profileData, setProfileData] = useState({

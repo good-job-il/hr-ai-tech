@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { MapPin, Phone, Star, Video } from "lucide-react"
-import { he, enUS } from "date-fns/locale"
 import { useTranslation } from "react-i18next"
 
 const TYPE_ICONS = {
@@ -34,11 +33,7 @@ export default function InterviewsPanel({
   onSchedule,
   onUpdate,
 }) {
-  const { t, i18n } = useTranslation()
-
-  const currentLang = i18n.language?.startsWith("en") ? "en" : "he"
-
-  const dateLocale = currentLang === "he" ? he : enUS
+  const { t } = useTranslation()
 
   const TYPE_LABELS = {
     phone: t("candidateCRM.interviews.types.phone"),

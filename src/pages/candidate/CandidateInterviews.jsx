@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { interviewService } from "@/api/services/interviewService"
 import { useAuth } from "@/lib/AuthContext"
-import { Calendar, CheckCircle2, XCircle, AlertCircle, RotateCcw, UserX } from "lucide-react"
+import { Calendar, CheckCircle2, AlertCircle } from "lucide-react"
 
 // ─── Status config ─────────────────────────────────────────────────────────────
 
@@ -14,15 +14,6 @@ const STATUS_STYLE = {
   cancelled: { color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
   no_show: { color: "#EA580C", bg: "#FFF7ED", border: "#FDBA74" },
   rescheduled: { color: "#CA8A04", bg: "#FEFCE8", border: "#FDE047" },
-}
-
-const STATUS_ICON = {
-  scheduled: Calendar,
-  confirmed: CheckCircle2,
-  completed: CheckCircle2,
-  cancelled: XCircle,
-  no_show: UserX,
-  rescheduled: RotateCcw,
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────

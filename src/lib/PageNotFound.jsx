@@ -14,7 +14,7 @@ export default function PageNotFound({}) {
         const user = await httpClient.get("/auth/me", { cache: false })
 
         return { user, isAuthenticated: true }
-      } catch (error) {
+      } catch {
         return { user: null, isAuthenticated: false }
       }
     },

@@ -9,7 +9,6 @@ export default function CandidateNotesPanel({
   onAddNote,
   onUpdateNote,
   onDeleteNote,
-  userRole,
   canUpdate = true,
 }) {
   const { t, i18n } = useTranslation()

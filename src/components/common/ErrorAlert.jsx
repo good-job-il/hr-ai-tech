@@ -2,7 +2,6 @@ export default function ErrorAlert({
   error,
   onDismiss,
   onRetry = null,
-  details = null,
   source = null,
 }) {
   if (!error) {

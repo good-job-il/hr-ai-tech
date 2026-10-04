@@ -12,13 +12,13 @@ export const AuthProvider = ({ children }) => {
 
   const [isLoadingAuth, setIsLoadingAuth] = useState(true)
 
-  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(false)
+  const [isLoadingPublicSettings] = useState(false)
 
-  const [authError, setAuthError] = useState(null)
+  const [authError] = useState(null)
 
   const [authChecked, setAuthChecked] = useState(false)
 
-  const [appPublicSettings, setAppPublicSettings] = useState(null) // unused with NestJS backend, kept for API compat
+  const [appPublicSettings] = useState(null) // unused with NestJS backend, kept for API compat
 
   const [organization, setOrganization] = useState(null)
 
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
 
           setOrganization(org)
           setOrgType(org?.org_type || null)
-        } catch (_) {
+        } catch {
           // org load failed — treat as no org (platform operator or orphaned user)
         }
       } else {
@@ -129,7 +129,7 @@ export const AuthProvider = ({ children }) => {
   const exitOrganization = async () => {
     try {
       await authService.exitOrganization()
-    } catch (_) {
+    } catch {
       // best-effort — proceed to drop the workspace token regardless
     }
 

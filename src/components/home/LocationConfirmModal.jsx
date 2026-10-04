@@ -3,7 +3,7 @@ import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function LocationConfirmModal({ initialCity, onConfirm, onDismiss }) {
-  const [city, setCity] = useState(initialCity)
+  const [city] = useState(initialCity)
 
   const [customCity, setCustomCity] = useState("")
 

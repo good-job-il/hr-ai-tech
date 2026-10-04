@@ -9,10 +9,8 @@ export default function RecruiterWorkspacePanel({
   onAssignRecruiter,
   onAddTag,
   onRemoveTag,
-  onSendToEmployer,
   onRequestDocuments,
   userRole,
-  currentUser,
   onReload,
 }) {
   const { t } = useTranslation()

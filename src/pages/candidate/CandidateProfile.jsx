@@ -22,9 +22,6 @@ const CATEGORY_KEYS = {
   other: "אחר",
 }
 
-// Reverse: stored value → key
-const DB_TO_KEY = Object.fromEntries(Object.entries(CATEGORY_KEYS).map(([k, v]) => [v, k]))
-
 function ProfileCompleteness({ form, t }) {
   const fields = [
     form?.full_name,

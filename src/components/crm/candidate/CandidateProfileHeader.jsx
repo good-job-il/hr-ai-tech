@@ -6,7 +6,6 @@ export default function CandidateProfileHeader({
   candidate,
   tags,
   applications = [],
-  onStatusChange,
   onEdit,
   onAssignSuccess,
 }) {
@@ -39,8 +38,6 @@ export default function CandidateProfileHeader({
     upload: t("candidateCRM.profileHeader.sources.upload"),
     crawl: t("candidateCRM.profileHeader.sources.crawl"),
   }
-
-  const [changingStatus, setChangingStatus] = useState(false)
 
   const [showResume, setShowResume] = useState(false)
 

@@ -14,7 +14,7 @@ const VISIBILITY = {
   employer: ["recruiter", "team_manager", "recruitment_manager"],
 }
 
-export default function JobCompensationDisplay({ job, baseSalary = 0, onEdit }) {
+export default function JobCompensationDisplay({ baseSalary = 0, onEdit }) {
   const { user } = useAuth()
 
   const userRole = user?.role || "employer"

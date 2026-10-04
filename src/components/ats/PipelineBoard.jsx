@@ -7,7 +7,6 @@ export default function PipelineBoard({
   applications,
   onCandidateClick,
   onMove,
-  userRole,
   isRTL = true,
   canMove = true,
 }) {

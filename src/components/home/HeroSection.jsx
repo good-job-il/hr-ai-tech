@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "@/lib/AuthContext"
 import { useTranslation } from "react-i18next"
 import { useQuery } from "@tanstack/react-query"
 import { publicJobService } from "@/api/services/publicJobService"
@@ -10,8 +9,6 @@ export default function HeroSection() {
   const [phone, setPhone] = useState("")
 
   const navigate = useNavigate()
-
-  const { user } = useAuth()
 
   const { t, i18n } = useTranslation()
 
