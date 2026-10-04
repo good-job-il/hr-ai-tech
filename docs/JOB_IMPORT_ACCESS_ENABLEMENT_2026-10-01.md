@@ -41,4 +41,8 @@ Job Imports effective flags возвращаются через organization API
 
 До migration organization API сохраняет работу существующих explicit overrides; Flags показывает ошибку загрузки с Retry, а не выдуманный inherited Enabled. После изменения defaults обновить agency page, чтобы AuthContext загрузил актуальные effective flags. Resource permission `job_imports.view` остаётся независимым обязательным условием.
 
-Production migration и проверка positive-access workflow. Шаг 20.1 полностью не закрыт до их выполнения; полный accessibility acceptance шага 20 также остаётся открытым.
+### Обновление проверки — 2026-10-04
+
+Шаг 20.1 закрыт в implementation plan. Read-only `npm run migration:show` подтвердил `[X] JobImportPermissionEnablement1754600000000` и `[X] PlanFeatureFlags1754700000000` в БД текущего backend configuration. Повторные проверки: backend 9 suites / 30 tests; frontend flags + import safety 45 tests — успешно.
+
+Положительный scoped-admin tenant доступ и accessibility acceptance шага 20 подтверждены [QA от 4 октября](JOB_IMPORT_STEP20_UI_QA_2026-10-04.md). Эквивалентность org_admin/scoped-admin permissions проверена реализацией и regression tests; новая ручная сессия отдельного org_admin в этой проверке не выполнялась. Изменения БД, прав, flags, jobs и расписаний не проводились. Это не подтверждение состояния deployment `hr-ai.tech` и не полный production rollout acceptance import platform.

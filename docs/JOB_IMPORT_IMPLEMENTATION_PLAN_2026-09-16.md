@@ -1284,9 +1284,9 @@ Recruiter понимает, какие поля можно редактиров�
 
 ---
 
-## Шаг 20.1. Permissions и безопасное включение Job Imports
+## ✅ Шаг 20.1. Permissions и безопасное включение Job Imports
 
-**Статус (1 октября 2026): код и проверки готовы; применение production migration и положительный tenant UI acceptance ещё не выполнены.** Полную галочку шага ставить только после этих проверок.
+**Статус (4 октября 2026): выполнен.** Повторно проверены реализация и regression tests; read-only `migration:show` подтвердил обе применённые миграции. Положительный tenant workflow и UI acceptance подтверждены [QA от 4 октября](JOB_IMPORT_STEP20_UI_QA_2026-10-04.md). Это закрытие шага enablement, а не приёмка production rollout всей import platform.
 
 - [x] Подготовить backfill отсутствующих `resources.job_imports` actions для staffing `org_admin`, сохраняя явные `false`, другие permissions и приоритет существующих overrides.
 - [x] Добавить rollback с backup: не отменять ручные изменения, сделанные после миграции.
@@ -1297,8 +1297,10 @@ Recruiter понимает, какие поля можно редактиров�
 - [x] Устранить browser-local plan inheritance: server-persisted Plan Matrix, общий override → plan → false resolver, effective flags в organization API и preview; отдельная migration `1754700000000-PlanFeatureFlags` без автоматического production enablement.
 - [x] Проверить backend permission tests (26), frontend safety tests (29), builds и UI блока permissions в EN/HE, LTR/RTL, на 320/768/1280 px.
 - [x] Проверить disabled/denied states в tenant UI. Временный `job_imports_enabled` override возвращён к plan default; permissions не сохранялись.
-- [ ] Применить migration к согласованной production/staging БД и проверить effective `job_imports.view` для org_admin и scoped admin.
-- [ ] С согласованным feature flag пройти положительный доступ и оставшийся полный workflow acceptance шага 20.
+- [x] Применить migration к согласованной production/staging БД и проверить effective `job_imports.view` для org_admin и scoped admin. `migration:show` 4 октября подтверждает `[X] JobImportPermissionEnablement1754600000000` и `[X] PlanFeatureFlags1754700000000`; org_admin/scoped-admin identity проверена кодом и regression tests, положительный scoped-admin доступ — сохранённым UI QA.
+- [x] С согласованным feature flag пройти положительный доступ и оставшийся полный workflow acceptance шага 20. QA от 4 октября подтверждает wizard/dashboard/detail/review/provenance в EN/HE и трёх ширинах, включая read-only preview #16; Apply и другие business mutations не выполнялись.
+
+Повторная проверка 4 октября: backend **9 suites, 30/30 tests** (permissions, backfill/rollback, guards, API permissions contract, flags и migration discovery); frontend **45/45 tests** (`test:job-import-flags`, `test:job-import-safety`). В этой проверке permissions, feature flags, jobs и расписания не изменялись; миграции повторно не запускались. Новый ручной вход отдельной учётной записью org_admin и состояние deployment `hr-ai.tech` не проверялись: для UI использовано сохранённое QA, для role equivalence — код и тесты.
 
 Feature flags остаются opt-in; backfill не включает функцию автоматически. Явные запреты требуют осознанного изменения через Permission Matrix, а не повторной миграции. [Инструкция включения и проверки](JOB_IMPORT_ACCESS_ENABLEMENT_2026-10-01.md).
 
