@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { platformJobImportService } from "@/api/services/importSourceService"
+import JobImportOperationsSummary from "./JobImportOperationsSummary"
 import {
   ErrorPanel,
   formatImportDate,
@@ -13,9 +15,11 @@ import {
 export default function PlatformJobImportOperationsPage() {
   const { t, i18n } = useTranslation()
 
+  const [page, setPage] = useState(1)
+
   const health = useQuery({
-    queryKey: ["platform-job-import-health"],
-    queryFn: () => platformJobImportService.listHealth({ page: 1, limit: 100 }),
+    queryKey: ["platform-job-import-health", page],
+    queryFn: () => platformJobImportService.listHealth({ page, limit: 25 }),
   })
 
   if (health.isError) {
@@ -37,6 +41,7 @@ export default function PlatformJobImportOperationsPage() {
         title={t("jobImports.platform.title")}
         description={t("jobImports.platform.description")}
       />
+      <JobImportOperationsSummary />
       <div className="grid gap-3 sm:grid-cols-3">
         <Panel>
           <p className="text-xs font-bold uppercase text-slate-500">
@@ -102,6 +107,19 @@ export default function PlatformJobImportOperationsPage() {
           </div>
         )}
       </Panel>
+      <nav aria-label={t("jobImports.platform.title")} className="flex items-center gap-3">
+        <button type="button" disabled={page === 1} onClick={() => setPage(page - 1)}>
+          {t("jobImports.operations.previous")}
+        </button>
+        <span>{page}</span>
+        <button
+          type="button"
+          disabled={page * 25 >= (health.data?.pagination.total || 0)}
+          onClick={() => setPage(page + 1)}
+        >
+          {t("jobImports.operations.next")}
+        </button>
+      </nav>
     </PageShell>
   )
 }

@@ -1306,6 +1306,19 @@ Feature flags остаются opt-in; backfill не включает функц
 
 ## Шаг 21. Наблюдаемость, аналитика и operations
 
+**Статус (4 октября 2026): реализация и автоматические проверки готовы; operational acceptance после deployment ещё не выполнен.** Полную галочку шага поставить после живой проверки scanner/SQL, on-call delivery и безопасной pause/recovery на изолированном staging tenant. Production mutations и включение monitoring в рамках реализации не выполнялись.
+
+- [x] Persistent run/connector/version/quality/freshness aggregates и HTTP telemetry, в том числе failed later page, retries/rate limits, pre-breaker proposed closes и applied closes.
+- [x] Server-side product funnel events на основе audit и run facts; batch review resolution не считается повторно при idempotent replay.
+- [x] Семь alert rules, persistent deduplication/resolution, multi-worker scanner lock, monitor heartbeat и отдельное stale-monitor состояние.
+- [x] Platform operations API/UI с EN/HE, pagination, отдельным native-admin allowlist scope и backend `manage_settings`; raw payload/credentials не выдаются.
+- [x] Read-only affected summary, подтверждённая idempotent pause exact connector version, transactional tenant audit; каждое новое apply item проверяет source lock/state/config version.
+- [x] Подтверждённое восстановление unchanged incident-paused sources в draft без schedule; mapping version повышается на сервере при изменении configuration/connector.
+- [x] [Runbook и rollout contract](JOB_IMPORT_OPERATIONS_RUNBOOK_2026-10-04.md): diagnostics, pause, replay, mapping migration, parser recovery, false-close/cross-tenant incident, credentials rotation.
+- [x] Backend regression: **25 suites / 228 tests**, плюс повторная проверка последних analytics/operations изменений **23/23**; frontend import safety **38/38**, flags **9/9**, agency jobs **33/33**; TypeScript, targeted ESLint, builds и diff checks успешны.
+- [ ] Оператор применяет `1754800000000-JobImportOperations`, задаёт `JOB_IMPORT_OPERATIONS_USER_IDS`, включает `JOB_IMPORT_ALERTS_ENABLED=true` после migration и проверяет свежий heartbeat.
+- [ ] На staging подтвердить реальные MySQL aggregates, connector-wide regression alert, pause/recovery/replay и delivery через согласованный log drain/alert manager (или polling alerts API). Внешний routing/получатели и production rollout требуют Operations approval; новая общая галочка не означает автоматически включённый production мониторинг.
+
 ### Backend metrics
 
 - run success/failure/partial;

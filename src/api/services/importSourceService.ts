@@ -555,6 +555,38 @@ class ImportSourceService extends ResourceService<
 export const importSourceService = new ImportSourceService()
 
 export const platformJobImportService = {
+  metrics() {
+    return httpClient.get<{
+      window_hours: number
+      monitor: { enabled: boolean; last_scan_at: string | null; stale: boolean }
+      runs: Array<Record<string, number | string | null>>
+      quality: Array<Record<string, number | string | null>>
+      freshness: { scheduled_sources: number; stale_sources: number }
+    }>("/platform-support/job-imports/metrics", { cache: false })
+  },
+  alerts(page = 1) {
+    return httpClient.get<{
+      data: Array<{
+        alert_key: string
+        code: string
+        severity: string
+        organization_id: number | null
+        source_id: number | null
+        connector_type: string | null
+        connector_version: string | null
+        evidence: Record<string, number>
+        first_seen_at: string
+        last_seen_at: string
+      }>
+      pagination: { page: number; limit: number; total: number }
+    }>(`/platform-support/job-imports/alerts?page=${page}&limit=25`, { cache: false })
+  },
+  analytics() {
+    return httpClient.get<{
+      window_hours: number
+      events: Array<{ event: string; count: number }>
+    }>("/platform-support/job-imports/analytics", { cache: false })
+  },
   listHealth(query: ResourceQuery & { organization_id?: number; health_state?: string } = {}) {
     const params = new URLSearchParams()
     Object.entries(query).forEach(([key, value]) => {
