@@ -37,6 +37,7 @@ test("external posting links only allow http and https", () => {
 
 test("only newly edited source-managed fields require confirmation", () => {
   const job = { title: "Engineer", required_skills: ["SQL"], recruiter_id: 5, domain_id: 17 }
+
   const form = {
     title: "Senior Engineer",
     required_skills_text: "SQL",

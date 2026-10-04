@@ -1,4 +1,5 @@
 const IMPORT_MANAGED_OWNERSHIP = new Set(["source_until_edited", "review_on_conflict"])
+
 const EDITABLE_IMPORT_FIELDS = new Set([
   "title",
   "description",
@@ -93,6 +94,7 @@ export function changedImportManagedFields(job, form, provenance) {
     .map(([field]) => field)
     .filter((field) => {
       const before = originalValue(job, field)
+
       const after = formValue(form, field)
 
       if (Array.isArray(before) || Array.isArray(after)) {

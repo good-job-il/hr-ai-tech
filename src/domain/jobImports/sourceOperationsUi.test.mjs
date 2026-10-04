@@ -6,17 +6,21 @@ const dashboard = readFileSync(
   new URL("../../pages/jobImports/JobImportSourcesPage.jsx", import.meta.url),
   "utf8",
 )
+
 const detail = readFileSync(
   new URL("../../pages/jobImports/JobImportSourceDetailPage.jsx", import.meta.url),
   "utf8",
 )
+
 const api = readFileSync(
   new URL("../../api/services/importSourceService.ts", import.meta.url),
   "utf8",
 )
+
 const en = JSON.parse(
   readFileSync(new URL("../../locales/en/translation.json", import.meta.url), "utf8"),
 )
+
 const he = JSON.parse(
   readFileSync(new URL("../../locales/he/translation.json", import.meta.url), "utf8"),
 )
@@ -34,6 +38,7 @@ test("source operations remain permission-aware and archive is recoverable", () 
   for (const action of ["run", "update", "review", "archive"]) {
     assert.match(dashboard, new RegExp(`canResource\\(\"job_imports\", \"${action}\"\\)`))
   }
+
   assert.match(dashboard, /AlertDialog/)
   assert.match(dashboard, /keepJobs/)
   assert.match(detail, /reconnectCredentials/)

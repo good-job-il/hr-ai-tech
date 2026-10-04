@@ -6,20 +6,25 @@ const page = readFileSync(
   new URL("../../pages/jobImports/JobImportRunReviewPage.jsx", import.meta.url),
   "utf8",
 )
+
 const api = readFileSync(
   new URL("../../api/services/importSourceService.ts", import.meta.url),
   "utf8",
 )
+
 const routes = readFileSync(new URL("../../App.jsx", import.meta.url), "utf8")
+
 const en = JSON.parse(
   readFileSync(new URL("../../locales/en/translation.json", import.meta.url), "utf8"),
 )
+
 const he = JSON.parse(
   readFileSync(new URL("../../locales/he/translation.json", import.meta.url), "utf8"),
 )
 
 test("review queue is routed and delegates all decisions to typed server endpoints", () => {
   assert.match(routes, /agency\/import\/jobs\/review/)
+
   for (const endpoint of [
     "/job-imports/review-items",
     "/approve",
@@ -61,6 +66,7 @@ test("review decisions expose source/current comparison and required safety cont
   ]) {
     assert.match(page.toLowerCase(), new RegExp(marker.toLowerCase()))
   }
+
   assert.match(page, /AlertDialog/)
   assert.match(page, /linkDuplicate/)
 })

@@ -3,9 +3,13 @@ import { readFileSync } from "node:fs"
 import test from "node:test"
 
 const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), "utf8")
+
 const page = read("pages/jobImports/JobImportNewPage.jsx")
+
 const service = read("api/services/importSourceService.ts")
+
 const en = JSON.parse(read("locales/en/translation.json"))
+
 const he = JSON.parse(read("locales/he/translation.json"))
 
 test("wizard persists recoverable progress on the backend without localStorage", () => {
@@ -30,6 +34,7 @@ test("wizard clears persisted preview with JSON null and localizes schedule/prog
   assert.match(page, /sample.scanning/)
   assert.match(page, /confirmation.manualSchedule/)
   assert.doesNotMatch(page, />6h<|>12h<|>24h<|>7d</)
+
   for (const translation of [en, he]) {
     assert.ok(translation.jobImports.wizard.sample.scanning)
     assert.ok(translation.jobImports.wizard.confirmation.manualSchedule)
@@ -44,5 +49,6 @@ test("wizard translations are complete in English and Hebrew", () => {
     assert.ok(translation.jobImports.wizard.previewStates.partial)
     assert.ok(translation.jobImports.wizard.confirmation.apply)
   }
+
   assert.match(page, /i18n\.dir\(\) === "rtl"/)
 })

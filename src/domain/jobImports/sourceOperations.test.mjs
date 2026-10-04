@@ -9,6 +9,7 @@ import {
 
 test("source freshness respects schedule and inactive lifecycle", () => {
   const now = Date.parse("2026-09-29T12:00:00Z")
+
   assert.equal(sourceFreshness({ state: "paused" }, now), "paused")
   assert.equal(sourceFreshness({ state: "draft", interval_hours: 24 }, now), "not_started")
   assert.equal(sourceFreshness({ state: "active", interval_hours: 0 }, now), "manual")

@@ -6,6 +6,7 @@ const root = new URL("../../", import.meta.url)
 
 test("job sources navigation is hidden until both feature and permission gate allow it", () => {
   const source = readFileSync(new URL("config/navigation/agencyNav.js", root), "utf8")
+
   assert.match(source, /requiresJobImports: true/)
   assert.match(source, /jobImportsVisible/)
 
@@ -13,12 +14,14 @@ test("job sources navigation is hidden until both feature and permission gate al
     new URL("components\/layouts\/StaffingAgencyLayout.jsx", root),
     "utf8",
   )
+
   assert.match(layout, /JOB_IMPORT_FEATURE_FLAGS\.ENABLED/)
   assert.match(layout, /canResource\("job_imports", "view"\)/)
 })
 
 test("agency and platform routes use the canonical job-import information architecture", () => {
   const app = readFileSync(new URL("App.jsx", root), "utf8")
+
   for (const route of [
     "/agency/import/jobs",
     "/agency/import/jobs/new",
