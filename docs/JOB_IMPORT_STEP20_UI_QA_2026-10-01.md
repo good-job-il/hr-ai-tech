@@ -22,13 +22,13 @@
 
 ## Дефекты
 
-| Приоритет | Наблюдение | Как воспроизвести |
-|---|---|---|
-| P1 | Primary controls практически невидимы: белый текст без цветного background. Computed styles у Add source и Run preview: foreground rgb(255,255,255), background rgba(0,0,0,0). | Открыть dashboard/source detail на светлом фоне. Проверить сгенерированные utilities `bg-violet-600` и theme palette. |
-| P1 | Пустой review показывает `1 selected` и batch controls без выбора item. | Открыть `/agency/import/jobs/runs/1` без query params: 0 items, но selected=1. В коде пустая строка преобразуется через `.split(',').map(Number)` в ID 0. |
-| P1 | У Cancel setup AlertDialog отсутствует `aria-modal`, хотя focus trap и scroll lock работают. | Открыть Cancel setup; role=alertdialog, aria-labelledby задан, aria-modal отсутствует. |
-| P2 | Client select показывает `#9` и `#10`, Source Detail показывает `9`, вместо человеческих названий клиентов. | Wizard Client и Source Detail тестового draft. |
-| P2 | Sample после failed preview показывает только Failed/0 items, без actionable причины или retry. | Run sample на тестовом source; причину можно прочитать только в Source Detail. |
+| Приоритет | Наблюдение                                                                                                                                                                     | Как воспроизвести                                                                                                                                         |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1        | Primary controls практически невидимы: белый текст без цветного background. Computed styles у Add source и Run preview: foreground rgb(255,255,255), background rgba(0,0,0,0). | Открыть dashboard/source detail на светлом фоне. Проверить сгенерированные utilities `bg-violet-600` и theme palette.                                     |
+| P1        | Пустой review показывает `1 selected` и batch controls без выбора item.                                                                                                        | Открыть `/agency/import/jobs/runs/1` без query params: 0 items, но selected=1. В коде пустая строка преобразуется через `.split(',').map(Number)` в ID 0. |
+| P1        | У Cancel setup AlertDialog отсутствует `aria-modal`, хотя focus trap и scroll lock работают.                                                                                   | Открыть Cancel setup; role=alertdialog, aria-labelledby задан, aria-modal отсутствует.                                                                    |
+| P2        | Client select показывает `#9` и `#10`, Source Detail показывает `9`, вместо человеческих названий клиентов.                                                                    | Wizard Client и Source Detail тестового draft.                                                                                                            |
+| P2        | Sample после failed preview показывает только Failed/0 items, без actionable причины или retry.                                                                                | Run sample на тестовом source; причину можно прочитать только в Source Detail.                                                                            |
 
 ## Непроверенные сценарии
 

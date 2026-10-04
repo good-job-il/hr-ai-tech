@@ -155,7 +155,9 @@
   border-radius: 11px;
   font-size: 15px;
   font-weight: 850;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .company-profile-primary-action {
@@ -366,7 +368,10 @@
   border: 1px solid #e0e6f3;
   border-radius: 16px;
   background: #fff;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .company-profile-job:hover {
@@ -637,7 +642,9 @@
 }
 
 @keyframes company-profile-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 900px) {

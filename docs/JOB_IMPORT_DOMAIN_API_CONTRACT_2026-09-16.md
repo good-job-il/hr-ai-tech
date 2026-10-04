@@ -17,16 +17,16 @@
 
 ## Lifecycle enums
 
-| Contract | Values |
-| --- | --- |
-| `ConnectorType` | `generic_json`, `json_ld`, `greenhouse`, `lever`, `generic_html` |
-| `ImportSourceState` | `draft`, `active`, `paused`, `needs_attention`, `archived` |
-| `ImportRunMode` | `preview`, `apply` |
-| `ImportRunStatus` | `pending`, `running`, `completed`, `partial`, `failed`, `cancelled` |
-| `SnapshotCompleteness` | `full`, `incremental`, `partial`, `failed` |
-| `SourceJobLifecycle` | `discovered`, `active`, `suspected_missing`, `closed`, `reopened`, `quarantined`, `ignored` |
-| `ImportAction` | `create`, `update`, `close`, `reopen`, `skip`, `review`, `error` |
-| `FieldOwnership` | `platform`, `user`, `source_until_edited`, `review_on_conflict` |
+| Contract               | Values                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------- |
+| `ConnectorType`        | `generic_json`, `json_ld`, `greenhouse`, `lever`, `generic_html`                            |
+| `ImportSourceState`    | `draft`, `active`, `paused`, `needs_attention`, `archived`                                  |
+| `ImportRunMode`        | `preview`, `apply`                                                                          |
+| `ImportRunStatus`      | `pending`, `running`, `completed`, `partial`, `failed`, `cancelled`                         |
+| `SnapshotCompleteness` | `full`, `incremental`, `partial`, `failed`                                                  |
+| `SourceJobLifecycle`   | `discovered`, `active`, `suspected_missing`, `closed`, `reopened`, `quarantined`, `ignored` |
+| `ImportAction`         | `create`, `update`, `close`, `reopen`, `skip`, `review`, `error`                            |
+| `FieldOwnership`       | `platform`, `user`, `source_until_edited`, `review_on_conflict`                             |
 
 Connector capabilities are explicit flags: pagination, detail fetch, incremental sync, closure events, salary, remote constraints, multiple locations, authentication and webhooks. The UI must render capabilities from this contract rather than infer them from a provider name.
 
@@ -63,15 +63,15 @@ Raw payloads, credentials and job descriptions must not be placed in error conte
 
 Job import authorization is stored separately under `permissions.resources.job_imports`:
 
-| Action | Meaning |
-| --- | --- |
-| `view` | Read sources, runs, health and provenance allowed by scope |
-| `create` | Create a source in draft state |
-| `update` | Change non-secret source configuration |
-| `run` | Start preview/apply runs according to feature and source policy |
-| `review` | Resolve review items and approve an apply operation |
-| `manage_credentials` | Create, rotate or remove credential references |
-| `archive` | Archive a source; this is the destructive configuration permission |
+| Action               | Meaning                                                            |
+| -------------------- | ------------------------------------------------------------------ |
+| `view`               | Read sources, runs, health and provenance allowed by scope         |
+| `create`             | Create a source in draft state                                     |
+| `update`             | Change non-secret source configuration                             |
+| `run`                | Start preview/apply runs according to feature and source policy    |
+| `review`             | Resolve review items and approve an apply operation                |
+| `manage_credentials` | Create, rotate or remove credential references                     |
+| `archive`            | Archive a source; this is the destructive configuration permission |
 
 All resource actions default to denied when an old permission record has no `resources` object. Backend guards and tenant scope are authoritative. Frontend checks may hide or disable controls but never grant access.
 

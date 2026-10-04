@@ -19,10 +19,10 @@ which the Vite development server proxies to `http://localhost:3001`.
 
 Environment variables:
 
-| Variable | Purpose |
-| --- | --- |
-| `VITE_API_BASE_URL` | Browser-facing API base URL, including `/api`; defaults to `/api` locally |
-| `VITE_API_PROXY_TARGET` | API origin used only by the local Vite proxy |
+| Variable                | Purpose                                                                   |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `VITE_API_BASE_URL`     | Browser-facing API base URL, including `/api`; defaults to `/api` locally |
+| `VITE_API_PROXY_TARGET` | API origin used only by the local Vite proxy                              |
 
 ## Vercel deployment
 

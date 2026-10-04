@@ -196,7 +196,10 @@
   background: rgba(255, 255, 255, 0.92);
   color: #11143d;
   box-shadow: 0 14px 40px rgba(55, 71, 128, 0.065);
-  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  transition:
+    transform 0.25s,
+    border-color 0.25s,
+    box-shadow 0.25s;
 }
 
 .company-card:hover {

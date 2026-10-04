@@ -63,12 +63,41 @@ const footerContent = {
     footerDescription:
       "Israel's smart recruitment platform. Connecting quality candidates with leading companies through AI.",
     footerColumns: [
-      ["For Candidates", [["Search Jobs", "/jobs"], ["Personal Profile", "/register?type=candidate"], ["AI Matching", "/ai-career"], ["Resume", "/register?type=candidate"]]],
-      ["For Companies", [["Post a Job", "/register?type=staffing_agency"], ["Find Candidates", "/register?type=staffing_agency"], ["AI Matching", "/ai-career"], ["Analytics", "/register?type=staffing_agency"]]],
-      ["Company", [["About", "/about"], ["Careers", "/about"], ["Blog", "/blog"], ["Contact", "/contact"]]],
+      [
+        "For Candidates",
+        [
+          ["Search Jobs", "/jobs"],
+          ["Personal Profile", "/register?type=candidate"],
+          ["AI Matching", "/ai-career"],
+          ["Resume", "/register?type=candidate"],
+        ],
+      ],
+      [
+        "For Companies",
+        [
+          ["Post a Job", "/register?type=staffing_agency"],
+          ["Find Candidates", "/register?type=staffing_agency"],
+          ["AI Matching", "/ai-career"],
+          ["Analytics", "/register?type=staffing_agency"],
+        ],
+      ],
+      [
+        "Company",
+        [
+          ["About", "/about"],
+          ["Careers", "/about"],
+          ["Blog", "/blog"],
+          ["Contact", "/contact"],
+        ],
+      ],
     ],
     support: "Support",
-    supportLinks: [["Help Center", "/contact"], ["Guides", "/resources"], ["System Status", "/contact"], ["FAQ", "/resources"]],
+    supportLinks: [
+      ["Help Center", "/contact"],
+      ["Guides", "/resources"],
+      ["System Status", "/contact"],
+      ["FAQ", "/resources"],
+    ],
     copyright: "© 2024 HeadHunter. All rights reserved.",
     terms: "Terms of Use",
     privacy: "Privacy Policy",
@@ -78,12 +107,41 @@ const footerContent = {
     footerDescription:
       "פלטפורמת הגיוס החכמה של ישראל. מחברת מועמדים איכותיים עם חברות מובילות באמצעות AI.",
     footerColumns: [
-      ["למועמדים", [["חיפוש משרות", "/jobs"], ["פרופיל אישי", "/register?type=candidate"], ["התאמות AI", "/ai-career"], ["קורות חיים", "/register?type=candidate"]]],
-      ["לחברות", [["פרסום משרה", "/register?type=staffing_agency"], ["חיפוש מועמדים", "/register?type=staffing_agency"], ["התאמות AI", "/ai-career"], ["אנליטיקה", "/register?type=staffing_agency"]]],
-      ["החברה", [["אודות", "/about"], ["קריירה", "/about"], ["בלוג", "/blog"], ["צור קשר", "/contact"]]],
+      [
+        "למועמדים",
+        [
+          ["חיפוש משרות", "/jobs"],
+          ["פרופיל אישי", "/register?type=candidate"],
+          ["התאמות AI", "/ai-career"],
+          ["קורות חיים", "/register?type=candidate"],
+        ],
+      ],
+      [
+        "לחברות",
+        [
+          ["פרסום משרה", "/register?type=staffing_agency"],
+          ["חיפוש מועמדים", "/register?type=staffing_agency"],
+          ["התאמות AI", "/ai-career"],
+          ["אנליטיקה", "/register?type=staffing_agency"],
+        ],
+      ],
+      [
+        "החברה",
+        [
+          ["אודות", "/about"],
+          ["קריירה", "/about"],
+          ["בלוג", "/blog"],
+          ["צור קשר", "/contact"],
+        ],
+      ],
     ],
     support: "תמיכה",
-    supportLinks: [["מרכז עזרה", "/contact"], ["מדריכים", "/resources"], ["סטטוס המערכת", "/contact"], ["שאלות נפוצות", "/resources"]],
+    supportLinks: [
+      ["מרכז עזרה", "/contact"],
+      ["מדריכים", "/resources"],
+      ["סטטוס המערכת", "/contact"],
+      ["שאלות נפוצות", "/resources"],
+    ],
     copyright: "© 2024 HeadHunter. כל הזכויות שמורות.",
     terms: "תנאי שימוש",
     privacy: "מדיניות פרטיות",
@@ -403,7 +461,7 @@ export default function Jobs() {
     ],
     queryFn: async () => {
       const experienceRange = {
-        "0": { min: 0, max: 0 },
+        0: { min: 0, max: 0 },
         "1-2": { min: 1, max: 2 },
         "3-5": { min: 3, max: 5 },
         "5+": { min: 5, max: undefined },
@@ -746,11 +804,7 @@ export default function Jobs() {
           aria-expanded={mobileFiltersOpen}
         >
           {mobileFiltersOpen ? <X /> : <SlidersHorizontal />}
-          {mobileFiltersOpen
-            ? isRtl
-              ? "סגירת מסננים"
-              : "Close filters"
-            : t("jobs.filters.title")}
+          {mobileFiltersOpen ? (isRtl ? "סגירת מסננים" : "Close filters") : t("jobs.filters.title")}
         </button>
 
         <div className="jobs-workspace">
@@ -766,7 +820,10 @@ export default function Jobs() {
                   {t("jobs.filters.title")}
                 </h3>
 
-                <button onClick={clearFilters} className="text-[#94A3B8] text-sm font-bold flex items-center gap-1">
+                <button
+                  onClick={clearFilters}
+                  className="text-[#94A3B8] text-sm font-bold flex items-center gap-1"
+                >
                   <RotateCcw className="w-4 h-4" />
 
                   {t("jobs.filters.clearAll")}
@@ -1032,7 +1089,9 @@ export default function Jobs() {
                 </div>
 
                 <p className="text-[#64748B] font-bold mb-4">
-                  {isRtl ? "עלייה בביקוש למשרות טכנולוגיה" : "Growth in demand for technology roles"}
+                  {isRtl
+                    ? "עלייה בביקוש למשרות טכנולוגיה"
+                    : "Growth in demand for technology roles"}
                 </p>
 
                 <div className="flex items-center gap-2 text-[#10B981] font-black text-sm">
@@ -1083,7 +1142,11 @@ export default function Jobs() {
                 [Building2, "חברות איכותיות", "משרות מחברות מובילות בלבד"],
               ]
             : [
-                [ShieldCheck, "Private by design", "Employers see your profile only after approval"],
+                [
+                  ShieldCheck,
+                  "Private by design",
+                  "Employers see your profile only after approval",
+                ],
                 [Zap, "Fast process", "Apply to relevant roles in one click"],
                 [Brain, "AI matching", "Smart recommendations updated in real time"],
                 [Building2, "Quality companies", "Openings from trusted employers only"],
@@ -1101,11 +1164,7 @@ export default function Jobs() {
           ))}
         </section>
       </main>
-      <LandingFooter
-        copy={jobsFooterCopy}
-        isEnglish={!isRtl}
-        changeLanguage={changeLanguage}
-      />
+      <LandingFooter copy={jobsFooterCopy} isEnglish={!isRtl} changeLanguage={changeLanguage} />
     </div>
   )
 }

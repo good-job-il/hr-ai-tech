@@ -949,21 +949,21 @@ export default function FlagsPage() {
   }, [persistedMatrix])
 
   if (isLoading) {
-return (
+    return (
       <PlatformPageShell>
         <p role="status">Loading feature flags...</p>
       </PlatformPageShell>
     )
-}
+  }
 
   if (isError) {
-return (
+    return (
       <PlatformPageShell>
         <p role="alert">Could not load server feature flags. Check backend migrations.</p>
         <button onClick={() => refetch()}>Retry</button>
       </PlatformPageShell>
     )
-}
+  }
 
   return (
     <PlatformPageShell dir="ltr">

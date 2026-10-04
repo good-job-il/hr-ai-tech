@@ -3,10 +3,7 @@ import { useTranslation } from "react-i18next"
 import { Save, UserPen, UserPlus } from "lucide-react"
 
 import { candidateService } from "@/api/services/candidateService"
-import {
-  PlatformModal,
-  platformFieldClassName,
-} from "@/components/platform/PlatformUI"
+import { PlatformModal, platformFieldClassName } from "@/components/platform/PlatformUI"
 
 const EMPTY_FORM = {
   full_name: "",
@@ -123,8 +120,7 @@ export default function CreateCandidateModal({ isOpen, candidate = null, onClose
         role_name: optionalText(form.role_name) ?? emptyValue,
         domain_name: optionalText(form.domain_name) ?? emptyValue,
         location: optionalText(form.location) ?? emptyValue,
-        experience_years:
-          form.experience_years === "" ? emptyValue : Number(form.experience_years),
+        experience_years: form.experience_years === "" ? emptyValue : Number(form.experience_years),
         desired_salary_min:
           form.desired_salary_min === "" ? emptyValue : Number(form.desired_salary_min),
         desired_salary_max:
@@ -304,7 +300,10 @@ export default function CreateCandidateModal({ isOpen, candidate = null, onClose
         </Field>
 
         {error && (
-          <p role="alert" className="rounded-xl bg-red-50 px-3 py-2 text-sm font-semibold text-red-600">
+          <p
+            role="alert"
+            className="rounded-xl bg-red-50 px-3 py-2 text-sm font-semibold text-red-600"
+          >
             {error}
           </p>
         )}

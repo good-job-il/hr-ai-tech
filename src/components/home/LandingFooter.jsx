@@ -7,12 +7,41 @@ const defaultContent = {
     footerDescription:
       "Israel's smart recruitment platform. Connecting quality candidates with leading companies through AI.",
     footerColumns: [
-      ["For Candidates", [["Search Jobs", "/jobs"], ["Personal Profile", "/register?type=candidate"], ["AI Matching", "/ai-career"], ["Resume", "/register?type=candidate"]]],
-      ["For Companies", [["Post a Job", "/register?type=staffing_agency"], ["Find Candidates", "/register?type=staffing_agency"], ["AI Matching", "/ai-career"], ["Analytics", "/register?type=staffing_agency"]]],
-      ["Company", [["About", "/about"], ["Careers", "/about"], ["Blog", "/blog"], ["Contact", "/contact"]]],
+      [
+        "For Candidates",
+        [
+          ["Search Jobs", "/jobs"],
+          ["Personal Profile", "/register?type=candidate"],
+          ["AI Matching", "/ai-career"],
+          ["Resume", "/register?type=candidate"],
+        ],
+      ],
+      [
+        "For Companies",
+        [
+          ["Post a Job", "/register?type=staffing_agency"],
+          ["Find Candidates", "/register?type=staffing_agency"],
+          ["AI Matching", "/ai-career"],
+          ["Analytics", "/register?type=staffing_agency"],
+        ],
+      ],
+      [
+        "Company",
+        [
+          ["About", "/about"],
+          ["Careers", "/about"],
+          ["Blog", "/blog"],
+          ["Contact", "/contact"],
+        ],
+      ],
     ],
     support: "Support",
-    supportLinks: [["Help Center", "/contact"], ["Guides", "/resources"], ["System Status", "/contact"], ["FAQ", "/resources"]],
+    supportLinks: [
+      ["Help Center", "/contact"],
+      ["Guides", "/resources"],
+      ["System Status", "/contact"],
+      ["FAQ", "/resources"],
+    ],
     copyright: "© 2024 HeadHunter. All rights reserved.",
     terms: "Terms of Use",
     privacy: "Privacy Policy",
@@ -22,12 +51,41 @@ const defaultContent = {
     footerDescription:
       "פלטפורמת הגיוס החכמה של ישראל. מחברת מועמדים איכותיים עם חברות מובילות באמצעות AI.",
     footerColumns: [
-      ["למועמדים", [["חיפוש משרות", "/jobs"], ["פרופיל אישי", "/register?type=candidate"], ["התאמות AI", "/ai-career"], ["קורות חיים", "/register?type=candidate"]]],
-      ["לחברות", [["פרסום משרה", "/register?type=staffing_agency"], ["חיפוש מועמדים", "/register?type=staffing_agency"], ["התאמות AI", "/ai-career"], ["אנליטיקה", "/register?type=staffing_agency"]]],
-      ["החברה", [["אודות", "/about"], ["קריירה", "/about"], ["בלוג", "/blog"], ["צור קשר", "/contact"]]],
+      [
+        "למועמדים",
+        [
+          ["חיפוש משרות", "/jobs"],
+          ["פרופיל אישי", "/register?type=candidate"],
+          ["התאמות AI", "/ai-career"],
+          ["קורות חיים", "/register?type=candidate"],
+        ],
+      ],
+      [
+        "לחברות",
+        [
+          ["פרסום משרה", "/register?type=staffing_agency"],
+          ["חיפוש מועמדים", "/register?type=staffing_agency"],
+          ["התאמות AI", "/ai-career"],
+          ["אנליטיקה", "/register?type=staffing_agency"],
+        ],
+      ],
+      [
+        "החברה",
+        [
+          ["אודות", "/about"],
+          ["קריירה", "/about"],
+          ["בלוג", "/blog"],
+          ["צור קשר", "/contact"],
+        ],
+      ],
     ],
     support: "תמיכה",
-    supportLinks: [["מרכז עזרה", "/contact"], ["מדריכים", "/resources"], ["סטטוס המערכת", "/contact"], ["שאלות נפוצות", "/resources"]],
+    supportLinks: [
+      ["מרכז עזרה", "/contact"],
+      ["מדריכים", "/resources"],
+      ["סטטוס המערכת", "/contact"],
+      ["שאלות נפוצות", "/resources"],
+    ],
     copyright: "© 2024 HeadHunter. כל הזכויות שמורות.",
     terms: "תנאי שימוש",
     privacy: "מדיניות פרטיות",

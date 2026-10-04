@@ -149,7 +149,11 @@ export default function CompanyProfile() {
     is_anonymous: false,
   })
 
-  const { data: company, isLoading, isError } = useQuery({
+  const {
+    data: company,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["company", id],
     queryFn: () => companyService.get(Number(id)),
   })
@@ -258,7 +262,9 @@ export default function CompanyProfile() {
                   <div className="company-profile-rating">
                     <Star />
                     <strong>{avgRating}</strong>
-                    <span>({reviews.length} {copy.reviews})</span>
+                    <span>
+                      ({reviews.length} {copy.reviews})
+                    </span>
                   </div>
                 )}
               </div>
@@ -346,9 +352,7 @@ export default function CompanyProfile() {
                             {job.location || (isEnglish ? "Israel" : "ישראל")}
                           </p>
                         </div>
-                        {job.salary_min && (
-                          <strong>₪{job.salary_min.toLocaleString()}+</strong>
-                        )}
+                        {job.salary_min && <strong>₪{job.salary_min.toLocaleString()}+</strong>}
                         <span>
                           {copy.viewRole}
                           <ForwardArrow />

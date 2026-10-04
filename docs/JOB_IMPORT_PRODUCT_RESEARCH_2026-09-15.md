@@ -49,17 +49,17 @@
 
 ## 3. Что реализовано сейчас
 
-| Область | Текущее состояние | Оценка |
-|---|---|---|
-| Сохранённые источники | URL, имя, provider, интервал, active flag, counters, последние status/error/logs | Базовая основа |
-| Выполнение | persisted background job, atomic claim, retries/backoff, recovery, расписание | Хорошая техническая основа, нужна tenant isolation и worker hardening |
-| JSON | корневые массивы `jobs`, `data`, `results`; несколько aliases полей; Jobicy-style payload | Узкий generic mapper, не полноценный Jobicy connector |
-| HTML | ссылки `<a>` с эвристикой URL/title | Только первый листинг, без detail enrichment |
-| Нормализация | очистка inline text/description, plausible-title filter | Полезная защита, но не полный validation contract |
-| Безопасность URL | HTTP(S), DNS lookup, private/link-local rejection, ручная проверка redirects, timeout | Нуждается в усилении, но правильное начало |
-| Синхронизация | create/update по `external_id` или `apply_url` | Нет source/tenant namespace, diff и reconciliation |
-| Мониторинг | last status/error, накопительные counters, короткий log | Недостаточно для операционной диагностики |
-| UX | список источников, quick scan, запуск, edit/delete, sync all | Нет безопасного onboarding, preview данных и review queue |
+| Область               | Текущее состояние                                                                         | Оценка                                                                |
+| --------------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Сохранённые источники | URL, имя, provider, интервал, active flag, counters, последние status/error/logs          | Базовая основа                                                        |
+| Выполнение            | persisted background job, atomic claim, retries/backoff, recovery, расписание             | Хорошая техническая основа, нужна tenant isolation и worker hardening |
+| JSON                  | корневые массивы `jobs`, `data`, `results`; несколько aliases полей; Jobicy-style payload | Узкий generic mapper, не полноценный Jobicy connector                 |
+| HTML                  | ссылки `<a>` с эвристикой URL/title                                                       | Только первый листинг, без detail enrichment                          |
+| Нормализация          | очистка inline text/description, plausible-title filter                                   | Полезная защита, но не полный validation contract                     |
+| Безопасность URL      | HTTP(S), DNS lookup, private/link-local rejection, ручная проверка redirects, timeout     | Нуждается в усилении, но правильное начало                            |
+| Синхронизация         | create/update по `external_id` или `apply_url`                                            | Нет source/tenant namespace, diff и reconciliation                    |
+| Мониторинг            | last status/error, накопительные counters, короткий log                                   | Недостаточно для операционной диагностики                             |
+| UX                    | список источников, quick scan, запуск, edit/delete, sync all                              | Нет безопасного onboarding, preview данных и review queue             |
 
 Тесты покрывают успешный Jobicy-style JSON mapping, отбрасывание privacy-like title и базовую фильтрацию HTML-ссылок. Не покрыты контрактные fixtures реальных ATS, pagination, closing/reopening, tenant collisions, partial runs, manual overrides и end-to-end workflow.
 
