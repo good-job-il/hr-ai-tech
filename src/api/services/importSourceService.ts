@@ -14,7 +14,7 @@ export interface ImportSourceRecord {
   name: string
   provider: string | null
   url: string
-  connector_type: "generic_json" | "json_ld" | "greenhouse" | "lever" | "generic_html"
+  connector_type: "generic_json" | "json_ld" | "greenhouse" | "lever" | "comeet" | "generic_html"
   connector_version: string
   state: "draft" | "active" | "paused" | "needs_attention" | "archived"
   configuration: Record<string, unknown>
@@ -30,9 +30,9 @@ export interface ImportSourceRecord {
   default_recruitment_manager_id: number | null
   onboarding_step: number
   onboarding_state: {
-    discovery?: Record<string, unknown>
-    preview_run_id?: number
-    preview_completed_at?: string
+    discovery?: Record<string, unknown> | null
+    preview_run_id?: number | null
+    preview_completed_at?: string | null
     overwrite_policy?: "source_until_edited" | "review_on_conflict"
   } | null
   interval_hours: number

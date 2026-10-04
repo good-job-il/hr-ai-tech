@@ -174,6 +174,8 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
 
   const titleInputRef = useRef(null)
 
+  const returnFocusRef = useRef(null)
+
   const [form, setForm] = useState(EMPTY_FORM)
 
   const [loading, setLoading] = useState(false)
@@ -681,7 +683,16 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
         dir={direction}
         onOpenAutoFocus={(event) => {
           event.preventDefault()
+          returnFocusRef.current = document.activeElement
           titleInputRef.current?.focus()
+        }}
+        onCloseAutoFocus={(event) => {
+          const trigger = returnFocusRef.current
+
+          if (trigger?.isConnected && typeof trigger.focus === "function") {
+            event.preventDefault()
+            trigger.focus()
+          }
         }}
         onInteractOutside={(event) => loading && event.preventDefault()}
         overlayClassName="bg-black/50"
@@ -736,7 +747,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                   <dd className="mt-0.5 font-semibold text-slate-900">
                     {importProvenance.source?.name || t("jobs_management.form.sourceUnavailable")}
                     {importProvenance.source && (
-                      <span className="ms-1 text-slate-500">
+                      <span className="ms-1 text-slate-600">
                         ·{" "}
                         {t(`jobImports.statuses.${importProvenance.source.state}`, {
                           defaultValue: importProvenance.source.state,
@@ -913,7 +924,7 @@ export default function JobFormModal({ job, isOpen, onClose, onSave, preselected
                 </div>
               )}
 
-              <p className="text-xs text-[#94A3B8]">{t("jobs_management.form.aliasHelp")}</p>
+              <p className="text-xs text-slate-600">{t("jobs_management.form.aliasHelp")}</p>
             </div>
           )}
 

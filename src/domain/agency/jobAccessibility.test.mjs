@@ -18,12 +18,17 @@ test("uses the shared modal dialog with labelled title and managed initial focus
   assert.match(modal, /<DialogTitle id={titleId}/)
   assert.match(modal, /onOpenAutoFocus=/)
   assert.match(modal, /titleInputRef\.current\?\.focus\(\)/)
+  assert.match(modal, /onCloseAutoFocus=/)
+  assert.match(modal, /returnFocusRef\.current = document\.activeElement/)
+  assert.match(modal, /trigger\.focus\(\)/)
+  assert.doesNotMatch(modal, /text-xs text-\[#94A3B8\]/)
   assert.match(modal, /<DialogClose asChild>/)
   assert.doesNotMatch(modal, /fixed inset-0 bg-black\/50/)
 
   assert.match(dialog, /DialogPrimitive\.Root/)
   assert.match(dialog, /DialogPrimitive\.Overlay/)
   assert.match(dialog, /DialogPrimitive\.Content/)
+  assert.match(dialog, /aria-modal="true"/)
   assert.match(dialog, /DialogPrimitive\.Close/)
 })
 

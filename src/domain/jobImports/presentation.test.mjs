@@ -114,8 +114,18 @@ test("import workflow exposes semantic keyboard and responsive affordances", () 
   assert.match(review, /aria-label=\{t\("jobImports\.review\.actions\.approve"\)\}/)
   assert.match(review, /role="status"\s+aria-live="polite"/)
   assert.doesNotMatch(review, /min-w-\[760px\]/)
+  assert.doesNotMatch(review, /minmax\(310px,auto\)/)
+  assert.match(review, /sm:col-span-3 sm:grid-cols-\[minmax\(0,1fr\)/)
   assert.doesNotMatch(wizard, /<table/)
   assert.match(sources, /jobImports\.sources\.search/)
   assert.match(css, /prefers-reduced-motion: reduce/)
+  assert.match(css, /\[role="dialog"\]/)
+  assert.match(wizard, /jobImports\.statuses\.\$\{action\}/)
+
+  for (const action of ["create", "update", "close", "reopen", "skip", "review"]) {
+    assert.ok(en.jobImports.statuses[action])
+    assert.ok(he.jobImports.statuses[action])
+  }
+
   assert.match(css, /focus-visible/)
 })

@@ -4,6 +4,7 @@ export type AgencyClientStatus = "prospect" | "active" | "inactive" | "archived"
 export type MutableAgencyClientStatus = Exclude<AgencyClientStatus, "archived">
 
 export interface AgencyClient {
+  name?: string
   id: number
   organization_id: number
   company_id: number

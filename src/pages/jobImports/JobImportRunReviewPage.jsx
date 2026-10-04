@@ -22,6 +22,7 @@ import { toast } from "sonner"
 import { agencyClientService } from "@/api/services/agencyClientService"
 import { importSourceService } from "@/api/services/importSourceService"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
+import { parseReviewSelection, agencyClientLabel } from "@/domain/jobImports/qaFixes"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -99,6 +100,12 @@ const displayValue = (value, field, locale, t) => {
   }
 
   if (typeof value === "string") {
+    if (field === "seniority") {
+      return t(`jobs_management.form.seniorityLevels.${value}`, {
+        defaultValue: t("jobImports.statuses.unknown"),
+      })
+    }
+
     const namespace = {
       employment_type: "employment",
       work_mode: "workMode",
@@ -437,13 +444,7 @@ export default function JobImportRunReviewPage() {
 
   const page = Math.max(1, Number(param("page")) || 1)
 
-  const selected = useMemo(
-    () =>
-      new Set(
-        (searchParams.get("selected") || "").split(",").map(Number).filter(Number.isSafeInteger),
-      ),
-    [searchParams],
-  )
+  const selected = useMemo(() => parseReviewSelection(searchParams.get("selected")), [searchParams])
 
   const expandedId = Number(param("open")) || null
 
@@ -684,21 +685,23 @@ export default function JobImportRunReviewPage() {
 
       <Panel className="space-y-4">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
-          <label className="relative xl:col-span-2">
+          <label className="xl:col-span-2">
             <span className="mb-1 block text-xs font-bold text-slate-700">
               {t("jobImports.review.filters.search")}
             </span>
-            <Search
-              className="absolute bottom-3 start-3 h-4 w-4 text-slate-400"
-              aria-hidden="true"
-            />
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder={t("jobImports.review.filters.searchPlaceholder")}
-              className="w-full rounded-xl border border-slate-200 py-2.5 pe-3 ps-9 text-sm"
-            />
+            <div className="relative">
+              <Search
+                className="absolute bottom-3 start-3 h-4 w-4 text-slate-400"
+                aria-hidden="true"
+              />
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder={t("jobImports.review.filters.searchPlaceholder")}
+                className="w-full rounded-xl border border-slate-200 py-2.5 pe-3 ps-9 text-sm"
+              />
+            </div>
           </label>
           {!numericRunId && (
             <label className="block text-xs font-bold text-slate-700">
@@ -728,7 +731,7 @@ export default function JobImportRunReviewPage() {
                 <option value="">{t("jobImports.review.filters.allClients")}</option>
                 {(clients.data?.data || []).map((client) => (
                   <option key={client.id} value={client.company_id}>
-                    {client.company?.name || `#${client.company_id}`}
+                    {agencyClientLabel(client, `#${client.company_id}`)}
                   </option>
                 ))}
               </select>
@@ -881,7 +884,7 @@ export default function JobImportRunReviewPage() {
 
               return (
                 <article key={item.id}>
-                  <div className="grid gap-3 p-4 lg:grid-cols-[auto_minmax(220px,1.5fr)_130px_120px_minmax(310px,auto)] lg:items-center">
+                  <div className="grid min-w-0 gap-3 p-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center">
                     <input
                       type="checkbox"
                       checked={selected.has(item.id)}
@@ -937,7 +940,7 @@ export default function JobImportRunReviewPage() {
                         })}
                       </p>
                     </div>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex min-w-0 flex-wrap gap-1 sm:col-span-3">
                       {(item.validation_issues || []).slice(0, 2).map((issue) => (
                         <span
                           key={issue.code}
@@ -950,7 +953,7 @@ export default function JobImportRunReviewPage() {
                       ))}
                     </div>
                     {canReview && (
-                      <div className="grid min-w-0 gap-2 sm:grid-cols-[minmax(110px,1fr)_minmax(120px,1fr)_auto_auto_auto]">
+                      <div className="grid min-w-0 gap-2 sm:col-span-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto_auto]">
                         <label className="text-xs font-bold text-slate-700">
                           {t("jobImports.review.actionForItem")}
                           <select

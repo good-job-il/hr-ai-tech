@@ -6,6 +6,7 @@ import {
   previewReadiness,
   sourceNameFromUrl,
   summarizeImportRun,
+  vendorConnectorForUrl,
 } from "./onboardingWizard.js"
 
 test("source URL accepts only absolute HTTP(S) URLs", () => {
@@ -13,6 +14,18 @@ test("source URL accepts only absolute HTTP(S) URLs", () => {
   assert.equal(isValidImportUrl("javascript:alert(1)"), false)
   assert.equal(isValidImportUrl("jobs.example.com"), false)
   assert.equal(sourceNameFromUrl("https://www.jobs.example.com/feed"), "jobs.example.com")
+})
+
+test("known vendors use their adapter, never a lookalike host or generic parser", () => {
+  assert.equal(vendorConnectorForUrl("https://www.comeet.com/jobs/hyperguest/09.00B/"), "comeet")
+  assert.equal(
+    vendorConnectorForUrl("https://boards.greenhouse.io/embed/job_board?for=fixture"),
+    "greenhouse",
+  )
+  assert.equal(vendorConnectorForUrl("https://jobs.lever.co/fixture"), "lever")
+  assert.equal(vendorConnectorForUrl("https://www.comeet.com.attacker.test/jobs/company"), null)
+  assert.equal(vendorConnectorForUrl("https://fixture.test/jobs.json"), null)
+  assert.equal(importErrorAction("CONNECTOR_MISMATCH"), "changeConnector")
 })
 
 test("partial, empty and review previews cannot reach apply", () => {

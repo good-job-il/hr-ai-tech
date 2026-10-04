@@ -26,6 +26,40 @@ export function sourceNameFromUrl(value) {
   }
 }
 
+export function vendorConnectorForUrl(value) {
+  try {
+    const url = new URL(value)
+
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return null
+    }
+
+    if (["www.comeet.com", "comeet.com", "www.comeet.co", "comeet.co"].includes(url.hostname)) {
+      return "comeet"
+    }
+
+    if (
+      ["boards.greenhouse.io", "job-boards.greenhouse.io", "boards-api.greenhouse.io"].includes(
+        url.hostname,
+      )
+    ) {
+      return "greenhouse"
+    }
+
+    if (
+      ["jobs.lever.co", "jobs.eu.lever.co", "api.lever.co", "api.eu.lever.co"].includes(
+        url.hostname,
+      )
+    ) {
+      return "lever"
+    }
+  } catch {
+    /* not a recognized URL */
+  }
+
+  return null
+}
+
 export function summarizeImportRun(run) {
   if (!run) {
     return { total: 0, destructive: 0, reviewRequired: 0 }
@@ -47,7 +81,7 @@ export function previewReadiness(run) {
     return { ready: false, reason: "running" }
   }
 
-  if (run.status === "failed") {
+  if (["failed", "dead_letter", "cancelled"].includes(run.status)) {
     return { ready: false, reason: "failed" }
   }
 
@@ -77,6 +111,7 @@ export function importErrorAction(code) {
     ROBOTS_DENIED: "chooseAnotherSource",
     RATE_LIMITED: "retryLater",
     UNSUPPORTED_FORMAT: "changeConnector",
+    CONNECTOR_MISMATCH: "changeConnector",
     PARSER_CHANGED: "reviewMapping",
     MAPPING_INVALID: "reviewMapping",
     PARTIAL_SNAPSHOT: "retryPreview",

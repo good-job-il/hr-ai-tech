@@ -56,8 +56,8 @@ module.exports = {
         foreground: "hsl(var(--foreground))",
         hhblue: "#3B82F6",
         hhpurple: "#8B5CF6",
-        cyan: "#06b6d4",
-        violet: "#a855f7",
+        cyan: { ...require("tailwindcss/colors").cyan, DEFAULT: "#06b6d4" },
+        violet: { ...require("tailwindcss/colors").violet, DEFAULT: "#a855f7" },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

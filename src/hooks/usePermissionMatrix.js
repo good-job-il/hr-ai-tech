@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { effectivePermissionService } from "@/api/services/permissionService"
 import { useAuth } from "@/lib/AuthContext"
+import { effectiveRoleKey } from "@/domain/jobImports/permissions"
 
 // Roles that always have all permissions (bypass matrix)
 const SUPER_ROLES = ["admin"]
@@ -49,9 +50,50 @@ export function usePermissionMatrix() {
 
   const [loading, setLoading] = useState(true)
 
-  const loadingRef = useRef(false)
+  const requestVersion = useRef(0)
+
+  const loadPermissions = useCallback(async (currentUser, { bypassCache = false } = {}) => {
+    const version = ++requestVersion.current
+
+    const orgId = currentUser.organization_id || null
+
+    const roleKey = effectiveRoleKey(currentUser)
+
+    const cacheKey = `${orgId}:${roleKey}`
+
+    if (!bypassCache && _permCache.has(cacheKey)) {
+      setPermissions(_permCache.get(cacheKey))
+      setLoading(false)
+
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const effective = await effectivePermissionService.get()
+
+      const result = effective.permissions || _buildEmptyPermissions()
+
+      if (requestVersion.current === version) {
+        _permCache.set(cacheKey, result)
+        setPermissions(result)
+      }
+    } catch {
+      if (requestVersion.current === version) {
+        setPermissions(_buildEmptyPermissions())
+      }
+    } finally {
+      if (requestVersion.current === version) {
+        setLoading(false)
+      }
+    }
+  }, [])
 
   useEffect(() => {
+    requestVersion.current += 1
+    setPermissions(null)
+
     if (!user) {
       setLoading(false)
 
@@ -66,7 +108,11 @@ export function usePermissionMatrix() {
     }
 
     loadPermissions(user)
-  }, [user?.id, user?.role, user?.organization_id, user?.org_type])
+
+    return () => {
+      requestVersion.current += 1
+    }
+  }, [user, loadPermissions])
 
   useEffect(() => {
     if (!user) {
@@ -78,7 +124,7 @@ export function usePermissionMatrix() {
 
       if (
         (!organizationId || String(organizationId) === String(user.organization_id)) &&
-        (!roleKey || roleKey === user.role)
+        (!roleKey || roleKey === effectiveRoleKey(user))
       ) {
         loadPermissions(user, { bypassCache: true })
       }
@@ -87,44 +133,7 @@ export function usePermissionMatrix() {
     window.addEventListener("effective-permissions-invalidated", reloadIfRelevant)
 
     return () => window.removeEventListener("effective-permissions-invalidated", reloadIfRelevant)
-  }, [user?.id, user?.role, user?.organization_id])
-
-  const loadPermissions = async (user, { bypassCache = false } = {}) => {
-    if (loadingRef.current) {
-      return
-    }
-
-    const orgId = user.organization_id || null
-
-    const roleKey = user.role
-
-    const cacheKey = `${orgId}:${roleKey}`
-
-    // Return from cache if available
-    if (!bypassCache && _permCache.has(cacheKey)) {
-      setPermissions(_permCache.get(cacheKey))
-      setLoading(false)
-
-      return
-    }
-
-    loadingRef.current = true
-    setLoading(true)
-
-    try {
-      const effective = await effectivePermissionService.get()
-
-      const result = effective.permissions || _buildEmptyPermissions()
-
-      _permCache.set(cacheKey, result)
-      setPermissions(result)
-    } catch {
-      setPermissions(_buildEmptyPermissions())
-    } finally {
-      setLoading(false)
-      loadingRef.current = false
-    }
-  }
+  }, [user, loadPermissions])
 
   const can = useCallback(
     (permKey) => {
@@ -150,10 +159,13 @@ export function usePermissionMatrix() {
 
   const refresh = useCallback(() => {
     if (user) {
-      invalidatePermissionMatrixCache({ organizationId: user.organization_id, roleKey: user.role })
+      invalidatePermissionMatrixCache({
+        organizationId: user.organization_id,
+        roleKey: effectiveRoleKey(user),
+      })
       loadPermissions(user)
     }
-  }, [user])
+  }, [user, loadPermissions])
 
   return { can, canResource, permissions, loading, refresh }
 }

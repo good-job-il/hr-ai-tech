@@ -402,7 +402,7 @@ export default function JobImportSourceDetailPage() {
             "connector",
             `${t(`jobImports.connectors.${sourceData.connector_type}`, { defaultValue: sourceData.connector_type })} · v${sourceData.connector_version}`,
           ],
-          ["client", client?.company?.name || sourceData.employer_company_id],
+          ["client", client?.name || client?.company?.name || sourceData.employer_company_id],
           ["lastAttempt", formatImportDate(sourceData.last_attempt_at, i18n.language)],
           ["lastSuccess", formatImportDate(sourceData.last_success_at, i18n.language)],
           ["nextRun", formatImportDate(sourceData.next_run_at, i18n.language)],

@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { organizationService } from "@/api/services/organizationService"
+import { httpClient } from "@/api/client/httpClient"
 import {
   Flag,
   Search,
@@ -249,19 +250,8 @@ const PLAN_COLORS = {
 
 const PLANS = ["trial", "starter", "pro", "enterprise"]
 
-const LS_KEY = "platform_flag_matrix"
-
-function loadMatrix() {
-  try {
-    const saved = localStorage.getItem(LS_KEY)
-
-    if (saved) {
-      return { ...PLAN_DEFAULTS, ...JSON.parse(saved) }
-    }
-  } catch {}
-
-  return { ...PLAN_DEFAULTS }
-}
+const mergePlanMatrix = (stored) =>
+  Object.fromEntries(PLANS.map((plan) => [plan, { ...PLAN_DEFAULTS[plan], ...stored?.[plan] }]))
 
 // ─── Toggle switch ────────────────────────────────────────────────────────────
 
@@ -291,8 +281,14 @@ function Toggle({ value, onChange, disabled, label }) {
 
 // ─── Plan Matrix tab ──────────────────────────────────────────────────────────
 
-function PlanMatrixTab() {
-  const [matrix, setMatrix] = useState(loadMatrix)
+function PlanMatrixTab({ persistedMatrix }) {
+  const [matrix, setMatrix] = useState(persistedMatrix)
+
+  const qc = useQueryClient()
+
+  const [saving, setSaving] = useState(false)
+
+  const [saveError, setSaveError] = useState(false)
 
   const [dirty, setDirty] = useState(false)
 
@@ -309,17 +305,27 @@ function PlanMatrixTab() {
     setSaved(false)
   }
 
-  const handleSave = () => {
-    localStorage.setItem(LS_KEY, JSON.stringify(matrix))
-    setDirty(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2500)
+  const handleSave = async () => {
+    setSaving(true)
+    setSaveError(false)
+
+    try {
+      const result = await httpClient.put("/billing/feature-flags", { matrix })
+
+      qc.setQueryData(["platform-plan-flags"], result)
+      setDirty(false)
+      setSaved(true)
+      await qc.invalidateQueries({ queryKey: ["platform-orgs"] })
+    } catch {
+      setSaveError(true)
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleReset = () => {
     setMatrix({ ...PLAN_DEFAULTS })
-    localStorage.removeItem(LS_KEY)
-    setDirty(false)
+    setDirty(true)
   }
 
   const toggleCat = (catId) => {
@@ -337,7 +343,7 @@ function PlanMatrixTab() {
       <PlatformCard className="p-5">
         <PlatformWidgetHeader
           title="Plan feature matrix"
-          subtitle="Define which features are included in each subscription plan. Changes apply to new and renewing organizations."
+          subtitle="Server-saved plan defaults apply immediately to organizations without an explicit override. Job Imports changes affect access; role permissions remain separate."
           action={
             <div className="flex flex-wrap gap-2">
               <button
@@ -352,7 +358,7 @@ function PlanMatrixTab() {
               <button
                 type="button"
                 onClick={handleSave}
-                disabled={!dirty}
+                disabled={!dirty || saving}
                 className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
                   saved
                     ? "bg-emerald-500 text-white shadow-[0_8px_18px_rgba(16,185,129,0.2)]"
@@ -363,7 +369,13 @@ function PlanMatrixTab() {
               >
                 <Save className="h-3.5 w-3.5" />
 
-                {saved ? "Saved!" : "Save changes"}
+                {saving
+                  ? "Saving..."
+                  : saveError
+                    ? "Save failed — retry"
+                    : saved
+                      ? "Saved!"
+                      : "Save changes"}
               </button>
             </div>
           }
@@ -483,7 +495,7 @@ function PlanMatrixTab() {
 
 // ─── Org Overrides tab ────────────────────────────────────────────────────────
 
-function OrgOverridesTab() {
+function OrgOverridesTab({ persistedMatrix }) {
   const [search, setSearch] = useState("")
 
   const [planFilter, setPlanFilter] = useState("all")
@@ -529,7 +541,7 @@ function OrgOverridesTab() {
   const handleToggleOverride = (org, featureId) => {
     const current = getOrgFlags(org)
 
-    const planDefault = loadMatrix()[org.plan || "trial"]?.[featureId] ?? false
+    const planDefault = persistedMatrix[org.plan || "trial"]?.[featureId] ?? false
 
     const currentValue = current[featureId] !== undefined ? current[featureId] : planDefault
 
@@ -567,6 +579,7 @@ function OrgOverridesTab() {
       const savedOrg = await organizationService.update(org.id, {
         settings: { ...(org.settings || {}), feature_flags: flags },
       })
+
       qc.setQueryData(["platform-orgs"], (current = []) =>
         current.map((item) => (item.id === org.id ? savedOrg : item)),
       )
@@ -680,7 +693,7 @@ function OrgOverridesTab() {
 
             const flags = getOrgFlags(org)
 
-            const planDefaults = loadMatrix()[plan] || {}
+            const planDefaults = persistedMatrix[plan] || {}
 
             const overridesCount = countOverrides(org)
 
@@ -911,8 +924,20 @@ function OrgOverridesTab() {
 export default function FlagsPage() {
   const [tab, setTab] = useState("matrix")
 
+  const {
+    data: storedMatrix,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["platform-plan-flags"],
+    queryFn: () => httpClient.get("/billing/feature-flags"),
+  })
+
+  const persistedMatrix = useMemo(() => mergePlanMatrix(storedMatrix), [storedMatrix])
+
   const stats = useMemo(() => {
-    const matrix = loadMatrix()
+    const matrix = persistedMatrix
 
     const counts = {}
 
@@ -921,7 +946,24 @@ export default function FlagsPage() {
     })
 
     return counts
-  }, [])
+  }, [persistedMatrix])
+
+  if (isLoading) {
+return (
+      <PlatformPageShell>
+        <p role="status">Loading feature flags...</p>
+      </PlatformPageShell>
+    )
+}
+
+  if (isError) {
+return (
+      <PlatformPageShell>
+        <p role="alert">Could not load server feature flags. Check backend migrations.</p>
+        <button onClick={() => refetch()}>Retry</button>
+      </PlatformPageShell>
+    )
+}
 
   return (
     <PlatformPageShell dir="ltr">
@@ -997,7 +1039,11 @@ export default function FlagsPage() {
           })}
         </PlatformCard>
 
-        {tab === "matrix" ? <PlanMatrixTab /> : <OrgOverridesTab />}
+        {tab === "matrix" ? (
+          <PlanMatrixTab persistedMatrix={persistedMatrix} />
+        ) : (
+          <OrgOverridesTab persistedMatrix={persistedMatrix} />
+        )}
       </div>
     </PlatformPageShell>
   )

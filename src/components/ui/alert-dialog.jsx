@@ -39,6 +39,7 @@ const AlertDialogContent = React.forwardRef(({ className, ...props }, ref) => (
         className,
       )}
       {...props}
+      aria-modal="true"
     />
   </AlertDialogPortal>
 ))
@@ -87,11 +88,7 @@ const AlertDialogAction = React.forwardRef(({ className, ...props }, ref) => (
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName
 
 const AlertDialogCancel = React.forwardRef(({ className, ...props }, ref) => (
-  <AlertDialogPrimitive.Cancel
-    ref={ref}
-    className={cn(cancelClass, className)}
-    {...props}
-  />
+  <AlertDialogPrimitive.Cancel ref={ref} className={cn(cancelClass, className)} {...props} />
 ))
 
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName

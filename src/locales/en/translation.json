@@ -1223,6 +1223,24 @@
     }
   },
   "permissionsMatrix": {
+    "jobImports": {
+      "title": "Job Imports permissions",
+      "hint": "These permissions are separate from general access. The organization must also have Job Imports enabled. Role restrictions are enforced by the server.",
+      "templateScope": "Editing defaults for this organization type. Organization overrides take precedence.",
+      "tenantScope": "Editing permissions for the current organization only.",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "roleRestricted": "Unavailable for this role",
+      "actions": {
+        "view": "View sources and runs",
+        "create": "Create sources",
+        "update": "Configure sources",
+        "run": "Run preview and imports",
+        "review": "Review and resolve changes",
+        "manage_credentials": "Manage connection credentials",
+        "archive": "Archive sources"
+      }
+    },
     "title": "Permissions Management",
     "subtitle": "Permission Matrix by Role",
     "staffingAgency": "Staffing Agency",
@@ -1545,6 +1563,16 @@
     }
   },
   "jobImports": {
+    "access": {
+      "organizationRequiredTitle": "Choose an organization",
+      "organizationRequiredDescription": "Open an organization from the platform Organizations page to use its Job Imports workspace. Access is checked against that organization's permissions.",
+      "openOrganizations": "Open organizations",
+      "disabledTitle": "Job Imports is not enabled",
+      "disabledDescription": "This feature is currently disabled for your organization. Ask a platform administrator to enable Job Imports.",
+      "deniedTitle": "Job Imports access is restricted",
+      "deniedDescription": "Your role does not have permission to view job sources. Ask your organization administrator to enable the Job Imports view permission in the Permission Matrix.",
+      "back": "Back to dashboard"
+    },
     "fields": {
       "unknown": "Source field",
       "external_key": "External ID",
@@ -1586,6 +1614,7 @@
       "ROBOTS_DENIED": "This site does not permit automated access.",
       "RATE_LIMITED": "The source is rate-limiting requests. Retry later.",
       "UNSUPPORTED_FORMAT": "The source format is not supported by this connector.",
+      "CONNECTOR_MISMATCH": "The selected connector does not match this source URL. Return to Source and save the detected connector, then run a new sample scan.",
       "PARSER_CHANGED": "The source page or response structure changed. Review the mapping.",
       "MAPPING_INVALID": "The mapping is invalid. Check the connector settings.",
       "PARTIAL_SNAPSHOT": "Only part of the source could be read. No missing jobs will be closed.",
@@ -1666,7 +1695,8 @@
       "generic_json": "JSON feed",
       "json_ld": "JobPosting (JSON-LD)",
       "greenhouse": "Greenhouse board",
-      "lever": "Lever site"
+      "lever": "Lever site",
+      "comeet": "Comeet careers (public token required)"
     },
     "employment": {
       "full_time": "Full time",
@@ -1734,6 +1764,8 @@
       "source": {
         "url": "Source URL",
         "urlHint": "Use a direct HTTP or HTTPS job feed URL.",
+        "comeetHint": "Paste the company Careers Website URL including its public token and select Comeet. Only published jobs are imported. Do not use a private Recruiting API credential.",
+        "detected": "This URL uses {{connector}}. Continue will save the detected connector and reset incompatible mapping options.",
         "name": "Source name",
         "nameHint": "Shown only inside your agency workspace.",
         "namePlaceholder": "Company job feed",
@@ -1759,6 +1791,10 @@
         "noLimitations": "No declared limitations"
       },
       "sample": {
+        "failed": "The sample scan did not complete. No jobs were changed.",
+        "retry": "Retry sample scan",
+        "fixConnection": "Fix source connection",
+        "scanning": "Scanning the source. No job changes are being applied.",
         "configureFirstHint": "If this source needs a collection path or detail-page selector, continue to Mapping first, then run the required dry-run.",
         "title": "Run a safe sample scan",
         "description": "Staging data is saved; live jobs cannot change.",
@@ -1804,6 +1840,8 @@
         "noAssignment": "No default assignment",
         "schedule": "Schedule",
         "manual": "Manual only",
+        "scheduleHours": "Every {{value}} hours",
+        "scheduleDays": "Every {{value}} days",
         "publishPolicy": "Publication policy",
         "drafts": "Import as drafts",
         "review": "Require review",
@@ -1835,6 +1873,7 @@
         "description": "The confirmed run contains {{count}} source items.",
         "activate": "Activate scheduled synchronization after apply",
         "activateHint": "Interval: every {{hours}} hours. Manual sources remain inactive.",
+        "manualSchedule": "Manual only. Scheduled synchronization is disabled; configure a schedule in Defaults to enable it.",
         "confirm": "I reviewed the dry-run summary and authorize these changes.",
         "apply": "Apply confirmed changes",
         "applyResult": "Applied: {{applied}}, skipped: {{skipped}}, failed: {{failed}}."

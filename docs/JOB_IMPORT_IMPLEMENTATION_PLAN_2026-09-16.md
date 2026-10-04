@@ -1248,9 +1248,11 @@ Recruiter понимает, какие поля можно редактиров�
 
 ---
 
-## Шаг 20. Локализация, адаптивность и доступность
+## ✅ Шаг 20. Локализация, адаптивность и доступность
 
-**Статус (1 октября 2026): реализация в коде готова, финальный UI acceptance ожидает работающего тестового backend.** EN/HE словари, typed errors, направление, locale-форматы, адаптивные карточки, доступные диалоги и клавиатурные действия добавлены. Автоматические тесты, ESLint для изменённых файлов и frontend build проходят. При попытке войти в локальный frontend форма вернула `Server error`: заданный в `.env.local` backend `localhost:3001` недоступен. Поэтому фактические keyboard walkthrough, проверка контраста и экранов 320/768/1280 в обоих языках не подтверждены; до этого шага галочку не ставить.
+**Принят 2026-10-04 по критериям этого шага.** Повторная проверка работающих frontend/backend в tenant Yaron Staffing подтвердила successful preview #16 (9 items, 9 skip, 0 business changes), dry-run, confirmation, populated review и provenance существующих imported jobs. Source/Client/Connection/Sample/Defaults/Dry-run/Confirmation, dashboard, source detail, раскрытый review и Job edit проверены в EN/HE на 320/768/1280 px. Исправлены дополнительно preview invalidation, переводы action/schedule/seniority, manual schedule hint, dialog modal semantics/return focus и контраст. Frontend tests 36/36 + 33/33, backend import tests 157/157 + DTO 18/18, frontend build и API typecheck, backend TypeScript no-emit проходят. [Финальный QA-отчёт и границы проверки](JOB_IMPORT_STEP20_UI_QA_2026-10-04.md).
+
+Исторические блокировки доступа и сетевой preview 1–2 октября сохранены в [первоначальном отчёте](JOB_IMPORT_STEP20_UI_QA_2026-10-01.md); они не описывают текущий результат. Эта приёмка относится к локальному UI и его доступности, не является разрешением на production deployment или массовый apply.
 
 ### Работы
 
@@ -1281,6 +1283,24 @@ Recruiter понимает, какие поля можно редактиров�
 Весь основной workflow доступен с клавиатуры, читаем в EN/HE и не теряет actions на узком экране.
 
 ---
+
+## Шаг 20.1. Permissions и безопасное включение Job Imports
+
+**Статус (1 октября 2026): код и проверки готовы; применение production migration и положительный tenant UI acceptance ещё не выполнены.** Полную галочку шага ставить только после этих проверок.
+
+- [x] Подготовить backfill отсутствующих `resources.job_imports` actions для staffing `org_admin`, сохраняя явные `false`, другие permissions и приоритет существующих overrides.
+- [x] Добавить rollback с backup: не отменять ручные изменения, сделанные после миграции.
+- [x] Добавить семь Job Imports actions в Permission Matrix UI, с явными Enabled/Disabled/Unavailable и ограничениями ролей.
+- [x] Разделить редактирование platform templates и tenant overrides; учитывать organization type.
+- [x] Исправить frontend cache/effective role при admin impersonation и защитить его от устаревших async responses.
+- [x] Разделить состояния «выбрать организацию», «функция выключена» и «нет permission view» без общего redirect на unauthorized.
+- [x] Устранить browser-local plan inheritance: server-persisted Plan Matrix, общий override → plan → false resolver, effective flags в organization API и preview; отдельная migration `1754700000000-PlanFeatureFlags` без автоматического production enablement.
+- [x] Проверить backend permission tests (26), frontend safety tests (29), builds и UI блока permissions в EN/HE, LTR/RTL, на 320/768/1280 px.
+- [x] Проверить disabled/denied states в tenant UI. Временный `job_imports_enabled` override возвращён к plan default; permissions не сохранялись.
+- [ ] Применить migration к согласованной production/staging БД и проверить effective `job_imports.view` для org_admin и scoped admin.
+- [ ] С согласованным feature flag пройти положительный доступ и оставшийся полный workflow acceptance шага 20.
+
+Feature flags остаются opt-in; backfill не включает функцию автоматически. Явные запреты требуют осознанного изменения через Permission Matrix, а не повторной миграции. [Инструкция включения и проверки](JOB_IMPORT_ACCESS_ENABLEMENT_2026-10-01.md).
 
 ## Шаг 21. Наблюдаемость, аналитика и operations
 

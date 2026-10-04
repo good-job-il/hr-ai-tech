@@ -10,6 +10,7 @@ export interface OrganizationRecord {
   contact_email?: string | null
   logo_url?: string | null
   settings?: Record<string, unknown> | null
+  effective_feature_flags?: Record<string, boolean>
   created_date?: string
   updated_date?: string
 }

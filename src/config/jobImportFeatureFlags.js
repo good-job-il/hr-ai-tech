@@ -15,12 +15,18 @@ function asRecord(value) {
 }
 
 export function resolveJobImportFeatureFlags(organization) {
+  const effective = asRecord(organization?.effective_feature_flags)
+
   const featureFlags = asRecord(asRecord(organization?.settings)?.feature_flags)
 
   return Object.fromEntries(
     Object.entries(DEFAULT_JOB_IMPORT_FEATURE_FLAGS).map(([flag, defaultValue]) => [
       flag,
-      typeof featureFlags?.[flag] === "boolean" ? featureFlags[flag] : defaultValue,
+      typeof effective?.[flag] === "boolean"
+        ? effective[flag]
+        : typeof featureFlags?.[flag] === "boolean"
+          ? featureFlags[flag]
+          : defaultValue,
     ]),
   )
 }

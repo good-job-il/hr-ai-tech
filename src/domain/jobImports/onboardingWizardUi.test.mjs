@@ -24,6 +24,19 @@ test("wizard exposes keyboard controls, raw comparison and recoverable cancel", 
   assert.match(page, /keepDraft/)
 })
 
+test("wizard clears persisted preview with JSON null and localizes schedule/progress", () => {
+  assert.match(page, /preview_run_id: null/)
+  assert.doesNotMatch(page, /preview_run_id: undefined/)
+  assert.match(page, /sample.scanning/)
+  assert.match(page, /confirmation.manualSchedule/)
+  assert.doesNotMatch(page, />6h<|>12h<|>24h<|>7d</)
+  for (const translation of [en, he]) {
+    assert.ok(translation.jobImports.wizard.sample.scanning)
+    assert.ok(translation.jobImports.wizard.confirmation.manualSchedule)
+    assert.ok(translation.jobImports.wizard.mapping.scheduleHours)
+  }
+})
+
 test("wizard translations are complete in English and Hebrew", () => {
   for (const translation of [en, he]) {
     assert.equal(Object.keys(translation.jobImports.wizard.steps).length, 7)

@@ -2,13 +2,19 @@
  * PermissionsPage — Organization Permission Matrix Editor
  * Accessible only by: admin, org_admin
  */
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { permissionMatrixService } from "@/api/services/permissionService"
 import { useAuth } from "@/lib/AuthContext"
 import { Download, Save, ShieldCheck, Lock, ShieldAlert } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { invalidatePermissionMatrixCache, usePermissionMatrix } from "@/hooks/usePermissionMatrix"
+import {
+  JOB_IMPORT_ACTIONS,
+  canConfigureJobImportAction,
+  normalizeMatrixPermissions,
+  resolvePermissionRecord,
+} from "@/domain/jobImports/permissions"
 
 const PERM_KEYS = [
   "view",
@@ -75,9 +81,9 @@ export default function PermissionsPage() {
 
   const canExportMatrix = user?.role !== "team_manager" && can("export")
 
-  const canSwitchOrgType = user?.role === "admin"
+  const canSwitchOrgType = user?.role === "admin" && !user?.impersonating
 
-  const orgId = user?.organization_id || null
+  const orgId = canSwitchOrgType ? null : user?.organization_id || null
 
   const roleKeys = orgType === "staffing_agency" ? STAFFING_ROLE_KEYS : ORG_ROLE_KEYS
 
@@ -86,43 +92,39 @@ export default function PermissionsPage() {
       ? t(`permissionsMatrix.staffingRoles.${key}`)
       : t(`permissionsMatrix.orgRoles.${key}`)
 
-  useEffect(() => {
-    load()
-  }, [])
-
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const all = await permissionMatrixService.list({ limit: 200 })
+      const all = await permissionMatrixService.list({
+        limit: 500,
+        org_type: orgType,
+        is_template: orgId == null ? true : undefined,
+      })
 
       setAllRecords(all)
-      buildMatrix(all)
+
+      const built = {}
+
+      for (const roleKey of roleKeys) {
+        const record = resolvePermissionRecord(all, orgId, orgType, roleKey)
+
+        built[roleKey] = normalizeMatrixPermissions(record?.permissions || emptyPerms())
+      }
+
+      setMatrix(built)
       setDirty({})
     } catch (requestError) {
       setError({ status: requestError?.status || requestError?.response?.status || null })
     } finally {
       setLoading(false)
     }
-  }
+  }, [orgId, orgType, roleKeys])
 
-  const buildMatrix = (records) => {
-    const built = {}
-
-    for (const roleKey of [...STAFFING_ROLE_KEYS, ...ORG_ROLE_KEYS]) {
-      // Priority: org override > template
-      const override = records.find(
-        (r) => r.organization_id === orgId && r.role_key === roleKey && !r.is_template,
-      )
-
-      const template = records.find((r) => r.is_template && r.role_key === roleKey)
-
-      built[roleKey] = { ...(override?.permissions || template?.permissions || emptyPerms()) }
-    }
-
-    setMatrix(built)
-  }
+  useEffect(() => {
+    load()
+  }, [load])
 
   const toggle = (roleKey, permKey) => {
     if (!canEdit) {
@@ -140,9 +142,12 @@ export default function PermissionsPage() {
   const saveRole = async (roleKey) => {
     const perms = matrix[roleKey]
 
-    const existing = allRecords.find(
-      (r) => r.organization_id === orgId && r.role_key === roleKey && !r.is_template,
-    )
+    const resolved = resolvePermissionRecord(allRecords, orgId, orgType, roleKey)
+
+    const existing =
+      resolved?.organization_id === orgId && resolved?.is_template === (orgId == null)
+        ? resolved
+        : null
 
     let savedRecord
 
@@ -153,7 +158,7 @@ export default function PermissionsPage() {
         organization_id: orgId,
         org_type: orgType,
         role_key: roleKey,
-        is_template: false,
+        is_template: orgId == null,
         permissions: perms,
       })
     }
@@ -196,7 +201,15 @@ export default function PermissionsPage() {
       return
     }
 
-    const headers = ["role_key", "source", "organization_id", ...PERM_KEYS]
+    const importKeys = orgType === "staffing_agency" ? JOB_IMPORT_ACTIONS : []
+
+    const headers = [
+      "role_key",
+      "source",
+      "organization_id",
+      ...PERM_KEYS,
+      ...importKeys.map((action) => `job_imports.${action}`),
+    ]
 
     const rows = roleKeys.map((roleKey) => {
       const override = records.find(
@@ -204,7 +217,7 @@ export default function PermissionsPage() {
           record.organization_id === orgId && record.role_key === roleKey && !record.is_template,
       )
 
-      const template = records.find((record) => record.is_template && record.role_key === roleKey)
+      const template = resolvePermissionRecord(records, null, orgType, roleKey)
 
       const perms = matrix[roleKey] || emptyPerms()
 
@@ -213,6 +226,11 @@ export default function PermissionsPage() {
         override ? "organization" : template ? "template" : "none",
         override?.organization_id ?? "",
         ...PERM_KEYS.map((key) => (perms[key] ? "true" : "false")),
+        ...importKeys.map((action) =>
+          canConfigureJobImportAction(roleKey, action) && perms.resources?.job_imports?.[action]
+            ? "true"
+            : "false",
+        ),
       ]
     })
 
@@ -237,7 +255,16 @@ export default function PermissionsPage() {
   const stickyColClass = isRtl ? "sticky right-0" : "sticky left-0"
 
   const enabledPermissions = roleKeys.reduce(
-    (total, roleKey) => total + Object.values(matrix[roleKey] || {}).filter(Boolean).length,
+    (total, roleKey) =>
+      total +
+      PERM_KEYS.filter((key) => matrix[roleKey]?.[key]).length +
+      (orgType === "staffing_agency"
+        ? JOB_IMPORT_ACTIONS.filter(
+            (action) =>
+              matrix[roleKey]?.resources?.job_imports?.[action] &&
+              canConfigureJobImportAction(roleKey, action),
+          ).length
+        : 0),
     0,
   )
 
@@ -325,7 +352,11 @@ export default function PermissionsPage() {
             label={t("permissionsMatrix.title")}
             value={enabledPermissions}
             tone="blue"
-            meta={t("permissionsMatrix.footer")}
+            meta={t(
+              orgId == null
+                ? "permissionsMatrix.jobImports.templateScope"
+                : "permissionsMatrix.footer",
+            )}
           />
 
           <PlatformStatCard
@@ -463,7 +494,82 @@ export default function PermissionsPage() {
           </PlatformCard>
         )}
 
-        <p className="text-center text-xs text-slate-400">{t("permissionsMatrix.footer")}</p>
+        {!loading && !error && orgType === "staffing_agency" && (
+          <PlatformCard className="p-5">
+            <h2 className="text-lg font-bold text-slate-900">
+              {t("permissionsMatrix.jobImports.title")}
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">{t("permissionsMatrix.jobImports.hint")}</p>
+            <p className="mt-2 text-xs text-slate-600">
+              {t(
+                orgId == null
+                  ? "permissionsMatrix.jobImports.templateScope"
+                  : "permissionsMatrix.jobImports.tenantScope",
+              )}
+            </p>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              {roleKeys.map((roleKey) => (
+                <section key={roleKey} className="min-w-0 rounded-xl border border-slate-200 p-4">
+                  <h3 className="font-bold text-slate-900">{roleLabel(roleKey)}</h3>
+                  <div className="mt-3 space-y-2">
+                    {JOB_IMPORT_ACTIONS.map((action) => {
+                      const allowed = canConfigureJobImportAction(roleKey, action)
+
+                      const enabled =
+                        allowed && Boolean(matrix[roleKey]?.resources?.job_imports?.[action])
+
+                      return (
+                        <button
+                          key={action}
+                          type="button"
+                          disabled={!canEdit || saving || !allowed}
+                          aria-pressed={enabled}
+                          aria-label={`${roleLabel(roleKey)} — ${t(`permissionsMatrix.jobImports.actions.${action}`)}`}
+                          onClick={() => {
+                            setMatrix((previous) => ({
+                              ...previous,
+                              [roleKey]: {
+                                ...previous[roleKey],
+                                resources: {
+                                  ...previous[roleKey].resources,
+                                  job_imports: {
+                                    ...previous[roleKey].resources.job_imports,
+                                    [action]: !enabled,
+                                  },
+                                },
+                              },
+                            }))
+                            setDirty((previous) => ({ ...previous, [roleKey]: true }))
+                            setSaved(false)
+                          }}
+                          className={`flex w-full flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2 text-start text-sm disabled:cursor-not-allowed ${enabled ? "border-emerald-300 bg-emerald-50 text-emerald-900" : "border-slate-200 bg-slate-50 text-slate-700"}`}
+                        >
+                          <span>{t(`permissionsMatrix.jobImports.actions.${action}`)}</span>
+                          <span className="text-xs font-bold">
+                            {t(
+                              !allowed
+                                ? "permissionsMatrix.jobImports.roleRestricted"
+                                : enabled
+                                  ? "permissionsMatrix.jobImports.enabled"
+                                  : "permissionsMatrix.jobImports.disabled",
+                            )}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </section>
+              ))}
+            </div>
+          </PlatformCard>
+        )}
+        <p className="text-center text-xs text-slate-500">
+          {t(
+            orgId == null
+              ? "permissionsMatrix.jobImports.templateScope"
+              : "permissionsMatrix.footer",
+          )}
+        </p>
       </div>
     </PlatformPageShell>
   )

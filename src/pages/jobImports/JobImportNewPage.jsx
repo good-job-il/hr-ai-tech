@@ -25,8 +25,10 @@ import {
   previewReadiness,
   sourceNameFromUrl,
   summarizeImportRun,
+  vendorConnectorForUrl,
 } from "@/domain/jobImports/onboardingWizard"
 import { usePermissionMatrix } from "@/hooks/usePermissionMatrix"
+import { agencyClientLabel } from "@/domain/jobImports/qaFixes"
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -474,7 +476,15 @@ export default function JobImportNewPage() {
   const setField = (field) => (event) => {
     const value = event.target.value
 
-    setForm((current) => ({ ...current, [field]: value }))
+    const detected = field === "url" ? vendorConnectorForUrl(value) : null
+
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+      ...(detected && catalog.some((item) => item.type === detected)
+        ? { connector_type: detected }
+        : {}),
+    }))
     setError(null)
   }
 
@@ -510,7 +520,9 @@ export default function JobImportNewPage() {
       return
     }
 
-    if (!form.connector_type) {
+    const effectiveConnector = vendorConnectorForUrl(form.url) || form.connector_type
+
+    if (!effectiveConnector) {
       setError(t("jobImports.wizard.errors.connectorRequired"))
       setErrorCode("UNSUPPORTED_FORMAT")
 
@@ -524,12 +536,32 @@ export default function JobImportNewPage() {
       const payload = {
         name: form.name.trim() || sourceNameFromUrl(form.url),
         url: form.url.trim(),
-        connector_type: form.connector_type,
-        configuration: source?.configuration || {},
+        connector_type: effectiveConnector,
+        configuration:
+          source?.connector_type === effectiveConnector ? source?.configuration || {} : {},
       }
 
       if (sourceId) {
-        await persistProgress(2, payload)
+        const connectionChanged =
+          source?.connector_type !== effectiveConnector || source?.url !== payload.url
+
+        await persistProgress(
+          2,
+          payload,
+          connectionChanged
+            ? {
+                preview_run_id: null,
+                preview_completed_at: null,
+                discovery: null,
+              }
+            : {},
+        )
+        setForm((current) => ({ ...current, connector_type: effectiveConnector }))
+
+        if (connectionChanged) {
+          setPreviewRun(null)
+          setPreviewItems([])
+        }
 
         return
       }
@@ -686,8 +718,8 @@ export default function JobImportNewPage() {
         },
         {
           overwrite_policy: form.overwrite_policy,
-          preview_run_id: undefined,
-          preview_completed_at: undefined,
+          preview_run_id: null,
+          preview_completed_at: null,
         },
       )
       setPreviewRun(null)
@@ -1032,10 +1064,10 @@ function WizardStep(props) {
           hint={t("jobImports.wizard.source.connectorHint")}
         >
           <select
-            value={form.connector_type}
+            value={vendorConnectorForUrl(form.url) || form.connector_type}
             onChange={setField("connector_type")}
             className={inputClass}
-            disabled={catalogLoading}
+            disabled={catalogLoading || Boolean(vendorConnectorForUrl(form.url))}
           >
             <option value="">{t("jobImports.wizard.source.selectConnector")}</option>
             {catalog.map((connector) => (
@@ -1045,6 +1077,14 @@ function WizardStep(props) {
             ))}
           </select>
         </Field>
+        {vendorConnectorForUrl(form.url) &&
+          vendorConnectorForUrl(form.url) !== form.connector_type && (
+            <p role="status" className="rounded-xl bg-violet-50 p-4 text-sm text-violet-900">
+              {t("jobImports.wizard.source.detected", {
+                connector: t(`jobImports.connectors.${vendorConnectorForUrl(form.url)}`),
+              })}
+            </p>
+          )}
         {selectedConnector && (
           <div className="rounded-xl bg-slate-50 p-4">
             <p className="text-sm font-bold text-slate-800">
@@ -1056,6 +1096,14 @@ function WizardStep(props) {
               ))}
             </div>
           </div>
+        )}
+        {form.connector_type === "comeet" && (
+          <p
+            role="note"
+            className="rounded-xl border border-violet-200 bg-violet-50 p-4 text-sm text-violet-900"
+          >
+            {t("jobImports.wizard.source.comeetHint")}
+          </p>
         )}
       </div>
     )
@@ -1078,7 +1126,7 @@ function WizardStep(props) {
             <option value="">{t("jobImports.wizard.client.select")}</option>
             {clients.map((client) => (
               <option key={client.id} value={client.company_id}>
-                {client.company?.name || `#${client.company_id}`}
+                {agencyClientLabel(client, `#${client.company_id}`)}
               </option>
             ))}
           </select>
@@ -1159,6 +1207,11 @@ function WizardStep(props) {
   if (step === 4) {
     return (
       <div className="space-y-5">
+        {busy && (
+          <p role="status" aria-live="polite" className="text-sm text-slate-700">
+            {t("jobImports.wizard.sample.scanning")}
+          </p>
+        )}
         {!previewRun && (
           <div className="rounded-xl bg-violet-50 p-5 text-center">
             <Play className="mx-auto h-8 w-8 text-violet-600" />
@@ -1182,6 +1235,38 @@ function WizardStep(props) {
         )}
         {previewRun && (
           <>
+            {["failed", "dead_letter", "cancelled"].includes(previewRun.status) && (
+              <div
+                role="alert"
+                className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-950"
+              >
+                <p className="font-bold">{t("jobImports.wizard.sample.failed")}</p>
+                <p className="mt-2 text-sm">
+                  {localizedImportError(previewRun.error, t, t("jobImports.common.loadErrorHint"))}
+                </p>
+                <p className="mt-1 text-sm">
+                  {t(
+                    `jobImports.wizard.errorActions.${importErrorAction(importErrorCode(previewRun.error))}`,
+                  )}
+                </p>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={executePreview}
+                  className="mt-3 rounded-lg bg-violet-700 px-4 py-2 font-bold text-white disabled:opacity-50"
+                >
+                  {t("jobImports.wizard.sample.retry")}
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => setStep(1)}
+                  className="ms-2 mt-3 rounded-lg border border-amber-400 px-4 py-2 font-bold disabled:opacity-50"
+                >
+                  {t("jobImports.wizard.sample.fixConnection")}
+                </button>
+              </div>
+            )}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-black text-slate-900">
@@ -1441,10 +1526,20 @@ function WizardStep(props) {
               className={inputClass}
             >
               <option value="0">{t("jobImports.wizard.mapping.manual")}</option>
-              <option value="6">6h</option>
-              <option value="12">12h</option>
-              <option value="24">24h</option>
-              <option value="168">7d</option>
+              {[6, 12, 24].map((hours) => (
+                <option key={hours} value={hours}>
+                  {t("jobImports.wizard.mapping.scheduleHours", {
+                    count: hours,
+                    value: formatImportNumber(hours, i18n.language),
+                  })}
+                </option>
+              ))}
+              <option value="168">
+                {t("jobImports.wizard.mapping.scheduleDays", {
+                  count: 7,
+                  value: formatImportNumber(7, i18n.language),
+                })}
+              </option>
             </select>
           </Field>
           <Field label={t("jobImports.wizard.mapping.publishPolicy")}>
@@ -1490,6 +1585,11 @@ function WizardStep(props) {
   if (step === 6) {
     return (
       <div className="space-y-5">
+        {busy && (
+          <p role="status" aria-live="polite" className="text-sm text-slate-700">
+            {t("jobImports.wizard.sample.scanning")}
+          </p>
+        )}
         {!previewRun && (
           <div className="rounded-xl border border-violet-200 bg-violet-50 p-5 text-center">
             <p className="font-black text-slate-900">{t("jobImports.wizard.dryRun.title")}</p>
@@ -1513,7 +1613,7 @@ function WizardStep(props) {
               {["create", "update", "close", "reopen", "skip", "review"].map((action) => (
                 <div key={action} className="rounded-xl bg-slate-50 p-3 text-center">
                   <p className="text-xs font-bold uppercase text-slate-500">
-                    {t(`jobImports.run.actions.${action}`)}
+                    {t(`jobImports.statuses.${action}`)}
                   </p>
                   <p className="mt-1 text-xl font-black text-slate-900">
                     {formatImportNumber(previewRun[`${action}_count`] || 0, i18n.language)}
@@ -1564,7 +1664,8 @@ function WizardStep(props) {
       <label className="flex items-start gap-3 rounded-xl border border-slate-200 p-4">
         <input
           type="checkbox"
-          checked={activateSchedule}
+          checked={Number(form.interval_hours) > 0 && activateSchedule}
+          disabled={Number(form.interval_hours) <= 0}
           onChange={(event) => setActivateSchedule(event.target.checked)}
           className="mt-1 h-4 w-4"
         />
@@ -1573,7 +1674,11 @@ function WizardStep(props) {
             {t("jobImports.wizard.confirmation.activate")}
           </span>
           <span className="mt-1 block text-xs text-slate-500">
-            {t("jobImports.wizard.confirmation.activateHint", { hours: form.interval_hours })}
+            {Number(form.interval_hours) > 0
+              ? t("jobImports.wizard.confirmation.activateHint", {
+                  hours: formatImportNumber(form.interval_hours, i18n.language),
+                })
+              : t("jobImports.wizard.confirmation.manualSchedule")}
           </span>
         </span>
       </label>
